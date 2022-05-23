@@ -19,28 +19,36 @@
   BASE_NAME                      = AnalogixDpLib
   FILE_GUID                      = 10142bcc-7b5c-11ec-b45f-f42a7dcb925d
   MODULE_TYPE                    = BASE
-  VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = DRMLib
+  VERSION_STRING                 = 1.0
 
 [Sources.common]
   AnalogixDpLib.c
   AnalogixDpReg.c
-  PhyRockchipSamsungHdptx.c  
+  PhyRockchipSamsungHdptx.c
 
 [LibraryClasses]
+  TimerLib
   DebugLib
   IoLib
+  BaseLib
   RockchipDisplayLib
+  MemoryAllocationLib
   PWMLib
-  TimerLib
+  RockchipPlatformLib
+  UefiLib
 
 [Packages]
   EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   Silicon/Rockchip/RockchipPkg.dec
+  Silicon/Rockchip/RK3588/RK3588.dec
+  Platform/Rockchip/RK3588/RK3588.dec
 
 [BuildOptions]
 
 [Pcd]
-
+  gRockchipTokenSpaceGuid.PcdLcdPixelFormat
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution
