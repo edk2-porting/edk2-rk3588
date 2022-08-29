@@ -18,9 +18,9 @@
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = AnalogixDpLib
   FILE_GUID                      = 10142bcc-7b5c-11ec-b45f-f42a7dcb925d
-  MODULE_TYPE                    = BASE
-  LIBRARY_CLASS                  = DRMLib
+  MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = AnalogixDpInitDp
 
 [Sources.common]
   AnalogixDpLib.c
@@ -37,6 +37,7 @@
   PWMLib
   RockchipPlatformLib
   UefiLib
+  UefiDriverEntryPoint
 
 [Packages]
   EmbeddedPkg/EmbeddedPkg.dec
@@ -53,3 +54,10 @@
   gRockchipTokenSpaceGuid.PcdEdpId
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution
+
+[Protocols]
+  gRockchipConnectorProtocolGuid
+
+[Depex]
+  TRUE
+

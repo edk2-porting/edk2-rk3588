@@ -21,8 +21,6 @@
 
 #include "LcdGraphicsOutputDxe.h"
 
-//to delete
-#include <Library/AnalogixDpLib.h>
 
 //
 // Global variables
@@ -279,8 +277,6 @@ InitializeDisplay (
       ConnectorState = &StateInterate->ConnectorState;
       Mode = &StateInterate->ConnectorState.DisplayMode;
 
-      //to delete
-      AnalogixDpConnectorInit (StateInterate);
       if (Connector && Connector->Init)
         Status = Connector->Init(Connector, StateInterate);
 
@@ -356,9 +352,6 @@ DisplayPreInit (
       CONNECTOR_STATE *ConnectorState = &StateInterate->ConnectorState;
       Crtc = (ROCKCHIP_CRTC_PROTOCOL*)StateInterate->CrtcState.Crtc;
       Connector = (ROCKCHIP_CONNECTOR_PROTOCOL *)StateInterate->ConnectorState.Connector;
-
-      //to delete
-      AnalogixDpConnectorPreInit(StateInterate);
 
       if (Connector && Connector->Preinit)
         Status = Connector->Preinit(Connector, StateInterate);
@@ -438,8 +431,7 @@ LcdGraphicsOutputDxeInitialize (
                                   (VOID **) &DisplayState->ConnectorState.Connector);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "Can not locate the RockchipConnectorProtocol. Exit Status=%r\n", Status));
-      //to delete
-      //return EFI_INVALID_PARAMETER;
+      return EFI_INVALID_PARAMETER;
     }
 
     DisplayState->ConnectorState.OverScan.LeftMargin = mDefaultOverScanParas.LeftMargin;
@@ -600,8 +592,6 @@ LcdGraphicsSetMode (
   DISPLAY_STATE                   *StateInterate;
   ROCKCHIP_CRTC_PROTOCOL          *Crtc;
   ROCKCHIP_CONNECTOR_PROTOCOL     *Connector;
-  //to delete
-  struct AnalogixDpDevice *Dp;
 
   Instance = LCD_INSTANCE_FROM_GOP_THIS (This);
 
@@ -638,25 +628,6 @@ LcdGraphicsSetMode (
                                  *Instance->ModeInfo.PixelsPerScanLine
                                  *GetBytesPerPixel (Bpp);
 
-  LIST_FOR_EACH_ENTRY(StateInterate, &mDisplayStateList, ListHead) {
-    if (StateInterate->ModeNumber == ModeNumber && StateInterate->IsEnable) {
-      Crtc = (ROCKCHIP_CRTC_PROTOCOL*)StateInterate->CrtcState.Crtc;
-      Connector = (ROCKCHIP_CONNECTOR_PROTOCOL *)StateInterate->ConnectorState.Connector;
-
-      if (Crtc && Crtc->SetPlane)
-        Crtc->SetPlane (Crtc, StateInterate);
-
-      if (Crtc && Crtc->Enable)
-        Crtc->Enable (Crtc, StateInterate);
-
-      if (Connector && Connector->Enable)
-        Connector->Enable (Connector, StateInterate);
-
-      //to delete
-      Dp = AllocatePool(sizeof(*Dp));
-      AnalogixDpConnectorEnable(StateInterate, Dp);
-    }
-  }
 
   // The UEFI spec requires that we now clear the visible portions of the
   // output display to black.
@@ -677,6 +648,22 @@ LcdGraphicsSetMode (
       This->Mode->Info->VerticalResolution,
       0
       );
+
+  LIST_FOR_EACH_ENTRY(StateInterate, &mDisplayStateList, ListHead) {
+    if (StateInterate->ModeNumber == ModeNumber && StateInterate->IsEnable) {
+      Crtc = (ROCKCHIP_CRTC_PROTOCOL*)StateInterate->CrtcState.Crtc;
+      Connector = (ROCKCHIP_CONNECTOR_PROTOCOL *)StateInterate->ConnectorState.Connector;
+
+      if (Crtc && Crtc->SetPlane)
+        Crtc->SetPlane (Crtc, StateInterate);
+
+      if (Crtc && Crtc->Enable)
+        Crtc->Enable (Crtc, StateInterate);
+
+      if (Connector && Connector->Enable)
+        Connector->Enable (Connector, StateInterate);
+    }
+  }
 
 EXIT:
   return Status;

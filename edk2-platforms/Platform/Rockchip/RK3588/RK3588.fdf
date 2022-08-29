@@ -161,6 +161,7 @@ READ_LOCK_STATUS   = TRUE
   #
 !ifdef $(ROCKCHIP_VOPEN)
   INF Silicon/Rockchip/Drivers/Vop2Dxe/Vop2Dxe.inf
+  INF Silicon/Rockchip/Library/DisplayLib/AnalogixDpLib.inf
   INF Silicon/Rockchip/Drivers/LcdGraphicsOutputDxe/LcdGraphicsOutputDxe.inf
   INF Platform/Rockchip/RK3588/LogoDxe/LogoDxe.inf
   INF Platform/Rockchip/RK3588/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf

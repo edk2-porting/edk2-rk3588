@@ -201,26 +201,6 @@ AnalogixDpGetPllLockStatus (
 }
 
 VOID
-AnalogixDpInitDp (
-  OUT struct AnalogixDpDevice *Dp
-  )
-{
-//TODO
-  EnableBacklight(TRUE);
-  EnablePWM(TRUE);
-  AnalogixDpReset(Dp);
-  AnalogixDpSwreset(Dp);
-  AnalogixDpInitAnalogParam(Dp);
-  AnalogixDpInitInterrupt(Dp);
-  /* SW defined function Normal operation */
-  AnalogixDpEnableSwFunction(Dp);
-  AnalogixDpConfigInterrupt(Dp);
-  AnalogixDpInitAnalogFunc(Dp);
-  AnalogixDpInitHpd(Dp);
-  AnalogixDpInitAux(Dp);
-}
-
-VOID
 AnalogixDpEnableRxToEnhancedMode (
   OUT struct AnalogixDpDevice *Dp,
   BOOLEAN Enable
@@ -746,8 +726,8 @@ AnalogixDpProcessClockRecovery (
           AdjustRequest, Lane);
       PreEmphasis = AnalogixDpGetAdjustRequestPreEmphasis(
           AdjustRequest, Lane);
- 
-    if (DPCD_VOLTAGE_SWING_GET(TrainingLane) ==
+
+      if (DPCD_VOLTAGE_SWING_GET(TrainingLane) ==
           VoltageSwing &&
         DPCD_PRE_EMPHASIS_GET(TrainingLane) ==
           PreEmphasis)
@@ -1103,18 +1083,19 @@ AnalogixDpConfigVideo (
 
     NanoSecondDelay(1001000);
   }
- 
+
   return 0;
 }
 
-INT32
+EFI_STATUS
 AnalogixDpConnectorPreInit (
+  OUT ROCKCHIP_CONNECTOR_PROTOCOL          *This,
   OUT DISPLAY_STATE                        *DisplayState
   )
 {
   CONNECTOR_STATE *ConnectorState = &DisplayState->ConnectorState;
-  OUT struct RockchipHdptxPhy Hdptx;
-  OUT struct AnalogixDpDevice *Dp;
+  struct RockchipHdptxPhy Hdptx;
+  struct AnalogixDpDevice *Dp;
   Dp = AllocateZeroPool(sizeof (*Dp));
 
   ConnectorState->Type = DRM_MODE_CONNECTOR_eDP;
@@ -1134,7 +1115,18 @@ AnalogixDpConnectorPreInit (
 
   RockchipHdptxPhyInit(&Hdptx);
   MicroSecondDelay (10);
-  AnalogixDpInitDp(Dp);
+  EnableBacklight(TRUE);
+  EnablePWM(TRUE);
+  AnalogixDpReset(Dp);
+  AnalogixDpSwreset(Dp);
+  AnalogixDpInitAnalogParam(Dp);
+  AnalogixDpInitInterrupt(Dp);
+  /* SW defined function Normal operation */
+  AnalogixDpEnableSwFunction(Dp);
+  AnalogixDpConfigInterrupt(Dp);
+  AnalogixDpInitAnalogFunc(Dp);
+  AnalogixDpInitHpd(Dp);
+  AnalogixDpInitAux(Dp);
 
   return 0;
 };
@@ -1166,8 +1158,9 @@ AnalogixDpLinkPowerUp (
   return 0;
 };
 
-INT32
+EFI_STATUS
 AnalogixDpConnectorInit (
+  OUT ROCKCHIP_CONNECTOR_PROTOCOL          *This,
   OUT DISPLAY_STATE                        *DisplayState
   )
 {
@@ -1179,8 +1172,9 @@ AnalogixDpConnectorInit (
   return 0;
 };
 
-INT32
+EFI_STATUS
 AnalogixDpConnectorGetEdid (
+  OUT ROCKCHIP_CONNECTOR_PROTOCOL          *This,
   OUT DISPLAY_STATE                        *DisplayState
   )
 {
@@ -1188,13 +1182,15 @@ AnalogixDpConnectorGetEdid (
   return 0;
 };
 
-INT32
+EFI_STATUS
 AnalogixDpConnectorEnable (
-  OUT DISPLAY_STATE                       *DisplayState,
-  OUT struct AnalogixDpDevice             *Dp
+  OUT ROCKCHIP_CONNECTOR_PROTOCOL          *This,
+  OUT DISPLAY_STATE                       *DisplayState
   )
 {
   CONNECTOR_STATE *ConnectorState = &DisplayState->ConnectorState;
+  struct AnalogixDpDevice *Dp;
+  Dp = AllocatePool(sizeof (*Dp));
   struct VideoInfo *Video = &Dp->VideoInfo;
   UINTN Ret;
 
@@ -1216,8 +1212,8 @@ AnalogixDpConnectorEnable (
     break;
   }
 
-  Dp->VideoInfo.MaxLinkRate = DP_LINK_BW_5_4; 
-  Dp->VideoInfo.MaxLaneCount = LANE_COUNT4; 	
+  Dp->VideoInfo.MaxLinkRate = DP_LINK_BW_5_4;
+  Dp->VideoInfo.MaxLaneCount = LANE_COUNT4;
   Dp->LinkTrain.SSC = TRUE;
   Dp->Id = PcdGet32(PcdEdpId);
 
@@ -1257,8 +1253,9 @@ AnalogixDpConnectorEnable (
   return 0;
 };
 
-INT32
+EFI_STATUS
 AnalogixDpConnectorDisable (
+  OUT ROCKCHIP_CONNECTOR_PROTOCOL          *This,
   OUT DISPLAY_STATE                        *DisplayState
   )
 {
@@ -1266,11 +1263,49 @@ AnalogixDpConnectorDisable (
   return 0;
 };
 
-INT32
+EFI_STATUS
 AnalogixDpConnectorDetect (
+  OUT ROCKCHIP_CONNECTOR_PROTOCOL          *This,
   OUT DISPLAY_STATE                        *DisplayState
   )
 {
   //Todo
   return 0;
 };
+
+ROCKCHIP_CONNECTOR_PROTOCOL mDp = {
+  NULL,
+  AnalogixDpConnectorPreInit,
+  AnalogixDpConnectorInit,
+  NULL,
+  AnalogixDpConnectorDetect,
+  NULL,
+  AnalogixDpConnectorGetEdid,
+  NULL,
+  AnalogixDpConnectorEnable,
+  AnalogixDpConnectorDisable,
+  NULL
+};
+
+EFI_STATUS
+EFIAPI
+AnalogixDpInitDp (
+  IN EFI_HANDLE             ImageHandle,
+  IN EFI_SYSTEM_TABLE       *SystemTable
+  )
+{
+  EFI_STATUS    Status;
+  EFI_HANDLE    Handle;
+
+  Handle = NULL;
+
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  &Handle,
+                  &gRockchipConnectorProtocolGuid,
+                  &mDp,
+                  NULL
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  return EFI_SUCCESS;
+}

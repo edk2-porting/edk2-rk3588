@@ -41,8 +41,6 @@
   UefiDriverEntryPoint
   UefiLib
   RockchipDisplayLib
-  //to delete
-  AnalogixDpLib
 
 [Protocols]
   gEfiCpuArchProtocolGuid

@@ -994,34 +994,39 @@ DumpHdptxPhyRegisters (
   OUT struct AnalogixDpDevice *Dp
   );
 
-INT32
+EFI_STATUS
 AnalogixDpConnectorPreInit (
+  OUT ROCKCHIP_CONNECTOR_PROTOCOL          *This,
   OUT DISPLAY_STATE                        *DisplayState
   );
 
-INT32
+EFI_STATUS
 AnalogixDpConnectorInit (
+  OUT ROCKCHIP_CONNECTOR_PROTOCOL          *This,
   OUT DISPLAY_STATE                        *DisplayState
   );
 
-INT32
+EFI_STATUS
 AnalogixDpConnectorGetEdid (
+  OUT ROCKCHIP_CONNECTOR_PROTOCOL          *This,
   OUT DISPLAY_STATE                        *DisplayState
   );
 
-INT32
+EFI_STATUS
 AnalogixDpConnectorEnable (
-  OUT DISPLAY_STATE                        *DisplayState,
-  OUT struct AnalogixDpDevice              *Dp
-  );
-
-INT32
-AnalogixDpConnectorDisable (
+  OUT ROCKCHIP_CONNECTOR_PROTOCOL          *This,
   OUT DISPLAY_STATE                        *DisplayState
   );
 
-INT32
+EFI_STATUS
+AnalogixDpConnectorDisable (
+  OUT ROCKCHIP_CONNECTOR_PROTOCOL          *This,
+  OUT DISPLAY_STATE                        *DisplayState
+  );
+
+EFI_STATUS
 AnalogixDpConnectorDetect (
+  OUT ROCKCHIP_CONNECTOR_PROTOCOL          *This,
   OUT DISPLAY_STATE                        *DisplayState
   );
 #endif

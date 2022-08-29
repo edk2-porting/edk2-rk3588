@@ -84,8 +84,6 @@
   AndroidBootImgLib|edk2/EmbeddedPkg/Library/AndroidBootImgLib/AndroidBootImgLib.inf
 
   RockchipDisplayLib|Silicon/Rockchip/Library/DisplayLib/RockchipDisplayLib.inf
-  # to delete
-  AnalogixDpLib|Silicon/Rockchip/Library/DisplayLib/AnalogixDpLib.inf
 
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
   LockBoxLib|MdeModulePkg/Library/LockBoxNullLib/LockBoxNullLib.inf
@@ -358,6 +356,7 @@
   MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
 
   Silicon/Rockchip/Drivers/Vop2Dxe/Vop2Dxe.inf
+  Silicon/Rockchip/Library/DisplayLib/AnalogixDpLib.inf
   Silicon/Rockchip/Drivers/LcdGraphicsOutputDxe/LcdGraphicsOutputDxe.inf
 
   Platform/Rockchip/RK3588/LogoDxe/LogoDxe.inf
