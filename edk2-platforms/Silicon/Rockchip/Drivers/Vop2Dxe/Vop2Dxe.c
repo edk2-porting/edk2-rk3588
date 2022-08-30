@@ -875,10 +875,10 @@ STATIC
 UINT64
 Vop2CalcCruConfig (
   IN  DISPLAY_STATE                        *DisplayState,
-  OUT UINT32*                              DclkCoreDiv,
-  OUT UINT32*                              DclkOutDiv,
-  OUT UINT32*                              IfPixclkDiv,
-  OUT UINT32*                              IfDclkDiv
+  OUT UINT32                               *DclkCoreDiv,
+  OUT UINT32                               *DclkOutDiv,
+  OUT UINT32                               *IfPixclkDiv,
+  OUT UINT32                               *IfDclkDiv
   )
 {
   CONNECTOR_STATE *ConnectorState = &DisplayState->ConnectorState;
@@ -894,25 +894,43 @@ Vop2CalcCruConfig (
   INT32 OutputMode = ConnectorState->OutputMode;
   UINT8 K = 1;
 
+  if (ConnectorState->OutputFlags & ROCKCHIP_OUTPUT_DUAL_CHANNEL_LEFT_RIGHT_MODE &&
+      OutputMode == ROCKCHIP_OUT_MODE_YUV420) {
+    DEBUG ((DEBUG_ERROR, "Dual channel and YUV420 can't work together\n"));
+    return -RETURN_INVALID_PARAMETER;
+  }
+
+  if (ConnectorState->OutputFlags & ROCKCHIP_OUTPUT_DUAL_CHANNEL_LEFT_RIGHT_MODE ||
+      OutputMode == ROCKCHIP_OUT_MODE_YUV420)
+    K = 2;
+
   if (OutputType == DRM_MODE_CONNECTOR_HDMIA) {
     /*
      * K = 2: dclk_core = if_pixclk_rate > if_dclk_rate
      * K = 1: dclk_core = hdmie_edp_dclk > if_pixclk_rate
      */
-    if (OutputMode == ROCKCHIP_OUT_MODE_YUV420)
+    if (ConnectorState->OutputFlags & ROCKCHIP_OUTPUT_DUAL_CHANNEL_LEFT_RIGHT_MODE ||
+        OutputMode == ROCKCHIP_OUT_MODE_YUV420) {
+      DclkRate = DclkRate >> 1;
       K = 2;
-    //if (ConnectorState->DSCEnable)
+    }
+
     IfPixclkRate = (DclkCoreRate << 1) / K;
     IfDclkRate = DclkCoreRate / K;
 
-    DclkRate = Vop2CalcDclk (IfPixclkRate, Vop2->Data->VpData->MaxDclk);
+    if (VPixclk > VOP2_MAX_DCLK_RATE)
+      DclkRate = Vop2CalcDclk (DclkCoreRate, Vop2->Data->VpData->MaxDclk);
+
     if (!DclkRate) {
-      DEBUG ((DEBUG_ERROR, "DP if_pixclk_rate out of range(max_dclk: %d KHZ, dclk_core: %lld KHZ)\n",
+      DEBUG ((DEBUG_ERROR, "DP IfPixclkRate out of range(MaxDclk: %d KHZ, DclkCore: %lld KHZ)\n",
                            Vop2->Data->VpData->MaxDclk, IfPixclkRate));
       return -RETURN_INVALID_PARAMETER;
     }
     *IfPixclkDiv = DclkRate / IfPixclkRate;
     *IfDclkDiv = DclkRate / IfDclkRate;
+    *DclkCoreDiv = DclkRate / DclkCoreRate;
+    DEBUG ((DEBUG_INFO, "DclkRate:%lu,IfPixclkDiv;%d,IfDclkDiv:%d\n",
+                        DclkRate, *IfPixclkDiv, *IfDclkDiv));
   } else if (OutputType == DRM_MODE_CONNECTOR_eDP) {
     /* edp_pixclk = edp_dclk > dclk_core */
     IfPixclkRate = VPixclk / K;
@@ -921,9 +939,6 @@ Vop2CalcCruConfig (
     *DclkCoreDiv = DclkRate / DclkCoreRate;
     *IfPixclkDiv = DclkRate / IfPixclkRate;
     *IfDclkDiv = *IfPixclkDiv;
-  } else if (OutputType == DRM_MODE_CONNECTOR_DPI) {
-    DclkRate = VPixclk;
-    *DclkCoreDiv = DclkRate / DclkCoreRate;
   }
 
   *IfPixclkDiv = LogCalculate(*IfPixclkDiv);
@@ -948,6 +963,7 @@ Vop2IfConfig (
 {
   CRTC_STATE *CrtcState = &DisplayState->CrtcState;
   CONNECTOR_STATE *ConnectorState = &DisplayState->ConnectorState;
+  DRM_DISPLAY_MODE *DisplayMode = &ConnectorState->DisplayMode;
   UINT32 VPOffset = CrtcState->CrtcID * 0x100;
   UINT32 OutputIf = ConnectorState->OutputInterface;
   UINT32 DclkCoreDiv = 0;
@@ -955,6 +971,15 @@ Vop2IfConfig (
   UINT32 IfPixclkDiv = 0;
   UINT32 IfDclkDiv = 0;
   UINT32 DclkRate;
+  UINT32 Val;
+
+  if (OutputIf & (VOP_OUTPUT_IF_HDMI0 | VOP_OUTPUT_IF_HDMI1)) {
+    Val = (DisplayMode->Flags & DRM_MODE_FLAG_NHSYNC) ? BIT(HSYNC_POSITIVE) : 0;
+    Val |= (DisplayMode->Flags & DRM_MODE_FLAG_NVSYNC) ? BIT(VSYNC_POSITIVE) : 0;
+  } else {
+    Val = (DisplayMode->Flags & DRM_MODE_FLAG_NHSYNC) ? 0 : BIT(HSYNC_POSITIVE);
+    Val |= (DisplayMode->Flags & DRM_MODE_FLAG_NVSYNC) ? 0 : BIT(VSYNC_POSITIVE);
+  }
 
   DclkRate = Vop2CalcCruConfig(DisplayState, &DclkCoreDiv, &DclkOutDiv, &IfPixclkDiv, &IfDclkDiv);
 
@@ -985,13 +1010,40 @@ Vop2IfConfig (
                   RK3588_GRF_EDP1_ENABLE_SHIFT, 1);
   }
 
-  /* temp eDP0 fixed vp2 */
+  if (OutputIf & VOP_OUTPUT_IF_HDMI0) {
+    Vop2MaskWrite (Vop2->BaseAddress, RK3568_DSP_IF_EN, EN_MASK,
+                   RK3588_HDMI0_EN_SHIFT, 1, FALSE);
+    Vop2MaskWrite (Vop2->BaseAddress, RK3568_DSP_IF_EN, IF_MUX_MASK,
+                   RK3588_HDMI_EDP0_MUX_SHIFT, CrtcState->CrtcID, FALSE);
+    Vop2MaskWrite (Vop2->BaseAddress, RK3568_DSP_IF_CTRL, 0x3,
+                   HDMI_EDP0_DCLK_DIV_SHIFT, IfDclkDiv, FALSE);
+    Vop2MaskWrite (Vop2->BaseAddress, RK3568_DSP_IF_CTRL, 0x3,
+                   HDMI_EDP0_PIXCLK_DIV_SHIFT, IfPixclkDiv, FALSE);
+    Vop2GrfWrite (RK3588_VOP_GRF_BASE, RK3588_GRF_VOP_CON2, EN_MASK,
+                  RK3588_GRF_HDMITX0_ENABLE_SHIFT, 1);
+    Vop2GrfWrite (RK3588_VO1_GRF_BASE, RK3588_GRF_VO1_CON0, HDMI_SYNC_POL_MASK,
+                  HDMI0_SYNC_POL_SHIFT, Val);
+  }
+
+  if (OutputIf & VOP_OUTPUT_IF_HDMI1) {
+    Vop2MaskWrite (Vop2->BaseAddress, RK3568_DSP_IF_EN, EN_MASK,
+                   RK3588_HDMI1_EN_SHIFT, 1, FALSE);
+    Vop2MaskWrite (Vop2->BaseAddress, RK3568_DSP_IF_EN, IF_MUX_MASK,
+                   RK3588_HDMI_EDP1_MUX_SHIFT, CrtcState->CrtcID, FALSE);
+    Vop2MaskWrite (Vop2->BaseAddress, RK3568_DSP_IF_CTRL, 0x3,
+                   HDMI_EDP1_DCLK_DIV_SHIFT, IfDclkDiv, FALSE);
+    Vop2MaskWrite (Vop2->BaseAddress, RK3568_DSP_IF_CTRL, 0x3,
+                   HDMI_EDP1_PIXCLK_DIV_SHIFT, IfPixclkDiv, FALSE);
+    Vop2GrfWrite (RK3588_VOP_GRF_BASE, RK3588_GRF_VOP_CON2, EN_MASK,
+                  RK3588_GRF_HDMITX1_ENABLE_SHIFT, 1);
+    Vop2GrfWrite (RK3588_VO1_GRF_BASE, RK3588_GRF_VO1_CON0, HDMI_SYNC_POL_MASK,
+                  HDMI1_SYNC_POL_SHIFT, Val);
+  }
+
   Vop2MaskWrite (Vop2->BaseAddress, RK3588_VP0_CLK_CTRL + VPOffset, 0x3,
                 DCLK_CORE_DIV_SHIFT, DclkCoreDiv, FALSE);
   Vop2MaskWrite (Vop2->BaseAddress, RK3588_VP0_CLK_CTRL + VPOffset, 0x3,
                 DCLK_OUT_DIV_SHIFT, DclkOutDiv, FALSE);
-
-  MmioWrite32(0xfdd90e0c, 0xe);
 
   return DclkRate;
 }
@@ -1545,7 +1597,6 @@ Vop2Init (
   else
     Val = 0;
 
-  /* RK3568_VP0_DSP_BG can't be changed --- todo now */
   Vop2Writel (Vop2->BaseAddress, RK3568_VP0_DSP_BG + VPOffset, 0);
 
   Vop2MaskWrite (Vop2->BaseAddress, RK3568_VP0_DSP_CTRL + VPOffset, EN_MASK,
