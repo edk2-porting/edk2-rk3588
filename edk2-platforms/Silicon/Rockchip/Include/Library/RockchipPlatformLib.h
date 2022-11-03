@@ -90,6 +90,10 @@ Usb2PhyResume (void);
 
 void
 EFIAPI
+Dwc3Force20ClkFor30Clk (UINT32 Address, BOOLEAN enable);
+
+void
+EFIAPI
 Pcie30IoInit(void);
 
 void

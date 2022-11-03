@@ -16,6 +16,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/Usb2HostController.h>
 #include <Guid/EventGroup.h>
 
+#include <Library/RockchipPlatformLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/UefiDriverEntryPoint.h>

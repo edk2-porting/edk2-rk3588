@@ -227,6 +227,23 @@ UdPhyU3PortDisable (void)
 
 void
 EFIAPI
+Dwc3Force20ClkFor30Clk (UINT32 Address, BOOLEAN enable)
+{
+  UINT32 Reg;
+
+  if (enable) {
+    Reg = MmioRead32(Address);
+    Reg |= (1 << 26);
+    MmioWrite32((Address), Reg);
+  } else {
+    Reg = MmioRead32(Address);
+    Reg &= ~(1 << 26);
+    MmioWrite32(Address, Reg);
+  }
+}
+
+void
+EFIAPI
 Pcie30IoInit(void)
 {
     /* Set reset and power IO to gpio output mode */

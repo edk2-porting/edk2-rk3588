@@ -74,20 +74,6 @@ Dwc3SetUsb2PhyCfg (
   MmioWrite32 ((UINTN)&Dwc3Reg->GUsb2PhyCfg, Reg);
 }
 
-STATIC
-VOID
-Dwc3SetGuctl1 (
-  IN  DWC3   *Dwc3Reg
-  )
-{
-  UINT32     Reg;
-
-  Reg = MmioRead32 ((UINTN)&Dwc3Reg->Res2);
-  Reg &= ~(1 << 26);
-  Reg |= 1 << 26;
-  MmioWrite32 ((UINTN)&Dwc3Reg->Res2, Reg);
-}
-
 /**
   This function issues phy reset and core soft reset
 
@@ -209,7 +195,7 @@ XhciCoreInit (
 
   Dwc3SetUsb2PhyCfg(Dwc3Reg);
 
-  Dwc3SetGuctl1(Dwc3Reg);
+  Dwc3Force20ClkFor30Clk((UINTN)&Dwc3Reg->Res2, TRUE);
 
   return Status;
 }

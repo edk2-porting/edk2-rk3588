@@ -1747,6 +1747,8 @@ XhcExitBootService (
 
   Xhc = (USB_XHCI_INSTANCE*) Context;
 
+  Dwc3Force20ClkFor30Clk(Xhc->UsbHcBaseAddress + 0xc11c, FALSE);
+
   //
   // Stop AsyncRequest Polling timer then stop the XHCI driver
   // and uninstall the XHCI protocl.
