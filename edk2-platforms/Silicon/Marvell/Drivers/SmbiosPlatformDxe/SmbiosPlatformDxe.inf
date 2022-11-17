@@ -1,0 +1,50 @@
+#/** @file
+#  SMBIOS Table for ARM platform
+#
+#  Copyright (c) 2013, Linaro Ltd. All rights reserved.<BR>
+#  Copyright (c) 2019, Marvell International Ltd. and its affiliates
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = SmbiosPlatformDxe
+  FILE_GUID                      = 1c5028a4-3bd0-43cf-9e56-b450584dc22b
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = SmbiosPlatformDriverEntryPoint
+
+[Sources]
+  SmbiosPlatformDxe.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/Marvell/Marvell.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  HobLib
+  PcdLib
+  SampleAtResetLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[FixedPcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareRevision
+  gMarvellTokenSpaceGuid.PcdProductManufacturer
+  gMarvellTokenSpaceGuid.PcdProductPlatformName
+  gMarvellTokenSpaceGuid.PcdProductSerial
+  gMarvellTokenSpaceGuid.PcdProductVersion
+  gMarvellTokenSpaceGuid.PcdFirmwareVendor
+  gMarvellTokenSpaceGuid.PcdFirmwareVersion
+
+[Protocols]
+  gEfiSmbiosProtocolGuid                      # PROTOCOL ALWAYS_CONSUMED
+
+[Depex]
+  gEfiSmbiosProtocolGuid

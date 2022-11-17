@@ -1,0 +1,25 @@
+## @file  U540.dec
+# This Package provides SiFive U540 modules and libraries.
+#
+# Copyright (c) 2019, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x0001001b
+  PACKAGE_NAME                   = U540
+  PACKAGE_UNI_FILE               = U540.uni
+  PACKAGE_GUID                   = B6569821-3FC0-4FE8-B98A-67CE1517C747
+  PACKAGE_VERSION                = 1.0
+
+[Includes]
+
+[LibraryClasses]
+
+[Guids]
+  gUefiRiscVPlatformU540PkgTokenSpaceGuid  = {0xDFD87009, 0x27A1, 0x41DD, { 0x84, 0xB1, 0x35, 0xB4, 0xB9, 0x0D, 0x17, 0x63 }}
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  U540PkgExtra.uni

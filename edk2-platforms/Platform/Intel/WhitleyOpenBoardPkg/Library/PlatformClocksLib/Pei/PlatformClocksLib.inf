@@ -1,0 +1,40 @@
+## @file
+#
+# @copyright
+# Copyright 2013 - 2021 Intel Corporation. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PlatformClocksLib
+  FILE_GUID                      = 09C4033A-CCD5-45BE-8846-BC7E4536489D
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformClocksLib | PEIM
+
+[Sources]
+  PlatformClocksLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  WhitleySiliconPkg/WhitleySiliconPkg.dec
+  WhitleySiliconPkg/CpRcPkg.dec
+  WhitleySiliconPkg/SiliconPkg.dec
+  WhitleyOpenBoardPkg/PlatformPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  HobLib
+
+[Protocols]
+
+[Guids]
+
+[Ppis]
+ gEfiPeiSmbus2PpiGuid
+
+[FixedPcd]
+  gEfiCpRcPkgTokenSpaceGuid.PcdMaxCpuSocketCount
+

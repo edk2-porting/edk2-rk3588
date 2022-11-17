@@ -1,0 +1,45 @@
+## @file
+#  EDKII Device Security library for PCI device
+#
+# Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = IntelPciDeviceSecurityDxe
+  FILE_GUID                      = D9569195-ED94-47D2-9523-38BF2D201371
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = MainEntryPoint
+
+[Sources]
+  IntelPciDeviceSecurityDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  IntelSiliconPkg/IntelSiliconPkg.dec
+
+[LibraryClasses]
+  UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  MemoryAllocationLib
+  DevicePathLib
+  BaseMemoryLib
+  PrintLib
+  DebugLib
+  UefiLib
+  PcdLib
+  TpmMeasurementLib
+
+[Protocols]
+  gEdkiiDeviceSecurityPolicyProtocolGuid  ## CONSUMES
+  gEdkiiDeviceSecurityProtocolGuid        ## PRODUCES
+  gEdkiiDeviceIdentifierTypePciGuid       ## COMSUMES
+
+[Depex]
+  gEdkiiDeviceSecurityPolicyProtocolGuid AND
+  gEfiTcg2ProtocolGuid

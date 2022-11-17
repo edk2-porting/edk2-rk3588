@@ -1,0 +1,17 @@
+## @file
+#  FDF file for post-memory modules that enable Intelligent Platform Management Interface.
+#
+# Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+  INF OutOfBandManagement/IpmiFeaturePkg/GenericIpmi/Dxe/GenericIpmi.inf
+  INF OutOfBandManagement/IpmiFeaturePkg/IpmiInit/DxeIpmiInit.inf
+  INF RuleOverride = DRIVER_ACPITABLE OutOfBandManagement/IpmiFeaturePkg/BmcAcpi/BmcAcpi.inf
+  INF OutOfBandManagement/IpmiFeaturePkg/BmcElog/BmcElog.inf
+  INF OutOfBandManagement/IpmiFeaturePkg/Frb/FrbDxe.inf
+  INF OutOfBandManagement/IpmiFeaturePkg/IpmiFru/IpmiFru.inf
+  INF OutOfBandManagement/IpmiFeaturePkg/OsWdt/OsWdt.inf
+  INF OutOfBandManagement/IpmiFeaturePkg/SolStatus/SolStatus.inf

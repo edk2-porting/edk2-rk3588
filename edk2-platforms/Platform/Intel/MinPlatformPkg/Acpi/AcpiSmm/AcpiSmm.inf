@@ -1,0 +1,45 @@
+### @file
+# Component information file for ACPI Traditional MM module.
+#
+# Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) Microsoft Corporation.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+###
+
+[Defines]
+  INF_VERSION                    = 0x00010017
+  BASE_NAME                      = AcpiSmm
+  FILE_GUID                      = DF9A9FFC-A075-4867-A0B2-5E7540BB023E
+  VERSION_STRING                 = 1.0
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  PI_SPECIFICATION_VERSION       = 1.20
+  ENTRY_POINT                    = AcpiTraditionalMmEntryPoint
+
+[LibraryClasses]
+  BoardAcpiEnableLib
+  DebugLib
+  MmServicesTableLib
+  PcdLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+
+[Pcd]
+  gMinPlatformPkgTokenSpaceGuid.PcdAcpiEnableSwSmi        ## CONSUMES
+  gMinPlatformPkgTokenSpaceGuid.PcdAcpiDisableSwSmi       ## CONSUMES
+
+[Sources]
+  AcpiMm.h
+  AcpiMm.c
+  AcpiTraditionalMm.c
+
+[Protocols]
+  gEfiSmmSwDispatch2ProtocolGuid                          ## CONSUMES
+
+[Depex]
+  gEfiSmmSwDispatch2ProtocolGuid

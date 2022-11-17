@@ -1,0 +1,44 @@
+#/** @file
+#
+#    Copyright (c) 2015, Hisilicon Limited. All rights reserved.
+#    Copyright (c) 2015, Linaro Limited. All rights reserved.
+#
+#    SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = AddSmbiosType9
+  FILE_GUID                      = 7AE6F104-66DF-48EF-B5A3-5050BF4908F0
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = AddSmbiosType9Entry
+
+[Sources]
+  AddSmbiosType9.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Silicon/Hisilicon/HisiPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  MemoryAllocationLib
+  DebugLib
+  UefiLib
+  UefiDriverEntryPoint
+  OemMiscLib
+
+[Protocols]
+  gEfiSmbiosProtocolGuid
+  gEfiPciIoProtocolGuid
+
+[Guids]
+
+[Pcd]
+
+[Depex]
+  gEfiSmbiosProtocolGuid AND
+  gEfiPciIoProtocolGuid

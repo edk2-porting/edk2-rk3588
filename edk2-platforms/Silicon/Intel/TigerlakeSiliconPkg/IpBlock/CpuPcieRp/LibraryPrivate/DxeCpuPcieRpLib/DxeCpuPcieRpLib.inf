@@ -1,0 +1,40 @@
+## @file
+#   The DXE CPU PCIE RP Library Implements After Memory PEIM
+#
+#  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+
+[Defines]
+INF_VERSION = 0x00010017
+BASE_NAME = DxeCpuPcieRpLib
+FILE_GUID = D563A22E-6A01-4EF7-84D1-78B6717E3402
+VERSION_STRING = 1.0
+MODULE_TYPE = DXE_DRIVER
+UEFI_SPECIFICATION_VERSION = 2.00
+LIBRARY_CLASS = DxeCpuPcieRpLib
+
+[LibraryClasses]
+IoLib
+BaseLib
+DebugLib
+BaseMemoryLib
+UefiBootServicesTableLib
+UefiLib
+HobLib
+
+[Packages]
+MdePkg/MdePkg.dec
+TigerlakeSiliconPkg/SiPkg.dec
+
+[Sources]
+DxeCpuPcieRpLib.c
+
+[Guids]
+gPcieDxeConfigGuid
+
+[Protocols]
+gSaPolicyProtocolGuid                  ## CONSUMES
+gSaNvsAreaProtocolGuid                 ## CONSUMES

@@ -1,0 +1,35 @@
+/** @file
+*
+*  Copyright (c) 2017 - 2018, Linaro, Ltd. All rights reserved.
+*
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
+*
+**/
+
+#langdef en-US  "English"
+
+#string STR_FORM_SET_TITLE             #language en-US "SynQuacer Platform Settings"
+#string STR_FORM_SET_TITLE_HELP        #language en-US "Press <Enter> to set platform specific options."
+
+#string STR_MAIN_FORM_TITLE            #language en-US "SynQuacer Platform Settings"
+#string STR_NULL_STRING                #language en-US ""
+
+#string STR_PCIE0_MAX_SPEED_PROMPT     #language en-US "PCIe x4 slot max speed"
+#string STR_PCIE1_MAX_SPEED_PROMPT     #language en-US "PCIe x1 slot 1 max speed"
+#string STR_PCIE2_MAX_SPEED_PROMPT     #language en-US "PCIe x1 slot 2 max speed"
+#string STR_PCIE_MAX_SPEED_HELP        #language en-US "The maximum speed the PCIe downstream port is allowed to negotiate"
+
+#string STR_PCIE_MAX_SPEED_UNLIMITED   #language en-US "Unlimited"
+#string STR_PCIE_MAX_SPEED_GEN1        #language en-US "Gen1 (2.5 GT/s)"
+
+#string STR_EMMC_ENABLE_PROMPT         #language en-US "Enable on-board eMMC"
+#string STR_EMMC_ENABLE_HELP           #language en-US "Enable the on-board eMMC for booting and for use by the OS."
+
+#string STR_EMMC_DISABLED              #language en-US "Disabled"
+#string STR_EMMC_ENABLED               #language en-US "Enabled"
+
+#string STR_DT_ACPI_SELECT_PROMPT      #language en-US "O/S Hardware Description"
+#string STR_DT_ACPI_SELECT_HELP        #language en-US "Select the hardware description that will be exposed to the O/S."
+
+#string STR_DT_ACPI_SELECT_DT          #language en-US "Device Tree"
+#string STR_DT_ACPI_SELECT_ACPI        #language en-US "ACPI"

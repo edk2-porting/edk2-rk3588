@@ -1,0 +1,38 @@
+## @file
+# PCH cycle decoding Lib.
+#
+# All function in this library is available for PEI, DXE, and SMM,
+# But do not support UEFI RUNTIME environment call.
+#
+# Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+
+[Defines]
+INF_VERSION = 0x00010017
+BASE_NAME = PeiDxeSmmPchCycleDecodingLib
+FILE_GUID = 676C749F-9CD1-46B7-BAFD-4B1BC36B4C8E
+VERSION_STRING = 1.0
+MODULE_TYPE = BASE
+LIBRARY_CLASS = PchCycleDecodingLib
+
+
+[LibraryClasses]
+BaseLib
+IoLib
+DebugLib
+MmPciLib
+PchInfoLib
+PchPcrLib
+PchP2sbLib
+
+[Packages]
+MdePkg/MdePkg.dec
+KabylakeSiliconPkg/SiPkg.dec
+
+
+[Sources]
+PchCycleDecodingLib.c

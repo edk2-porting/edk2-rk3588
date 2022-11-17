@@ -1,0 +1,37 @@
+## @file
+#
+# Copyright (c) 2018 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiBoardPostMemInitLib
+  FILE_GUID                      = 30F407D6-6B92-412A-B2DA-8E73E2B386E6
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = BoardInitLib
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  PcdLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+  PurleyRefreshSiliconPkg/SiPkg.dec
+
+[Sources]
+  PeiMtOlympusInitPostMemLib.c
+  PeiBoardInitPostMemLib.c
+
+[FixedPcd]
+
+[Pcd]
+

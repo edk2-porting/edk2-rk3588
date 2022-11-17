@@ -1,0 +1,77 @@
+## @file
+#  Component description file for Pch Initialization driver for FSP package
+#
+# Copyright (c) 2019 - 2020 Intel Corporation. All rights reserved. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+INF_VERSION          = 0x00010005
+BASE_NAME            = PchInitDxe
+FILE_GUID            = 5AA5031E-4CB6-43D4-B219-FE50FF5D116C
+MODULE_TYPE          = PEIM
+VERSION_STRING       = 1.0
+ENTRY_POINT          = PchInitEntryPointFsp
+
+
+[LibraryClasses]
+PeimEntryPoint
+PchCycleDecodingLib
+PchPcieRpLib
+PchPcrLib
+PchInfoLib
+PchPciExpressHelpersLib
+DebugLib
+IoLib
+TimerLib
+HobLib
+BaseMemoryLib
+MemoryAllocationLib
+CpuPlatformLib
+GpioLib
+PchSerialIoLib
+PchInitCommonLib
+S3BootScriptLib  # NULL library
+ConfigBlockLib
+PmcLib
+PmcPrivateLib
+PmcPrivateLibWithS3
+UsbInitLib
+PchDmiWithS3Lib
+PchGbeLib
+SiScheduleResetLib
+BiosLockLib
+
+
+[Packages]
+MdePkg/MdePkg.dec
+CoffeelakeSiliconPkg/SiPkg.dec
+IntelSiliconPkg/IntelSiliconPkg.dec
+
+[Pcd]
+gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+
+
+[Sources]
+PchInitFsp.c
+PchInit.h
+PchInit.c
+PchSata.c
+PchSerialIo.c
+
+
+[Protocols]
+gEfiPciEnumerationCompleteProtocolGuid ## CONSUMES
+
+
+[Guids]
+gEfiEventReadyToBootGuid
+gSiConfigHobGuid                 ## CONSUMES
+gPchConfigHobGuid                ## CONSUMES
+
+
+[Depex]
+  gEfiPeiMemoryDiscoveredPpiGuid
+

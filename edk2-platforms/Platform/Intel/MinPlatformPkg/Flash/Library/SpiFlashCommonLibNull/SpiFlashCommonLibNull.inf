@@ -1,0 +1,29 @@
+### @file
+# NULL instance of Spi Flash Common Library Class
+#
+# Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+###
+
+[Defines]
+  INF_VERSION                    = 0x00010017
+  BASE_NAME                      = SpiFlashCommonLibNull
+  FILE_GUID                      = F35BBEE7-A681-443E-BB15-07AF9FABBDED
+  VERSION_STRING                 = 1.0
+  MODULE_TYPE                    = BASE
+  LIBRARY_CLASS                  = SpiFlashCommonLib
+#
+# The following information is for reference only and not required by the build tools.
+#
+# VALID_ARCHITECTURES = IA32 X64
+#
+
+[LibraryClasses]
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[Sources]
+  SpiFlashCommonLibNull.c

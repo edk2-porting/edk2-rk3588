@@ -1,0 +1,101 @@
+## @file
+# Package for support of CPU RC
+# This package supports IA32 family processors, with CPU DXE module, CPU PEIM, CPU S3 module,
+# SMM modules, related libraries, and corresponding definitions.
+#
+# @copyright
+# Copyright 2017 - 2021 Intel Corporation. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = CpuRcPkg
+  PACKAGE_GUID                   = 6F855AF8-759E-4834-9AA4-05EC977A51BB
+  PACKAGE_VERSION                = 0.5
+
+[Includes]
+  Include
+
+[LibraryClasses]
+  CpuConfigLib|Include/Library/CpuConfigLib.h
+  CpuS3MsrLib|Include/Library/CpuS3MsrLib.h
+  CpuPpmLib|Include/Library/CpuPpmLib.h
+  CpuIpLib|Include/Library/CpuIpLib.h
+  CpuEarlyDataLib|Include/Library/CpuEarlyDataLib.h
+  CpuInitLib|Include/Library/CpuInitLib.h
+  PeiCpuLatePolicyLib|Include/Library/PeiCpuLatePolicyLib.h
+  CpuPolicyLib|Include/Library/CpuPolicyLib.h
+
+[Guids]
+  gCpuPkgTokenSpaceGuid          = { 0x513876ac, 0x4f71, 0x4543, { 0x8a, 0xf7, 0x27, 0xb, 0x19, 0x2b, 0xed, 0x3c }}
+  gEfiCpuNvramDataGuid           = { 0x184220a2, 0xe14c, 0x4497, { 0x85, 0xbb, 0x14, 0x90, 0xa9, 0xa1, 0xf0, 0xd3 }}
+  gEfiPmSsdtTableStorageGuid     = { 0x1d33f981, 0x43f0, 0x4a09, { 0xab, 0x3b, 0x2f, 0xf4, 0xf7, 0x11, 0x99, 0x9a }}
+
+[Ppis]
+  gPpmPolicyPpiGuid              = { 0xd86e33b4, 0x414f, 0x4941, { 0xb2, 0x84, 0x31, 0xe0, 0x3b, 0x3f, 0xc0, 0xf7 }}
+  gPeiCpuLatePolicyPpiGuid       = { 0x97415556, 0x8c58, 0x4e12, { 0x8e, 0xaf,  0x1, 0x98, 0x65, 0x50, 0xc5, 0xaa }}
+
+[Protocols]
+  gEfiCpuPolicyProtocolGuid      = { 0xec7c60b4, 0xa82c, 0x42a5, { 0xbe, 0x76, 0x87, 0xfc, 0xb5, 0x81, 0xa9, 0x1b }}
+  gPpmPolicyProtocolGuid         = { 0xd1b6a52c, 0x6810, 0x4957, { 0xa5, 0xfb, 0x85, 0x7b, 0xb2, 0xb5, 0xa3, 0xda }}
+  gEfiCpuPpmProtocolGuid         = { 0x7e6a6cf5, 0xc89c, 0x492f, { 0xac, 0x37, 0x23, 0x07, 0x84, 0x9c, 0x3a, 0xd5 }}
+  ## This protocol indicates CPU config context data is ready.
+  gCpuConfigContextReadyProtocolGuid = { 0x63a25a21, 0xeb79, 0x4835, { 0xaf, 0x76, 0x75, 0x32, 0x7, 0xa1, 0x31, 0xed }}
+
+[PcdsFeatureFlag]
+  gCpuPkgTokenSpaceGuid.PcdCpuSkylakeFamilyFlag|FALSE|BOOLEAN|0x10000036
+  gCpuPkgTokenSpaceGuid.PcdCpuIcelakeFamilyFlag|FALSE|BOOLEAN|0x10000038
+  gCpuPkgTokenSpaceGuid.PcdCpuSelectLfpAsBspFlag|FALSE|BOOLEAN|0x1000000F
+
+[PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamicEx]
+
+  ## Indicates the platform type: desktop, mobile or server.<BR><BR>
+  #  0 - desktop<BR>
+  #  1 - mobile<BR>
+  #  2 - server<BR>
+  # @Prompt Platform type.
+  # @ValidRange  0x80000001 | 0 - 2
+  gCpuPkgTokenSpaceGuid.PcdPlatformType|0|UINT8|0x60000003
+  gCpuPkgTokenSpaceGuid.PcdPlatformCpuMaxCoreFrequency|0x0|UINT32|0x60000004
+
+  ## Indicates if Intel Enhanced Debug (IED) will be enabled.
+  #  Note that for some processors, IED is optional, but for others, IED is required.<BR><BR>
+  #   TRUE  - IED will be enabled.<BR>
+  #   FALSE - IED will be disabled.<BR>
+  # @Prompt Enable IED.
+  gCpuPkgTokenSpaceGuid.PcdCpuIEDEnabled|FALSE|BOOLEAN|0x6000000B
+  gCpuPkgTokenSpaceGuid.PcdCpuIEDRamSize|0x20000|UINT32|0x6000000C
+  gCpuPkgTokenSpaceGuid.PcdCpuIEDRamBase|0x0|UINT32|0x6000001D
+
+  ## Specifies the Energy efficiency policy when Energy Performance Bias feature is enabled.
+  #   0  - indicates preference to highest performance.
+  #   15 - indicates preference to maximize energy saving.
+  # @Prompt The Energy efficiency policy.
+  # @ValidRange  0x80000001 | 0 - 15
+  gCpuPkgTokenSpaceGuid.PcdCpuEnergyPolicy|0x0|UINT8|0x60008000
+
+  gCpuPkgTokenSpaceGuid.PcdCpuSmmMsrSaveStateEnable|FALSE|BOOLEAN|0x60000014
+  gCpuPkgTokenSpaceGuid.PcdCpuSmmSmrr2Base|0|UINT32|0x60000015
+  gCpuPkgTokenSpaceGuid.PcdCpuSmmSmrr2Size|0|UINT32|0x60000016
+  gCpuPkgTokenSpaceGuid.PcdCpuSmmSmrr2CacheType|5|UINT8|0x60000017
+
+  gCpuPkgTokenSpaceGuid.PcdCpuSmmUseDelayIndication|TRUE|BOOLEAN|0x60000018
+  gCpuPkgTokenSpaceGuid.PcdCpuSmmUseBlockIndication|TRUE|BOOLEAN|0x60000019
+
+  gCpuPkgTokenSpaceGuid.PcdCpuSmmProtectedModeEnable|FALSE|BOOLEAN|0x6000001C
+  gCpuPkgTokenSpaceGuid.PcdCpuSmmRuntimeCtlHooks|FALSE|BOOLEAN|0x60000021
+
+  ## Specifies the register table entry maximum count for every processor in the CPU config context buffer.
+  # @Prompt CPU Config Register Table Entry Maximum Count.
+  gCpuPkgTokenSpaceGuid.PcdCpuConfigRegTblEntryMaxCount|0x64|UINT16|0x60000022
+
+[PcdsDynamic, PcdsDynamicEx]
+  gCpuPkgTokenSpaceGuid.PcdCpuConfigContextBuffer|0x0|UINT64|0x50000001
+
+  gCpuPkgTokenSpaceGuid.PcdPlatformCpuSocketCount|0x0|UINT32|0x60000012
+
+  ## Contains the pointer to a buffer where new socket IDs to be assigned are stored.
+  # @Prompt The pointer to a new socket ID buffer.
+  gCpuPkgTokenSpaceGuid.PcdCpuSocketId|{0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1,0x0,0x0,0x0,0x1,0x0,0x0,0x0,0x2,0x0,0x0,0x0,0x2,0x0,0x0,0x0,0x3,0x0,0x0,0x0,0x3,0x0,0x0,0x0}|VOID*|0x60008007

@@ -1,0 +1,55 @@
+## @file
+#
+# @copyright
+# Copyright 2009 - 2021 Intel Corporation. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiSetupLib
+  FILE_GUID                      = C27D6383-F718-490c-8959-CB8370263329
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SetupLib | PEIM
+
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources.common]
+  PeiSetupLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  WhitleySiliconPkg/WhitleySiliconPkg.dec
+  WhitleySiliconPkg/CpRcPkg.dec
+  WhitleySiliconPkg/SiliconPkg.dec
+  ServerPlatformPkg/PlatformPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  BaseMemoryLib
+  MemoryAllocationLib
+
+[Guids]
+  gEfiSocketIioVariableGuid
+  gEfiSocketCommonRcVariableGuid
+  gEfiSocketMpLinkVariableGuid
+  gEfiSocketMemoryVariableGuid
+  gEfiSocketPowermanagementVarGuid
+  gEfiSocketProcessorCoreVarGuid
+  gEfiSetupVariableGuid
+  gPchSetupVariableGuid
+  gEfiMeRcVariableGuid
+  gEfiIeRcVariableGuid
+  gFpgaSocketVariableGuid
+  gMemBootHealthGuid
+
+[Ppis]
+  gEfiPeiReadOnlyVariable2PpiGuid
+
+[Pcd.common]
+

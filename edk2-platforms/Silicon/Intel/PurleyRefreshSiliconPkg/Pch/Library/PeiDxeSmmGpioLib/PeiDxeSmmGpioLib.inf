@@ -1,0 +1,48 @@
+## @file
+#
+# Copyright (c) 2018 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION = 0x00010017
+  BASE_NAME = PeiDxeSmmGpioLib
+  FILE_GUID = 16EC5CA8-8195-4847-B6CB-662BD7B763F2
+  VERSION_STRING = 1.0
+  MODULE_TYPE = BASE
+  LIBRARY_CLASS = GpioLib
+#
+# The following information is for reference only and not required by the build tools.
+#
+# VALID_ARCHITECTURES = IA32 X64 IPF EBC
+#
+
+
+
+[LibraryClasses]
+  BaseLib
+  IoLib
+  DebugLib
+  MmPciLib
+  PchCycleDecodingLib
+  PchSbiAccessLib
+  PchPcrLib                                 #SERVER_BIOS
+  HobLib
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  PurleyRefreshSiliconPkg/SiPkg.dec
+
+
+[Sources]
+  GpioLib.c
+  GpioLibrary.h
+  GpioNativeLib.c
+  GpioInit.c
+  PchSklGpioData.c
+
+[Guids]
+  gPlatformGpioConfigGuid

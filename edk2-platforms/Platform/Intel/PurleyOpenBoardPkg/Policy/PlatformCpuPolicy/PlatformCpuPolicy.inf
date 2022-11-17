@@ -1,0 +1,80 @@
+## @file
+#
+# Copyright (c) 2018 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                   = 0x00010005
+  BASE_NAME                     = PlatformCpuPolicy
+  FILE_GUID                     = 76A7B4FC-C8D5-462d-A4D2-6E88338A772A
+  MODULE_TYPE                   = DXE_DRIVER
+  VERSION_STRING                = 1.0
+  ENTRY_POINT                   = PlatformCpuPolicyEntryPoint
+
+[Sources]
+  PlatformCpuPolicy.c
+
+[Packages]
+  UefiCpuPkg/UefiCpuPkg.dec
+  MdePkg/MdePkg.dec
+  PurleyOpenBoardPkg/OpenBoardPkg.dec
+  PurleyRefreshSiliconPkg/SiPkg.dec
+  PurleyRefreshSiliconPkg/Override/IA32FamilyCpuPkg/IA32FamilyCpuPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  PcdLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  BaseLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  HobLib
+  IoLib
+
+[Protocols]
+  gIntelCpuPcdsSetDoneProtocolGuid
+
+[Pcd]
+  gEfiCpuTokenSpaceGuid.PcdCpuProcessorFeatureUserConfiguration
+  gEfiCpuTokenSpaceGuid.PcdCpuProcessorFeatureUserConfigurationEx1
+  gEfiCpuTokenSpaceGuid.PcdCpuEnergyPolicy
+  gEfiCpuTokenSpaceGuid.PcdCpuAcpiLvl2Addr
+  gEfiCpuTokenSpaceGuid.PcdCpuPackageCStateLimit
+  gEfiCpuTokenSpaceGuid.PcdCpuCoreCStateValue
+  gEfiCpuTokenSpaceGuid.PcdCpuClockModulationDutyCycle
+  gEfiCpuTokenSpaceGuid.PcdCpuHwCoordination
+  gEfiCpuTokenSpaceGuid.PcdPlatformCpuSocketCount
+  gEfiCpuTokenSpaceGuid.PcdPlatformCpuSocketNames
+  gEfiCpuTokenSpaceGuid.PcdPlatformCpuAssetTags
+  gEfiCpuTokenSpaceGuid.PcdIsPowerOnReset
+  gEfiCpuTokenSpaceGuid.PcdCpuDcuMode
+  gEfiCpuTokenSpaceGuid.PcdCpuTurboOverride
+  gEfiCpuTokenSpaceGuid.PcdCpuProcessorMsrLockCtrl
+  gEfiCpuTokenSpaceGuid.PcdCpuIioLlcWaysBitMask
+  gEfiCpuTokenSpaceGuid.PcdCpuExpandedIioLlcWaysBitMask
+  gEfiCpuTokenSpaceGuid.PcdPchTraceHubEn
+  gEfiCpuTokenSpaceGuid.PcdCpuQlruCfgBitMask
+  gEfiCpuTokenSpaceGuid.PcdSbspSelection
+  gEfiCpuTokenSpaceGuid.PcdCpuPmStructAddr
+  gEfiCpuTokenSpaceGuid.PcdCpuSocketId
+  gEfiPchTokenSpaceGuid.PcdPchAcpiIoPortBaseAddress
+  gEfiCpuTokenSpaceGuid.PcdCpuRemoteWaysBitMask
+  gEfiCpuTokenSpaceGuid.PcdCpuRRQCountThreshold
+  gEfiCpuTokenSpaceGuid.PcdCpuSmmRuntimeCtlHooks
+  gEfiCpRcPkgTokenSpaceGuid.PcdMaxCpuSocketCount
+  gOemSkuTokenSpaceGuid.PcdSetupData
+  gOemSkuTokenSpaceGuid.PcdPchRcConfigurationData
+  gOemSkuTokenSpaceGuid.PcdSocketIioConfigData
+  gOemSkuTokenSpaceGuid.PcdSocketCommonRcConfigData
+  gOemSkuTokenSpaceGuid.PcdSocketMpLinkConfigData
+  gOemSkuTokenSpaceGuid.PcdSocketMemoryConfigData
+  gOemSkuTokenSpaceGuid.PcdSocketPowerManagementConfigData
+  gOemSkuTokenSpaceGuid.PcdSocketProcessorCoreConfigData
+
+[Depex]
+  gEfiVariableArchProtocolGuid
+

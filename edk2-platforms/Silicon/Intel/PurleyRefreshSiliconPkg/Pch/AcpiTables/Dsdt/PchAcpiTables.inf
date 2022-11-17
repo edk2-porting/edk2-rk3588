@@ -1,0 +1,34 @@
+## @file
+#
+# Copyright (c) 2018 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+INF_VERSION          = 0x00010005
+BASE_NAME            = PchAcpiTables
+FILE_GUID            = 31401EE7-1600-437c-A11C-B1035D8E6070
+MODULE_TYPE          = USER_DEFINED
+VERSION_STRING       = 1.0
+
+[Sources]
+  Pch.asl
+  PchNvs.asl
+  PchHda.asl
+  PchSerialIo.asl
+  PchPcie.asl
+  PchSata.asl
+  PchRstPcieStorage.asl
+  UsbSbd.asl
+  PchXhci.asl
+  PchXdci.asl
+  IrqLink.asl
+  PchGpioDefine.asl
+  PchGpioLib.asl
+  TraceHubDebug.asl
+
+[Packages]
+  MdePkg/MdePkg.dec
+  PurleyRefreshSiliconPkg/SiPkg.dec

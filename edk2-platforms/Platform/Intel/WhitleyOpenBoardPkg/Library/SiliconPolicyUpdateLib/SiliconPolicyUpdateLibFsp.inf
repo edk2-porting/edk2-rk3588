@@ -1,0 +1,68 @@
+## @file
+# Module Infomation file
+#
+# @copyright
+# Copyright 2011 - 2021 Intel Corporation. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SiliconPolicyUpdateLib
+  FILE_GUID                      = 6EA9585C-3C15-47da-9FFC-25E9E4EA4D0C
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SiliconPolicyUpdateLib
+
+[Sources]
+  SiliconPolicyUpdateLibFsp.c
+  PchPolicyUpdateUsb.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  WhitleySiliconPkg/WhitleySiliconPkg.dec
+  WhitleySiliconPkg/SiliconPkg.dec
+  WhitleySiliconPkg/CpRcPkg.dec
+  WhitleyOpenBoardPkg/PlatformPkg.dec
+  IntelFsp2WrapperPkg/IntelFsp2WrapperPkg.dec
+  IntelFsp2Pkg/IntelFsp2Pkg.dec
+  CedarIslandFspBinPkg/CedarIslandFspBinPkg.dec
+
+[LibraryClasses]
+  HobLib
+  IoLib
+  PcdLib
+  UbaPlatLib
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorId
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision
+  gOemSkuTokenSpaceGuid.PcdOemSkuBmcPciePortNumber
+
+  gStructPcdTokenSpaceGuid.PcdSocketIioConfig
+  gStructPcdTokenSpaceGuid.PcdSocketCommonRcConfig
+  gStructPcdTokenSpaceGuid.PcdSocketMpLinkConfig
+  gStructPcdTokenSpaceGuid.PcdSocketMemoryConfig
+  gStructPcdTokenSpaceGuid.PcdSocketPowerManagementConfig
+  gStructPcdTokenSpaceGuid.PcdSocketProcessorCoreConfig
+  gStructPcdTokenSpaceGuid.PcdSetup
+  gStructPcdTokenSpaceGuid.PcdPchSetup
+  gStructPcdTokenSpaceGuid.PcdFpgaSocketConfig
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspmUpdDataAddress ## CONSUMES
+
+[Guids]
+  gEfiAcpiVariableGuid
+
+[Ppis]
+  gPchPcieDeviceTablePpiGuid
+  gDynamicSiLibraryPpiGuid                 ## CONSUMES
+
+[Depex]
+  gDynamicSiLibraryPpiGuid

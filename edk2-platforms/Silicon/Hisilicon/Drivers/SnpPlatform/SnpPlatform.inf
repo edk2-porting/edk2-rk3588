@@ -1,0 +1,40 @@
+#/** @file
+#
+#    Copyright (c) 2017, Hisilicon Limited. All rights reserved.
+#    Copyright (c) 2017, Linaro Limited. All rights reserved.
+#
+#    SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = SnpPlatform
+  FILE_GUID                      = 102D8FC9-20A4-42eb-AC14-1C98BA5B17A8
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = SnpPlatformInitialize
+
+[Sources]
+  SnpPlatform.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/Hisilicon/HisiPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DxeServicesTableLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gHisiSnpPlatformProtocolGuid
+
+[Depex]
+  TRUE
+

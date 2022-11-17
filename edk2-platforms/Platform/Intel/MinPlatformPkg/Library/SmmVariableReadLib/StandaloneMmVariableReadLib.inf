@@ -1,0 +1,50 @@
+## @file
+# Component description file for Standalone MM Variable Read Lib
+#
+# This library provides phase agnostic access to the UEFI Variable Services.
+# This is done by implementing a wrapper on top of the phase specific mechanism
+# for reading from UEFI variables. For example, the PEI implementation of this
+# library uses EFI_PEI_READ_ONLY_VARIABLE2_PPI. The DXE implementation accesses
+# the UEFI Runtime Services Table, and the SMM implementation uses
+# EFI_SMM_VARIABLE_PROTOCOL.
+#
+# Using this library allows code to be written in a generic manner that can be
+# used in PEI, DXE, or SMM without modification.
+#
+# Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = StandaloneMmVariableReadLib
+  FILE_GUID                      = 46246048-856E-4C60-9026-F15E20C03B68
+  VERSION_STRING                 = 1.0
+  MODULE_TYPE                    = MM_STANDALONE
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  LIBRARY_CLASS                  = VariableReadLib|MM_STANDALONE MM_CORE_STANDALONE
+  CONSTRUCTOR                    = StandaloneMmVariableReadLibConstructor
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[Sources]
+  SmmVariableReadCommon.c
+  StandaloneMmVariableReadLibConstructor.c
+
+[LibraryClasses]
+  DebugLib
+  MmServicesTableLib
+
+[Guids]
+
+[Protocols]
+  gEfiSmmVariableProtocolGuid   ## CONSUMES
+
+[Pcd]
+
+[Depex]
+  gEfiSmmVariableProtocolGuid

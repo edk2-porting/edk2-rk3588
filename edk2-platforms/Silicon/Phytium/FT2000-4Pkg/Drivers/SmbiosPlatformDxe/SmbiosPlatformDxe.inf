@@ -1,0 +1,47 @@
+#/** @file
+#  This driver installs SMBIOS information for Phytium.
+#
+#  Copyright (C) 2020, Phytium Technology Co, Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001b
+  BASE_NAME                      = SmbiosPlatformDxe
+  FILE_GUID                      = d64f09f8-40dc-11eb-9be6-f7a038f956ba
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = SmbiosTablePublishEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = AARCH64
+#
+[Sources]
+  SmbiosPlatformDxe.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/Phytium/PhytiumCommonPkg/PhytiumCommonPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  IoLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Guids]
+  gEfiGlobalVariableGuid
+
+[Protocols]
+  gEfiSmbiosProtocolGuid      # PROTOCOL ALWAYS_CONSUMED
+
+[Guids]
+
+[Depex]
+  gEfiSmbiosProtocolGuid

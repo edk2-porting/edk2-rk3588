@@ -1,0 +1,22 @@
+## @file
+#
+#  Device tree description of the Marvell Armada 8040 MacchiatoBin platform
+#
+#  Copyright (c) 2018, Marvell International Ltd. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001A
+  BASE_NAME      = Armada80x0McBinDeviceTree
+  FILE_GUID      = 25462CDA-221F-47DF-AC1D-259CFAA4E326 # gDtPlatformDefaultDtbFileGuid
+  MODULE_TYPE    = USER_DEFINED
+  VERSION_STRING = 1.0
+
+[Sources]
+  armada-8040-mcbin.dts
+
+[Packages]
+  MdePkg/MdePkg.dec

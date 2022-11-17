@@ -1,0 +1,43 @@
+## @file
+# Gbe Library.
+#
+# All function in this library is available for PEI, DXE, and SMM,
+# But do not support UEFI RUNTIME environment call.
+#
+#  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+
+[Defines]
+INF_VERSION = 0x00010017
+BASE_NAME = PeiDxeSmmGbeLib
+FILE_GUID = FC022ED0-6EB3-43E1-A740-0BA27CBBD010
+VERSION_STRING = 1.0
+MODULE_TYPE = BASE
+LIBRARY_CLASS = GbeLib
+
+
+[LibraryClasses]
+BaseLib
+IoLib
+DebugLib
+PciSegmentLib
+PchInfoLib
+PchPcrLib
+PchCycleDecodingLib
+PmcPrivateLib
+SpiAccessLib
+GbeMdiLib
+PchPciBdfLib
+
+
+[Packages]
+MdePkg/MdePkg.dec
+TigerlakeSiliconPkg/SiPkg.dec
+
+
+[Sources]
+GbeLib.c
+

@@ -1,0 +1,49 @@
+#/** @file
+#
+#  Component discription file for NorFlashDxe module
+#
+#  Copyright (c) 2011, ARM Ltd. All rights reserved.<BR>
+#  Copyright (c) 2016, Hisilicon Limited. All rights reserved.<BR>
+#  Copyright (c) 2016, Linaro Limited. All rights reserved.<BR>
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = LpcSerialPortLib
+  FILE_GUID                      = 09F5FBB9-2AF2-41db-8387-1050300EB762
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SerialPortLib
+
+
+[Sources.common]
+
+[Binaries.AARCH64]
+  LIB|LpcSerialPortLib.lib|*
+
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  Silicon/Hisilicon/HisiPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  LpcLib
+
+[FixedPcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
+  gHisiTokenSpaceGuid.PcdSerialPortSendDelay
+  gHisiTokenSpaceGuid.PcdUartClkInHz
+

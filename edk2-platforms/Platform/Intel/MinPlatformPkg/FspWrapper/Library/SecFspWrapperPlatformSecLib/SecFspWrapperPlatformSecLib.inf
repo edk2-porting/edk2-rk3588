@@ -1,0 +1,98 @@
+## @file
+#  Provide FSP wrapper platform sec related function.
+#
+#  Copyright (c) 2017 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+################################################################################
+#
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SecFspWrapperPlatformSecLib
+  FILE_GUID                      = 4E1C4F95-90EA-47de-9ACC-B8920189A1F5
+  MODULE_TYPE                    = SEC
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformSecLib
+
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+################################################################################
+#
+# Sources Section - list of files that are required for the build to succeed.
+#
+################################################################################
+
+[Sources]
+  FspWrapperPlatformSecLib.c
+  SecRamInitData.c
+  SecPlatformInformation.c
+  SecGetPerformance.c
+  SecTempRamDone.c
+  PlatformInit.c
+  FsptCoreUpd.h
+
+[Sources.IA32]
+  Ia32/SecEntry.nasm
+  Ia32/PeiCoreEntry.nasm
+  Ia32/Stack.nasm
+  Ia32/Fsp.h
+
+################################################################################
+#
+# Package Dependency Section - list of Package files that are required for
+#                              this module.
+#
+################################################################################
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  IntelFsp2Pkg/IntelFsp2Pkg.dec
+  IntelFsp2WrapperPkg/IntelFsp2WrapperPkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+
+[LibraryClasses]
+  LocalApicLib
+  SerialPortLib
+  FspWrapperPlatformLib
+  FspWrapperApiLib
+  SecBoardInitLib
+  TestPointCheckLib
+  PeiServicesTablePointerLib
+
+[Ppis]
+  gEfiSecPlatformInformationPpiGuid       ## CONSUMES
+  gPeiSecPerformancePpiGuid               ## CONSUMES
+  gTopOfTemporaryRamPpiGuid               ## PRODUCES
+  gEfiPeiFirmwareVolumeInfoPpiGuid        ## PRODUCES
+  gFspTempRamExitPpiGuid                  ## CONSUMES
+  gPlatformInitTempRamExitPpiGuid         ## CONSUMES
+
+[Pcd]
+  gUefiCpuPkgTokenSpaceGuid.PcdPeiTemporaryRamStackSize               ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFsptBaseAddress                  ## CONSUMES
+  gIntelFsp2PkgTokenSpaceGuid.PcdFspTemporaryRamSize                  ## CONSUMES
+  gMinPlatformPkgTokenSpaceGuid.PcdSecSerialPortDebugEnable           ## CONSUMES
+
+[FixedPcd]
+  gMinPlatformPkgTokenSpaceGuid.PcdFlashFvMicrocodeBase               ## CONSUMES
+  gMinPlatformPkgTokenSpaceGuid.PcdFlashFvMicrocodeSize               ## CONSUMES
+  gMinPlatformPkgTokenSpaceGuid.PcdMicrocodeOffsetInFv                ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFlashCodeCacheAddress            ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFlashCodeCacheSize               ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspmBaseAddress                  ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspModeSelection                 ## CONSUMES
+  gMinPlatformPkgTokenSpaceGuid.PcdFspDispatchModeUseFspPeiMain       ## CONSUMES

@@ -1,0 +1,52 @@
+#/** @file
+#
+#  Copyright (c) 2017, Linaro, Ltd. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = SynQuacerPlatformPeiLib
+  FILE_GUID                      = 86537337-b62b-4dcd-846f-033a6a8355e0
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformPeiLib
+
+[Sources]
+  SynQuacerPlatformPeiLib.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Silicon/Socionext/SynQuacer/SynQuacer.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  HobLib
+  MemoryAllocationLib
+  PcdLib
+  PeiServicesLib
+
+[FixedPcd]
+  gArmTokenSpaceGuid.PcdFvBaseAddress
+  gArmTokenSpaceGuid.PcdFvSize
+  gSynQuacerTokenSpaceGuid.PcdClearSettingsGpioPin
+  gSynQuacerTokenSpaceGuid.PcdDramInfoBase
+  gSynQuacerTokenSpaceGuid.PcdPcie0PresenceDetectGpioPin
+
+[Ppis]
+  gEdkiiEmbeddedGpioPpiGuid             ## CONSUMES
+  gSynQuacerDramInfoPpiGuid             ## PRODUCES
+
+[Pcd]
+  gArmTokenSpaceGuid.PcdSystemMemoryBase
+  gArmTokenSpaceGuid.PcdSystemMemorySize
+  gSynQuacerTokenSpaceGuid.PcdPcieEnableMask
+
+[Depex]
+  gEdkiiEmbeddedGpioPpiGuid

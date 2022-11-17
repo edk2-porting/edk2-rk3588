@@ -1,0 +1,42 @@
+### @file
+# PEI BIOS ID library.
+#
+# Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+###
+[Defines]
+  INF_VERSION                   = 0x00010005
+  BASE_NAME                     = PeiBiosIdLib
+  FILE_GUID                     = C97DA4CA-67C1-4523-9A78-CE8CAFE6E239
+  MODULE_TYPE                   = PEIM
+  VERSION_STRING                = 1.0
+  LIBRARY_CLASS                 = BiosIdLib|PEI_CORE PEIM
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES          = IA32 X64
+#
+
+[Sources.common]
+  PeiBiosIdLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  BoardModulePkg/BoardModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  PeiServicesLib
+  BaseMemoryLib
+  HobLib
+  DebugLib
+
+[Guids]
+  ## SOMETIMES_CONSUMES ## HOB
+  ## SOMETIMES_PRODUCES ## HOB
+  ## SOMETIMES_CONSUMES ## GUID
+  gBiosIdGuid
+

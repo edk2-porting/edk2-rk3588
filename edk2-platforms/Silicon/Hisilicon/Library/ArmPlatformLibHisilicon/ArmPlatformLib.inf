@@ -1,0 +1,58 @@
+#/* @file
+#  Copyright (c) 2011-2014, ARM Limited. All rights reserved.
+#  Copyright (c) 2015, Hisilicon Limited. All rights reserved.
+#  Copyright (c) 2015, Linaro Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#  Based on the files under ArmPlatformPkg/ArmVExpressPkg/Library/ArmVExpressLibRTSM/
+#
+#*/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ArmPlatformLib
+  FILE_GUID                      = 6887500D-32AD-41cd-855E-F8A5D5B0D4D2
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmPlatformLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+
+  Silicon/Hisilicon/HisiPkg.dec
+
+[LibraryClasses]
+  IoLib
+  ArmLib
+  MemoryAllocationLib
+  SerialPortLib
+
+[Sources.common]
+  ArmPlatformLib.c
+  ArmPlatformLibMem.c
+
+[Sources.AARCH64]
+  AArch64/Helper.S
+
+[FixedPcd]
+  gArmTokenSpaceGuid.PcdSystemMemoryBase
+  gArmTokenSpaceGuid.PcdSystemMemorySize
+  gArmTokenSpaceGuid.PcdFvBaseAddress
+
+  gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
+  gArmTokenSpaceGuid.PcdArmPrimaryCore
+
+  gArmPlatformTokenSpaceGuid.PcdCoreCount
+
+  gHisiTokenSpaceGuid.PcdNORFlashBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase
+  gArmTokenSpaceGuid.PcdGicDistributorBase
+  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase
+  gHisiTokenSpaceGuid.PcdSysControlBaseAddress
+  gHisiTokenSpaceGuid.PcdPeriSubctrlAddress
+

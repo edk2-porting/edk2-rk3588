@@ -1,0 +1,810 @@
+## @file
+# FDF file of platform with 64-bit DXE
+# This package provides platform specific modules and flash layout information.
+#
+# @copyright
+# Copyright 2006 - 2021 Intel Corporation. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+DEFINE PLATFORM_PKG             = MinPlatformPkg
+
+# 0x00000060 = (EFI_FIRMWARE_VOLUME_HEADER. HeaderLength + sizeof (EFI_FFS_FILE_HEADER))
+DEFINE FDF_FIRMWARE_HEADER_SIZE = 0x00000060
+
+SET gMinPlatformPkgTokenSpaceGuid.PcdMicrocodeOffsetInFv              = 0x90 # FV Header plus FFS header
+
+DEFINE VPD_HEADER_SIZE = 0x00000090
+
+!if $(FSP_MODE) == 0
+  DEFINE FSP_BIN_DIR = Api
+!else
+  DEFINE FSP_BIN_DIR = Dispatch
+!endif
+
+#
+# Note: FlashNv PCD naming conventions are as follows:
+#        Note: This should be 100% true of all PCD's in the gCpPlatFlashTokenSpaceGuid space, and for
+#              Others should be examined with an effort to work toward this guideline.
+#       PcdFlash*Base is an address, usually in the range of 0xf* of FD's, note change in FDF spec
+#       PcdFlash*Size is a hex count of the length of the FD or FV
+#       All Fv will have the form 'PcdFlashFv', and all Fd will have the form 'PcdFlashFd'
+#
+#       Also all values will have a PCD assigned so that they can be used in the system, and
+#       the FlashMap edit tool can be used to change the values here, without effecting the code.
+#       This requires all code to only use the PCD tokens to recover the values.
+
+
+#
+# 16MiB Total FLASH Image (visible in memory mapped IO)
+#
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashAreaBaseAddress  = 0xFF000000
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashAreaSize         = 0x01000000
+
+################################################################################
+#
+#    FD SECPEI
+#
+# Contains all the SEC and PEI modules
+#
+# Layout: (Low address to high address)
+#
+#     FvBsp for board specific components
+#     FvPostMemory for compressed post memory MinPlatform spec required components
+#     FvFspS for compressed post memory silicon initialization components
+#       FvPostMemorySilicon for silicon components
+#     FvFspM for pre memory silicon initialization components
+#       FvPreMemorySilicon for silicon components
+#     FvFspT for temp RAM silicon initilization components
+#     FvBspPreMemory for board specific components required to intialize memory
+#       FvAdvancedPreMemory FV for advanced features components
+#     FvPreMemory for components required by MinPlatform spec and to initialize memory
+#       FvPreMemorySecurity FV for stage 6 required components
+#       Contains reset vector
+#
+################################################################################
+
+[FD.SecPei]
+  BaseAddress   = 0xFFCA0000   |gCpPlatFlashTokenSpaceGuid.PcdFlashFdSecPeiBase                 #The base address of the FLASH Device
+  Size          = 0x00360000   |gCpPlatFlashTokenSpaceGuid.PcdFlashFdSecPeiSize                 #The size in bytes of the FLASH Device
+  ErasePolarity = 1
+  BlockSize     = 0x1000
+  NumBlocks     = 0x360
+
+  #
+  # These must add up to the FD Size.
+  # This makes it easy to adjust the various sizes without having to manually calculate the offsets.
+  # At this time, the FSP FV must be aligned at the same address they were built to, 0xFFD00000
+  # This will be corrected in the future.
+  #
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvBspSize           = 0x00010000 # BaseAddress + PcdFlashFvBspSize + PcdFlashFvPostMemorySize must = 0xFFD00000
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvPostMemorySize    = 0x00010000 # BaseAddress + PcdFlashFvBspSize + PcdFlashFvPostMemorySize must = 0xFFD00000
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspSSize          = 0x00040000 # Size must match WhitleyFspPkg.fdf content
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspMSize          = 0x00221000 # Size must match WhitleyFspPkg.fdf content
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspTSize          = 0x00006000 # Size must match WhitleyFspPkg.fdf content
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvBspPreMemorySize  = 0x00001000
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvPreMemorySize     = gCpPlatFlashTokenSpaceGuid.PcdFlashFdSecPeiSize - gMinPlatformPkgTokenSpaceGuid.PcdFlashFvBspSize - gMinPlatformPkgTokenSpaceGuid.PcdFlashFvPostMemorySize - gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspSSize - gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspMSize - gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspTSize - gMinPlatformPkgTokenSpaceGuid.PcdFlashFvBspPreMemorySize
+
+  #
+  # Calculate Offsets Once (Do not modify)
+  # This layout is specified by the EDK II Minimum Platform Archicture specification.
+  # Each offset is the prior region's offset plus the prior region's size.
+  #
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvBspOffset           = 0x00000000
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvPostMemoryOffset    = gMinPlatformPkgTokenSpaceGuid.PcdFlashFvBspOffset           + gMinPlatformPkgTokenSpaceGuid.PcdFlashFvBspSize
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspSOffset          = gMinPlatformPkgTokenSpaceGuid.PcdFlashFvPostMemoryOffset    + gMinPlatformPkgTokenSpaceGuid.PcdFlashFvPostMemorySize
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspMOffset          = gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspSOffset          + gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspSSize
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspTOffset          = gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspMOffset          + gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspMSize
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvBspPreMemoryOffset  = gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspTOffset          + gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspTSize
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvPreMemoryOffset     = gMinPlatformPkgTokenSpaceGuid.PcdFlashFvBspPreMemoryOffset  + gMinPlatformPkgTokenSpaceGuid.PcdFlashFvBspPreMemorySize
+
+  #
+  # FV Layout (Do not modify)
+  # This layout is specified by the EDK II Minimum Platform Archicture specification.
+  #
+
+  gMinPlatformPkgTokenSpaceGuid.PcdFlashFvBspOffset|gMinPlatformPkgTokenSpaceGuid.PcdFlashFvBspSize
+  FV = FvBsp
+
+  gMinPlatformPkgTokenSpaceGuid.PcdFlashFvPostMemoryOffset|gMinPlatformPkgTokenSpaceGuid.PcdFlashFvPostMemorySize
+  FV = FvPostMemory
+
+  gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspSOffset|gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspSSize
+  FILE = $(FSP_BIN_PKG)/Fsp_Rebased_S.fd
+
+  gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspMOffset|gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspMSize
+  FILE = $(FSP_BIN_PKG)/Fsp_Rebased_M.fd
+
+  gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspTOffset|gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspTSize
+  FILE = $(FSP_BIN_PKG)/Fsp_Rebased_T.fd
+
+  #
+  # Shared FV layout
+  #
+
+  gMinPlatformPkgTokenSpaceGuid.PcdFlashFvBspPreMemoryOffset|gMinPlatformPkgTokenSpaceGuid.PcdFlashFvBspPreMemorySize
+  FV = FvBspPreMemory
+
+  gMinPlatformPkgTokenSpaceGuid.PcdFlashFvPreMemoryOffset|gMinPlatformPkgTokenSpaceGuid.PcdFlashFvPreMemorySize
+  FV = FvPreMemory
+
+  #
+  # Calculate base addresses (Do not modify)
+  # This layout is specified by the EDK II Minimum Platform Archicture specification.
+  # Each base is the prior region's base plus the prior region's size.
+  #
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvBspBase             = gCpPlatFlashTokenSpaceGuid.PcdFlashFdSecPeiBase + gMinPlatformPkgTokenSpaceGuid.PcdFlashFvBspOffset
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvPostMemoryBase      = gMinPlatformPkgTokenSpaceGuid.PcdFlashFvBspBase + gMinPlatformPkgTokenSpaceGuid.PcdFlashFvBspSize
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspSBase            = gMinPlatformPkgTokenSpaceGuid.PcdFlashFvPostMemoryBase + gMinPlatformPkgTokenSpaceGuid.PcdFlashFvPostMemorySize
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspMBase            = gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspSBase + gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspSSize
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspTBase            = gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspMBase + gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspMSize
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvBspPreMemoryBase    = gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspTBase + gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspTSize
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvPreMemoryBase       = gMinPlatformPkgTokenSpaceGuid.PcdFlashFvBspPreMemoryBase + gMinPlatformPkgTokenSpaceGuid.PcdFlashFvBspPreMemorySize
+
+  #
+  # Set duplicate PCD
+  # These should not need to be changed
+  #
+
+  SET gCpPlatFlashTokenSpaceGuid.PcdFlashFvMrcNormalBase = gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspMBase
+  SET gCpPlatFlashTokenSpaceGuid.PcdFlashFvMrcNormalSize = gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspMSize
+  SET gCpPlatFlashTokenSpaceGuid.PcdFlashFvSecPeiBase    = gMinPlatformPkgTokenSpaceGuid.PcdFlashFvPreMemoryBase
+  SET gCpPlatFlashTokenSpaceGuid.PcdFlashFvSecPeiSize    = gMinPlatformPkgTokenSpaceGuid.PcdFlashFvPreMemorySize
+
+  #
+  # For API mode, wrappers have some duplicate PCD as well
+  #
+  SET gIntelFsp2WrapperTokenSpaceGuid.PcdFspsBaseAddress = gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspSBase
+  SET gIntelFsp2WrapperTokenSpaceGuid.PcdFspmBaseAddress = gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspMBase
+  SET gIntelFsp2WrapperTokenSpaceGuid.PcdFsptBaseAddress = gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspTBase
+
+################################################################################
+#
+#    FD Main
+#
+# All DXE modules and other regions
+#
+# Layout: (Low address to high address)
+#
+#     FvAdvanced for advanced feature components
+#       Assorted advanced feature FV
+#     FvSecurity for MinPlatform spec required components needed to boot securely
+#     FvOsBoot for MinPlatform spec required components needed to boot OS
+#       FvLateSilicon for silicon specific components
+#     FvUefiBoot for MinPlatform spec required components needed to boot to UEFI shell
+#
+################################################################################
+[FD.Main]
+  BaseAddress   = 0xFF2E0000     | gCpPlatFlashTokenSpaceGuid.PcdFlashFdMainBase        # The base address of the FLASH Device
+  Size          = 0x009C0000     | gCpPlatFlashTokenSpaceGuid.PcdFlashFdMainSize        # The size in bytes of the FLASH Device
+  ErasePolarity = 1
+  BlockSize     = 0x1000
+  NumBlocks     = 0x9C0
+
+  #
+  # These must add up to the FD Size.
+  # This makes it easy to adjust the various sizes without having to manually calculate the offsets.
+  # These are out of flash layout order because FvAdvanced gets any remaining space
+  #
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvSecuritySize      = 0x00010000
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvOsBootSize        = 0x00230000
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvUefiBootSize      = 0x0004C000
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvAdvancedSize      = gCpPlatFlashTokenSpaceGuid.PcdFlashFdMainSize - gMinPlatformPkgTokenSpaceGuid.PcdFlashFvUefiBootSize - gMinPlatformPkgTokenSpaceGuid.PcdFlashFvOsBootSize - gMinPlatformPkgTokenSpaceGuid.PcdFlashFvSecuritySize
+
+  #
+  # Calculate Offsets Once (Do not modify)
+  # This layout is specified by the EDK II Minimum Platform Archicture specification.
+  # Each offset is the prior region's offset plus the prior region's size.
+  #
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvAdvancedOffset    = 0x00000000
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvSecurityOffset    = gMinPlatformPkgTokenSpaceGuid.PcdFlashFvAdvancedOffset  + gMinPlatformPkgTokenSpaceGuid.PcdFlashFvAdvancedSize
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvOsBootOffset      = gMinPlatformPkgTokenSpaceGuid.PcdFlashFvSecurityOffset  + gMinPlatformPkgTokenSpaceGuid.PcdFlashFvSecuritySize
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvUefiBootOffset    = gMinPlatformPkgTokenSpaceGuid.PcdFlashFvOsBootOffset    + gMinPlatformPkgTokenSpaceGuid.PcdFlashFvOsBootSize
+
+  #
+  # FV Layout (Do not modify)
+  # This layout is specified by the EDK II Minimum Platform Archicture specification.
+  #
+
+  gMinPlatformPkgTokenSpaceGuid.PcdFlashFvAdvancedOffset|gMinPlatformPkgTokenSpaceGuid.PcdFlashFvAdvancedSize
+  FV = FvAdvanced
+
+  gMinPlatformPkgTokenSpaceGuid.PcdFlashFvSecurityOffset|gMinPlatformPkgTokenSpaceGuid.PcdFlashFvSecuritySize
+  FV = FvSecurity
+
+  gMinPlatformPkgTokenSpaceGuid.PcdFlashFvOsBootOffset|gMinPlatformPkgTokenSpaceGuid.PcdFlashFvOsBootSize
+  FV = FvOsBoot
+
+  gMinPlatformPkgTokenSpaceGuid.PcdFlashFvUefiBootOffset|gMinPlatformPkgTokenSpaceGuid.PcdFlashFvUefiBootSize
+  FV = FvUefiBoot
+
+  #
+  # Calculate base addresses (Do not modify)
+  # This layout is specified by the EDK II Minimum Platform Archicture specification.
+  # Each base is the prior region's base plus the prior region's size.
+  #
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvAdvancedBase      = gCpPlatFlashTokenSpaceGuid.PcdFlashFdMainBase         + gMinPlatformPkgTokenSpaceGuid.PcdFlashFvAdvancedOffset
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvSecurityBase      = gMinPlatformPkgTokenSpaceGuid.PcdFlashFvAdvancedBase  + gMinPlatformPkgTokenSpaceGuid.PcdFlashFvAdvancedSize
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvOsBootBase        = gMinPlatformPkgTokenSpaceGuid.PcdFlashFvSecurityBase  + gMinPlatformPkgTokenSpaceGuid.PcdFlashFvSecuritySize
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvUefiBootBase      = gMinPlatformPkgTokenSpaceGuid.PcdFlashFvOsBootBase    + gMinPlatformPkgTokenSpaceGuid.PcdFlashFvOsBootSize
+
+################################################################################
+#
+#    FD BINARY
+#
+# Contains the OPROM and other binary modules
+#
+# Layout: (Low address to high address)
+#
+#     FvOpRom containing pre-built components
+#     FvAcmRegion containing ACM related content
+#       FV Header + Blank Space (1K)
+#       Policy block (3K)
+#       Blank space to align ACM on 64K boundary (60K)
+#       ACM binary
+#     FvMicrocode containing microcode update patches
+#     Unformatted region for PCI Gen 3 Data
+#     FvVpd containing PCD VPD data
+#     FvWhea for WHEA data recording
+#     FvNvStorageVariable for UEFI Variable storage
+#     FvNvStorageEventLog for NV Store management
+#     FvNvStorageFtwWorking for Fault Tolerant Write solution
+#     FvNvStorageFtwSpare for Fault Tolerant Write solution
+#
+################################################################################
+[FD.Binary]
+  BaseAddress   = 0xFF000000   |gCpPlatFlashTokenSpaceGuid.PcdFlashFvBinaryBase
+  Size          = 0x002E0000   |gCpPlatFlashTokenSpaceGuid.PcdFlashFvBinarySize
+  ErasePolarity = 1
+  BlockSize     = 0x1000
+  NumBlocks     = 0x2E0
+
+  #
+  # These must add up to the FD Size.
+  # This makes it easy to adjust the various sizes without having to manually calculate the offsets.
+  #
+  SET gCpPlatFlashTokenSpaceGuid.PcdFlashFvOpromSize                  = 0x00100000
+  SET gCpPlatFlashTokenSpaceGuid.PcdFlashFvAcmRegionSize              = 0x00050000
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvMicrocodeSize           = 0x000D0000
+  SET gPlatformModuleTokenSpaceGuid.PcdFlashFvVpdSize                 = 0x00010000
+  SET gCpPlatFlashTokenSpaceGuid.PcdFlashFvWheaSize                   = 0x00030000
+  #
+  # These four items are tightly coupled.
+  # The spare area size must be >= the first three areas.
+  #
+  # There isn't really a benefit to a larger spare area unless the FLASH device
+  # block size is larger than the size specified.
+  #
+  SET gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize    = 0x0003C000
+  SET gCpPlatFlashTokenSpaceGuid.PcdFlashFvNvStorageEventLogSize      = 0x00002000
+  SET gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize  = 0x00002000
+  SET gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize    = gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize + gCpPlatFlashTokenSpaceGuid.PcdFlashFvNvStorageEventLogSize +gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
+
+  #
+  # Calculate Offsets Once (You should not need to modify this section)
+  # Each offset is the prior region's offset plus the prior region's size.
+  #
+  SET gCpPlatFlashTokenSpaceGuid.PcdFlashFvOpromOffset                  = 0x00000000
+  SET gCpPlatFlashTokenSpaceGuid.PcdFlashFvAcmRegionOffset              = gCpPlatFlashTokenSpaceGuid.PcdFlashFvOpromOffset                + gCpPlatFlashTokenSpaceGuid.PcdFlashFvOpromSize
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvMicrocodeOffset           = gCpPlatFlashTokenSpaceGuid.PcdFlashFvAcmRegionOffset            + gCpPlatFlashTokenSpaceGuid.PcdFlashFvAcmRegionSize
+  SET gPlatformModuleTokenSpaceGuid.PcdFlashFvVpdOffset                 = gMinPlatformPkgTokenSpaceGuid.PcdFlashFvMicrocodeOffset         + gMinPlatformPkgTokenSpaceGuid.PcdFlashFvMicrocodeSize
+  SET gCpPlatFlashTokenSpaceGuid.PcdFlashFvWheaOffset                   = gPlatformModuleTokenSpaceGuid.PcdFlashFvVpdOffset               + gPlatformModuleTokenSpaceGuid.PcdFlashFvVpdSize
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashNvStorageVariableOffset     = gCpPlatFlashTokenSpaceGuid.PcdFlashFvWheaOffset                 + gCpPlatFlashTokenSpaceGuid.PcdFlashFvWheaSize
+  SET gPlatformModuleTokenSpaceGuid.PcdFlashFvNvStorageEventLogOffset   = gMinPlatformPkgTokenSpaceGuid.PcdFlashNvStorageVariableOffset   + gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingOffset   = gPlatformModuleTokenSpaceGuid.PcdFlashFvNvStorageEventLogOffset + gCpPlatFlashTokenSpaceGuid.PcdFlashFvNvStorageEventLogSize
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareOffset     = gMinPlatformPkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingOffset + gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
+
+  #
+  # Set gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchAddress dynamically
+  #
+  SET gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchAddress             = gCpPlatFlashTokenSpaceGuid.PcdFlashFvBinaryBase                 + gMinPlatformPkgTokenSpaceGuid.PcdFlashFvMicrocodeOffset         + gMinPlatformPkgTokenSpaceGuid.PcdMicrocodeOffsetInFv
+  SET gUefiCpuPkgTokenSpaceGuid.PcdCpuMicrocodePatchRegionSize          = gMinPlatformPkgTokenSpaceGuid.PcdFlashFvMicrocodeSize           - gMinPlatformPkgTokenSpaceGuid.PcdMicrocodeOffsetInFv
+
+  #
+  # FV Layout (You should not need to modify this section)
+  #
+  gCpPlatFlashTokenSpaceGuid.PcdFlashFvOpromOffset|gCpPlatFlashTokenSpaceGuid.PcdFlashFvOpromSize
+  FV = FvOprom
+
+  gCpPlatFlashTokenSpaceGuid.PcdFlashFvAcmRegionOffset|gCpPlatFlashTokenSpaceGuid.PcdFlashFvAcmRegionSize
+  FV = FvAcm
+
+  gMinPlatformPkgTokenSpaceGuid.PcdFlashFvMicrocodeOffset|gMinPlatformPkgTokenSpaceGuid.PcdFlashFvMicrocodeSize
+  FV = FvMicrocode
+
+  gPlatformModuleTokenSpaceGuid.PcdFlashFvVpdOffset|gPlatformModuleTokenSpaceGuid.PcdFlashFvVpdSize
+  FV = FvVPD
+
+  gCpPlatFlashTokenSpaceGuid.PcdFlashFvWheaOffset|gCpPlatFlashTokenSpaceGuid.PcdFlashFvWheaSize
+  FV = FvWhea
+
+  #
+  # Do not modify.
+  # See comments in size discussion above.  These four areas are tightly coupled and should be modified with utmost care.
+  #
+  gMinPlatformPkgTokenSpaceGuid.PcdFlashNvStorageVariableOffset|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
+  !include WhitleyOpenBoardPkg/Include/Fdf/NvStorage512K.fdf
+  gPlatformModuleTokenSpaceGuid.PcdFlashFvNvStorageEventLogOffset|gCpPlatFlashTokenSpaceGuid.PcdFlashFvNvStorageEventLogSize
+  DATA = { 0xFF } # Hack to ensure build doesn't treat the next PCD as Base/Size to be written
+  gMinPlatformPkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingOffset|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
+  !include WhitleyOpenBoardPkg/Include/Fdf/CommonNvStorageFtwWorking.fdf
+  gMinPlatformPkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareOffset|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
+  DATA = { 0xFF } # Hack to ensure build doesn't treat the next PCD as Base/Size to be written
+
+  #
+  # Calculate base addresses (You should not need to modify this section)
+  # Each base is the prior region's base plus the prior region's size.
+  #
+  SET gCpPlatFlashTokenSpaceGuid.PcdFlashFvOpromBase                  = gCpPlatFlashTokenSpaceGuid.PcdFlashFvBinaryBase                 + gCpPlatFlashTokenSpaceGuid.PcdFlashFvOpromOffset
+  SET gCpPlatFlashTokenSpaceGuid.PcdFlashFvAcmRegionBase              = gCpPlatFlashTokenSpaceGuid.PcdFlashFvOpromBase                  + gCpPlatFlashTokenSpaceGuid.PcdFlashFvOpromSize
+  SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvMicrocodeBase           = gCpPlatFlashTokenSpaceGuid.PcdFlashFvAcmRegionBase              + gCpPlatFlashTokenSpaceGuid.PcdFlashFvAcmRegionSize
+  SET gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress                = gMinPlatformPkgTokenSpaceGuid.PcdFlashFvMicrocodeBase           + gMinPlatformPkgTokenSpaceGuid.PcdFlashFvMicrocodeSize + $(VPD_HEADER_SIZE)
+  SET gCpPlatFlashTokenSpaceGuid.PcdFlashFvWheaBase                   = gEfiMdeModulePkgTokenSpaceGuid.PcdVpdBaseAddress                + gPlatformModuleTokenSpaceGuid.PcdFlashFvVpdSize - $(VPD_HEADER_SIZE)
+  SET gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase    = gCpPlatFlashTokenSpaceGuid.PcdFlashFvWheaBase                   + gCpPlatFlashTokenSpaceGuid.PcdFlashFvWheaSize
+  SET gCpPlatFlashTokenSpaceGuid.PcdFlashFvNvStorageEventLogBase      = gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase    + gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
+  SET gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase  = gCpPlatFlashTokenSpaceGuid.PcdFlashFvNvStorageEventLogBase      + gCpPlatFlashTokenSpaceGuid.PcdFlashFvNvStorageEventLogSize
+  SET gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase    = gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase  + gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
+
+  #
+  # ACM details
+  #
+  SET gCpPlatFlashTokenSpaceGuid.PcdFlashFvPeiPolicyBase      = gCpPlatFlashTokenSpaceGuid.PcdFlashFvAcmRegionBase + 0x1000
+  SET gCpPlatFlashTokenSpaceGuid.PcdFlashFvPeiPolicySize      = 0x3000
+  SET gCpPlatFlashTokenSpaceGuid.PcdFlashFvAcmBase            = gCpPlatFlashTokenSpaceGuid.PcdFlashFvAcmRegionBase + 0x10000
+  SET gCpPlatFlashTokenSpaceGuid.PcdFlashFvAcmSize            = 0x00040000
+
+  #
+  # Other duplicate PCD
+  #
+  SET gCpuUncoreTokenSpaceGuid.PcdFlashNvStorageMicrocodeBase = gCpPlatFlashTokenSpaceGuid.PcdFlashFvBinaryBase + gCpPlatFlashTokenSpaceGuid.PcdFlashFvAcmRegionSize + gCpPlatFlashTokenSpaceGuid.PcdFlashFvOpromSize
+  SET gCpuUncoreTokenSpaceGuid.PcdFlashNvStorageMicrocodeSize = gMinPlatformPkgTokenSpaceGuid.PcdFlashFvMicrocodeSize
+
+################################################################################
+#
+#    FD FPGA
+#
+# Contains the FPGA modules
+#
+################################################################################
+
+[FD.Fpga]
+  BaseAddress   = 0xFD000000   |gCpPlatFlashTokenSpaceGuid.PcdFlashFdFpgaBase                 #The base address of the FPGA Device ( 4G - 48M )
+  Size          = 0x02000000   |gCpPlatFlashTokenSpaceGuid.PcdFlashFdFpgaSize                 #The size in bytes of the FPGA Device ( 32M )
+  ErasePolarity = 1
+  BlockSize     = 0x1000
+  NumBlocks     = 0x2000
+
+  0x00000000|0x02000000
+  gCpPlatFlashTokenSpaceGuid.PcdFlashFvFpgaBbsBase | gCpPlatFlashTokenSpaceGuid.PcdFlashFvFpgaBbsSize
+  FV = FvFpga
+
+################################################################################
+#
+# FV Section
+#
+# [FV] section is used to define what components or modules are placed within a flash
+# device file.  This section also defines order the components and modules are positioned
+# within the image.  The [FV] section consists of define statements, set statements and
+# module statements.
+#
+################################################################################
+
+[FV.FvSecurityPreMemory]
+  !include WhitleyOpenBoardPkg/Include/Fdf/CommonSpiFvHeaderInfo.fdf
+  FvNameGuid         = 40ab290f-8494-41cf-b302-31b178b4ce0b
+
+[FV.FvPreMemory]
+  !include WhitleyOpenBoardPkg/Include/Fdf/CommonSpiFvHeaderInfo.fdf
+  FvNameGuid         = 6522280D-28F9-4131-ADC4-F40EBFA45864
+
+  INF  UefiCpuPkg/SecCore/SecCore.inf
+  INF  MdeModulePkg/Core/Pei/PeiMain.inf
+
+  INF  MdeModulePkg/Universal/PCD/Pei/Pcd.inf
+  INF  WhitleyOpenBoardPkg/Universal/PeiExStatusCodeRouter/ExReportStatusCodeRouterPei.inf
+  INF  WhitleyOpenBoardPkg/Universal/PeiExStatusCodeHandler/ExStatusCodeHandlerPei.inf
+
+  INF  UefiCpuPkg/CpuIoPei/CpuIoPei.inf
+
+  INF  MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
+  INF  MdeModulePkg/Universal/FaultTolerantWritePei/FaultTolerantWritePei.inf
+
+  INF  WhitleyOpenBoardPkg/BiosInfo/BiosInfo.inf
+
+  FILE PEIM = 0043A734-CB11-4274-B363-E165F958CB5F {
+    SECTION PEI_DEPEX = $(FSP_BIN_PKG)/UefiDrivers/$(FSP_BIN_DIR)/0043A734-CB11-4274-B363-E165F958CB5FMultiPch.depex
+    SECTION Align = 32 PE32 = $(FSP_BIN_PKG)/UefiDrivers/$(FSP_BIN_DIR)/0043A734-CB11-4274-B363-E165F958CB5FMultiPch.efi
+    SECTION UI = "MultiPch"
+  }
+
+  FILE PEIM = ac4b7f1b-e057-47d3-b2b5-1137493c0f38 {
+    SECTION PEI_DEPEX = $(FSP_BIN_PKG)/UefiDrivers/$(FSP_BIN_DIR)/ac4b7f1b-e057-47d3-b2b5-1137493c0f38DynamicSiLibrary.depex
+    SECTION Align = 32 PE32 = $(FSP_BIN_PKG)/UefiDrivers/$(FSP_BIN_DIR)/ac4b7f1b-e057-47d3-b2b5-1137493c0f38DynamicSiLibrary.efi
+    SECTION UI = "DynamicSiLibraryPei"
+  }
+
+  INF  WhitleyOpenBoardPkg/Features/Variable/PlatformVariable/Pei/PlatformVariableInitPei.inf
+
+  INF  WhitleyOpenBoardPkg/Platform/Pei/EmulationPlatformInit/EmulationPlatformInit.inf
+
+  INF  WhitleyOpenBoardPkg/Platform/Pei/PlatformInfo/PlatformInfo.inf
+
+  #
+  # UBA common and board specific components
+  #
+  !include WhitleyOpenBoardPkg/Uba/UbaPei.fdf
+
+  INF  MinPlatformPkg/PlatformInit/PlatformInitPei/PlatformInitPreMem.inf
+
+  INF  MinPlatformPkg/PlatformInit/ReportFv/ReportFvPei.inf
+
+  FILE PEIM = ca8efb69-d7dc-4e94-aad6-9fb373649161 {
+    SECTION PEI_DEPEX = $(FSP_BIN_PKG)/UefiDrivers/$(FSP_BIN_DIR)/ca8efb69-d7dc-4e94-aad6-9fb373649161SiliconPolicyInitPreAndPostMem.depex
+    SECTION Align = 32 PE32 = $(FSP_BIN_PKG)/UefiDrivers/$(FSP_BIN_DIR)/ca8efb69-d7dc-4e94-aad6-9fb373649161SiliconPolicyInitPreAndPostMem.efi
+    SECTION UI = "SiliconPolicyInitPreAndPostMem"
+  }
+
+  INF  MinPlatformPkg/PlatformInit/SiliconPolicyPei/SiliconPolicyPeiPreMem.inf
+
+  !include WhitleyOpenBoardPkg/Include/Fdf/EnablePerformanceMonitoringInfrastructurePreMemory.fdf
+
+  INF WhitleyOpenBoardPkg/Universal/PeiInterposerToSvidMap/PeiInterposerToSvidMap.inf
+
+  INF  UefiCpuPkg/CpuMpPei/CpuMpPei.inf
+
+  !if $(FSP_MODE) == 0
+    FILE PEIM = 8F7F3D20-9823-42DD-9FF7-53DAC93EF407 {
+      SECTION PEI_DEPEX = $(FSP_BIN_PKG)/UefiDrivers/$(FSP_BIN_DIR)/8F7F3D20-9823-42DD-9FF7-53DAC93EF407CsrPseudoOffsetInitPeim.depex
+      SECTION Align = 32 PE32 = $(FSP_BIN_PKG)/UefiDrivers/$(FSP_BIN_DIR)/8F7F3D20-9823-42DD-9FF7-53DAC93EF407CsrPseudoOffsetInitPeim.efi
+      SECTION UI = "CsrPseudoOffsetInitPeim"
+    }
+    FILE PEIM = 2C6CACC6-6C3C-4AA7-B2DE-384DAE2B0352 {
+      SECTION PEI_DEPEX = $(FSP_BIN_PKG)/UefiDrivers/$(FSP_BIN_DIR)/2C6CACC6-6C3C-4AA7-B2DE-384DAE2B0352RegAccessPeim.depex
+      SECTION Align = 32 PE32 = $(FSP_BIN_PKG)/UefiDrivers/$(FSP_BIN_DIR)/2C6CACC6-6C3C-4AA7-B2DE-384DAE2B0352RegAccessPeim.efi
+      SECTION UI = "RegAccessPeim"
+    }
+    FILE PEIM = C7D9BAF4-DC9D-4B22-B4E7-7500EAA7B67F {
+      SECTION PEI_DEPEX = $(FSP_BIN_PKG)/UefiDrivers/$(FSP_BIN_DIR)/C7D9BAF4-DC9D-4B22-B4E7-7500EAA7B67FSiliconDataInitPeim.depex
+      SECTION Align = 32 PE32 = $(FSP_BIN_PKG)/UefiDrivers/$(FSP_BIN_DIR)/C7D9BAF4-DC9D-4B22-B4E7-7500EAA7B67FSiliconDataInitPeim.efi
+      SECTION UI = "SiliconDataInitPeim"
+    }
+    INF  IntelFsp2WrapperPkg/FspmWrapperPeim/FspmWrapperPeim.inf
+    INF  IntelFsp2WrapperPkg/FspsWrapperPeim/FspsWrapperPeim.inf
+    INF  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf
+    INF  WhitleyOpenBoardPkg/Platform/Pei/DummyPchSpi/DummyPchSpi.inf
+  !endif
+
+  FILE FV_IMAGE = 40ab290f-8494-41cf-b302-31b178b4ce0b {
+    SECTION FV_IMAGE = FvSecurityPreMemory
+  }
+
+[FV.FvAdvancedPreMemory]
+  !include WhitleyOpenBoardPkg/Include/Fdf/CommonSpiFvHeaderInfo.fdf
+  FvNameGuid         = 09f25d44-b2ef-4225-8b2e-e0e094b51775
+
+[FV.FvBspPreMemory]
+  !include WhitleyOpenBoardPkg/Include/Fdf/CommonSpiFvHeaderInfo.fdf
+  FvNameGuid         = e6c65995-8c2d-4119-a52d-7dbf1acb45a1
+
+  FILE FV_IMAGE = 09f25d44-b2ef-4225-8b2e-e0e094b51775 {
+    SECTION FV_IMAGE = FvAdvancedPreMemory
+  }
+
+#
+# FvPostMemory includes common hardware, common core variable services, load and invoke DXE etc
+#
+[FV.FvPostMemoryUncompressed]
+  !include WhitleyOpenBoardPkg/Include/Fdf/CommonSpiFvHeaderInfo.fdf
+  FvNameGuid         = B4705B4B-0BE6-4BDB-A83A-51CAD2345CEA
+
+[FV.FvPostMemory]
+  !include WhitleyOpenBoardPkg/Include/Fdf/CommonSpiFvHeaderInfo.fdf
+  FvNameGuid         = 3298afc4-c484-47f1-a65a-5917a54b5e8c
+
+  FILE FV_IMAGE = B4705B4B-0BE6-4BDB-A83A-51CAD2345CEA {
+    SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE {
+      SECTION FV_IMAGE = FvPostMemoryUncompressed
+    }
+  }
+
+#
+# FvBsp includes board specific components
+#
+[FV.FvBspUncompressed]
+  !include WhitleyOpenBoardPkg/Include/Fdf/CommonSpiFvHeaderInfo.fdf
+  FvNameGuid         = e4c65347-fd90-4143-8a41-113e1015fe07
+
+[FV.FvBsp]
+  !include WhitleyOpenBoardPkg/Include/Fdf/CommonSpiFvHeaderInfo.fdf
+  FvNameGuid         = 9e151cf3-ca90-444f-b33b-a9941cbc772f
+
+  FILE FV_IMAGE = e4c65347-fd90-4143-8a41-113e1015fe07 {
+    SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE {
+      SECTION FV_IMAGE = FvBspUncompressed
+    }
+  }
+
+[FV.FvUefiBootUncompressed]
+  !include WhitleyOpenBoardPkg/Include/Fdf/CommonSpiFvHeaderInfo.fdf
+  FvNameGuid         = C4D3B0E2-FB26-44f8-A05B-E95895FCB960
+
+  INF  MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
+  INF  MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
+  INF  MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
+  INF  MdeModulePkg/Bus/Pci/UhciDxe/UhciDxe.inf
+  INF  MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
+
+  INF  MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
+
+  INF  MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
+  INF  MdeModulePkg/Universal/PlatformDriOverrideDxe/PlatformDriOverrideDxe.inf
+
+  INF  MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
+  INF  MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
+  INF  MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
+  INF  MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
+  INF  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
+
+  INF  MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
+  INF  MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
+  INF  MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
+  INF  MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
+  INF  MdeModulePkg/Universal/SmbiosMeasurementDxe/SmbiosMeasurementDxe.inf
+  #ATA for IDE/AHCI/RAID support
+  INF  MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf
+  INF  MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
+  INF  MdeModulePkg/Universal/MemoryTest/NullMemoryTestDxe/NullMemoryTestDxe.inf
+  INF  BoardModulePkg/BoardBdsHookDxe/BoardBdsHookDxe.inf
+
+[FV.FvUefiBoot]
+  !include WhitleyOpenBoardPkg/Include/Fdf/CommonSpiFvHeaderInfo.fdf
+  FvNameGuid         = ab9fe87b-1e37-440c-91cc-9aea03ce7bec
+
+  FILE FV_IMAGE = C4D3B0E2-FB26-44f8-A05B-E95895FCB960 {
+    SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE {
+      SECTION FV_IMAGE = FvUefiBootUncompressed
+    }
+  }
+
+[FV.FvOsBootUncompressed]
+  !include WhitleyOpenBoardPkg/Include/Fdf/CommonSpiFvHeaderInfo.fdf
+  FvNameGuid         = CDBB7B35-6833-4ed6-9AB2-57D2ACDDF6F0
+
+  #
+  #  DXE Phase modules
+  #
+  INF  MdeModulePkg/Core/Dxe/DxeMain.inf
+  INF  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
+  INF  MdeModulePkg/Universal/ReportStatusCodeRouter/RuntimeDxe/ReportStatusCodeRouterRuntimeDxe.inf
+  INF  MdeModulePkg/Universal/StatusCodeHandler/RuntimeDxe/StatusCodeHandlerRuntimeDxe.inf
+
+  FILE FV_IMAGE = B7C9F0CB-15D8-26FC-CA3F-C63947B12831 {
+    SECTION UI = "FvLateSilicon"
+    SECTION FV_IMAGE = $(FSP_BIN_PKG)/UefiDrivers/$(FSP_BIN_DIR)/FvLateSilicon.fv
+  }
+
+  INF  MdeModulePkg/Universal/SectionExtractionDxe/SectionExtractionDxe.inf
+
+  !include WhitleyOpenBoardPkg/Include/Fdf/EnablePerformanceMonitoringInfrastructurePostMemory.fdf
+
+  #
+  # UBA DXE common and board specific components
+  #
+  !include WhitleyOpenBoardPkg/Uba/UbaDxeCommon.fdf
+  !include WhitleyOpenBoardPkg/Uba/UbaDxeRpBoards.fdf
+  INF  WhitleyOpenBoardPkg/Platform/Dxe/PlatformType/PlatformType.inf
+  INF  MinPlatformPkg/PlatformInit/PlatformInitDxe/PlatformInitDxe.inf
+
+  !if ($(FSP_MODE) == 1)
+    INF WhitleyOpenBoardPkg/Platform/Dxe/S3NvramSave/S3NvramSave.inf
+  !else
+    INF MinPlatformPkg/FspWrapper/SaveMemoryConfig/SaveMemoryConfig.inf
+  !endif
+
+  INF  UefiCpuPkg/CpuIo2Dxe/CpuIo2Dxe.inf
+  INF  MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
+  INF  WhitleyOpenBoardPkg/Cpu/Dxe/PlatformCpuPolicy/PlatformCpuPolicy.inf
+  INF  UefiCpuPkg/CpuDxe/CpuDxe.inf
+  INF  UefiCpuPkg/CpuS3DataDxe/CpuS3DataDxe.inf
+
+  FILE FV_IMAGE = a0277d07-a725-4823-90f9-6cba00782111 {
+    SECTION UI = "FvLateOpenBoard"
+    SECTION FV_IMAGE = $(FSP_BIN_PKG)/UefiDrivers/$(FSP_BIN_DIR)/FvLateOpenBoard.fv
+  }
+
+  INF  MdeModulePkg/Universal/Metronome/Metronome.inf
+  INF  MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
+  INF  PcAtChipsetPkg/PcatRealTimeClockRuntimeDxe/PcatRealTimeClockRuntimeDxe.inf
+  INF  MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
+
+  INF  WhitleyOpenBoardPkg/Features/Pci/Dxe/PciHostBridge/PciHostBridge.inf
+  INF  MinPlatformPkg/PlatformInit/PlatformInitPei/PlatformInitPostMem.inf
+
+  INF  MdeModulePkg/Universal/MonotonicCounterRuntimeDxe/MonotonicCounterRuntimeDxe.inf
+  INF  RuleOverride = UI MdeModulePkg/Application/UiApp/UiApp.inf
+  INF  MdeModulePkg/Application/BootManagerMenuApp/BootManagerMenuApp.inf
+  INF  MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
+  #TPM when TPM enable, SecurityStubDxe needs to be removed from this FV.
+  INF  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
+
+  INF  MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
+
+  INF  FatPkg/EnhancedFatDxe/Fat.inf
+
+  INF  PcAtChipsetPkg/HpetTimerDxe/HpetTimerDxe.inf
+
+  INF  WhitleyOpenBoardPkg/Features/Pci/Dxe/PciPlatform/PciPlatform.inf
+  INF  MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
+
+  INF  ShellPkg/Application/Shell/Shell.inf
+
+  INF  MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
+
+  INF  MdeModulePkg/Core/PiSmmCore/PiSmmIpl.inf
+  INF  MdeModulePkg/Core/PiSmmCore/PiSmmCore.inf
+
+  INF  MdeModulePkg/Universal/ReportStatusCodeRouter/Smm/ReportStatusCodeRouterSmm.inf
+  INF  MdeModulePkg/Universal/StatusCodeHandler/Smm/StatusCodeHandlerSmm.inf
+
+  INF  UefiCpuPkg/CpuIo2Smm/CpuIo2Smm.inf
+
+  INF  MdeModulePkg/Universal/LockBox/SmmLockBox/SmmLockBox.inf
+  INF  UefiCpuPkg/PiSmmCommunication/PiSmmCommunicationSmm.inf
+
+  INF  MinPlatformPkg/Flash/SpiFvbService/SpiFvbServiceSmm.inf
+
+  INF  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteSmm.inf
+  INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmmRuntimeDxe.inf
+  INF  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableSmm.inf
+
+  INF  MdeModulePkg/Universal/SmmCommunicationBufferDxe/SmmCommunicationBufferDxe.inf
+
+  INF  MdeModulePkg/Universal/Acpi/S3SaveStateDxe/S3SaveStateDxe.inf
+
+  INF  MdeModulePkg/Universal/Acpi/BootScriptExecutorDxe/BootScriptExecutorDxe.inf
+
+  # UEFI USB stack
+  INF  MdeModulePkg/Bus/Pci/XhciDxe/XhciDxe.inf
+
+  INF  MdeModulePkg/Bus/Pci/PciSioSerialDxe/PciSioSerialDxe.inf
+  INF  BoardModulePkg/LegacySioDxe/LegacySioDxe.inf
+  INF  MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
+
+  INF  WhitleyOpenBoardPkg/Features/AcpiVtd/AcpiVtd.inf
+  INF  MinPlatformPkg/Acpi/AcpiSmm/AcpiSmm.inf
+
+[FV.FvOsBoot]
+  !include WhitleyOpenBoardPkg/Include/Fdf/CommonSpiFvHeaderInfo.fdf
+  FvNameGuid         = c7488640-5f51-4969-b63b-89fc369e1725
+
+  FILE FV_IMAGE = CDBB7B35-6833-4ed6-9AB2-57D2ACDDF6F0 {
+    SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE {
+      SECTION FV_IMAGE = FvOsBootUncompressed
+    }
+  }
+
+[FV.FvSecuritySilicon]
+  !include WhitleyOpenBoardPkg/Include/Fdf/CommonSpiFvHeaderInfo.fdf
+  FvNameGuid         = AD262F8D-BDED-4668-A8D4-8BC73516652F
+
+[FV.FvSecurityUncompressed]
+  !include WhitleyOpenBoardPkg/Include/Fdf/CommonSpiFvHeaderInfo.fdf
+  FvNameGuid         = 03E25550-89A5-4ee6-AF60-DB0553D91FD2
+
+  FILE FV_IMAGE = 81F80AEA-91EB-4AD9-A563-7CEBAA167B25 {
+    SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE {
+      SECTION FV_IMAGE = FvSecuritySilicon
+    }
+  }
+
+[FV.FvSecurity]
+  !include WhitleyOpenBoardPkg/Include/Fdf/CommonSpiFvHeaderInfo.fdf
+  FvNameGuid         = 68134833-2ff6-4d22-973b-575d0eae8ffd
+
+  FILE FV_IMAGE = 03E25550-89A5-4ee6-AF60-DB0553D91FD2 {
+    SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE {
+        SECTION FV_IMAGE = FvSecurityUncompressed
+    }
+  }
+
+[FV.FvAdvancedUncompressed]
+  !include WhitleyOpenBoardPkg/Include/Fdf/CommonSpiFvHeaderInfo.fdf
+  FvNameGuid         = 70aeaf57-4997-49ce-a4f7-122980745670
+
+[FV.FvAdvanced]
+  !include WhitleyOpenBoardPkg/Include/Fdf/CommonSpiFvHeaderInfo.fdf
+  FvNameGuid         = f21ee7a1-53a9-453d-aee3-b6a5c25bada5
+
+  FILE FV_IMAGE = 70aeaf57-4997-49ce-a4f7-122980745670 {
+    SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE {
+      SECTION FV_IMAGE = FvAdvancedUncompressed
+    }
+  }
+
+#
+# FV for all Microcode Updates.
+#
+[FV.FvMicrocode]
+  !include WhitleyOpenBoardPkg/Include/Fdf/CommonSpiFvHeaderInfo.fdf
+  LOCK_STATUS        = FALSE
+  FvNameGuid         = D2C29BA7-3809-480F-9C3D-DE389C61425A
+
+!if $(CPUTARGET) == "CPX"
+  INF RuleOverride = MICROCODE $(PLATFORM_SI_BIN_PACKAGE)/CpxMicrocode/MicrocodeUpdates.inf
+!else
+  INF RuleOverride = MICROCODE $(PLATFORM_SI_BIN_PACKAGE)/IcxMicrocode/MicrocodeUpdates.inf
+!endif
+
+
+[FV.FvVPD]
+  !include WhitleyOpenBoardPkg/Include/Fdf/CommonSpiFvHeaderInfo.fdf
+  LOCK_STATUS        = FALSE
+  FvNameGuid         = FFC29BA7-3809-480F-9C3D-DE389C61425A
+  FILE RAW = FF7DB236-F856-4924-90F8-CDF12FB875F3 {
+    $(OUTPUT_DIRECTORY)/$(TARGET)_$(TOOL_CHAIN_TAG)/FV/8C3D856A-9BE6-468E-850A-24F7A8D38E08.bin
+  }
+
+#
+# Various Vendor UEFI Drivers (OROMs).
+#
+[FV.FvOpromUncompressed]
+  !include WhitleyOpenBoardPkg/Include/Fdf/CommonSpiFvHeaderInfo.fdf
+  FvNameGuid         = B6EDE22C-DE30-45fa-BB09-CA202C1654B7
+
+[FV.FvOprom]
+  !include WhitleyOpenBoardPkg/Include/Fdf/CommonSpiFvHeaderInfo.fdf
+  FvNameGuid         = 983BCAB5-BF10-42ce-B85D-CB805DCB1EFD
+
+  FILE FV_IMAGE = B6EDE22C-DE30-45fa-BB09-CA202C1654B7 {
+    SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE {
+      SECTION FV_IMAGE = FvOpromUncompressed
+    }
+  }
+
+[FV.FvWhea]
+  BlockSize          = 0x1000
+  NumBlocks          = 0x30
+  !include WhitleyOpenBoardPkg/Include/Fdf/CommonSpiFvHeaderInfo.fdf
+  FvNameGuid         = d6a1cd70-4b33-4994-a6ea-375f2ccc5437
+
+#
+# FV For ACM Binary.
+#
+[FV.FvAcm]
+  BlockSize          = 0x1000
+  NumBlocks          = 0x50
+  !include WhitleyOpenBoardPkg/Include/Fdf/CommonSpiFvHeaderInfo.fdf
+  FvNameGuid         = 11668261-8A8D-47ca-9893-052D24435E59
+
+[FV.FvFpga]
+  !include WhitleyOpenBoardPkg/Include/Fdf/CommonSpiFvHeaderInfo.fdf
+  FvNameGuid         = 974650E7-6DFE-4998-A124-CEDEC5C9B47D
+
+################################################################################
+#
+# Rules are use with the [FV] section's module INF type to define
+# how an FFS file is created for a given INF file. The following Rule are the default
+# rules for the different module type. User can add the customized rules to define the
+# content of the FFS file.
+#
+################################################################################
+
+!include MinPlatformPkg/Include/Fdf/RuleInclude.fdf
+
+[Rule.Common.USER_DEFINED.ACPITABLE]
+  FILE FREEFORM = $(NAMED_GUID) {
+    RAW ACPI    Optional           |.acpi
+    RAW ASL     Optional           |.aml
+  }
+
+[Rule.Common.DXE_RUNTIME_DRIVER.DRIVER_ACPITABLE]
+  FILE DRIVER = $(NAMED_GUID) {
+    DXE_DEPEX DXE_DEPEX Optional       $(INF_OUTPUT)/$(MODULE_NAME).depex
+    PE32      PE32                     $(INF_OUTPUT)/$(MODULE_NAME).efi
+    RAW ACPI  Optional                |.acpi
+    RAW ASL   Optional                |.aml
+    UI        STRING="$(MODULE_NAME)" Optional
+    VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+  }

@@ -1,0 +1,22 @@
+/** @file
+
+Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+//
+// Define bits in LPC bridge config space
+//  (\_SB.PCI0.LPC0)
+//
+OperationRegion (LPCB, PCI_Config, 0x00, 0x100)
+Field (LPCB, DWordAcc, NoLock, Preserve)
+{
+	Offset (0xAC),
+	, 16,
+	XSMB, 1					// set when OS routes USB ports to xHCI in SmartAuto mode so next POST will know
+}
+
+#include "IrqLink.asl"       // PCI routing control methods
+#include "Mother.asi"        // Static motherboard device resource declaration
+

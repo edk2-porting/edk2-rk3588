@@ -1,0 +1,62 @@
+## @file
+#  User Authentication Dxe Driver.
+#
+#  This Driver mainly provides Setup Form to change password and
+#  does user authentication before entering Setup.
+#
+# Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UserAuthenticationDxe
+  FILE_GUID                      = 0683FB88-664C-4BA6-9ED4-1C0916EE43A4
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 2.0
+  ENTRY_POINT                    = UserAuthenticationEntry
+  UNLOAD_IMAGE                   = UserAuthenticationUnload
+
+[Sources]
+  UserAuthenticationDxe.c
+  UserAuthenticationDxe.h
+  UserAuthenticationDxePassword.c
+  UserAuthenticationDxeFormset.h
+  UserAuthenticationDxeVfr.vfr
+  UserAuthenticationDxeStrings.uni
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UserInterface/UserAuthFeaturePkg/UserAuthFeaturePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+  BaseMemoryLib
+  DebugLib
+  UefiLib
+  HiiLib
+  DevicePathLib
+  MemoryAllocationLib
+  PlatformPasswordLib
+  PrintLib
+
+[Guids]
+  gUserAuthenticationGuid                       ## CONSUMES  ## GUID
+  gEfiEventExitBootServicesGuid                 ## CONSUMES  ## Event
+  gEdkiiPiSmmCommunicationRegionTableGuid       ## CONSUMES  ## SystemTable
+
+[Protocols]
+  gEfiRscHandlerProtocolGuid                    ## CONSUMES
+  gEfiDevicePathProtocolGuid                    ## PRODUCES
+  gEfiHiiConfigAccessProtocolGuid               ## PRODUCES
+  gEfiSmmCommunicationProtocolGuid              ## CONSUMES
+
+[Depex]
+  gEfiSimpleTextOutProtocolGuid      AND
+  gEfiSmmCommunicationProtocolGuid   AND
+  gEfiVariableArchProtocolGuid       AND
+  gEfiVariableWriteArchProtocolGuid

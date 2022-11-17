@@ -1,0 +1,36 @@
+## @file
+#  PCI Segment Library for NXP SoCs with multiple RCs
+#
+#  Copyright 2018-2020 NXP
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = PciSegmentLib
+  FILE_GUID                      = c9f59261-5a60-4a4c-82f6-1f520442e100
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PciSegmentLib|DXE_DRIVER
+  CONSTRUCTOR                    = PciSegLibInit
+
+[Sources]
+  PciSegmentLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  Silicon/NXP/NxpQoriqLs.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  IoLib
+  PcdLib
+
+[FixedPcd]
+  gNxpQoriqLsTokenSpaceGuid.PcdPciExp1BaseAddr
+
+[Pcd]
+  gNxpQoriqLsTokenSpaceGuid.PcdPciCfgShiftEnable
+  gNxpQoriqLsTokenSpaceGuid.PcdPciLsGen4Ctrl

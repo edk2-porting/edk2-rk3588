@@ -1,0 +1,327 @@
+#/** @file RockchipPkg.dec
+#
+#    Copyright (c) 2021-2022, Rockchip Limited. All rights reserved.
+#
+#    SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = RockchipPkg
+  PACKAGE_GUID                   = 633b6754-2c95-11ec-b78c-f42a7dcb925d
+  PACKAGE_VERSION                = 0.1
+
+[Includes]
+  Include
+
+[Ppis]
+  #gIpmiInterfacePpiGuid = {0x28ae4d88, 0xb658, 0x46b9, {0xa0, 0xe7, 0xd4, 0x95, 0xe2, 0xe8, 0x97, 0xf}}
+
+[Protocols]
+  gUniNorFlashProtocolGuid = {0x86F305EA, 0xDFAC, 0x4A6B, {0x92, 0x77, 0x47, 0x31, 0x2E, 0xCE, 0x42, 0xA}}
+  gRockchipSpiFlashProtocolGuid = {0x339132DC, 0xCED7, 0x4f84, {0xAA, 0xE7, 0x2E, 0xC4, 0xF9, 0x14, 0x38, 0x2F}}
+  #gRockchipBoardNicProtocolGuid = {0xb5903955, 0x31e9, 0x4aaf, {0xb2, 0x83, 0x7, 0x9f, 0x3c, 0xc4, 0x71, 0x66}}
+  #gRockchipBoardXgeStatusProtocolGuid = {0xa6b8ed0e, 0xd8cc, 0x4853, {0xaa, 0x39, 0x2c, 0x3e, 0xcd, 0x7c, 0xa5, 0x97}}
+  #gBmcInfoProtocolGuid = {0x43fa6ffd, 0x35e4, 0x479e, {0xab, 0xec, 0x5, 0x3, 0xf6, 0x48, 0x0, 0xf5}}
+  #gSataEnableFlagProtocolGuid = {0xc2b3c770, 0x8b4a, 0x4796, {0xb2, 0xcf, 0x1d, 0xee, 0x44, 0xd0, 0x32, 0xf3}}
+  #gPlatformSasProtocolGuid = {0x40e9829f, 0x3a2c, 0x479a, {0x9a, 0x93, 0x45, 0x7d, 0x13, 0x50, 0x96, 0x5d}}
+  #gRockchipPlatformSasProtocolGuid = {0x20e9829f, 0x3a2c, 0x479a, {0x9a, 0x93, 0x45, 0x7d, 0x13, 0x50, 0x96, 0x6d}}
+  #gRockchipInstalledAcpiProtocolGuid = {0x31505f6a, 0xe496, 0x4c7e, {0xba, 0xbb, 0x71, 0x7b, 0xe2, 0xc4, 0xb4, 0x59}}
+  #gRockchipSasConfigProtocolGuid = {0x3A236669, 0x6666, 0x4d04, {0xb2, 0x83, 0x7, 0x9f, 0x3c, 0xc4, 0x71, 0x66}}
+  gRockchipI2cDemoProtocolGuid    = { 0x71954bda, 0x60d3, 0x4ef8, { 0x8e, 0x3c, 0x0e, 0x33, 0x9f, 0x3b, 0xc2, 0x2b }}
+  gRockchipCrtcProtocolGuid = {0xC128406A, 0x99D9, 0x11EC, {0x99, 0x27, 0xF4, 0x2A, 0x7D, 0xCB, 0x92, 0x5D}}
+  gRockchipConnectorProtocolGuid = {0x50439CB6, 0x9B85, 0x11EC, {0x95, 0x73, 0xF4, 0x2A, 0x7D, 0xCB, 0x92, 0x5D}}
+
+[Guids]
+  gRockchipTokenSpaceGuid = {0xc620b83a, 0x3175, 0x11ec, {0x95, 0xb4, 0xf4, 0x2a, 0x7d, 0xcb, 0x92, 0x5d}}
+  #gRockchipEfiMemoryMapGuid  = {0xf8870015, 0x6994, 0x4b98, {0x95, 0xa2, 0xbd, 0x56, 0xda, 0x91, 0xc0, 0x7f}}
+  #gOemConfigGuid = {0x42927b59, 0x58fc, 0x41be, {0x8f, 0x59, 0xd1, 0x7c, 0x02, 0x1a, 0x70, 0x13}}
+  #gVersionInfoHobGuid = {0xe13a14c, 0x859c, 0x4f22, {0x82, 0xbd, 0x18, 0xe, 0xe1, 0x42, 0x12, 0xbf}}
+  #gOemBootVariableGuid = {0xb7784577, 0x5aaf, 0x4557, {0xa1, 0x99, 0xd4, 0xa4, 0x2f, 0x45, 0x06, 0xf8}}
+  #gEfiHisiSocControllerGuid = {0xee369cc3, 0xa743, 0x5382, {0x75, 0x64, 0x53, 0xe4, 0x31, 0x19, 0x38, 0x35}}
+  gShellSfHiiGuid = { 0x03a67756, 0x8cde, 0x4638, { 0x82, 0x34, 0x4a, 0x0f, 0x6d, 0x58, 0x81, 0x39 } }
+
+[LibraryClasses]
+  PlatformSysCtrlLib|Include/Library/PlatformSysCtrlLib.h
+  CpldIoLib|Include/Library/CpldIoLib.h
+  OemAddressMapLib|Include/Library/OemAddressMapLib.h
+  OemMiscLib|Include/Library/OemMiscLib.h
+  I2CLib|Include/Library/I2CLib.h
+  PlatformPciLib|Include/Library/PlatformPciLib.h
+  FdtUpdateLib|Include/Library/FdtUpdateLib.h
+  LpcLib|Include/Library/LpcLib.h
+
+[PcdsFixedAtBuild]
+  gRockchipTokenSpaceGuid.PcdNORFlashBase|0x00000000|UINT64|0x01000008
+  gRockchipTokenSpaceGuid.PcdNORFlashCachableSize|0x1000000|UINT32|0x0100000c
+
+  gRockchipTokenSpaceGuid.PcdSerialPortSendDelay|500000|UINT32|0x01000010
+  gRockchipTokenSpaceGuid.UartClkInHz|24000000|UINT32|0x0100001F
+  #gRockchipTokenSpaceGuid.PcdSerialRegisterSpaceSize|0x10000|UINT64|0x01000019
+
+  gRockchipTokenSpaceGuid.PcdDsaSmmuBaseAddress|0|UINT64|0x00000047
+  gRockchipTokenSpaceGuid.PcdPcieSmmuBaseAddress|0|UINT64|0x00000046
+  gRockchipTokenSpaceGuid.PcdAlgSmmuBaseAddress|0|UINT64|0x00000048
+  gRockchipTokenSpaceGuid.PcdM3SmmuBaseAddress|0|UINT64|0x00000049
+
+  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4ApbBaseAddress|0|UINT64|0x10000050
+  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4DbiBaseAddress|0|UINT64|0x10000051
+  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4CfgBaseAddress|0|UINT64|0x10000052
+  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4CfgSize|0|UINT64|0x10000053
+  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4IoBaseAddress|0|UINT32|0x10000054
+  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4IoSize|0|UINT32|0x10000055
+  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4MemBaseAddress|0|UINT32|0x10000056
+  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4MemSize|0|UINT32|0x10000057
+  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4MemBaseAddress64|0|UINT64|0x10000058
+  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4MemSize64|0|UINT64|0x10000059
+
+  gRockchipTokenSpaceGuid.PcdSysControlBaseAddress|0|UINT64|0x01000023
+  gRockchipTokenSpaceGuid.PcdCpldBaseAddress|0|UINT64|0x01000024
+  gRockchipTokenSpaceGuid.PcdMailBoxAddress|0|UINT64|0x01000025
+
+  gRockchipTokenSpaceGuid.PcdSFCCFGBaseAddress|0|UINT64|0x01000037
+  gRockchipTokenSpaceGuid.PcdSFCMEM0BaseAddress|0|UINT64|0x01000038
+
+  gRockchipTokenSpaceGuid.PcdPeriSubctrlAddress|0|UINT64|0x01000041
+
+  gRockchipTokenSpaceGuid.PcdMdioSubctrlAddress|0|UINT64|0x01000042
+
+  gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x0 }|VOID*|0x02000001
+  gRockchipTokenSpaceGuid.PcdI2cSlaveBuses|{ 0x0 }|VOID*|0x02000002
+  gRockchipTokenSpaceGuid.PcdI2cControllersEnabled|{ 0x0 }|VOID*|0x02000003
+  gRockchipTokenSpaceGuid.PcdI2cClockFrequency|0|UINT32|0x02000004
+  gRockchipTokenSpaceGuid.PcdI2cBaudRate|0|UINT32|0x02000005
+  gRockchipTokenSpaceGuid.PcdI2cBusCount|0|UINT32|0x02000006
+  gRockchipTokenSpaceGuid.PcdI2cDemoAddresses|{ 0x0 }|VOID*|0x02000007
+  gRockchipTokenSpaceGuid.PcdI2cDemoBuses|{ 0x0 }|VOID*|0x02000008
+
+  gRockchipTokenSpaceGuid.PcdFirmwareVendor|L"Rockchip Corp."|VOID*|0x30000052
+  gRockchipTokenSpaceGuid.PcdSystemProductName|L""|VOID*|0x30000053
+  gRockchipTokenSpaceGuid.PcdSystemVersion|L""|VOID*|0x30000054
+  gRockchipTokenSpaceGuid.PcdBaseBoardProductName|L""|VOID*|0x30000055
+  gRockchipTokenSpaceGuid.PcdBaseBoardVersion|L""|VOID*|0x30000056
+  gRockchipTokenSpaceGuid.PcdCPUInfo|L""|VOID*|0x30000060
+  gRockchipTokenSpaceGuid.PcdBiosVersionString|L""|VOID*|0x00010069
+  gRockchipTokenSpaceGuid.PcdBiosVersionForBmc|L""|VOID*|0x00010070
+
+  gRockchipTokenSpaceGuid.PcdPlatformDefaultPackageType|0x0|UINT32|0x40000001
+
+  gRockchipTokenSpaceGuid.PcdTopOfLowMemory|0x0|UINT32|0x40000002
+  gRockchipTokenSpaceGuid.PcdBottomOfHighMemory|0x0|UINT64|0x40000003
+
+  gRockchipTokenSpaceGuid.PcdSlotPerChannelNum|0x0|UINT32|0x40000004
+
+  gRockchipTokenSpaceGuid.PcdShellFile|{ 0x83, 0xA5, 0x04, 0x7C, 0x3E, 0x9E, 0x1C, 0x4F, 0xAD, 0x65, 0xE0, 0x52, 0x68, 0xD0, 0xB4, 0xD1 }|VOID*|0x30006554
+
+  gRockchipTokenSpaceGuid.PcdSdhciDxeBaseAddress|0x0|UINT32|0x40000035
+
+  #FDT File Address
+  gRockchipTokenSpaceGuid.FdtFileAddress|0x0|UINT64|0x40000005
+
+  #Reserved for NVRAM
+  gRockchipTokenSpaceGuid.PcdReservedNvramBase|0x0|UINT64|0x40000006
+  gRockchipTokenSpaceGuid.PcdReservedNvramSize|0x0|UINT64|0x40000007
+
+  gRockchipTokenSpaceGuid.PcdTrustedFirmwareEnable|0x0|UINT64|0x40000008
+  gRockchipTokenSpaceGuid.PcdTrustedFirmwareBL1Base|0x0|UINT64|0x40000009
+  gRockchipTokenSpaceGuid.PcdTrustedFirmwareMagicNum|0x5A5A5A5A|UINT32|0x4000000a
+  gRockchipTokenSpaceGuid.PcdIsMPBoot|0|UINT32|0x4000000b
+  gRockchipTokenSpaceGuid.PcdSocketMask|1|UINT32|0x4000001b
+
+  gRockchipTokenSpaceGuid.PcdMacAddress|0x0|UINT64|0x4000000c
+  gRockchipTokenSpaceGuid.PcdNumaEnable|0|UINT32|0x4000000d
+
+  gRockchipTokenSpaceGuid.PcdArmPrimaryCoreTemp|0x0|UINT64|0x10000038
+
+  gRockchipTokenSpaceGuid.PcdPcieRootBridgeMask|0|UINT32|0x00000044
+  gRockchipTokenSpaceGuid.PcdPcieRootBridgeMask2P|0|UINT32|0x00000045
+
+  gRockchipTokenSpaceGuid.PcdHb1BaseAddress|0x400000000000|UINT64|0x00000051   # 4T
+  gRockchipTokenSpaceGuid.PcdHb0Rb1PciConfigurationSpaceBaseAddress|0|UINT64|0x00000052
+  gRockchipTokenSpaceGuid.PcdHb0Rb1PciConfigurationSpaceSize|0|UINT64|0x00000053
+  gRockchipTokenSpaceGuid.PcdHb0Rb0PciConfigurationSpaceBaseAddress|0|UINT64|0x00000054
+  gRockchipTokenSpaceGuid.PcdHb0Rb0PciConfigurationSpaceSize|0|UINT64|0x00000055
+  gRockchipTokenSpaceGuid.PcdHb0Rb2PciConfigurationSpaceBaseAddress|0|UINT64|0x00000056
+  gRockchipTokenSpaceGuid.PcdHb0Rb2PciConfigurationSpaceSize|0|UINT64|0x00000057
+  gRockchipTokenSpaceGuid.PcdHb0Rb3PciConfigurationSpaceBaseAddress|0|UINT64|0x00000058
+  gRockchipTokenSpaceGuid.PcdHb0Rb3PciConfigurationSpaceSize|0|UINT64|0x00000059
+  gRockchipTokenSpaceGuid.PcdHb0Rb4PciConfigurationSpaceBaseAddress|0|UINT64|0x00000152
+  gRockchipTokenSpaceGuid.PcdHb0Rb4PciConfigurationSpaceSize|0|UINT64|0x00000153
+  gRockchipTokenSpaceGuid.PcdHb0Rb5PciConfigurationSpaceBaseAddress|0|UINT64|0x00000154
+  gRockchipTokenSpaceGuid.PcdHb0Rb5PciConfigurationSpaceSize|0|UINT64|0x00000155
+  gRockchipTokenSpaceGuid.PcdHb0Rb6PciConfigurationSpaceBaseAddress|0|UINT64|0x00000156
+  gRockchipTokenSpaceGuid.PcdHb0Rb6PciConfigurationSpaceSize|0|UINT64|0x00000157
+  gRockchipTokenSpaceGuid.PcdHb0Rb7PciConfigurationSpaceBaseAddress|0|UINT64|0x00000158
+  gRockchipTokenSpaceGuid.PcdHb0Rb7PciConfigurationSpaceSize|0|UINT64|0x00000159
+
+  gRockchipTokenSpaceGuid.PcdHb1Rb0PciConfigurationSpaceBaseAddress|0|UINT64|0x00000252
+  gRockchipTokenSpaceGuid.PcdHb1Rb0PciConfigurationSpaceSize|0|UINT64|0x00000253
+  gRockchipTokenSpaceGuid.PcdHb1Rb1PciConfigurationSpaceBaseAddress|0|UINT64|0x00000254
+  gRockchipTokenSpaceGuid.PcdHb1Rb1PciConfigurationSpaceSize|0|UINT64|0x00000255
+  gRockchipTokenSpaceGuid.PcdHb1Rb2PciConfigurationSpaceBaseAddress|0|UINT64|0x00000256
+  gRockchipTokenSpaceGuid.PcdHb1Rb2PciConfigurationSpaceSize|0|UINT64|0x00000257
+  gRockchipTokenSpaceGuid.PcdHb1Rb3PciConfigurationSpaceBaseAddress|0|UINT64|0x00000258
+  gRockchipTokenSpaceGuid.PcdHb1Rb3PciConfigurationSpaceSize|0|UINT64|0x00000259
+  gRockchipTokenSpaceGuid.PcdHb1Rb4PciConfigurationSpaceBaseAddress|0|UINT64|0x00000352
+  gRockchipTokenSpaceGuid.PcdHb1Rb4PciConfigurationSpaceSize|0|UINT64|0x00000353
+  gRockchipTokenSpaceGuid.PcdHb1Rb5PciConfigurationSpaceBaseAddress|0|UINT64|0x00000354
+  gRockchipTokenSpaceGuid.PcdHb1Rb5PciConfigurationSpaceSize|0|UINT64|0x00000355
+  gRockchipTokenSpaceGuid.PcdHb1Rb6PciConfigurationSpaceBaseAddress|0|UINT64|0x00000356
+  gRockchipTokenSpaceGuid.PcdHb1Rb6PciConfigurationSpaceSize|0|UINT64|0x00000357
+  gRockchipTokenSpaceGuid.PcdHb1Rb7PciConfigurationSpaceBaseAddress|0|UINT64|0x00000358
+  gRockchipTokenSpaceGuid.PcdHb1Rb7PciConfigurationSpaceSize|0|UINT64|0x00000359
+
+  gRockchipTokenSpaceGuid.PciHb0Rb0Base|0|UINT64|0x0000005a
+  gRockchipTokenSpaceGuid.PciHb0Rb1Base|0|UINT64|0x0000005b
+  gRockchipTokenSpaceGuid.PciHb0Rb2Base|0|UINT64|0x0000005c
+  gRockchipTokenSpaceGuid.PciHb0Rb3Base|0|UINT64|0x0000005d
+  gRockchipTokenSpaceGuid.PciHb0Rb4Base|0|UINT64|0x0100005a
+  gRockchipTokenSpaceGuid.PciHb0Rb5Base|0|UINT64|0x0100005b
+  gRockchipTokenSpaceGuid.PciHb0Rb6Base|0|UINT64|0x0100005c
+  gRockchipTokenSpaceGuid.PciHb0Rb7Base|0|UINT64|0x0100005d
+  gRockchipTokenSpaceGuid.PciHb1Rb0Base|0|UINT64|0x0200005a
+  gRockchipTokenSpaceGuid.PciHb1Rb1Base|0|UINT64|0x0200005b
+  gRockchipTokenSpaceGuid.PciHb1Rb2Base|0|UINT64|0x0200005c
+  gRockchipTokenSpaceGuid.PciHb1Rb3Base|0|UINT64|0x0200005d
+  gRockchipTokenSpaceGuid.PciHb1Rb4Base|0|UINT64|0x0300005a
+  gRockchipTokenSpaceGuid.PciHb1Rb5Base|0|UINT64|0x0300005b
+  gRockchipTokenSpaceGuid.PciHb1Rb6Base|0|UINT64|0x0300005c
+  gRockchipTokenSpaceGuid.PciHb1Rb7Base|0|UINT64|0x0300005d
+
+  gRockchipTokenSpaceGuid.PcdHb0Rb0PciRegionBaseAddress|0|UINT64|0x8000005a
+  gRockchipTokenSpaceGuid.PcdHb0Rb1PciRegionBaseAddress|0|UINT64|0x8000005b
+  gRockchipTokenSpaceGuid.PcdHb0Rb2PciRegionBaseAddress|0|UINT64|0x8000005c
+  gRockchipTokenSpaceGuid.PcdHb0Rb3PciRegionBaseAddress|0|UINT64|0x8000005d
+  gRockchipTokenSpaceGuid.PcdHb0Rb4PciRegionBaseAddress|0|UINT64|0x8000005e
+  gRockchipTokenSpaceGuid.PcdHb0Rb5PciRegionBaseAddress|0|UINT64|0x8000005f
+  gRockchipTokenSpaceGuid.PcdHb0Rb6PciRegionBaseAddress|0|UINT64|0x80000060
+  gRockchipTokenSpaceGuid.PcdHb0Rb7PciRegionBaseAddress|0|UINT64|0x80000061
+  gRockchipTokenSpaceGuid.PcdHb1Rb0PciRegionBaseAddress|0|UINT64|0x80000062
+  gRockchipTokenSpaceGuid.PcdHb1Rb1PciRegionBaseAddress|0|UINT64|0x80000063
+  gRockchipTokenSpaceGuid.PcdHb1Rb2PciRegionBaseAddress|0|UINT64|0x80000064
+  gRockchipTokenSpaceGuid.PcdHb1Rb3PciRegionBaseAddress|0|UINT64|0x80000065
+  gRockchipTokenSpaceGuid.PcdHb1Rb4PciRegionBaseAddress|0|UINT64|0x80000066
+  gRockchipTokenSpaceGuid.PcdHb1Rb5PciRegionBaseAddress|0|UINT64|0x80000067
+  gRockchipTokenSpaceGuid.PcdHb1Rb6PciRegionBaseAddress|0|UINT64|0x80000068
+  gRockchipTokenSpaceGuid.PcdHb1Rb7PciRegionBaseAddress|0|UINT64|0x80000069
+
+  gRockchipTokenSpaceGuid.PcdHb0Rb0PciRegionSize|0|UINT64|0x6000005a
+  gRockchipTokenSpaceGuid.PcdHb0Rb1PciRegionSize|0|UINT64|0x6000005b
+  gRockchipTokenSpaceGuid.PcdHb0Rb2PciRegionSize|0|UINT64|0x6000005c
+  gRockchipTokenSpaceGuid.PcdHb0Rb3PciRegionSize|0|UINT64|0x6000005d
+  gRockchipTokenSpaceGuid.PcdHb0Rb4PciRegionSize|0|UINT64|0x6000005e
+  gRockchipTokenSpaceGuid.PcdHb0Rb5PciRegionSize|0|UINT64|0x6000005f
+  gRockchipTokenSpaceGuid.PcdHb0Rb6PciRegionSize|0|UINT64|0x60000060
+  gRockchipTokenSpaceGuid.PcdHb0Rb7PciRegionSize|0|UINT64|0x60000061
+  gRockchipTokenSpaceGuid.PcdHb1Rb0PciRegionSize|0|UINT64|0x60000062
+  gRockchipTokenSpaceGuid.PcdHb1Rb1PciRegionSize|0|UINT64|0x60000063
+  gRockchipTokenSpaceGuid.PcdHb1Rb2PciRegionSize|0|UINT64|0x60000064
+  gRockchipTokenSpaceGuid.PcdHb1Rb3PciRegionSize|0|UINT64|0x60000065
+  gRockchipTokenSpaceGuid.PcdHb1Rb4PciRegionSize|0|UINT64|0x60000066
+  gRockchipTokenSpaceGuid.PcdHb1Rb5PciRegionSize|0|UINT64|0x60000067
+  gRockchipTokenSpaceGuid.PcdHb1Rb6PciRegionSize|0|UINT64|0x60000068
+  gRockchipTokenSpaceGuid.PcdHb1Rb7PciRegionSize|0|UINT64|0x60000069
+
+  gRockchipTokenSpaceGuid.PcdHb0Rb0CpuMemRegionBase|0|UINT64|0x7000005a
+  gRockchipTokenSpaceGuid.PcdHb0Rb1CpuMemRegionBase|0|UINT64|0x7000005b
+  gRockchipTokenSpaceGuid.PcdHb0Rb2CpuMemRegionBase|0|UINT64|0x7000005c
+  gRockchipTokenSpaceGuid.PcdHb0Rb3CpuMemRegionBase|0|UINT64|0x7000005d
+  gRockchipTokenSpaceGuid.PcdHb0Rb4CpuMemRegionBase|0|UINT64|0x7000005e
+  gRockchipTokenSpaceGuid.PcdHb0Rb5CpuMemRegionBase|0|UINT64|0x7000005f
+  gRockchipTokenSpaceGuid.PcdHb0Rb6CpuMemRegionBase|0|UINT64|0x70000060
+  gRockchipTokenSpaceGuid.PcdHb0Rb7CpuMemRegionBase|0|UINT64|0x70000061
+  gRockchipTokenSpaceGuid.PcdHb1Rb0CpuMemRegionBase|0|UINT64|0x70000062
+  gRockchipTokenSpaceGuid.PcdHb1Rb1CpuMemRegionBase|0|UINT64|0x70000063
+  gRockchipTokenSpaceGuid.PcdHb1Rb2CpuMemRegionBase|0|UINT64|0x70000064
+  gRockchipTokenSpaceGuid.PcdHb1Rb3CpuMemRegionBase|0|UINT64|0x70000065
+  gRockchipTokenSpaceGuid.PcdHb1Rb4CpuMemRegionBase|0|UINT64|0x70000066
+  gRockchipTokenSpaceGuid.PcdHb1Rb5CpuMemRegionBase|0|UINT64|0x70000067
+  gRockchipTokenSpaceGuid.PcdHb1Rb6CpuMemRegionBase|0|UINT64|0x70000068
+  gRockchipTokenSpaceGuid.PcdHb1Rb7CpuMemRegionBase|0|UINT64|0x70000069
+
+  gRockchipTokenSpaceGuid.PcdHb0Rb0CpuIoRegionBase|0|UINT64|0x3000005a
+  gRockchipTokenSpaceGuid.PcdHb0Rb1CpuIoRegionBase|0|UINT64|0x3000005b
+  gRockchipTokenSpaceGuid.PcdHb0Rb2CpuIoRegionBase|0|UINT64|0x3000005c
+  gRockchipTokenSpaceGuid.PcdHb0Rb3CpuIoRegionBase|0|UINT64|0x3000005d
+  gRockchipTokenSpaceGuid.PcdHb0Rb4CpuIoRegionBase|0|UINT64|0x3000005e
+  gRockchipTokenSpaceGuid.PcdHb0Rb5CpuIoRegionBase|0|UINT64|0x30000070
+  gRockchipTokenSpaceGuid.PcdHb0Rb6CpuIoRegionBase|0|UINT64|0x30000061
+  gRockchipTokenSpaceGuid.PcdHb0Rb7CpuIoRegionBase|0|UINT64|0x30000062
+  gRockchipTokenSpaceGuid.PcdHb1Rb0CpuIoRegionBase|0|UINT64|0x30000063
+  gRockchipTokenSpaceGuid.PcdHb1Rb1CpuIoRegionBase|0|UINT64|0x30000064
+  gRockchipTokenSpaceGuid.PcdHb1Rb2CpuIoRegionBase|0|UINT64|0x30000065
+  gRockchipTokenSpaceGuid.PcdHb1Rb3CpuIoRegionBase|0|UINT64|0x30000066
+  gRockchipTokenSpaceGuid.PcdHb1Rb4CpuIoRegionBase|0|UINT64|0x30000067
+  gRockchipTokenSpaceGuid.PcdHb1Rb5CpuIoRegionBase|0|UINT64|0x30000068
+  gRockchipTokenSpaceGuid.PcdHb1Rb6CpuIoRegionBase|0|UINT64|0x30000069
+  gRockchipTokenSpaceGuid.PcdHb1Rb7CpuIoRegionBase|0|UINT64|0x3000006a
+
+  gRockchipTokenSpaceGuid.PcdHb0Rb0IoBase|0|UINT64|0x9000005a
+  gRockchipTokenSpaceGuid.PcdHb0Rb1IoBase|0|UINT64|0x9000005b
+  gRockchipTokenSpaceGuid.PcdHb0Rb2IoBase|0|UINT64|0x9000005c
+  gRockchipTokenSpaceGuid.PcdHb0Rb3IoBase|0|UINT64|0x9000005d
+  gRockchipTokenSpaceGuid.PcdHb0Rb4IoBase|0|UINT64|0x9100005a
+  gRockchipTokenSpaceGuid.PcdHb0Rb5IoBase|0|UINT64|0x9100005b
+  gRockchipTokenSpaceGuid.PcdHb0Rb6IoBase|0|UINT64|0x9100005c
+  gRockchipTokenSpaceGuid.PcdHb0Rb7IoBase|0|UINT64|0x9100005d
+  gRockchipTokenSpaceGuid.PcdHb1Rb0IoBase|0|UINT64|0x9010005a
+  gRockchipTokenSpaceGuid.PcdHb1Rb1IoBase|0|UINT64|0x9010005b
+  gRockchipTokenSpaceGuid.PcdHb1Rb2IoBase|0|UINT64|0x9010005c
+  gRockchipTokenSpaceGuid.PcdHb1Rb3IoBase|0|UINT64|0x9010005d
+  gRockchipTokenSpaceGuid.PcdHb1Rb4IoBase|0|UINT64|0x9110005a
+  gRockchipTokenSpaceGuid.PcdHb1Rb5IoBase|0|UINT64|0x9110005b
+  gRockchipTokenSpaceGuid.PcdHb1Rb6IoBase|0|UINT64|0x9110005c
+  gRockchipTokenSpaceGuid.PcdHb1Rb7IoBase|0|UINT64|0x9110005d
+
+  gRockchipTokenSpaceGuid.PcdHb0Rb0IoSize|0|UINT64|0x2000005a
+  gRockchipTokenSpaceGuid.PcdHb0Rb1IoSize|0|UINT64|0x2000005b
+  gRockchipTokenSpaceGuid.PcdHb0Rb2IoSize|0|UINT64|0x2000005c
+  gRockchipTokenSpaceGuid.PcdHb0Rb3IoSize|0|UINT64|0x2000005d
+  gRockchipTokenSpaceGuid.PcdHb0Rb4IoSize|0|UINT64|0x2100005a
+  gRockchipTokenSpaceGuid.PcdHb0Rb5IoSize|0|UINT64|0x2100005b
+  gRockchipTokenSpaceGuid.PcdHb0Rb6IoSize|0|UINT64|0x2100005c
+  gRockchipTokenSpaceGuid.PcdHb0Rb7IoSize|0|UINT64|0x2100005d
+  gRockchipTokenSpaceGuid.PcdHb1Rb0IoSize|0|UINT64|0x2010005a
+  gRockchipTokenSpaceGuid.PcdHb1Rb1IoSize|0|UINT64|0x2010005b
+  gRockchipTokenSpaceGuid.PcdHb1Rb2IoSize|0|UINT64|0x2010005c
+  gRockchipTokenSpaceGuid.PcdHb1Rb3IoSize|0|UINT64|0x2010005d
+  gRockchipTokenSpaceGuid.PcdHb1Rb4IoSize|0|UINT64|0x2110005a
+  gRockchipTokenSpaceGuid.PcdHb1Rb5IoSize|0|UINT64|0x2110005b
+  gRockchipTokenSpaceGuid.PcdHb1Rb6IoSize|0|UINT64|0x2110005c
+  gRockchipTokenSpaceGuid.PcdHb1Rb7IoSize|0|UINT64|0x2110005d
+
+  gRockchipTokenSpaceGuid.Pcdsoctype|0|UINT32|0x00000061
+  gRockchipTokenSpaceGuid.PcdSerDesFlowCtrlFlag|0|UINT32|0x40000056
+
+  gRockchipTokenSpaceGuid.SpiTestBaseAddr|0|UINT32|0x21200001
+  gRockchipTokenSpaceGuid.SpiRK806BaseAddr|0|UINT32|0x21200002
+
+  gRockchipTokenSpaceGuid.PcdEhciBaseAddress|0|UINT32|0x50000060
+  gRockchipTokenSpaceGuid.PcdNumEhciController|0|UINT32|0x50000061
+  gRockchipTokenSpaceGuid.PcdEhciSize|0|UINT32|0x50000062
+  gRockchipTokenSpaceGuid.PcdOhciBaseAddress|0|UINT32|0x50000063
+  gRockchipTokenSpaceGuid.PcdNumOhciController|0|UINT32|0x50000064
+  gRockchipTokenSpaceGuid.PcdOhciSize|0|UINT32|0x50000065
+
+  gRockchipTokenSpaceGuid.PcdXhciBaseAddress|0|UINT32|0x50000066
+  gRockchipTokenSpaceGuid.PcdNumXhciController|0|UINT32|0x50000067
+  gRockchipTokenSpaceGuid.PcdXhciSize|0|UINT32|0x50000068
+  gRockchipTokenSpaceGuid.PcdDwc3BaseAddress|0|UINT32|0x50000069
+  gRockchipTokenSpaceGuid.PcdNumDwc3Controller|0|UINT32|0x50000070
+  gRockchipTokenSpaceGuid.PcdDwc3Size|0|UINT32|0x50000071
+
+  gRockchipTokenSpaceGuid.FspiBaseAddr|0|UINT64|0x21200003
+  gRockchipTokenSpaceGuid.PcdSpiVariableOffset|0|UINT32|0x21200004
+  gRockchipTokenSpaceGuid.CruBaseAddr|0|UINT64|0x21200008
+
+  gRockchipTokenSpaceGuid.PcdNvStorageVariableBase|0|UINT32|0x21200005
+  gRockchipTokenSpaceGuid.PcdNvStorageFtwWorkingBase|0|UINT32|0x21200006
+  gRockchipTokenSpaceGuid.PcdNvStorageFtwSpareBase|0|UINT32|0x21200007
+
+  gRockchipTokenSpaceGuid.PcdLcdPixelFormat|0|UINT32|0x32000001
+  gRockchipTokenSpaceGuid.PcdComboPhyMode|{ 0x0 }|VOID*|0x32000002
+  
+[PcdsFeatureFlag]
+  gRockchipTokenSpaceGuid.PcdIsItsSupported|FALSE|BOOLEAN|0x00000065
+

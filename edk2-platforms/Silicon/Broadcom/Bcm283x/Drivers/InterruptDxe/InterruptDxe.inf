@@ -1,0 +1,44 @@
+#/** @file
+#  Copyright (c) 2019, ARM Limited. All rights reserved.
+#  Copyright (c) 2017, Andrei Warkentin <andrey.warkentin@gmail.com>
+#  Copyright (c) 2016 Linaro, Ltd. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = InterruptDxe
+  FILE_GUID                      = 3944f2d7-2e09-4fc0-9e98-008375641453
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InterruptDxeInitialize
+
+[Sources]
+  InterruptDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  Silicon/Broadcom/Bcm283x/Bcm283x.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  IoLib
+  PcdLib
+  UefiBootServicesTableLib
+  UefiLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gHardwareInterruptProtocolGuid  ## PRODUCES
+  gEfiCpuArchProtocolGuid         ## CONSUMES ## NOTIFY
+
+[FixedPcd]
+  gBcm283xTokenSpaceGuid.PcdBcm283xRegistersAddress
+  gEmbeddedTokenSpaceGuid.PcdInterruptBaseAddress
+
+[Depex]
+  TRUE

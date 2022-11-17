@@ -1,0 +1,66 @@
+### @file
+# Component information file for the Platform Init Pre-Memory PEI module.
+#
+# Copyright (c) 2017 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+###
+
+[Defines]
+  INF_VERSION                    = 0x00010017
+  BASE_NAME                      = PlatformInitPreMem
+  FILE_GUID                      = EEEE611D-F78F-4FB9-B868-55907F169280
+  VERSION_STRING                 = 1.0
+  MODULE_TYPE                    = PEIM
+  ENTRY_POINT                    = PlatformInitPreMemEntryPoint
+
+[LibraryClasses]
+  BaseMemoryLib
+  BoardInitLib
+  DebugLib
+  HobLib
+  IoLib
+  MemoryAllocationLib
+  PeimEntryPoint
+  PeiServicesLib
+  TestPointCheckLib
+  TimerLib
+  SetCacheMtrrLib
+  ReportCpuHobLib
+
+[Packages]
+  MinPlatformPkg/MinPlatformPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  IntelSiliconPkg/IntelSiliconPkg.dec
+
+[Pcd]
+  gMinPlatformPkgTokenSpaceGuid.PcdFspWrapperBootMode          ## CONSUMES
+  gMinPlatformPkgTokenSpaceGuid.PcdStopAfterDebugInit          ## CONSUMES
+  gMinPlatformPkgTokenSpaceGuid.PcdStopAfterMemInit            ## CONSUMES
+
+[FixedPcd]
+  gMinPlatformPkgTokenSpaceGuid.PcdPlatformEfiAcpiReclaimMemorySize  ## CONSUMES
+  gMinPlatformPkgTokenSpaceGuid.PcdPlatformEfiAcpiNvsMemorySize      ## CONSUMES
+  gMinPlatformPkgTokenSpaceGuid.PcdPlatformEfiReservedMemorySize     ## CONSUMES
+  gMinPlatformPkgTokenSpaceGuid.PcdPlatformEfiRtDataMemorySize       ## CONSUMES
+  gMinPlatformPkgTokenSpaceGuid.PcdPlatformEfiRtCodeMemorySize       ## CONSUMES
+
+[Sources]
+  PlatformInitPreMem.c
+
+[Ppis]
+  gEfiPeiMemoryDiscoveredPpiGuid
+  gEfiPeiMasterBootModePpiGuid                  ## PRODUCES
+  gEfiPeiBootInRecoveryModePpiGuid              ## PRODUCES
+  gPlatformInitTempRamExitPpiGuid               ## PRODUCES
+  gEfiPeiReadOnlyVariable2PpiGuid
+  gPeiBaseMemoryTestPpiGuid
+  gPeiPlatformMemorySizePpiGuid
+
+[Guids]
+  gEfiMemoryTypeInformationGuid
+
+[Depex]
+  gEfiPeiReadOnlyVariable2PpiGuid

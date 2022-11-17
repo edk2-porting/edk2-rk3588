@@ -1,0 +1,13 @@
+## @file
+#  Component description file for the Simics Ich10 SiPkg DXE drivers.
+#
+# Copyright (c) 2019 Intel Corporation. All rights reserved. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+!if gMinPlatformPkgTokenSpaceGuid.PcdBootToShellOnly == FALSE
+  INF  $(PCH_PKG)/SmmControl/RuntimeDxe/SmmControl2Dxe.inf
+  INF  $(PCH_PKG)/Spi/Smm/PchSpiSmm.inf
+!endif

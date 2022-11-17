@@ -1,0 +1,110 @@
+## @file
+# Component description file for PchInitSmm driver
+#
+#  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+
+[Defines]
+INF_VERSION = 0x00010017
+BASE_NAME = PchInitSmm
+FILE_GUID = D7B10D4E-67E6-4C74-83E9-F9AF0ACC33CC
+VERSION_STRING = 1.0
+MODULE_TYPE = DXE_SMM_DRIVER
+PI_SPECIFICATION_VERSION = 1.10
+ENTRY_POINT = PchInitSmmEntryPoint
+#
+# The following information is for reference only and not required by the build tools.
+#
+# VALID_ARCHITECTURES = IA32 X64
+#
+
+
+[LibraryClasses]
+UefiBootServicesTableLib
+UefiDriverEntryPoint
+DxeServicesTableLib
+IoLib
+DebugLib
+BaseLib
+BaseMemoryLib
+S3BootScriptLib
+PciExpressHelpersLib
+SmmServicesTableLib
+PciSegmentLib
+HobLib
+GpioLib
+GpioPrivateLib
+ReportStatusCodeLib
+DevicePathLib
+PmcLib
+PchPcieRpLib
+PchInfoLib
+EspiLib
+TimerLib
+ConfigBlockLib
+PmcPrivateLib
+SataLib
+GbeLib
+GbeMdiLib
+SpiAccessPrivateLib
+PchPciBdfLib
+
+[Packages]
+MdePkg/MdePkg.dec
+TigerlakeSiliconPkg/SiPkg.dec
+
+
+[Pcd]
+gSiPkgTokenSpaceGuid.PcdSiPciExpressBaseAddress
+gSiPkgTokenSpaceGuid.PcdSiliconInitTempPciBusMin
+gSiPkgTokenSpaceGuid.PcdSiliconInitTempPciBusMax
+gSiPkgTokenSpaceGuid.PcdSiliconInitTempMemBaseAddr
+gSiPkgTokenSpaceGuid.PcdSiliconInitTempMemSize
+
+
+[Sources]
+PchInitSmm.c
+PchPcieSmm.c
+GbeSxSmm.c
+PchInitSmm.h
+PchBiosWriteProtect.c
+PchSpiAsync.c
+PchHdaSxSmm.c
+
+
+[Protocols]
+gEfiSmmIoTrapDispatch2ProtocolGuid ## CONSUMES
+gEfiSmmSxDispatch2ProtocolGuid ## CONSUMES
+gPchSmmIoTrapControlGuid ## CONSUMES
+gEfiSmmCpuProtocolGuid ## CONSUMES
+gPchNvsAreaProtocolGuid ## CONSUMES
+gPchPcieSmiDispatchProtocolGuid ## CONSUMES
+gPchTcoSmiDispatchProtocolGuid ## CONSUMES
+gPchSmiDispatchProtocolGuid ## CONSUMES
+gPchEspiSmiDispatchProtocolGuid ## CONSUMES
+gPchPcieIoTrapProtocolGuid ## PRODUCES
+gPchPolicyProtocolGuid ##CONSUMES
+
+
+[Guids]
+gSiConfigHobGuid             ## CONSUMES
+gPchConfigHobGuid            ## CONSUMES
+gPchDeviceTableHobGuid
+gPchPcieRpDxeConfigGuid         ## CONSUMES
+
+
+[Depex]
+gEfiSmmIoTrapDispatch2ProtocolGuid AND
+gEfiSmmSxDispatch2ProtocolGuid AND
+gPchSmmIoTrapControlGuid AND
+gPchPcieSmiDispatchProtocolGuid AND
+gPchTcoSmiDispatchProtocolGuid AND
+gEfiSmmCpuProtocolGuid AND
+gPchNvsAreaProtocolGuid AND
+gEfiPciHostBridgeResourceAllocationProtocolGuid AND # This is to ensure that PCI MMIO resource has been prepared and available for this driver to allocate.
+gEfiSmmBase2ProtocolGuid AND # This is for SmmServicesTableLib
+gPchPolicyProtocolGuid
+

@@ -1,0 +1,54 @@
+## @file
+#
+# @copyright
+# Copyright 2012 - 2021 Intel Corporation. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UbaConfigDatabasePei
+  FILE_GUID                      = 2C181BE1-8BAC-4433-873C-E5074CB5A723
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = UbaConfigDatabasePeimEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32
+#
+
+[Sources]
+  CfgDbPei.c
+  CfgDbPei.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  WhitleyOpenBoardPkg/PlatformPkg.dec
+
+[LibraryClasses]
+  HobLib
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  PeiServicesLib
+  PeimEntryPoint
+  DebugLib
+  PeiServicesTablePointerLib
+
+[Guids]
+  gUbaCurrentConfigHobGuid
+
+[Ppis]
+  gUbaConfigDatabasePpiGuid
+  gEfiEndOfPeiSignalPpiGuid
+
+[Pcd]
+
+[Depex]
+  TRUE
+
+

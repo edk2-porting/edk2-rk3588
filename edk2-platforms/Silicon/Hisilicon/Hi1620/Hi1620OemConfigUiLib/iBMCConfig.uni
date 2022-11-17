@@ -1,0 +1,28 @@
+// /** @file
+// OEM Config Library used by UiApp
+//
+//
+//  Copyright (c) 2018, Hisilicon Limited. All rights reserved.
+//  Copyright (c) 2018, Linaro Limited. All rights reserved.
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// **/
+#langdef   en-US "English"
+
+#string STR_BMC_WATCHDOG_TIMER                      #language en-US  "iBMC WDT Support For POST"
+#string STR_BMC_WATCHDOG_TIMER_HELP                 #language en-US  "Enable/Disable iBMC watchdog timer at start of POST."
+#string STR_BMC_WATCHDOG_TIMER_TIMEOUT              #language en-US  "iBMC WDT TimeOut For POST"
+#string STR_BMC_WATCHDOG_TIMER_TIMEOUT_C10_HELP     #language en-US  "Enter the number of minutes the system firmware has to boot the OS before it takes the Timeout Action. Valid values are from 15 to 25 minutes."
+#string STR_BMC_WATCHDOG_TIMER_ACTION               #language en-US  "iBMC WDT Action For POST"
+#string STR_BMC_WATCHDOG_TIMER_ACTION_HELP          #language en-US  "Timeout Action Choices: No Action, Hard Reset, Power Down or Power Cycle"
+#string STR_BMC_WATCHDOG_TIMER_NO_ACTION            #language en-US  "No Action"
+#string STR_BMC_WATCHDOG_TIMER_HARD_RESET           #language en-US  "Hard Reset"
+#string STR_BMC_WATCHDOG_TIMER_POWER_DOWN           #language en-US  "Power Down"
+#string STR_BMC_WATCHDOG_TIMER_POWER_CYCLE          #language en-US  "Power Cycle"
+#string STR_BMC_OS_WATCHDOG_TIMER                   #language en-US  "iBMC WDT Support For OS"
+#string STR_BMC_OS_WATCHDOG_TIMER_HELP              #language en-US  "Enable/Disable OS Watchdog Timer When OS Load"
+#string STR_BMC_OS_WDT_TIMEOUT                      #language en-US  "iBMC WDT TimeOut For OS"
+#string STR_BMC_OS_WDT_TIMEOUT_HELP                 #language en-US  "Enter the number of minutes the system firmware \n has to OS Load before it takes the Timeout Action. Valid values are from 5 to 8 minutes."
+#string STR_BMC_OS_WDT_ACTION                       #language en-US  "iBMC WDT Action For OS"
+

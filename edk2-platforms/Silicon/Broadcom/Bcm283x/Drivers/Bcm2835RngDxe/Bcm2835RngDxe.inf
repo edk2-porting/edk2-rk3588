@@ -1,0 +1,44 @@
+#/** @file
+#
+#  Copyright (c) 2019, ARM Limited. All rights reserved.
+#  Copyright (c) 2019 Linaro, Ltd. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = Bcm2835RngDxe
+  FILE_GUID                      = 9743084e-c82a-4714-b2ba-f571f81cb021
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = Bcm2835RngEntryPoint
+
+[Sources]
+  Bcm2835RngDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  Silicon/Broadcom/Bcm283x/Bcm283x.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  IoLib
+  PcdLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiRngProtocolGuid              ## PRODUCES
+
+[Guids]
+  gEfiRngAlgorithmRaw
+
+[FixedPcd]
+  gBcm283xTokenSpaceGuid.PcdBcm283xRegistersAddress
+
+[Depex]
+  TRUE

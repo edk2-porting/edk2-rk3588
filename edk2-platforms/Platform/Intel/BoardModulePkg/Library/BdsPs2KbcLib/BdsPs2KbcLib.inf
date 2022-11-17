@@ -1,0 +1,38 @@
+## @file
+# Component information file for Ps2 keyboard controller library
+#
+# Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = BdsPs2KbcLib
+  FILE_GUID                      = E94EA52E-E84C-42E7-B863-EA1327EFA265
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.2
+  LIBRARY_CLASS                  = NULL|UEFI_DRIVER
+  CONSTRUCTOR                    = BdsPs2KbcLibConstructor
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  BoardModulePkg/BoardModulePkg.dec
+
+[Sources]
+  BdsPs2KbcLib.c
+  BdsPs2KbcLib.h
+
+[LibraryClasses]
+  DevicePathLib
+  DebugLib
+  IoLib
+  UefiDriverEntryPoint
+  UefiBootManagerLib
+  UefiLib
+  TimerLib
+
+[Pcd]
+  gBoardModulePkgTokenSpaceGuid.PcdPs2KbMsEnable
+  gBoardModulePkgTokenSpaceGuid.PcdSuperIoPciIsaBridgeDevice

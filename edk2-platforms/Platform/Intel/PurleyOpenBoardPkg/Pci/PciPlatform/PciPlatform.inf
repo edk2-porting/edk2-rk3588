@@ -1,0 +1,70 @@
+## @file
+#
+# Copyright (c) 2018 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                   = 0x00010005
+  BASE_NAME       		= PciPlatform
+  FILE_GUID       		= E2441B64-7EF4-41fe-B3A3-8CAA7F8D3017
+  MODULE_TYPE                  = DXE_DRIVER
+  VERSION_STRING                = 1.0
+  ENTRY_POINT                   = PciPlatformDriverEntry
+
+[Sources]
+  PciPlatform.c
+  PciPlatform.h
+  PciPlatformHooks.c
+  PciPlatformHooks.h
+  PciIovPlatformPolicy.c
+  PciIovPlatformPolicy.h
+  PciSupportLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+  PurleyOpenBoardPkg/OpenBoardPkg.dec
+  PurleyRefreshSiliconPkg/SiPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  IoLib
+  BaseMemoryLib
+  DebugLib
+  UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
+  HobLib
+  S3PciLib
+  PcdLib
+
+[Protocols]
+  gEfiPciCallbackProtocolGuid
+  gEfiCpuIo2ProtocolGuid
+  gEfiFirmwareVolume2ProtocolGuid
+  gEfiPciIoProtocolGuid
+  gEfiPciPlatformProtocolGuid
+  gEfiIioUdsProtocolGuid
+  gEfiPciRootBridgeIoProtocolGuid
+  gEfiPciIovPlatformProtocolGuid
+  gEfiIioSystemProtocolGuid
+  gEfiPciHostBridgeResourceAllocationProtocolGuid
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSystemPageSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSupport
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAriSupport
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMrIovSupport
+  gOemSkuTokenSpaceGuid.PcdSetupData
+  gMinPlatformPkgTokenSpaceGuid.PcdIoApicId
+  gMinPlatformPkgTokenSpaceGuid.PcdPcIoApicIdBase
+
+[FixedPcd]
+  gEfiCpRcPkgTokenSpaceGuid.PcdMaxNestedLevel
+
+[Depex]
+  TRUE
+

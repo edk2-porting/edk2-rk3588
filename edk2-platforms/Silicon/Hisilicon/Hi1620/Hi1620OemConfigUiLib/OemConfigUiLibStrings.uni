@@ -1,0 +1,36 @@
+/** @file
+*
+*  String definitions for the OEM Config.
+*
+*  Copyright (c) 2017 - 2018, Hisilicon Limited. All rights reserved.
+*  Copyright (c) 2017 - 2018, Linaro Limited. All rights reserved.
+*
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
+*
+**/
+
+/=#
+
+#langdef   en-US "English"
+
+#string STR_EMPTY_STRING               #language en-US  ""
+#string STR_BIOS_BUILDTIME_STRING      #language en-US  "Build Date"
+#string STR_MISC_BIOS_BUILDTIME        #language en-US  ""
+#string SYSTEM_TIME                    #language en-US  "System Time"
+#string SYSTEM_TIME_HELP               #language en-US  "System Time (HH:MM:SS)"
+#string SYSTEM_DATE                    #language en-US  "System Date"
+#string SYSTEM_DATE_HELP               #language en-US  "System Date (MM/DD/YYYY) Use [ENTER],[TAB] or [SHIFT-TAB] to select a field. Use [+] or [-] to configure system Time."
+#string STR_OEM_CONFIG                 #language en-US  "Oem Config"
+#string STR_ENABLED                    #language en-US  "Enabled"
+#string STR_DISABLED                   #language en-US  "Disabled"
+#string STR_MEMORY_CONFIG_FORM_TITLE   #language en-US  "Memory Config"
+#string STR_MEMORY_CONFIG_FORM_HELP    #language en-US  "Display Memory DIMM information."
+#string STR_PCIE_CONFIG_FORM_TITLE     #language en-US  "PCIe Config"
+#string STR_PCIE_CONFIG_FORM_HELP      #language en-US  "Display PCIe information."
+#string STR_MISC_CONFIG_FORM_TITLE     #language en-US  "MISC Config"
+#string STR_MISC_CONFIG_FORM_HELP      #language en-US  "Include SMMU Support Enable and Change the boot manner of DTB/ACPI."
+#string STR_IBMC_CONFIG_FORM_TITLE     #language en-US  "IBMC Config"
+#string STR_IBMC_CONFIG_FORM_HELP      #language en-US  "Include IBMC WDT(Watchdog Timer) Config."
+#string STR_RAS_CONFIG_FORM_TITLE      #language en-US  "RAS Config"
+#string STR_RAS_CONFIG_FORM_HELP       #language en-US  "Displays and provides option to change the Ras Configuration"
+#string STR_EXIT_STRING                #language en-US  "Press ESC to exit."

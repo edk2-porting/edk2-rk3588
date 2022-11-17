@@ -1,0 +1,145 @@
+/** @file
+
+Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+Scope (\_SB) {
+
+  Name (XCNT, 0)
+  Name (OSYS, 0)   // Global variable for type of OS.
+
+  //
+  // Device specific method
+  //
+  Method (_DSM, 4, Serialized) {
+    If (LEqual(Arg0,ToUUID("663E35AF-CC10-41A4-88EA-5470AF055295"))){
+
+      // L1 DIR POINTER
+      Switch (ToInteger(Arg2)) {
+        //
+        //Function 0: Return supported functions, based on revision
+        //
+        Case(0)
+        {
+          Switch (ToInteger(Arg1)) {
+            Case(0) { 
+              If (Lequal(EMCA,1))
+              {
+                Return ( Buffer() {0x3} )
+              }
+              Else
+              {
+                Return (Buffer() {0})
+              }
+            }
+          }
+            
+        } 
+        //
+        // Function 1: 
+        //
+        Case(1) {Return (LDIR) }
+        Default { }
+      } 
+    }
+
+    Return (Buffer() {0})
+  }
+
+  Method (_INI) {
+
+    If (CondRefOf (_OSI)) {
+
+      If (\_OSI ("Windows 2001.1 SP1")) {
+        Store (5, OSYS)      // Windows Server 2003 SP1
+      }
+
+      If (\_OSI ("Windows 2001.1")) {
+        Store (6, OSYS)      // Windows Server 2003
+      }
+
+      If (\_OSI ("Windows 2001 SP2")) {
+        Store (7, OSYS)      // Windows XP SP2
+      }
+
+      If (\_OSI ("Windows 2001")) {
+        Store (8, OSYS)      // Windows XP
+      }
+
+      If (\_OSI ("Windows 2006.1")) {
+        Store (9, OSYS)      // Windows Server 2008
+      }
+
+      If (\_OSI ("Windows 2006 SP1")) {
+        Store (10, OSYS)      // Windows Vista SP1
+      } 
+
+      If (\_OSI ("Windows 2006")) {
+        Store (11, OSYS)      // Windows Vista
+      }
+
+      If (\_OSI ("Windows 2009")) {
+        Store (12, OSYS)      // Windows Server 2008 R2 & Windows 7
+      }
+
+      If (\_OSI ("Windows 2012")) {
+        Store (13, OSYS)      // Windows Server 2012 & Windows 8
+      }
+
+      If (\_OSI ("Windows 2013")) {
+        Store (14, OSYS)      // Windows Server 2012 R2 & Windows 8.1
+      }
+
+      If (\_OSI ("Windows 2015")) {
+        Store (15, OSYS)      // Windows 10 & Windows Server Technical Preview
+      }
+
+      If (\_OSI ("Windows 2016")) {
+        Store (16, OSYS)      // Windows 10, version 1607
+      }
+
+      If (\_OSI ("Windows 2017")) {
+        Store (17, OSYS)      // Windows 10, version 1703
+      }
+
+      //
+      // Check Linux also
+      //
+      If (\_OSI ("Linux")) {
+        Store (1, OSYS)
+      }
+
+      If (\_OSI ("FreeBSD")) {
+        Store (2, OSYS)
+      }
+
+      If (\_OSI ("HP-UX")) {
+        Store (3, OSYS)
+      }
+
+      If (\_OSI ("OpenVMS")) {
+        Store (4, OSYS)
+      }
+
+      //
+      // Running WinSvr2012, Win8, or later?
+      //
+      If (LGreaterEqual (\_SB.OSYS, 13)) {
+        //
+        // It is Svr2012 or Win8
+        // Call xHCI device to switch USB ports over
+        //  unless it has been done already
+        //
+        If (LEqual (XCNT, 0)) {
+          Store (0x84, IO80)
+          Increment (XCNT)
+        }
+      } Else {
+        Store (\_SB.OSYS, IO80)
+      }
+    }  
+  } // End Method (_INI)
+  
+} // End Scope (_SB)

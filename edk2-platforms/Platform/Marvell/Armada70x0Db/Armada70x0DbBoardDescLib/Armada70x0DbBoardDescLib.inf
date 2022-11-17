@@ -1,0 +1,29 @@
+## @file
+#
+#  Copyright (C) 2018, Marvell International Ltd. and its affiliates<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = Armada70x0DbBoardDescLib
+  FILE_GUID                      = 3164c8d9-19d4-4ad6-8196-cea094b1ddf1
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmadaBoardDescLib
+
+[Sources]
+  Armada70x0DbBoardDescLib.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/Marvell/Marvell.dec
+
+[LibraryClasses]
+  DebugLib
+  IoLib

@@ -1,0 +1,33 @@
+/** @file
+
+Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+  Name (PRU0, Package() {
+    Package() { 0x0008FFFF, 0, \_SB.PC00.LPC0.LNKA, 0 },
+    Package() { 0x0008FFFF, 1, \_SB.PC00.LPC0.LNKB, 0 },
+    Package() { 0x0008FFFF, 2, \_SB.PC00.LPC0.LNKC, 0 },
+    Package() { 0x0008FFFF, 3, \_SB.PC00.LPC0.LNKD, 0 }
+  })
+
+  Name (ARU0, Package() {
+     Package() { 0x0008FFFF, 0, 0, 16 },
+     Package() { 0x0008FFFF, 1, 0, 17 },
+     Package() { 0x0008FFFF, 2, 0, 18 },
+     Package() { 0x0008FFFF, 3, 0, 19 }
+  })
+
+
+  Device (UNC0) {
+    Name (_UID, "UNCORE0")
+    Name (_ADR, 0x00000000)
+    Method (_PRT, 0) {
+      If (LEqual(PICM, Zero)) {
+        Return (PRU0)
+      }
+      Return (ARU0)
+    }
+  }
+

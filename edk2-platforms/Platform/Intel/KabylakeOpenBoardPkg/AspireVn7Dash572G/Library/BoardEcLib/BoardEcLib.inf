@@ -1,0 +1,27 @@
+## @file
+# Component information file for Aspire VN7-572G EC library
+#
+# Copyright (c) 2021, Baruch Binyamin Doron
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010017
+  BASE_NAME                      = BoardEcLib
+  FILE_GUID                      = 2406A521-A06B-4B48-ADBF-81E737771979
+  VERSION_STRING                 = 1.0
+  MODULE_TYPE                    = BASE
+  LIBRARY_CLASS                  = BoardEcLib
+
+[LibraryClasses]
+  DebugLib
+  EcLib
+  IoLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  KabylakeOpenBoardPkg/OpenBoardPkg.dec
+
+[Sources]
+  EcCommands.c

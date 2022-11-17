@@ -1,0 +1,81 @@
+## @file
+#
+# Copyright (c) 2018 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+################################################################################
+#
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = CsrToPciePeiLib
+  FILE_GUID                      = C18FB69B-D1A7-4EF0-988D-2A40FE2E96B0
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = CsrToPcieLib
+
+##  {C18FB69B-D1A7-4EF0-988D-2A40FE2E96B0}
+##{ 0xc18fb69b, 0xd1a7, 0x4ef0, { 0x98, 0x8d, 0x2a, 0x40, 0xfe, 0x2e, 0x96, 0xb0 } };
+
+
+[Sources]
+  CsrToPcieLib.c
+  ../ProcMemInit/Chip/Common/CpuPciAccessCommon.c
+
+################################################################################
+#
+# Package Dependency Section - list of Package files that are required for
+#                              this module.
+#
+################################################################################
+
+[Packages]
+  MdePkg/MdePkg.dec
+  PurleyRefreshSiliconPkg/SiPkg.dec
+
+################################################################################
+#
+# Library Class Section - list of Library Classes that are required for
+#                         this module.
+#
+################################################################################
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+
+[Protocols]
+
+[Guids]
+  gEfiCpRcPkgTokenSpaceGuid
+
+[FixedPcd]
+  gEfiCpRcPkgTokenSpaceGuid.PcdMaxCpuSocketCount
+
+[Depex]
+
+
+################################################################################
+#
+# Protocol C Name Section - list of Protocol and Protocol Notify C Names
+#                           that this module uses or produces.
+#
+################################################################################
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+  gEfiCpRcPkgTokenSpaceGuid.PcdPcieSegmentSize
+  gEfiCpRcPkgTokenSpaceGuid.PcdPcieMmcfgTablePtr
+
+
+[BuildOptions.Ia32]
+  MSFT:*_*_*_CC_FLAGS     = /W4 /Gs999999 /GF /GL- /wd4214 /wd4334 /wd4142 /wd4819 /DBUILDING_FOR_IA32  /DIA32 $(DSC_GLOBAL_BUILD_OPTIONS)
+  GCC:*_*_*_CC_FLAGS     = -DBUILDING_FOR_IA32  -DIA32 $(DSC_GLOBAL_BUILD_OPTIONS)
+
+[BuildOptions.X64]
+  MSFT:*_*_X64_CC_FLAGS   = /W2 /Gs32768 /DKTI_HW_PLATFORM /DBUILDING_FOR_X64 /UIA32 /DRAS_FEATURES /wd4142 /wd4819 $(DSC_GLOBAL_BUILD_OPTIONS)
+  GCC:*_*_X64_CC_FLAGS   = -DKTI_HW_PLATFORM -DBUILDING_FOR_X64 -UIA32 -DRAS_FEATURES $(DSC_GLOBAL_BUILD_OPTIONS)

@@ -1,0 +1,41 @@
+#/** @file
+#
+#  Copyright (c) 2018, Hisilicon Limited. All rights reserved.<BR>
+#  Copyright (c) 2018, Linaro Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = M41T83RealTimeClockLib
+  FILE_GUID                      = 470DFB96-E205-4515-A75E-2E60F853E79D
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = RealTimeClockLib
+
+[Sources.common]
+  M41T83RealTimeClockLib.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  Platform/Hisilicon/D06/D06.dec
+  Silicon/Hisilicon/HisiPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  CpldIoLib
+  DebugLib
+  I2CLib
+  IoLib
+  PcdLib
+  RtcHelperLib
+  TimeBaseLib
+  TimerLib
+  UefiLib
+  UefiRuntimeLib        # Use EFiAtRuntime to check stage
+
+[Depex]
+  gEfiCpuArchProtocolGuid

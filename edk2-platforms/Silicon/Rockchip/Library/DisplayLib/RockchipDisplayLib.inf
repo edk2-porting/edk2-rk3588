@@ -1,0 +1,35 @@
+## @file
+#
+#  Copyright (c) 2022 Rockchip Electronics Co. Ltd.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = RockchipDisplayLib
+  FILE_GUID                      = 967dc52a-7cfa-11ec-b45f-f42a7dcb925d
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = DisplayLib
+
+[Sources.common]
+  RockchipDisplayLib.c
+
+[LibraryClasses]
+  IoLib
+  DebugLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseLib
+
+[Packages]
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  ArmPkg/ArmPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/Rockchip/RockchipPkg.dec
+  Silicon/Rockchip/RK3588/RK3588.dec
+  Platform/Rockchip/RK3588/RK3588.dec

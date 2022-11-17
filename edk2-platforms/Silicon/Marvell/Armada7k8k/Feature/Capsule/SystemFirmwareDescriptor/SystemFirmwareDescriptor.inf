@@ -1,0 +1,44 @@
+## @file
+#  System Firmware descriptor.
+#
+#  Copyright (c) 2018, Marvell International Limited. All rights reserved.
+#  Copyright (c) 2018, Linaro Limited. All rights reserved.
+#  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = SystemFirmwareDescriptor
+  FILE_GUID                      = 90B2B846-CA6D-4D6E-A8D3-C140A8E110AC
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = SystemFirmwareDescriptorPeimEntry
+
+[Sources]
+  SystemFirmwareDescriptorPei.c
+  SystemFirmwareDescriptor.aslc
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  SignedCapsulePkg/SignedCapsulePkg.dec
+
+[LibraryClasses]
+  DebugLib
+  PcdLib
+  PeimEntryPoint
+  PeiServicesLib
+
+[FixedPcd]
+  gArmTokenSpaceGuid.PcdFdSize
+
+[Pcd]
+  gEfiSignedCapsulePkgTokenSpaceGuid.PcdEdkiiSystemFirmwareImageDescriptor
+
+[Depex]
+  TRUE

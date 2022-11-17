@@ -1,0 +1,21 @@
+﻿// *++
+//
+// Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2015, Hisilicon Limited. All rights reserved.<BR>
+// Copyright (c) 2015, Linaro Limited. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// Based on files under Nt32Pkg/MiscSubClassPlatformDxe/
+// --*/
+
+/=#
+
+#string STR_MISC_BASE_BOARD_MANUFACTURER     #language en-US  "Huawei Technologies Co., Ltd."
+//#string STR_MISC_BASE_BOARD_PRODUCT_NAME     #language en-US  "To Be Filled By O.E.M."
+#string STR_MISC_BASE_BOARD_PRODUCT_NAME     #language en-US  "STL2SPCA"
+//#string STR_MISC_BASE_BOARD_VERSION          #language en-US  "To Be Filled By O.E.M."
+#string STR_MISC_BASE_BOARD_VERSION          #language en-US  "V200R002"
+#string STR_MISC_BASE_BOARD_SERIAL_NUMBER    #language en-US  "To Be Filled By O.E.M."
+#string STR_MISC_BASE_BOARD_ASSET_TAG        #language en-US  "To Be Filled By O.E.M."
+#string STR_MISC_BASE_BOARD_CHASSIS_LOCATION #language en-US  "To Be Filled By O.E.M."

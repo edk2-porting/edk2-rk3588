@@ -1,0 +1,24 @@
+## @file
+#
+# @copyright
+# Copyright 2012 - 2021 Intel Corporation. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PlatformVariableHookLibNull
+  FILE_GUID                      = 8DAB8601-7FE8-4a1d-A314-09F7D3789C5A
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformVariableHookLibNull
+[sources]
+  PlatformVariableHookLibNull.c
+
+[LibraryClasses]
+  BaseLib
+  IoLib
+
+[Packages]
+  MdePkg/MdePkg.dec

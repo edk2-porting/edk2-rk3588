@@ -1,0 +1,23 @@
+#  LX2160aRdbPkg.dec
+#  LX2160a board package.
+#
+#  Copyright 2018, 2020 NXP
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+[Defines]
+  PACKAGE_NAME                   = LX2160aRdbPkg
+  PACKAGE_GUID                   = 474e0c59-5f77-4060-82dd-9025ee4f4939
+
+################################################################################
+#
+# Include Section - list of Include Paths that are provided by this package.
+#                   Comments are used for Keywords and Module Types.
+#
+# Supported Module Types:
+#  BASE SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
+#
+################################################################################
+[Includes.common]
+  Include                        # Root include for the package

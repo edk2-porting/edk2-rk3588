@@ -1,0 +1,41 @@
+/** @file
+
+  Memory mapped config space base address table (MCFG)
+
+  Copyright (c) 2017, Linaro Ltd. All rights reserved.<BR>
+  Copyright (C) 2019, Marvell International Ltd. and its affiliates.<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#include <Library/AcpiLib.h>
+
+#include "AcpiHeader.h"
+#include "Cn913xDbA/Pcie.h"
+
+#include <IndustryStandard/MemoryMappedConfigurationSpaceAccessTable.h>
+
+#pragma pack(1)
+typedef struct {
+  EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_HEADER Header;
+  EFI_ACPI_MEMORY_MAPPED_ENHANCED_CONFIGURATION_SPACE_BASE_ADDRESS_ALLOCATION_STRUCTURE Structure;
+} ACPI_6_0_MCFG_STRUCTURE;
+#pragma pack()
+
+STATIC ACPI_6_0_MCFG_STRUCTURE Mcfg = {
+  {
+    __ACPI_HEADER (EFI_ACPI_5_0_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_BASE_ADDRESS_DESCRIPTION_TABLE_SIGNATURE,
+                   ACPI_6_0_MCFG_STRUCTURE,
+                   EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_TABLE_REVISION),
+    EFI_ACPI_RESERVED_QWORD
+  }, {
+    PCI_ECAM_BASE,                   // BaseAddress
+    0,                               // PciSegmentGroupNumber
+    PCI_BUS_MIN,                     // StartBusNumber
+    PCI_BUS_MAX,                     // EndBusNumber
+    EFI_ACPI_RESERVED_DWORD          // Reserved
+  }
+};
+
+VOID CONST * CONST ReferenceAcpiTable = &Mcfg;

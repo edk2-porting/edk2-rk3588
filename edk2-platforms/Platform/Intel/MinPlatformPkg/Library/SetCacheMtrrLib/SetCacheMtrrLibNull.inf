@@ -1,0 +1,29 @@
+## @file
+# Component information file for Platform SetCacheMtrr Library.
+#
+# Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseSetCacheMtrrLibNull
+  FILE_GUID                      = D1ED4CD7-AD20-4943-9192-3ABE766A9411
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SetCacheMtrrLib
+
+[LibraryClasses]
+  BaseLib
+  PcdLib
+  DebugLib
+
+[Packages]
+  MinPlatformPkg/MinPlatformPkg.dec
+  MdePkg/MdePkg.dec
+
+[Sources]
+  SetCacheMtrrLibNull.c
+

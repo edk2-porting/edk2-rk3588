@@ -1,0 +1,137 @@
+## @file
+#  Component description file for the Kabylake Private DEC file.
+#
+# Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = KabylakeSiliconPrivate
+  PACKAGE_GUID                   = DD6CB7A8-32F8-4170-8267-942093A5E5F6
+  PACKAGE_VERSION                = 0.1
+
+[Includes.common]
+
+[Ppis]
+  #
+  # PCH
+  #
+  gPchPmcXramOffsetDataPpiGuid = { 0xc1392859, 0x1f65, 0x446e, { 0xa3, 0xf6, 0x85, 0x36, 0xfc, 0xc7, 0xd1, 0xc4 }}
+
+[LibraryClasses]
+  #
+  # Common
+  #
+  PcieInitLib|KabylakeSiliconPkg/IncludePrivate/Library/PcieInitLib.h
+  SiFviInitLib|KabylakeSiliconPkg/IncludePrivate/Library/SiFviInitLib.h
+
+  #
+  # CPU
+  #
+  BiosGuardLib|Cpu/IncludePrivate/Library/BiosGuardInit.h
+  CpuCommonLib|Cpu/IncludePrivate/Library/CpuCommonLib.h
+  CpuInitLib|Cpu/IncludePrivate/Library/CpuInitLib.h
+  CpuOcLib|Cpu/IncludePrivate/Library/CpuOcLib.h
+  CpuPowerOnConfigLib|Cpu/IncludePrivate/Library/CpuPowerOnConfigLib.h
+  CpuS3Lib|Cpu/IncludePrivate/Library/CpuS3Lib.h
+  SmbiosCpuLib|Cpu/IncludePrivate/Library/SmbiosCpuLib.h
+  SoftwareGuardLib|Cpu/IncludePrivate/Library/SoftwareGuardLib.h
+  PeiTxtLib|Cpu/IncludePrivate/Library/TxtPeiLib.h
+
+  #
+  # PCH
+  #
+  PchHdaLib|Pch/IncludePrivate/Library/DxePchHdaNhlt.h
+  GpioPrivateLib|Pch/IncludePrivate/Library/GpioPrivateLib.h
+  I2cMasterCommonLib|Pch/IncludePrivate/Library/I2cMasterCommonLib.h
+  PchAlternateAccessModeLib|Pch/IncludePrivate/Library/PchAlternateAccessModeLib.h
+  PchHdaLib|Pch/IncludePrivate/Library/PchHdaLib.h
+  PchInitCommonLib|Pch/IncludePrivate/Library/PchInitCommonLib.h
+  PchInitLib|Pch/IncludePrivate/Library/PchInitLib.h
+  PchPciExpressHelpersLib|Pch/IncludePrivate/Library/PchPciExpressHelpersLib.h
+  PchRcLib|Pch/IncludePrivate/Library/PchRcLib.h
+  PchSmbusCommonLib|Pch/IncludePrivate/Library/PchSmbusCommonLib.h
+  PchSpiCommonLib|Pch/IncludePrivate/Library/PchSpiCommonLib.h
+  PchXhciLib|Pch/IncludePrivate/Library/PchXhciLib.h
+  PeiI2cMasterLib|Pch/IncludePrivate/Library/PeiI2cMasterLib.h
+  PchPsfPrivateLib|Pch/IncludePrivate/Library/PchPsfPrivateLib.h
+  RstPrivateLib|Pch/IncludePrivate/Library/RstPrivateLib.h
+
+  #
+  # SystemAgent
+  #
+  GmmInitLib|SystemAgent/IncludePrivate/Library/GmmInitLib.h
+  GraphicsInitLib|SystemAgent/IncludePrivate/Library/GraphicsInitLib.h
+  SaDmiInitLib|SystemAgent/IncludePrivate/Library/SaDmiInitLib.h
+  SaInitLib|SystemAgent/IncludePrivate/Library/SaPcieLib.h
+  SaOcInitLib|SystemAgent/IncludePrivate/Library/SaOcInitLib.h
+  SaPcieDmiLib|SystemAgent/IncludePrivate/Library/SaPcieDmiLib.h
+  SaPcieInitLib|SystemAgent/IncludePrivate/Library/SaPcieInitLib.h
+  SaPcieLib|SystemAgent/IncludePrivate/Library/SaPcieLib.h
+  SkyCamInitLib|SystemAgent/IncludePrivate/Library/SkyCamInitLib.h
+  SmbiosMemoryLib|SystemAgent/IncludePrivate/Library/SmbiosMemoryLib.h
+  SwitchableGraphicsInitLib|SystemAgent/IncludePrivate/Library/SwitchableGraphicsInitLib.h
+  VtdInitLib|SystemAgent/IncludePrivate/Library/VtdInitLib.h
+
+  #
+  # Me
+  #
+  ActiveManagementLib|Me/IncludePrivate/Library/ActiveManagementLib.h
+  AlertStandardFormatLib|Me/IncludePrivate/Library/AlertStandardFormatLib.h
+  DxeBeihaiLib|Me/IncludePrivate/Library/DxeBeihaiLib.h
+  DxeJhiSupportLib|Me/IncludePrivate/Library/DxeJhiSupportLib.h
+  HeciInitLib|Me/IncludePrivate/Library/HeciInitLib.h
+  MeInitLib|Me/IncludePrivate/Library/MeInitLib.h
+
+[Guids]
+  ##
+  ## Common
+  ##
+  gSiConfigHobGuid  =  {0xb3903068, 0x7482, 0x4424, {0xba, 0x4b, 0x40, 0x5f, 0x8f, 0xd7, 0x65, 0x4e}}
+
+  #
+  # PCH
+  #
+  gPchDeviceTableHobGuid       = { 0xb3e123d0, 0x7a1e, 0x4db4, { 0xaf, 0x66, 0xbe, 0xd4, 0x1e, 0x9c, 0x66, 0x38 }}
+  gWdtHobGuid                  = { 0x65675786, 0xacca, 0x4b11, { 0x8a, 0xb7, 0xf8, 0x43, 0xaa, 0x2a, 0x8b, 0xea }}
+  gPchConfigHobGuid            = { 0x524ed3ca, 0xb250, 0x49f5, { 0x94, 0xd9, 0xa2, 0xba, 0xff, 0xc7, 0x0e, 0x14 }}
+
+  #
+  # CPU
+  #
+  gPeiAcpiCpuDataGuid          = { 0x7682bbef, 0xb0b6, 0x4939, { 0xae, 0x66, 0x1b, 0x3d, 0xf2, 0xf6, 0xaa, 0xf3 }}
+  gCpuStatusCodeDataTypeExceptionHandlerGuid = { 0x3BC2BD12, 0xAD2E, 0x11D5, { 0x87, 0xDD, 0x00, 0x06, 0x29, 0x45, 0xC3, 0xB9 }}
+
+  #
+  # SA
+  #
+  gTpmRegInfoHobGuid           = { 0x558a4a27, 0x9343, 0x4116, { 0xa9, 0xe,  0xf5, 0xd7, 0xee, 0x81, 0xbb, 0x9b }}
+  gSchemaListGuid              = { 0x3047C2AC, 0x5E8E, 0x4C55, { 0xA1, 0xCB, 0xEA, 0xAD, 0x0A, 0x88, 0x86, 0x1B }}
+  gEqPhase3SchemaGuid          = { 0x145AC084, 0x340E, 0x4777, { 0xBC, 0x75, 0xF8, 0x50, 0x5F, 0xFD, 0x50, 0x9D }}
+  gScoreSchemaGuid             = { 0x8233A1BB, 0x58D5, 0x4F66, { 0xA1, 0x3F, 0x8A, 0xA3, 0xED, 0x6A, 0xF5, 0xA0 }}
+  gPortMarginGuid              = { 0xD7154D12, 0x03B2, 0x4054, { 0x8C, 0xD2, 0x9F, 0x4B, 0x20, 0x90, 0xBE, 0xF7 }}
+  gJitterTolerenceGuid         = { 0xB52A2E04, 0x45FF, 0x484E, { 0xB5, 0xFE, 0xEE, 0x47, 0x8F, 0x5F, 0x6C, 0x9B }}
+  gLaneMarginGuid              = { 0x7AC0996D, 0xA601, 0x4210, { 0x94, 0x4E, 0x93, 0x4E, 0x51, 0x7B, 0x6C, 0x57 }}
+  gVocMarginGuid               = { 0x3578349A, 0x9E98, 0x4F70, { 0x91, 0xCB, 0xE2, 0x5B, 0x98, 0x99, 0xBC, 0x16 }}
+
+[Protocols]
+  #
+  # PCH
+  #
+  gPchPcieIoTrapProtocolGuid   = { 0xd66a1cf,  0x79ad, 0x494b, { 0x97, 0x8b, 0xb2, 0x59, 0x81, 0x68, 0x93, 0x34 }}
+
+  #
+  # SA
+  #
+  gSaIotrapSmiProtocolGuid     = { 0x1861e089, 0xcaa3, 0x473e, { 0x84, 0x32, 0xdc, 0x1f, 0x94, 0xc6, 0xc1, 0xa6 }}
+
+  #
+  # CPU
+  #
+  gPowerMgmtInitDoneProtocolGuid  =  {0xd71db106, 0xe32d, 0x4225, {0xbf, 0xf4, 0xde, 0x6d, 0x77, 0x87, 0x17, 0x61}}
+
+[Ppis]
+gEndOfSiInitPpiGuid = { 0xE2E3D5D1, 0x8356, 0x4F96, { 0x9C, 0x9E, 0x2E, 0xC3, 0x48, 0x1D, 0xEA, 0x88 }}

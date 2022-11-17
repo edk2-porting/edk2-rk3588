@@ -1,0 +1,42 @@
+### @file
+#  DXE BIOS ID library.
+#
+# Copyright (c) 2015 - 2019, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+###
+[Defines]
+  INF_VERSION                   = 0x00010005
+  BASE_NAME                     = DxeBiosIdLib
+  FILE_GUID                     = D72C04E9-C6C4-49d5-BC16-BD612EBA127B
+  MODULE_TYPE                   = DXE_DRIVER
+  VERSION_STRING                = 1.0
+  LIBRARY_CLASS                 = BiosIdLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER SMM_CORE
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES          = IA32 X64
+#
+
+[Sources.common]
+  DxeBiosIdLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  BoardModulePkg/BoardModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DxeServicesLib
+  BaseMemoryLib
+  HobLib
+  MemoryAllocationLib
+  DebugLib
+
+[Guids]
+  ## SOMETIMES_CONSUMES ## HOB
+  ## SOMETIMES_CONSUMES ## GUID
+  gBiosIdGuid
+

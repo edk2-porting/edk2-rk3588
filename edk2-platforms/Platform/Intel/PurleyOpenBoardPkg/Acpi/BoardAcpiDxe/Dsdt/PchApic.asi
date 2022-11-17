@@ -1,0 +1,17 @@
+/** @file
+
+Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+Device(APIC) {
+  Name (_HID,EISAID("PNP0003"))        // APIC resources
+  Name (_CRS, ResourceTemplate() {
+    //
+    // APIC range(0xFEC0_0000 to 0xFECF_FFFF)
+    //
+    Memory32Fixed (ReadOnly, 0xFEC00000, 0x100000) // IO APIC            
+    }
+  )
+}

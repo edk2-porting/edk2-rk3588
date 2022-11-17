@@ -1,0 +1,35 @@
+#
+#  Copyright (c) 2014-2018, Linaro Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+[Defines]
+  DEC_SPECIFICATION              = 0x0001001a
+  PACKAGE_NAME                   = RK3588
+  PACKAGE_GUID                   = 9364fc90-45e7-11ec-9726-f42a7dcb925d
+  PACKAGE_VERSION                = 0.1
+
+################################################################################
+#
+# Include Section - list of Include Paths that are provided by this package.
+#                   Comments are used for Keywords and Module Types.
+#
+# Supported Module Types:
+#  BASE SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
+#
+################################################################################
+[Includes.common]
+  Include                        # Root include for the package
+
+[Guids.common]
+  gRK3588TokenSpaceGuid          =  { 0xaad4eac0, 0x45e7, 0x11ec, { 0x95, 0xb4, 0xf4, 0x2a, 0x7d, 0xcb, 0x92, 0x5d } }
+
+[PcdsFixedAtBuild.common]
+  gRK3588TokenSpaceGuid.PcdAndroidBootDevicePath|L""|VOID*|0x00000001
+  gRK3588TokenSpaceGuid.PcdAndroidBootFile|{ 0x36, 0x8b, 0x73, 0x3a, 0xc5, 0xb9, 0x63, 0x47, 0xab, 0xbd, 0x6c, 0xbd, 0x4b, 0x25, 0xf9, 0xff }|VOID*|0x00000002
+  gRK3588TokenSpaceGuid.PcdAndroidFastbootFile|{ 0x2a, 0x50, 0x88, 0x95, 0x70, 0x53, 0xe3, 0x11, 0x86, 0x31, 0xd7, 0xc5, 0x95, 0x13, 0x64, 0xc8 }|VOID*|0x00000003
+  gRK3588TokenSpaceGuid.PcdSdBootDevicePath|L""|VOID*|0x00000004
+  gRK3588TokenSpaceGuid.AcpiEnable|FALSE|BOOLEAN|0x00000005
+  gRK3588TokenSpaceGuid.PcdKernelBootArg|L""|VOID*|0x00000006
+  gRK3588TokenSpaceGuid.PcdTotalMemorySize|0x0|UINT64|0x00000007

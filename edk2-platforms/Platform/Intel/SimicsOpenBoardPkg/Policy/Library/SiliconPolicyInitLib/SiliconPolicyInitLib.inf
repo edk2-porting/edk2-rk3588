@@ -1,0 +1,38 @@
+## @file
+#
+# Copyright (c) 2019 Intel Corporation. All rights reserved. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION          = 0x00010005
+  BASE_NAME            = SiliconPolicyInitLib
+  FILE_GUID            = B494DF39-A5F8-48A1-B2D0-EF523AD91C55
+  MODULE_TYPE          = PEIM
+  VERSION_STRING       = 1.0
+  LIBRARY_CLASS        = SiliconPolicyInitLib
+
+[Sources]
+  SiliconPolicyInitLib.c
+
+################################################################################
+#
+# Package Dependency Section - list of Package files that are required for
+#                              this module.
+#
+################################################################################
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  BaseLib
+  DebugLib
+  DebugPrintErrorLevelLib
+  HobLib
+  IoLib
+  MemoryAllocationLib
+  PeiServicesLib
+

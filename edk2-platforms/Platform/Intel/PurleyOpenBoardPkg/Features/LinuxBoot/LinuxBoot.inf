@@ -1,0 +1,40 @@
+## @file
+#
+# Copyright (c) 2021, American Megatrends International LLC.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+    INF_VERSION                 =   0x00010005
+    VERSION_STRING              =   1.0
+    BASE_NAME                   =   LinuxBoot
+    FILE_GUID                   =   74a41ddc-fac5-4787-afad-d81ee30a8b63    #   {0x74a41ddc, 0xfac5, 0x4787, {0xaf, 0xad, 0xd8, 0x1e, 0xe3, 0x0a, 0x8b, 0x63}}
+    MODULE_TYPE                 =   DXE_DRIVER
+    LIBRARY_CLASS               =   LinuxBootLib|DXE_DRIVER
+[Sources]
+   LinuxBoot.c
+   LinuxBoot.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  DxeServicesLib
+  BaseMemoryLib
+  DebugLib
+  UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
+  UefiLib
+  LoadLinuxLib
+  
+[Guids]
+  
+[Protocols]
+  gEfiLoadedImageProtocolGuid
+
+[Pcd]

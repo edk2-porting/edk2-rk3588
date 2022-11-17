@@ -1,0 +1,75 @@
+/** @file
+  System Firmware descriptor.
+
+  Copyright (c) 2018, Marvell International Limited. All rights reserved.
+  Copyright (c) 2018, Linaro Limited. All rights reserved.
+  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#include <PiPei.h>
+#include <Guid/EdkiiSystemFmpCapsule.h>
+#include <Protocol/FirmwareManagement.h>
+
+#define PACKAGE_VERSION                     0xFFFFFFFF
+#define PACKAGE_VERSION_STRING              L"Unknown"
+
+#define CURRENT_FIRMWARE_VERSION            0x00000002
+#define CURRENT_FIRMWARE_VERSION_STRING     L"0x00000002"
+#define LOWEST_SUPPORTED_FIRMWARE_VERSION   0x00000001
+
+#define IMAGE_ID                            SIGNATURE_64('M','V','E', 'B', 'U', '_', 'I', 'D')
+#define IMAGE_ID_STRING                     L"MvebuPlatform"
+
+// PcdSystemFmpCapsuleImageTypeIdGuid
+#define IMAGE_TYPE_ID_GUID                  { 0x757fc475, 0x6b22, 0x4482, { 0x86, 0x8e, 0xde, 0xd2, 0x86, 0xf3, 0x09, 0x40 } }
+
+typedef struct {
+  EDKII_SYSTEM_FIRMWARE_IMAGE_DESCRIPTOR  Descriptor;
+  // real string data
+  CHAR16                                  ImageIdNameStr[ARRAY_SIZE (IMAGE_ID_STRING)];
+  CHAR16                                  VersionNameStr[ARRAY_SIZE (CURRENT_FIRMWARE_VERSION_STRING)];
+  CHAR16                                  PackageVersionNameStr[ARRAY_SIZE (PACKAGE_VERSION_STRING)];
+} IMAGE_DESCRIPTOR;
+
+IMAGE_DESCRIPTOR mImageDescriptor =
+{
+  {
+    EDKII_SYSTEM_FIRMWARE_IMAGE_DESCRIPTOR_SIGNATURE,
+    sizeof (EDKII_SYSTEM_FIRMWARE_IMAGE_DESCRIPTOR),
+    sizeof (IMAGE_DESCRIPTOR),
+    PACKAGE_VERSION,                                       // PackageVersion
+    OFFSET_OF (IMAGE_DESCRIPTOR, PackageVersionNameStr),   // PackageVersionName
+    1,                                                     // ImageIndex;
+    {0x0},                                                 // Reserved
+    IMAGE_TYPE_ID_GUID,                                    // ImageTypeId;
+    IMAGE_ID,                                              // ImageId;
+    OFFSET_OF (IMAGE_DESCRIPTOR, ImageIdNameStr),          // ImageIdName;
+    CURRENT_FIRMWARE_VERSION,                              // Version;
+    OFFSET_OF (IMAGE_DESCRIPTOR, VersionNameStr),          // VersionName;
+    {0x0},                                                 // Reserved2
+    FixedPcdGet32 (PcdFdSize),                             // Size;
+    IMAGE_ATTRIBUTE_IMAGE_UPDATABLE |
+      IMAGE_ATTRIBUTE_RESET_REQUIRED |
+      IMAGE_ATTRIBUTE_AUTHENTICATION_REQUIRED |
+      IMAGE_ATTRIBUTE_IN_USE,                              // AttributesSupported;
+    IMAGE_ATTRIBUTE_IMAGE_UPDATABLE |
+      IMAGE_ATTRIBUTE_RESET_REQUIRED |
+      IMAGE_ATTRIBUTE_AUTHENTICATION_REQUIRED |
+      IMAGE_ATTRIBUTE_IN_USE,                              // AttributesSetting;
+    0x0,                                                   // Compatibilities;
+    LOWEST_SUPPORTED_FIRMWARE_VERSION,                     // LowestSupportedImageVersion;
+    0x00000000,                                            // LastAttemptVersion;
+    0,                                                     // LastAttemptStatus;
+    {0x0},                                                 // Reserved3
+    0,                                                     // HardwareInstance;
+  },
+  // real string data
+  {IMAGE_ID_STRING},
+  {CURRENT_FIRMWARE_VERSION_STRING},
+  {PACKAGE_VERSION_STRING},
+};
+
+VOID* CONST ReferenceAcpiTable = &mImageDescriptor;

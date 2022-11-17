@@ -1,0 +1,41 @@
+## @file
+# Component description file for DXE Variable Read Lib
+#
+# This library provides phase agnostic access to the UEFI Variable Services.
+# This is done by implementing a wrapper on top of the phase specific mechanism
+# for reading from UEFI variables. For example, the PEI implementation of this
+# library uses EFI_PEI_READ_ONLY_VARIABLE2_PPI. The DXE implementation accesses
+# the UEFI Runtime Services Table, and the SMM implementation uses
+# EFI_SMM_VARIABLE_PROTOCOL.
+#
+# Using this library allows code to be written in a generic manner that can be
+# used in PEI, DXE, or SMM without modification.
+#
+# Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeRuntimeVariableReadLib
+  FILE_GUID                      = 9C357AD8-2BF4-450C-9E65-C0938F6D2424
+  VERSION_STRING                 = 1.0
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  LIBRARY_CLASS                  = VariableReadLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION UEFI_DRIVER
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[Sources]
+  DxeRuntimeVariableReadLib.c
+
+[LibraryClasses]
+  UefiRuntimeServicesTableLib
+
+[Protocols]
+  gEfiVariableArchProtocolGuid    ## CONSUMES
+
+[Depex]
+  gEfiVariableArchProtocolGuid

@@ -1,0 +1,29 @@
+## @file
+# Component INF file for the BaseConfigBlock library.
+#
+# Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+INF_VERSION    = 0x00010017
+BASE_NAME      = BaseConfigBlockLib
+FILE_GUID      = 1EC07EA8-7808-4e06-9D79-309AE331D2D5
+VERSION_STRING = 1.0
+MODULE_TYPE    = BASE
+LIBRARY_CLASS  = ConfigBlockLib
+
+
+[Packages]
+MdePkg/MdePkg.dec
+IntelSiliconPkg/IntelSiliconPkg.dec
+
+[Sources]
+BaseConfigBlockLib.c
+
+[LibraryClasses]
+DebugLib
+BaseMemoryLib
+MemoryAllocationLib

@@ -1,0 +1,65 @@
+## @file
+#  This driver effectuates Simics X58 platform configuration settings and exposes
+#  them via HII.
+#
+#  Copyright (C) 2014, Red Hat, Inc.
+#  Copyright (c) 2009 - 2019, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SimicsDxe
+  FILE_GUID                      = 74B64DC1-B0B6-4853-A6BD-C6426059AB1E
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = PlatformInit
+  UNLOAD_IMAGE                   = PlatformUnload
+
+[Sources]
+  Platform.c
+  Platform.uni
+  PlatformConfig.c
+  PlatformForms.vfr
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SimicsOpenBoardPkg/OpenBoardPkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  HiiLib
+  MemoryAllocationLib
+  PrintLib
+  UefiBootServicesTableLib
+  UefiHiiServicesLib
+  UefiLib
+  UefiRuntimeServicesTableLib
+  UefiDriverEntryPoint
+  DxeServicesTableLib
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution
+
+[Protocols]
+  gEfiDevicePathProtocolGuid      ## PRODUCES
+  gEfiGraphicsOutputProtocolGuid  ## CONSUMES
+  gEfiHiiConfigAccessProtocolGuid ## PRODUCES
+
+[Guids]
+  gEfiIfrTianoGuid
+  gSimicsBoardConfigGuid
+
+[Depex]
+  gEfiHiiConfigRoutingProtocolGuid  AND
+  gEfiHiiDatabaseProtocolGuid       AND
+  gEfiVariableArchProtocolGuid      AND
+  gEfiVariableWriteArchProtocolGuid

@@ -1,0 +1,361 @@
+From http://community.arm.com/docs/DOC-8402, dated 4 Jul 2014.
+
+Juno Software EULA
+
+THIS END USER LICENCE AGREEMENT ("LICENCE") IS A LEGAL AGREEMENT BETWEEN YOU
+(EITHER A SINGLE INDIVIDUAL, OR SINGLE LEGAL ENTITY) AND ARM LIMITED ("ARM") FOR
+THE USE OF THE DELIVERABLES ACCOMPANYING THIS LICENCE. ARM IS ONLY WILLING TO
+LICENSE THE DELIVERABLES TO YOU ON CONDITION THAT YOU ACCEPT ALL OF THE TERMS IN
+THIS LICENCE. BY CLICKING "I AGREE" OR BY INSTALLING OR OTHERWISE USING OR
+COPYING THE DELIVERABLES YOU INDICATE THAT YOU AGREE TO BE BOUND BY ALL THE
+TERMS OF THIS LICENCE. IF YOU DO NOT AGREE TO THE TERMS OF THIS LICENCE, ARM IS
+UNWILLING TO LICENSE THE DELIVERABLES TO YOU AND YOU MAY NOT INSTALL, USE OR
+COPY THE DELIVERABLES, BUT YOU SHOULD PROMPTLY RETURN THE DELIVERABLES TO YOUR
+SUPPLIER AND ASK FOR A REFUND OF ANY LICENCE FEE PAID.
+
+"Juno ARM Development Platform" means a hardware development board purchased
+directly from ARM or its authorised distributors.
+
+"Deliverables" means any software, firmware, boardfiles, data and documentation
+accompanying this Licence, any printed, electronic or online documentation
+supplied with it, and any updates, patches and modifications ARM may make
+available to you under the terms of this Licence, in all cases relating to the
+supporting deliverables for the Juno ARM Development Platform
+
+"Separate Files" means the separate files identified in Part D of the Schedule.
+
+1.  LICENCE GRANTS.
+
+(i)  DELIVERABLES: ARM hereby grants to you, subject to the terms and conditions
+of this Licence, a non-exclusive, non-transferable licence solely for use on a
+Juno ARM Development Platform and only for the purposes of your internal
+development, testing and debugging of software applications that are designed to
+run solely on microprocessors manufactured under licence from ARM, to:
+
+(a) use and copy the Deliverables identified in Part A of the Schedule;
+
+(b) use, copy and modify the Deliverables identified in Part B and Part C of the
+Schedule;
+
+(c) distribute and sub-license to third parties the right to use, copy and
+modify the Deliverables identified in Part C(i) of the Schedule, or your
+derivatives thereof, as part of your own products ("Licensed Products")
+provided you comply with the terms of Clause 1(ii);
+
+(d) permit either or both your customers and your authorised distributors to
+redistribute the Deliverables identified in Part C(i) of the Schedule, or your
+derivatives thereof, solely as part of Licensed Products developed by you or
+your permitted users (identified in clause 2 paragraph three below).
+
+Except as permitted by clause 1(i)(b) above, you shall not modify the
+Deliverables.  Except as permitted by clauses 1(i)(c) and 1(i)(d) above, you
+shall not redistribute any of the Deliverables.
+
+(ii)  FURTHER CONDITIONS APPLICABLE TO REDISTRIBUTION AND SUB-LICENSING: If you
+choose to redistribute the Deliverables identified in Part C(i) of the Schedule
+("Example Code") you agree: (a) to ensure that they are licensed for use only as
+part of Licensed Products and only on microprocessors manufactured or simulated
+under licence from ARM; (b) not to use ARM’s or any of its licensors names,
+logos or trademarks to market the Licensed Products; (c) to include valid
+copyright notices on the Licensed Products, and preserve any copyright notices
+which are included with, or in, the Example Code; (d) to comply with all the
+other terms of this Licence; and (e) to ensure that any further redistribution
+is limited to redistribution by either or both your customers and your
+authorised distributors only as part of Licensed Products developed by you or
+your permitted users and only for use on microprocessors manufactured or
+simulated under licence from ARM and  that your customers  and authorised
+distributors comply with the terms of this clause 1(ii).
+
+2.  RESTRICTIONS ON USE OF THE DELIVERABLES.
+
+COPYING: You shall not use or copy the Deliverables except as expressly
+authorised in this Licence. You may make one additional copy of the delivered
+Deliverables media or image for backup or archival purposes.
+
+PERMITTED USERS: The Deliverables shall be used only by your employees, or by
+your bona fide sub-contractors for whose acts and omissions you hereby agree to
+be responsible to ARM to the same extent as you are for any acts and omissions
+of your employees, and provided always that such sub-contractors; (i) work only
+onsite at your premises; (ii) comply with the terms of this Licence; (iii) are
+contractually obligated to use the Deliverables only for your benefit, and (iv)
+agree to assign all their work product and any rights they create therein in
+the supply of such work to you. Only the single individual, company or other
+legal entity to whom ARM is supplying this Licence may use the Deliverables.
+Except as provided in this clause, you shall not allow third parties (including
+but not limited to any subsidiary, parent or affiliated companies, or offsite
+contractors you may have) to use the Deliverables unless ARM specifically agrees
+otherwise with you on a case by case basis.
+
+NO REMOTE USE: The Deliverables shall only be used onsite at your premises and
+only for your benefit.
+
+MULTIPLE VERSIONS: The media on which the Deliverables resides may contain more
+than one version of the Deliverables, each of which is compatible with a
+different operating system (such as Microsoft Windows XP Professional and Red
+Hat Linux).
+
+ACADEMIC OR EDUCATIONAL USERS ONLY: If you or your employer or institution paid
+academic or educational pricing for the Deliverables, or the Deliverables are
+identified as an academic or educational version (together "Academic Software"),
+then notwithstanding anything else in this Licence, YOU AGREE TO USE THE
+ACADEMIC SOFTWARE ONLY FOR ACADEMIC, NON-COMMERCIAL PURPOSES, AND ARM DOES NOT
+GRANT YOU ANY RIGHTS TO DISTRIBUTE OR SUB-LICENSE ANY APPLICATIONS DEVELOPED
+USING THE ACADEMIC SOFTWARE UNDER THIS LICENCE.
+
+REVERSE ENGINEERING: Except to the extent that such activity is permitted by
+applicable law you shall not reverse engineer, decompile or disassemble any of
+the Deliverables. If the Deliverables were provided to you in Europe you shall
+not reverse engineer, decompile or disassemble any of the Deliverables for the
+purposes of error correction.
+
+BENCHMARKING: This licence does not prevent you from using the Deliverables for
+internal benchmarking purposes. However, you shall treat any and all
+benchmarking data, and any other results of your use or testing of the
+Deliverables which are indicative of performance, efficacy, reliability or
+quality, as confidential information and you shall not disclose such information
+to any third party without the express written permission of ARM.
+
+RESTRICTIONS ON TRANSFER OF LICENSED RIGHTS: The rights granted to you under
+this Licence may not be assigned, sublicensed or otherwise transferred by you
+to any third party without the prior written consent of ARM. An assignment shall
+be deemed to include, without limitation; (i) any transaction or series of
+transactions whereby a third party acquires, directly or indirectly, the power
+to control the management and policies of you, whether through the acquisition
+of voting securities, by contract or otherwise; or (ii) the sale of more than
+fifty percent (50%) of the your assets whether in a single transaction or series
+of transactions.  You shall not rent or lease the Deliverables. You shall not
+share the Deliverables with contractors (except as identified in the ‘PERMITTED
+USERS’ clause above) or other third parties.
+
+COPYRIGHT AND RESERVATION OF RIGHTS: The Deliverables are owned by ARM or its
+licensors and are protected by copyright and other intellectual property laws
+and international treaties. The Deliverables are licensed not sold. You acquire
+no rights to the Deliverables other than as expressly provided by this Licence.
+You shall not remove from the Deliverables any copyright notice or other notice
+and shall ensure that any such notice is reproduced in any copies of the whole
+or any part of the Deliverables made by you or your permitted users.
+
+3.  SUPPORT AND MAINTENANCE.
+
+If you purchased the Deliverables directly from ARM, and you are not receiving
+them as an update or upgrade or as Academic Software (defined in Clause 2), you
+are entitled to reasonable support and maintenance for the Deliverables for the
+period of one (1) year from the date of purchase. The support will be provided
+on any version of the Deliverables which, at the date of your support request,
+are either; (a) the current version made generally available by ARM; or (b) the
+previous version made generally available by ARM at some time during the
+previous ninety (90) days.
+
+Support will be provided by telephone, email or other written format designated
+by ARM, prioritised at ARM’s discretion, and may not be used as a substitute for
+training or as additional resource for your programming projects.  Maintenance
+will be provided in the form of upgrades, updates and patch releases to the
+Deliverables as and when they are made generally available from ARM.
+
+ARM’s obligation under this Clause 3 is limited to the provision of support and
+maintenance to you and ARM is under no obligation to provide any support and
+maintenance to any third parties under this Licence. If you purchase support and
+maintenance for additional years it will be provided pursuant to this Clause 3
+and will be subject to the terms and conditions of this Licence.
+
+If; (i) you obtained the Deliverables from an ARM authorised reseller or other
+third party; (ii) Deliverables were provided free of charge or for evaluation;
+or (iii) it is Academic Software, you are not entitled to any support for the
+Deliverables from ARM, but ARM may, at its sole discretion provide limited
+support to you. The vendor of the Deliverables may or may not offer support to
+you for the Deliverables. Please refer to the Technical Support area of
+http://www.arm.com for contact details for ARM’s support service and (if
+applicable) other authorised support channels.  ARM shall be under no obligation
+to provide support in respect of any modifications (where permitted) to the
+Deliverables.
+
+4.  CONFIDENTIALITY.
+
+You acknowledge that the Deliverables and any benchmarking data and related
+information mentioned in Clause 2 contains trade secrets and confidential
+material, and you agree to maintain all such information in confidence and
+apply security measures no less stringent than the measures which you apply to
+protect your own like information, but not less than a reasonable degree of
+care, to prevent their unauthorised disclosure and use. Subject to any
+restrictions imposed by applicable law, the period of confidentiality shall be
+indefinite. You agree that you shall not use any such information other than in
+normal use of the Deliverables under the licences granted in this Licence.
+
+Notwithstanding the foregoing you may disclose the Deliverables identified in
+Part C(i) of the Schedule to third parties solely in exercise of the licence
+rights contained in Clause 1(i)(c) of this Licence.
+
+5.  LIMITED WARRANTIES.
+
+For the period of ninety (90) days from the date of receipt by you of the
+Deliverables, ARM warrants to you that (i) the media on which the Deliverables
+are provided shall be free from defects in materials and workmanship under
+normal use; and (ii) the Deliverables will perform substantially in accordance
+with the accompanying documentation (if any). ARM's total liability and your
+exclusive remedy for breach of these limited warranties shall be limited to ARM,
+at ARM's option; (a) replacing the defective Deliverables; or (b) using
+reasonable efforts to correct material, documented, reproducible defects in the
+Deliverables and delivering such corrected Deliverables to you. Any replacement
+Deliverables will be warranted for the remainder of the original warranty
+period or thirty (30) days, whichever is the longer.
+
+EXCEPT AS PROVIDED ABOVE, YOU AGREE THAT THE DELIVERABLES ARE LICENSED "AS IS",
+AND THAT ARM EXPRESSLY DISCLAIMS ALL REPRESENTATIONS, WARRANTIES, CONDITIONS OR
+OTHER TERMS, EXPRESS, IMPLIED OR STATUTORY, INCLUDING WITHOUT LIMITATION THE
+IMPLIED WARRANTIES OF NON- INFRINGEMENT, SATISFACTORY QUALITY, AND FITNESS FOR A
+PARTICULAR PURPOSE.
+
+YOU EXPRESSLY ASSUME ALL LIABILITIES AND RISKS, FOR USE OR OPERATION OF SOFTWARE
+APPLICATIONS, INCLUDING WITHOUT LIMITATION, APPLICATIONS DESIGNED OR INTENDED
+FOR MISSION CRITICAL APPLICATIONS, SUCH AS PACEMAKERS, WEAPONARY, AIRCRAFT
+NAVIGATION, FACTORY CONTROL SYSTEMS, ETC. SHOULD THE DELIVERABLES PROVE
+DEFECTIVE, YOU ASSUME THE ENTIRE COST OF ALL NECESSARY SERVICING, REPAIR OR
+CORRECTION.
+
+6.  LIMITATION OF LIABILITY.
+
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL ARM BE
+LIABLE FOR ANY INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES (INCLUDING
+LOSS OF PROFITS) ARISING OUT OF THE USE OR INABILITY TO USE THE DELIVERABLES
+WHETHER BASED ON A CLAIM UNDER CONTRACT, TORT OR OTHER LEGAL THEORY, EVEN IF ARM
+WAS ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+ARM does not seek to limit or exclude liability for death or personal injury
+arising from ARM's negligence or ARM’s fraud and because some jurisdictions do
+not permit the exclusion or limitation of liability for consequential or
+incidental damages the above limitation relating to liability for consequential
+damages may not apply to you.
+
+NOTWITHSTANDING ANYTHING TO THE CONTRARY CONTAINED IN THIS LICENCE, THE MAXIMUM
+LIABILITY OF ARM TO YOU IN AGGREGATE FOR ALL CLAIMS MADE AGAINST ARM IN CONTRACT
+TORT OR OTHERWISE UNDER OR IN CONNECTION WITH THE SUBJECT MATTER OF THIS LICENCE
+SHALL NOT EXCEED THE GREATER OF; (I) THE TOTAL OF SUMS PAID BY YOU TO ARM (IF
+ANY) FOR THIS LICENCE; AND (II) $10 USD.
+
+THE EXISTENCE OF MORE THAN ONE CLAIM WILL NOT ENLARGE OR EXTEND THE LIMIT.
+
+7.  THIRD PARTY RIGHTS.
+
+The Separate Files are delivered subject to and your use is governed by their
+own separate licence agreements. This Licence does not apply to such Separate
+Files and they are not included in the term "Deliverables" under this Licence.
+You agree to comply with all terms and conditions imposed on you in respect of
+such Separate Files including those identified in the Schedule ("Third Party
+Terms").
+
+ARM HEREBY DISCLAIMS ANY AND ALL WARRANTIES EXPRESS OR IMPLIED FROM ANY THIRD
+PARTIES REGARDING ANY SEPARATE FILES, ANY THIRD PARTY MATERIALS INCLUDED IN THE
+DELIVERABLES, ANY THIRD PARTY MATERIALS FROM WHICH THE DELIVERABLES ARE DERIVED
+(COLLECTIVELY "OTHER CODE"), AND THE USE OF ANY OR ALL THE OTHER CODE IN
+CONNECTION WITH THE DELIVERABLES, INCLUDING (WITHOUT LIMITATION) ANY WARRANTIES
+OF SATISFACTORY QUALITY OR FITNESS FOR A PARTICULAR PURPOSE.
+
+NO THIRD PARTY LICENSORS OF OTHER CODE SHALL HAVE ANY LIABILITY FOR ANY DIRECT,
+INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING
+WITHOUT LIMITATION LOST PROFITS), HOWEVER CAUSED AND WHETHER MADE UNDER
+CONTRACT, TORT OR OTHER LEGAL THEORY, ARISING IN ANY WAY OUT OF THE USE OR
+DISTRIBUTION OF THE OTHER CODE OR THE EXERCISE OF ANY RIGHTS GRANTED UNDER
+EITHER OR BOTH THIS LICENCE AND THE LEGAL TERMS APPLICABLE TO ANY SEPARATE
+FILES, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+8.  GOVERNMENT END USERS.
+
+US Government Restrictions: Use, duplication, reproduction, release,
+modification, disclosure or transfer of the Deliverables is restricted in
+accordance with the terms of this Licence.
+
+9.  TERM AND TERMINATION.
+
+This Licence shall remain in force until terminated by you or by ARM. Without
+prejudice to any of its other rights if you are in breach of any of the terms
+and conditions of this Licence then ARM may terminate this Licence immediately
+upon giving written notice to you. You may terminate this Licence at any time.
+Upon termination of this Licence by you or by ARM you shall stop using the
+Deliverables and confidential information and destroy all copies of the
+Deliverables and confidential information in your possession together with all
+documentation and related materials. Notwithstanding the foregoing, except where
+ARM has terminated this Licence for your breach, your rights to distribute the
+Example Code as part of Licensed Products developed prior to termination shall
+survive termination of this Licence, subject to the terms of this Licence. The
+provisions of Clauses 4, 6, 7, 8, 9 and 10 shall survive termination of this
+Licence.
+
+10.  GENERAL.
+
+This Licence is governed by English Law. Except where ARM agrees otherwise in;
+(i) a written contract signed by you and ARM; or (ii) a written contract
+provided by ARM and accepted by you, this is the only agreement between you and
+ARM relating to the Deliverables and it may only be modified by written
+agreement between you and ARM. This Licence may not be modified by purchase
+orders, advertising or other representation by any person. If any clause or
+sentence in this Licence is held by a court of law to be illegal or
+unenforceable the remaining provisions of this Licence shall not be affected
+thereby. The failure by ARM to enforce any of the provisions of this Licence,
+unless waived in writing, shall not constitute a waiver of ARM's rights to
+enforce such provision or any other provision of this Licence in the future.
+
+The Deliverables provided under this Licence are subject to U.S. export control
+laws, including the U.S. Export Administration Act and its associated
+regulations, and may be subject to export or import regulations in other
+countries. You agree to comply fully with all laws and regulations of the United
+States and other countries ("Export Laws") to assure that the Deliverables, are
+not (1) exported, directly or indirectly, in violation of Export Laws, either to
+any countries that are subject to U.S.A. export restrictions or to any end user
+who has been prohibited from participating in the U.S.A. export transactions by
+any federal agency of the U.S.A. government; or (2) intended to be used for any
+purpose prohibited by Export Laws, including, without limitation, nuclear,
+chemical, or biological weapons proliferation.
+
+To the extent that the provisions contained in this Licence conflict with any
+provisions of any other licence you have entered with ARM governing the
+Deliverables the provisions contained in this Licence shall prevail over and
+shall supersede any such conflicting provisions.
+
+
+SCHEDULE
+
+Part A
+
+Hardware Binaries:
+FPGA bitstream file for any or all of the Hardware Source identified below in
+this Part A
+
+Software Binaries:
+Motherboard configuration controller
+Daughterboard configuration controller
+Daughterboard Application note SelfTest
+SCP firmware
+Mali GPU driver
+
+Documentation:
+Documentation, provided as PDF
+
+Hardware Source
+Hardware netlists of the ARM CoreLink peripheral technology and components known as TLX-400, NIC-400, and PL330
+
+Part B
+
+Wrapper:
+Application Note wrapper file provided as hardware source files and netlists.
+
+Part C: Example Code
+(i) Platform specific libraries and source code.
+(ii)    ARM source code of Application note SelfTest.
+
+Part D: Separate Files
+A.    UEFI firmware, including drivers for third party components licensed to
+you under BSD 3-Clause.
+B.    Linux kernel licensed to you under the GNU General Public License version
+2.0
+
+To the extent that ARM is obliged to do so, ARM hereby offers to supply the
+files which are subject to the GNU General Public Licence version 2 (identified
+above), in source code form, subject to the terms of the GNU General Public
+License version 2, upon request. This offer is valid for three (3) years from
+the date of your acceptance of this Licence.
+
+C.    ARM Trusted Firmware licensed to you under BSD 3-Clause.
+
+/end
+
+ARM contract references: LES-PRE-20435 JUNO ARM DEVELOPMENT PLATFORM DELIVERABLES

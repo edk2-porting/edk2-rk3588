@@ -1,0 +1,41 @@
+## @file
+# PEI PCH PMC Private Lib for Cannon Lake PCH.
+#
+# Copyright (c) 2019 - 2020 Intel Corporation. All rights reserved. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+INF_VERSION = 0x00010017
+BASE_NAME = PeiPmcPrivateLibCnl
+FILE_GUID = 1DD4EA23-12F2-4F05-93AF-535476106D8C
+VERSION_STRING = 1.0
+MODULE_TYPE = PEIM
+LIBRARY_CLASS = PeiPmcPrivateLib
+
+
+[LibraryClasses]
+BaseLib
+BaseMemoryLib
+IoLib
+DebugLib
+PeiServicesLib
+PciSegmentLib
+ConfigBlockLib
+PchInfoLib
+PchPcrLib
+PmcLib
+PmcPrivateLib
+PchEspiLib
+GpioPrivateLib
+PeiItssLib
+
+[Packages]
+MdePkg/MdePkg.dec
+CoffeelakeSiliconPkg/SiPkg.dec
+IntelSiliconPkg/IntelSiliconPkg.dec
+
+[Sources]
+PeiPmcPrivateLib.c

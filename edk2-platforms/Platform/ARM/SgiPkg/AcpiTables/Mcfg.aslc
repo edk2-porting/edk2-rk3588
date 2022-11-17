@@ -1,0 +1,53 @@
+/** @file
+*  Memory mapped configuration space base address description table (MCFG)
+*
+*  Copyright (c) 2018, ARM Ltd. All rights reserved.
+*
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
+*
+**/
+
+#include <IndustryStandard/Acpi62.h>
+#include <IndustryStandard/MemoryMappedConfigurationSpaceAccessTable.h>
+#include <Library/PcdLib.h>
+#include "SgiAcpiHeader.h"
+#include "SgiPlatform.h"
+
+#include <Library/AcpiLib.h>
+#include <Library/ArmLib.h>
+#include <IndustryStandard/Acpi.h>
+
+#pragma pack(1)
+typedef struct
+{
+  EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_HEADER Header;
+  EFI_ACPI_MEMORY_MAPPED_ENHANCED_CONFIGURATION_SPACE_BASE_ADDRESS_ALLOCATION_STRUCTURE Structure[1];
+} EFI_ACPI_PCI_MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_DESCRIPTION_TABLE;
+#pragma pack()
+
+EFI_ACPI_PCI_MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_DESCRIPTION_TABLE Mcfg = {
+  {
+    ARM_ACPI_HEADER (
+      EFI_ACPI_6_2_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_BASE_ADDRESS_DESCRIPTION_TABLE_SIGNATURE,
+      EFI_ACPI_PCI_MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_DESCRIPTION_TABLE,
+      EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_TABLE_REVISION
+    ),
+    EFI_ACPI_RESERVED_QWORD, // Reserved
+  },
+  {
+    // PCIe ECAM
+    {
+      FixedPcdGet64 (PcdPciExpressBaseAddress),             // Base Address
+      0x0,                                                  // Segment Group Number
+      FixedPcdGet32 (PcdPciBusMin),                         // Start Bus Number
+      FixedPcdGet32 (PcdPciBusMax),                         // End Bus Number
+      0x00000000,                                           // Reserved
+    }
+  }
+};
+
+//
+// Reference the table being generated to prevent the optimizer from removing the
+// data structure from the executable
+//
+VOID* CONST ReferenceAcpiTable = &Mcfg;

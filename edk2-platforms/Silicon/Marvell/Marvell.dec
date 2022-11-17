@@ -1,0 +1,208 @@
+# Copyright (C) 2016 Marvell International Ltd.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = OpenPlatformMarvellPkg
+  PACKAGE_GUID                   = c372916e-83ad-4b2a-8410-bbc31bd9e68f
+  PACKAGE_VERSION                = 0.1
+
+################################################################################
+#
+# Include Section - list of Include Paths that are provided by this package.
+#                   Comments are used for Keywords and Module Types.
+#
+# Supported Module Types:
+#  BASE SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
+#
+################################################################################
+
+[Includes]
+  Include
+
+[Guids.common]
+  gMarvellTokenSpaceGuid = { 0xf995c6c8, 0xbc9b, 0x4e93, { 0xbd, 0xcf, 0x49, 0x90, 0xc6, 0xe7, 0x8c, 0x7f } }
+
+  gShellEepromHiiGuid = { 0xb2f4c714, 0x147f, 0x4ff7, { 0x82, 0x1b, 0xce, 0x7b, 0x91, 0x7f, 0x5f, 0x2f } }
+  gShellFUpdateHiiGuid = { 0x9b5d2176, 0x590a, 0x49db, { 0x89, 0x5d, 0x4a, 0x70, 0xfe, 0xad, 0xbe, 0x24 } }
+  gShellSfHiiGuid = { 0x03a67756, 0x8cde, 0x4638, { 0x82, 0x34, 0x4a, 0x0f, 0x6d, 0x58, 0x81, 0x39 } }
+
+[LibraryClasses]
+  ArmadaBoardDescLib|Include/Library/ArmadaBoardDescLib.h
+  ArmadaIcuLib|Include/Library/ArmadaIcuLib.h
+  ArmadaSoCDescLib|Include/Library/ArmadaSoCDescLib.h
+  MvGpioLib|Include/Library/MvGpioLib.h
+  NonDiscoverableInitLib|Include/Library/NonDiscoverableInitLib.h
+  SampleAtResetLib|Include/Library/SampleAtResetLib.h
+
+[Protocols]
+  # installed as a protocol by PlatInitDxe to force ordering between DXE drivers
+  # that depend on the lowlevel platform initialization having been completed
+  gMarvellPlatformInitCompleteProtocolGuid = { 0x465b8cf7, 0x016f, 0x4ba6, { 0xbe, 0x6b, 0x28, 0x0e, 0x3a, 0x7d, 0x38, 0x6f } }
+
+[PcdsFixedAtBuild.common]
+#Board description
+  gMarvellTokenSpaceGuid.PcdMaxCpCount|0x2|UINT8|0x30000072
+
+#MPP
+  gMarvellTokenSpaceGuid.PcdMppChipCount|0|UINT32|0x30000001
+
+  gMarvellTokenSpaceGuid.PcdChip0MppReverseFlag|FALSE|BOOLEAN|0x30000002
+  gMarvellTokenSpaceGuid.PcdChip0MppBaseAddress|0|UINT64|0x30000003
+  gMarvellTokenSpaceGuid.PcdChip0MppPinCount|0|UINT32|0x30000004
+  gMarvellTokenSpaceGuid.PcdChip0MppSel0|{ 0x0 }|VOID*|0x30000005
+  gMarvellTokenSpaceGuid.PcdChip0MppSel1|{ 0x0 }|VOID*|0x30000006
+  gMarvellTokenSpaceGuid.PcdChip0MppSel2|{ 0x0 }|VOID*|0x30000007
+  gMarvellTokenSpaceGuid.PcdChip0MppSel3|{ 0x0 }|VOID*|0x30000008
+  gMarvellTokenSpaceGuid.PcdChip0MppSel4|{ 0x0 }|VOID*|0x30000009
+  gMarvellTokenSpaceGuid.PcdChip0MppSel5|{ 0x0 }|VOID*|0x30000010
+  gMarvellTokenSpaceGuid.PcdChip0MppSel6|{ 0x0 }|VOID*|0x30000011
+  gMarvellTokenSpaceGuid.PcdChip0MppSel7|{ 0x0 }|VOID*|0x30000012
+
+  gMarvellTokenSpaceGuid.PcdChip1MppReverseFlag|FALSE|BOOLEAN|0x30000013
+  gMarvellTokenSpaceGuid.PcdChip1MppBaseAddress|0|UINT64|0x30000014
+  gMarvellTokenSpaceGuid.PcdChip1MppPinCount|0|UINT32|0x30000015
+  gMarvellTokenSpaceGuid.PcdChip1MppSel0|{ 0x0 }|VOID*|0x30000016
+  gMarvellTokenSpaceGuid.PcdChip1MppSel1|{ 0x0 }|VOID*|0x30000017
+  gMarvellTokenSpaceGuid.PcdChip1MppSel2|{ 0x0 }|VOID*|0x30000018
+  gMarvellTokenSpaceGuid.PcdChip1MppSel3|{ 0x0 }|VOID*|0x30000019
+  gMarvellTokenSpaceGuid.PcdChip1MppSel4|{ 0x0 }|VOID*|0x30000020
+  gMarvellTokenSpaceGuid.PcdChip1MppSel5|{ 0x0 }|VOID*|0x30000021
+  gMarvellTokenSpaceGuid.PcdChip1MppSel6|{ 0x0 }|VOID*|0x30000022
+  gMarvellTokenSpaceGuid.PcdChip1MppSel7|{ 0x0 }|VOID*|0x30000023
+
+  gMarvellTokenSpaceGuid.PcdChip2MppReverseFlag|FALSE|BOOLEAN|0x30000024
+  gMarvellTokenSpaceGuid.PcdChip2MppBaseAddress|0|UINT64|0x30000025
+  gMarvellTokenSpaceGuid.PcdChip2MppPinCount|0|UINT32|0x30000026
+  gMarvellTokenSpaceGuid.PcdChip2MppSel0|{ 0x0 }|VOID*|0x30000027
+  gMarvellTokenSpaceGuid.PcdChip2MppSel1|{ 0x0 }|VOID*|0x30000028
+  gMarvellTokenSpaceGuid.PcdChip2MppSel2|{ 0x0 }|VOID*|0x30000029
+  gMarvellTokenSpaceGuid.PcdChip2MppSel3|{ 0x0 }|VOID*|0x30000030
+  gMarvellTokenSpaceGuid.PcdChip2MppSel4|{ 0x0 }|VOID*|0x30000031
+  gMarvellTokenSpaceGuid.PcdChip2MppSel5|{ 0x0 }|VOID*|0x30000032
+  gMarvellTokenSpaceGuid.PcdChip2MppSel6|{ 0x0 }|VOID*|0x30000033
+  gMarvellTokenSpaceGuid.PcdChip2MppSel7|{ 0x0 }|VOID*|0x30000034
+
+  gMarvellTokenSpaceGuid.PcdChip3MppReverseFlag|FALSE|BOOLEAN|0x30000035
+  gMarvellTokenSpaceGuid.PcdChip3MppBaseAddress|0|UINT64|0x30000036
+  gMarvellTokenSpaceGuid.PcdChip3MppPinCount|0|UINT32|0x30000037
+  gMarvellTokenSpaceGuid.PcdChip3MppSel0|{ 0x0 }|VOID*|0x30000038
+  gMarvellTokenSpaceGuid.PcdChip3MppSel1|{ 0x0 }|VOID*|0x30000039
+  gMarvellTokenSpaceGuid.PcdChip3MppSel2|{ 0x0 }|VOID*|0x30000040
+  gMarvellTokenSpaceGuid.PcdChip3MppSel3|{ 0x0 }|VOID*|0x30000041
+  gMarvellTokenSpaceGuid.PcdChip3MppSel4|{ 0x0 }|VOID*|0x30000042
+  gMarvellTokenSpaceGuid.PcdChip3MppSel5|{ 0x0 }|VOID*|0x30000043
+  gMarvellTokenSpaceGuid.PcdChip3MppSel6|{ 0x0 }|VOID*|0x30000044
+  gMarvellTokenSpaceGuid.PcdChip3MppSel7|{ 0x0 }|VOID*|0x30000045
+
+#I2C
+  gMarvellTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x0 }|VOID*|0x3000046
+  gMarvellTokenSpaceGuid.PcdI2cSlaveBuses|{ 0x0 }|VOID*|0x3000184
+  gMarvellTokenSpaceGuid.PcdEepromI2cAddresses|{ 0x0 }|VOID*|0x3000050
+  gMarvellTokenSpaceGuid.PcdEepromI2cBuses|{ 0x0 }|VOID*|0x3000185
+  gMarvellTokenSpaceGuid.PcdI2cControllersEnabled|{ 0x0 }|VOID*|0x3000047
+  gMarvellTokenSpaceGuid.PcdI2cClockFrequency|0|UINT32|0x3000048
+  gMarvellTokenSpaceGuid.PcdI2cBaudRate|0|UINT32|0x3000049
+  gMarvellTokenSpaceGuid.PcdI2cBusCount|0|UINT32|0x3000183
+
+#SPI
+  gMarvellTokenSpaceGuid.PcdSpiRegBase|0|UINT32|0x3000051
+  gMarvellTokenSpaceGuid.PcdSpiMemoryBase|0|UINT64|0x3000059
+  gMarvellTokenSpaceGuid.PcdSpiMemoryMapped|TRUE|BOOLEAN|0x3000060
+  gMarvellTokenSpaceGuid.PcdSpiVariableOffset|0|UINT32|0x3000061
+  gMarvellTokenSpaceGuid.PcdSpiMaxFrequency|0|UINT32|0x30000052
+  gMarvellTokenSpaceGuid.PcdSpiClockFrequency|0|UINT32|0x30000053
+
+  gMarvellTokenSpaceGuid.PcdSpiFlashCs|0|UINT32|0x3000057
+  gMarvellTokenSpaceGuid.PcdSpiFlashMode|0|UINT32|0x3000058
+
+#ComPhy
+  gMarvellTokenSpaceGuid.PcdComPhyDevices|{ 0x0 }|VOID*|0x30000098
+
+  #Chip0
+  gMarvellTokenSpaceGuid.PcdChip0ComPhyTypes|{ 0x0 }|VOID*|0x30000068
+  gMarvellTokenSpaceGuid.PcdChip0ComPhySpeeds|{ 0x0 }|VOID*|0x30000069
+  gMarvellTokenSpaceGuid.PcdChip0ComPhyInvFlags|{ 0x0 }|VOID*|0x30000070
+
+  #Chip1
+  gMarvellTokenSpaceGuid.PcdChip1ComPhyTypes|{ 0x0 }|VOID*|0x30000105
+  gMarvellTokenSpaceGuid.PcdChip1ComPhySpeeds|{ 0x0 }|VOID*|0x30000106
+  gMarvellTokenSpaceGuid.PcdChip1ComPhyInvFlags|{ 0x0 }|VOID*|0x30000107
+
+  #Chip2
+  gMarvellTokenSpaceGuid.PcdChip2ComPhyTypes|{ 0x0 }|VOID*|0x30000140
+  gMarvellTokenSpaceGuid.PcdChip2ComPhySpeeds|{ 0x0 }|VOID*|0x30000141
+  gMarvellTokenSpaceGuid.PcdChip2ComPhyInvFlags|{ 0x0 }|VOID*|0x30000142
+
+  #Chip3
+  gMarvellTokenSpaceGuid.PcdChip3ComPhyTypes|{ 0x0 }|VOID*|0x30000175
+  gMarvellTokenSpaceGuid.PcdChip3ComPhySpeeds|{ 0x0 }|VOID*|0x30000176
+  gMarvellTokenSpaceGuid.PcdChip3ComPhyInvFlags|{ 0x0 }|VOID*|0x30000177
+
+#UtmiPhy
+  gMarvellTokenSpaceGuid.PcdUtmiControllersEnabled|{ 0x0 }|VOID*|0x30000206
+  gMarvellTokenSpaceGuid.PcdUtmiPortType|{ 0x0 }|VOID*|0x30000207
+
+#MDIO
+  gMarvellTokenSpaceGuid.PcdMdioControllersEnabled|{ 0x0 }|VOID*|0x3000043
+
+#PHY
+  gMarvellTokenSpaceGuid.PcdPhy2MdioController|{ 0x0 }|VOID*|0x3000027
+  gMarvellTokenSpaceGuid.PcdPhyDeviceIds|{ 0x0 }|VOID*|0x3000095
+  gMarvellTokenSpaceGuid.PcdPhySmiAddresses|{ 0x0 }|VOID*|0x3000024
+  gMarvellTokenSpaceGuid.PcdPhyStartupAutoneg|FALSE|BOOLEAN|0x3000070
+
+#NET
+  gMarvellTokenSpaceGuid.PcdPp2Controllers|{ 0x0 }|VOID*|0x3000028
+  gMarvellTokenSpaceGuid.PcdPp2GopIndexes|{ 0x0 }|VOID*|0x3000029
+  gMarvellTokenSpaceGuid.PcdPp2InterfaceAlwaysUp|{ 0x0 }|VOID*|0x300002A
+  gMarvellTokenSpaceGuid.PcdPp2InterfaceSpeed|{ 0x0 }|VOID*|0x300002B
+  gMarvellTokenSpaceGuid.PcdPp2PhyConnectionTypes|{ 0x0 }|VOID*|0x3000044
+  gMarvellTokenSpaceGuid.PcdPp2PhyIndexes|{ 0x0 }|VOID*|0x3000045
+  gMarvellTokenSpaceGuid.PcdPp2Port2Controller|{ 0x0 }|VOID*|0x300002D
+  gMarvellTokenSpaceGuid.PcdPp2PortIds|{ 0x0 }|VOID*|0x300002C
+
+#PciEmulation
+  gMarvellTokenSpaceGuid.PcdPciEXhci|{ 0x0 }|VOID*|0x3000033
+  gMarvellTokenSpaceGuid.PcdPciEAhci|{ 0x0 }|VOID*|0x3000034
+  gMarvellTokenSpaceGuid.PcdPciESdhci|{ 0x0 }|VOID*|0x3000035
+
+#Platform description
+  gMarvellTokenSpaceGuid.PcdFirmwareVendor|"EFI Development Kit II / Semihalf"|VOID*|0x50000104
+  gMarvellTokenSpaceGuid.PcdFirmwareVersion|"EDK II"|VOID*|0x50000105
+  gMarvellTokenSpaceGuid.PcdProductManufacturer|"Marvell"|VOID*|0x50000100
+  gMarvellTokenSpaceGuid.PcdProductPlatformName|"Marvell Development Board"|VOID*|0x50000101
+  gMarvellTokenSpaceGuid.PcdProductSerial|"Serial Not Set"|VOID*|0x50000103
+  gMarvellTokenSpaceGuid.PcdProductVersion|"Revision unknown"|VOID*|0x50000102
+
+#RTC
+  gMarvellTokenSpaceGuid.PcdRtcBaseAddress|0x0|UINT64|0x40000052
+
+#TRNG
+  gMarvellTokenSpaceGuid.PcdEip76TrngBaseAddress|0x0|UINT64|0x50000053
+
+#Configuration space
+  gMarvellTokenSpaceGuid.PcdConfigSpaceBaseAddress|0xF0000000|UINT64|0x50000054
+
+  #
+  # The secure firmware may occupy a DRAM region that is accessible by the
+  # normal world. These PCDs describe such a region, which will be converted
+  # to 'reserved' memory before DXE is entered.
+  #
+  gMarvellTokenSpaceGuid.PcdArmTFRegionBase|0x0|UINT64|0x50000000
+  gMarvellTokenSpaceGuid.PcdArmTFRegionSize|0x0|UINT32|0x50000001
+  gMarvellTokenSpaceGuid.PcdAuxiliaryReservedRegionBase|0x0|UINT64|0x50000002
+  gMarvellTokenSpaceGuid.PcdAuxiliaryReservedRegionSize|0x0|UINT32|0x50000003
+  gMarvellTokenSpaceGuid.PcdOpTeeRegionBase|0x0|UINT64|0x50000004
+  gMarvellTokenSpaceGuid.PcdOpTeeRegionSize|0x0|UINT32|0x50000005
+
+[Protocols]
+  gMarvellBoardDescProtocolGuid            = { 0xebed8738, 0xd4a6, 0x4001, { 0xa9, 0xc9, 0x52, 0xb0, 0xcb, 0x7d, 0xdb, 0xf9 }}
+  gMarvellEepromProtocolGuid               = { 0x71954bda, 0x60d3, 0x4ef8, { 0x8e, 0x3c, 0x0e, 0x33, 0x9f, 0x3b, 0xc2, 0x2b }}
+  gMarvellMdioProtocolGuid                 = { 0x40010b03, 0x5f08, 0x496a, { 0xa2, 0x64, 0x10, 0x5e, 0x72, 0xd3, 0x71, 0xaa }}
+  gMarvellPhyProtocolGuid                  = { 0x32f48a43, 0x37e3, 0x4acf, { 0x93, 0xc4, 0x3e, 0x57, 0xa7, 0xb0, 0xfb, 0xdc }}
+  gMarvellSpiMasterProtocolGuid            = { 0x23de66a3, 0xf666, 0x4b3e, { 0xaa, 0xa2, 0x68, 0x9b, 0x18, 0xae, 0x2e, 0x19 }}
+  gMarvellSpiFlashProtocolGuid             = { 0x9accb423, 0x5bd2, 0x4fca, { 0x9b, 0x4c, 0x2e, 0x65, 0xfc, 0x25, 0xdf, 0x21 }}
+

@@ -1,0 +1,33 @@
+#/** @file
+#
+#  Copyright (c) 2020, ARM Ltd. All rights reserved.
+
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = NorFlashSgiLib
+  FILE_GUID                      = 3f021755-6d74-4065-9ee4-98225267b36e
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NorFlashPlatformLib
+
+[Sources.common]
+  NorFlashLib.c
+
+[Packages]
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  MdePkg/MdePkg.dec
+  Platform/ARM/SgiPkg/SgiPlatform.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  IoLib
+
+[FixedPcd]
+  gArmSgiTokenSpaceGuid.PcdSysPeriphSysRegBase
+  gArmSgiTokenSpaceGuid.PcdSmcCs0Base
+  gArmSgiTokenSpaceGuid.PcdSmcCs1Base

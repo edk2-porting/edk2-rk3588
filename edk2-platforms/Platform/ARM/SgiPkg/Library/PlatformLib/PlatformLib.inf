@@ -1,0 +1,93 @@
+#
+#  Copyright (c) 2018-2020, ARM Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = ArmSgiLib
+  FILE_GUID                      = 1d0ee1e1-d791-4ecf-a43e-a9c76e674264
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmPlatformLib
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Platform/ARM/SgiPkg/SgiPlatform.dec
+  StandaloneMmPkg/StandaloneMmPkg.dec
+
+[LibraryClasses]
+  ArmLib
+  DebugLib
+  HobLib
+  IoLib
+  MemoryAllocationLib
+  SerialPortLib
+
+[Sources.common]
+  PlatformLibMem.c
+  PlatformLib.c
+
+[Sources.AARCH64]
+  AArch64/Helper.S | GCC
+
+[FixedPcd]
+  gArmPlatformTokenSpaceGuid.PcdClusterCount
+  gArmPlatformTokenSpaceGuid.PcdCoreCount
+  gArmPlatformTokenSpaceGuid.PcdArmHdLcdBase
+
+  gArmSgiTokenSpaceGuid.PcdDramBlock2Base
+  gArmSgiTokenSpaceGuid.PcdDramBlock2Size
+  gArmSgiTokenSpaceGuid.PcdGicSize
+
+  gArmTokenSpaceGuid.PcdSystemMemoryBase
+  gArmTokenSpaceGuid.PcdSystemMemorySize
+
+  gArmSgiTokenSpaceGuid.PcdChipCount
+
+  gArmTokenSpaceGuid.PcdGicDistributorBase
+  gArmTokenSpaceGuid.PcdGicRedistributorsBase
+  gArmTokenSpaceGuid.PcdFvBaseAddress
+  gArmTokenSpaceGuid.PcdArmPrimaryCore
+  gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
+  gArmTokenSpaceGuid.PcdPciBusMin
+  gArmTokenSpaceGuid.PcdPciBusMax
+  gArmTokenSpaceGuid.PcdPciMmio32Base
+  gArmTokenSpaceGuid.PcdPciMmio32Size
+  gArmTokenSpaceGuid.PcdPciMmio64Base
+  gArmTokenSpaceGuid.PcdPciMmio64Size
+
+  gArmTokenSpaceGuid.PcdMmBufferBase
+  gArmTokenSpaceGuid.PcdMmBufferSize
+
+  gArmSgiTokenSpaceGuid.PcdSmcCs0Base
+  gArmSgiTokenSpaceGuid.PcdSmcCs1Base
+  gArmSgiTokenSpaceGuid.PcdSmmuBase
+  gArmSgiTokenSpaceGuid.PcdSmmuSize
+  gArmSgiTokenSpaceGuid.PcdSysPeriphBase
+  gArmSgiTokenSpaceGuid.PcdTimerBase0Base
+  gArmSgiTokenSpaceGuid.PcdTimerBase0Size
+  gArmSgiTokenSpaceGuid.PcdTimerControlBase
+  gArmSgiTokenSpaceGuid.PcdTimerControlSize
+  gArmSgiTokenSpaceGuid.PcdTimerCounterReadBase
+  gArmSgiTokenSpaceGuid.PcdTimerCounterReadSize
+  gArmSgiTokenSpaceGuid.PcdWdogBase
+  gArmSgiTokenSpaceGuid.PcdWdogSize
+
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase
+
+[Guids]
+  gArmSgiPlatformIdDescriptorGuid
+  gEfiHobListGuid          ## CONSUMES  ## SystemTable
+  gFdtTableGuid
+
+[Ppis]
+  gArmMpCoreInfoPpiGuid
+  gNtFwConfigDtInfoPpiGuid

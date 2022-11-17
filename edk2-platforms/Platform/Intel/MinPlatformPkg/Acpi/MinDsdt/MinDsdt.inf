@@ -1,0 +1,47 @@
+### @file
+#  Component information file for Minimal DSDT module
+#
+# Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+###
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = MinDsdt
+  FILE_GUID                      = 8EB04370-482C-4505-AA27-7EB226A5729F
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InstallMinDsdt
+
+[Sources.common]
+  MinDsdt.c
+  MinDsdt.asl
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  BaseLib
+  DebugLib
+  PcdLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  BaseMemoryLib
+  MemoryAllocationLib
+
+[Protocols]
+  gEfiAcpiTableProtocolGuid                     ## CONSUMES
+  gEfiFirmwareVolume2ProtocolGuid               ## CONSUMES
+
+[Pcd]
+  gMinPlatformPkgTokenSpaceGuid.PcdPciReservedMemBase
+  gMinPlatformPkgTokenSpaceGuid.PcdPciReservedMemLimit
+
+[Depex]
+  gEfiAcpiTableProtocolGuid           AND
+  gEfiFirmwareVolume2ProtocolGuid
+

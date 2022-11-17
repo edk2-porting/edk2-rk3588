@@ -1,0 +1,33 @@
+#  DUartPortLib.inf
+#
+#  Component description file for DUartPortLib module
+#
+#  Copyright (c) 2013, Freescale Ltd. All rights reserved.
+#  Copyright 2017, 2020 NXP
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = DUartPortLib
+  FILE_GUID                      = c42dfe79-8de5-429e-a055-2d0a58591498
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SerialPortLib
+
+[Sources.common]
+  DUartPortLib.c
+
+[LibraryClasses]
+  ArmPlatformLib
+  PcdLib
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/NXP/NxpQoriqLs.dec
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate

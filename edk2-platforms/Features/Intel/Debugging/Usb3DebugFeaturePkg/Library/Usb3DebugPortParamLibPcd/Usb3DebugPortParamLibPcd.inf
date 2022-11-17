@@ -1,0 +1,31 @@
+## @file
+#  USB3 Debug Port Parameter library instance based on PCD.
+#
+# Copyright (c) 2013 - 2020, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Usb3DebugPortParamLibPcd
+  FILE_GUID                      = 4990A700-4002-4d08-8E00-622720032662
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = Usb3DebugPortParamLib
+
+[Sources]
+  Usb3DebugPortParamLibPcd.c
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  Usb3DebugFeaturePkg/Usb3DebugFeaturePkg.dec
+
+[Pcd]
+  gUsb3DebugFeaturePkgTokenSpaceGuid.PcdUsbSerialXhciBus     ## CONSUMES
+  gUsb3DebugFeaturePkgTokenSpaceGuid.PcdUsbSerialXhciDev     ## CONSUMES
+  gUsb3DebugFeaturePkgTokenSpaceGuid.PcdUsbSerialXhciFunc    ## CONSUMES

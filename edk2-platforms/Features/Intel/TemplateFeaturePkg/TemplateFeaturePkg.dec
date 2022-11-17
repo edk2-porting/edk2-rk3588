@@ -1,0 +1,30 @@
+## @file
+# This package provides advanced feature functionality for <TEMPLATE> support.
+# This package should only depend on EDK II Core packages, IntelSiliconPkg, and MinPlatformPkg.
+#
+# The DEC files are used by the utilities that parse DSC and
+# INF files to generate AutoGen.c and AutoGen.h files
+# for the build infrastructure.
+#
+# Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION = 0x00010017
+  PACKAGE_NAME      = TemplateFeaturePkg
+  PACKAGE_GUID      = 00000000-0000-0000-0000-000000000000
+  PACKAGE_VERSION   = 0.1
+
+[Includes]
+  Include
+
+[LibraryClasses]
+
+[Guids]
+  gTemplateFeaturePkgTokenSpaceGuid  =  {0x00000000, 0x0000, 0x0000, {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}}
+
+[PcdsFeatureFlag]
+  gTemplateFeaturePkgTokenSpaceGuid.PcdTemplateFeatureEnable|FALSE|BOOLEAN|0xA0000001

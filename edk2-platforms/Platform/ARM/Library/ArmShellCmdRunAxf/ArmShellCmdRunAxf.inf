@@ -1,0 +1,56 @@
+## @file
+#
+#  Copyright (c) 2014, ARM Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = ArmShellCmdRunAxf
+  FILE_GUID                      = 676a0e7c-2e16-43e8-b49c-d82a1f9e24df
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmShellCmdRunAxfLib
+
+[Sources.common]
+  ArmShellCmdRunAxf.c
+  ArmShellCmdRunAxf.uni
+  RunAxf.c
+  BootMonFsLoader.h
+  BootMonFsLoader.c
+  ElfLoader.h
+  ElfLoader.c
+  # ELF definitions taken from BaseTools
+  elf32.h
+  elf64.h
+  elf_common.h
+
+[Sources.AARCH64]
+  AArch64/Pivot.S
+
+[Sources.ARM]
+  Arm/Pivot.S
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Platform/ARM/ARM.dec
+  ShellPkg/ShellPkg.dec
+
+[LibraryClasses]
+  ArmLib
+  BaseLib
+  CacheMaintenanceLib
+  DebugLib
+  HiiLib
+  ShellLib
+
+[Protocols]
+  gEfiLoadedImageProtocolGuid
+  gEfiShellDynamicCommandProtocolGuid
+
+[Guids]
+  gArmBootMonFsFileInfoGuid

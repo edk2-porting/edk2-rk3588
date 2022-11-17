@@ -1,0 +1,45 @@
+## @file
+# Component description file for the PeiCpuPolicyLibPreMem library.
+#
+# Copyright (c) 2019 - 2020 Intel Corporation. All rights reserved. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+INF_VERSION = 0x00010017
+BASE_NAME = PeiCpuPolicyLibPreMem
+FILE_GUID = 5F4C2CF1-9DFE-4D99-9318-98FD31C8517D
+VERSION_STRING = 1.0
+MODULE_TYPE = PEIM
+LIBRARY_CLASS = CpuPolicyLibPreMem
+
+[LibraryClasses]
+DebugLib
+IoLib
+PeiServicesLib
+BaseMemoryLib
+MemoryAllocationLib
+CpuPlatformLib
+SiConfigBlockLib
+PostCodeLib
+ConfigBlockLib
+
+[Packages]
+MdePkg/MdePkg.dec
+UefiCpuPkg/UefiCpuPkg.dec
+CoffeelakeSiliconPkg/SiPkg.dec
+IntelSiliconPkg/IntelSiliconPkg.dec
+
+[Sources]
+PeiCpuPolicyLib.c
+PeiCpuPolicyLibrary.h
+CpuPrintPolicy.c
+
+[Ppis]
+gSiPreMemPolicyPpiGuid         ## CONSUMES
+
+[Guids]
+gCpuSecurityPreMemConfigGuid      ## PRODUCES
+gCpuOverclockingPreMemConfigGuid  ## PRODUCES

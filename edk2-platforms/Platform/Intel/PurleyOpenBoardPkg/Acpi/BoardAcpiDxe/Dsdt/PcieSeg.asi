@@ -1,0 +1,355 @@
+/** @file
+
+Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#include "MaxSocket.h"
+
+ Scope(\) {
+
+	//
+	//  \SG00, SG01,... SG07 are defined to contain Segment # for Segment/socket 0, 1, ....
+	//
+       // Create _SEG for each segment/socket
+	//
+
+      //
+      // Debug method for use under BITS
+      // Example:  Set SG01 to 5              SSEG(1,5)
+      //
+      Method(SSEG, 2) {
+            If (LEqual(Arg0, 0) ) { Store (Arg1, SG00) } 
+            If (LEqual(Arg0, 1) ) { Store (Arg1, SG01) } 
+            If (LEqual(Arg0, 2) ) { Store (Arg1, SG02) } 
+            If (LEqual(Arg0, 3) ) { Store (Arg1, SG03) } 
+      }
+
+
+// ------------------------------------------------------
+// Socket 0    PC00 - PC05  share the same segment number SG00
+// ------------------------------------------------------
+
+	Scope(\_SB.PC00) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG00)
+			}
+	}
+
+	Scope(\_SB.PC01) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG00)
+			}
+	}
+
+	Scope(\_SB.PC02) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG00)
+			}
+	}
+
+	Scope(\_SB.PC03) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG00)
+			}
+	}
+
+	Scope(\_SB.PC04) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG00)
+			}
+	}
+
+	Scope(\_SB.PC05) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG00)
+			}
+	}
+
+// ------------------------------------------------------
+// Socket 1    PC06 - PC11  share the same segment number SG01
+// ------------------------------------------------------
+
+	Scope(\_SB.PC06) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG01)
+			}
+	}
+
+	Scope(\_SB.PC07) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG01)
+			}
+	}
+
+	Scope(\_SB.PC08) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG01)
+			}
+	}
+
+	Scope(\_SB.PC09) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG01)
+			}
+	}
+
+	Scope(\_SB.PC10) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG01)
+			}
+	}
+
+	Scope(\_SB.PC11) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG01)
+			}
+	}
+
+// ------------------------------------------------------
+// Socket 2    PC12 - PC17  share the same segment number SG02
+// ------------------------------------------------------
+
+	Scope(\_SB.PC12) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG02)
+			}
+	}
+
+	Scope(\_SB.PC13) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG02)
+			}
+	}
+
+	Scope(\_SB.PC14) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG02)
+			}
+	}
+
+	Scope(\_SB.PC15) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG02)
+			}
+	}
+
+	Scope(\_SB.PC16) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG02)
+			}
+	}
+
+	Scope(\_SB.PC17) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG02)
+			}
+	}
+
+
+// ------------------------------------------------------
+// Socket 3    PC18 - PC23  share the same segment number SG03
+// ------------------------------------------------------
+
+	Scope(\_SB.PC18) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG03)
+			}
+	}
+
+	Scope(\_SB.PC19) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG03)
+			}
+	}
+
+	Scope(\_SB.PC20) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG03)
+			}
+	}
+
+	Scope(\_SB.PC21) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG03)
+			}
+	}
+
+	Scope(\_SB.PC22) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG03)
+			}
+	}
+
+	Scope(\_SB.PC23) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG03)
+			}
+	}
+
+#if MAX_SOCKET > 4
+
+// ------------------------------------------------------
+// Socket 4    PC24 - PC29  share the same segment number SG03
+// ------------------------------------------------------
+
+	Scope(\_SB.PC24) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG04)
+			}
+	}
+
+	Scope(\_SB.PC25) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG04)
+			}
+	}
+
+	Scope(\_SB.PC26) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG04)
+			}
+	}
+
+	Scope(\_SB.PC27) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG04)
+			}
+	}
+
+	Scope(\_SB.PC28) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG04)
+			}
+	}
+
+	Scope(\_SB.PC29) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG04)
+			}
+	}
+	
+// ------------------------------------------------------
+// Socket 5    PC30 - PC35  share the same segment number SG03
+// ------------------------------------------------------
+
+	Scope(\_SB.PC30) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG05)
+			}
+	}
+
+	Scope(\_SB.PC31) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG05)
+			}
+	}
+
+	Scope(\_SB.PC32) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG05)
+			}
+	}
+
+	Scope(\_SB.PC33) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG05)
+			}
+	}
+
+	Scope(\_SB.PC34) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG05)
+			}
+	}
+
+	Scope(\_SB.PC35) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG05)
+			}
+	}
+
+// ------------------------------------------------------
+// Socket 6    PC36 - PC41  share the same segment number SG03
+// ------------------------------------------------------
+
+	Scope(\_SB.PC36) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG06)
+			}
+	}
+
+	Scope(\_SB.PC37) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG06)
+			}
+	}
+
+	Scope(\_SB.PC38) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG06)
+			}
+	}
+
+	Scope(\_SB.PC39) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG06)
+			}
+	}
+
+	Scope(\_SB.PC40) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG06)
+			}
+	}
+
+	Scope(\_SB.PC41) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG06)
+			}
+	}	
+	
+// ------------------------------------------------------
+// Socket 7    PC42 - PC47  share the same segment number SG03
+// ------------------------------------------------------
+
+	Scope(\_SB.PC42) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG07)
+			}
+	}
+
+	Scope(\_SB.PC43) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG07)
+			}
+	}
+
+	Scope(\_SB.PC44) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG07)
+			}
+	}
+
+	Scope(\_SB.PC45) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG07)
+			}
+	}
+
+	Scope(\_SB.PC46) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG07)
+			}
+	}
+
+	Scope(\_SB.PC47) {
+			Method (_SEG, 0, NotSerialized) {
+				return (SG07)
+			}
+	}	
+#endif
+
+} // End Scope(\)
+  

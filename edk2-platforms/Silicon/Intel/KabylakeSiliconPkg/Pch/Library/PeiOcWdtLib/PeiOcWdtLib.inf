@@ -1,0 +1,37 @@
+## @file
+# Component Description File for OcWdt Support.
+#
+# Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+
+[Defines]
+INF_VERSION = 0x00010017
+BASE_NAME = PeiOcWdtLib
+FILE_GUID = D5207C23-3632-4078-A671-3B5C364B2BDB
+VERSION_STRING = 1.0
+MODULE_TYPE = PEIM
+LIBRARY_CLASS = OcWdtLib
+
+
+[LibraryClasses]
+IoLib
+DebugLib
+PeiServicesLib
+PchWdtCommonLib
+
+
+[Packages]
+MdePkg/MdePkg.dec
+KabylakeSiliconPkg/SiPkg.dec
+
+
+[Sources]
+PeiOcWdtLib.c
+
+
+[Ppis]
+gWdtPpiGuid  ## PRODUCES

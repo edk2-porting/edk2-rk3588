@@ -1,0 +1,49 @@
+#/** @file
+#
+# Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
+# Copyright (c) 2014 - 2016, AMD Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+#/**
+#  Derived from:
+#   ArmPlatformPkg/Library/PL031RealTimeClockLib/PL031RealTimeClockLib.inf
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = AmdStyxRealTimeClockLib
+  FILE_GUID                      = fd922639-f4ee-4d2f-955b-804e60df1e68
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = RealTimeClockLib
+
+[Sources.common]
+  RealTimeClockLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  Silicon/AMD/Styx/AmdModulePkg/AmdModulePkg.dec
+  Silicon/AMD/Styx/AmdStyx.dec
+
+[LibraryClasses]
+  IoLib
+  DebugLib
+  UefiRuntimeLib
+  DxeServicesTableLib
+
+[Guids]
+  gEfiEventVirtualAddressChangeGuid
+
+[Protocols]
+  gAmdIscpDxeProtocolGuid            ## CONSUMER
+
+[Depex]
+  gAmdIscpDxeProtocolGuid
+
+
+

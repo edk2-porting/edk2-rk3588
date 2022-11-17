@@ -1,0 +1,39 @@
+#/** @file
+#
+#  Copyright (c) 2016 Linaro Ltd.
+#  Copyright (c) 2016 Hisilicon Limited.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SasV1Dxe
+  FILE_GUID                      = 2b235921-8405-4219-a461-972a3a60969c
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = SasV1Initialize
+
+
+[Sources.common]
+  SasV1Dxe.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/Hisilicon/HisiPkg.dec
+
+[LibraryClasses]
+  DmaLib
+  IoLib
+  MemoryAllocationLib
+  PcdLib
+  TimerLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Protocols]
+  gEfiExtScsiPassThruProtocolGuid
+  gPlatformSasProtocolGuid

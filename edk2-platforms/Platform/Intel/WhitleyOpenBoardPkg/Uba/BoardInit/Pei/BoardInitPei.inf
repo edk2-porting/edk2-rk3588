@@ -1,0 +1,55 @@
+## @file
+# Board Init for multi-boards support in PEI phase.
+#
+# @copyright
+# Copyright 2015 - 2021 Intel Corporation. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BoardInitPeim
+  FILE_GUID                      = 64980BB9-7BA3-4cb0-AA83-FE396A7F6724
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = BoardInitPeimEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32
+#
+
+[Sources]
+  BoardInitPei.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  WhitleyOpenBoardPkg/PlatformPkg.dec
+  WhitleySiliconPkg/WhitleySiliconPkg.dec
+  WhitleySiliconPkg/SiliconPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  PeiServicesLib
+  PeimEntryPoint
+  DebugLib
+
+[Guids]
+  gEfiPlatformInfoGuid
+
+[Ppis]
+  gEfiPeiReadOnlyVariable2PpiGuid                 ## CONSUMES
+  gBoardInitGuid                                  ## PRODUCES
+
+[Pcd]
+
+[FixedPcd]
+
+[Depex]
+  gUbaConfigDatabasePpiGuid AND
+  gEfiPeiReadOnlyVariable2PpiGuid AND
+  gEfiPlatformInfoGuid

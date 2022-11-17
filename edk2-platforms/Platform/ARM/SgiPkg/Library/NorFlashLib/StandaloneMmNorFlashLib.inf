@@ -1,0 +1,33 @@
+## @file
+#  StandaloneMM instance of NOR Flash library.
+#
+#  Copyright (c) 2021, ARM Limited. All rights reserved.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = NorFlashMmLib
+  FILE_GUID                      = 2ce22190-b933-4d1e-99ba-8bf1f0768255
+  MODULE_TYPE                    = MM_STANDALONE
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  LIBRARY_CLASS                  = NorFlashPlatformLib
+
+[Sources.common]
+  StandaloneMmNorFlashLib.c
+
+[Packages]
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  MdePkg/MdePkg.dec
+  Platform/ARM/SgiPkg/SgiPlatform.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  IoLib
+
+[FixedPcd]
+  gArmSgiTokenSpaceGuid.PcdSysPeriphSysRegBase
+  gArmSgiTokenSpaceGuid.PcdSmcCs2Base

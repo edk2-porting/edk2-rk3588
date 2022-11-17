@@ -1,0 +1,53 @@
+#
+#  Copyright (c) 2018, Linaro Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+[Defines]
+  INF_VERSION                    = 0x0001001a
+  BASE_NAME                      = HiKey960Dxe
+  FILE_GUID                      = 6d824b2c-640e-4643-b9f2-9c09e8bff429
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = HiKey960EntryPoint
+
+[Sources.common]
+  HiKey960Dxe.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Platform/Hisilicon/HiKey960/HiKey960.dec
+  Silicon/Hisilicon/Hi3660/Hi3660.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  CacheMaintenanceLib
+  DxeServicesTableLib
+  IoLib
+  PcdLib
+  TimerLib
+  UefiBootManagerLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Protocols]
+  gEfiDevicePathFromTextProtocolGuid
+  gEfiLoadedImageProtocolGuid
+  gEmbeddedGpioProtocolGuid
+  gPlatformBootManagerProtocolGuid
+  gPlatformVirtualKeyboardProtocolGuid
+
+[Pcd]
+  gHiKey960TokenSpaceGuid.PcdAndroidBootDevicePath
+  gHiKey960TokenSpaceGuid.PcdAndroidBootFile
+  gHiKey960TokenSpaceGuid.PcdAndroidFastbootFile
+  gHiKey960TokenSpaceGuid.PcdSdBootDevicePath
+
+[Guids]
+  gEfiEndOfDxeEventGroupGuid
+
+[Depex]
+  TRUE

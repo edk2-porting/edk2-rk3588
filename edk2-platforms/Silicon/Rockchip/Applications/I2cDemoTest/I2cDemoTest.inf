@@ -1,0 +1,45 @@
+#
+# Copyright (c) 2021-2022, Rockchip Limited. All rights reserved.
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+[Defines]
+  INF_VERSION = 0x00010006
+  BASE_NAME = UefiShellI2cDemoLib
+  FILE_GUID = adf4b61c-2ca3-4e1a-9597-99282f5a4aa2
+  MODULE_TYPE = UEFI_APPLICATION
+  VERSION_STRING = 0.1
+  LIBRARY_CLASS  = NULL|UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR = ShellI2cDemoTestLibConstructor
+  DESTRUCTOR  = ShellI2cDemoTestLibDestructor
+
+[Sources]
+  I2cDemoTest.c
+  I2cDemoTest.uni
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ShellPkg/ShellPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Silicon/Rockchip/RockchipPkg.dec
+  Silicon/Rockchip/RK3588/RK3588.dec
+
+[LibraryClasses]
+  UefiLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  ShellCommandLib
+  ShellLib
+  UefiLib
+  UefiRuntimeServicesTableLib
+  PcdLib
+
+[Protocols]
+ gRockchipI2cDemoProtocolGuid
+ gEfiI2cMasterProtocolGuid
+
+[Guids]
+  gShellI2cDemoHiiGuid

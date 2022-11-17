@@ -1,0 +1,63 @@
+## @file
+# This module will perform specific PCI-Express devices
+# resource configuration.
+#
+#
+#  Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010017
+  BASE_NAME                      = PciHotPlug
+  FILE_GUID                      = 3022E512-B94A-4F12-806D-7EF1177899D8
+  VERSION_STRING                 = 1.0
+  MODULE_TYPE                    = DXE_DRIVER
+  ENTRY_POINT                    = PciHotPlug
+#
+# The following information is for reference only and not required by the build tools.
+#
+# VALID_ARCHITECTURES = IA32 X64 EBC
+#
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  DevicePathLib
+  DebugLib
+  UefiLib
+  HobLib
+  PchPcieRpLib
+  ConfigBlockLib
+  TbtCommonLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+  CometlakeOpenBoardPkg/OpenBoardPkg.dec
+  CoffeelakeSiliconPkg/SiPkg.dec
+  IntelSiliconPkg/IntelSiliconPkg.dec
+
+[Sources]
+  PciHotPlug.c
+  PciHotPlug.h
+
+[Protocols]
+  gEfiPciHotPlugInitProtocolGuid                ## PRODUCES
+  gSaPolicyProtocolGuid                         ## CONSUMES
+
+[Guids]
+  gEfiHobListGuid                               ## CONSUMES
+  gPcieRpConfigGuid                  ## CONSUMES
+
+[Pcd]
+
+[Depex]
+  gDxeTbtPolicyProtocolGuid
+

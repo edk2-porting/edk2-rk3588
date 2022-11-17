@@ -1,0 +1,34 @@
+## @file
+# Component information file for SEC Board Init Library
+#
+# Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SecBoardInitLibNull
+  FILE_GUID                      = B9DC6910-67E0-4FCE-A1A4-675115E71455
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SecBoardInitLib
+
+[Sources.IA32]
+  Ia32/SecBoardInit.nasm
+
+[Sources]
+  SecBoardInitLib.c
+
+[Packages]
+  MinPlatformPkg/MinPlatformPkg.dec
+  MdePkg/MdePkg.dec
+  IntelFsp2Pkg/IntelFsp2Pkg.dec
+
+[LibraryClasses]
+  BaseLib
+
+[Guids]
+
+[Pcd]

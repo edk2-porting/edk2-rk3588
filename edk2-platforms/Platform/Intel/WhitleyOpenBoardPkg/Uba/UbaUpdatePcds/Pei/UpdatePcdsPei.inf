@@ -1,0 +1,50 @@
+## @file
+# Uba update pcds in PEI phase.
+#
+# @copyright
+# Copyright 2014 - 2021 Intel Corporation. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UpdatePcdPei
+  FILE_GUID                      = AB8F1705-7EB6-4d08-A9B3-918BDE24F479
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = UpdatePcdPeimEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32
+#
+
+[Sources]
+  UpdatePcdsPei.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  WhitleyOpenBoardPkg/PlatformPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  PeiServicesLib
+  PeimEntryPoint
+  DebugLib
+  PeiServicesTablePointerLib
+  UbaPlatLib
+
+[Guids]
+
+[Ppis]
+  gUpdatePcdGuid
+
+[Pcd]
+
+[Depex]
+  gBoardInitGuid
+
+

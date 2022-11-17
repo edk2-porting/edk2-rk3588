@@ -1,0 +1,53 @@
+#/** @file
+#  Sample ACPI Platform Driver.
+#
+#  Copyright (C) 2020, Phytium Technology Co, Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001b
+  BASE_NAME                      = AcpiPlatform
+  FILE_GUID                      = d51068e8-40dc-11eb-9322-1f6d234e9e6e
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = AcpiPlatformEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  AcpiPlatform.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Silicon/Phytium/PhytiumCommonPkg/PhytiumCommonPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  DxeServicesLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Guids]
+
+[Protocols]
+  gEfiAcpiTableProtocolGuid                                 ## CONSUMES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiTableStorageFile    ## CONSUMES
+
+[FixedPcd]
+  gArmTokenSpaceGuid.PcdGicRedistributorsBase
+
+[Depex]
+  gEfiAcpiTableProtocolGuid

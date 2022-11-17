@@ -1,0 +1,50 @@
+#/** @file
+#
+# Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.<BR>
+# Copyright (c) 2017, Marvell International Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+#/**
+#  Derived from:
+#  ArmPlatformPkg/Library/PL031RealTimeClockLib/PL031RealTimeClockLib.inf
+#
+#**/
+
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = ArmadaRealTimeClockLib
+  FILE_GUID                      = fa81e889-045b-4c96-9093-742554fd0588
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = RealTimeClockLib|DXE_RUNTIME_DRIVER
+
+[Sources.common]
+  RealTimeClockLib.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/Marvell/Marvell.dec
+
+[LibraryClasses]
+  DebugLib
+  DxeServicesTableLib
+  IoLib
+  PcdLib
+  TimeBaseLib
+  TimerLib
+  UefiRuntimeLib
+
+[Guids]
+  gEfiEventVirtualAddressChangeGuid
+
+[Pcd]
+  gMarvellTokenSpaceGuid.PcdRtcBaseAddress
+
+[Depex.common.DXE_RUNTIME_DRIVER]
+  gEfiCpuArchProtocolGuid

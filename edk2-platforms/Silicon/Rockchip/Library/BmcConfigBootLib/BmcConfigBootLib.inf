@@ -1,0 +1,46 @@
+#/** @file
+#
+#    Copyright (c) 2015, Hisilicon Limited. All rights reserved.
+#    Copyright (c) 2015, Linaro Limited. All rights reserved.
+#
+#    SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = BmcConfigBootLib
+  FILE_GUID                      = 87150b08-3177-11ec-95b4-f42a7dcb925d
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = BmcConfigBootLib
+
+[Sources.common]
+  BmcConfigBootLib.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/Rockchip/RockchipNonOsi.dec
+  Silicon/Rockchip/RockchipPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  IpmiCmdLib
+  PcdLib
+  PrintLib
+  UefiBootManagerLib
+
+[Guids]
+  gEfiEventReadyToBootGuid
+  gOemBootVariableGuid
+
+[Protocols]
+  gEfiDevicePathToTextProtocolGuid              ## CONSUMES
+  gEfiSimpleFileSystemProtocolGuid              ## CONSUMES
+
+[Depex]
+  gEfiDevicePathToTextProtocolGuid

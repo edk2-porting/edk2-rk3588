@@ -1,0 +1,117 @@
+## @file
+# Component description file for SystemAgent Initialization driver
+#
+#  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+
+[Defines]
+INF_VERSION = 0x00010017
+BASE_NAME = SaInitDxe
+FILE_GUID = DE23ACEE-CF55-4fb6-AA77-984AB53DE811
+VERSION_STRING = 1.0
+MODULE_TYPE = DXE_DRIVER
+ENTRY_POINT = SaInitEntryPointDxe
+#
+# The following information is for reference only and not required by the build tools.
+#
+# VALID_ARCHITECTURES = IA32 X64 EBC
+#
+
+
+
+[LibraryClasses]
+UefiDriverEntryPoint
+UefiLib
+UefiBootServicesTableLib
+DxeServicesTableLib
+DebugLib
+PciCf8Lib
+PciSegmentLib
+BaseMemoryLib
+MemoryAllocationLib
+IoLib
+S3BootScriptLib
+PmcLib
+PchInfoLib
+GpioLib
+ConfigBlockLib
+SaPlatformLib
+PchPcieRpLib
+DxeGraphicsInitLib
+DxeIgdOpRegionInitLib
+DxeVtdInitLib
+PciExpressHelpersLib
+DxeCpuPcieRpLib
+SataLib
+
+[Packages]
+TigerlakeSiliconPkg/SiPkg.dec
+MdePkg/MdePkg.dec
+UefiCpuPkg/UefiCpuPkg.dec
+IntelSiliconPkg/IntelSiliconPkg.dec
+
+[Pcd]
+gSiPkgTokenSpaceGuid.PcdSiPciExpressBaseAddress
+gSiPkgTokenSpaceGuid.PcdMchBaseAddress
+gSiPkgTokenSpaceGuid.PcdSiIoApicBaseAddress
+gSiPkgTokenSpaceGuid.PcdCpuPcieEnable                  ## CONSUMES
+
+[FixedPcd]
+
+[Sources]
+SaInitDxe.h
+SaInitDxe.c
+SaInit.h
+SaInit.c
+SaAcpi.c
+
+
+[Protocols]
+gEfiAcpiTableProtocolGuid              ## CONSUMES
+gSaNvsAreaProtocolGuid                 ## PRODUCES
+gSaPolicyProtocolGuid                  ## CONSUMES
+gEfiCpuArchProtocolGuid                ## CONSUMES
+gEfiPciEnumerationCompleteProtocolGuid ## CONSUMES
+gEfiPciRootBridgeIoProtocolGuid        ## CONSUMES
+gIgdOpRegionProtocolGuid               ## PRODUCES
+gEfiFirmwareVolume2ProtocolGuid        ## CONSUMES
+gGopComponentName2ProtocolGuid         ## CONSUMES
+gSaIotrapSmiProtocolGuid               ## CONSUMES
+gCpuPcieIoTrapProtocolGuid             ## CONSUMES
+
+[Guids]
+gSaConfigHobGuid
+gHgAcpiTablePchStorageGuid
+gSaAcpiTableStorageGuid
+gHgAcpiTableStorageGuid
+gSaSsdtAcpiTableStorageGuid
+gSegSsdtAcpiTableStorageGuid
+gTcssSsdtAcpiTableStorageGuid
+gGraphicsAcpiTableStorageGuid
+gIpuAcpiTableStorageGuid
+gEfiEndOfDxeEventGroupGuid
+gSiConfigHobGuid        ## CONSUMES
+gGraphicsDxeConfigGuid
+gMemoryDxeConfigGuid
+gPcieDxeConfigGuid
+gPchInfoHobGuid
+gTcssHobGuid
+gSaConfigHobGuid
+gSaDataHobGuid
+gCpuPcieHobGuid
+gHostBridgeDataHobGuid
+gVmdInfoHobGuid                   ## CONSUMES
+
+[FixedPcd]
+
+[Depex]
+gEfiAcpiTableProtocolGuid AND
+gEfiFirmwareVolume2ProtocolGuid AND
+gSaPolicyProtocolGuid AND
+gEfiPciRootBridgeIoProtocolGuid AND
+gEfiPciHostBridgeResourceAllocationProtocolGuid AND # This is to ensure that PCI MMIO resource has been prepared and available for this driver to allocate.
+gEfiHiiDatabaseProtocolGuid
+

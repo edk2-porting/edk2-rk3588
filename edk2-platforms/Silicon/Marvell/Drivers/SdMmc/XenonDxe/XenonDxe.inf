@@ -1,0 +1,51 @@
+## @file
+#  SdMmcPciHcDxe driver is used to manage those host controllers which comply with SD
+#  Host Controller Simplified Specifiction version 3.0.
+#
+#  It will produce EFI_SD_MMC_PASS_THRU_PROTOCOL to allow sending SD/MMC/eMMC cmds
+#  to specified devices from upper layer.
+#
+#  Copyright (c) 2015, Intel Corporation. All rights reserved.<BR>
+#  Copyright (C) 2018, Marvell International Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = XenonDxe
+  FILE_GUID                      = 17f56b40-f7c1-435c-ab8d-404872da951e
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializeXenonDxe
+
+[Sources]
+  XenonPciHci.c
+  XenonPciHci.h
+  XenonSdhci.c
+  XenonSdhci.h
+  XenonSdMmcOverride.c
+  XenonSdMmcOverride.h
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Silicon/Marvell/Marvell.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+  UefiRuntimeServicesTableLib
+
+[Protocols]
+  gEdkiiSdMmcOverrideProtocolGuid               ## PRODUCES
+  gEdkiiNonDiscoverableDeviceProtocolGuid       ## TO_START
+  gEfiPciIoProtocolGuid                         ## TO_START
+  gMarvellBoardDescProtocolGuid                 ## TO_START

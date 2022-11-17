@@ -1,0 +1,58 @@
+## @file
+#
+# @copyright
+# Copyright 2009 - 2021 Intel Corporation. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PlatformType
+  FILE_GUID                      = 2E6A521C-F697-402d-9774-98B2B7E140F3
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = PlatformTypeInit
+
+[Sources]
+  PlatformTypes.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  WhitleySiliconPkg/WhitleySiliconPkg.dec
+  WhitleySiliconPkg/SiliconPkg.dec
+  WhitleyOpenBoardPkg/PlatformPkg.dec
+  WhitleySiliconPkg/Cpu/CpuRcPkg.dec
+  WhitleySiliconPkg/CpRcPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+
+[LibraryClasses]
+  PcdLib
+  BaseLib
+  HobLib
+  DebugLib
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+
+ [Protocols]
+  gEfiPlatformTypeProtocolGuid     ## PRODUCES
+  gEfiIioUdsProtocolGuid
+  gDynamicSiLibraryProtocolGuid    ## CONSUMES
+
+[Guids]
+  gEfiPlatformInfoGuid
+  gEfiSetupVariableGuid
+
+[Pcd]
+  gOemSkuTokenSpaceGuid.PcdOemSkuPlatformName
+  gOemSkuTokenSpaceGuid.PcdOemSkuPlatformNameSize
+  gOemSkuTokenSpaceGuid.PcdOemSkuAssertPostGPIO
+  gOemSkuTokenSpaceGuid.PcdOemSkuAssertPostGPIOValue
+
+[FixedPcd]
+  gEfiCpRcPkgTokenSpaceGuid.PcdMaxCpuSocketCount
+  gEfiCpRcPkgTokenSpaceGuid.PcdMaxCpuCoreCount
+
+[Depex]
+  gDynamicSiLibraryProtocolGuid

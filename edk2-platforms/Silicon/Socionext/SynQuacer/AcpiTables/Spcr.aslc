@@ -1,0 +1,123 @@
+/** @file
+
+  Serial Port Console Redirection Table
+  (c) 2000 - 2014 Microsoft Corporation. All rights reserved.
+  http://go.microsoft.com/fwlink/?linkid=403368
+
+  Copyright (c) 2014 - 2016, AMD Inc. All rights reserved.
+  Copyright (c) 2018, Linaro Ltd. All rights reserved.
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#include <IndustryStandard/Acpi61.h>
+#include <IndustryStandard/SerialPortConsoleRedirectionTable.h>
+#include <Platform/MemoryMap.h>
+
+#include "AcpiTables.h"
+
+#pragma pack(push, 1)
+
+STATIC EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE Spcr = {
+  //
+  // Header
+  //
+  __ACPI_HEADER (EFI_ACPI_5_0_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_SIGNATURE,
+                 EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE,
+                 2), /* New MS definition for PL011 support */
+  //
+  // InterfaceType
+  //
+  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERFACE_TYPE_ARM_PL011_UART,
+  //
+  // Reserved[3]
+  //
+  { EFI_ACPI_RESERVED_BYTE, EFI_ACPI_RESERVED_BYTE, EFI_ACPI_RESERVED_BYTE },
+  //
+  // BaseAddress
+  //
+  {
+    EFI_ACPI_5_1_SYSTEM_MEMORY,
+    32,
+    0,
+    EFI_ACPI_5_1_DWORD,
+    SYNQUACER_UART0_BASE
+  },
+  //
+  // InterruptType
+  //
+  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_GIC,
+  //
+  // Irq
+  //
+  0,
+  //
+  // GlobalSystemInterrupt
+  //
+  95,
+  //
+  // BaudRate
+  //
+  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_BAUD_RATE_115200,
+  //
+  // Parity
+  //
+  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_PARITY_NO_PARITY,
+  //
+  // StopBits
+  //
+  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_STOP_BITS_1,
+  //
+  // FlowControl
+  //
+  0,
+  //
+  // TerminalType
+  //
+  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_TERMINAL_TYPE_ANSI,
+  //
+  // Language
+  //
+  EFI_ACPI_RESERVED_BYTE,
+  //
+  // PciDeviceId
+  //
+  0xFFFF,
+  //
+  // PciVendorId
+  //
+  0xFFFF,
+  //
+  // PciBusNumber
+  //
+  0x00,
+  //
+  // PciDeviceNumber
+  //
+  0x00,
+  //
+  // PciFunctionNumber
+  //
+  0x00,
+  //
+  // PciFlags
+  //
+  0,
+  //
+  // PciSegment
+  //
+  0,
+  //
+  // Reserved2
+  //
+  EFI_ACPI_RESERVED_DWORD
+};
+
+#pragma pack(pop)
+
+//
+// Reference the table being generated to prevent the optimizer from removing
+// the data structure from the executable
+//
+VOID* CONST ReferenceAcpiTable = &Spcr;

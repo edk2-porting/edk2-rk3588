@@ -1,0 +1,46 @@
+#  UsbHcd.inf
+#
+#  Copyright 2017, 2020 NXP
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+
+[Defines]
+  INF_VERSION                     = 0x0001001A
+  BASE_NAME                       = UsbHcdDxe
+  FILE_GUID                       = 90d1ea5e-d266-11ec-b47a-f42a7dcb925d
+  MODULE_TYPE                     = DXE_DRIVER
+  VERSION_STRING                  = 1.0
+  ENTRY_POINT                     = InitializeDwc3
+
+[Sources.common]
+  UsbDwc3.c
+  UsbDwc3.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Silicon/Rockchip/RockchipPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  IoLib
+  MemoryAllocationLib
+  NonDiscoverableDeviceRegistrationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  RockchipPlatformLib
+
+[FixedPcd]
+  gRockchipTokenSpaceGuid.PcdNumDwc3Controller
+  gRockchipTokenSpaceGuid.PcdDwc3BaseAddress
+  gRockchipTokenSpaceGuid.PcdDwc3Size
+
+[Guids]
+  gEfiEndOfDxeEventGroupGuid
+
+[Depex]
+  TRUE

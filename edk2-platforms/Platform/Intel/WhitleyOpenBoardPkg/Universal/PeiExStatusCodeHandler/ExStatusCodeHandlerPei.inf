@@ -1,0 +1,61 @@
+## @file
+#  Report Status Code Handler PEIM which produces general handlers and hook them onto the PEI status code router.
+#
+#  @copyright
+#  Copyright (c) 2009 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ExStatusCodeHandlerPei
+  FILE_GUID                      = 75E78806-C68F-4839-8A68-B29084820659
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = ExStatusCodeHandlerPeiEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC (EBC is only for build)
+#
+
+[Sources]
+  ExStatusCodeHandlerPei.c
+  ExStatusCodeHandlerPei.h
+  ExSerialStatusCodeWorker.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  WhitleyOpenBoardPkg/PlatformPkg.dec
+  IntelSiliconPkg/IntelSiliconPkg.dec
+  WhitleySiliconPkg/WhitleySiliconPkg.dec
+
+[LibraryClasses]
+  PeimEntryPoint
+  PeiServicesLib
+  PcdLib
+  HobLib
+  SerialPortLib
+  ReportStatusCodeLib
+  PrintLib
+  DebugLib
+  DebugPrintErrorLevelLib
+  BaseMemoryLib
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdStatusCodeUseSerial     ## CONSUMES
+
+[Guids]
+  gEfiStatusCodeDataTypeStringGuid              ## SOMETIMES_CONSUMES
+  gStatusCodeDataTypeExDebugGuid                ## SOMETIMES_CONSUMES
+
+[Ppis]
+  gEfiPeiRscHandlerPpiGuid                      ## CONSUMES
+  gEfiPeiExStatusCodeHandlerPpiGuid             ## PRODUCES
+
+[Depex]
+  gEfiPeiRscHandlerPpiGuid

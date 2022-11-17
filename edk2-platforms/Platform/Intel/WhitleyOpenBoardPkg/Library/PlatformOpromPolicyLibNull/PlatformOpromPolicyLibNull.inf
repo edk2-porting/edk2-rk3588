@@ -1,0 +1,29 @@
+## @file
+#
+# @copyright
+# Copyright 2015 - 2021 Intel Corporation. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PlatformOpromPolicyLib
+  FILE_GUID                      = 9FFE7727-A322-4957-BC66-76E25D85A069
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformOpromPolicyLib|DXE_DRIVER
+
+#
+#  VALID_ARCHITECTURES           = X64
+#
+
+[Sources]
+  PlatformOpromPolicyLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  WhitleyOpenBoardPkg/PlatformPkg.dec
+
+[LibraryClasses]
+  DebugLib

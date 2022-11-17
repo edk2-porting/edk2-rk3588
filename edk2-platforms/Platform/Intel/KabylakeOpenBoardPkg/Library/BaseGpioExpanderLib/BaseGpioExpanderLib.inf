@@ -1,0 +1,33 @@
+### @file
+# Library producing Gpio Expander functionality.
+#
+# Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+###
+
+[Defines]
+  INF_VERSION                    = 0x00010017
+  BASE_NAME                      = BaseGpioExpanderLib
+  FILE_GUID                      = D10AE2A4-782E-427E-92FB-BB74505ED329
+  VERSION_STRING                 = 1.0
+  MODULE_TYPE                    = BASE
+  LIBRARY_CLASS                  = GpioExpanderLib
+
+[LibraryClasses]
+  BaseLib
+  IoLib
+  DebugLib
+  TimerLib
+  PchSerialIoLib
+  I2cAccessLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+  KabylakeOpenBoardPkg/OpenBoardPkg.dec
+  KabylakeSiliconPkg/SiPkg.dec
+
+[Sources]
+  BaseGpioExpanderLib.c

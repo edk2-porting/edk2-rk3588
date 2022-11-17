@@ -1,0 +1,30 @@
+## @file
+# PCI Segment Library for SynQuacer SoC with multiple RCs
+#
+# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2017, Linaro Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = SynQuacerPciSegmentLib
+  FILE_GUID                      = 1299f005-a30b-47d3-9003-24a91f100840
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PciSegmentLib
+
+[Sources]
+  PciSegmentLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  Silicon/Socionext/SynQuacer/SynQuacer.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  IoLib

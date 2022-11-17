@@ -1,0 +1,74 @@
+#
+#  Copyright (c) 2013-2018, ARM Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ArmJunoLib
+  FILE_GUID                      = 87c525cd-e1a2-469e-994c-c28cd0c7bd0d
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmPlatformLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  Platform/ARM/JunoPkg/ArmJuno.dec
+
+[LibraryClasses]
+  IoLib
+  ArmLib
+  HobLib
+  MemoryAllocationLib
+  SerialPortLib
+
+[Sources.common]
+  ArmJuno.c
+  ArmJunoMem.c
+
+[Sources.AARCH64]
+  AArch64/ArmJunoHelper.S
+
+[Sources.ARM]
+  Arm/ArmJunoHelper.S     | GCC
+
+[FixedPcd]
+  gArmTokenSpaceGuid.PcdSystemMemoryBase
+  gArmTokenSpaceGuid.PcdSystemMemorySize
+  gArmTokenSpaceGuid.PcdFvBaseAddress
+
+  gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
+
+  gArmJunoTokenSpaceGuid.PcdPcieControlBaseAddress
+  gArmJunoTokenSpaceGuid.PcdPciConfigurationSpaceBaseAddress
+  gArmJunoTokenSpaceGuid.PcdPciConfigurationSpaceSize
+
+  # Framebuffer Memory
+  gArmPlatformTokenSpaceGuid.PcdArmLcdDdrFrameBufferBase
+  gArmPlatformTokenSpaceGuid.PcdArmLcdDdrFrameBufferSize
+
+  #
+  # PL011 Serial Debug UART
+  #
+  gArmPlatformTokenSpaceGuid.PcdSerialDbgRegisterBase
+  gArmPlatformTokenSpaceGuid.PcdSerialDbgUartBaudRate
+  gArmPlatformTokenSpaceGuid.PcdSerialDbgUartClkInHz
+
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits
+
+[Pcd]
+  gArmTokenSpaceGuid.PcdPciMmio32Base
+  gArmTokenSpaceGuid.PcdPciMmio32Size
+  gArmTokenSpaceGuid.PcdPciMmio64Base
+  gArmTokenSpaceGuid.PcdPciMmio64Size
+
+[Ppis]
+  gArmMpCoreInfoPpiGuid

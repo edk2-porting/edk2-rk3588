@@ -1,0 +1,46 @@
+## @file
+# Firmware Boot Media Info Module
+#
+# This module publishes firmware boot media device information used in the boot flow for system initialization
+# decisions dependent upon the firmware boot media.
+#
+# This module depends upon a library instance to actually perform firmware boot media device detection since the
+# detection mechanism will vary across systems. In many cases, the media type may simply be set to a single firmware
+# boot media device with no run-time logic required. In any case, this module should dispatch as early as possible in
+# the system boot flow so the firmware boot media information is available for other modules. If any dependencies are
+# required to dynamically determine the firmware boot media device, those should be in the DEPEX section of the active
+# FirmwareBootMediaInfoLib such that this module will dispatch once those dependencies are satisfied.
+#
+# Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION       = 0x00010017
+  BASE_NAME         = FirmwareBootMediaInfoPei
+  FILE_GUID         = A8F14FA9-FC88-45F4-A622-F06E6C56E632
+  VERSION_STRING    = 1.0
+  MODULE_TYPE       = PEIM
+  ENTRY_POINT       = FirmwareBootMediaInfoPeiEntry
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  FirmwareBootMediaLib
+  FirmwareBootMediaInfoLib
+  HobLib
+  PeimEntryPoint
+  PeiServicesLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  IntelSiliconPkg/IntelSiliconPkg.dec
+  BoardModulePkg/BoardModulePkg.dec
+
+[Sources]
+  FirmwareBootMediaInfoPei.c
+
+[Depex]
+  TRUE

@@ -1,0 +1,56 @@
+## @file
+# Component information file for KabylakeRvp3InitLib in PEI post memory phase.
+#
+# Copyright (c) 2017 - 2020 Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiKabylakeRvp3MultiBoardInitLib
+  FILE_GUID                      = C7D39F17-E5BA-41D9-8DFE-FF9017499280
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL
+  CONSTRUCTOR                    = PeiKabylakeRvp3MultiBoardInitLibConstructor
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  GpioExpanderLib
+  PcdLib
+  SiliconInitLib
+  MultiBoardInitSupportLib
+
+[Packages]
+  MinPlatformPkg/MinPlatformPkg.dec
+  KabylakeOpenBoardPkg/OpenBoardPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  KabylakeSiliconPkg/SiPkg.dec
+  IntelSiliconPkg/IntelSiliconPkg.dec
+
+[Sources]
+  PeiKabylakeRvp3InitPostMemLib.c
+  KabylakeRvp3GpioTable.c
+  KabylakeRvp3HdaVerbTables.c
+  PeiMultiBoardInitPostMemLib.c
+
+[FixedPcd]
+
+[Pcd]
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdBoardGpioTable
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdBoardGpioTableSize
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdBoardGpioTableTouchPanel
+
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdGpioExpanderTable
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdGpioExpanderTableSize
+
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdHdaVerbTable
+
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdBoardUcmcGpioTable
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdBoardUcmcGpioTableSize

@@ -1,0 +1,94 @@
+## @file
+#  Configuration Manager Dxe
+#
+#  Copyright (c) 2021, ARM Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = ConfigurationManagerDxe
+  FILE_GUID                      = 6F9C3B47-6F7D-44B6-87E5-4B7F44A60147
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = ConfigurationManagerDxeInitialize
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = AARCH64
+#
+
+[Sources]
+  AslTables/DsdtFvp.asl
+  AslTables/SsdtPciFvp.asl
+  ConfigurationManager.c
+  ConfigurationManager.h
+  ConfigurationManagerFvp.c
+  ConfigurationManagerFvp.h
+  Platform.h
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  DynamicTablesPkg/DynamicTablesPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Platform/ARM/Morello/MorelloPlatform.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEdkiiConfigurationManagerProtocolGuid
+
+[FixedPcd]
+  gArmMorelloTokenSpaceGuid.PcdPciBusCount
+  gArmMorelloTokenSpaceGuid.PcdPciBusMax
+  gArmMorelloTokenSpaceGuid.PcdPciBusMin
+  gArmMorelloTokenSpaceGuid.PcdPciExpressBaseAddress
+  gArmMorelloTokenSpaceGuid.PcdPciIoBase
+  gArmMorelloTokenSpaceGuid.PcdPciIoMaxBase
+  gArmMorelloTokenSpaceGuid.PcdPciIoSize
+  gArmMorelloTokenSpaceGuid.PcdPciIoTranslation
+  gArmMorelloTokenSpaceGuid.PcdPciMmio32Base
+  gArmMorelloTokenSpaceGuid.PcdPciMmio32MaxBase
+  gArmMorelloTokenSpaceGuid.PcdPciMmio32Size
+  gArmMorelloTokenSpaceGuid.PcdPciMmio32Translation
+  gArmMorelloTokenSpaceGuid.PcdPciMmio64Base
+  gArmMorelloTokenSpaceGuid.PcdPciMmio64MaxBase
+  gArmMorelloTokenSpaceGuid.PcdPciMmio64Size
+  gArmMorelloTokenSpaceGuid.PcdPciMmio64Translation
+
+  gArmMorelloTokenSpaceGuid.PcdVirtioBlkBaseAddress
+  gArmMorelloTokenSpaceGuid.PcdVirtioBlkInterrupt
+  gArmMorelloTokenSpaceGuid.PcdVirtioBlkSize
+
+  ## PL011 Serial Debug UART
+  gArmPlatformTokenSpaceGuid.PcdSerialDbgRegisterBase
+  gArmPlatformTokenSpaceGuid.PcdSerialDbgUartBaudRate
+  gArmPlatformTokenSpaceGuid.PcdSerialDbgUartClkInHz
+
+  gArmPlatformTokenSpaceGuid.PL011UartClkInHz
+  gArmPlatformTokenSpaceGuid.PL011UartInterrupt
+
+  gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum
+  gArmTokenSpaceGuid.PcdArmArchTimerIntrNum
+  gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum
+  gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum
+
+  # SBSA Generic Watchdog
+  gArmTokenSpaceGuid.PcdGenericWatchdogControlBase
+  gArmTokenSpaceGuid.PcdGenericWatchdogEl2IntrNum
+  gArmTokenSpaceGuid.PcdGenericWatchdogRefreshBase
+
+  gArmTokenSpaceGuid.PcdGicDistributorBase
+  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase
+  gArmTokenSpaceGuid.PcdGicRedistributorsBase
+
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
+
+[Depex]
+  TRUE

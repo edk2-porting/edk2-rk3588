@@ -1,0 +1,28 @@
+## @file
+#  Component description file for the PchSpiCommonLib
+#
+# Copyright (c) 2019 Intel Corporation. All rights reserved. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BasePchSpiCommonLib
+  FILE_GUID                      = A37CB67E-7D85-45B3-B07E-BF65BDB603E8
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PchSpiCommonLib
+
+[Sources]
+  SpiCommon.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  CoffeelakeSiliconPkg/SiPkg.dec
+
+[LibraryClasses]
+  IoLib
+  DebugLib
+  PmcLib

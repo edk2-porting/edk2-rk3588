@@ -1,0 +1,44 @@
+## @file
+# Component description file for the PeiSaPolicy library.
+#
+# Copyright (c) 2019 - 2020 Intel Corporation. All rights reserved. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+INF_VERSION = 0x00010017
+BASE_NAME = DxeSaPolicyLib
+FILE_GUID = B402A3A4-4B82-410E-B79C-5914880A05E7
+VERSION_STRING = 1.0
+MODULE_TYPE = BASE
+LIBRARY_CLASS = DxeSaPolicyLib
+
+[LibraryClasses]
+BaseMemoryLib
+UefiRuntimeServicesTableLib
+UefiBootServicesTableLib
+DebugLib
+PostCodeLib
+ConfigBlockLib
+HobLib
+
+[Packages]
+MdePkg/MdePkg.dec
+CoffeelakeSiliconPkg/SiPkg.dec
+IntelSiliconPkg/IntelSiliconPkg.dec
+
+[Sources]
+DxeSaPolicyLib.c
+DxeSaPolicyLibrary.h
+
+[Guids]
+gGraphicsDxeConfigGuid
+gMiscDxeConfigGuid
+gPcieDxeConfigGuid
+gMemoryDxeConfigGuid
+gVbiosDxeConfigGuid
+
+[Protocols]
+gSaPolicyProtocolGuid ## PRODUCES

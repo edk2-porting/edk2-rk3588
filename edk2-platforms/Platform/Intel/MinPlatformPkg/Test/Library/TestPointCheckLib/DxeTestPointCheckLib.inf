@@ -1,0 +1,110 @@
+## @file
+# Component information file for Board Init Test Library
+#
+# Copyright (c) 2017-2019, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeTestPointCheckLib
+  FILE_GUID                      = 74A1F91F-AD11-49C5-96B8-A579F4AA65F1
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TestPointCheckLib
+  CONSTRUCTOR                    = DxeTestPointCheckLibConstructor
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DxeServicesTableLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  UefiLib
+  PrintLib
+  DevicePathLib
+  DxeServicesLib
+  HobLib
+  PeCoffGetEntryPointLib
+  HstiLib
+  TestPointLib
+  PciSegmentLib
+  PciSegmentInfoLib
+  SafeIntLib
+
+[Packages]
+  MinPlatformPkg/MinPlatformPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  IntelSiliconPkg/IntelSiliconPkg.dec
+
+[Sources]
+  DxeTestPointCheckLib.c
+  DxeCheckGcd.c
+  DxeCheckMemoryMap.c
+  DxeCheckMemoryAttribute.c
+  DxeCheckPci.c
+  DxeCheckConsoleVariable.c
+  DxeCheckBootVariable.c
+  DxeCheckVariable.c
+  DxeCheckDevicePath.c
+  DxeCheckMemoryTypeInformation.c
+  DxeCheckAcpi.c
+  DxeCheckAcpiMadt.c
+  DxeCheckAcpiMcfg.c
+  DxeCheckAcpiHpet.c
+  DxeCheckAcpiDmar.c
+  DxeCheckAcpiWsmt.c
+  DxeCheckAcpiTpm.c
+  DxeCheckHsti.c
+  DxeCheckEsrt.c
+  DxeCheckLoadedImage.c
+  DxeCheckSmmInfo.c
+  DxeCheckSmiHandlerInstrument.c
+  DxeCheckUefiSecureBoot.c
+  DxeCheckPiSignedFvBoot.c
+  DxeCheckTcgTrustedBoot.c
+  DxeCheckTcgMor.c
+  DxeCheckDmaProtection.c
+  TestPointHelp.c
+  TestPointInternal.h
+
+[Guids]
+  gEfiMemoryAttributesTableGuid
+  gEfiGlobalVariableGuid
+  gEfiAcpi20TableGuid
+  gEfiAcpi10TableGuid
+  gEfiMemoryTypeInformationGuid
+  gEfiSystemResourceTableGuid
+  gEfiMemoryOverwriteControlDataGuid
+  gEfiMemoryOverwriteRequestControlLockGuid
+  gEfiGlobalVariableGuid
+  gEfiImageSecurityDatabaseGuid
+  gSmiHandlerProfileGuid
+  gEdkiiPiSmmCommunicationRegionTableGuid
+
+[Protocols]
+  gEfiPciIoProtocolGuid
+  gEfiPciRootBridgeIoProtocolGuid
+  gEfiSmmAccess2ProtocolGuid
+  gEdkiiVarCheckProtocolGuid
+  gEfiLoadedImageProtocolGuid
+  gEfiLoadedImageDevicePathProtocolGuid
+  gEfiDevicePathProtocolGuid
+  gEfiRuntimeArchProtocolGuid
+  gEfiTcg2ProtocolGuid
+  gEfiSmmCommunicationProtocolGuid
+  gEfiSmmSwDispatch2ProtocolGuid
+  gEfiSmmSxDispatch2ProtocolGuid
+  gEfiSmmPowerButtonDispatch2ProtocolGuid
+  gEfiSmmStandbyButtonDispatch2ProtocolGuid
+  gEfiSmmPeriodicTimerDispatch2ProtocolGuid
+  gEfiSmmGpiDispatch2ProtocolGuid
+  gEfiSmmIoTrapDispatch2ProtocolGuid
+  gEfiSmmUsbDispatch2ProtocolGuid
+
+[Pcd]
+  gMinPlatformPkgTokenSpaceGuid.PcdTestPointIbvPlatformFeature

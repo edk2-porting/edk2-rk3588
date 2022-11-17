@@ -1,0 +1,142 @@
+/** @file
+ *
+ *  Copyright (c) 2018, Andrei Warkentin <andrey.warkentin@gmail.com>
+ *  Copyright (c) 2020, ARM Limited. All rights reserved.
+ *
+ *  SPDX-License-Identifier: BSD-2-Clause-Patent
+ *
+ **/
+
+#langdef en-US  "English"
+
+#string STR_NULL_STRING          #language en-US ""
+
+#string STR_FORM_SET_TITLE       #language en-US "Raspberry Pi Configuration"
+#string STR_FORM_SET_TITLE_HELP  #language en-US "Press <Enter> to configure system settings."
+
+/*
+ * Chipset configuration.
+ */
+
+#string STR_CHIPSET_FORM_TITLE      #language en-US "CPU Configuration"
+#string STR_CHIPSET_FORM_SUBTITLE   #language en-US "Note: OS may override settings."
+
+#string STR_CHIPSET_CLOCK_CPU_PROMPT #language en-US "CPU Clock"
+#string STR_CHIPSET_CLOCK_CPU_HELP   #language en-US "CPU Speed"
+#string STR_CHIPSET_CLOCK_CPU_LOW    #language en-US "Low"
+#string STR_CHIPSET_CLOCK_CPU_DEF    #language en-US "Default"
+#string STR_CHIPSET_CLOCK_CPU_MAX    #language en-US "Max"
+#string STR_CHIPSET_CLOCK_CPU_CUSTOM #language en-US "Custom"
+
+#string STR_CHIPSET_CUSTOM_CPU_CLOCK_PROMPT #language en-US "CPU Clock Rate (MHz)"
+#string STR_CHIPSET_CUSTOM_CPU_CLOCK_HELP   #language en-US "Manually set the CPU Speed\n\nWarning: Overclocking can make the system unbootable!"
+
+/*
+ * Advanced configuration.
+ */
+
+#string STR_ADVANCED_FORM_TITLE      #language en-US "Advanced Configuration"
+
+#string STR_ADVANCED_3GB_PROMPT      #language en-US "Limit RAM to 3 GB"
+#string STR_ADVANCED_3GB_HELP        #language en-US "OSes not supporting ACPI DMA constraints require a 3 GB limit or face broken xHCI USB"
+#string STR_ADVANCED_3GB_OFF         #language en-US "Disabled"
+#string STR_ADVANCED_3GB_ON          #language en-US "Enabled"
+
+#string STR_ADVANCED_SYSTAB_PROMPT   #language en-US "System Table Selection"
+#string STR_ADVANCED_SYSTAB_HELP     #language en-US "ACPI/DT choice for specific OSes"
+#string STR_ADVANCED_SYSTAB_ACPI     #language en-US "ACPI"
+#string STR_ADVANCED_SYSTAB_BOTH     #language en-US "ACPI + Devicetree"
+#string STR_ADVANCED_SYSTAB_DT       #language en-US "Devicetree"
+
+#string STR_ADVANCED_FANONGPIO_PROMPT #language en-US "ACPI fan control"
+#string STR_ADVANCED_FANONGPIO_HELP   #language en-US "Cycle a fan via GPIO at given temperature"
+#string STR_ADVANCED_FANONGPIO_OFF    #language en-US "Disabled"
+#string STR_ADVANCED_FANONGPIO_18     #language en-US "Fan Shim/GPIO-18"
+#string STR_ADVANCED_FANONGPIO_19     #language en-US "GPIO-19"
+
+#string STR_ADVANCED_FANTEMP_PROMPT   #language en-US "ACPI fan temperature"
+#string STR_ADVANCED_FANTEMP_HELP     #language en-US "Cycle a fan at C"
+
+#string STR_ADVANCED_XHCIPCI_PROMPT   #language en-US "ACPI XHCI/PCIe"
+#string STR_ADVANCED_XHCIPCI_HELP     #language en-US "OS sees XHCI USB platform device or PCIe bridge"
+#string STR_ADVANCED_XHCIPCI_XHCI     #language en-US "XHCI"
+#string STR_ADVANCED_XHCIPCI_PCIE     #language en-US "PCIe"
+
+#string STR_ADVANCED_ASSET_TAG_PROMPT #language en-US "Asset Tag"
+#string STR_ADVANCED_ASSET_TAG_HELP   #language en-US "Set the system Asset Tag"
+
+/*
+ * MMC/SD configuration.
+ */
+
+#string STR_MMC_FORM_TITLE       #language en-US "SD/MMC Configuration"
+#string STR_MMC_FORM_SUBTITLE    #language en-US "Note: UEFI only, OS may override settings."
+
+#string STR_MMC_SD_PROMPT        #language en-US "uSD/eMMC Routing"
+#string STR_MMC_SD_HELP          #language en-US "Choose host controller to drive local flash storage"
+#string STR_MMC_SD_EMMC2         #language en-US "eMMC2 SDHCI"
+#string STR_MMC_SD_SDHOST        #language en-US "Broadcom SDHOST"
+#string STR_MMC_SD_ARASAN        #language en-US "Arasan SDHCI"
+
+#string STR_MMC_DISMULTI_PROMPT  #language en-US "Multi-Block Support"
+#string STR_MMC_DISMULTI_HELP    #language en-US "Use CMD18/CMD25 for transfers when possible"
+#string STR_MMC_DISMULTI_N       #language en-US "Multi-block transfers"
+#string STR_MMC_DISMULTI_Y       #language en-US "Single-block transfers"
+
+#string STR_MMC_FORCE1BIT_PROMPT #language en-US "uSD Max Bus Width"
+#string STR_MMC_FORCE1BIT_HELP   #language en-US "Tweak for bad media (N/A for eMMC)"
+#string STR_MMC_FORCE1BIT_Y      #language en-US "1 Bit Mode"
+#string STR_MMC_FORCE1BIT_N      #language en-US "4 Bit Mode"
+
+#string STR_MMC_FORCEDS_PROMPT   #language en-US "uSD Force Default Speed"
+#string STR_MMC_FORCEDS_HELP     #language en-US "Tweak for bad media (N/A for eMMC)"
+#string STR_MMC_FORCEDS_Y        #language en-US "Force Default Speed"
+#string STR_MMC_FORCEDS_N        #language en-US "Allow High Speed"
+
+#string STR_MMC_SD_DS_PROMPT     #language en-US "SD Default Speed (MHz)"
+#string STR_MMC_SD_DS_HELP       #language en-US "Override default 25Mhz"
+
+#string STR_MMC_SD_HS_PROMPT     #language en-US "SD High Speed (MHz)"
+#string STR_MMC_SD_HS_HELP       #language en-US "Override default 50Mhz"
+
+#string STR_MMC_EMMC_PROMPT      #language en-US "Enable eMMC DMA modes"
+#string STR_MMC_EMMC_PIO         #language en-US "PIO"
+#string STR_MMC_EMMC_DMA         #language en-US "SDMA/ADMA2"
+#string STR_MMC_EMMC_HELP        #language en-US "Enable eMMC DMA modes for OSes that support ACPI _DMA() translations"
+
+/*
+ * Display settings.
+ */
+
+#string STR_DISPLAY_FORM_TITLE      #language en-US "Display Configuration"
+#string STR_DISPLAY_FORM_SUBTITLE   #language en-US "UEFI video driver settings"
+
+#string STR_DISPLAY_VMODES_640_PROMPT  #language en-US "Virtual 640x480"
+#string STR_DISPLAY_VMODES_640_HELP    #language en-US "Enable scaled 640x480 mode"
+#string STR_DISPLAY_VMODES_800_PROMPT  #language en-US "Virtual 800x600"
+#string STR_DISPLAY_VMODES_800_HELP    #language en-US "Enable scaled 800x600 mode"
+#string STR_DISPLAY_VMODES_1024_PROMPT #language en-US "Virtual 1024x768"
+#string STR_DISPLAY_VMODES_1024_HELP   #language en-US "Enable scaled 1024x768 mode"
+#string STR_DISPLAY_VMODES_720_PROMPT  #language en-US "Virtual 720p"
+#string STR_DISPLAY_VMODES_720_HELP    #language en-US "Enable scaled 720p mode"
+#string STR_DISPLAY_VMODES_1080_PROMPT #language en-US "Virtual 1080p"
+#string STR_DISPLAY_VMODES_1080_HELP   #language en-US "Enable scaled 1080p mode"
+
+#string STR_DISPLAY_VMODES_REAL_PROMPT #language en-US "Native resolution"
+#string STR_DISPLAY_VMODES_REAL_HELP   #language en-US "Native resolution"
+
+#string STR_DISPLAY_SSHOT_PROMPT    #language en-US "Screenshot Support"
+#string STR_DISPLAY_SSHOT_HELP      #language en-US "Save screen capture as a BMP on the first writable file system found"
+#string STR_DISPLAY_SSHOT_ENABLE    #language en-US "Control-Alt-F12"
+#string STR_DISPLAY_SSHOT_DISABLE   #language en-US "Not Enabled"
+
+/*
+ * Debugging settings go here.
+ */
+#string STR_DEBUG_FORM_TITLE        #language en-US "Debugging Configuration"
+#string STR_DEBUG_FORM_SUBTITLE     #language en-US "For UEFI/OS Developers"
+
+#string STR_DEBUG_JTAG_PROMPT       #language en-US "JTAG Routing"
+#string STR_DEBUG_JTAG_HELP         #language en-US "Signals (nTRST, TDI, TMS, TCK, RTCK, TDO) -> Header pins (15, 7, 13, 22, 16, 18)"
+#string STR_DEBUG_JTAG_ENABLE       #language en-US "Enable JTAG via GPIO"
+#string STR_DEBUG_JTAG_DISABLE      #language en-US "Disable JTAG"

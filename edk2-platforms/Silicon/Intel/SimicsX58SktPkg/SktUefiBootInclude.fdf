@@ -1,0 +1,14 @@
+## @file
+#  Component description file for the Simics X58 SiPkg DXE drivers.
+#
+# Copyright (c) 2019 Intel Corporation. All rights reserved. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+!if gMinPlatformPkgTokenSpaceGuid.PcdBootToShellOnly == FALSE
+  INF  $(SKT_PKG)/Smm/Access/SmmAccess2Dxe.inf
+  INF  UefiCpuPkg/PiSmmCpuDxeSmm/PiSmmCpuDxeSmm.inf
+!endif
+INF  MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf

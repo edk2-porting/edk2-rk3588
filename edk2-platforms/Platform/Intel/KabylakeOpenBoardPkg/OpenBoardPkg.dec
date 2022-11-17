@@ -1,0 +1,319 @@
+## @file
+# Declaration file for Kaby Lake based boards.
+#
+# The DEC files are used by the utilities that parse DSC and
+# INF files to generate AutoGen.c and AutoGen.h files
+# for the build infrastructure.
+#
+# Copyright (c) 2017 - 2019, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+
+[Defines]
+DEC_SPECIFICATION = 0x00010017
+PACKAGE_NAME = OpenBoardPkg
+PACKAGE_VERSION = 0.1
+PACKAGE_GUID = 0A8BA6E8-C8AC-4AC1-87AC-52772FA6AE5E
+
+[Includes]
+Include
+AspireVn7Dash572G/Include
+GalagoPro3/Include
+KabylakeRvp3/Include
+Features/Tbt/Include
+
+[Guids]
+
+gKabylakeOpenBoardPkgTokenSpaceGuid   =  {0x7cdc8563, 0xe40d, 0x446b, {0x9f, 0x0d, 0xf3, 0x67, 0xfb, 0x01, 0xae, 0xc9}}
+
+gTianoLogoGuid                        =  {0x7BB28B99, 0x61BB, 0x11D5, {0x9A, 0x5D, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D}}
+
+gSpiFlashDebugHobGuid                 =  {0xcaaaf418, 0x38a5, 0x4d49, {0xbe, 0x74, 0xe6, 0x06, 0xe4, 0x02, 0x6d, 0x25}}
+
+gTbtInfoHobGuid                       =  {0x74a81eaa, 0x033c, 0x4783, {0xbe, 0x2b, 0x84, 0x85, 0x74, 0xa6, 0x97, 0xb7}}
+
+gPlatformModuleTokenSpaceGuid         =  {0x69d13bf0, 0xaf91, 0x4d96, {0xaa, 0x9f, 0x21, 0x84, 0xc5, 0xce, 0x3b, 0xc0}}
+
+
+[Protocols]
+gTbtNvsAreaProtocolGuid               =  {0x4d6a54d1, 0xcd56, 0x47f3, {0x93, 0x6e, 0x7e, 0x51, 0xd9, 0x31, 0x15, 0x4f}}
+gDxeTbtPolicyProtocolGuid             =  {0x196bf9e3, 0x20d7, 0x4b7b, {0x89, 0xf9, 0x31, 0xc2, 0x72, 0x08, 0xc9, 0xb9}}
+
+[Ppis]
+gPeiTbtPolicyPpiGuid                  =  {0xd7e7e1e6, 0xcbec, 0x4f5f, {0xae, 0xd3, 0xfd, 0xc0, 0xa8, 0xb0, 0x7e, 0x25}}
+gPeiTbtPolicyBoardInitDonePpiGuid     =  {0x970f9c60, 0x8547, 0x49d7, { 0xa4, 0xb, 0x1e, 0xc4, 0xbc, 0x4e, 0xe8, 0x9b}}
+
+[LibraryClasses]
+
+[PcdsFixedAtBuild, PcdsPatchableInModule]
+
+[PcdsFixedAtBuild]
+
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdLpcIoDecodeRange|0x0010|UINT16|0x10001004
+gKabylakeOpenBoardPkgTokenSpaceGuid.PchLpcIoEnableDecoding|0x3c03|UINT16|0x10001005
+
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdLpcSioIndexPort|0x4e|UINT16|0x90000018
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdLpcSioDataPort|0x4f|UINT16|0x9000001F
+
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdLpcSioConfigDefaultPort|0x164E|UINT16|0x9000001C
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdSioBaseAddress|0x0680|UINT16|0x9000001D
+
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdLpcSioIndexDefaultPort|0x164E|UINT16|0x90000021
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdLpcSioDataDefaultPort|0x164F|UINT16|0x90000022
+
+## Tbt SW_SMI_DTBT_ENUMERATEgSetupVariableGuid
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdSwSmiDTbtEnumerate|0xF7|UINT8|0x000000110
+
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdSmcExtSmiBitPosition|0x01|UINT8|0x90000015
+
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdFlashNvDebugMessageBase|0x00000000|UINT32|0x90000030
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdFlashNvDebugMessageSize|0x00000000|UINT32|0x90000031
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdFlashNvDebugMessageOffset|0x00000000|UINT32|0x90000032
+
+[PcdsDynamic]
+
+# Board GPIO Table
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdBoardGpioTable|0|UINT32|0x00000040
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdBoardGpioTableSize|0|UINT16|0x00000041
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdBoardGpioTable2|0|UINT32|0x00000042
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdBoardGpioTable2Size|0|UINT16|0x00000043
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdBoardGpioTablePreMem|0|UINT32|0x000000113
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdBoardGpioTablePreMemSize|0|UINT16|0x000000114
+
+# Board Expander GPIO Table
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdGpioExpanderTable|0|UINT32|0x00000044
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdGpioExpanderTableSize|0|UINT16|0x00000045
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdGpioExpanderTable2|0|UINT32|0x00000046
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdGpioExpanderTable2Size|0|UINT16|0x00000047
+
+# TouchPanel & SDHC CD GPIO Table
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdBoardGpioTableTouchPanel|0|UINT32|0x00000048
+
+# PCH-LP HSIO PTSS Table
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUnknowLpHsioPtssTable1|0|UINT32|0x0000004A
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUnknowLpHsioPtssTable2|0|UINT32|0x0000004B
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUnknowLpHsioPtssTable1Size|0|UINT16|0x0000004C
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUnknowLpHsioPtssTable2Size|0|UINT16|0x0000004D
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdSpecificLpHsioPtssTable1|0|UINT32|0x0000004E
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdSpecificLpHsioPtssTable2|0|UINT32|0x0000004F
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdSpecificLpHsioPtssTable1Size|0|UINT16|0x00000050
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdSpecificLpHsioPtssTable2Size|0|UINT16|0x00000051
+
+# PCH-H HSIO PTSS Table
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUnknowHHsioPtssTable1|0|UINT32|0x00000052
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUnknowHHsioPtssTable2|0|UINT32|0x00000053
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUnknowHHsioPtssTable1Size|0|UINT16|0x00000054
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUnknowHHsioPtssTable2Size|0|UINT16|0x00000055
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdSpecificHHsioPtssTable1|0|UINT32|0x00000056
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdSpecificHHsioPtssTable2|0|UINT32|0x00000057
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdSpecificHHsioPtssTable1Size|0|UINT16|0x00000058
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdSpecificHHsioPtssTable2Size|0|UINT16|0x00000059
+
+# HDA Verb Table
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdHdaVerbTable|0|UINT32|0x0000005A
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdHdaVerbTable2|0|UINT32|0x0000005B
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdExtHdaVerbTable|0|UINT32|0x0000005C
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdCommonHdaVerbTable1|0|UINT32|0x0000005D
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdCommonHdaVerbTable2|0|UINT32|0x0000005E
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdCommonHdaVerbTable3|0|UINT32|0x0000005F
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDisplayAudioHdaVerbTable|0|UINT32|0x00000060
+
+# SA Misc Configuration
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdSaMiscUserBd|0|UINT8|0x00000066
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdSaMiscMmioSizeAdjustment|0|UINT16|0x00000067
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdSaDdrFreqLimit|0|UINT16|0x00000101
+
+# DRAM Configuration
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcRcompResistor|0|UINT32|0x00000068
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcRcompTarget|0|UINT32|0x00000069
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcDqByteMap|0|UINT32|0x0000006A
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcDqByteMapSize|0|UINT16|0x0000006B
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcDqsMapCpu2Dram|0|UINT32|0x0000006C
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcDqsMapCpu2DramSize|0|UINT16|0x0000006D
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcDqPinsInterleavedControl|FALSE|BOOLEAN|0x0000006E
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcDqPinsInterleaved|FALSE|BOOLEAN|0x0000006F
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcSpdData|0|UINT32|0x00000070
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcSpdDataSize|0|UINT16|0x00000071
+
+# PEG RESET GPIO
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdPegGpioResetControl|FALSE|BOOLEAN|0x00000072
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdPegGpioResetSupoort|FALSE|BOOLEAN|0x00000073
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdPegResetGpioPad|0|UINT32|0x00000074
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdPegResetGpioActive|FALSE|BOOLEAN|0x00000075
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdPcie0WakeGpioNo|0|UINT32|0x00000079
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdPcie0HoldRstExpanderNo|0|UINT8|0x0000007A
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdPcie0HoldRstGpioNo|0|UINT32|0x0000007B
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdPcie0HoldRstActive|FALSE|BOOLEAN|0x0000007C
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdPcie0PwrEnableExpanderNo|0|UINT8|0x0000007D
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdPcie0PwrEnableGpioNo|0|UINT32|0x0000007E
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdPcie0PwrEnableActive|FALSE|BOOLEAN|0x0000007F
+
+# SPD Address Table
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcSpdAddressTable0|0|UINT8|0x00000099
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcSpdAddressTable1|0|UINT8|0x0000009A
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcSpdAddressTable2|0|UINT8|0x0000009B
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcSpdAddressTable3|0|UINT8|0x0000009C
+
+# CA Vref Configuration
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcCaVrefConfig|0|UINT8|0x0000009D
+
+# Root Port Clock Info
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort0ClkInfo|0|UINT64|0x0000009E
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort1ClkInfo|0|UINT64|0x0000009F
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort2ClkInfo|0|UINT64|0x000000A0
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort3ClkInfo|0|UINT64|0x000000A1
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort4ClkInfo|0|UINT64|0x000000A2
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort5ClkInfo|0|UINT64|0x000000A3
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort6ClkInfo|0|UINT64|0x000000A4
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort7ClkInfo|0|UINT64|0x000000A5
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort8ClkInfo|0|UINT64|0x000000A6
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort9ClkInfo|0|UINT64|0x000000A7
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort10ClkInfo|0|UINT64|0x000000A8
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort11ClkInfo|0|UINT64|0x000000A9
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort12ClkInfo|0|UINT64|0x000000AA
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort13ClkInfo|0|UINT64|0x000000AB
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort14ClkInfo|0|UINT64|0x000000AC
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort15ClkInfo|0|UINT64|0x000000AD
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort16ClkInfo|0|UINT64|0x000000AE
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort17ClkInfo|0|UINT64|0x000000AF
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort18ClkInfo|0|UINT64|0x000000B0
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort19ClkInfo|0|UINT64|0x000000B1
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort20ClkInfo|0|UINT64|0x000000B2
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort21ClkInfo|0|UINT64|0x000000B3
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort22ClkInfo|0|UINT64|0x000000B4
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort23ClkInfo|0|UINT64|0x000000B5
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort24ClkInfo|0|UINT64|0x000000B6
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort25ClkInfo|0|UINT64|0x000000B7
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort26ClkInfo|0|UINT64|0x000000B8
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort27ClkInfo|0|UINT64|0x000000B9
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort28ClkInfo|0|UINT64|0x000000BA
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort29ClkInfo|0|UINT64|0x000000BB
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort30ClkInfo|0|UINT64|0x000000BC
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort31ClkInfo|0|UINT64|0x000000BD
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPortLanClkInfo|0|UINT64|0x000000BE
+
+# USB 2.0 Port AFE
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port0Afe|0|UINT32|0x000000BF
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port1Afe|0|UINT32|0x000000C0
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port2Afe|0|UINT32|0x000000C1
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port3Afe|0|UINT32|0x000000C2
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port4Afe|0|UINT32|0x000000C3
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port5Afe|0|UINT32|0x000000C4
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port6Afe|0|UINT32|0x000000C5
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port7Afe|0|UINT32|0x000000C6
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port8Afe|0|UINT32|0x000000C7
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port9Afe|0|UINT32|0x000000C8
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port10Afe|0|UINT32|0x000000C9
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port11Afe|0|UINT32|0x000000CA
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port12Afe|0|UINT32|0x000000CB
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port13Afe|0|UINT32|0x000000CC
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port14Afe|0|UINT32|0x000000CD
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port15Afe|0|UINT32|0x000000CE
+
+# USB 2.0 Port Over Current Pin
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort0|0|UINT8|0x000000CF
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort1|0|UINT8|0x000000D0
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort2|0|UINT8|0x000000D1
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort3|0|UINT8|0x000000D2
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort4|0|UINT8|0x000000D3
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort5|0|UINT8|0x000000D4
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort6|0|UINT8|0x000000D5
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort7|0|UINT8|0x000000D6
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort8|0|UINT8|0x000000D7
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort9|0|UINT8|0x000000D8
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort10|0|UINT8|0x000000D9
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort11|0|UINT8|0x000000DA
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort12|0|UINT8|0x000000DB
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort13|0|UINT8|0x000000DC
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort14|0|UINT8|0x000000DD
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort15|0|UINT8|0x000000DE
+
+# USB 3.0 Port Over Current Pin
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb30OverCurrentPinPort0|0|UINT8|0x000000DF
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb30OverCurrentPinPort1|0|UINT8|0x000000E0
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb30OverCurrentPinPort2|0|UINT8|0x000000E1
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb30OverCurrentPinPort3|0|UINT8|0x000000E2
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb30OverCurrentPinPort4|0|UINT8|0x000000E3
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb30OverCurrentPinPort5|0|UINT8|0x000000E4
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb30OverCurrentPinPort6|0|UINT8|0x000000E5
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb30OverCurrentPinPort7|0|UINT8|0x000000E6
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb30OverCurrentPinPort8|0|UINT8|0x000000E7
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb30OverCurrentPinPort9|0|UINT8|0x000000E8
+
+# TBT
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtBootOn |0|UINT8|0x000000E9
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtUsbOn |0|UINT8|0x000000EA
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtGpio3ForcePwr |0|UINT8|0x000000EB
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtGpio3ForcePwrDly |0|UINT16|0x000000ED
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtControllerEn |0|UINT8|0x000000EE
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtControllerType |0|UINT8|0x000000EF
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtPcieRpNumber |0|UINT8|0x000000F0
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtGpioAccessType |0|UINT8|0x000000F1
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdExpander |0|UINT8|0x000000F2
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtGpioLevel |0|BOOLEAN|0x000000F3
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtForcepowerGpioPad |0|UINT32|0x000000F4
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtCioPlugEventGpioPad |0|UINT32|0x000000F5
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtAcpiGpeSignature |0|UINT32|0x000000F6
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtAcpiGpeSignaturePorting |0|BOOLEAN|0x000000F7
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtSecurityMode |0|UINT8|0x000000F8
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtGpio5Filter |0|UINT8|0x000000F9
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtWakeupSupport |0|UINT8|0x000000FA
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtHotSMI |0|UINT8|0x000000FB
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtHotNotify |0|UINT8|0x000000FC
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtSetClkReq|0|UINT8|0x000000FD
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtAspm |0|UINT8|0x000000FE
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtLtr | 0 | UINT8| 0x00000116
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtAcDcSwitch |0|UINT8|0x000000FF
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRtd3Tbt |0|UINT8|0x00000100
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRtd3TbtClkReq |0|UINT8|0x0000010A
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtWin10Support |0|UINT8|0x000000102
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRtd3TbtClkReqDelay |0|UINT16|0x00000103
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRtd3TbtOffDelay |0|UINT16|0x00000104
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtPcieExtraBusRsvd |0|UINT8|0x00000105
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtPcieMemRsvd |0|UINT16|0x00000106
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtPcieMemAddrRngMax |0|UINT8|0x00000107
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtPciePMemRsvd |0|UINT16|0x00000108
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtPciePMemAddrRngMax |0|UINT8|0x00000109
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdPchPcieRootPortHpe|0|UINT32|0x00000117
+
+
+
+
+# UCMC GPIO Table
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdBoardUcmcGpioTable|0|UINT32|0x000000111
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdBoardUcmcGpioTableSize|0|UINT16|0x000000112
+
+# Misc
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdIoExpanderPresent|FALSE|BOOLEAN|0x000000EC
+
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdAcpiSleepState|1|UINT8|0x40000002
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdAcpiHibernate|1|UINT8|0x40000003
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdLowPowerS0Idle|0|UINT8|0x40000004
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdPciExpNative|0|UINT8|0x40000005
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdNativeAspmEnable|1|UINT8|0x40000006
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDisableActiveTripPoints|1|UINT8|0x4000000A
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDisablePassiveTripPoints|0|UINT8|0x4000000B
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDisableCriticalTripPoints|1|UINT8|0x4000000C
+  # 0: Type-C
+  # 1: Stacked-Jack
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdAudioConnector|0|UINT8|0x40000012
+
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdAcpiGnvsAddress|0|UINT64|0x40000013
+
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdGraphicsVbtGuid|{0x22, 0x61, 0xd4, 0x4a, 0xeb, 0xff, 0x52, 0x4a, 0xbf, 0xb0, 0x51, 0x8c, 0xfc, 0xa0, 0x2d, 0xb0}|VOID*|0x40000014
+
+[PcdsDynamicEx]
+
+[PcdsDynamic, PcdsDynamicEx]
+
+[PcdsPatchableInModule]
+
+[PcdsFeatureFlag]
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdIntelGopEnable      |TRUE|BOOLEAN|0xF0000062
+
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMultiBoardSupport   |TRUE|BOOLEAN|0xF0000000
+
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdTbtEnable           |FALSE|BOOLEAN|0x000000115

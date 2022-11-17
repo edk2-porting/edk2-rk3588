@@ -1,0 +1,33 @@
+  #Copyright (c) 2011 - 2019, Intel Corporaton. All rights reserved.
+  #SPDX-License-Identifier: BSD-2-Clause-Patent
+
+[Defines]
+  DEC_SPECIFICATION              = 1.27
+  PACKAGE_NAME                   = DesignWarePkg
+  PACKAGE_GUID                   = 3b5936d8-c72d-412d-b4d9-3bf0dea73598
+  PACKAGE_VERSION                = 0.1
+
+################################################################################
+#
+# Include Section - list of Include Paths that are provided by this package.
+#                   Comments are used for Keywords and Module Types.
+#
+# Supported Module Types:
+#  BASE SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
+#
+################################################################################
+
+[Guids.common]
+  gDesignWareTokenSpaceGuid = { 0x89cb1241, 0xd283, 0x4543, { 0x88, 0x9c, 0x6b, 0x62, 0x36, 0x1a, 0x95, 0x7a } }
+  gDwEmacNetNonDiscoverableDeviceGuid = { 0x401950CD, 0xF9CD, 0x4A65, { 0xAD, 0x8E, 0x84, 0x9F, 0x3B, 0xAF, 0x23, 0x04 } }
+
+[PcdsFixedAtBuild.common]
+  #
+  # Permit the use of obsolete drivers in this package
+  #
+  gDesignWareTokenSpaceGuid.PcdDwPermitObsoleteDrivers|FALSE|BOOLEAN|0x00000001
+
+  gDesignWareTokenSpaceGuid.PcdDwEmmcDxeBaseAddress|0x0|UINT32|0x00000002
+  gDesignWareTokenSpaceGuid.PcdDwEmmcDxeClockFrequencyInHz|0x0|UINT32|0x00000003
+  gDesignWareTokenSpaceGuid.PcdDwEmmcDxeMaxClockFreqInHz|0x0|UINT32|0x00000004
+  gDesignWareTokenSpaceGuid.PcdDwEmmcDxeFifoDepth|0x0|UINT32|0x00000005

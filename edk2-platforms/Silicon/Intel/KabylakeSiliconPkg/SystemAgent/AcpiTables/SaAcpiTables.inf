@@ -1,0 +1,55 @@
+## @file
+#  Component description file for the ACPI tables
+#
+# Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+################################################################################
+#
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+
+[Defines]
+INF_VERSION          = 0x00010005
+BASE_NAME            = SaAcpiTables
+FILE_GUID            = 3c0ed5e2-91ea-4b94-820d-9daf9a3bb4a2
+MODULE_TYPE          = USER_DEFINED
+VERSION_STRING       = 1.0
+
+[Sources]
+  Dmar/Dmar.aslc
+  Dmar/Dmar.h
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  KabylakeSiliconPkg/SiPkg.dec
+
+################################################################################
+#
+# Library Class Section - list of Library Classes that are required for
+#                         this module.
+#
+################################################################################
+
+[LibraryClasses]
+
+################################################################################
+#
+# Protocol C Name Section - list of Protocol and Protocol Notify C Names
+#                           that this module uses or produces.
+#
+################################################################################
+[Pcd]
+
+[Protocols]
+
+[PPIs]
+
+[Guids]
+
+[Depex]
+

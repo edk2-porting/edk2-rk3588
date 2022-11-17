@@ -1,0 +1,45 @@
+## @file
+# Library producing CMOS access functionalities are relevant to platform.
+#
+# @copyright
+# Copyright 2015 - 2021 Intel Corporation. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PlatformCmosAccessLib
+  FILE_GUID                      = f4d9e039-d8c9-4981-a504-7e91715efbc5
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformCmosAccessLib | PEIM
+
+[Sources]
+  PlatformCmosAccessLib.c
+
+[LibraryClasses]
+  DebugLib
+  IoLib
+  PeiServicesLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  WhitleySiliconPkg/WhitleySiliconPkg.dec
+  WhitleySiliconPkg/SiliconPkg.dec
+  BoardModulePkg/BoardModulePkg.dec
+  WhitleySiliconPkg/CpRcPkg.dec
+  WhitleyOpenBoardPkg/PlatformPkg.dec
+
+[FixedPcd]
+  gEfiCpRcPkgTokenSpaceGuid.PcdMaxCpuSocketCount
+  gEfiCpRcPkgTokenSpaceGuid.PcdMaxCpuCoreCount
+
+[Ppis]
+  gDynamicSiLibraryPpiGuid                 ## CONSUMES
+
+[Guids]
+  gPlatformGpioInitDataGuid
+
+[Depex]
+  gDynamicSiLibraryPpiGuid

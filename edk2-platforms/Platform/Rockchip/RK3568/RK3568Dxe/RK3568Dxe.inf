@@ -1,0 +1,51 @@
+#
+#  Copyright (c) 2013 - 2014, ARM Ltd. All rights reserved.
+#  Copyright (c) 2018, Linaro Ltd. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+[Defines]
+  INF_VERSION                    = 0x0001001a
+  BASE_NAME                      = RK3568Dxe
+  FILE_GUID                      = 101d1748-3177-11ec-95b4-f42a7dcb925d
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = RK3568EntryPoint
+
+[Sources.common]
+  RK3568Dxe.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Platform/Rockchip/RK3568/RK3568.dec
+
+[LibraryClasses]
+  CacheMaintenanceLib
+  DebugLib
+  IoLib
+  UefiBootManagerLib
+  UefiLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiDevicePathFromTextProtocolGuid
+  gEfiLoadedImageProtocolGuid
+  gEmbeddedGpioProtocolGuid
+  gPlatformBootManagerProtocolGuid
+  gPlatformVirtualKeyboardProtocolGuid
+  gAndroidBootImgProtocolGuid
+
+[Pcd]
+  gRK3568TokenSpaceGuid.PcdAndroidBootDevicePath
+  gRK3568TokenSpaceGuid.PcdAndroidBootFile
+  gRK3568TokenSpaceGuid.PcdAndroidFastbootFile
+  gRK3568TokenSpaceGuid.PcdSdBootDevicePath
+
+[Guids]
+  gEfiEndOfDxeEventGroupGuid
+
+[Depex]
+  TRUE

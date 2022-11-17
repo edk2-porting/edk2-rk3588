@@ -1,0 +1,118 @@
+## @file
+# Component information file for PEI CometlakeURvp Board Init Pre-Mem Library
+#
+#
+#  Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiBoardInitPreMemLib
+  FILE_GUID                      = ec3675bc-1470-417d-826e-37378140213d
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = BoardInitLib
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  PcdLib
+  SiliconInitLib
+
+[Packages]
+  MinPlatformPkg/MinPlatformPkg.dec
+  CometlakeOpenBoardPkg/OpenBoardPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  CoffeelakeSiliconPkg/SiPkg.dec
+  IntelSiliconPkg/IntelSiliconPkg.dec
+
+[Sources]
+  PeiCometlakeURvpDetect.c
+  PeiCometlakeURvpInitPreMemLib.c
+  CometlakeURvpHsioPtssTables.c
+  PeiBoardInitPreMemLib.c
+
+[Pcd]
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdLpcSioConfigDefaultPort
+
+  # PCH-LP HSIO PTSS Table
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdSpecificLpHsioPtssTable1
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdSpecificLpHsioPtssTable2
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdSpecificLpHsioPtssTable1Size
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdSpecificLpHsioPtssTable2Size
+
+  # SA Misc Config
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdSaMiscUserBd
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdMrcRcompResistor
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdMrcRcompTarget
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdMrcDqByteMap
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdMrcDqByteMapSize
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdMrcDqsMapCpu2Dram
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdMrcDqsMapCpu2DramSize
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdMrcSpdData
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdMrcSpdDataSize
+
+  # PEG Reset By GPIO
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcie0WakeGpioNo
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcie0HoldRstExpanderNo
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcie0HoldRstGpioNo
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcie0HoldRstActive
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcie0PwrEnableExpanderNo
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcie0PwrEnableGpioNo
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcie0PwrEnableActive
+
+
+  # SPD Address Table
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdMrcSpdAddressTable0
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdMrcSpdAddressTable1
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdMrcSpdAddressTable2
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdMrcSpdAddressTable3
+
+  # USB 2.0 Port AFE
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port0Afe
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port1Afe
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port2Afe
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port3Afe
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port4Afe
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port5Afe
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port6Afe
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port7Afe
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port8Afe
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port9Afe
+
+  # USB 2.0 Port Over Current Pin
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort0
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort1
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort2
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort3
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort4
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort5
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort6
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort7
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort8
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort9
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort10
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort11
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort12
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort13
+
+  # USB 3.0 Port Over Current Pin
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb30OverCurrentPinPort0
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb30OverCurrentPinPort1
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb30OverCurrentPinPort2
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb30OverCurrentPinPort3
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb30OverCurrentPinPort4
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb30OverCurrentPinPort5
+
+  # Misc
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdIoExpanderPresent
+
+
+

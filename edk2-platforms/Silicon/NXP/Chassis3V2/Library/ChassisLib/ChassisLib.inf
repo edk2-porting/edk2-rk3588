@@ -1,0 +1,33 @@
+#  @file
+#
+#  Copyright 2020 NXP
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+
+[Defines]
+  INF_VERSION                    = 1.27
+  BASE_NAME                      = Chassis3V2Lib
+  FILE_GUID                      = fae0d077-5fc2-494f-b8e1-c51a3023ee3e
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ChassisLib
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/NXP/Chassis3V2/Chassis3V2.dec
+  Silicon/NXP/NxpQoriqLs.dec
+
+[LibraryClasses]
+  IoAccessLib
+  IoLib
+  PcdLib
+  SerialPortLib
+
+[Sources.common]
+  ChassisLib.c
+
+[FeaturePcd]
+  gNxpQoriqLsTokenSpaceGuid.PcdDcfgBigEndian

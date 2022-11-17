@@ -1,0 +1,32 @@
+#/** @file
+#
+#  Copyright (c) 2020, Hisilicon Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = RtcHelperLib
+  FILE_GUID                      = 5cb1a98f-2408-4fef-b68f-d5d04ff6a91f
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = RtcHelperLib
+
+[Sources.common]
+  RtcHelperLib.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  Platform/Hisilicon/D06/D06.dec
+  Silicon/Hisilicon/HisiPkg.dec
+
+[LibraryClasses]
+  CpldIoLib
+  DebugLib
+  IoLib
+
+[Depex]
+  TRUE

@@ -1,0 +1,31 @@
+## @file
+#  Component description file for the PchWdtCommonLib
+#
+# Copyright (c) 2019 Intel Corporation. All rights reserved. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiDxeSmmPchWdtCommonLib
+  FILE_GUID                      = 171F78D2-0A52-4692-8830-AB693791EA23
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PchWdtCommonLib
+
+[Sources]
+  WdtCommon.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  CoffeelakeSiliconPkg/SiPkg.dec
+
+[LibraryClasses]
+  IoLib
+  DebugLib
+  PmcLib
+
+[Pcd]
+  gSiPkgTokenSpaceGuid.PcdOcEnableWdtforDebug           ## CONSUMES

@@ -1,0 +1,45 @@
+## @file
+#  Platform Flash Access library.
+#
+#  Copyright (c) 2018, Hisilicon Limited. All rights reserved.
+#  Copyright (c) 2018, Linaro Limited. All rights reserved.
+#  Copyright (c) 2016, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = PlatformFlashAccessLibDxe
+  FILE_GUID                      = c230e06c-c0d8-4935-8c23-9b8f7d33d1c4
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformFlashAccessLib|DXE_DRIVER
+  CONSTRUCTOR                    = PerformFlashAccessLibConstructor
+
+[Sources]
+  PlatformFlashAccessLibDxe.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  SignedCapsulePkg/SignedCapsulePkg.dec
+  Silicon/Hisilicon/HisiPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  PcdLib
+  UefiBootServicesTableLib
+
+[Protocols]
+  gHisiSpiFlashProtocolGuid
+
+[FixedPcd]
+  gArmTokenSpaceGuid.PcdFdBaseAddress
+  gHisiTokenSpaceGuid.PcdSFCMEM0BaseAddress
+
+[Depex]
+  gHisiSpiFlashProtocolGuid

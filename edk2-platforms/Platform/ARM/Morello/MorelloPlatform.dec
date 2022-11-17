@@ -1,0 +1,66 @@
+## @file
+#  Describes the entire platform configuration.
+#
+#  Copyright (c) 2021, ARM Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x0001001A
+  PACKAGE_NAME                   = Morello
+  PACKAGE_GUID                   = F09A2C11-7864-4B1D-869E-03EE2AD79288
+  PACKAGE_VERSION                = 0.1
+
+################################################################################
+#
+# Include Section - list of Include Paths that are provided by this package.
+#                   Comments are used for Keywords and Module Types.
+#
+################################################################################
+[Includes.common]
+  Include                        # Root include for the package
+
+[Guids.common]
+  gArmMorelloTokenSpaceGuid =  { 0x0A8C3A78, 0xA56F, 0x4788, { 0x83, 0xB4, 0xCD, 0x29, 0x62, 0x96, 0x77, 0x51 } }
+
+[PcdsFixedAtBuild]
+  # Ramdisk
+  gArmMorelloTokenSpaceGuid.PcdRamDiskBase|0x88000000|UINT32|0x00000001
+  gArmMorelloTokenSpaceGuid.PcdRamDiskSize|0x18000000|UINT32|0x00000002
+
+  # Secondary DDR memory
+  gArmMorelloTokenSpaceGuid.PcdDramBlock2Base|0|UINT64|0x00000003
+
+  # Virtio Block device
+  gArmMorelloTokenSpaceGuid.PcdVirtioBlkBaseAddress|0x00000000|UINT32|0x00000004
+  gArmMorelloTokenSpaceGuid.PcdVirtioBlkSize|0x00000000|UINT32|0x00000005
+  gArmMorelloTokenSpaceGuid.PcdVirtioBlkInterrupt|0x00000000|UINT32|0x00000006
+
+  # PCIe
+  gArmMorelloTokenSpaceGuid.PcdPciBusMin|0|UINT32|0x00000009
+  gArmMorelloTokenSpaceGuid.PcdPciBusMax|15|UINT32|0x0000000A
+  gArmMorelloTokenSpaceGuid.PcdPciBusCount|16|UINT32|0x0000000B
+  gArmMorelloTokenSpaceGuid.PcdPciIoBase|0x0|UINT32|0x0000000C
+  gArmMorelloTokenSpaceGuid.PcdPciIoSize|0x00800000|UINT32|0x0000000D
+  gArmMorelloTokenSpaceGuid.PcdPciIoMaxBase|0x007FFFFF|UINT32|0x0000000E
+  gArmMorelloTokenSpaceGuid.PcdPciIoTranslation|0x67800000|UINT32|0x0000000F
+  gArmMorelloTokenSpaceGuid.PcdPciMmio32Base|0x60000000|UINT32|0x00000010
+  gArmMorelloTokenSpaceGuid.PcdPciMmio32Size|0x07800000|UINT32|0x00000011
+  gArmMorelloTokenSpaceGuid.PcdPciMmio32MaxBase|0x677FFFFF|UINT32|0x00000012
+  gArmMorelloTokenSpaceGuid.PcdPciMmio32Translation|0x0|UINT32|0x00000013
+  gArmMorelloTokenSpaceGuid.PcdPciMmio64Base|0x900000000|UINT64|0x00000014
+  gArmMorelloTokenSpaceGuid.PcdPciMmio64Size|0x2000000000|UINT64|0x00000015
+  gArmMorelloTokenSpaceGuid.PcdPciMmio64MaxBase|0x28FFFFFFFF|UINT64|0x00000016
+  gArmMorelloTokenSpaceGuid.PcdPciMmio64Translation|0x0|UINT64|0x00000017
+  gArmMorelloTokenSpaceGuid.PcdPciExpressBaseAddress|0x20000000|UINT64|0x00000018
+
+  # Virtio Net device
+  gArmMorelloTokenSpaceGuid.PcdVirtioNetBaseAddress|0x00000000|UINT32|0x00000019
+  gArmMorelloTokenSpaceGuid.PcdVirtioNetSize|0x00000000|UINT32|0x0000001A
+  gArmMorelloTokenSpaceGuid.PcdVirtioNetInterrupt|0x00000000|UINT32|0x0000001B
+
+[PcdsFeatureFlag.common]
+  gArmMorelloTokenSpaceGuid.PcdRamDiskSupported|FALSE|BOOLEAN|0x00000007
+  gArmMorelloTokenSpaceGuid.PcdVirtioBlkSupported|FALSE|BOOLEAN|0x00000008
+  gArmMorelloTokenSpaceGuid.PcdVirtioNetSupported|FALSE|BOOLEAN|0x0000001C

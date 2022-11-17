@@ -1,0 +1,66 @@
+## @file
+#
+# @copyright
+# Copyright 2009 - 2021 Intel Corporation. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = AcpiVtd
+  FILE_GUID                      = 64A11188-5B86-4f59-A702-73365896E65E
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = VtdTableEntryPoint
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  AcpiVtd.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  WhitleyOpenBoardPkg/PlatformPkg.dec
+  WhitleySiliconPkg/SiliconPkg.dec
+  WhitleySiliconPkg/CpRcPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  IoLib
+  BaseMemoryLib
+  DebugLib
+  UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
+  DevicePathLib
+  HobLib
+  SetupLib
+  TpmMeasurementLib
+
+[Protocols]
+  gDmaRemapProtocolGuid                         ## CONSUMES
+
+[Guids]
+  gEfiHobListGuid                               ## CONSUMES
+  gEfiSocketIioVariableGuid                     ## CONSUMES
+  gEfiEndOfDxeEventGroupGuid                    ## CONSUMES
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId
+  gPlatformTokenSpaceGuid.PcdConditionallyExtendPcr7
+
+[FixedPcd]
+  gEfiCpRcPkgTokenSpaceGuid.PcdMaxCpuSocketCount
+  gEfiCpRcPkgTokenSpaceGuid.PcdMaxCpuCoreCount
+
+[Depex]
+  gEfiVariableArchProtocolGuid AND
+  gEfiIioUdsProtocolGuid AND
+  gEfiIioSystemProtocolGuid
+

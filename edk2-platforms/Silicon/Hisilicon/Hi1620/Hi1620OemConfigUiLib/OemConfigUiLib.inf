@@ -1,0 +1,62 @@
+## @file
+#  OEM config Library used by BDS
+#
+#  Copyright (c) 2018, Hisilicon Limited. All rights reserved.
+#  Copyright (c) 2018, Linaro Limited. All rights reserved.
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = OemConfigUiLib
+  MODULE_UNI_FILE                = OemConfigUiLib.uni
+  FILE_GUID                      = 32B373AC-00B6-471b-B3AE-6E4A4501F6BA
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|DXE_DRIVER UEFI_APPLICATION
+  CONSTRUCTOR                    = OemConfigUiLibConstructor
+  DESTRUCTOR                     = OemConfigUiLibDestructor
+
+[Sources]
+  iBMCConfig.hfr
+  iBMCConfig.uni
+  MemoryConfig.hfr
+  MemoryConfig.uni
+  MiscConfig.hfr
+  MiscConfig.uni
+  OemConfig.c
+  OemConfig.h
+  OemConfigUiLibStrings.uni
+  OemConfigVfr.vfr
+  PcieConfig.hfr
+  PcieConfigStrings.uni
+  PciePortConfig.hfr
+  RasConfig.hfr
+  RasConfig.uni
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/Hisilicon/HisiPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  HiiLib
+  MemoryAllocationLib
+  PrintLib
+  UefiBootServicesTableLib
+  UefiHiiServicesLib
+  UefiRuntimeServicesTableLib
+
+[Guids]
+  gEfiHiiPlatformSetupFormsetGuid               ## CONSUMES ## GUID (Indicate the formset class guid to be displayed)
+  gEfiIfrFrontPageGuid                          ## CONSUMES ## GUID (Indicate the formset in this library need to dispaly in which page)
+  gEfiIfrTianoGuid                              ## CONSUMES ## GUID (Extended IFR Guid Opcode)
+  gOemConfigGuid
+  gVersionInfoHobGuid
+
+[Protocols]
+  gEfiHiiConfigAccessProtocolGuid               ## CONSUMES

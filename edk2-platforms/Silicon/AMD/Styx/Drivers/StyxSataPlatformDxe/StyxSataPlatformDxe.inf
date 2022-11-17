@@ -1,0 +1,57 @@
+## @file
+#
+#  Component description file for the Styx SATA platform driver.
+#
+#  Copyright (c) 2014 - 2016, AMD Inc. All rights reserved.<BR>
+#  Copyright (c) 2016, Linaro, Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = StyxSataPlatformDxe
+  FILE_GUID                      = 4703fac4-9de9-4010-87d1-11402894296a
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = StyxSataPlatformDxeEntryPoint
+
+[Sources]
+  InitController.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/AMD/Styx/AmdModulePkg/AmdModulePkg.dec
+  Silicon/AMD/Styx/AmdStyx.dec
+
+[LibraryClasses]
+  AmdSataInit
+  BaseLib
+  DebugLib
+  IoLib
+  NonDiscoverableDeviceRegistrationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[FixedPcd]
+  gAmdModulePkgTokenSpaceGuid.PcdSataSerdesBase
+  gAmdModulePkgTokenSpaceGuid.PcdSataSerdesOffset
+  gAmdModulePkgTokenSpaceGuid.PcdSataNumChPerSerdes
+
+  gAmdStyxTokenSpaceGuid.PcdSata0CtrlAxiSlvPort
+  gAmdStyxTokenSpaceGuid.PcdSata0PortCount
+  gAmdStyxTokenSpaceGuid.PcdSata1CtrlAxiSlvPort
+  gAmdStyxTokenSpaceGuid.PcdSata1PortCount
+  gAmdStyxTokenSpaceGuid.PcdSataPortMode
+  gAmdStyxTokenSpaceGuid.PcdSataSmpsSupport
+  gAmdStyxTokenSpaceGuid.PcdSataSssSupport
+  gAmdStyxTokenSpaceGuid.PcdSataPortCpd
+  gAmdStyxTokenSpaceGuid.PcdSataPortMpsp
+
+[Pcd]
+  gAmdStyxTokenSpaceGuid.PcdSocCpuId
+
+[Depex]
+  TRUE

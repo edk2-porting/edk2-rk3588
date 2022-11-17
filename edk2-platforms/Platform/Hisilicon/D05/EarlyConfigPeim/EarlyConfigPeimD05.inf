@@ -1,0 +1,48 @@
+#/** @file
+#
+#    Copyright (c) 2016, Hisilicon Limited. All rights reserved.
+#    Copyright (c) 2016, Linaro Limited. All rights reserved.
+#
+#    SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = EarlyConfigPeimD05
+  FILE_GUID                      = 13525B94-06F0-41AC-8CAF-724B149FD259
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = EarlyConfigEntry
+
+[Sources.common]
+  EarlyConfigPeimD05.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Silicon/Hisilicon/HisiliconNonOsi.dec
+  Silicon/Hisilicon/HisiPkg.dec
+
+[LibraryClasses]
+  ArmLib
+  CacheMaintenanceLib
+  DebugLib
+  IoLib
+  PcdLib
+  PeimEntryPoint
+  PlatformSysCtrlLib
+
+[Pcd]
+  gHisiTokenSpaceGuid.PcdMailBoxAddress
+  gHisiTokenSpaceGuid.PcdPeriSubctrlAddress
+  gHisiTokenSpaceGuid.PcdTrustedFirmwareEnable
+
+[Depex]
+## As we will clean mailbox in this module, need to wait memory init complete
+  gEfiPeiMemoryDiscoveredPpiGuid
+
+[BuildOptions]
+

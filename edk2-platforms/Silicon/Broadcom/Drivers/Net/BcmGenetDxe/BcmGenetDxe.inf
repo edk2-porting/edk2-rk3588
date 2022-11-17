@@ -1,0 +1,63 @@
+## @file
+# Component description file for Broadcom GENET driver.
+#
+# Copyright (c) 2020, Jared McNeill All rights reserved.<BR>
+# Copyright (c) 2020, Jeremy Linton All rights reserved.<BR>
+# Copyright (c) 2020, ARM Limited. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.27
+  BASE_NAME                      = BcmGenetDxe
+  FILE_GUID                      = e2b1eaf3-50b7-4ae1-b79e-ec8020cb57ac
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = GenetEntryPoint
+  UNLOAD_IMAGE                   = GenetUnload
+
+[Sources]
+  AdapterInfo.c
+  BcmGenetDxe.h
+  ComponentName.c
+  DriverBinding.c
+  GenericPhy.c
+  GenericPhy.h
+  GenetUtil.c
+  SimpleNetwork.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  NetworkPkg/NetworkPkg.dec
+  Silicon/Broadcom/Drivers/Net/BcmNet.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  DmaLib
+  IoLib
+  MemoryAllocationLib
+  NetLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Protocols]
+  gBcmGenetPlatformDeviceProtocolGuid         ## TO_START
+  gEfiAdapterInformationProtocolGuid          ## BY_START
+  gEfiDevicePathProtocolGuid                  ## BY_START
+  gEfiSimpleNetworkProtocolGuid               ## BY_START
+
+[Guids]
+  gEfiAdapterInfoMediaStateGuid
+  gEfiEventExitBootServicesGuid
+
+[FixedPcd]
+  gEmbeddedTokenSpaceGuid.PcdDmaDeviceOffset
+  gEmbeddedTokenSpaceGuid.PcdDmaDeviceLimit

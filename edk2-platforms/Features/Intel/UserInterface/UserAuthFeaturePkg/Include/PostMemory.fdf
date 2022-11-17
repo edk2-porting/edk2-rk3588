@@ -1,0 +1,12 @@
+## @file
+#  FDF file for post-memory modules that enable User Authentication.
+#
+# Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+  INF UserInterface/UserAuthFeaturePkg/UserAuthenticationDxeSmm/UserAuthenticationDxe.inf
+  INF UserInterface/UserAuthFeaturePkg/UserAuthenticationDxeSmm/UserAuthentication2Dxe.inf
+  INF UserInterface/UserAuthFeaturePkg/UserAuthenticationDxeSmm/UserAuthenticationSmm.inf

@@ -1,0 +1,29 @@
+## @file
+# Component information file for AspireVn7Dash572GInitLib in DXE phase.
+#
+# Copyright (c) 2021, Baruch Binyamin Doron
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeBoardInitLib
+  FILE_GUID                      = 5869FDEA-E336-4CA0-9FEA-8A9B9F6AAB66
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = BoardInitLib
+
+[LibraryClasses]
+  UefiRuntimeServicesTableLib
+  DebugLib
+  EcLib
+  BoardEcLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+  KabylakeOpenBoardPkg/OpenBoardPkg.dec
+
+[Sources]
+  DxeBoardInitLib.c

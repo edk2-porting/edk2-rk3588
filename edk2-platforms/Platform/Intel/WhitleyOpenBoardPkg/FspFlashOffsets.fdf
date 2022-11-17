@@ -1,0 +1,25 @@
+## @file
+#  FDF file for calculation of FSP rebase addresses for WhitleyOpenBoardPkg
+#
+# Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+# @todo: This file is currently only used to enable RebaseFspBinBaseAddress.py to function.
+#        The FDF file for WhitleyOpenBoardPkg should be adapted to leverage FlashMapInclude.fdf
+#        format found in other OpenBoardPkgs.
+
+#
+# Note Whitley unintuitively has multiple "FD" in a single BIOS flash region, so the base should be for FD.SecPei
+# and not the basis of the BIOS region for the FLASH device.
+#
+DEFINE FLASH_BASE                                                   = 0xFFCA0000
+
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspSOffset              = 0x00020000  # Flash addr (0xFF020000)
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspSSize                = 0x00040000  #
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspMOffset              = 0x00060000  # Flash addr (0xFF060000)
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspMSize                = 0x00221000  #
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspTOffset              = 0x00281000  # Flash addr (0xFF281000)
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspTSize                = 0x00006000  #

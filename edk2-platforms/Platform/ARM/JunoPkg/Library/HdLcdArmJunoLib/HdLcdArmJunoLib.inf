@@ -1,0 +1,35 @@
+#/** @file
+#
+#  Component description file for HdLcdArmJunoLib module
+#
+#  Copyright (c) 2013-2018, ARM Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = HdLcdArmJunoLib
+  FILE_GUID                      = 7B1D26F7-7B88-47ED-B193-DD3BDF319006
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = LcdPlatformLib
+
+[Sources.common]
+  HdLcdArmJuno.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  MdePkg/MdePkg.dec
+  Platform/ARM/JunoPkg/ArmJuno.dec
+
+[LibraryClasses]
+  BaseLib
+
+[FixedPcd]
+  gArmPlatformTokenSpaceGuid.PcdArmLcdDdrFrameBufferBase
+  gArmPlatformTokenSpaceGuid.PcdArmLcdDdrFrameBufferSize
+  gArmJunoTokenSpaceGuid.PcdArmHdLcdMaxMode
+  gArmPlatformTokenSpaceGuid.PcdGopPixelFormat

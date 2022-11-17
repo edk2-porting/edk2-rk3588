@@ -1,0 +1,43 @@
+## @file
+# Component description file for PCH Reset Lib Pei Phase
+#
+# Copyright (c) 2017 - 2019, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+INF_VERSION = 0x00010017
+BASE_NAME = PeiPchResetLib
+FILE_GUID = DB91FFF0-5B99-4A88-9EC8-183A2106DCA2
+VERSION_STRING = 1.0
+MODULE_TYPE = PEIM
+LIBRARY_CLASS = PchResetLib
+#
+# The following information is for reference only and not required by the build tools.
+#
+# VALID_ARCHITECTURES = IA32 X64 IPF
+#
+
+[LibraryClasses]
+DebugLib
+PeiServicesLib
+PeiServicesTablePointerLib
+ResetSystemLib
+
+[Packages]
+MdePkg/MdePkg.dec
+MdeModulePkg/MdeModulePkg.dec
+KabylakeSiliconPkg/SiPkg.dec
+
+[Sources]
+PchReset.c
+
+[Ppis]
+gPchResetPpiGuid ## PRODUCES
+gEfiPeiReset2PpiGuid ## PRODUCES
+gPchResetCallbackPpiGuid ## CONSUMES
+
+[Guids]
+gPchGlobalResetGuid

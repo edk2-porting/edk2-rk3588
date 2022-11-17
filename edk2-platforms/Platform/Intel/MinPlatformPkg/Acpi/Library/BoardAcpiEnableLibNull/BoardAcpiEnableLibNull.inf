@@ -1,0 +1,24 @@
+## @file
+# Component information file for NULL instance of the Board ACPI Enable library
+#
+# Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) Microsoft Corporation.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BoardAcpiEnableLibNull
+  FILE_GUID                      = EAF8AA6D-549A-40CC-8FB2-3A1FFEC41601
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = BoardAcpiEnableLib
+
+[Packages]
+  MinPlatformPkg/MinPlatformPkg.dec
+  MdePkg/MdePkg.dec
+
+[Sources]
+  BoardAcpiEnableLibNull.c

@@ -1,0 +1,37 @@
+#/** @file
+#  Component description file for ArmMaliDpLib module
+#
+#  Copyright (c) 2017-2018, Arm Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = ArmMaliDpLib
+  FILE_GUID                      = 36C47FED-2F3F-49C7-89CE-31B13F0431D8
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = LcdPlatformLib
+
+[Sources.common]
+  ArmMaliDpLib.c
+
+[Packages]
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  MdePkg/MdePkg.dec
+  Platform/ARM/VExpressPkg/ArmVExpressPkg.dec
+
+[LibraryClasses]
+  BaseLib
+
+[FixedPcd.common]
+  gArmPlatformTokenSpaceGuid.PcdArmLcdDdrFrameBufferBase
+  gArmPlatformTokenSpaceGuid.PcdArmLcdDdrFrameBufferSize
+  gArmPlatformTokenSpaceGuid.PcdGopPixelFormat
+
+  # MaxMode must be one number higher than the actual max mode,
+  # i.e. for actual maximum mode 2, set the value to 3.
+  # See Section 12.9 of the UEFI Specification 2.7
+  gArmVExpressTokenSpaceGuid.PcdArmMaliDpMaxMode
+

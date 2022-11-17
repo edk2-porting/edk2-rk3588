@@ -1,0 +1,148 @@
+### @file
+# Library functions for Fsp Policy Initialization Library.
+#
+# Copyright (c) 2019 - 2020 Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+################################################################################
+#
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiSiliconPolicyInitLibFspAml
+  FILE_GUID                      = 930816C4-D182-4A23-BF21-9AED635AF06C
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SiliconPolicyInitLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32
+#
+
+################################################################################
+#
+# Sources Section - list of files that are required for the build to succeed.
+#
+################################################################################
+
+[Sources]
+  PeiFspPolicyInitLib.c
+  PeiFspSiPolicyInitLib.c
+  PeiFspPchPolicyInitLib.c
+  PeiFspCpuPolicyInitLib.c
+  PeiFspMePolicyInitLib.c
+  PeiFspSaPolicyInitLib.c
+  PeiFspMiscUpdInitLib.c
+
+  PeiPolicyInitPreMem.c
+  PeiPolicyInit.c
+  PeiPolicyInit.h
+
+################################################################################
+#
+# Package Dependency Section - list of Package files that are required for
+#                              this module.
+#
+################################################################################
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  IntelFsp2Pkg/IntelFsp2Pkg.dec
+  IntelFsp2WrapperPkg/IntelFsp2WrapperPkg.dec
+  KabylakeSiliconPkg/SiPkg.dec
+  AmberLakeFspBinPkg/AmberLakeFspBinPkg.dec
+  IntelSiliconPkg/IntelSiliconPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  IoLib
+  PeiServicesLib
+  PcdLib
+  SmbusLib
+  MmPciLib
+  ConfigBlockLib
+  MemoryAllocationLib
+  DebugPrintErrorLevelLib
+  FspWrapperApiLib
+  SiPolicyLib
+
+[Pcd]
+  gSiPkgTokenSpaceGuid.PcdTsegSize                    ## CONSUMES
+  gSiPkgTokenSpaceGuid.PcdSmbusBaseAddress            ## CONSUMES
+  gIntelFsp2PkgTokenSpaceGuid.PcdTemporaryRamBase      ## CONSUMES
+  gIntelFsp2PkgTokenSpaceGuid.PcdTemporaryRamSize      ## CONSUMES
+  gIntelFsp2PkgTokenSpaceGuid.PcdFspTemporaryRamSize   ## CONSUMES
+  gIntelFsp2PkgTokenSpaceGuid.PcdFspReservedBufferSize ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspmUpdDataAddress ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspmBaseAddress    ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspsUpdDataAddress ## CONSUMES
+  gIntelFsp2WrapperTokenSpaceGuid.PcdFspsBaseAddress    ## CONSUMES
+
+[Ppis]
+  gSiPolicyPpiGuid                              ## CONSUMES
+  gSiPreMemPolicyPpiGuid                        ## CONSUMES
+
+[Guids]
+  gTraceHubPreMemConfigGuid                     ## CONSUMES
+  gSmbusPreMemConfigGuid                        ## CONSUMES
+  gDciPreMemConfigGuid                          ## CONSUMES
+  gHpetPreMemConfigGuid                         ## CONSUMES
+  gHsioPciePreMemConfigGuid                     ## CONSUMES
+  gHsioSataPreMemConfigGuid                     ## CONSUMES
+  gHsioPreMemConfigGuid                         ## CONSUMES
+  gPcieRpPreMemConfigGuid                       ## CONSUMES
+  gLpcPreMemConfigGuid                          ## CONSUMES
+  gPchGeneralPreMemConfigGuid                   ## CONSUMES
+  gWatchDogPreMemConfigGuid                     ## CONSUMES
+  gLanConfigGuid                                ## CONSUMES
+  gPcieRpConfigGuid                             ## CONSUMES
+  gSataConfigGuid                               ## CONSUMES
+  gHdAudioConfigGuid                            ## CONSUMES
+  gCio2ConfigGuid                               ## CONSUMES
+  gScsConfigGuid                                ## CONSUMES
+  gIshConfigGuid                                ## CONSUMES
+  gSpiConfigGuid                                ## CONSUMES
+  gSataConfigGuid                               ## CONSUMES
+  gUsbConfigGuid                                ## CONSUMES
+  gSerialIoConfigGuid                           ## CONSUMES
+  gInterruptConfigGuid                          ## CONSUMES
+  gLockDownConfigGuid                           ## CONSUMES
+  gSaMiscPeiPreMemConfigGuid                    ## PRODUCES
+  gMemoryConfigGuid                             ## CONSUMES
+  gMemoryConfigNoCrcGuid                        ## CONSUMES
+  gGraphicsPeiConfigGuid                        ## CONSUMES
+  gMePeiPreMemConfigGuid                        ## CONSUMES
+  gMePeiConfigGuid                              ## CONSUMES
+  gAmtPeiConfigGuid                             ## CONSUMES
+  gDmiConfigGuid                                ## CONSUMES
+  gFlashProtectionConfigGuid                    ## CONSUMES
+  gIoApicConfigGuid                             ## CONSUMES
+  gPmConfigGuid                                 ## CONSUMES
+  gP2sbConfigGuid                               ## CONSUMES
+  gPchGeneralConfigGuid                         ## CONSUMES
+  gPort61ConfigGuid                             ## CONSUMES
+  gSerialIrqConfigGuid                          ## CONSUMES
+  gThermalConfigGuid                            ## CONSUMES
+  gCpuSecurityPreMemConfigGuid                  ## CONSUMES
+  gCpuTxtPreMemConfigGuid                       ## CONSUMES
+  gCpuConfigGuid                                ## CONSUMES
+  gBiosGuardConfigGuid                          ## CONSUMES
+  gCpuOverclockingPreMemConfigGuid              ## CONSUMES
+  gCpuConfigLibPreMemConfigGuid                 ## CONSUMES
+  gCpuSgxConfigGuid                             ## CONSUMES
+  gCpuPowerMgmtBasicConfigGuid                  ## CONSUMES
+  gCpuPowerMgmtCustomConfigGuid                 ## CONSUMES
+  gCpuTestConfigGuid                            ## CONSUMES
+  gCpuPidTestConfigGuid                         ## CONSUMES
+  gCpuPowerMgmtTestConfigGuid                   ## CONSUMES
+  gSmramCpuDataHeaderGuid                       ## CONSUMES
+  gFspReservedMemoryResourceHobTsegGuid         ## CONSUMES

@@ -1,0 +1,60 @@
+## @file
+#
+# @copyright
+# Copyright 2014 - 2021 Intel Corporation. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiUbaPlatLib
+  FILE_GUID                      = EBD8C6DC-8439-47f1-9B31-91464088F135
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = UbaPlatLib|PEIM PEI_CORE
+
+[sources]
+  UbaPchEarlyUpdateLib.c
+  UbaClkGenUpdateLib.c
+  UbaGpioUpdateLib.c
+  UbaPcdUpdateLib.c
+  UbaSoftStrapUpdateLib.c
+  UbaIioConfigLibPei.c
+  UbaSlotUpdateLibPei.c
+  UbaBoardSioInfoLib.c
+  UbaClocksConfigLib.c
+  UbaIioPortBifurcationInitLib.c
+  UbaPchPcieBifurcationLib.c
+  UbaHsioPtssTableConfigLib.c
+  PeiUbaUsbOcUpdateLib.c
+  PeiUbaGpioPlatformConfigLib.c
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  PeiServicesLib
+  PeimEntryPoint
+  PeiServicesTablePointerLib
+  IoLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  WhitleySiliconPkg/WhitleySiliconPkg.dec
+  WhitleySiliconPkg/CpRcPkg.dec
+  WhitleySiliconPkg/SiliconPkg.dec
+  WhitleyOpenBoardPkg/PlatformPkg.dec
+
+[FixedPcd]
+  gEfiCpRcPkgTokenSpaceGuid.PcdMaxCpuSocketCount
+  gEfiCpRcPkgTokenSpaceGuid.PcdMaxCpuCoreCount
+
+[Ppis]
+  gUbaConfigDatabasePpiGuid
+  gDynamicSiLibraryPpiGuid             ## ALWAYS_CONSUMES
+
+[Depex]
+  gUbaConfigDatabasePpiGuid AND
+  gDynamicSiLibraryPpiGuid

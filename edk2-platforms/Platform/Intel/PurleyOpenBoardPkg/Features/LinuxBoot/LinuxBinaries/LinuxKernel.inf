@@ -1,0 +1,17 @@
+## @file
+#
+# Copyright (c) 2021, American Megatrends International LLC.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 1.27
+  BASE_NAME                      = LinuxKernel
+  FILE_GUID                      = 81339b04-fa8c-4be0-9ca7-916fc5319eb5
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+
+[Binaries.common.AARCH64]
+  PE32|linux.efi|*

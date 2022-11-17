@@ -1,0 +1,381 @@
+EDK II Platforms Maintainers
+============================
+
+This file provides information about the primary maintainers for
+EDK II Platforms.
+
+In general, you should not privately email the maintainer. You should
+email the edk2-devel list, and Cc the package maintainers and
+reviewers.
+
+If the package maintainer wants to hand over the role to other people,
+the package maintainer should send the patch to update Maintainers.txt
+with new maintainer, and the new maintainer should follow up with
+an Acked-by or a Reviewed-by.
+
+Descriptions of section entries:
+
+  L: Mailing list that is relevant to this area (default is edk2-devel)
+     Patches and questions should be sent to the email list.
+  M: Package Maintainer: Cc address for patches and questions. Responsible
+     for reviewing and pushing package changes to source control.
+  R: Package Reviewer: Cc address for patches and questions. Reviewers help
+     maintainers review code, but don't have push access. A designated Package
+     Reviewer is reasonably familiar with the Package (or some modules
+     thereof), and/or provides testing or regression testing for the Package
+     (or some modules thereof), in certain platforms and environments.
+  W: Web-page with status/info
+  T: SCM tree type and location.  Type is one of: git, svn.
+  S: Status, one of the following:
+     Supported:  Someone is actually paid to look after this.
+     Maintained: Someone actually looks after it.
+     Odd Fixes:  It has a maintainer but they don't have time to do
+                 much other than throw the odd patch in. See below.
+     Orphan:     No current maintainer [but maybe you could take the
+                 role as you write your new code].
+     Obsolete:   Old code. Something tagged obsolete generally means
+                 it has been replaced by a better system and you
+                 should be using that.
+  F: Files and directories with wildcard patterns.
+     A trailing slash includes all files and subdirectory files.
+     F:   MdeModulePkg/   all files in and below MdeModulePkg
+     F:   MdeModulePkg/*  all files in MdeModulePkg, but not below
+     F:   */Pci/*         all files in a directory called Pci, at any depth in
+                          the hierarchy, but not below
+     One pattern per line.  Multiple F: lines per section acceptable.
+  X: Files and directories that are NOT maintained, same rules as F:
+     Files exclusions are tested after file matches.
+     Can be useful for excluding a specific subdirectory, for instance:
+     F:   NetworkPkg/
+     X:   NetworkPkg/Ip6Dxe/
+     matches all files in and below NetworkPkg excluding NetworkPkg/Ip6Dxe/
+  Filenames not caught by any F: rule get matched as being located in the top-
+  level directory. (Internally, the script looks for a match called '<default>',
+  so please don't add a file called that in the top-level directory.)
+
+
+EDK II Platforms
+----------------
+W: https://github.com/tianocore/tianocore.github.io/wiki/EDK-II
+L: https://edk2.groups.io/g/devel/
+T: git - https://github.com/tianocore/edk2-platforms.git
+
+All patches CC:d here
+L: devel@edk2.groups.io
+F: *
+F: */
+
+EDK II Platforms maintainers
+----------------------------
+F: *
+M: Leif Lindholm <leif@nuviainc.com>
+M: Michael D Kinney <michael.d.kinney@intel.com>
+
+Responsible Disclosure, Reporting Security Issues
+-------------------------------------------------
+W: https://github.com/tianocore/tianocore.github.io/wiki/Security
+
+EDK II Platforms Packages:
+--------------------------
+
+96Boards
+F: Platform/96Boards/
+M: Ard Biesheuvel <ardb+tianocore@kernel.org>
+M: Leif Lindholm <leif@nuviainc.com>
+
+AMD Seattle
+F: Platform/AMD/OverdriveBoard/
+F: Platform/LeMaker/CelloBoard/
+F: Platform/SoftIron/
+F: Silicon/AMD/Styx/
+M: Ard Biesheuvel <ardb+tianocore@kernel.org>
+M: Leif Lindholm <leif@nuviainc.com>
+
+Ampere Computing
+F: Platform/Ampere
+F: Silicon/Ampere
+R: Nhi Pham <nhi@os.amperecomputing.com>
+R: Vu Nguyen <vunguyen@os.amperecomputing.com>
+R: Thang Nguyen <thang@os.amperecomputing.com>
+R: Chuong Tran <chuong@os.amperecomputing.com>
+M: Leif Lindholm <leif@nuviainc.com>
+
+ARM
+F: Platform/ARM/
+F: Silicon/ARM/
+R: Ard Biesheuvel <ardb+tianocore@kernel.org>
+R: Thomas Abraham <thomas.abraham@arm.com>
+M: Sami Mujawar <sami.mujawar@arm.com>
+
+BeagleBoard:
+F: Platform/BeagleBoard/
+F: Silicon/TexasInstruments/
+R: Ard Biesheuvel <ardb+tianocore@kernel.org>
+M: Leif Lindholm <leif@nuviainc.com>
+
+Comcast
+F: Platform/Comcast/
+M: Ard Biesheuvel <ardb+tianocore@kernel.org>
+M: Leif Lindholm <leif@nuviainc.com>
+
+OptionRomPkg
+F: Drivers/OptionRomPkg/
+W: https://github.com/tianocore/tianocore.github.io/wiki/OptionRomPkg
+M: Ray Ni <ray.ni@intel.com>
+
+StandAloneMMPkg for OP-TEE
+F: Platform/StandaloneMm/PlatformStandaloneMmPkg/
+M: Sami Mujawar <sami.mujawar@arm.com>
+M: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+
+DisplayLink
+F: Drivers/DisplayLink/
+M: Leif Lindholm <leif@nuviainc.com>
+M: Ard Biesheuvel <ardb+tianocore@kernel.org>
+R: Andy Hayes <andy.hayes@displaylink.com>
+
+HiSilicon
+F: Platform/Hisilicon/
+F: Silicon/Hisilicon/
+M: Leif Lindholm <leif@nuviainc.com>
+R: Ard Biesheuvel <ardb+tianocore@kernel.org>
+R: Wenyi Xie <xiewenyi2@huawei.com>
+
+Features/Ext4Pkg
+F: Features/Ext4Pkg/
+M: Pedro Falcato <pedro.falcato@gmail.com>
+
+Features/Intel
+F: Features/Intel/
+M: Sai Chaganty <rangasai.v.chaganty@intel.com>
+R: Liming Gao <gaoliming@byosoft.com.cn>
+
+Features/Intel/Debugging
+F: Features/Intel/Debugging/
+M: Eric Dong <eric.dong@intel.com>
+R: Liming Gao <gaoliming@byosoft.com.cn>
+
+Features/Intel/OutOfBandManagement/IpmiFeaturePkg
+F: Features/Intel/OutOfBandManagement/IpmiFeaturePkg
+M: Isaac Oram <isaac.w.oram@intel.com>
+M: Nate DeSimone <nathaniel.l.desimone@intel.com>
+R: Liming Gao <gaoliming@byosoft.com.cn>
+
+Features/Intel/UserInterface
+F: Features/Intel/UserInterface/
+M: Dandan Bi <dandan.bi@intel.com>
+R: Liming Gao <gaoliming@byosoft.com.cn>
+
+Platform/Intel/QuarkPlatformPkg
+F: Platform/Intel/QuarkPlatformPkg/
+M: Michael D Kinney <michael.d.kinney@intel.com>
+M: Kelly Steele <kelly.steele@intel.com>
+R: Nate DeSimone <nathaniel.l.desimone@intel.com>
+
+Platform/Intel/Vlv2TbltDevicePkg
+F: Platform/Intel/Vlv2TbltDevicePkg/
+M: Zailiang Sun <zailiang.sun@intel.com>
+M: Yi Qian <yi.qian@intel.com>
+R: Nate DeSimone <nathaniel.l.desimone@intel.com>
+
+Platform/Intel/BoardModulePkg
+F: Platform/Intel/BoardModulePkg/
+M: Eric Dong <eric.dong@intel.com>
+R: Liming Gao <gaoliming@byosoft.com.cn>
+
+Platform/Intel/KabylakeOpenBoardPkg
+F: Platform/Intel/KabylakeOpenBoardPkg/
+M: Chasel Chiu <chasel.chiu@intel.com>
+M: Nate DeSimone <nathaniel.l.desimone@intel.com>
+
+Platform/Intel/KabylakeOpenBoardPkg/AspireVn7Dash572G
+F: Platform/Intel/KabylakeOpenBoardPkg/AspireVn7Dash572G/
+R: Benjamin Doron <benjamin.doron00@gmail.com>
+
+Platform/Intel/KabylakeOpenBoardPkg/GalagoPro3
+F: Platform/Intel/KabylakeOpenBoardPkg/GalagoPro3/
+R: Jeremy Soller <jeremy@system76.com>
+
+Platform/Intel/MinPlatformPkg
+F: Platform/Intel/MinPlatformPkg/
+M: Chasel Chiu <chasel.chiu@intel.com>
+M: Nate DeSimone <nathaniel.l.desimone@intel.com>
+R: Liming Gao <gaoliming@byosoft.com.cn>
+R: Eric Dong <eric.dong@intel.com>
+
+Platform/Intel/PurleyOpenBoardPkg
+F: Platform/Intel/PurleyOpenBoardPkg/
+M: Nate DeSimone <nathaniel.l.desimone@intel.com>
+M: Chasel Chiu <chasel.chiu@intel.com>
+
+Platform/Intel/WhiskeylakeOpenBoardPkg
+F: Platform/Intel/WhiskeylakeOpenBoardPkg/
+M: Chasel Chiu <chasel.chiu@intel.com>
+M: Nate DeSimone <nathaniel.l.desimone@intel.com>
+
+Platform/Intel/CometlakeOpenBoardPkg
+F: Platform/Intel/CometlakeOpenBoardPkg/
+M: Chasel Chiu <chasel.chiu@intel.com>
+M: Nate DeSimone <nathaniel.l.desimone@intel.com>
+M: Rangasai V Chaganty <rangasai.v.chaganty@intel.com>
+R: Deepika Kethi Reddy <deepika.kethi.reddy@intel.com>
+R: Kathappan Esakkithevar <kathappan.esakkithevar@intel.com>
+
+Platform/Intel/TigerlakeOpenBoardPkg
+F: Platform/Intel/TigerlakeOpenBoardPkg/
+M: Sai Chaganty <rangasai.v.chaganty@intel.com>
+M: Nate DeSimone <nathaniel.l.desimone@intel.com>
+R: Heng Luo <heng.luo@intel.com>
+
+Platform/Intel/WhitleyOpenBoardPkg
+F: Platform/Intel/WhitleyOpenBoardPkg/
+M: Isaac Oram <isaac.w.oram@intel.com>
+M: Nate DeSimone <nathaniel.l.desimone@intel.com>
+M: Chasel Chiu <chasel.chiu@intel.com>
+
+Platform/Intel/SimicsOpenBoardPkg
+F: Platform/Intel/SimicsOpenBoardPkg/
+M: Agyeman Prince <prince.agyeman@intel.com>
+
+Platform/Intel/Tools
+F: Platform/Intel/Tools/
+M: Bob Feng <bob.c.feng@intel.com>
+M: Liming Gao <gaoliming@byosoft.com.cn>
+R: Yuwei Chen <yuwei.chen@intel.com>
+
+Platform/RISC-V/PlatformPkg
+F: Platform/RISC-V/PlatformPkg/
+M: Abner Chang <abner.chang@hpe.com>
+R: Daniel Schaefer <daniel.schaefer@hpe.com>
+R: Gilbert Chen <gilbert.chen@hpe.com>
+
+Platform/SiFive/U5Series
+F:Platform/SiFive/U5Series/
+M: Abner Chang <abner.chang@hpe.com>
+R: Gilbert Chen <gilbert.chen@hpe.com>
+R: Daniel Schaefer <daniel.schaefer@hpe.com>
+
+Silicon/Intel/IntelSiliconPkg
+F: Silicon/Intel/IntelSiliconPkg/
+M: Ray Ni <ray.ni@intel.com>
+M: Rangasai V Chaganty <rangasai.v.chaganty@intel.com>
+
+Silicon/Intel/QuarkSocPkg
+F: Silicon/Intel/QuarkSocPkg/
+M: Michael D Kinney <michael.d.kinney@intel.com>
+M: Kelly Steele <kelly.steele@intel.com>
+R: Nate DeSimone <nathaniel.l.desimone@intel.com>
+
+Silicon/Intel/Vlv2DeviceRefCodePkg
+F: Silicon/Intel/Vlv2DeviceRefCodePkg/
+M: Zailiang Sun <zailiang.sun@intel.com>
+M: Yi Qian <yi.qian@intel.com>
+R: Nate DeSimone <nathaniel.l.desimone@intel.com>
+
+Silicon/Intel/CoffeelakeSiliconPkg
+F: Silicon/Intel/CoffeelakeSiliconPkg/
+M: Chasel Chiu <chasel.chiu@intel.com>
+M: Sai Chaganty <rangasai.v.chaganty@intel.com>
+
+Silicon/Intel/KabylakeSiliconPkg
+F: Silicon/Intel/KabylakeSiliconPkg/
+M: Chasel Chiu <chasel.chiu@intel.com>
+M: Sai Chaganty <rangasai.v.chaganty@intel.com>
+
+Silicon/Intel/PurleyRefreshSiliconPkg
+F: Silicon/Intel/PurleyRefreshSiliconPkg/
+M: Chasel Chiu <chasel.chiu@intel.com>
+M: Nate DeSimone <nathaniel.l.desimone@intel.com>
+
+Silicon/Intel/TigerlakeSiliconPkg
+F: Silicon/Intel/TigerlakeSiliconPkg/
+M: Sai Chaganty <rangasai.v.chaganty@intel.com>
+M: Nate DeSimone <nathaniel.l.desimone@intel.com>
+R: Heng Luo <heng.luo@intel.com>
+
+Silicon/Intel/WhitleySiliconPkg
+F: Silicon/Intel/WhitleySiliconPkg/
+M: Isaac Oram <isaac.w.oram@intel.com>
+M: Nate DeSimone <nathaniel.l.desimone@intel.com>
+M: Chasel Chiu <chasel.chiu@intel.com>
+
+Silicon/Intel/SimicsX58SktPkg
+F: Silicon/Intel/SimicsX58SktPkg/
+M: Agyeman Prince <prince.agyeman@intel.com>
+
+Silicon/Intel/SimicsIch10Pkg
+F: Silicon/Intel/SimicsIch10Pkg/
+M: Agyeman Prince <prince.agyeman@intel.com>
+
+Silicon/Intel/Tools
+F: Silicon/Intel/Tools/
+M: Bob Feng <bob.c.feng@intel.com>
+M: Liming Gao <gaoliming@byosoft.com.cn>
+R: Yuwei Chen <yuwei.chen@intel.com>
+
+Marvell platforms and silicon
+F: Platform/Marvell/
+F: Platform/SolidRun/Armada80x0McBin/
+F: Silicon/Marvell/
+R: Marcin Wojtas <mw@semihalf.com>
+M: Leif Lindholm <leif@nuviainc.com>
+
+Miscellaneous drivers
+F: Silicon/Atmel/
+F: Silicon/Openmoko/
+F: Silicon/Synopsys/DesignWare/
+R: Ard Biesheuvel <ardb+tianocore@kernel.org>
+M: Leif Lindholm <leif@nuviainc.com>
+
+NXP platforms and silicon
+F: Platform/NXP/
+F: Silicon/NXP/
+M: Leif Lindholm <leif@nuviainc.com>
+R: Meenakshi Aggarwal <meenakshi.aggarwal@nxp.com>
+
+QEMU sbsa-ref platform
+F: Platform/Qemu/SbsaQemu/
+F: Silicon/Qemu/SbsaQemu/
+M: Ard Biesheuvel <ardb+tianocore@kernel.org>
+M: Leif Lindholm <leif@nuviainc.com>
+R: Graeme Gregory <graeme@nuviainc.com>
+R: Radoslaw Biernacki <rad@semihalf.com>
+
+Raspberry Pi platforms and silicon
+F: Platform/RaspberryPi/
+F: Silicon/Broadcom/
+M: Ard Biesheuvel <ardb+tianocore@kernel.org>
+M: Leif Lindholm <leif@nuviainc.com>
+R: Pete Batard <pete@akeo.ie>
+
+RPMB driver for OP-TEE
+F: Drivers/OpTee/OpteeRpmbPkg/
+M: Sami Mujawar <sami.mujawar@arm.com>
+M: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+
+Socionext platforms and silicon
+F: Platform/Socionext/
+F: Silicon/NXP/Library/Pcf8563RealTimeClockLib/
+F: Silicon/Socionext/
+M: Ard Biesheuvel <ardb+tianocore@kernel.org>
+M: Leif Lindholm <leif@nuviainc.com>
+
+Silicon/RISC-V/ProcessorPkg
+F: Silicon/RISC-V/ProcessorPkg/
+M: Abner Chang <abner.chang@hpe.com>
+M: Daniel Schaefer <daniel.schaefer@hpe.com>
+R: Gilbert Chen <gilbert.chen@hpe.com>
+
+Silicon/SiFive
+F: Silicon/SiFive/
+M: Abner Chang <abner.chang@hpe.com>
+M: Gilbert Chen <gilbert.chen@hpe.com>
+R: Daniel Schaefer <daniel.schaefer@hpe.com>
+
+Phytium platforms and silicon
+F: Platform/Phytium/
+F: Silicon/silicon/
+M: Leif Lindholm <leif@nuviainc.com>
+R: Peng Xie <xiepeng@phytium.com.cn>
+R: Ling Jia <jialing@phytium.com.cn>
+R: Yiqi Shu <shuyiqi@phytium.com.cn>

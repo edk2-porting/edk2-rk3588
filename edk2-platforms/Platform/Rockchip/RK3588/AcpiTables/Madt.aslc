@@ -1,0 +1,108 @@
+/** @file
+*  Multiple APIC Description Table (MADT)
+*
+*  Copyright (c) 2016 Linaro Ltd. All rights reserved.
+*  Copyright (c) 2012 - 2015, ARM Limited. All rights reserved.
+*
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
+*
+**/
+
+#include <IndustryStandard/Acpi.h>
+#include <Library/AcpiLib.h>
+#include <Library/ArmLib.h>
+#include <Library/PcdLib.h>
+
+#include "AcpiTables.h"
+//
+// Multiple APIC Description Table
+//
+#pragma pack (1)
+
+#define EFI_ACPI_6_0_GIC_ITS_FRAME_INIT(Id, PhysAddress) { \
+  EFI_ACPI_6_0_GIC_ITS,                                    \
+  sizeof (EFI_ACPI_6_0_GIC_ITS_STRUCTURE),                 \
+  0,                                                       \
+  Id,                                                      \
+  PhysAddress,                                             \
+  0                                                        \
+  }
+
+typedef struct {
+  EFI_ACPI_6_3_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER   Header;
+  EFI_ACPI_6_3_GIC_STRUCTURE                            GicInterfaces[8];
+  EFI_ACPI_6_3_GIC_DISTRIBUTOR_STRUCTURE                GicDistributor;
+  EFI_ACPI_6_3_GICR_STRUCTURE                           GicRedistributor;
+  EFI_ACPI_6_0_GIC_ITS_STRUCTURE                        GicIts[2];
+} RK_MULTIPLE_APIC_DESCRIPTION_TABLE;
+
+#pragma pack ()
+
+RK_MULTIPLE_APIC_DESCRIPTION_TABLE Madt = {
+  {
+    ACPI_HEADER (
+      EFI_ACPI_6_3_MULTIPLE_APIC_DESCRIPTION_TABLE_SIGNATURE,
+      RK_MULTIPLE_APIC_DESCRIPTION_TABLE,
+      EFI_ACPI_6_3_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION
+    ),
+    0, // LocalApicAddress
+    0, // Flags
+  },
+  {
+    EFI_ACPI_6_3_GICC_STRUCTURE_INIT (
+      0, 0, GET_MPID(0, 0), EFI_ACPI_6_3_GIC_ENABLED, 23,
+      FixedPcdGet64 (PcdGicInterruptInterfaceBase), FixedPcdGet64 (PcdGicInterruptInterfaceBase),
+      //
+      // Use 1 for GICR Base Address below, since Windows 10 on Raspberry Pi 3 does not
+      // boot otherwise, and this is the value that Microsoft had in their IoT blobs.
+      // Kept to 1 for GICv2-based Pi 4, since this field only matters for GICv3.
+      //
+      FixedPcdGet64 (PcdGicInterruptInterfaceBase), 25, FixedPcdGet64 (PcdGicRedistributorsBase), 1, 0),
+    EFI_ACPI_6_3_GICC_STRUCTURE_INIT (
+      1, 1, GET_MPID(1, 0), EFI_ACPI_6_3_GIC_ENABLED, 23,
+      FixedPcdGet64 (PcdGicInterruptInterfaceBase), FixedPcdGet64 (PcdGicInterruptInterfaceBase),
+      FixedPcdGet64 (PcdGicInterruptInterfaceBase), 25, FixedPcdGet64 (PcdGicRedistributorsBase), 1, 0),
+    EFI_ACPI_6_3_GICC_STRUCTURE_INIT (
+      2, 2, GET_MPID(2, 0), EFI_ACPI_6_3_GIC_ENABLED, 23,
+      FixedPcdGet64 (PcdGicInterruptInterfaceBase), FixedPcdGet64 (PcdGicInterruptInterfaceBase),
+      FixedPcdGet64 (PcdGicInterruptInterfaceBase), 25, FixedPcdGet64 (PcdGicRedistributorsBase), 1, 0),
+    EFI_ACPI_6_3_GICC_STRUCTURE_INIT (
+      3, 3, GET_MPID(3, 0), EFI_ACPI_6_3_GIC_ENABLED, 23,
+      FixedPcdGet64 (PcdGicInterruptInterfaceBase), FixedPcdGet64 (PcdGicInterruptInterfaceBase),
+      FixedPcdGet64 (PcdGicInterruptInterfaceBase), 25, FixedPcdGet64 (PcdGicRedistributorsBase), 1, 0),
+    EFI_ACPI_6_3_GICC_STRUCTURE_INIT (
+      4, 4, GET_MPID(4, 0), EFI_ACPI_6_3_GIC_ENABLED, 23,
+      FixedPcdGet64 (PcdGicInterruptInterfaceBase), FixedPcdGet64 (PcdGicInterruptInterfaceBase),
+      FixedPcdGet64 (PcdGicInterruptInterfaceBase), 25, FixedPcdGet64 (PcdGicRedistributorsBase), 1, 0),
+    EFI_ACPI_6_3_GICC_STRUCTURE_INIT (
+      5, 5, GET_MPID(5, 0), EFI_ACPI_6_3_GIC_ENABLED, 23,
+      FixedPcdGet64 (PcdGicInterruptInterfaceBase), FixedPcdGet64 (PcdGicInterruptInterfaceBase),
+      FixedPcdGet64 (PcdGicInterruptInterfaceBase), 25, FixedPcdGet64 (PcdGicRedistributorsBase), 1, 0),
+    EFI_ACPI_6_3_GICC_STRUCTURE_INIT (
+      6, 6, GET_MPID(6, 0), EFI_ACPI_6_3_GIC_ENABLED, 23,
+      FixedPcdGet64 (PcdGicInterruptInterfaceBase), FixedPcdGet64 (PcdGicInterruptInterfaceBase),
+      FixedPcdGet64 (PcdGicInterruptInterfaceBase), 25, FixedPcdGet64 (PcdGicRedistributorsBase), 1, 0),
+    EFI_ACPI_6_3_GICC_STRUCTURE_INIT (
+      7, 7, GET_MPID(7, 0), EFI_ACPI_6_3_GIC_ENABLED, 23,
+      FixedPcdGet64 (PcdGicInterruptInterfaceBase), FixedPcdGet64 (PcdGicInterruptInterfaceBase),
+      FixedPcdGet64 (PcdGicInterruptInterfaceBase), 25, FixedPcdGet64 (PcdGicRedistributorsBase), 1, 0),
+  },
+  EFI_ACPI_6_0_GIC_DISTRIBUTOR_INIT (0, FixedPcdGet32 (PcdGicDistributorBase), 0, 3),
+  {
+    EFI_ACPI_6_3_GICR,
+    sizeof (EFI_ACPI_6_3_GICR_STRUCTURE),
+    EFI_ACPI_RESERVED_WORD,
+    FixedPcdGet32 (PcdGicRedistributorsBase),
+    0x100000
+  },
+  {
+    EFI_ACPI_6_0_GIC_ITS_FRAME_INIT(0x0, 0xfe640000),
+    EFI_ACPI_6_0_GIC_ITS_FRAME_INIT(0x1, 0xfe660000)
+  },
+};
+
+//
+// Reference the table being generated to prevent the optimizer from removing the
+// data structure from the executable
+//
+VOID* CONST ReferenceAcpiTable = &Madt;

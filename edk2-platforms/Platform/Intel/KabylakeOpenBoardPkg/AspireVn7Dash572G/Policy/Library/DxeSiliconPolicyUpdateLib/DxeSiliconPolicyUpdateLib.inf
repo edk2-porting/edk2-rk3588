@@ -1,0 +1,52 @@
+## @file
+# Component information file for Silicon Update Library
+#
+# Copyright (c) 2017 - 2020 Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeSiliconUpdateLib
+  FILE_GUID                      = C523609D-E354-416B-B24F-33468D4BD21D
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SiliconUpdateLib
+
+[LibraryClasses]
+  BaseLib
+  PcdLib
+  DebugLib
+  ConfigBlockLib
+  EcLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  KabylakeSiliconPkg/SiPkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+  KabylakeOpenBoardPkg/OpenBoardPkg.dec
+  IntelSiliconPkg/IntelSiliconPkg.dec
+
+[Sources]
+  DxeSiliconPolicyUpdateLib.c
+  DxeGopPolicyInit.c
+  DxeSaPolicyUpdate.c
+
+[Pcd]
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdIntelGopEnable
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdGraphicsVbtGuid
+
+[Protocols]
+  gEfiFirmwareVolume2ProtocolGuid               ## CONSUMES
+  gSaPolicyProtocolGuid                         ## CONSUMES
+  gDxeSiPolicyProtocolGuid                      ## PRODUCES
+  gGopPolicyProtocolGuid                        ## PRODUCES
+
+[Guids]
+  gGraphicsDxeConfigGuid
+  gMiscDxeConfigGuid
+
+[Depex]
+  gEfiVariableArchProtocolGuid

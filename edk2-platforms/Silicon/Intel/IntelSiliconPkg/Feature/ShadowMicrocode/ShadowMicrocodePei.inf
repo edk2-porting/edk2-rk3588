@@ -1,0 +1,47 @@
+### @file
+# FIT based microcode shadow PEIM.
+#
+# Copyright (c) 2020 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+###
+
+[Defines]
+  INF_VERSION                    = 0x00010017
+  BASE_NAME                      = ShadowMicrocodePei
+  FILE_GUID                      = 8af4cf68-ebe4-4b21-a008-0cb3da277be5
+  VERSION_STRING                 = 1.0
+  MODULE_TYPE                    = PEIM
+  ENTRY_POINT                    = ShadowMicrocodePeimInit
+
+[Sources]
+  ShadowMicrocodePei.c
+
+[LibraryClasses]
+  PeimEntryPoint
+  DebugLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  HobLib
+  PeiServicesLib
+  MicrocodeLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  IntelSiliconPkg/IntelSiliconPkg.dec
+
+[Ppis]
+  gEdkiiPeiShadowMicrocodePpiGuid                     ## PRODUCES
+
+[Guids]
+  gEdkiiMicrocodeShadowInfoHobGuid
+  gEdkiiMicrocodeStorageTypeFlashGuid
+
+[Pcd]
+  gIntelSiliconPkgTokenSpaceGuid.PcdShadowAllMicrocode
+
+[Depex]
+  TRUE

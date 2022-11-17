@@ -1,0 +1,146 @@
+/** @file
+*  Generic Timer Description Table (GTDT)
+*
+*  Copyright (c) 2018, ARM Limited. All rights reserved.
+*
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
+*
+**/
+
+#include "SgiAcpiHeader.h"
+#include <Library/AcpiLib.h>
+#include <Library/PcdLib.h>
+#include <IndustryStandard/Acpi62.h>
+
+#define SGI_PLATFORM_WATCHDOG_COUNT       2
+#define SGI_PLATFORM_TIMER_COUNT          (SGI_PLATFORM_WATCHDOG_COUNT + 1)
+#define SGI_TIMER_FRAMES_COUNT            2
+
+#define SYSTEM_TIMER_BASE_ADDRESS         0xFFFFFFFFFFFFFFFF
+#define GTDT_GLOBAL_FLAGS                 0
+#define GTDT_GTIMER_FLAGS                 EFI_ACPI_6_2_GTDT_TIMER_FLAG_TIMER_INTERRUPT_POLARITY
+
+#define SGI_GT_BLOCK_CTL_BASE             0x2A810000
+#define SGI_GT_BLOCK_FRAME1_CTL_BASE      0x2A820000
+#define SGI_GT_BLOCK_FRAME1_CTL_EL0_BASE  0xFFFFFFFFFFFFFFFF
+#define SGI_GT_BLOCK_FRAME1_GSIV          FixedPcdGet32 (PcdGtFrame1Gsiv)
+
+#define SGI_GT_BLOCK_FRAME0_CTL_BASE      0x2A830000
+#define SGI_GT_BLOCK_FRAME0_CTL_EL0_BASE  0xFFFFFFFFFFFFFFFF
+#define SGI_GT_BLOCK_FRAME0_GSIV          FixedPcdGet32 (PcdGtFrame0Gsiv)
+
+#define SGI_GTX_TIMER_FLAGS               0
+#define GTX_TIMER_SECURE                  EFI_ACPI_6_2_GTDT_GT_BLOCK_COMMON_FLAG_SECURE_TIMER
+#define GTX_TIMER_NON_SECURE              0
+#define GTX_TIMER_SAVE_CONTEXT            EFI_ACPI_6_2_GTDT_GT_BLOCK_COMMON_FLAG_ALWAYS_ON_CAPABILITY
+#define SGI_GTX_COMMON_FLAGS_S            (GTX_TIMER_SAVE_CONTEXT | GTX_TIMER_SECURE)
+#define SGI_GTX_COMMON_FLAGS_NS           (GTX_TIMER_SAVE_CONTEXT | GTX_TIMER_NON_SECURE)
+
+#define EFI_ACPI_6_2_SBSA_GENERIC_WATCHDOG_STRUCTURE_INIT(        \
+  RefreshFramePhysicalAddress, ControlFramePhysicalAddress,       \
+  WatchdogTimerGSIV, WatchdogTimerFlags)                          \
+  {                                                               \
+    EFI_ACPI_6_2_GTDT_SBSA_GENERIC_WATCHDOG,                      \
+    sizeof (EFI_ACPI_6_2_GTDT_SBSA_GENERIC_WATCHDOG_STRUCTURE),   \
+    EFI_ACPI_RESERVED_WORD,                                       \
+    RefreshFramePhysicalAddress,                                  \
+    ControlFramePhysicalAddress,                                  \
+    WatchdogTimerGSIV,                                            \
+    WatchdogTimerFlags                                            \
+  }
+
+#pragma pack (1)
+
+typedef struct {
+  EFI_ACPI_6_2_GENERIC_TIMER_DESCRIPTION_TABLE       Gtdt;
+  EFI_ACPI_6_2_GTDT_GT_BLOCK_STRUCTURE               GtBlock;
+  EFI_ACPI_6_2_GTDT_GT_BLOCK_TIMER_STRUCTURE         Frames[SGI_TIMER_FRAMES_COUNT];
+  EFI_ACPI_6_2_GTDT_SBSA_GENERIC_WATCHDOG_STRUCTURE  Watchdogs[SGI_PLATFORM_WATCHDOG_COUNT];
+} EFI_ACPI_6_2_GENERIC_TIMER_DESCRIPTION_TABLES;
+
+#pragma pack ()
+
+STATIC EFI_ACPI_6_2_GENERIC_TIMER_DESCRIPTION_TABLES Gtdt = {
+  {
+    ARM_ACPI_HEADER (
+      EFI_ACPI_6_2_GENERIC_TIMER_DESCRIPTION_TABLE_SIGNATURE,
+      EFI_ACPI_6_2_GENERIC_TIMER_DESCRIPTION_TABLES,
+      EFI_ACPI_6_2_GENERIC_TIMER_DESCRIPTION_TABLE_REVISION
+    ),
+    SYSTEM_TIMER_BASE_ADDRESS,                    // UINT64  PhysicalAddress
+    0,                                            // UINT32  Reserved
+    FixedPcdGet32 (PcdArmArchTimerSecIntrNum),    // UINT32  SecurePL1TimerGSIV
+    GTDT_GTIMER_FLAGS,                            // UINT32  SecurePL1TimerFlags
+    FixedPcdGet32 (PcdArmArchTimerIntrNum),       // UINT32  NonSecurePL1TimerGSIV
+    GTDT_GTIMER_FLAGS,                            // UINT32  NonSecurePL1TimerFlags
+    FixedPcdGet32 (PcdArmArchTimerVirtIntrNum),   // UINT32  VirtualTimerGSIV
+    GTDT_GTIMER_FLAGS,                            // UINT32  VirtualTimerFlags
+    FixedPcdGet32 (PcdArmArchTimerHypIntrNum),    // UINT32  NonSecurePL2TimerGSIV
+    GTDT_GTIMER_FLAGS,                            // UINT32  NonSecurePL2TimerFlags
+    0xFFFFFFFFFFFFFFFF,                           // UINT64  CntReadBasePhysicalAddress
+    SGI_PLATFORM_TIMER_COUNT,                     // UINT32  PlatformTimerCount
+    sizeof (EFI_ACPI_6_2_GENERIC_TIMER_DESCRIPTION_TABLE) // UINT32 PlatfromTimerOffset
+  },
+  {
+    EFI_ACPI_6_2_GTDT_GT_BLOCK,                           // UINT8 Type
+    sizeof (EFI_ACPI_6_2_GTDT_GT_BLOCK_STRUCTURE) +       // UINT16 Length
+    sizeof (EFI_ACPI_6_2_GTDT_GT_BLOCK_TIMER_STRUCTURE) *
+    SGI_TIMER_FRAMES_COUNT,
+    EFI_ACPI_RESERVED_BYTE,                               // UINT8 Reserved
+    SGI_GT_BLOCK_CTL_BASE,                                // UINT64 CntCtlBase
+    SGI_TIMER_FRAMES_COUNT,                               // UINT32 GTBlockTimerCount
+    sizeof (EFI_ACPI_6_2_GTDT_GT_BLOCK_STRUCTURE)         // UINT32 GTBlockTimerOffset
+  },
+  {
+    {
+      0,                                     // UINT8 GTFrameNumber
+      {
+        EFI_ACPI_RESERVED_BYTE,
+        EFI_ACPI_RESERVED_BYTE,
+        EFI_ACPI_RESERVED_BYTE
+      },                                     // UINT8 Reserved[3]
+      SGI_GT_BLOCK_FRAME0_CTL_BASE,          // UINT64 CntBaseX
+      SGI_GT_BLOCK_FRAME0_CTL_EL0_BASE,      // UINT64 CntEL0BaseX
+      SGI_GT_BLOCK_FRAME0_GSIV,              // UINT32 GTxPhysicalTimerGSIV
+      SGI_GTX_TIMER_FLAGS,                   // UINT32 GTxPhysicalTimerFlags
+      0,                                     // UINT32 GTxVirtualTimerGSIV
+      0,                                     // UINT32 GTxVirtualTimerFlags
+      SGI_GTX_COMMON_FLAGS_NS                // UINT32 GTxCommonFlags
+    },
+    {
+      1,                                     // UINT8 GTFrameNumber
+      {
+        EFI_ACPI_RESERVED_BYTE,
+        EFI_ACPI_RESERVED_BYTE,
+        EFI_ACPI_RESERVED_BYTE
+      },                                     // UINT8 Reserved[3]
+      SGI_GT_BLOCK_FRAME1_CTL_BASE,          // UINT64 CntBaseX
+      SGI_GT_BLOCK_FRAME1_CTL_EL0_BASE,      // UINT64 CntEL0BaseX
+      SGI_GT_BLOCK_FRAME1_GSIV,              // UINT32 GTxPhysicalTimerGSIV
+      SGI_GTX_TIMER_FLAGS,                   // UINT32 GTxPhysicalTimerFlags
+      0,                                     // UINT32 GTxVirtualTimerGSIV
+      0,                                     // UINT32 GTxVirtualTimerFlags
+      SGI_GTX_COMMON_FLAGS_S                 // UINT32 GTxCommonFlags
+    }
+  },
+  {
+    EFI_ACPI_6_2_SBSA_GENERIC_WATCHDOG_STRUCTURE_INIT (
+      FixedPcdGet32 (PcdGenericWatchdogRefreshBase),
+      FixedPcdGet32 (PcdGenericWatchdogControlBase),
+      FixedPcdGet32 (PcdWdogWS0Gsiv),
+      0
+    ),
+    EFI_ACPI_6_2_SBSA_GENERIC_WATCHDOG_STRUCTURE_INIT (
+      FixedPcdGet32 (PcdGenericWatchdogRefreshBase),
+      FixedPcdGet32 (PcdGenericWatchdogControlBase),
+      FixedPcdGet32 (PcdWdogWS1Gsiv),
+      EFI_ACPI_6_2_GTDT_SBSA_GENERIC_WATCHDOG_FLAG_SECURE_TIMER
+    )
+  }
+};
+
+//
+// Reference the table being generated to prevent the optimizer from removing the
+// data structure from the executable
+//
+VOID* CONST ReferenceAcpiTable = &Gtdt;

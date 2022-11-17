@@ -1,0 +1,79 @@
+#
+#
+# Copyright (c)  1999  - 2019, Intel Corporation. All rights reserved
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#  Module Name:
+#
+#   Platform.inf
+#
+#  Abstract:
+#
+#    Component description file for SMM Platform handler module
+#
+#--*/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PlatformSmm
+  FILE_GUID                      = 99C20A37-042A-46e2-80F4-E4027FDBC86F
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializePlatformSmm
+  PI_SPECIFICATION_VERSION       = 0x0001000A
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[Sources]
+  S3Save.c
+  Platform.c
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  SmmServicesTableLib
+  DebugLib
+  IoLib
+  BaseLib
+  BaseMemoryLib
+  DevicePathLib
+  HobLib
+  S3BootScriptLib
+  StallSmmLib
+  PchPlatformLib
+
+[Guids]
+  gEfiSetupVariableGuid
+
+[Protocols]
+  gEfiSmmIchnDispatchProtocolGuid
+  gEfiGlobalNvsAreaProtocolGuid
+  gEfiSmmSwDispatch2ProtocolGuid
+  gEfiSmmPowerButtonDispatch2ProtocolGuid
+  gEfiSmmSxDispatch2ProtocolGuid
+  gEfiSmmVariableProtocolGuid
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Vlv2DeviceRefCodePkg/Vlv2DeviceRefCodePkg.dec
+  Vlv2TbltDevicePkg/PlatformPkg.dec
+
+[Pcd.common]
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+
+[Depex]
+  gEfiSmmAccess2ProtocolGuid              AND
+  gEfiSmmPowerButtonDispatch2ProtocolGuid AND
+  gEfiSmmSxDispatch2ProtocolGuid          AND
+  gEfiSmmIchnDispatchProtocolGuid         AND
+  gEfiSmmSwDispatch2ProtocolGuid          AND
+  gEfiVariableArchProtocolGuid            AND
+  gEfiVariableWriteArchProtocolGuid       AND
+  gEfiGlobalNvsAreaProtocolGuid
+

@@ -1,0 +1,27 @@
+## @file
+#
+# Copyright (c) 2018 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BasePchResetCommonLib
+  FILE_GUID                      = 1E6151B2-6306-4C9C-B9AC-794A13BEBC3F
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PchResetCommonLib
+
+[Sources]
+  PchResetCommon.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  PurleyRefreshSiliconPkg/SiPkg.dec
+
+[LibraryClasses]
+  IoLib
+  DebugLib
+  PchCycleDecodingLib

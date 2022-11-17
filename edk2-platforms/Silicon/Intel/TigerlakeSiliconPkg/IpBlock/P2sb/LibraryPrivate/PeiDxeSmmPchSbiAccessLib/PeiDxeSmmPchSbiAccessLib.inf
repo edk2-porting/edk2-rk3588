@@ -1,0 +1,36 @@
+## @file
+# PCH SBI access library.
+#
+# All function in this library is available for PEI, DXE, and SMM,
+# But do not support UEFI RUNTIME environment call.
+#
+#  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+
+[Defines]
+INF_VERSION = 0x00010017
+BASE_NAME = PeiDxeSmmPchSbiAccessLib
+FILE_GUID = 96ECB0FB-A975-4DC8-B88A-D90C3378CE87
+VERSION_STRING = 1.0
+MODULE_TYPE = BASE
+LIBRARY_CLASS = PchSbiAccessLib
+
+
+[LibraryClasses]
+BaseLib
+IoLib
+DebugLib
+PciSegmentLib
+PchPciBdfLib
+
+
+[Packages]
+MdePkg/MdePkg.dec
+TigerlakeSiliconPkg/SiPkg.dec
+
+
+[Sources]
+PchSbiAccessLib.c

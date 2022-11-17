@@ -1,0 +1,175 @@
+/** @file
+
+Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+  Name (PRU1, Package() {
+    Package() { 0x0008FFFF, 0, \_SB.PC00.LPC0.LNKA, 0 },
+    Package() { 0x0008FFFF, 1, \_SB.PC00.LPC0.LNKB, 0 },
+    Package() { 0x0008FFFF, 2, \_SB.PC00.LPC0.LNKC, 0 },
+    Package() { 0x0008FFFF, 3, \_SB.PC00.LPC0.LNKD, 0 },
+
+    Package() { 0x0009FFFF, 0, \_SB.PC00.LPC0.LNKA, 0 },
+    Package() { 0x0009FFFF, 1, \_SB.PC00.LPC0.LNKB, 0 },
+    Package() { 0x0009FFFF, 2, \_SB.PC00.LPC0.LNKC, 0 },
+    Package() { 0x0009FFFF, 3, \_SB.PC00.LPC0.LNKD, 0 },
+
+    Package() { 0x000AFFFF, 0, \_SB.PC00.LPC0.LNKA, 0 },
+    Package() { 0x000AFFFF, 1, \_SB.PC00.LPC0.LNKB, 0 },
+    Package() { 0x000AFFFF, 2, \_SB.PC00.LPC0.LNKC, 0 },
+    Package() { 0x000AFFFF, 3, \_SB.PC00.LPC0.LNKD, 0 },
+
+    Package() { 0x000BFFFF, 0, \_SB.PC00.LPC0.LNKA, 0 },
+    Package() { 0x000BFFFF, 1, \_SB.PC00.LPC0.LNKB, 0 },
+    Package() { 0x000BFFFF, 2, \_SB.PC00.LPC0.LNKC, 0 },
+    Package() { 0x000BFFFF, 3, \_SB.PC00.LPC0.LNKD, 0 },
+
+
+    Package() { 0x000EFFFF, 0, \_SB.PC00.LPC0.LNKA, 0 },
+    Package() { 0x000EFFFF, 1, \_SB.PC00.LPC0.LNKB, 0 },
+    Package() { 0x000EFFFF, 2, \_SB.PC00.LPC0.LNKC, 0 },
+    Package() { 0x000EFFFF, 3, \_SB.PC00.LPC0.LNKD, 0 },
+
+    Package() { 0x000FFFFF, 0, \_SB.PC00.LPC0.LNKA, 0 },
+    Package() { 0x000FFFFF, 1, \_SB.PC00.LPC0.LNKB, 0 },
+    Package() { 0x000FFFFF, 2, \_SB.PC00.LPC0.LNKC, 0 },
+    Package() { 0x000FFFFF, 3, \_SB.PC00.LPC0.LNKD, 0 },
+
+    Package() { 0x0010FFFF, 0, \_SB.PC00.LPC0.LNKA, 0 },
+    Package() { 0x0010FFFF, 1, \_SB.PC00.LPC0.LNKB, 0 },
+    Package() { 0x0010FFFF, 2, \_SB.PC00.LPC0.LNKC, 0 },
+    Package() { 0x0010FFFF, 3, \_SB.PC00.LPC0.LNKD, 0 },
+
+    Package() { 0x0011FFFF, 0, \_SB.PC00.LPC0.LNKA, 0 },
+    Package() { 0x0011FFFF, 1, \_SB.PC00.LPC0.LNKB, 0 },
+    Package() { 0x0011FFFF, 2, \_SB.PC00.LPC0.LNKC, 0 },
+    Package() { 0x0011FFFF, 3, \_SB.PC00.LPC0.LNKD, 0 },
+
+    Package() { 0x0014FFFF, 0, \_SB.PC00.LPC0.LNKA, 0 },
+    Package() { 0x0014FFFF, 1, \_SB.PC00.LPC0.LNKB, 0 },
+    Package() { 0x0014FFFF, 2, \_SB.PC00.LPC0.LNKC, 0 },
+    Package() { 0x0014FFFF, 3, \_SB.PC00.LPC0.LNKD, 0 },
+
+    Package() { 0x0015FFFF, 0, \_SB.PC00.LPC0.LNKA, 0 },
+    Package() { 0x0015FFFF, 1, \_SB.PC00.LPC0.LNKB, 0 },
+    Package() { 0x0015FFFF, 2, \_SB.PC00.LPC0.LNKC, 0 },
+    Package() { 0x0015FFFF, 3, \_SB.PC00.LPC0.LNKD, 0 },
+
+    Package() { 0x0016FFFF, 0, \_SB.PC00.LPC0.LNKA, 0 },
+    Package() { 0x0016FFFF, 1, \_SB.PC00.LPC0.LNKB, 0 },
+    Package() { 0x0016FFFF, 2, \_SB.PC00.LPC0.LNKC, 0 },
+    Package() { 0x0016FFFF, 3, \_SB.PC00.LPC0.LNKD, 0 },
+
+    Package() { 0x0017FFFF, 0, \_SB.PC00.LPC0.LNKA, 0 },
+    Package() { 0x0017FFFF, 1, \_SB.PC00.LPC0.LNKB, 0 },
+    Package() { 0x0017FFFF, 2, \_SB.PC00.LPC0.LNKC, 0 },
+    Package() { 0x0017FFFF, 3, \_SB.PC00.LPC0.LNKD, 0 },
+
+    Package() { 0x001DFFFF, 0, \_SB.PC00.LPC0.LNKA, 0 },
+    Package() { 0x001DFFFF, 1, \_SB.PC00.LPC0.LNKB, 0 },
+    Package() { 0x001DFFFF, 2, \_SB.PC00.LPC0.LNKC, 0 },
+    Package() { 0x001DFFFF, 3, \_SB.PC00.LPC0.LNKD, 0 },
+
+    Package() { 0x001EFFFF, 0, \_SB.PC00.LPC0.LNKA, 0 },
+    Package() { 0x001EFFFF, 1, \_SB.PC00.LPC0.LNKB, 0 },
+    Package() { 0x001EFFFF, 2, \_SB.PC00.LPC0.LNKC, 0 },
+    Package() { 0x001EFFFF, 3, \_SB.PC00.LPC0.LNKD, 0 },
+
+    Package() { 0x001FFFFF, 0, \_SB.PC00.LPC0.LNKA, 0 },
+    Package() { 0x001FFFFF, 1, \_SB.PC00.LPC0.LNKB, 0 },
+    Package() { 0x001FFFFF, 2, \_SB.PC00.LPC0.LNKC, 0 },
+    Package() { 0x001FFFFF, 3, \_SB.PC00.LPC0.LNKD, 0 },
+  })
+
+  Name (ARU1, Package() {
+    Package() { 0x0008FFFF, 0, 0, 16 },
+    Package() { 0x0008FFFF, 1, 0, 17 },
+    Package() { 0x0008FFFF, 2, 0, 18 },
+    Package() { 0x0008FFFF, 3, 0, 19 },
+
+    Package() { 0x0009FFFF, 0, 0, 16 },
+    Package() { 0x0009FFFF, 1, 0, 17 },
+    Package() { 0x0009FFFF, 2, 0, 18 },
+    Package() { 0x0009FFFF, 3, 0, 19 },
+
+    Package() { 0x000AFFFF, 0, 0, 16 },
+    Package() { 0x000AFFFF, 1, 0, 17 },
+    Package() { 0x000AFFFF, 2, 0, 18 },
+    Package() { 0x000AFFFF, 3, 0, 19 },
+
+    Package() { 0x000BFFFF, 0, 0, 16 },
+    Package() { 0x000BFFFF, 1, 0, 17 },
+    Package() { 0x000BFFFF, 2, 0, 18 },
+    Package() { 0x000BFFFF, 3, 0, 19 },
+
+    Package() { 0x000EFFFF, 0, 0, 16 },
+    Package() { 0x000EFFFF, 1, 0, 17 },
+    Package() { 0x000EFFFF, 2, 0, 18 },
+    Package() { 0x000EFFFF, 3, 0, 19 },
+
+    Package() { 0x000FFFFF, 0, 0, 16 },
+    Package() { 0x000FFFFF, 1, 0, 17 },
+    Package() { 0x000FFFFF, 2, 0, 18 },
+    Package() { 0x000FFFFF, 3, 0, 19 },
+
+    Package() { 0x0010FFFF, 0, 0, 16 },
+    Package() { 0x0010FFFF, 1, 0, 17 },
+    Package() { 0x0010FFFF, 2, 0, 18 },
+    Package() { 0x0010FFFF, 3, 0, 19 },
+
+    Package() { 0x0011FFFF, 0, 0, 16 },
+    Package() { 0x0011FFFF, 1, 0, 17 },
+    Package() { 0x0011FFFF, 2, 0, 18 },
+    Package() { 0x0011FFFF, 3, 0, 19 },
+
+    Package() { 0x0014FFFF, 0, 0, 16 },
+    Package() { 0x0014FFFF, 1, 0, 17 },
+    Package() { 0x0014FFFF, 2, 0, 18 },
+    Package() { 0x0014FFFF, 3, 0, 19 },
+
+    Package() { 0x0015FFFF, 0, 0, 16 },
+    Package() { 0x0015FFFF, 1, 0, 17 },
+    Package() { 0x0015FFFF, 2, 0, 18 },
+    Package() { 0x0015FFFF, 3, 0, 19 },
+
+    Package() { 0x0016FFFF, 0, 0, 16 },
+    Package() { 0x0016FFFF, 1, 0, 17 },
+    Package() { 0x0016FFFF, 2, 0, 18 },
+    Package() { 0x0016FFFF, 3, 0, 19 },
+
+    Package() { 0x0017FFFF, 0, 0, 16 },
+    Package() { 0x0017FFFF, 1, 0, 17 },
+    Package() { 0x0017FFFF, 2, 0, 18 },
+    Package() { 0x0017FFFF, 3, 0, 19 },
+
+    Package() { 0x001DFFFF, 0, 0, 16 },
+    Package() { 0x001DFFFF, 1, 0, 17 },
+    Package() { 0x001DFFFF, 2, 0, 18 },
+    Package() { 0x001DFFFF, 3, 0, 19 },
+
+    Package() { 0x001EFFFF, 0, 0, 16 },
+    Package() { 0x001EFFFF, 1, 0, 17 },
+    Package() { 0x001EFFFF, 2, 0, 18 },
+    Package() { 0x001EFFFF, 3, 0, 19 },
+
+    Package() { 0x001FFFFF, 0, 0, 16 },
+    Package() { 0x001FFFFF, 1, 0, 17 },
+    Package() { 0x001FFFFF, 2, 0, 18 },
+    Package() { 0x001FFFFF, 3, 0, 19 },
+  })
+
+  //
+  // Devices 8 - 31 on PStack
+  //
+  Device (UNC1) {
+    Name (_UID, "UNCORE1")
+    Name (_ADR, 0x00000000)
+    Method (_PRT, 0) {
+      If (LEqual(PICM, Zero)) {
+        Return (PRU1)
+      }
+      Return (ARU1)
+    }
+  }

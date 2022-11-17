@@ -1,0 +1,29 @@
+## @file
+#
+# Copyright (c) 2018 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Dsdt
+  FILE_GUID                      = 7E374E25-8E01-4FEE-87F2-390C23C606CD
+  MODULE_TYPE                    = USER_DEFINED
+  VERSION_STRING                 = 1.0
+
+[Sources]
+  Dsdt/WFPPlatform.asl
+
+[Packages]
+  MdePkg/MdePkg.dec
+  PurleyOpenBoardPkg/OpenBoardPkg.dec
+  PurleyRefreshSiliconPkg/SiPkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+
+[BuildOptions]
+  # add -vr and -so to generate offset.h
+  *_*_*_ASL_FLAGS = -oi -vr -so
+
+

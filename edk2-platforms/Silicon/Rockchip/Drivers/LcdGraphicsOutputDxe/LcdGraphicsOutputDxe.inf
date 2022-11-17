@@ -1,0 +1,63 @@
+#/** @file
+#
+#  Component description file for LcdGraphicsOutputDxe module
+#
+#  Copyright (c) 2011 - 2020, Arm Limited. All rights reserved.<BR>
+#  Copyright (c) 2022 Rockchip Electronics Co. Ltd.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = LcdGraphicsOutputDxe
+  FILE_GUID                      = eaf89ad8-92e1-11ec-b51d-f42a7dcb925d
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = LcdGraphicsOutputDxeInitialize
+
+[Sources.common]
+  LcdGraphicsOutputBlt.c
+  LcdGraphicsOutputDxe.c
+  LcdGraphicsOutputDxe.h
+
+[Packages]
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  ArmPkg/ArmPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/Rockchip/RockchipPkg.dec
+  Silicon/Rockchip/RK3588/RK3588.dec
+  Platform/Rockchip/RK3588/RK3588.dec
+
+[LibraryClasses]
+  ArmLib
+  BaseLib
+  BaseMemoryLib
+  CacheMaintenanceLib
+  DebugLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+  RockchipDisplayLib
+  //to delete
+  AnalogixDpLib
+
+[Protocols]
+  gEfiCpuArchProtocolGuid
+  gEfiDevicePathProtocolGuid
+  gEfiGraphicsOutputProtocolGuid
+  gRockchipCrtcProtocolGuid
+  gRockchipConnectorProtocolGuid
+
+[Pcd]
+  gRockchipTokenSpaceGuid.PcdLcdPixelFormat
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution
+
+[FeaturePcd]
+  gArmPlatformTokenSpaceGuid.PcdGopDisableOnExitBootServices
+
+[Depex]
+  TRUE

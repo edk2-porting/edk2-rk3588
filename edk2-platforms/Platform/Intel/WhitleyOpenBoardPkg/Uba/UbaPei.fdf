@@ -1,0 +1,24 @@
+## @file
+# Uba Pei fdf file
+#
+# @copyright
+# Copyright 2012 - 2021 Intel Corporation. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+INF  $(RP_PKG)/Uba/CfgDb/Pei/CfgDbPei.inf
+
+#
+# Board Init Peim
+#
+INF $(RP_PKG)/Uba/BoardInit/Pei/BoardInitPei.inf
+
+#
+# For Dynamic Feature Support
+#
+
+#
+# Update all PCDs for UBA in PEI phase
+#
+INF   $(RP_PKG)/Uba/UbaUpdatePcds/Pei/UpdatePcdsPei.inf

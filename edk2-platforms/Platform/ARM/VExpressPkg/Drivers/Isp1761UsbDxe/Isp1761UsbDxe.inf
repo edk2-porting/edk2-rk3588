@@ -1,0 +1,46 @@
+#/** @file
+#
+#  WARNING:
+#  This driver fails to follow the UEFI driver model without a good
+#  reason, and only remains in the tree because it is still used by
+#  a small number of platforms. It will be removed when no longer used.
+#  New platforms should not use it, and no one should use this as
+#  reference code for developing new drivers.
+#
+#  Copyright (c) 2013-2015, ARM Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Isp1761PeriphDxe
+  FILE_GUID                      = 72d78ea6-4dee-11e3-8100-f3842a48d0a0
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = Isp1761PeriphEntryPoint
+
+[Sources.common]
+  Isp1761UsbDxe.c
+
+[LibraryClasses]
+  DebugLib
+  IoLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiDriverBindingProtocolGuid
+  gUsbDeviceProtocolGuid
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Platform/ARM/VExpressPkg/ArmVExpressPkg.dec
+
+[Pcd]
+  gArmVExpressTokenSpaceGuid.PcdIsp1761BaseAddress

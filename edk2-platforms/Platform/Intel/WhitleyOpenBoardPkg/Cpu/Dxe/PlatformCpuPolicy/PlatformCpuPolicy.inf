@@ -1,0 +1,81 @@
+## @file
+# Component description file for Platform CPU Policy DXE Driver.
+#
+# @copyright
+# Copyright 2015 - 2021 Intel Corporation. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                   = 0x00010005
+  BASE_NAME                     = PlatformCpuPolicy
+  FILE_GUID                     = 76A7B4FC-C8D5-462d-A4D2-6E88338A772A
+  MODULE_TYPE                   = DXE_DRIVER
+  VERSION_STRING                = 1.0
+  ENTRY_POINT                   = PlatformCpuPolicyEntryPoint
+
+[Sources]
+  PlatformCpuPolicy.c
+
+[Packages]
+  UefiCpuPkg/UefiCpuPkg.dec
+  MdePkg/MdePkg.dec
+  WhitleySiliconPkg/CpRcPkg.dec
+  WhitleySiliconPkg/WhitleySiliconPkg.dec
+  WhitleyOpenBoardPkg/PlatformPkg.dec
+  WhitleySiliconPkg/SiliconPkg.dec
+  WhitleySiliconPkg/Cpu/CpuRcPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  PcdLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  BaseLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  HobLib
+  IoLib
+
+[Protocols]
+  gEfiPlatformTypeProtocolGuid
+  gEfiCpuPolicyProtocolGuid
+  gPpmPolicyProtocolGuid
+  gDynamicSiLibraryProtocolGuid                 ## CONSUMES
+
+[Guids]
+  gEfiSetupVariableGuid
+  gEfiSocketMemoryVariableGuid
+  gEfiSocketPowermanagementVarGuid
+  gEfiSocketProcessorCoreVarGuid
+  gEfiEndOfDxeEventGroupGuid
+
+[Pcd]
+  gCpuPkgTokenSpaceGuid.PcdPlatformCpuSocketCount
+  gCpuPkgTokenSpaceGuid.PcdCpuSocketId
+  gCpuPkgTokenSpaceGuid.PcdCpuSmmMsrSaveStateEnable
+  gCpuPkgTokenSpaceGuid.PcdCpuSmmProtectedModeEnable
+  gCpuPkgTokenSpaceGuid.PcdCpuSmmRuntimeCtlHooks
+  gSiPkgTokenSpaceGuid.PcdAcpiBaseAddress
+  gOemSkuTokenSpaceGuid.PcdOemSkuBoardSocketCount
+  gCpuPkgTokenSpaceGuid.PcdCpuIEDRamSize
+
+  gStructPcdTokenSpaceGuid.PcdSocketIioConfig
+  gStructPcdTokenSpaceGuid.PcdSocketCommonRcConfig
+  gStructPcdTokenSpaceGuid.PcdSocketMpLinkConfig
+  gStructPcdTokenSpaceGuid.PcdSocketMemoryConfig
+  gStructPcdTokenSpaceGuid.PcdSocketPowerManagementConfig
+  gStructPcdTokenSpaceGuid.PcdSocketProcessorCoreConfig
+  gStructPcdTokenSpaceGuid.PcdSetup
+  gStructPcdTokenSpaceGuid.PcdPchSetup
+  gStructPcdTokenSpaceGuid.PcdFpgaSocketConfig
+
+  gOemSkuTokenSpaceGuid.PcdTurboPowerLimitLock
+
+[FixedPcd]
+  gEfiCpRcPkgTokenSpaceGuid.PcdMaxCpuSocketCount
+  gEfiCpRcPkgTokenSpaceGuid.PcdMaxCpuCoreCount
+
+[Depex]
+  gEfiVariableArchProtocolGuid AND gEfiPlatformTypeProtocolGuid AND gDynamicSiLibraryProtocolGuid

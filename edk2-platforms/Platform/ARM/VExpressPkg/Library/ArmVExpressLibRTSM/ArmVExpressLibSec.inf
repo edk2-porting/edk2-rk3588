@@ -1,0 +1,50 @@
+#/* @file
+#  Copyright (c) 2011-2018, ARM Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#*/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = RTSMArmVExpressLibSec
+  FILE_GUID                      = a79eed97-4b98-4974-9690-37b32d6a5b56
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmPlatformLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Platform/ARM/VExpressPkg/ArmVExpressPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+
+[LibraryClasses]
+  IoLib
+  ArmLib
+  SerialPortLib
+
+[Sources.common]
+  RTSM.c
+
+[Sources.ARM]
+  Arm/RTSMHelper.asm    | RVCT
+  Arm/RTSMHelper.S      | GCC
+
+[Sources.AARCH64]
+  AArch64/RTSMHelper.S
+
+[FixedPcd]
+  gArmTokenSpaceGuid.PcdSystemMemoryBase
+  gArmTokenSpaceGuid.PcdSystemMemorySize
+  gArmTokenSpaceGuid.PcdFvBaseAddress
+
+  gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
+  gArmTokenSpaceGuid.PcdArmPrimaryCore
+
+  gArmPlatformTokenSpaceGuid.PcdCoreCount
+
+[Ppis]
+  gArmMpCoreInfoPpiGuid

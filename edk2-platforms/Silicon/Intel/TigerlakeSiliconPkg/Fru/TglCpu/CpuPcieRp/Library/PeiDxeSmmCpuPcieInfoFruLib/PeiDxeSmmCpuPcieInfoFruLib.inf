@@ -1,0 +1,36 @@
+## @file
+# CPU PCIe information library for TigerLake PCH.
+#
+# All function in this library is available for PEI, DXE, and SMM,
+# But do not support UEFI RUNTIME environment call.
+#
+#  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+
+[Defines]
+INF_VERSION = 0x00010017
+BASE_NAME = PeiDxeSmmCpuPcieInfoFruLib
+FILE_GUID = 59CA5352-ED46-4449-BF1C-0D0074C4D5B1
+VERSION_STRING = 1.0
+MODULE_TYPE = BASE
+LIBRARY_CLASS = CpuPcieInfoFruLib
+
+
+[LibraryClasses]
+IoLib
+BaseLib
+DebugLib
+PrintLib
+PcdLib
+ConfigBlockLib
+CpuPcieInitCommonLib
+
+[Packages]
+MdePkg/MdePkg.dec
+TigerlakeSiliconPkg/SiPkg.dec
+
+[Sources]
+CpuPcieInfoFruLib.c

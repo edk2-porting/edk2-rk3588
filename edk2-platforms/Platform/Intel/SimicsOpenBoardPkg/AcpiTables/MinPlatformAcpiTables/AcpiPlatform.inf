@@ -1,0 +1,105 @@
+## @file
+#  Component information file for AcpiPlatform module
+#
+# Copyright (c) 2019 Intel Corporation. All rights reserved. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = AcpiPlatform
+  FILE_GUID                      = FC90EB7A-3E0A-483C-A26C-484D36593FF4
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InstallAcpiPlatform
+
+[Sources.common]
+  AcpiPlatform.h
+  AcpiPlatform.c
+  Fadt/Fadt.c
+  Facs/Facs.c
+  Hpet/Hpet.c
+  Wsmt/Wsmt.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+  PcAtChipsetPkg/PcAtChipsetPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  BaseLib
+  DebugLib
+  IoLib
+  PcdLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  BaseMemoryLib
+  HobLib
+  PciSegmentInfoLib
+  AslUpdateLib
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorId
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision
+
+  gMinPlatformPkgTokenSpaceGuid.PcdPcIoApicEnable
+  gMinPlatformPkgTokenSpaceGuid.PcdPcIoApicCount
+  gMinPlatformPkgTokenSpaceGuid.PcdPcIoApicIdBase
+  gMinPlatformPkgTokenSpaceGuid.PcdPcIoApicAddressBase
+  gMinPlatformPkgTokenSpaceGuid.PcdPcIoApicInterruptBase
+  gMinPlatformPkgTokenSpaceGuid.PcdMaxCpuThreadCount
+  gMinPlatformPkgTokenSpaceGuid.PcdMaxCpuCoreCount
+  gMinPlatformPkgTokenSpaceGuid.PcdMaxCpuSocketCount
+
+  gMinPlatformPkgTokenSpaceGuid.PcdFadtPreferredPmProfile
+  gMinPlatformPkgTokenSpaceGuid.PcdFadtIaPcBootArch
+  gMinPlatformPkgTokenSpaceGuid.PcdFadtFlags
+
+  gPcAtChipsetPkgTokenSpaceGuid.PcdHpetBaseAddress
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+  gMinPlatformPkgTokenSpaceGuid.PcdPciExpressRegionLength
+  gMinPlatformPkgTokenSpaceGuid.PcdAcpiEnableSwSmi
+  gMinPlatformPkgTokenSpaceGuid.PcdAcpiDisableSwSmi
+  gMinPlatformPkgTokenSpaceGuid.PcdAcpiPm1AEventBlockAddress
+  gMinPlatformPkgTokenSpaceGuid.PcdAcpiPm1BEventBlockAddress
+  gMinPlatformPkgTokenSpaceGuid.PcdAcpiPm1AControlBlockAddress
+  gMinPlatformPkgTokenSpaceGuid.PcdAcpiPm1BControlBlockAddress
+  gMinPlatformPkgTokenSpaceGuid.PcdAcpiPm2ControlBlockAddress
+  gMinPlatformPkgTokenSpaceGuid.PcdAcpiPmTimerBlockAddress
+  gMinPlatformPkgTokenSpaceGuid.PcdAcpiGpe0BlockAddress
+  gMinPlatformPkgTokenSpaceGuid.PcdAcpiGpe1BlockAddress
+
+  gMinPlatformPkgTokenSpaceGuid.PcdLocalApicAddress
+  gMinPlatformPkgTokenSpaceGuid.PcdIoApicAddress
+  gMinPlatformPkgTokenSpaceGuid.PcdIoApicId
+
+  gUefiCpuPkgTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber
+  gMinPlatformPkgTokenSpaceGuid.PcdMaxCpuSocketCount
+
+  gMinPlatformPkgTokenSpaceGuid.PcdWsmtProtectionFlags
+
+[Protocols]
+  gEfiAcpiTableProtocolGuid                     ## CONSUMES
+  gEfiMpServiceProtocolGuid                     ## CONSUMES
+  gEfiPciIoProtocolGuid                         ## CONSUMES
+
+[Guids]
+  gEfiGlobalVariableGuid                        ## CONSUMES
+  gEfiHobListGuid                               ## CONSUMES
+  gEfiEndOfDxeEventGroupGuid                    ## CONSUMES
+
+[Depex]
+  gEfiAcpiTableProtocolGuid           AND
+  gEfiMpServiceProtocolGuid           AND
+  gEfiPciRootBridgeIoProtocolGuid     AND
+  gEfiVariableArchProtocolGuid        AND
+  gEfiVariableWriteArchProtocolGuid
+
+

@@ -1,0 +1,22 @@
+## @file
+# Component description file for Cpu Mailbox Null Lib
+#
+# Copyright (c) 2017 - 2019 Intel Corporation. All rights reserved. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+INF_VERSION = 0x00010017
+BASE_NAME = BaseCpuMailboxLibNull
+FILE_GUID = 74F470BC-1769-4732-B9C0-EE9AB0B12411
+VERSION_STRING = 1.0
+MODULE_TYPE = BASE
+LIBRARY_CLASS = CpuMailboxLib
+
+[Packages]
+MdePkg/MdePkg.dec
+
+[Sources]
+BaseCpuMailboxLibNull.c

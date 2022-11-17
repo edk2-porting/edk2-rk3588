@@ -1,0 +1,32 @@
+#
+#  Copyright (c) 2014-2018, Linaro Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+[Defines]
+  DEC_SPECIFICATION              = 0x0001001a
+  PACKAGE_NAME                   = HiKey
+  PACKAGE_GUID                   = d6db414d-ea67-4312-94d5-9c9e5b224d25
+  PACKAGE_VERSION                = 0.1
+
+################################################################################
+#
+# Include Section - list of Include Paths that are provided by this package.
+#                   Comments are used for Keywords and Module Types.
+#
+# Supported Module Types:
+#  BASE SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
+#
+################################################################################
+[Includes.common]
+  Include                        # Root include for the package
+
+[Guids.common]
+  gHiKeyTokenSpaceGuid          =  { 0x91148425, 0xcdd2, 0x4830, { 0x8b, 0xd0, 0xc6, 0x1c, 0x6d, 0xea, 0x36, 0x21 } }
+
+[PcdsFixedAtBuild.common]
+  gHiKeyTokenSpaceGuid.PcdAndroidBootDevicePath|L""|VOID*|0x00000001
+  gHiKeyTokenSpaceGuid.PcdAndroidBootFile|{ 0x36, 0x8b, 0x73, 0x3a, 0xc5, 0xb9, 0x63, 0x47, 0xab, 0xbd, 0x6c, 0xbd, 0x4b, 0x25, 0xf9, 0xff }|VOID*|0x00000002
+  gHiKeyTokenSpaceGuid.PcdAndroidFastbootFile|{ 0x2a, 0x50, 0x88, 0x95, 0x70, 0x53, 0xe3, 0x11, 0x86, 0x31, 0xd7, 0xc5, 0x95, 0x13, 0x64, 0xc8 }|VOID*|0x00000003
+  gHiKeyTokenSpaceGuid.PcdSdBootDevicePath|L""|VOID*|0x00000004

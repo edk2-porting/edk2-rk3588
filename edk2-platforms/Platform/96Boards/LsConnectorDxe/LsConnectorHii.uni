@@ -1,0 +1,21 @@
+/** @file
+
+  Copyright (c) 2018, Linaro, Ltd. All rights reserved.
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#langdef en-US  "English"
+
+#string STR_FORM_SET_TITLE             #language en-US "96boards Mezzanine options"
+#string STR_FORM_SET_TITLE_HELP        #language en-US "Configure the installed 96boards mezzanine"
+
+#string STR_MAIN_FORM_TITLE            #language en-US "96boards Mezzanine options"
+#string STR_NULL_STRING                #language en-US ""
+
+#string STR_MEZZANINE_SELECT_PROMPT    #language en-US "96boards mezzanine"
+#string STR_MEZZANINE_SELECT_HELP      #language en-US "The type of mezzanine board plugged into the 96boards LS connector"
+
+#string STR_MEZZANINE_NONE             #language en-US "None/Unknown"
+#string STR_MEZZANINE_SECURE96         #language en-US "Secure96"

@@ -1,0 +1,55 @@
+#/** @file
+#  Library for Phytium Platform.
+#
+#  Copyright (C) 2020, Phytium Technology Co, Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001b
+  BASE_NAME                      = PlatformLib
+  FILE_GUID                      = fac08f56-40fe-11eb-a2a3-27b46864b1f3
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmPlatformLib
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Silicon/Phytium/PhytiumCommonPkg/PhytiumCommonPkg.dec
+
+[LibraryClasses]
+  ArmSmcLib
+  HobLib
+
+[Sources.common]
+  PlatformLib.c
+  PlatformLibMem.c
+
+[Sources.AARCH64]
+  AArch64/PhytiumPlatformHelper.S
+
+[Guids]
+
+[FixedPcd]
+  gPhytiumPlatformTokenSpaceGuid.PcdSystemIoBase
+  gPhytiumPlatformTokenSpaceGuid.PcdSystemIoSize
+  gPhytiumPlatformTokenSpaceGuid.PcdPciConfigBase
+  gPhytiumPlatformTokenSpaceGuid.PcdPciConfigSize
+  gArmTokenSpaceGuid.PcdPciBusMin
+  gArmTokenSpaceGuid.PcdPciBusMax
+  gArmTokenSpaceGuid.PcdPciIoBase
+  gArmTokenSpaceGuid.PcdPciIoSize
+  gArmTokenSpaceGuid.PcdPciIoTranslation
+  gArmTokenSpaceGuid.PcdPciMmio32Base
+  gArmTokenSpaceGuid.PcdPciMmio32Size
+  gArmTokenSpaceGuid.PcdPciMmio32Translation
+  gArmTokenSpaceGuid.PcdPciMmio64Base
+  gArmTokenSpaceGuid.PcdPciMmio64Size
+
+[Pcd]
+  gArmPlatformTokenSpaceGuid.PcdCoreCount

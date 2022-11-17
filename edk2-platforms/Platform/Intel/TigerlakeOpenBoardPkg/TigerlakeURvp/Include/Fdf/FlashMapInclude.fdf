@@ -1,0 +1,54 @@
+## @file
+#  FDF file of Platform.
+#
+#  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+#=================================================================================#
+# 12 M BIOS - for FSP wrapper
+#=================================================================================#
+DEFINE FLASH_BASE                                                   = 0xFF400000  #
+DEFINE FLASH_SIZE                                                   = 0x00C00000  #
+DEFINE FLASH_BLOCK_SIZE                                             = 0x00010000  #
+DEFINE FLASH_NUM_BLOCKS                                             = 0x000000C0  #
+#=================================================================================#
+
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashNvStorageOffset             = 0x00000000  # Flash addr (0xFF400000)
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashNvStorageSize               = 0x00060000  #
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashNvStorageVariableOffset     = 0x00000000  # Flash addr (0xFF400000)
+SET gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize      = 0x0002E000  #
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingOffset   = 0x0002E000  # Flash addr (0xFF42E000)
+SET gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize    = 0x00002000  #
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareOffset     = 0x00030000  # Flash addr (0xFF430000)
+SET gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize      = 0x00030000  #
+
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvAdvancedOffset            = 0x000E0000  # Flash addr (0xFF4E0000)
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvAdvancedSize              = 0x001A0000  #
+SET gBoardModuleTokenSpaceGuid.PcdFlashFvOptionalOffset               = 0x00280000  # Flash addr (0xFF680000)
+SET gBoardModuleTokenSpaceGuid.PcdFlashFvOptionalSize                 = 0x00300000  #
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvOsBootOffset              = 0x00580000  # Flash addr (0xFF980000)
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvOsBootSize                = 0x000A0000  #
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvUefiBootOffset            = 0x00620000  # Flash addr (0xFFA20000)
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvUefiBootSize              = 0x001D0000  #
+
+## Firmware binaries FV absolute address requires 256kB alignment
+## Build script checks the requirement.
+SET gBoardModuleTokenSpaceGuid.PcdFlashFvFirmwareBinariesOffset       = 0x00800000  # Flash addr (0xFFC00000)
+SET gBoardModuleTokenSpaceGuid.PcdFlashFvFirmwareBinariesSize         = 0x00080000  # Keep 0x80000 or larger
+SET gSiPkgTokenSpaceGuid.PcdFlashMicrocodeFvOffset                    = 0x00880000  # Flash addr (0xFFC80000)
+SET gSiPkgTokenSpaceGuid.PcdFlashMicrocodeFvSize                      = 0x00070000  # Keep 0x70000 or larger, change MicrocodeFv.fdf in case that this value change
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvPostMemoryOffset          = 0x008F0000  # Flash addr (0xFFC00000)
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvPostMemorySize            = 0x00080000  #
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspSOffset                = 0x00970000  # Flash addr (0xFFD70000)
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspSSize                  = 0x000A0000  #
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspMOffset                = 0x00A10000  # Flash addr (0xFFE10000)
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspMSize                  = 0x00110000  #
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspTOffset                = 0x00B20000  # Flash addr (0xFFF20000)
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspTSize                  = 0x00010000  #
+
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvSecurityOffset            = 0x00B30000  # Flash addr (0xFFF30000)
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvSecuritySize              = 0x00020000  #
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvPreMemoryOffset           = 0x00B50000  # Flash addr (0xFFF50000)
+SET gMinPlatformPkgTokenSpaceGuid.PcdFlashFvPreMemorySize             = 0x000B0000  #

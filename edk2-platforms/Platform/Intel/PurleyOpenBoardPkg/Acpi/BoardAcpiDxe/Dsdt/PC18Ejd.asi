@@ -1,0 +1,9 @@
+/** @file
+
+Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+  // Eject device if PC18 is removed.
+  Name(_EJD,"\\_SB.PC18")   // Dependent on PC18

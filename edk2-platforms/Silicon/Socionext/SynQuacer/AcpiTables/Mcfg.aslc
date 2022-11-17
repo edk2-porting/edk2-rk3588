@@ -1,0 +1,57 @@
+/** @file
+
+  ACPI Memory mapped configuration space base address Description Table (MCFG).
+  Implementation based on PCI Firmware Specification Revision 3.0 final draft,
+  downloadable at http://www.pcisig.com/home
+
+  Copyright (c) 2014 - 2016, AMD Inc. All rights reserved.
+  Copyright (c) 2018, Linaro Limited. All rights reserved.
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#include <IndustryStandard/Acpi61.h>
+#include <IndustryStandard/MemoryMappedConfigurationSpaceAccessTable.h>
+#include <Platform/Pcie.h>
+
+#include "AcpiTables.h"
+
+#pragma pack(push, 1)
+
+typedef struct {
+  EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_HEADER Header;
+  EFI_ACPI_MEMORY_MAPPED_ENHANCED_CONFIGURATION_SPACE_BASE_ADDRESS_ALLOCATION_STRUCTURE Structure[2];
+} EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_DESCRIPTION_TABLE;
+
+EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_DESCRIPTION_TABLE Mcfg = {
+  {
+    __ACPI_HEADER (EFI_ACPI_5_0_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_BASE_ADDRESS_DESCRIPTION_TABLE_SIGNATURE,
+    EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_DESCRIPTION_TABLE,
+    EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_TABLE_REVISION),
+    EFI_ACPI_RESERVED_QWORD
+  },
+  {
+    {
+      SYNQUACER_PCI_SEG0_CONFIG_BASE,
+      0,
+      SYNQUACER_PCI_SEG0_BUSNUM_MIN,
+      SYNQUACER_PCI_SEG0_BUSNUM_MAX,
+      EFI_ACPI_RESERVED_DWORD
+    }, {
+      SYNQUACER_PCI_SEG1_CONFIG_BASE,
+      1,
+      SYNQUACER_PCI_SEG1_BUSNUM_MIN,
+      SYNQUACER_PCI_SEG1_BUSNUM_MAX,
+      EFI_ACPI_RESERVED_DWORD
+    }
+  }
+};
+
+#pragma pack(pop)
+
+//
+// Reference the table being generated to prevent the optimizer
+// from removing the data structure from the executable
+//
+VOID* CONST ReferenceAcpiTable = &Mcfg;

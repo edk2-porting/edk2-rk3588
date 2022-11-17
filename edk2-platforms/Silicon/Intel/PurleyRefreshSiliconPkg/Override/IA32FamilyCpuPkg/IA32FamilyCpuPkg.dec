@@ -1,0 +1,609 @@
+## @file
+#
+# Copyright (c) 2018 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = IA32FamilyCpuPkg
+  PACKAGE_GUID                   = 7dbe088f-2e1a-475c-b006-55632c2a5489
+  PACKAGE_VERSION                = 0.5
+
+[Includes]
+  Include
+
+[LibraryClasses]
+  CpuConfigLib|Include/Library/CpuConfigLib.h
+  CpuOnlyResetLib|Include/Library/CpuOnlyResetLib.h
+  Socket775LgaLib|Include/Library/SocketLga775Lib.h
+  SocketLga1156Lib|Include/Library/SocketLga1156Lib.h
+
+[Guids]
+  ## Include/Guid/HtBistHob.h
+  gEfiHtBistHobGuid              = { 0xBE644001, 0xE7D4, 0x48B1, { 0xB0, 0x96, 0x8B, 0xA0, 0x47, 0xBC, 0x7A, 0xE7 }}
+  ## Include/Guid/IA32FamilyCpuPkgTokenSpace.h
+  gEfiCpuTokenSpaceGuid          = { 0x2ADA836D, 0x0A3D, 0x43D6, { 0xA2, 0x5A, 0x38, 0x45, 0xCA, 0xD2, 0xD4, 0x00 }}
+
+  ## IntelFrameworkModule package token space guid
+  #  Include/Guid/IntelFrameworkModulePkgTokenSpace.h
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid = { 0xD3705011, 0xBC19, 0x4af7, { 0xBE, 0x16, 0xF6, 0x80, 0x30, 0x37, 0x8C, 0x15 }}
+
+[Ppis]
+  ## Include/Ppi/Cache.h
+  gPeiCachePpiGuid               = { 0xC153205A, 0xE898, 0x4C24, { 0x86, 0x89, 0xA4, 0xB4, 0xBC, 0xC5, 0xC8, 0xA2 }}
+
+[Protocols]
+  gSmmCpuSyncProtocolGuid        = { 0xd5950985, 0x8be3, 0x4b1c, { 0xb6, 0x3f, 0x95, 0xd1, 0x5a, 0xb3, 0xb6, 0x5f }}
+  gSmmCpuSync2ProtocolGuid       = { 0x9db72e22, 0x9262, 0x4a18, { 0x8f, 0xe0, 0x85, 0xe0, 0x3d, 0xfa, 0x96, 0x73 }}
+  gIntelCpuPcdsSetDoneProtocolGuid = { 0xadb7b9e6, 0x70b7, 0x48d4, { 0xb6, 0xa5, 0x18, 0xfa, 0x15, 0xeb, 0xcd, 0x78 }}
+
+#
+# [Error.gEfiCpuTokenSpaceGuid]
+#   0x80000001 | Invalid value provided.
+#
+
+[PcdsFeatureFlag]
+  ## Indicates if the support for Intel(R) Pentium(R) 4 (90nm) processor with HT
+  #  Technology, Intel(R) Celeron D Processor, Intel(R) Pentium(R) 4 Processor
+  #  Extreme Edition Supporting HT Technology Processor, and Mobile Intel(R)
+  #  Pentium(R) 4 Processor supporting HT Technology is included in the CPU MP driver.<BR><BR>
+  #   TRUE  - The support is included in the CPU MP driver.<BR>
+  #   FALSE - The support is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver Processor Family.
+  gEfiCpuTokenSpaceGuid.PcdCpuPrescottFamilyFlag|TRUE|BOOLEAN|0x00000001
+  ## Indicates if the support for Intel(R) Pentium(R) 4 (65nm) processor supporting HT Technology and Intel(R)
+  #  Celeron D Processor is included in the CPU MP driver.<BR><BR>
+  #   TRUE  - The support is included in the CPU MP driver.<BR>
+  #   FALSE - The support is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver Intel(R) Pentium(R) 4 (65nm) processor supporting HT Technology and Intel(R) Celeron D Processor Support.
+  gEfiCpuTokenSpaceGuid.PcdCpuCedarMillFamilyFlag|TRUE|BOOLEAN|0x00000002
+  ## Indicates if the support for Intel(R) Core(TM)2 Processor, Intel(R) Celeron(R) Processor,
+  #  Intel (R) Pentium(R) Processor, and Intel(R) Xeon(R) Processor is included in
+  #  the CPU MP driver.<BR><BR>
+  #   TRUE  - The support is included in the CPU MP driver.<BR>
+  #   FALSE - The support is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver Intel(R) Core(TM)2 Processor, Intel(R) Celeron(R) Processor, Intel (R) Pentium(R) Processor, and Intel(R) Xeon(R) Processor Support.
+  gEfiCpuTokenSpaceGuid.PcdCpuConroeFamilyFlag|TRUE|BOOLEAN|0x00000003
+  ## Indicates if the support for Intel(R) Atom(TM) E6xx processor family is
+  #  included in the CPU MP driver.<BR><BR>
+  #   TRUE  - The support for Intel(R) Atom(TM) E6xx processor family is included in the CPU MP driver.<BR>
+  #   FALSE - The support for Intel(R) Atom(TM) E6xx processor family is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver Intel(R) Atom(TM) E6xx processor family Support.
+  gEfiCpuTokenSpaceGuid.PcdCpuTunnelCreekFamilyFlag|FALSE|BOOLEAN|0x10000033
+  ## Indicates if the support for Intel(R) Xeon(R) (45nm QPI) processor family is included
+  #  in the CPU MP driver.<BR><BR>
+  #   TRUE  - The support for Intel(R) Xeon(R) Processor family (45nm QPI)is included in the CPU MP driver.<BR>
+  #   FALSE - The support for Intel(R) Xeon(R) Processor family (45nm QPI)is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver Intel(R) Xeon(R) Processor family (45nm QPI) Support.
+  gEfiCpuTokenSpaceGuid.PcdCpuNehalemFamilyFlag|TRUE|BOOLEAN|0x10000019
+  ## Indicates if the support for Intel(R) Core(TM) 2xxx processor family is
+  #  included in the CPU MP driver.<BR><BR>
+  #   TRUE  - The support is included in the CPU MP driver.<BR>
+  #   FALSE - The support is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver Intel(R) Xeon(R) Processor, Intel (R) Pentium(R) Processor, Intel(R) Core(TM) Processor, Intel(R) Celeron(R) Processor Support.
+  gEfiCpuTokenSpaceGuid.PcdCpuSandyBridgeFamilyFlag|TRUE|BOOLEAN|0x10000030
+  ## Indicates if the support for Intel(R) Atom(TM) C2xxx processor family is
+  #  included in the CPU MP driver.<BR><BR>
+  #   TRUE  - The support is included in the CPU MP driver.<BR>
+  #   FALSE - The support is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver Intel(R) Atom(TM) C2xxx processor family Support.
+  gEfiCpuTokenSpaceGuid.PcdCpuSilvermontFamilyFlag|FALSE|BOOLEAN|0x10000034
+  ## Indicates if the support for Intel(R) Core(TM) 3xxx processor family is
+  #  included in the CPU MP driver.<BR><BR>
+  #   TRUE  - The support is included in the CPU MP driver.<BR>
+  #   FALSE - The support is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver Intel(R) Xeon(R) Processor, Intel (R) Pentium(R) Processor, Intel(R) Core(TM) Processor Support.
+  gEfiCpuTokenSpaceGuid.PcdCpuIvyBridgeFamilyFlag|TRUE|BOOLEAN|0x10000031
+  ## Indicates if the support for 4th Generation Intel(R) Core(TM) processor family is included in the CPU
+  #  MP driver.<BR><BR>
+  #   TRUE  - The support for 4th Generation Intel(R) Core(TM) processor is included in the CPU MP driver.<BR>
+  #   FALSE - The support for 4th Generation Intel(R) Core(TM) processor is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver 4th Generation Intel(R) Core(TM) processor support.
+  gEfiCpuTokenSpaceGuid.PcdCpuHaswellFamilyFlag|TRUE|BOOLEAN|0x10000032
+  ## Indicates if the support for 5th Generation Intel(R) Core(TM) processor family is included in the CPU
+  #  MP driver.<BR><BR>
+  #   TRUE  - The support for 5th Generation Intel(R) Core(TM) processor is included in the CPU MP driver.<BR>
+  #   FALSE - The support for 5th Generation Intel(R) Core(TM) processor is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver 5th Generation Intel(R) Core(TM) processor support.
+  gEfiCpuTokenSpaceGuid.PcdCpuBroadwellFamilyFlag|FALSE|BOOLEAN|0x10000035
+  ## Indicates if the support for 6th Generation Intel(R) Core(TM) processor family is included in the CPU
+  #  MP driver.<BR><BR>
+  #   TRUE  - The support for 6th Generation Intel(R) Core(TM) processor is included in the CPU MP driver.<BR>
+  #   FALSE - The support for 6th Generation Intel(R) Core(TM) processor is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver 6th Generation Intel(R) Core(TM) processor support.
+  gEfiCpuTokenSpaceGuid.PcdCpuSkylakeFamilyFlag|FALSE|BOOLEAN|0x10000036
+  ## Indicates if the support for 16nm Intel(R) Atom(TM) processor family is included in the CPU
+  #  MP driver.<BR><BR>
+  #   TRUE  - The support for 16nm Intel(R) Atom(TM) processor family is included in the CPU MP driver.<BR>
+  #   FALSE - The support for 16nm Intel(R) Atom(TM) processor family is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver 16nm Intel(R) Atom(TM) processor family support.
+  gEfiCpuTokenSpaceGuid.PcdCpuGoldmontFamilyFlag|FALSE|BOOLEAN|0x10000037
+  ## Indicates if the support for 14nm Intel(R) Xeon Phi(TM) Coprocessor family is included in the CPU MP driver.<BR><BR>
+  #   TRUE  - The support for 14nm Intel(R) Xeon Phi(TM) Coprocessor family is included in the CPU MP driver.<BR>
+  #   FALSE - The support for 14nm Intel(R) Xeon Phi(TM) Coprocessor family is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver 14nm Intel(R) Xeon Phi(TM) Coprocessor family support.
+  gEfiCpuTokenSpaceGuid.PcdCpuKnightsLandingFamilyFlag|FALSE|BOOLEAN|0x10000038
+  ## Indicates if the support for thermal management features is included in the CPU MP driver.
+  #  Thermal management features include TM1, TM2 and bi-directional PROCHOT.<BR><BR>
+  #   TRUE  - The support for thermal management features is included in the CPU MP driver.<BR>
+  #   FALSE - The support for thermal management features is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver thermal management features support.
+  gEfiCpuTokenSpaceGuid.PcdCpuThermalManagementFlag|TRUE|BOOLEAN|0x10000001
+  ## Indicates if the support for enhanced C-State feature (including C1e) is included in the CPU MP driver.<BR><BR>
+  #   TRUE  - The support for enhanced C-State feature is included in the CPU MP driver.<BR>
+  #   FALSE - The support for enhanced C-State feature is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver enhanced C-State feature support.
+  gEfiCpuTokenSpaceGuid.PcdCpuEnhancedCStateFlag|TRUE|BOOLEAN|0x10000006
+  ## Indicates if the support for Limit CPUID Maxval feature is included in the CPU MP driver.<BR><BR>
+  #   TRUE  - The support for Limit CPUID Maxval feature is included in the CPU MP driver.<BR>
+  #   FALSE - The support for Limit CPUID Maxval feature is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver Limit CPUID Maxval feature support.
+  gEfiCpuTokenSpaceGuid.PcdCpuMaxCpuIDValueLimitFlag|TRUE|BOOLEAN|0x10000008
+  ## Indicates if the support for CPU microcode update is included in the CPU MP driver.<BR><BR>
+  #   TRUE  - The support for CPU microcode update is included in the CPU MP driver.<BR>
+  #   FALSE - The support for CPU microcode update is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver CPU microcode update support.
+  gEfiCpuTokenSpaceGuid.PcdCpuMicrocodeUpdateFlag|TRUE|BOOLEAN|0x1000000D
+  ## Indicates if the support for Machine Check feature is included in the CPU MP driver.<BR><BR>
+  #   TRUE  - The support for Machine Check feature is included in the CPU MP driver.<BR>
+  #   FALSE - The support for Machine Check feature is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver Machine Check feature support.
+  gEfiCpuTokenSpaceGuid.PcdCpuMachineCheckFlag|TRUE|BOOLEAN|0x1000000E
+  ## Indicates if the support for Select Least Featured Processor as BSP feature is included in the CPU MP driver.<BR><BR>
+  #   TRUE  - The support for Select Least Featured Processor as BSP feature is included in the CPU MP driver.<BR>
+  #   FALSE - The support for Select Least Featured Processor as BSP feature is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver Select Least Featured Processor as BSP feature support.
+  gEfiCpuTokenSpaceGuid.PcdCpuSelectLfpAsBspFlag|FALSE|BOOLEAN|0x1000000F
+  ## Indicates if BSP election in SMM will be enabled.
+  #  If enabled, a BSP will be dynamically elected among all processors in each SMI.
+  #  Otherwise, processor 0 is always as BSP in each SMI.<BR><BR>
+  #   TRUE  - BSP election in SMM will be enabled.<BR>
+  #   FALSE - BSP election in SMM will be disabled.<BR>
+  # @Prompt Enable BSP election in SMM.
+  gEfiCpuTokenSpaceGuid.PcdCpuSmmEnableBspElection|TRUE|BOOLEAN|0x32132106
+  ## Indicates if the support for Enhanced Intel Speed Step (EIST) feature is included in the CPU MP driver.<BR><BR>
+  #   TRUE  - The support for EIST feature is included in the CPU MP driver.<BR>
+  #   FALSE - The support for EIST feature is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver EIST feature support.
+  gEfiCpuTokenSpaceGuid.PcdCpuEistFlag|TRUE|BOOLEAN|0x10000004
+  ## Indicates if the support for VT-x and TXT initialization is included in the CPU MP driver.
+  #  VT-x - Intel Virtualization Technology for IA-32 Intel Architecture.
+  #  TXT - Intel(R) Trusted Execution Technology.<BR><BR>
+  #   TRUE  - The support for VT and LT initialization is included in the CPU MP driver.<BR>
+  #   FALSE - The support for VT and LT initialization is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver VT-x and TXT initialization support.
+  gEfiCpuTokenSpaceGuid.PcdCpuVtLtFlag|TRUE|BOOLEAN|0x10000007
+  ## Indicates if the support for Execute Disable Bit feature is included in the CPU MP driver.<BR><BR>
+  #   TRUE  - The support for Execute Disable Bit feature is included in the CPU MP driver.<BR>
+  #   FALSE - The support for Execute Disable Bit feature is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver Execute Disable Bit feature support.
+  gEfiCpuTokenSpaceGuid.PcdCpuExecuteDisableBitFlag|TRUE|BOOLEAN|0x10000009
+  ## Indicates if the support for Fast Strings for REP MOVS and REP STOS feature is included in the CPU MP driver.<BR><BR>
+  #   TRUE  - The support for Fast Strings feature is included in the CPU MP driver.<BR>
+  #   FALSE - The support for Fast Strings feature is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver Fast Strings feature support.
+  gEfiCpuTokenSpaceGuid.PcdCpuFastStringFlag|TRUE|BOOLEAN|0x10000012
+  ## Indicates if the support for Hardware Prefetcher feature is included in the CPU MP driver.<BR><BR>
+  #   TRUE  - The support for Hardware Prefetcher feature is included in the CPU MP driver.<BR>
+  #   FALSE - The support for Hardware Prefetcher feature is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver Hardware Prefetcher feature support.
+  gEfiCpuTokenSpaceGuid.PcdCpuHardwarePrefetcherFlag|TRUE|BOOLEAN|0x10000013
+  ## Indicates if the support for Adjacent Cache Line Prefetcher feature is included in the CPU MP driver.<BR><BR>
+  #   TRUE  - The support for Adjacent Cache Line Prefetcher feature is included in the CPU MP driver.<BR>
+  #   FALSE - The support for Adjacent Cache Line Prefetcher feature is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver Adjacent Cache Line Prefetcher feature support.
+  gEfiCpuTokenSpaceGuid.PcdCpuAdjacentCacheLinePrefetchFlag|TRUE|BOOLEAN|0x10000014
+  ## Indicates if the support for DCU Streamer Prefetcher feature is included in the CPU MP driver.<BR><BR>
+  #   TRUE  - The support for DCU Streamer Prefetcher feature is included in the CPU MP driver.<BR>
+  #   FALSE - The support for DCU Streamer Prefetcher feature is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver DCU Streamer Prefetcher feature support.
+  gEfiCpuTokenSpaceGuid.PcdCpuDcuPrefetcherFlag|TRUE|BOOLEAN|0x10000015
+  ## Indicates if the support for DCU IP Prefetcher feature is included in the CPU MP driver.<BR><BR>
+  #   TRUE  - The support for DCU IP Prefetcher feature is included in the CPU MP driver.<BR>
+  #   FALSE - The support for DCU IP Prefetcher feature is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver DCU IP Prefetcher feature support.
+  gEfiCpuTokenSpaceGuid.PcdCpuIpPrefetcherFlag|TRUE|BOOLEAN|0x10000016
+  ## Indicates if the support for MLC Streamer Prefetcher feature is included in the CPU MP driver.<BR><BR>
+  #   TRUE  - The support for MLC Streamer Prefetcher feature is included in the CPU MP driver.<BR>
+  #   FALSE - The support for MLC Streamer Prefetcher feature is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver MLC Streamer Prefetcher feature support.
+  gEfiCpuTokenSpaceGuid.PcdCpuMlcStreamerPrefetcherFlag|TRUE|BOOLEAN|0x1000001D
+  ## Indicates if the support for MLC Spatial Prefetcher feature is included in the CPU MP driver.<BR><BR>
+  #   TRUE  - The support for MLC Spatial Prefetcher feature is included in the CPU MP driver.<BR>
+  #   FALSE - The support for MLC Spatial Prefetcher feature is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver MLC Spatial Prefetcher feature support.
+  gEfiCpuTokenSpaceGuid.PcdCpuMlcSpatialPrefetcherFlag|TRUE|BOOLEAN|0x1000001E
+  ## Indicates if the support for L2 Prefetcher feature is included in the CPU MP driver.<BR><BR>
+  #   TRUE  - The support for L2 Prefetcher feature is included in the CPU MP driver.<BR>
+  #   FALSE - The support for L2 Prefetcher feature is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver L2 Prefetcher feature support.
+  gEfiCpuTokenSpaceGuid.PcdCpuL2PrefetcherFlag|TRUE|BOOLEAN|0x1000002B
+  ## Indicates if the support for L1 Data Prefetcher feature is included in the CPU MP driver.<BR><BR>
+  #   TRUE  - The support for L1 Data Prefetcher feature is included in the CPU MP driver.<BR>
+  #   FALSE - The support for L1 Data Prefetcher feature is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver L1 Data Prefetcher feature support.
+  gEfiCpuTokenSpaceGuid.PcdCpuL1DataPrefetcherFlag|TRUE|BOOLEAN|0x1000002C
+  ## Indicates if the support for Pending Break Enable feature is included in the CPU MP driver.
+  #  This feature uses the FERR#/PBE# pin when the processor is in the stop-clock state to signal the processor
+  #  that an interrupt is pending and that the processor should return to normal operation to handle the interrupt.<BR><BR>
+  #   TRUE  - The support for Pending Break Enable feature is included in the CPU MP driver.<BR>
+  #   FALSE - The support for Pending Break Enable feature is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver Pending Break Enable feature support.
+  gEfiCpuTokenSpaceGuid.PcdCpuFerrSignalBreakFlag|TRUE|BOOLEAN|0x10000017
+  ## Indicates if the support for Platform Enviroment Control Interface (PECI) feature is included in the CPU MP driver.<BR><BR>
+  #   TRUE  - The support for PECI feature is included in the CPU MP driver.<BR>
+  #   FALSE - The support for PECI feature is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver Platform Environment Control Interface (PECI) feature support.
+  gEfiCpuTokenSpaceGuid.PcdCpuPeciFlag|TRUE|BOOLEAN|0x10000018
+  ## Indicates if the support for MONITOR (MONITOR and MWAIT instructions) feature is included in the CPU MP driver.<BR><BR>
+  #   TRUE  - The support for MONITOR feature is included in the CPU MP driver.<BR>
+  #   FALSE - The support for MONITOR feature is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver MONITOR feature support.
+  gEfiCpuTokenSpaceGuid.PcdCpuMonitorMwaitFlag|TRUE|BOOLEAN|0x1000001F
+  ## Indicates if the support for Three Strike Counter feature is included in the CPU MP driver.<BR><BR>
+  #   TRUE  - The support for Three Strike Counter feature is included in the CPU MP driver.<BR>
+  #   FALSE - The support for Three Strike Counter feature is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver Three Strike Counter feature support.
+  gEfiCpuTokenSpaceGuid.PcdCpuThreeStrikeCounterFlag|TRUE|BOOLEAN|0x10000020
+  ## Indicates if the support for CPU Energy Efficiency Policy feature is included in the CPU MP driver.<BR><BR>
+  #   TRUE  - The support for CPU Energy Efficiency Policy feature is included in the CPU MP driver.<BR>
+  #   FALSE - The support for CPU Energy Efficiency Policy feature is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver CPU Energy Efficiency Policy feature support.
+  gEfiCpuTokenSpaceGuid.PcdCpuEnergyPerformanceBiasFlag|TRUE|BOOLEAN|0x10000021
+  ## Indicates if the support for T-State feature is included in the CPU MP driver.<BR><BR>
+  #   TRUE  - The support for T-State feature is included in the CPU MP driver.<BR>
+  #   FALSE - The support for T-State feature is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver T-State feature support.
+  gEfiCpuTokenSpaceGuid.PcdCpuTStateFlag|TRUE|BOOLEAN|0x10000022
+  ## Indicates if the support for Advanced Encryption Standard (AES) feature is included in the CPU MP driver.<BR><BR>
+  #   TRUE  - The support for AES feature is included in the CPU MP driver.<BR>
+  #   FALSE - The support for AES feature is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver Advanced Encryption Standard (AES) feature support.
+  gEfiCpuTokenSpaceGuid.PcdCpuAesFlag|TRUE|BOOLEAN|0x10000023
+  ## Indicates if the support for Direct Cache Access (DCA) feature is included in the CPU MP driver.<BR><BR>
+  #   TRUE  - The support for DCA feature is included in the CPU MP driver.<BR>
+  #   FALSE - The support for DCA feature is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver Direct Cache Access (DCA) feature support.
+  gEfiCpuTokenSpaceGuid.PcdCpuDcaFlag|TRUE|BOOLEAN|0x10000024
+  ## Indicates if the support for C-State feature is included in the CPU MP driver.<BR><BR>
+  #   TRUE  - The support for C-State feature is included in the CPU MP driver.<BR>
+  #   FALSE - The support for C-State feature is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver C-State feature support.
+  gEfiCpuTokenSpaceGuid.PcdCpuCStateFlag|TRUE|BOOLEAN|0x10000025
+  ## Indicates if the support for x2APIC mode is included in the CPU MP driver.<BR><BR>
+  #   TRUE  - The support for x2APIC mode is included in the CPU MP driver.<BR>
+  #   FALSE - The support for x2APIC mode is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver x2APIC mode support.
+  gEfiCpuTokenSpaceGuid.PcdCpuX2ApicFlag|TRUE|BOOLEAN|0x10000026
+  ## Indicates if the support for APIC TPR Update message feature is included in the CPU MP driver.<BR><BR>
+  #   TRUE  - The support for APIC TPR Update message feature is included in the CPU MP driver.<BR>
+  #   FALSE - The support for APIC TPR Update message feature is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver APIC TPR Update message feature support.
+  gEfiCpuTokenSpaceGuid.PcdCpuApicTprUpdateMessageFlag|TRUE|BOOLEAN|0x10000027
+  ## Indicates if the support for Data Cache Unit (DCU) mode selection feature is included in the CPU MP driver.<BR><BR>
+  #   TRUE  - The support for Data Cache Unit (DCU) mode selection feature is included in the CPU MP driver.<BR>
+  #   FALSE - The support for Data Cache Unit (DCU) mode selection feature is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver DCU mode selection feature support.
+  gEfiCpuTokenSpaceGuid.PcdCpuDcuModeSelectionFlag|TRUE|BOOLEAN|0x10000028
+  ## Indicates if the support for A20M Disable feature is included in the CPU MP driver.
+  #  When the A20M #pin (Address 20 Mask) is asserted, the processor will mask physical address bit 20 (A20#).
+  #  The A20M Disable can disable this legacy A20M feature.<BR><BR>
+  #   TRUE  - The support for A20M Disable feature is included in the CPU MP driver.<BR>
+  #   FALSE - The support for A20M Disable feature is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver A20M Disable feature support.
+  gEfiCpuTokenSpaceGuid.PcdCpuGateA20MDisableFlag|TRUE|BOOLEAN|0x1000001A
+  ## Indicates if the support for CPU socket ID re-assignment feature is included in the CPU MP driver.
+  #  This feature allows re-assignment of CPU socket ID over hardware power-on default value, which in turn
+  #  changes the APIC ID of logical processors in the CPU socket.<BR><BR>
+  #   TRUE  - The support for CPU socket ID re-assignment feature is included in the CPU MP driver.<BR>
+  #   FALSE - The support for CPU socket ID re-assignment feature is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver CPU socket ID re-assignment feature support.
+  gEfiCpuTokenSpaceGuid.PcdCpuSocketIdReassignmentFlag|FALSE|BOOLEAN|0x10000029
+  ## Indicates if SMM Debug will be enabled.
+  #  If enabled, hardware breakpoints in SMRAM can be set outside of SMM mode and take effect in SMM.<BR><BR>
+  #   TRUE  - SMM Debug will be enabled.<BR>
+  #   FALSE - SMM Debug will be disabled.<BR>
+  # @Prompt Enable SMM Debug.
+  gEfiCpuTokenSpaceGuid.PcdCpuSmmDebug|FALSE|BOOLEAN|0x1000001B
+  ## Indicates if SMM Stack Guard will be enabled.
+  #  If enabled, stack overflow in SMM can be caught which eases debugging.<BR><BR>
+  #   TRUE  - SMM Stack Guard will be enabled.<BR>
+  #   FALSE - SMM Stack Guard will be disabled.<BR>
+  # @Prompt Enable SMM Stack Guard.
+  gEfiCpuTokenSpaceGuid.PcdCpuSmmStackGuard|FALSE|BOOLEAN|0x1000001C
+  ## Indicates if SMM Startup AP in a blocking fashion.
+  #   TRUE  - SMM Startup AP in a blocking fashion.<BR>
+  #   FALSE - SMM Startup AP in a non-blocking fashion.<BR>
+  # @Prompt SMM Startup AP in a blocking fashion.
+  gEfiCpuTokenSpaceGuid.PcdCpuSmmBlockStartupThisAp|FALSE|BOOLEAN|0x32132108
+  ## Indicates if SMM Profile will be enabled.
+  #  If enabled, instruction executions in and data accesses to memory outside of SMRAM will be logged.
+  #  This PCD is only for validation purpose. It should be set to false in production.<BR><BR>
+  #   TRUE  - SMM Profile will be enabled.<BR>
+  #   FALSE - SMM Profile will be disabled.<BR>
+  # @Prompt Enable SMM Profile.
+  gEfiCpuTokenSpaceGuid.PcdCpuSmmProfileEnable|FALSE|BOOLEAN|0x32132109
+  ## Indicates if the SMM profile log buffer is a ring buffer.
+  #  If disabled, no additional log can be done when the buffer is full.<BR><BR>
+  #   TRUE  - the SMM profile log buffer is a ring buffer.<BR>
+  #   FALSE - the SMM profile log buffer is a normal buffer.<BR>
+  # @Prompt The SMM profile log buffer is a ring buffer.
+  gEfiCpuTokenSpaceGuid.PcdCpuSmmProfileRingBuffer|FALSE|BOOLEAN|0x3213210a
+  ## Indicates if SMM MP sync data resides in un-cached RAM.<BR><BR>
+  #   TRUE  - SMM MP sync data will be resided in un-cached RAM.<BR>
+  #   FALSE - SMM MP sync data will be resided in cached RAM.<BR>
+  # @Prompt SMM MP sync data resides in un-cached RAM.
+  gEfiCpuTokenSpaceGuid.PcdCpuSmmUncacheCpuSyncData|FALSE|BOOLEAN|0x3213210D
+  ## Indidates if CPU SMM hot-plug will be enabled.<BR><BR>
+  #   TRUE  - SMM CPU hot-plug will be enabled.<BR>
+  #   FALSE - SMM CPU hot-plug will be disabled.<BR>
+  # @Prompt SMM CPU hot-plug.
+  gEfiCpuTokenSpaceGuid.PcdCpuHotPlugSupport|FALSE|BOOLEAN|0x3213210C
+  ## Indidates if lock SMM Feature Control MSR.<BR><BR>
+  #   TRUE  - SMM Feature Control MSR will be locked.<BR>
+  #   FALSE - SMM Feature Control MSR will not be locked.<BR>
+  # @Prompt Lock SMM Feature Control MSR.
+  gEfiCpuTokenSpaceGuid.PcdCpuSmmFeatureControlMsrLock|TRUE|BOOLEAN|0x3213210B
+  ## Whether to set the IA untrusted lock feature of SAI-capable processors.
+  #   TRUE  - IA untrusted lock feature is supported.<BR>
+  #   FALSE - IA untrusted lock feature is not supported.<BR>
+  # @Prompt Enabled the IA untrusted lock feature.
+  gEfiCpuTokenSpaceGuid.PcdCpuEnableIaUntrustedModeFlag|TRUE|BOOLEAN|0x3213210E
+  ## Indicates if the support for Peci Downstream Write feature is included in the CPU MP driver.<BR><BR>
+  #   TRUE  - The support for Peci Downstream Write feature is included in the CPU MP driver.<BR>
+  #   FALSE - The support for Peci Downstream Write feature is not included in the CPU MP driver.<BR>
+  # @Prompt CPU MP driver Peci Downstream Write feature support.
+  gEfiCpuTokenSpaceGuid.PcdCpuPeciDownstreamWriteFlag|TRUE|BOOLEAN|0x1000002E
+
+  gEfiCpuTokenSpaceGuid.PcdCpuPCIeDownStreamPECIFlag|TRUE|BOOLEAN|0x1000002F
+
+[PcdsFixedAtBuild]
+  ## Specifies maximum number of PPIs provided by SecCore.
+  # @Prompt Maximum number of PPIs provided by SecCore.
+  gEfiCpuTokenSpaceGuid.PcdSecCoreMaxPpiSupported|0x6|UINT32|0x10001010
+
+[PcdsFixedAtBuild, PcdsPatchableInModule]
+  ## Specifies maximum number of processors supported by the platform.
+  # @Prompt Maximum number of processors supported by the platform.
+  gEfiCpuTokenSpaceGuid.PcdCpuMaxLogicalProcessorNumber|64|UINT32|0x30000002
+  ## Specifies timeout value in microseconds for the BSP in SMM to wait for all APs to come into SMM.
+  # @Prompt AP synchronization timeout value in SMM.
+  gEfiCpuTokenSpaceGuid.PcdCpuSmmApSyncTimeout|1000000|UINT64|0x32132104
+  ## Specifies stack size in bytes for each processor in SMM.
+  # @Prompt Processor stack size in SMM.
+  gEfiCpuTokenSpaceGuid.PcdCpuSmmStackSize|0x2000|UINT32|0x32132105
+  ## Specifies buffer size in bytes to save SMM profile data. The value should be a multiple of 4KB.
+  # @Prompt SMM profile data buffer size.
+  gEfiCpuTokenSpaceGuid.PcdCpuSmmProfileSize|0x200000|UINT32|0x32132107
+  ## Specifies the temporary RAM base address.
+  # @Prompt Temporary RAM base address.
+  gEfiCpuTokenSpaceGuid.PcdTemporaryRamBase|0xfef00000|UINT32|0x10001001
+  ## Specifies the temporary RAM size in bytes.
+  # @Prompt Temporary RAM size.
+  gEfiCpuTokenSpaceGuid.PcdTemporaryRamSize|0x2000|UINT32|0x10001002
+  ## Maximum number of processors in SEC (Not used).
+  # @Prompt Maximum number of processors in SEC.
+  gEfiCpuTokenSpaceGuid.PcdSecMaximumNumberOfProcessors|1|UINT32|0x10001000
+  ## Specifies stack size in the temporary RAM. 0 means half of TemporaryRamSize.
+  # @Prompt Stack size in the temporary RAM.
+  gEfiCpuTokenSpaceGuid.PcdPeiTemporaryRamStackSize|0|UINT32|0x10001003
+  ## Indidates if SMM Code Access Check is enabled.
+  #  If enabled, the SMM handler cannot execut the code outside ranges defined by SMRR/SMRR2.
+  #  This PCD is suggested to TRUE in production image.<BR><BR>
+  #   TRUE  - SMM Code Access Check will be enabled.<BR>
+  #   FALSE - SMM Code Access Check will be disabled.<BR>
+  # @Prompt SMM Code Access Check.
+  gEfiCpuTokenSpaceGuid.PcdCpuSmmCodeAccessCheckEnable|TRUE|BOOLEAN|0x60000013
+
+[PcdsDynamicEx]
+  ## Specifies timeout value in microseconds for the BSP to detect all APs for the first time.
+  # @Prompt Timeout for the BSP to detect all APs for the first time.
+  gEfiCpuTokenSpaceGuid.PcdCpuApInitTimeOutInMicroSeconds|50000|UINT32|0x30000001
+  ## Specifies user's desired settings for enabling/disabling processor features, each bit corresponding to a specific feature.
+  # @Prompt User settings for enabling/disabling processor features.
+  gEfiCpuTokenSpaceGuid.PcdCpuProcessorFeatureUserConfiguration|0|UINT32|0x40000001
+  ## Specifies desired settings for enabling/disabling processor features, each bit corresponding to a specific feature.
+  # @Prompt User extension1 settings for enabling/disabling processor features.
+  gEfiCpuTokenSpaceGuid.PcdCpuProcessorFeatureUserConfigurationEx1|0|UINT32|0x40000006
+  ## Specifies the Energy efficiency policy when Energy Performance Bias feature is enabled.
+  #   0  - indicates preference to highest performance.
+  #   15 - indicates preference to maximize energy saving.
+  # @Prompt The Energy efficiency policy.
+  # @ValidRange  0x80000001 | 0 - 15
+  gEfiCpuTokenSpaceGuid.PcdCpuEnergyPolicy|0x0|UINT8|0x60008000
+  ## Specifies the 16-bit IO port base address of the LVL_2 register visible to software.
+  # @Prompt LVL_2 register IO port base address.
+  gEfiCpuTokenSpaceGuid.PcdCpuAcpiLvl2Addr|0x0|UINT16|0x60008001
+  ## Specifies the package C-State limit.
+  # @Prompt The package C-State limit.
+  # @ValidRange  0x80000001 | 0 - 7
+  gEfiCpuTokenSpaceGuid.PcdCpuPackageCStateLimit|0x0|UINT8|0x60008002
+  ## Specifies the On-demand clock modulation duty cycle when T-State feature is enabled.
+  # @Prompt The encoded values for target duty cycle modulation.
+  # @ValidRange  0x80000001 | 0 - 15
+  gEfiCpuTokenSpaceGuid.PcdCpuClockModulationDutyCycle|0x0|UINT8|0x60008003
+  ## Indicates if HW Coordination is enabled when EIST feature is enabled.<BR><BR>
+  #   TRUE  - HW Coordination will be enabled.<BR>
+  #   FALSE - HW Coordination will be disabled.<BR>
+  # @Prompt Enable HW Coordination.
+  gEfiCpuTokenSpaceGuid.PcdCpuHwCoordination|FALSE|BOOLEAN|0x60008004
+  ## Selects the DCU (Data Cache Unit) mode.<BR><BR>
+  #   0 - 32-KB 8-way without ECC.<BR>
+  #   1 - 16-KB 4-way with ECC.<BR>
+  # @Prompt The DCU (Data Cache Unit) mode.
+  # @ValidRange  0x80000001 | 0 - 1
+  gEfiCpuTokenSpaceGuid.PcdCpuDcuMode|0x0|UINT8|0x60008005
+
+[PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
+  ## Specifies stack size in bytes for each AP.
+  # @Prompt AP stack size.
+  gEfiCpuTokenSpaceGuid.PcdCpuApStackSize|0x8000|UINT32|0x30000003
+  ## Indicates if the platform supports high power load line.
+  # @Prompt The platform supports high power load line.
+  gEfiCpuTokenSpaceGuid.PcdPlatformHighPowerLoadLineSupport|TRUE|BOOLEAN|0x60000001
+  ## Platform dynamic Vid support (not used).
+  # @Prompt Platform dynamic Vid support.
+  gEfiCpuTokenSpaceGuid.PcdPlatformDynamicVidSupport|TRUE|BOOLEAN|0x60000002
+  ## Indicates the platform type: desktop, mobile or server.<BR><BR>
+  #  0 - desktop<BR>
+  #  1 - mobile<BR>
+  #  2 - server<BR>
+  # @Prompt Platform type.
+  # @ValidRange  0x80000001 | 0 - 2
+  gEfiCpuTokenSpaceGuid.PcdPlatformType|0|UINT8|0x60000003
+  ## Indicates the maximum CPU core frequency in the platform.
+  # @Prompt Maximum CPU core frequency in the platform.
+  gEfiCpuTokenSpaceGuid.PcdPlatformCpuMaxCoreFrequency|0x0|UINT32|0x60000004
+  ## Platform CPU maximum FSB frequency (not used).
+  # @Prompt Platform CPU maximum FSB frequency.
+  gEfiCpuTokenSpaceGuid.PcdPlatformCpuMaxFsbFrequency|0x0|UINT32|0x60000005
+  ## Specifies the base address of the first microcode Patch in the microcode Region.
+  # @Prompt Microcode Region base address.
+  gEfiCpuTokenSpaceGuid.PcdCpuMicrocodePatchAddress|0x0|UINT64|0x60000009
+  ## Specifies the size of the microcode Region.
+  # @Prompt Microcode Region size.
+  gEfiCpuTokenSpaceGuid.PcdCpuMicrocodePatchRegionSize|0x0|UINT64|0x6000000A
+  ## Indicates if Intel Enhanced Debug (IED) will be enabled.
+  #  Note that for some processors, IED is optional, but for others, IED is required.<BR><BR>
+  #   TRUE  - IED will be enabled.<BR>
+  #   FALSE - IED will be disabled.<BR>
+  # @Prompt Enable IED.
+  gEfiCpuTokenSpaceGuid.PcdCpuIEDEnabled|FALSE|BOOLEAN|0x6000000B
+  ## Specifies the IEDRAM size.
+  #  Note that there is a minimum size requirement for a processor.
+  # @Prompt IEDRAM size.
+  gEfiCpuTokenSpaceGuid.PcdCpuIEDRamSize|0x20000|UINT32|0x6000000C
+
+  ## Specifies the AP wait loop mode during POST.
+  #  The value is defined as below.<BR><BR>
+  #  1: ApInHltLoop,   AP is in the Hlt-Loop state.<BR>
+  #  2: ApInMwaitLoop, AP is in the Mwait-Loop state.<BR>
+  #  3: ApInRunLoop,   AP is in the Run-Loop state.<BR>
+  # @Prompt The AP wait loop mode.
+  # @ValidRange  0x80000001 | 1 - 3
+  gEfiCpuTokenSpaceGuid.PcdCpuApLoopMode|1|UINT8|0x60008006
+  ## Specifies the SMRR2 base address.<BR><BR>
+  # @Prompt SMRR2 base address.
+  # @Expression  0x80000001 | (gEfiCpuTokenSpaceGuid.PcdCpuSmmSmrr2Base & 0xfff) == 0
+  gEfiCpuTokenSpaceGuid.PcdCpuSmmSmrr2Base|0|UINT32|0x60000015
+  ## Specifies the SMRR2 range size.<BR><BR>
+  # @Prompt SMRR2 range size.
+  # @Expression  0x80000001 | (gEfiCpuTokenSpaceGuid.PcdCpuSmmSmrr2Size & 0xfff) == 0
+  gEfiCpuTokenSpaceGuid.PcdCpuSmmSmrr2Size|0|UINT32|0x60000016
+  ## Specifies the SMRR2 range cache type.
+  #  If SMRR2 is used to map a flash/ROM based handler, it would be configured as WP.<BR><BR>
+  #  5: WP(Write Protect).<BR>
+  #  6: WB(Write Back).<BR>
+  # @Prompt SMRR2 range cache type.
+  # @ValidList  0x80000001 | 5, 6
+  gEfiCpuTokenSpaceGuid.PcdCpuSmmSmrr2CacheType|5|UINT8|0x60000017
+  ## Indidates if SMM Delay feature is supported.<BR><BR>
+  #   TRUE  - SMM Delay feature is supported.<BR>
+  #   FALSE - SMM Delay feature is not supported.<BR>
+  # @Prompt SMM Delay feature.
+  gEfiCpuTokenSpaceGuid.PcdCpuSmmUseDelayIndication|TRUE|BOOLEAN|0x60000018
+  ## Indidates if SMM Block feature is supported.<BR><BR>
+  #   TRUE  - SMM Block feature is supported.<BR>
+  #   FALSE - SMM Block feature is not supported.<BR>
+  # @Prompt SMM Block feature.
+  gEfiCpuTokenSpaceGuid.PcdCpuSmmUseBlockIndication|TRUE|BOOLEAN|0x60000019
+  ## Indidates if SMM Enable/Disable feature is supported.<BR><BR>
+  #   TRUE  - SMM Enable/Disable feature is supported.<BR>
+  #   FALSE - SMM Enable/Disable feature is not supported.<BR>
+  # @Prompt SMM Enable/Disable feature.
+  gEfiCpuTokenSpaceGuid.PcdCpuSmmUseSmmEnableIndication|TRUE|BOOLEAN|0x6000001A
+  ## Specifies the TCC Activation Offset value.<BR><BR>
+  # @Prompt TCC Activation Offset value.
+  gEfiCpuTokenSpaceGuid.PcdCpuTccActivationOffset|0|UINT8|0x6000001B
+
+
+[PcdsDynamicEx]
+  ## Indidates if SMM Save State saved in MSRs.
+  #  if enabled, SMM Save State will use the MSRs instead of the memory.<BR><BR>
+  #   TRUE  - SMM Save State will use the MSRs.<BR>
+  #   FALSE - SMM Save State will use the memory.<BR>
+  # @Prompt SMM Save State uses MSRs.
+  gEfiCpuTokenSpaceGuid.PcdCpuSmmMsrSaveStateEnable|FALSE|BOOLEAN|0x60000014
+  ## Indidates if SMM PROT MODE feature is supported.<BR><BR>
+  #   TRUE  - SMM PROT MODE feature is supported.<BR>
+  #   FALSE - SMM PROT MODE feature is not supported.<BR>
+  # @Prompt  SMM PROT MODE feature.
+  gEfiCpuTokenSpaceGuid.PcdCpuSmmProtectedModeEnable|FALSE|BOOLEAN|0x6000001C
+  gEfiCpuTokenSpaceGuid.PcdCpuCoreCStateValue|0x0|UINT8|0x60008009
+
+  ## Indicates processor feature capabilities, each bit corresponding to a specific feature.
+  # @Prompt Processor feature capabilities.
+  # @ValidList   0x80000001 | 0
+  gEfiCpuTokenSpaceGuid.PcdCpuProcessorFeatureCapability|0|UINT32|0x40000002
+  ## Specifies actual settings for processor features, each bit corresponding to a specific feature.
+  # @Prompt Actual processor feature settings.
+  # @ValidList   0x80000001 | 0
+  gEfiCpuTokenSpaceGuid.PcdCpuProcessorFeatureSetting|0|UINT32|0x40000003
+  ## Indicates processor feature capabilities, each bit corresponding to a specific feature.
+  # @Prompt Processor feature extension1 capabilities.
+  # @ValidList   0x80000001 | 0
+  gEfiCpuTokenSpaceGuid.PcdCpuProcessorFeatureCapabilityEx1|0|UINT32|0x40000004
+  ## Specifies actual settings for processor features, each bit corresponding to a specific feature.
+  # @Prompt Actual processor feature extension1 settings.
+  # @ValidList   0x80000001 | 0
+  gEfiCpuTokenSpaceGuid.PcdCpuProcessorFeatureSettingEx1|0|UINT32|0x40000005
+  ## Contains the pointer to CPU Configuration Context Buffer defined in the CpuConfigLib.
+  # @Prompt The pointer to CPU Configuration Context Buffer.
+  # @ValidList   0x80000001 | 0
+  gEfiCpuTokenSpaceGuid.PcdCpuConfigContextBuffer|0x0|UINT64|0x50000001
+  ## Used for a callback mechanism for the CPU MP driver.
+  #  The CPU MP driver will set this PCD at pre-defined points. If there is callback function registered on it,
+  #  the callback function will be triggered, and it may change the value of PcdCpuCallbackSignal.
+  # @Prompt PCD for CPU callback signal.
+  # @ValidList   0x80000001 | 0
+  gEfiCpuTokenSpaceGuid.PcdCpuCallbackSignal|0x0|UINT8|0x50000002
+  ## Platform CPU frequency lists (not used).
+  # @Prompt Platform CPU frequency lists.
+  gEfiCpuTokenSpaceGuid.PcdPlatformCpuFrequencyLists|0x0|UINT64|0x60000006
+  ## Specifies the number of CPU sockets in the platform.
+  # @Prompt The number of CPU sockets in the platform.
+  gEfiCpuTokenSpaceGuid.PcdPlatformCpuSocketCount|0x0|UINT32|0x60000012
+  ## Contains the pointer to a pointer array of which each item points to a unicode string of CPU socket name.
+  # @Prompt The name of each CPU socket.
+  # @ValidList   0x80000001 | 0
+  gEfiCpuTokenSpaceGuid.PcdPlatformCpuSocketNames|0x0|UINT64|0x60000007
+  ## Contains the pointer to a pointer array of which each item points to a unicode string of CPU asset tag.
+  # @Prompt The asset tag of each CPU socket.
+  # @ValidList   0x80000001 | 0
+  gEfiCpuTokenSpaceGuid.PcdPlatformCpuAssetTags|0x0|UINT64|0x60000008
+  ## Indicates if the current boot is a power-on reset.<BR><BR>
+  #   TRUE  - Current boot is a power-on reset.<BR>
+  #   FALSE - Current boot is not a power-on reset.<BR>
+  # @Prompt Current boot is a power-on reset.
+  gEfiCpuTokenSpaceGuid.PcdIsPowerOnReset|FALSE|BOOLEAN|0x6000000F
+  ## CPU page table address (not used).
+  # @Prompt CPU page table address.
+  gEfiCpuTokenSpaceGuid.PcdCpuPageTableAddress|0x0|UINT64|0x6000000E
+  ## Contains the pointer to a MTRR table buffer of structure MTRR_SETTINGS.
+  # @Prompt The pointer to a MTRR table buffer.
+  # @ValidList   0x80000001 | 0
+  gEfiCpuTokenSpaceGuid.PcdCpuMtrrTableAddress|0x0|UINT64|0x6000000D
+  ## Contains the pointer to a CPU S3 data buffer of structure ACPI_CPU_DATA.
+  # @Prompt The pointer to a CPU S3 data buffer.
+  # @ValidList   0x80000001 | 0
+  gEfiCpuTokenSpaceGuid.PcdCpuS3DataAddress|0x0|UINT64|0x60000010
+
+  ## Contains the pointer to a buffer where new socket IDs to be assigned are stored.
+  # @Prompt The pointer to a new socket ID buffer.
+#  gEfiCpuTokenSpaceGuid.PcdCpuSocketId|{0x0}|VOID*|0x60008007
+
+  ## Contains the pointer to a CPU Hot Plug Data structure if CPU hot-plug is supported.
+  # @Prompt The pointer to CPU Hot Plug Data.
+  # @ValidList   0x80000001 | 0
+  gEfiCpuTokenSpaceGuid.PcdCpuHotPlugDataAddress|0x0|UINT64|0x60000011
+
+  ## Contains the pointer to a buffer where new socket IDs to be assigned are stored.
+  # @Prompt The pointer to a new socket ID buffer.
+  gEfiCpuTokenSpaceGuid.PcdCpuSocketId|{0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x1,0x0,0x0,0x0,0x1,0x0,0x0,0x0,0x2,0x0,0x0,0x0,0x2,0x0,0x0,0x0,0x3,0x0,0x0,0x0,0x3,0x0,0x0,0x0}|VOID*|0x60008007
+  gEfiCpuTokenSpaceGuid.PcdCpuSmmRuntimeCtlHooks|FALSE|BOOLEAN|0x6000001D
+
+[PcdsFixedAtBuild, PcdsDynamic, PcdsDynamicEx, PcdsPatchableInModule]
+  gEfiIntelFrameworkModulePkgTokenSpaceGuid.PcdEbdaReservedMemorySize|0x8000|UINT32|0x30000005

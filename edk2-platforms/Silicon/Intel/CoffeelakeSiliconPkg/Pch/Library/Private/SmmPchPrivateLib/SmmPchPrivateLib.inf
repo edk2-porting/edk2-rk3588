@@ -1,0 +1,32 @@
+## @file
+#  PCH SMM private lib.
+#
+# Copyright (c) 2019 Intel Corporation. All rights reserved. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+INF_VERSION = 0x00010017
+BASE_NAME = SmmPchPrivateLib
+FILE_GUID = FE6495FB-7AA9-4A24-BF3E-4698F7BCE0EE
+VERSION_STRING = 1.0
+MODULE_TYPE = DXE_SMM_DRIVER
+LIBRARY_CLASS = SmmPchPrivateLib
+
+
+[LibraryClasses]
+BaseLib
+IoLib
+DebugLib
+CpuPlatformLib
+
+
+[Packages]
+MdePkg/MdePkg.dec
+CoffeelakeSiliconPkg/SiPkg.dec
+
+
+[Sources]
+SmmPchPrivateLib.c

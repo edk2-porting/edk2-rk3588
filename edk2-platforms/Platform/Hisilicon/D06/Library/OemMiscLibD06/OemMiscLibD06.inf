@@ -1,0 +1,45 @@
+#/** @file
+#
+#    Copyright (c) 2018, Hisilicon Limited. All rights reserved.
+#    Copyright (c) 2018, Linaro Limited. All rights reserved.
+#
+#    SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = OemMiscLib
+  FILE_GUID                      = 3002911C-C160-4C46-93BB-782846673EEA
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = OemMiscLib
+
+[Sources.common]
+  BoardFeatureD06.c
+  BoardFeatureD06Strings.uni
+  OemMiscLibD06.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Platform/Hisilicon/D06/D06.dec
+  Silicon/Hisilicon/HisiliconNonOsi.dec
+  Silicon/Hisilicon/HisiPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  CpldIoLib
+  IoLib
+  PcdLib
+  TimerLib
+
+[Ppis]
+  gEfiPeiReadOnlyVariable2PpiGuid   ## SOMETIMES_CONSUMES
+
+[Pcd]
+  gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz
+  gHisiTokenSpaceGuid.PcdIsMPBoot
+  gHisiTokenSpaceGuid.PcdSocketMask
+  gHisiTokenSpaceGuid.PcdTrustedFirmwareEnable

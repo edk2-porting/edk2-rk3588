@@ -1,0 +1,75 @@
+## @file
+# Component description file for the PeiSaPolicy library.
+#
+# Copyright (c) 2019 - 2020 Intel Corporation. All rights reserved. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+INF_VERSION = 0x00010017
+BASE_NAME = PeiSaPolicyLib
+FILE_GUID = d7022865-ef1b-449d-8c3f-ac36488c408b
+VERSION_STRING = 1.0
+MODULE_TYPE = PEIM
+LIBRARY_CLASS = PeiSaPolicyLib
+
+
+[LibraryClasses]
+DebugLib
+IoLib
+PeiServicesLib
+BaseMemoryLib
+MemoryAllocationLib
+ConfigBlockLib
+CpuMailboxLib
+SiConfigBlockLib
+RngLib
+PmcPrivateLib
+GpioLib
+PchInfoLib
+
+[Packages]
+MdePkg/MdePkg.dec
+UefiCpuPkg/UefiCpuPkg.dec
+CoffeelakeSiliconPkg/SiPkg.dec
+IntelSiliconPkg/IntelSiliconPkg.dec
+
+[Pcd]
+gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+gSiPkgTokenSpaceGuid.PcdTsegSize
+gSiPkgTokenSpaceGuid.PcdRegBarBaseAddress
+gSiPkgTokenSpaceGuid.PcdIpuEnable                   ## CONSUMES
+
+[Sources]
+PeiSaPolicyLib.c
+PeiSaPolicyLibrary.h
+MrcOemPlatform.c
+MrcOemPlatform.h
+SaPrintPolicy.c
+PeiSaPolicyLibSample.c
+
+[Sources.IA32]
+Ia32/MrcOemPlatform.nasm
+Ia32/MrcOemPlatform.S
+
+[Ppis]
+gSiPreMemPolicyPpiGuid        ## CONSUMES
+gSiPolicyPpiGuid              ## CONSUMES
+
+[Guids]
+gSaMiscPeiPreMemConfigGuid    ## PRODUCES
+gSaMiscPeiConfigGuid          ## PRODUCES
+gSaPciePeiPreMemConfigGuid    ## PRODUCES
+gSaPciePeiConfigGuid          ## PRODUCES
+gGraphicsPeiPreMemConfigGuid  ## CONSUMES
+gGraphicsPeiConfigGuid        ## CONSUMES
+gSwitchableGraphicsConfigGuid ## PRODUCES
+gCpuTraceHubConfigGuid        ## PRODUCES
+gMemoryConfigGuid             ## PRODUCES
+gMemoryConfigNoCrcGuid        ## PRODUCES
+gIpuPreMemConfigGuid          ## PRODUCES
+gGnaConfigGuid                ## PRODUCES
+gVtdConfigGuid                ## PRODUCES
+gSaOverclockingPreMemConfigGuid ## PRODUCES

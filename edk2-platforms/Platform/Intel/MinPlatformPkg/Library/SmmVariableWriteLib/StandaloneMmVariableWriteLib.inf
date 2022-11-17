@@ -1,0 +1,45 @@
+## @file
+# Component description file for Standalone MM Variable Write Lib
+#
+# This library provides phase agnostic access to the UEFI Variable Services.
+# This is done by implementing a wrapper on top of the phase specific mechanism
+# for writing to UEFI variables. For example, the DXE implementation accesses
+# the UEFI Runtime Services Table, and the SMM implementation uses
+# EFI_SMM_VARIABLE_PROTOCOL.
+#
+# Using this library allows code to be written in a generic manner that can be
+# used in DXE or SMM without modification.
+#
+# Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = StandaloneMmVariableWriteLib
+  FILE_GUID                      = 62A023A6-DEBA-4407-A617-18963090DAFD
+  VERSION_STRING                 = 1.0
+  MODULE_TYPE                    = MM_STANDALONE
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  LIBRARY_CLASS                  = VariableWriteLib|MM_STANDALONE MM_CORE_STANDALONE
+  CONSTRUCTOR                    = StandaloneMmVariableWriteLibConstructor
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[Sources]
+  SmmVariableWriteCommon.c
+  StandaloneMmVariableWriteLibConstructor.c
+
+[LibraryClasses]
+  DebugLib
+  MmServicesTableLib
+
+[Protocols]
+  gEfiSmmVariableProtocolGuid   ## CONSUMES
+
+[Depex]
+  gEfiSmmVariableProtocolGuid

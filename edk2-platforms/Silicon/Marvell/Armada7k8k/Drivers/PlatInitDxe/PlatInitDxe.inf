@@ -1,0 +1,52 @@
+#/* @file
+#  Copyright (c) 2017, Linaro Limited. All rights reserved.
+#  Copyright (c) 2017, Marvell International Ltd. and its affiliates
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#*/
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = PlatInitDxe
+  FILE_GUID                      = 8c66f65b-08a6-4c91-b993-ff81e0adf818
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = ArmadaPlatInitDxeEntryPoint
+
+[Sources]
+  PlatInitDxe.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/Marvell/Marvell.dec
+
+[LibraryClasses]
+  ArmadaBoardDescLib
+  ArmadaIcuLib
+  ArmSmcLib
+  ComPhyLib
+  DebugLib
+  MppLib
+  PcdLib
+  TimerLib
+  UefiDriverEntryPoint
+  UtmiPhyLib
+
+[Guids]
+  gEdkiiPlatformHasAcpiGuid
+  gEfiEventReadyToBootGuid
+
+[FixedPcd]
+  gMarvellTokenSpaceGuid.PcdProductManufacturer
+  gMarvellTokenSpaceGuid.PcdProductPlatformName
+
+[Protocols]
+  gMarvellPlatformInitCompleteProtocolGuid    ## PRODUCES
+
+[Depex]
+  TRUE

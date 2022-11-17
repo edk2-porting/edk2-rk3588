@@ -1,0 +1,49 @@
+#**
+# @file
+#
+# Gionb.inf
+#
+# AMD-specific Gionb module information file.
+#
+# @xrefitem bom "File Content Label" "Release Content"
+# @e project: FDK
+# @e sub-project: UEFI
+# @e version: $Revision: 325775 $ @e date: $Date: 2015-08-31 17:45:22 -0500 (Mon, 31 Aug 2015) $
+#
+#
+#*****************************************************************************
+#
+#  Copyright (c) 2015 - 2016, AMD Inc. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#***************************************************************************/
+
+[Defines]
+INF_VERSION = 0x00010015
+VERSION_STRING = 1.0
+BASE_NAME = Gionb
+MODULE_TYPE = PEIM
+FILE_GUID = 3D65D81A-6E60-436F-951A-C9878BF77390
+ENTRY_POINT = PeiInitGionb
+
+[Binaries.AARCH64]
+  PE32|Gionb.efi|*
+  PEI_DEPEX|Gionb.depex|*
+
+[Packages]
+  Silicon/AMD/Styx/AmdModulePkg/AmdModulePkg.dec
+
+[PatchPcd]
+  gAmdModulePkgTokenSpaceGuid.PcdPcieCoreConfiguration|2|0x8B60
+  gAmdModulePkgTokenSpaceGuid.PcdPcieHardcodeEnumeration|TRUE|0x8C7C
+  gAmdModulePkgTokenSpaceGuid.PcdPcieGenMax|2|0x8ECC
+  gAmdModulePkgTokenSpaceGuid.PcdPciePort0Present|1|0x8ECD
+  gAmdModulePkgTokenSpaceGuid.PcdPciePort1Present|1|0x8ECE
+  gAmdModulePkgTokenSpaceGuid.PcdPciePort2Present|1|0x8ECF

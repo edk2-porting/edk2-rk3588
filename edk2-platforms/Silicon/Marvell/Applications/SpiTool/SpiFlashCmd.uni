@@ -1,0 +1,52 @@
+/*******************************************************************************
+Copyright (C) 2016 Marvell International Ltd.
+Copyright (c) 2020, Intel Corporation. All rights reserved.
+
+SPDX-License-Identifier: BSD-2-Clause-Patent
+
+*******************************************************************************/
+
+/=#
+
+#langdef   en-US "english"
+
+#string STR_GET_HELP_SF            #language en-US ""
+".TH sf 0 "Basic SPI flash command."\r\n"
+".SH NAME\r\n"
+"Read/write data from/into SPI flash.\r\n"
+".SH SYNOPSIS\r\n"
+" \r\n"
+"sf [probe | read | readfile | write | writefile | erase | \r\n"
+"    update | updatefile] \r\n"
+".SH OPTIONS\r\n"
+" \r\n"
+"   Length        - Number of bytes to send\r\n"
+"   Address       - Address in RAM to store/load data\r\n"
+"   Offset        - Offset from beginning of SPI flash to store/load data\r\n"
+"   FilePath      - Path to file to read data into or write/update data from \r\n"
+".SH EXAMPLES\r\n"
+" \r\n"
+"EXAMPLES:\r\n"
+"Check if there is response from SPI flash\r\n"
+"  sf probe\r\n"
+"Read 32 bytes from 0xe00000 of SPI flash into RAM at address 0x100000\r\n"
+"  sf read 0x100000 0xe00000 32\r\n"
+"Read 0x20 bytes from 0x200000 of SPI flash into RAM at address 0x300000\r\n"
+"  sf read 0x300000 0x200000 0x20\r\n"
+"Erase 0x10000 bytes from offset 0x100000 of SPI flash\r\n"
+"  sf erase 0x100000 0x100000\r\n"
+"Write 16 bytes from 0x200000 at RAM into SPI flash at address 0x4000000\r\n"
+"  sf write 0x200000 0x4000000 16\r\n"
+"Update 100 bytes from 0x100000 at RAM in SPI flash at address 0xe00000\r\n"
+"  sf update 0x100000 0xe00000 100\r\n"
+"Read 0x3000 bytes from 0x0 of SPI flash into file fs2:file.bin\r\n"
+"  sf readfile fs2:file.bin 0x0 0x3000\r\n"
+"Update data in SPI flash at 0x3000000 from file Linux.efi\r\n"
+"  sf update Linux.efi 0x3000000\r\n"
+".SH RETURNVALUES\r\n"
+" \r\n"
+"RETURN VALUES:\r\n"
+"  SHELL_SUCCESS        The action was completed as requested.\r\n"
+"  SHELL_ABORTED        Error while processing command\r\n"
+
+

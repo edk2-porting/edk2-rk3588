@@ -1,0 +1,267 @@
+### @file
+#
+# Copyright (c) 2018 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+# This program and the accompanying materials are licensed and made available under
+# the terms and conditions of the BSD License which accompanies this distribution.
+# The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+###
+
+[Defines]
+  INF_VERSION               = 0x00010017
+  BASE_NAME                 = FvTempMemorySilicon
+  FILE_GUID                 = 229EEDCE-8E76-4809-B233-EC36BFBF6989
+  MODULE_TYPE               = PEIM
+  VERSION_STRING            = 1.0
+
+[Binaries]
+  FV|FVTEMPMEMORYSILICON.Fv
+
+
+#![Pcd]
+#!  gMinPlatformPkgTokenSpaceGuid.PcdFlashFvFspTBase|0xFFFE0000
+
+# ## @file
+# #  SecCore module that implements the SEC phase.
+# #
+# #  This is the first module taking control of the platform upon power-on/reset.
+# #  It implements the first phase of the security phase. The entry point function is
+# #  _ModuleEntryPoint in PlatformSecLib. The entry point function will switch to
+# #  protected mode, setup flat memory model, enable temporary memory and
+# #  call into SecStartup().
+# #
+# #  Copyright (c) 2006 - 2016, Intel Corporation. All rights reserved.<BR>
+# #  This program and the accompanying materials
+# #  are licensed and made available under the terms and conditions of the BSD License
+# #  which accompanies this distribution.  The full text of the license may be found at
+# #  http://opensource.org/licenses/bsd-license.php
+# #
+# #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# #
+# ##
+# 
+# # DO NOT EDIT
+# # FILE auto-generated
+# 
+# [Defines]
+#   INF_VERSION                = 0x00010017
+#   BASE_NAME                  = SecCore
+#   FILE_GUID                  = 1BA0062E-C779-4582-8566-336AE8F78F09
+#   MODULE_TYPE                = SEC
+#   VERSION_STRING             = 1.0
+#   MODULE_UNI_FILE            = SecCore.uni
+# 
+[Packages.IA32]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+
+# [Binaries.IA32]
+#   BIN|ResetVec.bin
+#   PE32|SecCore.efi
+#   DISPOSABLE|SecCore.pdb
+# 
+[PatchPcd.IA32]
+  ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000042|0x1ff74 # 0x5C04+0x1a370
+
+
+# [Protocols.IA32]
+# 
+# [Ppis.IA32]
+#   ## SOMETIMES_CONSUMES
+#   ## PRODUCES
+#   gEfiSecPlatformInformationPpiGuid
+# 
+#   ## SOMETIMES_CONSUMES
+#   ## SOMETIMES_PRODUCES
+#   gEfiSecPlatformInformation2PpiGuid
+# 
+#   ## PRODUCES
+#   gEfiTemporaryRamDonePpiGuid
+# 
+#   ## NOTIFY
+#   ## SOMETIMES_CONSUMES
+#   gPeiSecPerformancePpiGuid
+# 
+#   ## SOMETIMES_PRODUCES
+#   gEfiPeiFirmwareVolumeInfoPpiGuid
+# 
+#   ## SOMETIMES_PRODUCES
+#   gEfiPeiFirmwareVolumeInfo2PpiGuid
+# 
+# 
+# [Guids.IA32]
+#   ## SOMETIMES_PRODUCES   ## HOB
+#   gEfiFirmwarePerformanceGuid
+# 
+#   ## SOMETIMES_PRODUCES ## HOB # MemoryAllocation StackHob
+#   gEfiHobMemoryAllocStackGuid
+# 
+#   ## SOMETIMES_PRODUCES ## HOB # MemoryAllocation BspStoreHob
+#   gEfiHobMemoryAllocBspStoreGuid
+# 
+#   ## SOMETIMES_PRODUCES ## HOB # MemoryAllocation ModuleHob
+#   gEfiHobMemoryAllocModuleGuid
+# 
+#   ## SOMETIMES_PRODUCES ## GUID # FV File System Guid.
+#   gEfiFirmwareFileSystem2Guid
+# 
+# 
+[PcdEx.IA32]
+
+# [LibraryClasses.IA32]
+# ## @LIB_INSTANCES
+# #  MdePkg/Library/PeiMemoryAllocationLib/PeiMemoryAllocationLib.inf
+# #  MdePkg/Library/PeiHobLib/PeiHobLib.inf
+# #  MdePkg/Library/PeiServicesTablePointerLibIdt/PeiServicesTablePointerLibIdt.inf
+# #  MdePkg/Library/PeiServicesLib/PeiServicesLib.inf
+# #  MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
+# #  MdePkg/Library/BaseLib/BaseLib.inf
+# #  MdePkg/Library/BaseMemoryLibRepStr/BaseMemoryLibRepStr.inf
+# #  MdePkg/Library/BaseIoLibIntrinsic/BaseIoLibIntrinsic.inf
+# #  MdePkg/Library/BasePciCf8Lib/BasePciCf8Lib.inf
+# #  MdePkg/Library/BasePciLibCf8/BasePciLibCf8.inf
+# #  PurleyOpenBoardPkg/BoardMtOlympus/Library/BasePlatformHookLib/BasePlatformHookLib.inf
+# #  MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf
+# #  MdePkg/Library/BasePrintLib/BasePrintLib.inf
+# #  MdeModulePkg/Library/BaseSerialPortLib16550/BaseSerialPortLib16550.inf
+# #  MdePkg/Library/BaseDebugLibSerialPort/BaseDebugLibSerialPort.inf
+# #  MdePkg/Library/BaseTimerLibNullTemplate/BaseTimerLibNullTemplate.inf
+# #  PurleyOpenBoardPkg/OemHook/Library/OemProcessorStartupLib/OemProcessorStartupLib.inf
+# #  UefiCpuPkg/Library/BaseXApicX2ApicLib/BaseXApicX2ApicLib.inf
+# #  MdePkg/Library/BasePeCoffGetEntryPointLib/BasePeCoffGetEntryPointLib.inf
+# #  PurleySktPkg/Library/ProcessorStartup/ProcessorStartup.inf
+# #  MdeModulePkg/Library/DebugAgentLibNull/DebugAgentLibNull.inf
+# #  UefiCpuPkg/Library/BaseUefiCpuLib/BaseUefiCpuLib.inf
+# #  MdePkg/Library/BasePeCoffExtraActionLibNull/BasePeCoffExtraActionLibNull.inf
+# #  UefiCpuPkg/Library/CpuExceptionHandlerLib/SecPeiCpuExceptionHandlerLib.inf
+# #  MdePkg/Library/BaseReportStatusCodeLibNull/BaseReportStatusCodeLibNull.inf
+# 
+# [Depex.IA32]
+# 
+# 
+# [UserExtensions.TianoCore."ExtraFiles"]
+# SecCoreExtra.uni
+# 
+# 
+# 
+# #
+# # The following information is for reference only and not required by the build tools.
+# #
+# #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+# #
+# 
+# [BuildOptions.IA32]
+# ## @AsBuilt
+# ##   MSFT:DEBUG_VS2015x86_IA32_SYMRENAME_FLAGS = Symbol renaming not needed for
+# ##   MSFT:DEBUG_VS2015x86_IA32_VFR_FLAGS = -n
+# ##   MSFT:DEBUG_VS2015x86_IA32_PP_FLAGS = /nologo /E /TC /FIAutoGen.h -D CRB_FLAG -D TRAD_FLAG=1 $(ULT_BUILD_OPTION) -D PCH_SERVER_BIOS_FLAG=1 -D SUS_WELL_RESTORE=1 -D SERVER_BIOS_FLAG=1 -D PCH_SPT -D PURLEY_FLAG $(SPARING_SCRATCHPAD_OPTION) $(TRACE_HUB_DEBUG_BUILD_OPTIONS) $(TRACE_HUB_INIT_BUILD_OPTIONS) -D MAX_SOCKET=2 -D EFI_PCI_IOV_SUPPORT -D WHEA_SUPPORT -D SKX_HOST -D CLX_HOST -D SERIAL_DBG_MSG=1
+# ##   MSFT:DEBUG_VS2015x86_IA32_GENFW_FLAGS = 
+# ##   MSFT:DEBUG_VS2015x86_IA32_SLINK_FLAGS = /NOLOGO /LTCG
+# ##   MSFT:DEBUG_VS2015x86_IA32_ASLDLINK_FLAGS = /NODEFAULTLIB /ENTRY:ReferenceAcpiTable /SUBSYSTEM:CONSOLE
+# ##   MSFT:DEBUG_VS2015x86_IA32_ASM_FLAGS = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
+# ##   MSFT:DEBUG_VS2015x86_IA32_ASL_FLAGS = 
+# ##   MSFT:DEBUG_VS2015x86_IA32_CC_FLAGS = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm /Gw -D CRB_FLAG -D TRAD_FLAG=1 $(ULT_BUILD_OPTION) -D PCH_SERVER_BIOS_FLAG=1 -D SUS_WELL_RESTORE=1 -D SERVER_BIOS_FLAG=1 -D PCH_SPT -D PURLEY_FLAG $(SPARING_SCRATCHPAD_OPTION) $(TRACE_HUB_DEBUG_BUILD_OPTIONS) $(TRACE_HUB_INIT_BUILD_OPTIONS) -D MAX_SOCKET=2 -D EFI_PCI_IOV_SUPPORT -D WHEA_SUPPORT -D SKX_HOST -D CLX_HOST -D SERIAL_DBG_MSG=1
+# ##   MSFT:DEBUG_VS2015x86_IA32_VFRPP_FLAGS = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h -D CRB_FLAG -D TRAD_FLAG=1 $(ULT_BUILD_OPTION) -D PCH_SERVER_BIOS_FLAG=1 -D SUS_WELL_RESTORE=1 -D SERVER_BIOS_FLAG=1 -D PCH_SPT -D PURLEY_FLAG $(SPARING_SCRATCHPAD_OPTION) $(TRACE_HUB_DEBUG_BUILD_OPTIONS) $(TRACE_HUB_INIT_BUILD_OPTIONS) -D MAX_SOCKET=2 -D EFI_PCI_IOV_SUPPORT -D WHEA_SUPPORT -D SKX_HOST -D CLX_HOST -D SERIAL_DBG_MSG=1
+# ##   MSFT:DEBUG_VS2015x86_IA32_ASLCC_FLAGS = /nologo /c /FIAutoGen.h /TC /Dmain=ReferenceAcpiTable -D CRB_FLAG -D TRAD_FLAG=1 $(ULT_BUILD_OPTION) -D PCH_SERVER_BIOS_FLAG=1 -D SUS_WELL_RESTORE=1 -D SERVER_BIOS_FLAG=1 -D PCH_SPT -D PURLEY_FLAG $(SPARING_SCRATCHPAD_OPTION) $(TRACE_HUB_DEBUG_BUILD_OPTIONS) $(TRACE_HUB_INIT_BUILD_OPTIONS) -D MAX_SOCKET=2 -D EFI_PCI_IOV_SUPPORT -D WHEA_SUPPORT -D SKX_HOST -D CLX_HOST -D SERIAL_DBG_MSG=1
+# ##   MSFT:DEBUG_VS2015x86_IA32_APP_FLAGS = /nologo /E /TC -D CRB_FLAG -D TRAD_FLAG=1 $(ULT_BUILD_OPTION) -D PCH_SERVER_BIOS_FLAG=1 -D SUS_WELL_RESTORE=1 -D SERVER_BIOS_FLAG=1 -D PCH_SPT -D PURLEY_FLAG $(SPARING_SCRATCHPAD_OPTION) $(TRACE_HUB_DEBUG_BUILD_OPTIONS) $(TRACE_HUB_INIT_BUILD_OPTIONS) -D MAX_SOCKET=2 -D EFI_PCI_IOV_SUPPORT -D WHEA_SUPPORT -D SKX_HOST -D CLX_HOST -D SERIAL_DBG_MSG=1
+# ##   MSFT:DEBUG_VS2015x86_IA32_DLINK2_FLAGS = 
+# ##   MSFT:DEBUG_VS2015x86_IA32_OPTROM_FLAGS = -e
+# ##   MSFT:DEBUG_VS2015x86_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+# ##   MSFT:DEBUG_VS2015x86_IA32_NASMB_FLAGS = -f bin
+# ##   MSFT:DEBUG_VS2015x86_IA32_ASLPP_FLAGS = /nologo /E /C /FIAutoGen.h -D CRB_FLAG -D TRAD_FLAG=1 $(ULT_BUILD_OPTION) -D PCH_SERVER_BIOS_FLAG=1 -D SUS_WELL_RESTORE=1 -D SERVER_BIOS_FLAG=1 -D PCH_SPT -D PURLEY_FLAG $(SPARING_SCRATCHPAD_OPTION) $(TRACE_HUB_DEBUG_BUILD_OPTIONS) $(TRACE_HUB_INIT_BUILD_OPTIONS) -D MAX_SOCKET=2 -D EFI_PCI_IOV_SUPPORT -D WHEA_SUPPORT -D SKX_HOST -D CLX_HOST -D SERIAL_DBG_MSG=1
+# ##   MSFT:DEBUG_VS2015x86_IA32_OBJCOPY_FLAGS = objcopy not needed for
+# ##   MSFT:DEBUG_VS2015x86_IA32_MAKE_FLAGS = /nologo
+# ##   MSFT:DEBUG_VS2015x86_IA32_ASMLINK_FLAGS = /nologo /tiny
+# ##   MSFT:DEBUG_VS2015x86_IA32_NASM_FLAGS = -Ox -f win32 -g
+# ## @file
+# # PeiMain module is core module in PEI phase.
+# #
+# # It takes responsibilities of:
+# # 1) Initialize memory, PPI, image services etc, to establish PEIM runtime environment.
+# # 2) Dispatch PEIM from discovered FV.
+# # 3) Handoff control to DxeIpl to load DXE core and enter DXE phase.
+# #
+# # Copyright (c) 2006 - 2017, Intel Corporation. All rights reserved.<BR>
+# #
+# #  This program and the accompanying materials
+# #  are licensed and made available under the terms and conditions of the BSD License
+# #  which accompanies this distribution. The full text of the license may be found at
+# #  http://opensource.org/licenses/bsd-license.php
+# #  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# #  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+# #
+# #
+# ##
+# 
+# # DO NOT EDIT
+# # FILE auto-generated
+# 
+# [Defines]
+#   INF_VERSION                = 0x00010017
+#   BASE_NAME                  = DummyPeiCore
+#   FILE_GUID                  = AEB462A4-8A74-4B76-A2EE-5D8EA5450DFF
+#   MODULE_TYPE                = PEI_CORE
+#   VERSION_STRING             = 1.0
+#   ENTRY_POINT                = PeiCore
+# 
+[Packages.IA32]
+
+# [Binaries.IA32]
+#   PE32|DummyPeiCore.efi
+#   DISPOSABLE|DummyPeiCore.pdb
+# 
+[PatchPcd.IA32]
+
+# [Protocols.IA32]
+# 
+# [Ppis.IA32]
+# 
+# [Guids.IA32]
+# 
+[PcdEx.IA32]
+
+# [LibraryClasses.IA32]
+# ## @LIB_INSTANCES
+# 
+# [Depex.IA32]
+# 
+# 
+# 
+# 
+# #
+# # The following information is for reference only and not required by the build tools.
+# #
+# #  VALID_ARCHITECTURES           = IA32 X64 IPF EBC (EBC is for build only)
+# #
+# 
+# [BuildOptions.IA32]
+# ## @AsBuilt
+# ##   MSFT:DEBUG_VS2015x86_IA32_SYMRENAME_FLAGS = Symbol renaming not needed for
+# ##   MSFT:DEBUG_VS2015x86_IA32_VFR_FLAGS = -n
+# ##   MSFT:DEBUG_VS2015x86_IA32_PP_FLAGS = /nologo /E /TC /FIAutoGen.h -D CRB_FLAG -D TRAD_FLAG=1 $(ULT_BUILD_OPTION) -D PCH_SERVER_BIOS_FLAG=1 -D SUS_WELL_RESTORE=1 -D SERVER_BIOS_FLAG=1 -D PCH_SPT -D PURLEY_FLAG $(SPARING_SCRATCHPAD_OPTION) $(TRACE_HUB_DEBUG_BUILD_OPTIONS) $(TRACE_HUB_INIT_BUILD_OPTIONS) -D MAX_SOCKET=2 -D EFI_PCI_IOV_SUPPORT -D WHEA_SUPPORT -D SKX_HOST -D CLX_HOST -D SERIAL_DBG_MSG=1
+# ##   MSFT:DEBUG_VS2015x86_IA32_GENFW_FLAGS = 
+# ##   MSFT:DEBUG_VS2015x86_IA32_SLINK_FLAGS = /NOLOGO /LTCG
+# ##   MSFT:DEBUG_VS2015x86_IA32_ASLDLINK_FLAGS = /NODEFAULTLIB /ENTRY:ReferenceAcpiTable /SUBSYSTEM:CONSOLE
+# ##   MSFT:DEBUG_VS2015x86_IA32_ASM_FLAGS = /nologo /c /WX /W3 /Cx /coff /Zd /Zi
+# ##   MSFT:DEBUG_VS2015x86_IA32_ASL_FLAGS = 
+# ##   MSFT:DEBUG_VS2015x86_IA32_CC_FLAGS = /nologo /arch:IA32 /c /WX /GS- /W4 /Gs32768 /D UNICODE /O1b2 /GL /FIAutoGen.h /EHs-c- /GR- /GF /Gy /Zi /Gm /Gw -D CRB_FLAG -D TRAD_FLAG=1 $(ULT_BUILD_OPTION) -D PCH_SERVER_BIOS_FLAG=1 -D SUS_WELL_RESTORE=1 -D SERVER_BIOS_FLAG=1 -D PCH_SPT -D PURLEY_FLAG $(SPARING_SCRATCHPAD_OPTION) $(TRACE_HUB_DEBUG_BUILD_OPTIONS) $(TRACE_HUB_INIT_BUILD_OPTIONS) -D MAX_SOCKET=2 -D EFI_PCI_IOV_SUPPORT -D WHEA_SUPPORT -D SKX_HOST -D CLX_HOST -D SERIAL_DBG_MSG=1
+# ##   MSFT:DEBUG_VS2015x86_IA32_VFRPP_FLAGS = /nologo /E /TC /DVFRCOMPILE /FI$(MODULE_NAME)StrDefs.h -D CRB_FLAG -D TRAD_FLAG=1 $(ULT_BUILD_OPTION) -D PCH_SERVER_BIOS_FLAG=1 -D SUS_WELL_RESTORE=1 -D SERVER_BIOS_FLAG=1 -D PCH_SPT -D PURLEY_FLAG $(SPARING_SCRATCHPAD_OPTION) $(TRACE_HUB_DEBUG_BUILD_OPTIONS) $(TRACE_HUB_INIT_BUILD_OPTIONS) -D MAX_SOCKET=2 -D EFI_PCI_IOV_SUPPORT -D WHEA_SUPPORT -D SKX_HOST -D CLX_HOST -D SERIAL_DBG_MSG=1
+# ##   MSFT:DEBUG_VS2015x86_IA32_ASLCC_FLAGS = /nologo /c /FIAutoGen.h /TC /Dmain=ReferenceAcpiTable -D CRB_FLAG -D TRAD_FLAG=1 $(ULT_BUILD_OPTION) -D PCH_SERVER_BIOS_FLAG=1 -D SUS_WELL_RESTORE=1 -D SERVER_BIOS_FLAG=1 -D PCH_SPT -D PURLEY_FLAG $(SPARING_SCRATCHPAD_OPTION) $(TRACE_HUB_DEBUG_BUILD_OPTIONS) $(TRACE_HUB_INIT_BUILD_OPTIONS) -D MAX_SOCKET=2 -D EFI_PCI_IOV_SUPPORT -D WHEA_SUPPORT -D SKX_HOST -D CLX_HOST -D SERIAL_DBG_MSG=1
+# ##   MSFT:DEBUG_VS2015x86_IA32_APP_FLAGS = /nologo /E /TC -D CRB_FLAG -D TRAD_FLAG=1 $(ULT_BUILD_OPTION) -D PCH_SERVER_BIOS_FLAG=1 -D SUS_WELL_RESTORE=1 -D SERVER_BIOS_FLAG=1 -D PCH_SPT -D PURLEY_FLAG $(SPARING_SCRATCHPAD_OPTION) $(TRACE_HUB_DEBUG_BUILD_OPTIONS) $(TRACE_HUB_INIT_BUILD_OPTIONS) -D MAX_SOCKET=2 -D EFI_PCI_IOV_SUPPORT -D WHEA_SUPPORT -D SKX_HOST -D CLX_HOST -D SERIAL_DBG_MSG=1
+# ##   MSFT:DEBUG_VS2015x86_IA32_DLINK2_FLAGS = 
+# ##   MSFT:DEBUG_VS2015x86_IA32_OPTROM_FLAGS = -e
+# ##   MSFT:DEBUG_VS2015x86_IA32_DLINK_FLAGS = /NOLOGO /NODEFAULTLIB /IGNORE:4001 /OPT:REF /OPT:ICF=10 /MAP /ALIGN:32 /SECTION:.xdata,D /SECTION:.pdata,D /MACHINE:X86 /LTCG /DLL /ENTRY:$(IMAGE_ENTRY_POINT) /SUBSYSTEM:EFI_BOOT_SERVICE_DRIVER /SAFESEH:NO /BASE:0 /DRIVER /DEBUG
+# ##   MSFT:DEBUG_VS2015x86_IA32_NASMB_FLAGS = -f bin
+# ##   MSFT:DEBUG_VS2015x86_IA32_ASLPP_FLAGS = /nologo /E /C /FIAutoGen.h -D CRB_FLAG -D TRAD_FLAG=1 $(ULT_BUILD_OPTION) -D PCH_SERVER_BIOS_FLAG=1 -D SUS_WELL_RESTORE=1 -D SERVER_BIOS_FLAG=1 -D PCH_SPT -D PURLEY_FLAG $(SPARING_SCRATCHPAD_OPTION) $(TRACE_HUB_DEBUG_BUILD_OPTIONS) $(TRACE_HUB_INIT_BUILD_OPTIONS) -D MAX_SOCKET=2 -D EFI_PCI_IOV_SUPPORT -D WHEA_SUPPORT -D SKX_HOST -D CLX_HOST -D SERIAL_DBG_MSG=1
+# ##   MSFT:DEBUG_VS2015x86_IA32_OBJCOPY_FLAGS = objcopy not needed for
+# ##   MSFT:DEBUG_VS2015x86_IA32_MAKE_FLAGS = /nologo
+# ##   MSFT:DEBUG_VS2015x86_IA32_ASMLINK_FLAGS = /nologo /tiny
+# ##   MSFT:DEBUG_VS2015x86_IA32_NASM_FLAGS = -Ox -f win32 -g

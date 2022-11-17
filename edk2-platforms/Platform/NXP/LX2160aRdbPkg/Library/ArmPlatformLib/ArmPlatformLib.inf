@@ -1,0 +1,44 @@
+#/* @file
+#  Copyright 2018, 2020 NXP
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#*/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = PlatformLib
+  FILE_GUID                      = d1361285-8a47-421c-9efd-6b262c9093fc
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmPlatformLib
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/NXP/Chassis3V2/Chassis3V2.dec
+  Silicon/NXP/LX2160A/LX2160A.dec
+  Silicon/NXP/NxpQoriqLs.dec
+
+[LibraryClasses]
+  ArmLib
+  DebugLib
+  SocLib
+
+[Sources.common]
+  ArmPlatformLib.c
+  ArmPlatformLibMem.c
+
+[Sources.AArch64]
+  AArch64/ArmPlatformHelper.S
+
+[FixedPcd]
+  gArmTokenSpaceGuid.PcdArmPrimaryCore
+  gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
+  gNxpQoriqLsTokenSpaceGuid.PcdNumPciController
+  gNxpQoriqLsTokenSpaceGuid.PcdPciExp1BaseAddr
+
+[Ppis]
+  gArmMpCoreInfoPpiGuid

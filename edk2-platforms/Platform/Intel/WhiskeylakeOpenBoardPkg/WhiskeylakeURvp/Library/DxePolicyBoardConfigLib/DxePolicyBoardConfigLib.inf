@@ -1,0 +1,45 @@
+## @file
+# Module Information file for DxePolicyBoardConfigLib Library
+#
+#
+#  Copyright (c) 2019 - 2020 Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010017
+  BASE_NAME                      = DxePolicyBoardConfigLib
+  FILE_GUID                      = 17836E9F-7188-4640-80A3-B4441585FFE9
+  VERSION_STRING                 = 1.0
+  MODULE_TYPE                    = DXE_DRIVER
+  LIBRARY_CLASS                  = DxePolicyUpdateLib|DXE_DRIVER
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  DxeSaPolicyBoardConfig.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  CoffeelakeSiliconPkg/SiPkg.dec
+  WhiskeylakeOpenBoardPkg/OpenBoardPkg.dec
+  IntelSiliconPkg/IntelSiliconPkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  BaseLib
+  BaseMemoryLib
+  PcdLib
+  DebugLib
+  HobLib
+  ConfigBlockLib
+
+[Guids]
+  gMemoryDxeConfigGuid                          ## CONSUMES
+

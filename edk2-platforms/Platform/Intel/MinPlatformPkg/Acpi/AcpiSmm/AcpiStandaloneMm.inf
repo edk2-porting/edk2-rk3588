@@ -1,0 +1,46 @@
+### @file
+# Component information file for ACPI Standalone MM module.
+#
+# Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) Microsoft Corporation.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+###
+
+[Defines]
+  INF_VERSION                    = 0x00010017
+  BASE_NAME                      = AcpiStandaloneMm
+  FILE_GUID                      = F113611F-DEE7-4137-8623-0168675E9F6D
+  VERSION_STRING                 = 1.0
+  MODULE_TYPE                    = MM_STANDALONE
+  PI_SPECIFICATION_VERSION       = 0x00010032
+  ENTRY_POINT                    = AcpiStandaloneMmEntryPoint
+
+[LibraryClasses]
+  BoardAcpiEnableLib
+  DebugLib
+  MmServicesTableLib
+  PcdLib
+  StandaloneMmDriverEntryPoint
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+
+# Note: All PCDs consumed in the Standalone MM instance must be either FixedAtBuild
+#       or PatchableInModule
+[Pcd]
+  gMinPlatformPkgTokenSpaceGuid.PcdAcpiEnableSwSmi        ## CONSUMES
+  gMinPlatformPkgTokenSpaceGuid.PcdAcpiDisableSwSmi       ## CONSUMES
+
+[Sources]
+  AcpiMm.h
+  AcpiMm.c
+  AcpiStandaloneMm.c
+
+[Protocols]
+  gEfiSmmSwDispatch2ProtocolGuid                          ## CONSUMES
+
+[Depex]
+  gEfiSmmSwDispatch2ProtocolGuid

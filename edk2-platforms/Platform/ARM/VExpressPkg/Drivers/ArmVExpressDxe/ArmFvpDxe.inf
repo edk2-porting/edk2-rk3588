@@ -1,0 +1,36 @@
+#/** @file
+#
+#  Copyright (c) 2013-2021, Arm Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = ArmFvpDxe
+  FILE_GUID                      = 405b2307-6839-4d52-aeb9-bece64252800
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = ArmFvpInitialise
+
+[Sources.common]
+  ArmFvpDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  OvmfPkg/OvmfPkg.dec
+  Platform/ARM/ARM.dec
+  Platform/ARM/VExpressPkg/ArmVExpressPkg.dec
+
+[LibraryClasses]
+  ArmShellCmdRunAxfLib
+  BaseMemoryLib
+  IoLib
+  TimerLib
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  VirtioMmioDeviceLib
+

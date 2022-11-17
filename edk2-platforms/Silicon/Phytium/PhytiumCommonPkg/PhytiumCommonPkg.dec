@@ -1,0 +1,51 @@
+## @file
+# This package provides common Phytium silicon modules.
+#
+# Copyright (C) 2020, Phytium Technology Co,Ltd. All rights reserved.
+#
+# SPDX-License-Identifier:BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x0001001b
+  PACKAGE_NAME                   = PhytiumCommnonPkg
+  PACKAGE_GUID                   = b34af0b4-3e7c-11eb-a9d0-0738806d2dec
+  PACKAGE_VERSION                = 0.1
+
+################################################################################
+#
+# Include Section - list of Include Paths that are provided by this package.
+#                   Comments are used for Keywords and Module Types.
+#
+# Supported Module Types:
+#  BASE SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
+#
+################################################################################
+[Includes]
+  Include             # Root include for the package
+
+[Guids.common]
+  gPhytiumPlatformTokenSpaceGuid = { 0x8c3abed4, 0x1fc8, 0x46d3, { 0xb4, 0x17, 0xa3, 0x22, 0x38, 0x14, 0xde, 0x76 } }
+
+[PcdsFixedAtBuild.common]
+  gPhytiumPlatformTokenSpaceGuid.PcdSystemIoBase|0x0|UINT64|0x00000000
+  gPhytiumPlatformTokenSpaceGuid.PcdSystemIoSize|0x0|UINT64|0x00000001
+
+  #
+  # PCI configuration address space
+  #
+  gPhytiumPlatformTokenSpaceGuid.PcdPciConfigBase|0x0|UINT64|0x00000002
+  gPhytiumPlatformTokenSpaceGuid.PcdPciConfigSize|0x0|UINT64|0x00000003
+
+  #
+  # SPI Flash Controller Register Base Address and Size
+  #
+  gPhytiumPlatformTokenSpaceGuid.PcdSpiFlashBase|0x0|UINT64|0x00000004
+  gPhytiumPlatformTokenSpaceGuid.PcdSpiFlashSize|0x0|UINT64|0x00000005
+  gPhytiumPlatformTokenSpaceGuid.PcdSpiControllerBase|0x0|UINT64|0x00000006
+  gPhytiumPlatformTokenSpaceGuid.PcdSpiControllerSize|0x0|UINT64|0x00000007
+  gPhytiumPlatformTokenSpaceGuid.PcdRtcBaseAddress|0x0|UINT32|0x00000008
+
+[Protocols]
+  gSpiMasterProtocolGuid = { 0xdf093560, 0xf955, 0x11ea, { 0x96, 0x42, 0x43, 0x9d, 0x80, 0xdd, 0x0b, 0x7c}}

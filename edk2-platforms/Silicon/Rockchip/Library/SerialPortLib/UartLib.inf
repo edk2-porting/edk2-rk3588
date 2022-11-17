@@ -1,0 +1,41 @@
+#/** @file
+#
+#  Component description file for Uart module
+#
+#  Copyright (c) 2011-2016, ARM Ltd. All rights reserved.<BR>
+#  Copyright (c) 2017, Rockchip Inc. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UartLib
+  FILE_GUID                      = c15412fa-3177-11ec-95b4-f42a7dcb925d
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = UartLib
+
+[Sources.common]
+  UartLib.c
+
+[LibraryClasses]
+  DebugLib
+  IoLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Silicon/Rockchip/RockchipPkg.dec
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialBaudRate
+  #gRockchipTokenSpaceGuid.PcdGrfRegisterBase
+  gRockchipTokenSpaceGuid.UartClkInHz

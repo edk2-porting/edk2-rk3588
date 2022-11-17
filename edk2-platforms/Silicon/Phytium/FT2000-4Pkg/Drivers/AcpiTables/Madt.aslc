@@ -1,0 +1,67 @@
+/** @file
+  Phytium ACPI ASL Sources.
+
+  Copyright (C) 2020, Phytium Technology Co Ltd. All rights reserved.<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#include <IndustryStandard/Acpi.h>
+#include <Library/AcpiLib.h>
+#include <Library/ArmLib.h>
+#include <Library/PcdLib.h>
+#include <Platform.h>
+
+
+#define PLATFORM_GET_MPID(ClusterId, CoreId)   (((ClusterId) << 8) | (CoreId))
+
+#define EFI_GICC_STRUCTURE(AcpiCpuUid, Mpidr, GicRBaseOffset)                                             \
+    EFI_ACPI_6_1_GICC_STRUCTURE_INIT(0, AcpiCpuUid, Mpidr,  EFI_ACPI_6_1_GIC_ENABLED, 23,                \
+    FixedPcdGet64(PcdGicInterruptInterfaceBase), FixedPcdGet64 (PcdGicInterruptInterfaceBase) + 0x20000, \
+    FixedPcdGet64(PcdGicInterruptInterfaceBase) + 0x10000, 25, FixedPcdGet64 (PcdGicRedistributorsBase) + GicRBaseOffset, 0)
+#define CORE_NUM 4
+//
+// Multiple APIC Description Table
+//
+#pragma pack (1)
+
+typedef struct {
+  EFI_ACPI_6_1_MULTIPLE_APIC_DESCRIPTION_TABLE_HEADER   Header;
+  EFI_ACPI_6_1_GIC_STRUCTURE                            GicInterfaces[CORE_NUM];
+  EFI_ACPI_6_1_GIC_DISTRIBUTOR_STRUCTURE                GicDistributor;
+  EFI_ACPI_6_1_GIC_ITS_STRUCTURE                        GicITS[1];
+} EFI_ACPI_6_1_MULTIPLE_APIC_DESCRIPTION_TABLE;
+
+#pragma pack ()
+
+//
+// Multiple APIC Description Table
+//
+EFI_ACPI_6_1_MULTIPLE_APIC_DESCRIPTION_TABLE Madt = {
+  {
+    PHYTIUM_ACPI_HEADER (
+      EFI_ACPI_6_1_MULTIPLE_APIC_DESCRIPTION_TABLE_SIGNATURE,
+      EFI_ACPI_6_1_MULTIPLE_APIC_DESCRIPTION_TABLE,
+      EFI_ACPI_6_1_MULTIPLE_APIC_DESCRIPTION_TABLE_REVISION
+    ),
+    //
+    // MADT specific fields
+    //
+    0, // LocalApicAddress
+    0, // Flags
+  },
+  {
+    EFI_GICC_STRUCTURE (0x00, PLATFORM_GET_MPID (0x00, 0), 0x000000),
+    EFI_GICC_STRUCTURE (0x01, PLATFORM_GET_MPID (0x00, 1), 0x020000),
+    EFI_GICC_STRUCTURE (0x02, PLATFORM_GET_MPID (0x01, 0), 0x040000),
+    EFI_GICC_STRUCTURE (0x03, PLATFORM_GET_MPID (0x01, 1), 0x060000),
+  },
+
+  EFI_ACPI_6_1_GIC_DISTRIBUTOR_INIT (0, FixedPcdGet32 (PcdGicDistributorBase), 0, 0x3),
+  {
+    EFI_ACPI_6_1_GIC_ITS_INIT (0, FixedPcdGet64 (PcdGicDistributorBase) + 0x20000),
+  }
+};
+
+VOID * CONST ReferenceAcpiTable = &Madt;

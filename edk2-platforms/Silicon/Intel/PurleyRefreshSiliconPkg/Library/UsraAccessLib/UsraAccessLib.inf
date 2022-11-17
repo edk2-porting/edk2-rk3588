@@ -1,0 +1,62 @@
+## @file
+#
+# Copyright (c) 2018 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+################################################################################
+#
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SiliconAccessLib
+  FILE_GUID                      = 6CF9B31D-C5E9-4F5F-8030-78883D66CDF0
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SiliconAccessLib
+
+## { 0x6cf9b31d, 0xc5e9, 0x4f5f, { 0x80, 0x30, 0x78, 0x88, 0x3d, 0x66, 0xcd, 0xf0 } };
+
+[Sources]
+  UsraAccessLib.c
+  CsrAccess.c
+  PcieAccess.c
+
+################################################################################
+#
+# Package Dependency Section - list of Package files that are required for
+#                              this module.
+#
+################################################################################
+
+[Packages]
+  MdePkg/MdePkg.dec
+  PurleyRefreshSiliconPkg/SiPkg.dec
+
+
+################################################################################
+#
+# Library Class Section - list of Library Classes that are required for
+#                         this module.
+#
+################################################################################
+
+[LibraryClasses]
+  S3BootScriptLib
+  CsrToPcieLib
+  PcieAddrLib
+  HobLib
+  BaseLib
+  IoLib
+
+[Guids]
+
+[FeaturePcd]
+  gEfiCpRcPkgTokenSpaceGuid.PcdUsraSupportS3
+
+
+

@@ -1,0 +1,20 @@
+#/** @file
+#
+#  Copyright (c) 2011-2017, ARM Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  DEC_SPECIFICATION              = 0x0001001A
+  PACKAGE_NAME                   = BootMonFs
+  PACKAGE_GUID                   = 41f14aba-452f-4204-a435-25242973c5b1
+  PACKAGE_VERSION                = 0.1
+
+[Guids.common]
+  gArmBootMonFsTokenSpaceGuid = { 0xeb76a201, 0x69b4, 0x491f, { 0x9b, 0xde, 0xbf, 0x30, 0xbd, 0x03, 0x82, 0xb4 } }
+
+[PcdsFixedAtBuild.common]
+  # Boot Monitor FileSystem
+  gArmBootMonFsTokenSpaceGuid.PcdBootMonFsSupportedDevicePaths|L""|VOID*|0x0000003A

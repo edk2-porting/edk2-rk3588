@@ -1,0 +1,56 @@
+#/** @file
+#
+#    Copyright (c) 2015, Hisilicon Limited. All rights reserved.
+#    Copyright (c) 2015, Linaro Limited. All rights reserved.
+#
+#    SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UpdateFdtDxe
+  FILE_GUID                      = E29977F9-20A4-4551-B0EC-BCE246592E76
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = UpdateFdt
+
+[Sources.common]
+  UpdateFdtDxe.c
+
+
+[Packages]
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ArmPkg/ArmPkg.dec
+  OpenPlatformPkg/Chips/Hisilicon/HisiPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  UefiDriverEntryPoint
+  DebugLib
+  BaseLib
+  FdtLib
+  PcdLib
+  FdtUpdateLib
+  DxeServicesTableLib
+
+[Guids]
+ gFdtTableGuid
+[Protocols]
+
+ gHisiBoardNicProtocolGuid
+
+[Pcd]
+
+ gHisiTokenSpaceGuid.FdtFileAddress
+ gHisiTokenSpaceGuid.PcdReservedNvramSize
+ gHisiTokenSpaceGuid.PcdReservedNvramBase
+
+
+[Depex]
+  gEfiGenericMemTestProtocolGuid

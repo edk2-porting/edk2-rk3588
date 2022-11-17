@@ -1,0 +1,30 @@
+/** @file
+// String definitions for User Authentication formset.
+//
+// Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+**/
+
+#langdef en-US  "English"
+#langdef fr-FR  "Francais"
+
+
+#string STR_FORM_SET_TITLE             #language en-US "User Password Management"
+                                       #language fr-FR "User Password Management"
+#string STR_FORM_SET_TITLE_HELP        #language en-US "This Driver mainly handle user's password"
+                                       #language fr-FR "This Driver mainly handle user's password"
+#string STR_FORM_TITLE                 #language en-US "Password Management Form"
+                                       #language fr-FR "Password Management Form"
+#string STR_ADMIN_PASSWORD_PROMPT      #language en-US "Change Admin Password"
+                                       #language fr-FR "Change Admin Password"
+#string STR_ADMIN_PASSWORD_HELP        #language en-US "Input old admin password if it was set, then you can change the password to a new one. After the change action, you may need input the new password when you enter UI. The new password must be between 8 and 32 chars include lowercase, uppercase alphabetic, number, and symbol. Input an empty password can clean old admin password, then no need input password to enter UI."
+                                       #language fr-FR "Input old admin password if it was set, then you can change the password to a new one. After the change action, you may need input the new password when you enter UI. The new password must be between 8 and 32 chars include lowercase, uppercase alphabetic, number, and symbol. Input an empty password can clean old admin password, then no need input password to enter UI."
+#string STR_ADMIN_PASSWORD_STS_HELP    #language en-US "Current Admin Password status: Installed or Not Installed."
+                                       #language fr-FR "Current Admin Password status: Installed or Not Installed."
+#string STR_ADMIN_PASSWORD_STS_PROMPT  #language en-US "Admin Password Status"
+                                       #language fr-FR "Admin Password Status"
+#string STR_ADMIN_PASSWORD_STS_CONTENT #language en-US ""
+                                       #language fr-FR ""
+

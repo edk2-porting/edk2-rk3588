@@ -1,0 +1,87 @@
+/** @file
+
+  Memory mapped config space base address table (MCFG)
+
+  Copyright (c) 2017, Linaro Ltd. All rights reserved.<BR>
+  Copyright (C) 2019, Marvell International Ltd. and its affiliates.<BR>
+  Copyright (C) 2021, Semihalf.<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#include <Library/AcpiLib.h>
+
+#include "AcpiHeader.h"
+#include "Cn913xCEx7Eval/Pcie.h"
+
+#include <IndustryStandard/MemoryMappedConfigurationSpaceAccessTable.h>
+
+#pragma pack(1)
+typedef struct {
+  EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_HEADER Header;
+  EFI_ACPI_MEMORY_MAPPED_ENHANCED_CONFIGURATION_SPACE_BASE_ADDRESS_ALLOCATION_STRUCTURE Structure[7];
+} ACPI_6_0_MCFG_STRUCTURE;
+#pragma pack()
+
+STATIC ACPI_6_0_MCFG_STRUCTURE Mcfg = {
+  {
+    __ACPI_HEADER (EFI_ACPI_5_0_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_BASE_ADDRESS_DESCRIPTION_TABLE_SIGNATURE,
+                   ACPI_6_0_MCFG_STRUCTURE,
+                   EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_TABLE_REVISION),
+    EFI_ACPI_RESERVED_QWORD
+  },
+  {
+    {
+      CP0_PCI0_ECAM_BASE,              // BaseAddress
+      0,                               // PciSegmentGroupNumber
+      CP0_PCI0_BUS_MIN,                // StartBusNumber
+      CP0_PCI0_BUS_MAX,                // EndBusNumber
+      EFI_ACPI_RESERVED_DWORD          // Reserved
+    },
+    {
+      CP1_PCI0_ECAM_BASE,              // BaseAddress
+      1,                               // PciSegmentGroupNumber
+      CP1_PCI0_BUS_MIN,                // StartBusNumber
+      CP1_PCI0_BUS_MAX,                // EndBusNumber
+      EFI_ACPI_RESERVED_DWORD          // Reserved
+    },
+    {
+      CP1_PCI1_ECAM_BASE,              // BaseAddress
+      2,                               // PciSegmentGroupNumber
+      CP1_PCI1_BUS_MIN,                // StartBusNumber
+      CP1_PCI1_BUS_MAX,                // EndBusNumber
+      EFI_ACPI_RESERVED_DWORD          // Reserved
+    },
+    {
+      CP1_PCI2_ECAM_BASE,              // BaseAddress
+      3,                               // PciSegmentGroupNumber
+      CP1_PCI2_BUS_MIN,                // StartBusNumber
+      CP1_PCI2_BUS_MAX,                // EndBusNumber
+      EFI_ACPI_RESERVED_DWORD          // Reserved
+    },
+    {
+      CP2_PCI0_ECAM_BASE,              // BaseAddress
+      4,                               // PciSegmentGroupNumber
+      CP2_PCI0_BUS_MIN,                // StartBusNumber
+      CP2_PCI0_BUS_MAX,                // EndBusNumber
+      EFI_ACPI_RESERVED_DWORD          // Reserved
+    },
+    {
+      CP2_PCI1_ECAM_BASE,              // BaseAddress
+      5,                               // PciSegmentGroupNumber
+      CP2_PCI1_BUS_MIN,                // StartBusNumber
+      CP2_PCI1_BUS_MAX,                // EndBusNumber
+      EFI_ACPI_RESERVED_DWORD          // Reserved
+    },
+    {
+      CP2_PCI2_ECAM_BASE,              // BaseAddress
+      6,                               // PciSegmentGroupNumber
+      CP2_PCI2_BUS_MIN,                // StartBusNumber
+      CP2_PCI2_BUS_MAX,                // EndBusNumber
+      EFI_ACPI_RESERVED_DWORD          // Reserved
+    }
+  }
+};
+
+VOID CONST * CONST ReferenceAcpiTable = &Mcfg;

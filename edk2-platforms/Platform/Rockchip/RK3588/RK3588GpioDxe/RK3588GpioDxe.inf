@@ -1,0 +1,30 @@
+#
+#  Copyright (c) 2018, Linaro. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+[Defines]
+  INF_VERSION                    = 0x0001001a
+  BASE_NAME                      = RK3588Gpio
+  FILE_GUID                      = 271ea88c-45ed-11ec-9726-f42a7dcb925d
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = RK3588GpioEntryPoint
+
+[Sources.common]
+  RK3588GpioDxe.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  DebugLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gPlatformGpioProtocolGuid
+
+[Depex]
+  TRUE

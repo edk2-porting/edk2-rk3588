@@ -1,0 +1,36 @@
+## @file
+#
+# Copyright (c) 2018 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = IioUdsDataDxe
+  FILE_GUID                      = 036125ED-DD4C-4BF7-AC8D-83FE11CDD5DB
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = IioUdsDataInit
+
+[Sources]
+  IioUdsDataDxe.c
+  IioUdsDataDxe.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  PurleyOpenBoardPkg/OpenBoardPkg.dec
+  PurleyRefreshSiliconPkg/SiPkg.dec
+
+[LibraryClasses]
+  HobLib
+  BaseMemoryLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiIioUdsProtocolGuid
+
+[Depex]
+  TRUE

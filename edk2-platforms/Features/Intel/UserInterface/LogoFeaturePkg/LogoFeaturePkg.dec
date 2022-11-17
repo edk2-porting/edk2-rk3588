@@ -1,0 +1,31 @@
+## @file
+# This package provides advanced feature functionality for LOGO.
+# This package should only depend on EDK II Core packages.
+#
+# The DEC files are used by the utilities that parse DSC and
+# INF files to generate AutoGen.c and AutoGen.h files
+# for the build infrastructure.
+#
+# Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION = 0x00010017
+  PACKAGE_NAME      = LogoFeaturePkg
+  PACKAGE_GUID      = A1A87B33-C3E3-497B-978F-2FF7813FEB21
+  PACKAGE_VERSION   = 0.1
+
+[Includes]
+  Include
+
+[LibraryClasses]
+
+[Guids]
+  gLogoFeaturePkgTokenSpaceGuid  =  {0x567199de, 0xb448, 0x4aa0, {0x99, 0x4e, 0xd5, 0xd6, 0x82, 0x59, 0x91, 0x17}}
+
+[PcdsFeatureFlag]
+  gLogoFeaturePkgTokenSpaceGuid.PcdLogoFeatureEnable|FALSE|BOOLEAN|0xA0000001
+  gLogoFeaturePkgTokenSpaceGuid.PcdJpgEnable|FALSE|BOOLEAN|0xA0000002

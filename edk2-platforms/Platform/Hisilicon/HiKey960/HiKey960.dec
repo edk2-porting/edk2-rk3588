@@ -1,0 +1,29 @@
+#
+#  Copyright (c) 2018, Linaro Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+[Defines]
+  DEC_SPECIFICATION              = 0x0001001a
+  PACKAGE_NAME                   = HiKey960
+  PACKAGE_GUID                   = 1892b5b5-d18d-47a3-8fab-e3ae6b4226b0
+  PACKAGE_VERSION                = 0.1
+
+################################################################################
+#
+# Include Section - list of Include Paths that are provided by this package.
+#                   Comments are used for Keywords and Module Types.
+#
+# Supported Module Types:
+#  BASE SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
+#
+################################################################################
+[Guids.common]
+  gHiKey960TokenSpaceGuid        = { 0x99a14446, 0xaad7, 0xe460, {0xb4, 0xe5, 0x1f, 0x79, 0xaa, 0xa4, 0x93, 0xfd } }
+
+[PcdsFixedAtBuild.common]
+  gHiKey960TokenSpaceGuid.PcdAndroidBootDevicePath|L""|VOID*|0x00000001
+  gHiKey960TokenSpaceGuid.PcdAndroidBootFile|{ 0x36, 0x8b, 0x73, 0x3a, 0xc5, 0xb9, 0x63, 0x47, 0xab, 0xbd, 0x6c, 0xbd, 0x4b, 0x25, 0xf9, 0xff }|VOID*|0x00000002
+  gHiKey960TokenSpaceGuid.PcdAndroidFastbootFile|{ 0x2a, 0x50, 0x88, 0x95, 0x70, 0x53, 0xe3, 0x11, 0x86, 0x31, 0xd7, 0xc5, 0x95, 0x13, 0x64, 0xc8 }|VOID*|0x00000003
+  gHiKey960TokenSpaceGuid.PcdSdBootDevicePath|L""|VOID*|0x00000004

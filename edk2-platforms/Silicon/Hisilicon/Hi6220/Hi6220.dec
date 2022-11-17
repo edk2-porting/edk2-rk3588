@@ -1,0 +1,26 @@
+#
+#  Copyright (c) 2014-2017, Linaro Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010019
+  PACKAGE_NAME                   = HiKey
+  PACKAGE_GUID                   = 01be44a1-5ed3-47fc-8ecf-daa83344678c
+  PACKAGE_VERSION                = 0.1
+
+################################################################################
+#
+# Include Section - list of Include Paths that are provided by this package.
+#                   Comments are used for Keywords and Module Types.
+#
+# Supported Module Types:
+#  BASE SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
+#
+################################################################################
+[Includes.common]
+  Include                        # Root include for the package
+
+[Guids.common]
+  gHi6220TokenSpaceGuid      =  { 0x47fc9a0e, 0x1796, 0x4d04, { 0xaf, 0x68, 0x2b, 0xcb, 0x0d, 0x40, 0x84, 0x09} }

@@ -1,0 +1,36 @@
+## @file
+#  UEFI Compression Library implementation.
+#
+#  Copyright (c) 2007 - 2020, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = CompressLib
+  FILE_GUID                      = d9249b61-30a7-456d-a3a1-23d24fed17aa
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = CompressLib
+
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+
+[Sources]
+  CompressLib.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+

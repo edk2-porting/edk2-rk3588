@@ -1,0 +1,49 @@
+## @file
+# Component description file for Traditional MM Variable Read Lib
+#
+# This library provides phase agnostic access to the UEFI Variable Services.
+# This is done by implementing a wrapper on top of the phase specific mechanism
+# for reading from UEFI variables. For example, the PEI implementation of this
+# library uses EFI_PEI_READ_ONLY_VARIABLE2_PPI. The DXE implementation accesses
+# the UEFI Runtime Services Table, and the SMM implementation uses
+# EFI_SMM_VARIABLE_PROTOCOL.
+#
+# Using this library allows code to be written in a generic manner that can be
+# used in PEI, DXE, or SMM without modification.
+#
+# Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = TraditionalMmVariableReadLib
+  FILE_GUID                      = 50910542-A4ED-4142-AF25-25E141C016FC
+  VERSION_STRING                 = 1.0
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  LIBRARY_CLASS                  = VariableReadLib|DXE_SMM_DRIVER SMM_CORE
+  CONSTRUCTOR                    = TraditionalMmVariableReadLibConstructor
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[Sources]
+  SmmVariableReadCommon.c
+  TraditionalMmVariableReadLibConstructor.c
+
+[LibraryClasses]
+  DebugLib
+  SmmServicesTableLib
+
+[Guids]
+
+[Protocols]
+  gEfiSmmVariableProtocolGuid   ## CONSUMES
+
+[Pcd]
+
+[Depex]
+  gEfiSmmVariableProtocolGuid

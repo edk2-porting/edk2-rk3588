@@ -1,0 +1,385 @@
+/** @file
+
+Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+  Name (SUPP, 0)
+  Name (CTRL, 0)
+  
+  //
+  // Set this root port to use the correct Proximity Domain
+  //
+  Name(_PXM, 0)
+
+  Method(_OSC,4) {
+    //
+    // Create DWord-addressable fields from the capabilities Buffer
+    //
+    CreateDWordField(Arg3,0,CDW1)
+    If (LEqual(Arg0,ToUUID("33DB4D5B-1FF7-401C-9657-7441C03DD766"))) {
+        //
+        // Create DWord-addressable fields from the capabilities Buffer
+        //
+        CreateDWordField(Arg3,4,CDW2)
+
+        //
+        // Fill 3rd capability DWORD only if the count is greater than 2.
+        //
+        If(LGreater(Arg2,2)) {
+            CreateDWordField(Arg3,8,CDW3)
+        }
+
+        //
+        // Save Capabilities DWord2 & 3
+        //
+        Store(CDW2,SUPP)
+        Store(CDW3,CTRL)
+
+        //
+        // Never allow SHPC (no SHPC controller in system)
+        //
+        And(CTRL, 0x1D, CTRL)
+        //
+        // Disable Native PCIe AER handling from OS so that it uses Firmware First model in WHEA
+        //
+        And (CTRL, 0x17, CTRL)
+        
+
+        If (LNotEqual(Arg1,one)) { // unknown revision
+          Or(CDW1,0x08,CDW1)
+        }
+
+        If(LNotEqual(CDW3,CTRL)) { // capabilities bits were masked
+          Or(CDW1,0x10,CDW1)
+        }
+        //
+        // update DWORD3 in the buffer
+        //
+        Store(CTRL,CDW3)
+          Return(Arg3)
+
+      } Else {
+        //
+        // Just indicate unrecognized UUID
+        // Leave it at that
+        //
+        Or (CDW1,4,CDW1)
+        Store (0xEE, IO80)
+        Return(Arg3)
+      }
+  } // End _OSC
+
+#include "Pch.asi"
+#include "PchApic.asi"
+
+
+#define RESOURCE_CHUNK1_OFF     0
+#define RESOURCE_CHUNK2_OFF    16   //(RESOURCE_CHUNK1_OFF + 16)
+#define RESOURCE_CHUNK3_OFF    24   //(RESOURCE_CHUNK2_OFF +  8)
+#define RESOURCE_CHUNK4_OFF    40   //(RESOURCE_CHUNK3_OFF + 16)
+#define RESOURCE_CHUNK5_OFF    56   //(RESOURCE_CHUNK4_OFF + 16)
+#define RESOURCE_CHUNK6_OFF    82   //(RESOURCE_CHUNK5_OFF + 26)
+#define RESOURCE_CHUNK7_OFF   108   //(RESOURCE_CHUNK6_OFF + 26)
+
+#define PciResourceStart       Local0
+#define PciResourceLen         Local1
+
+  Name(P0RS, ResourceTemplate() {
+    //RESOURCE_CHUNK1_OFF
+    WORDBusNumber(            // Bus number resource (0); the bridge produces bus numbers for its subsequent buses
+      ResourceProducer,       // bit 0 of general flags is 1
+      MinFixed,               // Range is fixed
+      MaxFixed,               // Range is fixed
+      PosDecode,              // PosDecode
+      0x0000,                 // Granularity (FIX1 - Patched by ACPI Platform Driver during POST)
+      0x0000,                 // Min         (FIX1 - Patched by ACPI Platform Driver during POST)
+      0x0000,                 // Max         (FIX1 - Patched by ACPI Platform Driver during POST)
+      0x0000,                 // Translation
+      0x0001,                 // Range Length = Max-Min+1 (FIX1 - Patched by ACPI Platform Driver during POST)
+            ,
+            ,
+      FIX1                    // DescriptorName populated so iASL outputs offset for it in a .h file
+    )
+
+    //RESOURCE_CHUNK2_OFF
+    IO(                       // Consumed resource (CF8-CFF)
+      Decode16,
+      0x0cf8,
+      0xcf8,
+      1,
+      8
+    )
+
+    //RESOURCE_CHUNK3_OFF
+    WORDIO(                   // Consumed-and-produced resource (all I/O below CF8)
+      ResourceProducer,       // bit 0 of general flags is 0
+      MinFixed,               // Range is fixed
+      MaxFixed,               // Range is fixed
+      PosDecode,
+      EntireRange,
+      0x0000,                 // Granularity
+      0x0000,                 // Min
+      0x0cf7,                 // Max
+      0x0000,                 // Translation
+      0x0cf8                  // Range Length
+   )
+
+    //RESOURCE_CHUNK4_OFF
+    WORDIO(                   // Consumed-and-produced resource (all I/O above CFF)
+      ResourceProducer,       // bit 0 of general flags is 0
+      MinFixed,               // Range is fixed
+      MaxFixed,               // Range is fixed
+      PosDecode,
+      EntireRange,
+      0x0000,                 // Granularity  (FIX2 - Patched by ACPI Platform Driver during POST)
+      0x0000,                 // Min          (FIX2 - Patched by ACPI Platform Driver during POST)
+      0x0000,                 // Max          (FIX2 - Patched by ACPI Platform Driver during POST)
+      0x0000,                 // Translation
+      0x0001,                 // Range Length (FIX2 - Patched by ACPI Platform Driver during POST)
+            ,
+            ,
+      FIX2                    // DescriptorName populated so iASL outputs offset for it in a .h file
+    )
+
+    //RESOURCE_CHUNK5_OFF
+    DWORDMEMORY(              // descriptor for video RAM on video card
+      ResourceProducer,       // bit 0 of general flags is 0
+      PosDecode,
+      MinFixed,               // Range is fixed
+      MaxFixed,               // Range is Fixed
+      Cacheable,
+      ReadWrite,
+      0x00000000,             // Granularity  (FIX5 - Patched by ACPI Platform Driver during POST)
+      0x00000000,             // Min          (FIX5 - Patched by ACPI Platform Driver during POST)
+      0x00000000,             // Max          (FIX5 - Patched by ACPI Platform Driver during POST)
+      0x00000000,             // Translation
+      0x00000000,             // Range Length (FIX5 - Patched by ACPI Platform Driver during POST)
+                ,
+		,
+      FIX5			// Descriptor Name
+    )
+
+    //RESOURCE_CHUNK6_OFF
+    DWORDMEMORY(              // descriptor for Shadow RAM
+      ResourceProducer,       // bit 0 of general flags is 0
+      PosDecode,
+      MinFixed,               // Range is fixed
+      MaxFixed,               // Range is Fixed
+      Cacheable,
+      ReadWrite,
+      0x00000000,             // Granularity
+      0x00000000,             // Min (calculated dynamically)
+      0x00000000,             // Max (calculated dynamically)
+      0x00000000,             // Translation
+      0x00000000,             // Range Length (calculated dynamically)
+                ,
+                ,
+      SRAM                    // DescriptorName populated so iASL doesn't flag 0 value fields and no tag as error
+    )
+/*
+    //RESOURCE_TPM
+    DWORDMemory(              // Consumed-and-produced resource(all of memory space)
+      ResourceProducer,       // bit 0 of general flags is 0
+      PosDecode,              // positive Decode
+      MinFixed,               // Range is fixed
+      MaxFixed,               // Range is fixed
+      NonCacheable,
+      ReadWrite,
+      0x00000000,             // Granularity
+      0xFED40000,             // Min (calculated dynamically)
+      0xFEDFFFFF,             // Max = 4GB - 1MB  (fwh + fwh alias...)
+      0x00000000,             // Translation
+      0x000C0000              // Range Length (calculated dynamically)
+    )
+*/
+   DWordMemory(ResourceProducer,PosDecode,MinFixed,MaxFixed,NonCacheable,
+        ReadWrite,0x00,0xFE010000,0xFE010FFF,0x00,0x1000)
+
+    //
+    // PCI RESOURCE_32bit
+    //
+    DWORDMemory(              // Consumed-and-produced resource(all of memory space)
+      ResourceProducer,       // bit 0 of general flags is 0
+      PosDecode,              // positive Decode
+      MinFixed,               // Range is fixed
+      MaxFixed,               // Range is fixed
+      NonCacheable,
+      ReadWrite,
+      0x00000000,             // Granularity (FIX3 - Patched by ACPI Platform Driver during POST)
+      0x00000000,             // Min (calculated dynamically) (FIX3 - Patched by ACPI Platform Driver during POST)
+      0x00000000,             // Max = 4GB - 1MB  (fwh + fwh alias) (FIX3 - Patched by ACPI Platform Driver during POST)
+      0x00000000,             // Translation
+      0x00000000,             // Range Length (calculated dynamically) (FIX3 - Patched by ACPI Platform Driver during POST)
+                ,
+                ,
+      FIX3                    // DescriptorName populated so iASL outputs offset for it in a .h file
+    )
+
+    //
+    // PCI RESOURCE_64bit
+    //
+    QWORDMemory(              // Consumed-and-produced resource(all of memory space)
+      ResourceProducer,       // bit 0 of general flags is 0
+      PosDecode,              // positive Decode
+      MinFixed,               // Range is fixed
+      MaxFixed,               // Range is fixed
+      NonCacheable,
+      ReadWrite,
+      0x00000000000,          // Granularity (FIX4 - Patched by ACPI Platform Driver during POST)
+      0x00000000000,          // Min (calculated dynamically) (FIX4 - Patched by ACPI Platform Driver during POST)
+      0x00000000000,          // Max = 4GB - 1MB  (fwh + fwh alias) (FIX4 - Patched by ACPI Platform Driver during POST)
+      0x00000000000,          // Translation
+      0x00000000000,          // Range Length (calculated dynamically) (FIX4 - Patched by ACPI Platform Driver during POST)
+                   ,
+                   ,
+      FIX4                    // DescriptorName populated so iASL outputs offset for it in a .h file
+    )
+  }) // end of P0RS Buffer
+
+  OperationRegion(TMEM, PCI_Config, 0x00, 0x100)
+  Field(TMEM, ByteAcc, NoLock, Preserve) {
+    Offset(0x40),
+    , 4,
+    BSEG, 4,
+    PAMS, 48,
+    Offset(0x52),
+    DIM0, 4,
+    DIM1, 4,
+    , 8,
+    DIM2, 4,
+  }
+
+  Name(MTBL, Package(0x10) {
+    0x0,
+    0x20,
+    0x20,
+    0x30,
+    0x40,
+    0x40,
+    0x60,
+    0x80,
+    0x80,
+    0x80,
+    0x80,
+    0xc0,
+    0x100,
+    0x100,
+    0x100,
+    0x200
+  })
+
+  Name(ERNG, Package(0xd) {
+    0xc0000,
+    0xc4000,
+    0xc8000,
+    0xcc000,
+    0xd0000,
+    0xd4000,
+    0xd8000,
+    0xdc000,
+    0xe0000,
+    0xe4000,
+    0xe8000,
+    0xec000,
+    0xf0000
+  })
+
+  Name(PAMB, Buffer(0x7) {
+  })
+
+  Method(EROM, 0x0, NotSerialized) {
+    CreateDWordField(P0RS, ^SRAM._MIN, RMIN) // Do not reference hard-coded address
+    CreateDWordField(P0RS, ^SRAM._MAX, RMAX) // Do not reference hard-coded address
+    CreateDWordField(P0RS, ^SRAM._LEN, RLEN) // Do not reference hard-coded address
+    CreateByteField(PAMB, 0x6, BREG)
+    Store(PAMS, PAMB)
+    Store(BSEG, BREG)
+    Store(0x0, RMIN)
+    Store(0x0, RMAX)
+    Store(0x0, RLEN)
+    Store(0x0, Local0)
+    While(LLess(Local0, 0xd))
+    {
+      ShiftRight(Local0, 0x1, Local1)
+      Store(DerefOf(Index(PAMB, Local1, )), Local2)
+      If(And(Local0, 0x1, ))
+      {
+          ShiftRight(Local2, 0x4, Local2)
+      }
+      And(Local2, 0x3, Local2)
+      If(RMIN)
+      {
+        If(Local2)
+        {
+          Add(DerefOf(Index(ERNG, Local0, )), 0x3fff, RMAX)
+          If(LEqual(RMAX, 0xf3fff))
+          {
+            Store(0xfffff, RMAX)
+          }
+          Subtract(RMAX, RMIN, RLEN)
+          Increment(RLEN)
+        }
+        Else
+        {
+          Store(0xc, Local0)
+        }
+      }
+      Else
+      {
+        If(Local2)
+        {
+          Store(DerefOf(Index(ERNG, Local0, )), RMIN)
+          Add(DerefOf(Index(ERNG, Local0, )), 0x3fff, RMAX)
+          If(LEqual(RMAX, 0xf3fff))
+          {
+            Store(0xfffff, RMAX)
+          }
+          Subtract(RMAX, RMIN, RLEN)
+          Increment(RLEN)
+        }
+        Else
+        {
+        }
+      }
+      Increment(Local0)
+    }
+  }
+
+  // Current resource template return
+  Method(_CRS, 0x0, NotSerialized) {
+    EROM()
+    Return(P0RS)
+  }
+
+  //
+  // Memory Riser UID will be in Interger form to support CPU Migration.
+  // First two digits will indicate Memory Device(01) and last two
+  // digits will represent the Memory Riser number.
+  //
+  Device (MHP0) {
+    // Within the IIO, read D5:F1 for Memory HP status
+    Name(_ADR, 0x00050001)          // D5:F1
+    Name(_UID, "00-00")
+
+    // MHP0 - Config register for Slot status
+    OperationRegion(MHP0, PCI_Config, 0x00, 0x100)
+    Field(MHP0,ByteAcc,NoLock,Preserve) {
+      Offset(0x0E),
+      STM0,7,
+    }
+  }
+
+  Device (MHP1) {
+    // Within the IIO, read D5:F1 for Memory HP status
+    Name(_ADR, 0x00050001)          // D5:F1
+    Name(_UID, "00-01")
+
+    // MHP1 - Config register for Slot status
+    OperationRegion(MHP1, PCI_Config, 0x00, 0x100)
+    Field(MHP1,ByteAcc,NoLock,Preserve) {
+      Offset(0x1E),
+      STM1,7,
+    }
+  }

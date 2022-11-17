@@ -1,0 +1,49 @@
+#/** @file
+#
+#  Copyright (c) 2019, ARM Limited. All rights reserved.
+#  Copyright (c) 2017, Andrei Warkentin <andrey.warkentin@gmail.com>
+#  Copyright (c) Microsoft Corporation. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = ArasanMMCHost
+  FILE_GUID                      = 100c2cfa-b586-4198-9b4c-1683d195b1da
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = MMCInitialize
+
+[Sources.common]
+  ArasanMmcHostDxe.h
+  ArasanMmcHostDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  Silicon/Broadcom/Bcm283x/Bcm283x.dec
+  Platform/RaspberryPi/RaspberryPi.dec
+
+[LibraryClasses]
+  PcdLib
+  UefiLib
+  UefiDriverEntryPoint
+  MemoryAllocationLib
+  IoLib
+  DmaLib
+  CacheMaintenanceLib
+
+[Guids]
+
+[Protocols]
+  gRaspberryPiMmcHostProtocolGuid  ## PRODUCES
+  gRaspberryPiFirmwareProtocolGuid ## CONSUMES
+
+[Pcd]
+  gBcm283xTokenSpaceGuid.PcdBcm283xRegistersAddress
+  gRaspberryPiTokenSpaceGuid.PcdSdIsArasan
+
+[Depex]
+  gRaspberryPiFirmwareProtocolGuid AND gRaspberryPiConfigAppliedProtocolGuid

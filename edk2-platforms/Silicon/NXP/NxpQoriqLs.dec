@@ -1,0 +1,63 @@
+#  @file.
+#
+#  Copyright 2017-2020 NXP
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+
+[Defines]
+  DEC_SPECIFICATION              = 0x0001001A
+  PACKAGE_VERSION                = 0.1
+
+[Includes]
+  Include
+
+[LibraryClasses]
+  ##  @libraryclass  Provides Chassis specific functions to other modules
+  ChassisLib|Include/Library/ChassisLib.h
+
+  ##  @libraryclass  Provides services to read/write to I2c devices
+  I2cLib|Include/Library/I2cLib.h
+
+[Guids.common]
+  gNxpQoriqLsTokenSpaceGuid      = {0x98657342, 0x4aee, 0x4fc6, {0xbc, 0xb5, 0xff, 0x45, 0xb7, 0xa8, 0x71, 0xf2}}
+  gNxpNonDiscoverableI2cMasterGuid = { 0x5f2c099c, 0x54a3, 0x4dd4, {0x9e, 0xc5, 0xe9, 0x12, 0x8c, 0x36, 0x81, 0x6a}}
+
+[PcdsFeatureFlag]
+  gNxpQoriqLsTokenSpaceGuid.PcdI2cErratumA009203|FALSE|BOOLEAN|0x00000315
+  gNxpQoriqLsTokenSpaceGuid.PcdDcfgBigEndian|FALSE|BOOLEAN|0x00000316
+  gNxpQoriqLsTokenSpaceGuid.PcdPciLutBigEndian|FALSE|BOOLEAN|0x00000317
+  gNxpQoriqLsTokenSpaceGuid.PcdSataErratumA009185|FALSE|BOOLEAN|0x00000318
+  gNxpQoriqLsTokenSpaceGuid.PcdGpioControllerBigEndian|FALSE|BOOLEAN|0x00000319
+  gNxpQoriqLsTokenSpaceGuid.PcdScfgBigEndian|FALSE|BOOLEAN|0x00000320
+
+[PcdsFixedAtBuild.common]
+  # Pcds for PCI Express
+  gNxpQoriqLsTokenSpaceGuid.PcdPciExp1BaseAddr|0x0|UINT64|0x00000500
+  gNxpQoriqLsTokenSpaceGuid.PcdNumPciController|0|UINT32|0x00000501
+  gNxpQoriqLsTokenSpaceGuid.PcdPcieLutBase|0x0|UINT32|0x00000502
+  gNxpQoriqLsTokenSpaceGuid.PcdPcieLutDbg|0x0|UINT32|0x00000503
+  gNxpQoriqLsTokenSpaceGuid.PcdSerDesLanes|0x0|UINT8|0x00000504
+
+  # Pcds for USB
+  gNxpQoriqLsTokenSpaceGuid.PcdUsbBaseAddr|0x0|UINT64|0x00000510
+  gNxpQoriqLsTokenSpaceGuid.PcdUsbSize|0x0|UINT32|0x00000511
+  gNxpQoriqLsTokenSpaceGuid.PcdNumUsbController|0|UINT32|0x00000512
+
+  # Pcds for SATA
+  gNxpQoriqLsTokenSpaceGuid.PcdSataBaseAddr|0x0|UINT64|0x00000350
+  gNxpQoriqLsTokenSpaceGuid.PcdSataSize|0x0|UINT32|0x00000351
+  gNxpQoriqLsTokenSpaceGuid.PcdNumSataController|0x0|UINT32|0x00000352
+
+  #
+  # Pcds for Gpio
+  #
+  gNxpQoriqLsTokenSpaceGuid.PcdNumGpioController|0|UINT32|0x00000355
+  gNxpQoriqLsTokenSpaceGuid.PcdGpioModuleBaseAddress|0|UINT64|0x00000356
+  gNxpQoriqLsTokenSpaceGuid.PcdGpioControllerOffset|0|UINT64|0x00000357
+
+[PcdsDynamic.common]
+  gNxpQoriqLsTokenSpaceGuid.PcdPciCfgShiftEnable|FALSE|BOOLEAN|0x00000600
+  gNxpQoriqLsTokenSpaceGuid.PcdPciLsGen4Ctrl|FALSE|BOOLEAN|0x00000601
+  gNxpQoriqLsTokenSpaceGuid.PcdPciHideRootPort|FALSE|BOOLEAN|0x00000602

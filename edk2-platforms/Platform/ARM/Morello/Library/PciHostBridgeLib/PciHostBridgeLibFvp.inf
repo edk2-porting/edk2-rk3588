@@ -1,0 +1,48 @@
+## @file
+#  PCI Host Bridge Library instance for ARM Morello FVP platform.
+#
+#  Copyright (c) 2021, ARM Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = PciHostBridgeLib
+  FILE_GUID                      = 6879CEAD-DC94-42EB-895C-096D36B8083C
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PciHostBridgeLib|DXE_DRIVER
+
+#
+# The following information is for reference only and not required by the build
+# tools.
+#
+#  VALID_ARCHITECTURES           = AARCH64
+#
+
+[Sources]
+  PciHostBridgeLibFvp.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Platform/ARM/Morello/MorelloPlatform.dec
+
+[FixedPcd]
+  gArmMorelloTokenSpaceGuid.PcdPciBusMax
+  gArmMorelloTokenSpaceGuid.PcdPciBusMin
+  gArmMorelloTokenSpaceGuid.PcdPciIoBase
+  gArmMorelloTokenSpaceGuid.PcdPciIoSize
+  gArmMorelloTokenSpaceGuid.PcdPciMmio32Base
+  gArmMorelloTokenSpaceGuid.PcdPciMmio32Size
+  gArmMorelloTokenSpaceGuid.PcdPciMmio64Base
+  gArmMorelloTokenSpaceGuid.PcdPciMmio64Size
+
+[Protocols]
+  gEfiCpuIo2ProtocolGuid          ## CONSUMES
+
+[Depex]
+  gEfiCpuIo2ProtocolGuid

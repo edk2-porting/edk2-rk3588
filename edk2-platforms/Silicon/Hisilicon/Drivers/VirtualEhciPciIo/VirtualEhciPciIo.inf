@@ -1,0 +1,33 @@
+#/** @file
+#
+#    Copyright (c) 2016, Hisilicon Limited. All rights reserved.
+#    Copyright (c) 2016, Linaro Limited. All rights reserved.
+#
+#    SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = VirtualEhciPciIo
+  FILE_GUID                      = CCC39A9C-33EC-4e5a-924B-2C5CD4CEF6A4
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = EhciVirtualPciIoInitialize
+
+
+[Sources]
+  VirtualEhciPciIo.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Silicon/Hisilicon/HisiliconNonOsi.dec
+  Silicon/Hisilicon/HisiPkg.dec
+
+[LibraryClasses]
+  NonDiscoverableDeviceRegistrationLib
+  PlatformSysCtrlLib
+  UefiDriverEntryPoint

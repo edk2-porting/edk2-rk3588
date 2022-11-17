@@ -1,0 +1,88 @@
+EDK II Maintainers
+==================
+
+This file provides information about the primary maintainers for
+EDK II.
+
+In general, you should not privately email the maintainer. You should
+email the edk2-devel list, but you can also Cc the maintainer.
+
+Descriptions of section entries:
+
+  L: Mailing list that is relevant to this area (default is edk2-devel)
+     Patches and questions should be sent to the email list.
+  M: Cc address for patches and questions (ie, the package maintainer)
+  W: Web-page with status/info
+  T: SCM tree type and location.  Type is one of: git, svn.
+  S: Status, one of the following:
+     Supported:  Someone is actually paid to look after this.
+     Maintained: Someone actually looks after it.
+     Odd Fixes:  It has a maintainer but they don't have time to do
+                 much other than throw the odd patch in. See below.
+     Orphan:     No current maintainer [but maybe you could take the
+                 role as you write your new code].
+     Obsolete:   Old code. Something tagged obsolete generally means
+                 it has been replaced by a better system and you
+                 should be using that.
+
+EDK II
+------
+W: http://www.tianocore.org/edk2/
+L: https://lists.sourceforge.net/lists/listinfo/edk2-devel
+T: git - https://github.com/tianocore/edk2-non-osi.git
+T: git - https://bitbucket.org/tianocore/edk2-non-osi.git
+T: git - http://git.code.sf.net/p/tianocore/edk2-non-osi
+T: svn - https://svn.code.sf.net/p/edk2/code/trunk/edk2-non-osi
+
+Responsible Disclosure, Reporting Security Issues
+-------------------------------------------------
+W: https://github.com/tianocore/tianocore.github.io/wiki/Security
+
+EDK II Packages:
+----------------
+
+Platform/Intel/KabylakeOpenBoardBinPkg
+M: Chasel Chiu <chasel.chiu@intel.com>
+M: Nate DeSimone <nathaniel.l.desimone@intel.com>
+
+Platform/Intel/WhitleyOpenBoardBinPkg
+M: Isaac Oram <isaac.w.oram@intel.com>
+M: Nate DeSimone <nathaniel.l.desimone@intel.com>
+M: Chasel Chiu <chasel.chiu@intel.com>
+
+Platform/Intel/CoffeelakeSiliconBinPkg
+M: Chasel Chiu <chasel.chiu@intel.com>
+M: Sai Chaganty <rangasai.v.chaganty@intel.com>
+
+Platform/Intel/CometlakeSiliconBinPkg
+M: Kathappan Esakkithevar <kathappan.esakkithevar@intel.com>
+M: Sai Chaganty <rangasai.v.chaganty@intel.com>
+
+Silicon/Intel/ElkhartlakeSiliconBinPkg
+M: Nate DeSimone <nathaniel.l.desimone@intel.com>
+M: Sai Chaganty <rangasai.v.chaganty@intel.com>
+M: Jin Jhu Lim <jin.jhu.lim@intel.com>
+
+Silicon/Intel/KabylakeSiliconBinPkg
+M: Chasel Chiu <chasel.chiu@intel.com>
+M: Sai Chaganty <rangasai.v.chaganty@intel.com>
+
+Silicon/Intel/PurleySiliconBinPkg
+M: Nate DeSimone <nathaniel.l.desimone@intel.com>
+M: Isaac W Oram <isaac.w.oram@intel.com>
+
+Silicon/Intel/WhitleySiliconBinPkg
+M: Nate DeSimone <nathaniel.l.desimone@intel.com>
+M: Isaac W Oram <isaac.w.oram@intel.com>
+
+Silicon/Intel/QuarkSocBinPkg
+M: Michael D Kinney <michael.d.kinney@intel.com>
+M: Kelly Steele <kelly.steele@intel.com>
+
+Silicon/Intel/Vlv2SocBinPkg
+M: Zailiang Sun <zailiang.sun@intel.com>
+M: Yi Qian <yi.qian@intel.com>
+
+Silicon/Intel/TigerlakeSiliconBinPkg
+M: Sai Chaganty <rangasai.v.chaganty@intel.com>
+M: Nate DeSimone <nathaniel.l.desimone@intel.com>

@@ -1,0 +1,9 @@
+/** @file
+
+Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+  // Eject device if SCK1 is removed.
+  Name(_EJD,"\\_SB.SCK1")   // Dependent on SCK1

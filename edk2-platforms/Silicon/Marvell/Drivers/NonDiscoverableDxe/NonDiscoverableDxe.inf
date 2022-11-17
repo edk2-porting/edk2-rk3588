@@ -1,0 +1,33 @@
+# Copyright (C) 2016 Marvell International Ltd.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+[Defines]
+  INF_VERSION                     = 0x00010019
+  BASE_NAME                       = NonDiscoverableDxe
+  FILE_GUID                       = 3dfa08da-923b-4841-9435-c77a604d7493
+  MODULE_TYPE                     = DXE_DRIVER
+  VERSION_STRING                  = 1.0
+
+  ENTRY_POINT                     = NonDiscoverableEntryPoint
+
+[Sources.common]
+  NonDiscoverableDxe.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/Marvell/Marvell.dec
+
+[LibraryClasses]
+  NonDiscoverableDeviceRegistrationLib
+  NonDiscoverableInitLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gMarvellBoardDescProtocolGuid
+
+[Depex]
+  TRUE

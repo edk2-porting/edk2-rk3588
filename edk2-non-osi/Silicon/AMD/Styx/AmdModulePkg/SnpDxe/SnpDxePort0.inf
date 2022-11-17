@@ -1,0 +1,48 @@
+# $NoKeywords */
+#
+# @file
+#
+# SnpDxePort0.inf
+#
+# Ethernet port 0 driver module information file.
+#
+# @xrefitem bom "File Content Label" "Release Content"
+# @e project: FDK
+# @e sub-project: UEFI
+# @e version: $Revision: 294189 $ @e date: $Date: 2014-05-29 17:25:20 -0700 (Thu, 29 May 2014) $
+#
+#
+#*****************************************************************************
+#
+#  Copyright (c) 2015 - 2016, AMD Inc. All rights reserved.<BR>
+#
+#  This program and the accompanying materials
+#  are licensed and made available under the terms and conditions of the BSD License
+#  which accompanies this distribution.  The full text of the license may be found at
+#  http://opensource.org/licenses/bsd-license.php
+#
+#  THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#***************************************************************************/
+
+[Defines]
+  INF_VERSION          = 0x00010005
+  VERSION_STRING       = 1.0
+  BASE_NAME            = SnpDxePort0
+  MODULE_TYPE          = UEFI_DRIVER
+  FILE_GUID            = 25ac458a-cf60-476e-861a-211c757657a6
+  ENTRY_POINT          = UefiMain
+
+[Binaries.AARCH64]
+  PE32|SnpDxePort0.efi
+  DEPEX|SnpDxePort0.depex
+
+[Packages]
+  Silicon/AMD/Styx/AmdModulePkg/AmdModulePkg.dec
+
+[PatchPcd]
+  gAmdModulePkgTokenSpaceGuid.PcdXgbeUseMacFromIscp
+  gAmdModulePkgTokenSpaceGuid.PcdXgbeRev
+  gAmdModulePkgTokenSpaceGuid.PcdEthMacA
+  gAmdModulePkgTokenSpaceGuid.PcdEthMacB

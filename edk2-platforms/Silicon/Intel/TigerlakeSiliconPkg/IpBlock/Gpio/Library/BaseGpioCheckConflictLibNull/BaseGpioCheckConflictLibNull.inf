@@ -1,0 +1,26 @@
+## @file
+#  Component information file for BaseGpioCheckConflictLib.
+#
+#  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+[Defines]
+  INF_VERSION                    = 0x00010017
+  BASE_NAME                      = BaseGpioCheckConflictLibNull
+  FILE_GUID                      = C19A848A-F013-4DBF-9C23-F0F74DEA6F14
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = GpioCheckConflictLib
+
+[LibraryClasses]
+  DebugLib
+  HobLib
+  GpioLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  TigerlakeSiliconPkg/SiPkg.dec
+
+[Sources]
+  BaseGpioCheckConflictLibNull.c

@@ -1,0 +1,38 @@
+## @file
+#
+#  Copyright (c) 2017, Linaro Ltd. All rights reserved.<BR>
+#  Copyright (c) 2019, Marvell International Ltd. All rights reserved.<BR>
+#  Copyright (c) 2021, Semihalf. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = Cn913xCExEvalNonDiscoverableInitLib
+  FILE_GUID                      = 8e6a8766-df51-497f-9743-fc0d9170ced8
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NonDiscoverableInitLib
+
+[Sources]
+  NonDiscoverableInitLib.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Silicon/Marvell/Marvell.dec
+
+[LibraryClasses]
+  DebugLib
+  IoLib
+  MvGpioLib
+
+[Protocols]
+  gEmbeddedGpioProtocolGuid
+
+[Depex]
+  gMarvellPlatformInitCompleteProtocolGuid

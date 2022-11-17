@@ -1,0 +1,49 @@
+## @file
+# SiliconPolicyInitLate DXE Boot Services Driver
+#
+# This driver initializes silicon policy with the defaults from the silicon provider.
+# It publishes a protocol that is consumed by a shim library instance that provides the functions used by the
+# common MinPlatformPkg PolicyInit late silicon init code.
+# This driver produces SiliconPolicyInit LATE services.  A PEIM provides the PRE and POST memory services.
+#
+# @copyright
+# Copyright 2021 Intel Corporation. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SiliconPolicyInitLate
+  FILE_GUID                      = ff6216f2-d911-44a5-9f48-c174223acc7c
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = SiliconPolicyInitLateDxeEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = X64
+#
+
+[Sources]
+  SiliconPolicyInitLate.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+  WhitleySiliconPkg/WhitleySiliconPkg.dec
+  WhitleyOpenboardPkg/PlatformPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  DriverEntryPoint
+  UefiBootServicesTableLib
+  SiliconPolicyInitLib
+
+[Guids]
+  gSiliconPolicyInitLibInterfaceGuid      ## ALWAYS_PRODUCES a PROTOCOL with this GUID
+
+[Depex]
+  TRUE

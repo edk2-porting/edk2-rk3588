@@ -1,0 +1,176 @@
+## @file
+# Module Information file for the PolicyInit DXE driver.
+#
+#
+#  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010017
+  BASE_NAME                      = PolicyInitDxe
+  FILE_GUID                      = 490D0119-4448-440D-8F5C-F58FB53EE057
+  VERSION_STRING                 = 1.0
+  MODULE_TYPE                    = DXE_DRIVER
+  ENTRY_POINT                    = PolicyInitDxeEntryPoint
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  CpuPlatformLib
+  DebugLib
+  DxeServicesTableLib
+  IoLib
+  MemoryAllocationLib
+  DxeSaPolicyLib
+  DxePchPolicyLib
+  PcdLib
+  DxePolicyBoardConfigLib
+  DxePolicyUpdateLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+  UefiRuntimeServicesTableLib
+  ConfigBlockLib
+  DevicePathLib
+  DxeTbtPolicyLib
+  PchPcieRpLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  CoffeelakeSiliconPkg/SiPkg.dec
+  WhiskeylakeOpenBoardPkg/OpenBoardPkg.dec
+  IntelSiliconPkg/IntelSiliconPkg.dec
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress                     ## CONSUMES
+  gSiPkgTokenSpaceGuid.PcdFlashMicrocodeFvBase                          ## CONSUMES
+  gSiPkgTokenSpaceGuid.PcdFlashMicrocodeFvSize                          ## CONSUMES
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdIntelGopEnable
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdPlatformFlavor
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdPlatformType
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdEcPresent
+  gIntelSiliconPkgTokenSpaceGuid.PcdIntelGraphicsVbtFileGuid
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdTbtEnable
+  gSiPkgTokenSpaceGuid.PcdCpuSmmMsrSaveStateEnable                      ## CONSUMES
+  gSiPkgTokenSpaceGuid.PcdCpuSmmCodeAccessCheckEnable                   ## CONSUMES
+  gSiPkgTokenSpaceGuid.PcdCpuSmmUseDelayIndication                      ## CONSUMES
+  gSiPkgTokenSpaceGuid.PcdCpuSmmUseBlockIndication                      ## CONSUMES
+  gSiPkgTokenSpaceGuid.PcdCpuSmmUseSmmEnableIndication                  ## CONSUMES
+
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdVirtualButtonVolumeUpSupport
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdVirtualButtonVolumeDownSupport
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdVirtualButtonHomeButtonSupport
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdVirtualButtonRotationLockSupport
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdSlateModeSwitchSupport
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdAcDcAutoSwitchSupport
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdPmPowerButtonGpioPin
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdAcpiEnableAllButtonSupport
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdAcpiHidDriverButtonSupport
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdTsOnDimmTemperature
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdBatteryPresent
+
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsbTypeCSupport
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsbTypeCEcLess
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdEcHotKeyF3Support
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdEcHotKeyF4Support
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdEcHotKeyF5Support
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdEcHotKeyF6Support
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdEcHotKeyF7Support
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdEcHotKeyF8Support
+
+  #
+  # PSS Board Configuration.
+  #
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdPssReadSN
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdPssI2cBusNumber
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdPssI2cSlaveAddress
+
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdXhciAcpiTableSignature
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdPreferredPmProfile
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdFingerPrintSleepGpio
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdFingerPrintIrqGpio
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdGnssResetGpio
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdTouchpadIrqGpio
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdTouchpanelIrqGpio
+
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdHdaI2sCodecIrqGpio
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdHdaI2sCodecI2cBusNumber
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdBleUsbPortNumber
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdEcSmiGpio
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdEcLowPowerExitGpio
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdHidI2cIntPad
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdDetectPs2KbOnCmdAck
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdSpdAddressOverride
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdDDISelection
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdGfxCrbDetectGpio
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsbTypeCPort1
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsbTypeCPort1Pch
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsbCPort1Proterties
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsbTypeCPort2
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsbTypeCPort2Pch
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsbCPort2Proterties
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsbTypeCPort3
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsbTypeCPort3Pch
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsbCPort3Proterties
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsbTypeCPort4
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsbTypeCPort4Pch
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsbCPort4Proterties
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsbTypeCPort5
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsbTypeCPort5Pch
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsbCPort5Proterties
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsbTypeCPort6
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsbTypeCPort6Pch
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsbCPort6Proterties
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdMipiCam0LinkUsed
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdMipiCam1LinkUsed
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdMipiCam2LinkUsed
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdMipiCam3LinkUsed
+  gPlatformModuleTokenSpaceGuid.PcdH8S2113Present
+  gPlatformModuleTokenSpaceGuid.PcdNat87393Present
+  gPlatformModuleTokenSpaceGuid.PcdNct677FPresent
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdConvertableDockSupport
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdSmcRuntimeSciPin
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdRealBattery1Control
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdRealBattery2Control
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdDimmPopulationError
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdBtIrqGpio
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdBtRfKillGpio
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdWhlErbRtd3TableEnable
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdTypeCPortsSupported
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdMipiCamSensor
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdH8S2113SIO
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdNCT6776FCOM
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdNCT6776FSIO
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdNCT6776FHWMON
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdGpioTier2WakeEnable
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdFunctionGopVbtSpecificUpdate
+
+[Sources]
+  PolicyInitDxe.c
+  SaPolicyInitDxe.c
+  SiliconPolicyInitDxe.c
+  GopPolicyInitDxe.c
+  PchPolicyInitDxe.c
+  CpuPolicyInitDxe.c
+  BoardInitLib.c
+
+[Protocols]
+  gEfiFirmwareVolume2ProtocolGuid               ## CONSUMES
+  gDxeMePolicyGuid                              ## PRODUCES
+  gSaPolicyProtocolGuid                         ## CONSUMES
+  gPchPolicyProtocolGuid                        ## CONSUMES
+  gDxeSiPolicyProtocolGuid                      ## PRODUCES
+  gGopPolicyProtocolGuid                        ## PRODUCES
+  gDxeCpuPolicyProtocolGuid                     ## PRODUCES
+
+[Guids]
+  gCpuSmmGuid                                   ## CONSUMES
+  gSiMemoryInfoDataGuid
+
+[Depex]
+  gEfiVariableArchProtocolGuid
+

@@ -1,0 +1,87 @@
+## @file
+#
+# @copyright
+# Copyright 2006 - 2021 Intel Corporation. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                   = 0x00010005
+  BASE_NAME                     = PciPlatform
+  FILE_GUID                     = E2441B64-7EF4-41fe-B3A3-8CAA7F8D3017
+  MODULE_TYPE                   = DXE_DRIVER
+  VERSION_STRING                = 1.0
+  ENTRY_POINT                   = PciPlatformDriverEntry
+
+[Sources]
+  PciPlatform.c
+  PciPlatform.h
+  PciPlatformHooks.c
+  PciPlatformHooks.h
+  PciIovPlatformPolicy.c
+  PciIovPlatformPolicy.h
+  PciSupportLib.c
+  PciSupportLib.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  WhitleySiliconPkg/WhitleySiliconPkg.dec
+  WhitleySiliconPkg/SiliconPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  WhitleySiliconPkg/CpRcPkg.dec
+  WhitleySiliconPkg/Cpu/CpuRcPkg.dec
+  WhitleyOpenBoardPkg/PlatformPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  IoLib
+  BaseMemoryLib
+  DebugLib
+  UefiRuntimeServicesTableLib
+  UefiBootServicesTableLib
+  HobLib
+  S3PciLib
+  SetupLib
+  PcdLib
+  PlatformOpromPolicyLib
+
+[Protocols]
+  gEfiPciCallbackProtocolGuid
+  gEfiCpuIo2ProtocolGuid
+  gEfiFirmwareVolume2ProtocolGuid
+  gEfiPciIoProtocolGuid
+  gEfiPciPlatformProtocolGuid
+  gEfiIioUdsProtocolGuid
+  gEfiPciRootBridgeIoProtocolGuid
+  gEfiPciIovPlatformProtocolGuid
+  gEfiIioSystemProtocolGuid
+  gEfiPciHostBridgeResourceAllocationProtocolGuid
+  gUbaConfigDatabaseProtocolGuid
+  gDynamicSiLibraryProtocolGuid                            ## CONSUMES
+
+[Guids]
+  gEfiPlatformInfoGuid
+  gEfiSetupVariableGuid
+  gPchSetupVariableGuid
+  gSystemBoardInfoConfigDataGuid
+
+[Pcd]
+  gPlatformTokenSpaceGuid.PcdOemSkuPcieSlotOpromBitMap
+  gPlatformTokenSpaceGuid.PcdMaxOptionRomNumber
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSystemPageSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSrIovSupport
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAriSupport
+  gEfiMdeModulePkgTokenSpaceGuid.PcdMrIovSupport
+  gStructPcdTokenSpaceGuid.PcdSetup
+
+[FixedPcd]
+  gEfiCpRcPkgTokenSpaceGuid.PcdMaxNestedLevel
+  gEfiCpRcPkgTokenSpaceGuid.PcdMaxCpuSocketCount
+  gEfiCpRcPkgTokenSpaceGuid.PcdMaxCpuCoreCount
+
+[Depex]
+  gSystemBoardInfoConfigDataGuid AND
+  gEfiPciHostBridgeResourceAllocationProtocolGuid AND
+  gUbaConfigDatabaseProtocolGuid AND
+  gDynamicSiLibraryProtocolGuid

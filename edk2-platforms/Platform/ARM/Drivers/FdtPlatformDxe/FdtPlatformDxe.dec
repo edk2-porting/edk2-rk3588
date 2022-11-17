@@ -1,0 +1,25 @@
+#/** @file
+#
+#  Copyright (c) 2011-2017, ARM Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  DEC_SPECIFICATION              = 0x0001001A
+  PACKAGE_NAME                   = FdtPlatformDxe
+  PACKAGE_GUID                   = ed22c1e5-71cb-48d6-a9d8-c20f8d6b909f
+  PACKAGE_VERSION                = 0.1
+
+[Guids]
+  gFdtPlatformDxeTokenSpaceGuid = { 0xbfcaa0af, 0xedd4, 0x4ce7, { 0xbd, 0xb3, 0x39, 0x15, 0x07, 0x28, 0x65, 0x77 } }
+
+[PcdsFeatureFlag.common]
+  # Enable the development specific features
+  gFdtPlatformDxeTokenSpaceGuid.PcdOverridePlatformFdt|TRUE|BOOLEAN|0x00000001
+  # Add 'dumpfdt' EFI Shell command
+  gFdtPlatformDxeTokenSpaceGuid.PcdDumpFdtShellCommand|TRUE|BOOLEAN|0x00000002
+
+[PcdsFixedAtBuild.common, PcdsDynamic.common]
+  gFdtPlatformDxeTokenSpaceGuid.PcdFdtDevicePaths|L""|VOID*|0x00000055

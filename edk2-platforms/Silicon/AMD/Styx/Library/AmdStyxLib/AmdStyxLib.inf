@@ -1,0 +1,66 @@
+#/* @file
+#
+#  Copyright (c) 2011-2014, ARM Limited. All rights reserved.<BR>
+#  Copyright (c) 2014 - 2016, AMD Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#*/
+#/**
+#  Derived from:
+#   ArmPlatformPkg/ArmVExpressPkg/Library/ArmVExpressLibRTSM/ArmVExpressLib.inf
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = AmdStyxLib
+  FILE_GUID                      = 256ee872-5a3e-4b6e-afd6-63c49ba3d7ba
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmPlatformLib
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  Silicon/AMD/Styx/AmdModulePkg/AmdModulePkg.dec
+  Silicon/AMD/Styx/AmdStyx.dec
+
+[LibraryClasses]
+  ArmLib
+  HobLib
+  DebugLib
+
+[Sources.common]
+  Styx.c
+  StyxMem.c
+
+[Sources.AARCH64]
+  AArch64/Helper.S  | GCC
+
+[Guids]
+  gAmdStyxMpCoreInfoGuid               ## CONSUMER
+
+[Ppis]
+  gArmMpCoreInfoPpiGuid
+
+[Pcd]
+  gArmTokenSpaceGuid.PcdSystemMemoryBase
+  gArmTokenSpaceGuid.PcdSystemMemorySize
+  gArmTokenSpaceGuid.PcdFvBaseAddress
+  gArmTokenSpaceGuid.PcdFdBaseAddress
+
+  gAmdStyxTokenSpaceGuid.PcdTrustedFWMemoryBase
+  gAmdStyxTokenSpaceGuid.PcdTrustedFWMemorySize
+
+[FixedPcd]
+  gArmTokenSpaceGuid.PcdArmPrimaryCore
+
+  gArmPlatformTokenSpaceGuid.PcdCoreCount
+  gArmPlatformTokenSpaceGuid.PcdCPUCoresStackBase
+
+[Depex]
+  gAmdStyxPlatInitPpiGuid

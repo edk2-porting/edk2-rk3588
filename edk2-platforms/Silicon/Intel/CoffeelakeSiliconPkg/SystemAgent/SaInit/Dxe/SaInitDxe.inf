@@ -1,0 +1,116 @@
+## @file
+# Component description file for SystemAgent Initialization driver
+#
+# Copyright (c) 2019 Intel Corporation. All rights reserved. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+INF_VERSION = 0x00010017
+BASE_NAME = SaInitDxe
+FILE_GUID = DE23ACEE-CF55-4fb6-AA77-984AB53DE811
+VERSION_STRING = 1.0
+MODULE_TYPE = DXE_DRIVER
+ENTRY_POINT = SaInitEntryPointDxe
+#
+# The following information is for reference only and not required by the build tools.
+#
+# VALID_ARCHITECTURES = IA32 X64 EBC
+#
+
+[LibraryClasses]
+UefiDriverEntryPoint
+UefiLib
+UefiBootServicesTableLib
+DxeServicesTableLib
+DebugLib
+TimerLib
+PciCf8Lib
+PciSegmentLib
+BaseMemoryLib
+MemoryAllocationLib
+CpuPlatformLib
+IoLib
+S3BootScriptLib
+PmcLib
+PchCycleDecodingLib
+PchInfoLib
+GpioLib
+ConfigBlockLib
+SaPlatformLib
+PchPcieRpLib
+
+[Packages]
+MdePkg/MdePkg.dec
+UefiCpuPkg/UefiCpuPkg.dec
+IntelSiliconPkg/IntelSiliconPkg.dec
+CoffeelakeSiliconPkg/SiPkg.dec
+PcAtChipsetPkg/PcAtChipsetPkg.dec
+
+[Pcd]
+gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+gSiPkgTokenSpaceGuid.PcdAcpiDefaultOemId
+gSiPkgTokenSpaceGuid.PcdAcpiDefaultOemTableId
+gSiPkgTokenSpaceGuid.PcdAcpiDefaultOemRevision
+gSiPkgTokenSpaceGuid.PcdAcpiDefaultCreatorId
+gSiPkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision
+gSiPkgTokenSpaceGuid.PcdMchBaseAddress
+gPcAtChipsetPkgTokenSpaceGuid.PcdIoApicBaseAddress
+
+[Sources]
+SaInitDxe.h
+SaInitDxe.c
+SaInit.h
+SaInit.c
+VTd.c
+VTd.h
+IgdOpRegionInit.h
+IgdOpRegionInit.c
+GraphicsInit.h
+GraphicsInit.c
+PciExpressInit.h
+PciExpressInit.c
+PcieComplex.c
+PcieComplex.h
+SaAcpi.c
+
+[Protocols]
+gEfiAcpiTableProtocolGuid              ## CONSUMES
+gSaNvsAreaProtocolGuid                 ## PRODUCES
+gSaPolicyProtocolGuid                  ## CONSUMES
+gEfiCpuArchProtocolGuid                ## CONSUMES
+gEfiPciEnumerationCompleteProtocolGuid ## CONSUMES
+gEfiPciRootBridgeIoProtocolGuid        ## CONSUMES
+gEfiPciIoProtocolGuid                  ## CONSUMES
+gIgdOpRegionProtocolGuid               ## PRODUCES
+gEfiFirmwareVolume2ProtocolGuid        ## CONSUMES
+gEfiLegacyBiosProtocolGuid             ## CONSUMES
+gGopComponentName2ProtocolGuid         ## CONSUMES
+gSaIotrapSmiProtocolGuid               ## CONSUMES
+
+[Guids]
+gSaConfigHobGuid
+gSgAcpiTablePchStorageGuid
+gSaAcpiTableStorageGuid
+gSgAcpiTableStorageGuid
+gSaSsdtAcpiTableStorageGuid
+gPegSsdtAcpiTableStorageGuid
+gEfiEndOfDxeEventGroupGuid
+gSiConfigHobGuid        ## CONSUMES
+gMiscDxeConfigGuid
+gGraphicsDxeConfigGuid
+gMemoryDxeConfigGuid
+gPcieDxeConfigGuid
+gVbiosDxeConfigGuid
+gPchInfoHobGuid
+
+[Depex]
+gEfiAcpiTableProtocolGuid AND
+gEfiFirmwareVolume2ProtocolGuid AND
+gSaPolicyProtocolGuid AND
+gEfiPciRootBridgeIoProtocolGuid AND
+gEfiPciHostBridgeResourceAllocationProtocolGuid AND # This is to ensure that PCI MMIO resource has been prepared and available for this driver to allocate.
+gEfiHiiDatabaseProtocolGuid
+

@@ -1,0 +1,72 @@
+## @file
+#
+# @copyright
+# Copyright 2009 - 2021 Intel Corporation. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BoardInitDxeLib
+  FILE_GUID                      = DDD75880-C38A-4D6B-B84E-FAC1122560BF
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = BoardInitLib
+  CONSTRUCTOR                    = BoardNotificationInit
+
+[Sources]
+  BoardInitDxeLib.c
+  BoardInitDxeLib.uni
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+  WhitleySiliconPkg/WhitleySiliconPkg.dec
+  WhitleySiliconPkg/SiliconPkg.dec
+  WhitleySiliconPkg/CpRcPkg.dec
+  WhitleyOpenBoardPkg/PlatformPkg.dec
+
+[LibraryClasses]
+  IoLib
+  PcdLib
+  HobLib
+  UefiLib
+  BaseMemoryLib
+  HiiLib
+  UefiBootManagerLib
+  BoardBdsHookLib
+
+[Guids]
+  gEfiPlatformTxtDeviceMemoryGuid
+  gEfiDprRegsProgrammedGuid
+  gEfiSetupVariableGuid
+  gEfiEndOfDxeEventGroupGuid
+  gEfiEventExitBootServicesGuid
+  gImr2BaseAddressHobGuid
+  gBdsEventBeforeConsoleAfterTrustedConsoleGuid
+
+[Protocols]
+  gEfiMpServiceProtocolGuid
+  gEfiPciEnumerationCompleteProtocolGuid
+  gDynamicSiLibraryProtocolGuid                 ## CONSUMES
+
+[Pcd]
+  gPlatformTokenSpaceGuid.PcdImr0Enable
+  gPlatformTokenSpaceGuid.PcdImr0Base
+  gPlatformTokenSpaceGuid.PcdImr0Mask
+  gPlatformTokenSpaceGuid.PcdImr0Rac
+  gPlatformTokenSpaceGuid.PcdImr0Wac
+  gEfiCpRcPkgTokenSpaceGuid.PcdImr2Enable
+  gEfiCpRcPkgTokenSpaceGuid.PcdImr2Size
+  gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeOsLoaderLoad
+  gEfiMdeModulePkgTokenSpaceGuid.PcdProgressCodeOsLoaderStart
+  gStructPcdTokenSpaceGuid.PcdSetup
+
+[FixedPcd]
+  gEfiCpRcPkgTokenSpaceGuid.PcdMaxCpuSocketCount
+  gEfiCpRcPkgTokenSpaceGuid.PcdMaxCpuCoreCount
+
+[Depex]
+  gDynamicSiLibraryProtocolGuid

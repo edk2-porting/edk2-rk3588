@@ -1,0 +1,97 @@
+/** @file
+*
+*  String definitions for the Memory Config.
+*
+*  Copyright (c) 2017 - 2018, Hisilicon Limited. All rights reserved.
+*  Copyright (c) 2017 - 2018, Linaro Limited. All rights reserved.
+*
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
+*
+**/
+
+/=#
+
+#langdef   en-US "English"
+
+#string STR_MEMORY_CONFIG_FORM_TITLE        #language en-US "Memory Configuration"
+#string STR_MEMORY_CONFIG_FORM_HELP         #language en-US "Displays and provides option to change the Memory Settings"
+#string STR_MEMORY_RAS_CONFIG_FORM_TITLE    #language en-US "Memory RAS Configuration"
+#string STR_MEMORY_RAS_CONFIG_FORM_HELP     #language en-US "Displays and provides option to change the Ras Configuration"
+#string STR_MEM_PRINT_LEVEL_PROMPT          #language en-US "Memory Print Level"
+#string STR_MEM_PRINT_LEVEL_HELP            #language en-US "Memory Print Level Set. Disable: Do not print any MRC statement/ Minimum: Print the most important(High level) MRC statement/ Minmax: Print the Mid-important(Mid level) and most important MRC statement/ Maximum: Print all of the MRC statement"
+#string STR_ENABLE                          #language en-US  "Enabled"
+#string STR_DISABLE                         #language en-US  "Disabled"
+
+#string STR_MEM_PRINT_LEVEL_MINIMUM         #language en-US "Minimum"
+#string STR_MEM_PRINT_LEVEL_MINMAX          #language en-US "Minmax"
+#string STR_MEM_PRINT_LEVEL_MAXIMUM         #language en-US "Maximum"
+#string STR_MEM_PRINT_LEVEL_DISABLE         #language en-US "Disable"
+
+#string STR_XMP_DDR_FREQ_LIMIT_PROMPT       #language en-US "Memory Frequency"
+#string STR_XMP_DDR_FREQ_LIMIT_HELP         #language en-US "Maximum Memory Frequency Selections in Mhz. Do not select Reserved"
+#string STR_AUTO                            #language en-US "Auto"
+#string STR_DDR_FREQ_1333_STRING            #language en-US "1333"
+#string STR_DDR_FREQ_1600_STRING            #language en-US "1600"
+#string STR_DDR_FREQ_1866_STRING            #language en-US "1866"
+#string STR_DDR_FREQ_2133_STRING            #language en-US "2133"
+#string STR_DDR_FREQ_2400_STRING            #language en-US "2400"
+#string STR_DDR_FREQ_2600_STRING            #language en-US "2600"
+#string STR_DDR_FREQ_2667_STRING            #language en-US "2667"
+#string STR_DDR_FREQ_2800_STRING            #language en-US "2800"
+#string STR_DDR_FREQ_2933_STRING            #language en-US "2993"
+#string STR_DDR_FREQ_3000_STRING            #language en-US "3000"
+#string STR_DDR_FREQ_3200_STRING            #language en-US "3200"
+
+#string STR_DDR_REFRESH_SUPPORT_PROMPT      #language en-US "Custom Refresh Enable"
+#string STR_DDR_REFRESH_SUPPORT_HELP        #language en-US "Memory Custom Refresh Enable "
+#string STR_DDR_REFRESH_PROMPT              #language en-US "Custom Refresh Rate"
+#string STR_DDR_REFRESH_HELP                #language en-US "Memory Custom Refresh Rate "
+#string STR_32MS                            #language en-US "32ms"
+#string STR_64MS                            #language en-US "64ms"
+
+#string STR_RMT_PROMPT                      #language en-US "Rank Margin Tool"
+#string STR_RMT_HELP                        #language en-US "Enable the rank margin tool to run after DDR memory training"
+#string STR_RMTM_PROMPT                     #language en-US "Rank Margin Mode"
+#string STR_RMTM_HELP                       #language en-US "Select test mode for rank margin test"
+#string STR_RMTM_SFC                        #language en-US "SFC"
+#string STR_RMTM_EXMBIST                    #language en-US "EXMBIST"
+#string STR_RMT_PATTERN_PROMPT              #language en-US "RMT Pattern Length"
+#string STR_RMT_PATTERN_HELP                #language en-US "Set the pattern length(1-32767) for the Rank Margin Tool"
+#string STR_PER_BIT_MARGIN_PROMPT           #language en-US "Per Bit Margin"
+#string STR_PER_BIT_MARGIN_HELP             #language en-US "Enables the logging from the serial port of DDR Per Bit Margin Data"
+#string STR_CA_MARGINS_PROMPT               #language en-US "CA Margin"
+#string STR_CA_MARGINS_HELP                 #language en-US "Enables CA margin"
+#string STR_CAVREF_MARGINS_PROMPT           #language en-US "CAVref Margin"
+#string STR_CAVREF_MARGINS_HELP             #language en-US "CAVref margin Options"
+#string STR_CAVREF_MARGINS_OPTION0          #language en-US "VDD/2^2 connected to QVrefVA and BVrefCA"
+#string STR_CAVREF_MARGINS_OPTION2          #language en-US "Internally generated Vref connected to QVrefCA^3 VDD/2^2 connected to BVrefCA"
+
+#string STR_DIE_INTERLEAVING_PROMPT         #language en-US "Die Interleaving"
+#string STR_DIE_INTERLEAVING_HELP           #language en-US "Select Die Interleaving setting"
+#string STR_CHANNEL_INTERLEAVING_PROMPT     #language en-US "Channel Interleaving"
+#string STR_CHANNEL_INTERLEAVING_HELP       #language en-US "Select Channel Interleaving setting"
+#string STR_RANK_INTERLEAVING_PROMPT        #language en-US "Rank Interleaving"
+#string STR_RANK_INTERLEAVING_HELP          #language en-US "Select Rank Interleaving setting"
+
+#string STR_1WAY_STRING                     #language en-US "1-way Interleave"
+#string STR_2WAY_STRING                     #language en-US "2-way Interleave"
+#string STR_3WAY_STRING                     #language en-US "3-way Interleave"
+#string STR_4WAY_STRING                     #language en-US "4-way Interleave"
+#string STR_6WAY_STRING                     #language en-US "6-way Interleave"
+#string STR_8WAY_STRING                     #language en-US "8-way Interleave"
+
+#string STR_NUMA_PROMPT                     #language en-US "NUMA"
+#string STR_NUMA_HELP                       #language en-US "Enable or Disable Non uniform Memory Access (NUMA)."
+
+#string STR_MEM_TEST_PROMPT                 #language en-US "Memory Test"
+#string STR_MEM_TEST_HELP                   #language en-US "Enable/disable memory test during normal boot"
+
+#string STR_ECC_SUPPORT_PROMPT              #language en-US "ECC/SDEC Support"
+#string STR_ECC_SUPPORT_HELP                #language en-US "Enable/disable DDR Ecc/SDEC Support"
+#string STR_ECC_EN                          #language en-US "Ecc Enable"
+#string STR_SDEC_EN                         #language en-US "SDEC Enable"
+
+
+
+
+

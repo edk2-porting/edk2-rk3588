@@ -1,0 +1,33 @@
+#
+#  Copyright (c) 2021, Rockchip Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010019
+  PACKAGE_NAME                   = RK3588
+  PACKAGE_GUID                   = 26e6ce4a-45e7-11ec-9726-f42a7dcb925d
+  PACKAGE_VERSION                = 0.1
+
+################################################################################
+#
+# Include Section - list of Include Paths that are provided by this package.
+#                   Comments are used for Keywords and Module Types.
+#
+# Supported Module Types:
+#  BASE SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
+#
+################################################################################
+[Includes.common]
+  Include                        # Root include for the package
+
+[Guids.common]
+  gRK3588TokenSpaceGuid      =  { 0x32594b40, 0x45e7, 0x11ec, { 0xbb, 0xc1, 0xf4, 0x2a, 0x7d, 0xcb, 0x92, 0x5d} }
+  gRockchipDemoProtocolGuid   = { 0x71954bda, 0x60d3, 0x4ef8, { 0x8e, 0x3c, 0x0e, 0x33, 0x9f, 0x3b, 0xc2, 0x2b } }
+  gShellI2cDemoHiiGuid = { 0xb2f4c714, 0x147f, 0x4ff7, { 0x82, 0x1b, 0xce, 0x7b, 0x91, 0x7f, 0x5f, 0x2f } }
+
+
+[Protocols]
+  gRockchipI2cDemoProtocolGuid    = { 0x71954bda, 0x60d3, 0x4ef8, { 0x8e, 0x3c, 0x0e, 0x33, 0x9f, 0x3b, 0xc2, 0x2b }}
+

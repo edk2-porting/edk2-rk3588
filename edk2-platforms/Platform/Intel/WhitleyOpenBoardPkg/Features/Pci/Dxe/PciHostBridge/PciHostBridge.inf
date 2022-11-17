@@ -1,0 +1,69 @@
+## @file
+#
+# @copyright
+# Copyright 2009 - 2021 Intel Corporation. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PciHostBridge
+  FILE_GUID                      = D58EBCE1-AF26-488d-BE66-C164417F8C13
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializePciHostBridge
+
+[Sources]
+  PciHostBridge.h
+  PciRootBridge.h
+  PciHostBridge.c
+  PciRootBridgeIo.c
+  PciHostBridgeSupport.c
+  PciHostResource.h
+  PciRebalance.c
+  PciRebalanceIo.c
+  PciRebalanceMmio32.c
+  PciRebalanceMmio64.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  WhitleySiliconPkg/WhitleySiliconPkg.dec
+  WhitleySiliconPkg/SiliconPkg.dec
+  WhitleySiliconPkg/CpRcPkg.dec
+  WhitleySiliconPkg/Cpu/CpuRcPkg.dec
+  WhitleyOpenBoardPkg/PlatformPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  DebugLib
+  DxeServicesTableLib
+  DevicePathLib
+  BaseMemoryLib
+  BaseLib
+  UefiLib
+  TimerLib
+  SetupLib
+
+[Protocols]
+  gEfiCpuIo2ProtocolGuid                          ## CONSUMES
+  gEfiDevicePathProtocolGuid                      ## BY_START
+  gEfiPciRootBridgeIoProtocolGuid                 ## BY_START
+  gEfiPciHostBridgeResourceAllocationProtocolGuid ## BY_START
+  gEdkiiIoMmuProtocolGuid                         ## SOMETIMES_CONSUMES
+  gEfiIioUdsProtocolGuid
+  gDynamicSiLibraryProtocolGuid                   ## CONSUMES
+
+[Guids]
+  gEfiSocketPciResourceDataGuid
+
+[FixedPcd]
+  gEfiCpRcPkgTokenSpaceGuid.PcdMaxCpuSocketCount
+  gEfiCpRcPkgTokenSpaceGuid.PcdMaxCpuCoreCount
+
+[Depex]
+  gEfiCpuIo2ProtocolGuid AND
+  gEfiIioUdsProtocolGuid AND
+  gDynamicSiLibraryProtocolGuid

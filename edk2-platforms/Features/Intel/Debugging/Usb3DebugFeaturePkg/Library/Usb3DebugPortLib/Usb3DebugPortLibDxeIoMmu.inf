@@ -1,0 +1,63 @@
+## @file
+#  USB3 Debug port library.
+#
+# Copyright (c) 2013 - 2020, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Usb3DebugPortLibDxeIoMmu
+  FILE_GUID                      = BC48A65D-5E5E-4512-8ACC-90E79E2D80C2
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = Usb3DebugPortLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SAL_DRIVER DXE_SMM_DRIVER UEFI_APPLICATION UEFI_DRIVER SMM_CORE
+  CONSTRUCTOR                    = Usb3DebugPortLibDxeConstructor
+  DESTRUCTOR                     = Usb3DebugPortLibDxeDestructor
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF
+#
+
+[Sources]
+  Usb3DebugPortLibDxeIoMmu.c
+  Usb3DebugPortDataTransfer.c
+  Usb3DebugPortInitialize.c
+  MiscServices.c
+  Usb3DebugPortLibInternal.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Usb3DebugFeaturePkg/Usb3DebugFeaturePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  PcdLib
+  IoLib
+  PciLib
+  TimerLib
+  UefiBootServicesTableLib
+  UefiLib
+  HobLib
+  Usb3DebugPortParamLib
+
+[Protocols]
+  gEfiSmmAccess2ProtocolGuid                       ## CONSUMES
+  gEfiSmmBase2ProtocolGuid                         ## CONSUMES
+   ## NOTIFY
+   ## SOMETIMES_CONSUMES
+  gEfiPciIoProtocolGuid
+  gEdkiiIoMmuProtocolGuid                          ## SOMETIMES_CONSUMES
+   ## NOTIFY
+  gEfiDxeSmmReadyToLockProtocolGuid
+
+[Pcd]
+  gUsb3DebugFeaturePkgTokenSpaceGuid.PcdXhciDefaultBaseAddress     ## SOMETIMES_CONSUMES
+  gUsb3DebugFeaturePkgTokenSpaceGuid.PcdXhciHostWaitTimeout        ## CONSUMES
+
+[FeaturePcd]
+  gUsb3DebugFeaturePkgTokenSpaceGuid.PcdUsb3DebugFeatureEnable     ## CONSUMES

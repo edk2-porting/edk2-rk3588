@@ -1,0 +1,38 @@
+## @file
+# Component information file for Silicon Init Library Shim instance
+#
+# This library provides a "shim" between the library and PPI or protocols implementing the library services.
+# This allows the silicon initialization specifics to be abstracted behind binaries.
+#
+# Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SiliconPolicyInitLibShim
+  FILE_GUID                      = 3af20aaa-ed5d-4d82-bfd4-db7cc85d4188
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SiliconPolicyInitLib | PEIM DXE_DRIVER
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  PeiServicesLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+  WhitleySiliconPkg/WhitleySiliconPkg.dec
+
+[Sources]
+  SiliconPolicyInitLibShim.c
+
+[Guids]
+  gSiliconPolicyInitLibInterfaceGuid      ## ALWAYS CONSUMES
+
+[Depex]
+  gSiliconPolicyInitLibInterfaceGuid

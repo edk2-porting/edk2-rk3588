@@ -1,0 +1,45 @@
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = BoardDescDxe
+  FILE_GUID                      = 4ed385f9-5d2c-4774-95c5-d5d9d70b3c37
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = MvBoardDescEntryPoint
+
+[Sources]
+  MvBoardDescDxe.c
+  MvBoardDescDxe.h
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/Marvell/Marvell.dec
+
+[LibraryClasses]
+  ArmadaBoardDescLib
+  ArmadaSoCDescLib
+  DebugLib
+  MemoryAllocationLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Protocols]
+  gMarvellBoardDescProtocolGuid
+
+[Pcd]
+  gMarvellTokenSpaceGuid.PcdComPhyDevices
+  gMarvellTokenSpaceGuid.PcdI2cControllersEnabled
+  gMarvellTokenSpaceGuid.PcdPciEAhci
+  gMarvellTokenSpaceGuid.PcdPciESdhci
+  gMarvellTokenSpaceGuid.PcdPciEXhci
+  gMarvellTokenSpaceGuid.PcdPp2Controllers
+  gMarvellTokenSpaceGuid.PcdUtmiControllersEnabled
+  gMarvellTokenSpaceGuid.PcdUtmiPortType
+
+[Depex]
+  TRUE

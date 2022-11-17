@@ -1,0 +1,51 @@
+# Copyright (C) 2016 Marvell International Ltd.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Armada7k8kLib
+  FILE_GUID                      = 3f29b642-4a49-4dfd-8f4a-205dd38432bb
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmPlatformLib
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/Marvell/Marvell.dec
+
+[LibraryClasses]
+  ArmadaBoardDescLib
+  ArmadaSoCDescLib
+  ArmLib
+  ArmSmcLib
+  DebugLib
+  MemoryAllocationLib
+  MppLib
+
+[Sources.common]
+  Armada7k8kLib.c
+  Armada7k8kLibMem.c
+
+[Sources.AArch64]
+  AArch64/ArmPlatformHelper.S
+
+[Sources.ARM]
+  ARM/ArmPlatformHelper.S
+
+[FixedPcd]
+  gArmTokenSpaceGuid.PcdSystemMemoryBase
+  gArmTokenSpaceGuid.PcdSystemMemorySize
+
+  gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
+  gArmTokenSpaceGuid.PcdArmPrimaryCore
+
+  gMarvellTokenSpaceGuid.PcdConfigSpaceBaseAddress
+
+[Ppis]
+  gArmMpCoreInfoPpiGuid

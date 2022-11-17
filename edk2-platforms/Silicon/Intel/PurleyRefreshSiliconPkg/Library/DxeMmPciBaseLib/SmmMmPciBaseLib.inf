@@ -1,0 +1,60 @@
+## @file
+#
+# Copyright (c) 2018 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+################################################################################
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeSmmMmPciLib
+  FILE_GUID                      = 96D31DB6-CCFC-4B80-B850-FC070806CA78
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = MmPciLib|DXE_SMM_DRIVER
+  CONSTRUCTOR                    = SmmMmPciLibConstructor
+
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC
+#
+[Sources]
+  SmmMmPciBaseLib.c
+
+################################################################################
+#
+# Package Dependency Section - list of Package files that are required for
+#                              this module.
+#
+################################################################################
+
+[Packages]
+  MdePkg/MdePkg.dec
+  PurleyRefreshSiliconPkg/SiPkg.dec
+
+################################################################################
+#
+# Library Class Section - list of Library Classes that are required for
+#                         this module.
+#
+################################################################################
+
+[LibraryClasses]
+  BaseLib
+  UefiBootServicesTableLib
+  IoLib
+  DebugLib
+  UefiLib
+  SmmServicesTableLib
+
+[Protocols]
+  gEfiSmmCpuIo2ProtocolGuid
+  gUsraProtocolGuid                             ## CONSUMES
+
+[Depex.common.DXE_SMM_DRIVER]
+  gEfiSmmCpuIo2ProtocolGuid
+

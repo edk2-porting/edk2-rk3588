@@ -1,0 +1,49 @@
+## @file
+#  PCI Host Bridge Library instance for ARM Neoverse N1 platform.
+#
+#  Copyright (c) 2019 - 2020, ARM Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = PciHostBridgeLib
+  FILE_GUID                      = daa340e1-89dd-4bd2-b645-ebe75e541f8b
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PciHostBridgeLib|DXE_DRIVER
+
+[Sources]
+  PciHostBridgeLib.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/ARM/NeoverseN1Soc/NeoverseN1Soc.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  DevicePathLib
+  IoLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+
+[FixedPcd]
+  gArmNeoverseN1SocTokenSpaceGuid.PcdPcieBusMin
+  gArmNeoverseN1SocTokenSpaceGuid.PcdPcieBusMax
+  gArmNeoverseN1SocTokenSpaceGuid.PcdPcieIoBase
+  gArmNeoverseN1SocTokenSpaceGuid.PcdPcieIoSize
+  gArmNeoverseN1SocTokenSpaceGuid.PcdPcieMmio32Base
+  gArmNeoverseN1SocTokenSpaceGuid.PcdPcieMmio32Size
+  gArmNeoverseN1SocTokenSpaceGuid.PcdPcieMmio64Base
+  gArmNeoverseN1SocTokenSpaceGuid.PcdPcieMmio64Size
+
+[Protocols]
+  gEfiCpuIo2ProtocolGuid
+
+[Depex]
+  gEfiCpuIo2ProtocolGuid

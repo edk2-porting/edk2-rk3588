@@ -1,0 +1,45 @@
+## @file
+#
+# @copyright
+# Copyright 2017 - 2021 Intel Corporation. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SystemBoardInfo
+  FILE_GUID                      = 9826a826-004e-4197-b179-9f489af1e3c9
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = SystemBoardInfoEntry
+
+[Sources]
+  SystemBoardInfoDxe.c
+  SystemBoardInfoDxe.h
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  DebugLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  WhitleySiliconPkg/WhitleySiliconPkg.dec
+  WhitleySiliconPkg/SiliconPkg.dec
+  WhitleyOpenBoardPkg/PlatformPkg.dec
+  WhitleySiliconPkg/CpRcPkg.dec
+
+
+[Guids]
+  gSystemBoardInfoConfigDataGuid
+
+[Protocols]
+  gUbaConfigDatabaseProtocolGuid
+
+[Depex]
+  gUbaConfigDatabaseProtocolGuid

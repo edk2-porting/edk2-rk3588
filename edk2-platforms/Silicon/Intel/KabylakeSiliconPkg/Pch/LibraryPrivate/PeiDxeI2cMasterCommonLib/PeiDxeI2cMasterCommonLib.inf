@@ -1,0 +1,38 @@
+## @file
+# Component description file for the I2C port driver.
+#
+# Copyright (c) 2017 - 2020 Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+INF_VERSION = 0x00010017
+BASE_NAME = PeiDxeI2cMasterCommonLib
+FILE_GUID = D0E4E669-D467-42af-93D8-21513E226EEA
+VERSION_STRING = 1.0
+MODULE_TYPE = BASE
+LIBRARY_CLASS = I2cMasterCommonLib
+
+
+[LibraryClasses]
+DebugLib
+PchSerialIoLib
+MmPciLib
+IoLib
+PciLib
+MmPciLib
+TimerLib
+PchInfoLib
+
+
+[Packages]
+KabylakeSiliconPkg/SiPkg.dec
+KabylakeSiliconPkg/KabylakeSiliconPrivate.dec
+MdePkg/MdePkg.dec
+IntelSiliconPkg/IntelSiliconPkg.dec
+
+[Sources]
+I2cMasterCommonLib.c
+

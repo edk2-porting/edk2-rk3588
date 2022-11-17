@@ -1,0 +1,54 @@
+#/** @file
+#
+#  Copyright (c) 2017, Linaro, Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = SynQuacerI2cDxe
+  FILE_GUID                      = ab5ed376-dd38-4d22-ae89-b645a4a3236e
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = SynQuacerI2cDxeEntryPoint
+  UNLOAD                         = SynQuacerI2cDxeUnload
+
+[Sources.common]
+  ComponentName.c
+  DriverBinding.c
+  SynQuacerI2cDxe.c
+  SynQuacerI2cDxe.h
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/Socionext/SynQuacer/SynQuacer.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  DxeServicesTableLib
+  IoLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiLib
+  UefiDriverEntryPoint
+  UefiRuntimeLib
+
+[Guids]
+  gEfiEventVirtualAddressChangeGuid
+  gSynQuacerNonDiscoverableI2cMasterGuid
+  gSynQuacerNonDiscoverableRuntimeI2cMasterGuid
+
+[Protocols]
+  gEdkiiNonDiscoverableDeviceProtocolGuid     ## TO_START
+  gEfiI2cMasterProtocolGuid                   ## BY_START
+
+[FixedPcd]
+  gSynQuacerTokenSpaceGuid.PcdI2cReferenceClock
+
+[Depex]
+  BEFORE gSynQuacerPlatformDxeFileGuid

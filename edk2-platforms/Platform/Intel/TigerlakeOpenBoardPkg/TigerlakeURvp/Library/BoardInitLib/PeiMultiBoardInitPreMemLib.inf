@@ -1,0 +1,115 @@
+## @file
+#  Component information file for PEI TigerlakeURvp Board Init Pre-Mem Library
+#
+#  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiTigerlakeURvpMultiBoardInitPreMemLib
+  FILE_GUID                      = EA05BD43-136F-45EE-BBBA-27D75817574F
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL
+  CONSTRUCTOR                    = PeiTigerlakeURvpMultiBoardInitPreMemLibConstructor
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  PcdLib
+  PeiPlatformHookLib
+  MultiBoardInitSupportLib
+  PeiLib
+
+[Packages]
+  MinPlatformPkg/MinPlatformPkg.dec
+  TigerlakeOpenBoardPkg/OpenBoardPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  IntelFsp2Pkg/IntelFsp2Pkg.dec
+  TigerlakeSiliconPkg/SiPkg.dec
+
+[Sources]
+  PeiTigerlakeURvpInitPreMemLib.c
+  PeiMultiBoardInitPreMemLib.c
+  PeiTigerlakeURvpDetect.c
+  BoardSaInitPreMemLib.c
+  BoardPchInitPreMemLib.c
+  GpioTableTigerlakeUDdr4RvpPreMem.h
+
+[Ppis]
+  gEfiPeiReadOnlyVariable2PpiGuid
+  gEfiPeiMemoryDiscoveredPpiGuid                ## CONSUMES
+  gEfiPeiResetPpiGuid                           ## PRODUCES
+[Pcd]
+  gBoardModuleTokenSpaceGuid.PcdLpcSioConfigDefaultPort
+
+  # SA Misc Config
+  gBoardModuleTokenSpaceGuid.PcdSaMiscUserBd
+  gBoardModuleTokenSpaceGuid.PcdMrcSpdData
+  gBoardModuleTokenSpaceGuid.PcdMrcSpdDataSize
+
+  # SPD Address Table
+  gBoardModuleTokenSpaceGuid.PcdMrcSpdAddressTable0
+  gBoardModuleTokenSpaceGuid.PcdMrcSpdAddressTable1
+  gBoardModuleTokenSpaceGuid.PcdMrcSpdAddressTable2
+  gBoardModuleTokenSpaceGuid.PcdMrcSpdAddressTable3
+
+  #===========================================================
+  # Board Init Table List
+  gBoardModuleTokenSpaceGuid.PcdBoardGpioTablePreMem
+  gBoardModuleTokenSpaceGuid.PcdBoardGpioTablePreMemSize
+
+  # Board Information
+  gBoardModuleTokenSpaceGuid.PcdCpuRatio
+  gBoardModuleTokenSpaceGuid.PcdBiosGuard
+
+  gIntelFsp2PkgTokenSpaceGuid.PcdTemporaryRamBase              ## CONSUMES
+  gIntelFsp2PkgTokenSpaceGuid.PcdTemporaryRamSize              ## CONSUMES
+  gIntelFsp2PkgTokenSpaceGuid.PcdFspTemporaryRamSize           ## CONSUMES
+  gIntelFsp2PkgTokenSpaceGuid.PcdFspReservedBufferSize         ## CONSUMES
+
+  # SA USB Config
+  gBoardModuleTokenSpaceGuid.PcdCpuUsb30PortEnable
+
+  # PCIe Clock Info
+  gBoardModuleTokenSpaceGuid.PcdPcieClock0
+  gBoardModuleTokenSpaceGuid.PcdPcieClock1
+  gBoardModuleTokenSpaceGuid.PcdPcieClock2
+  gBoardModuleTokenSpaceGuid.PcdPcieClock3
+  gBoardModuleTokenSpaceGuid.PcdPcieClock4
+  gBoardModuleTokenSpaceGuid.PcdPcieClock5
+  gBoardModuleTokenSpaceGuid.PcdPcieClock6
+  gBoardModuleTokenSpaceGuid.PcdPcieClock7
+  gBoardModuleTokenSpaceGuid.PcdPcieClock8
+  gBoardModuleTokenSpaceGuid.PcdPcieClock9
+  gBoardModuleTokenSpaceGuid.PcdPcieClock10
+  gBoardModuleTokenSpaceGuid.PcdPcieClock11
+  gBoardModuleTokenSpaceGuid.PcdPcieClock12
+  gBoardModuleTokenSpaceGuid.PcdPcieClock13
+  gBoardModuleTokenSpaceGuid.PcdPcieClock14
+  gBoardModuleTokenSpaceGuid.PcdPcieClock15
+
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+
+  gMinPlatformPkgTokenSpaceGuid.PcdPciExpressRegionLength
+  gMinPlatformPkgTokenSpaceGuid.PcdLocalApicAddress
+  gMinPlatformPkgTokenSpaceGuid.PcdLocalApicMmioSize
+  gMinPlatformPkgTokenSpaceGuid.PcdFlashAreaBaseAddress
+  gMinPlatformPkgTokenSpaceGuid.PcdFlashAreaSize
+
+  gSiPkgTokenSpaceGuid.PcdMchBaseAddress
+  gSiPkgTokenSpaceGuid.PcdMchMmioSize
+
+  gBoardModuleTokenSpaceGuid.PcdDmiBaseAddress
+  gBoardModuleTokenSpaceGuid.PcdDmiMmioSize
+  gBoardModuleTokenSpaceGuid.PcdEpBaseAddress
+  gBoardModuleTokenSpaceGuid.PcdEpMmioSize
+
+[Guids]
+  gFspNonVolatileStorageHobGuid
+  gEfiMemoryOverwriteControlDataGuid

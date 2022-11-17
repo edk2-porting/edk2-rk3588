@@ -1,0 +1,66 @@
+## @file
+# This package provides advanced feature functionality to enable the
+# Intelligent Platform Management Interface (IPMI).
+# This package should only depend on EDK II Core packages, IntelSiliconPkg, and MinPlatformPkg.
+#
+# The DEC files are used by the utilities that parse DSC and
+# INF files to generate AutoGen.c and AutoGen.h files
+# for the build infrastructure.
+#
+# Copyright (c) 2019-2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION = 0x00010017
+  PACKAGE_NAME      = IpmiFeaturePkg
+  PACKAGE_GUID      = AE091910-F6C9-4AB5-B8B4-995E2F0D5166
+  PACKAGE_VERSION   = 0.1
+
+[Includes]
+  GenericIpmi/Common
+  GenericIpmi/Dxe
+  GenericIpmi/Pei
+  GenericIpmi/Smm
+  Include
+  IpmiInit
+  Library
+  OsWdt
+
+[LibraryClasses]
+  ## @libraryclass  Provides services to send IPMI commands.
+  #
+  IpmiCommandLib|Include/Library/IpmiCommandLib.inf
+
+  ## @libraryclass  Provides an API for platform-specific IPMI hooks.
+  #
+  IpmiCommandLib|Include/Library/IpmiPlatformHookLib.h
+
+[Guids]
+  gIpmiFeaturePkgTokenSpaceGuid  =  {0xc05283f6, 0xd6a8, 0x48f3, {0x9b, 0x59, 0xfb, 0xca, 0x71, 0x32, 0x0f, 0x12}}
+
+[Ppis]
+  gPeiIpmiTransportPpiGuid = {0x7bf5fecc, 0xc5b5, 0x4b25, {0x81, 0x1b, 0xb4, 0xb5, 0xb, 0x28, 0x79, 0xf7}}
+
+[Protocols]
+  gIpmiTransportProtocolGuid  = {0x6bb945e8, 0x3743, 0x433e, {0xb9, 0x0e, 0x29, 0xb3, 0x0d, 0x5d, 0xc6, 0x30}}
+  gSmmIpmiTransportProtocolGuid  = {0x8bb070f1, 0xa8f3, 0x471d, {0x86, 0x16, 0x77, 0x4b, 0xa3, 0xf4, 0x30, 0xa0}}
+  gEfiVideoPrintProtocolGuid     = {0x3dbf3e06, 0x9d0c, 0x40d3, {0xb2, 0x17, 0x45, 0x5f, 0x33, 0x9e, 0x29, 0x09}}
+
+[PcdsFeatureFlag]
+  gIpmiFeaturePkgTokenSpaceGuid.PcdIpmiFeatureEnable|FALSE|BOOLEAN|0xA0000001
+
+[PcdsFixedAtBuild]
+  gIpmiFeaturePkgTokenSpaceGuid.PcdMaxSOLChannels|3|UINT8|0xF0000001
+  #When True, BIOS will send a Pre-Boot signal to BMC
+  gIpmiFeaturePkgTokenSpaceGuid.PcdSignalPreBootToBmc|FALSE|BOOLEAN|0xF0000002
+
+[PcdsDynamic, PcdsDynamicEx]
+  gIpmiFeaturePkgTokenSpaceGuid.PcdFRB2EnabledFlag|TRUE|BOOLEAN|0xD0000001
+  gIpmiFeaturePkgTokenSpaceGuid.PcdFRBTimeoutValue|360|UINT16|0xD0000002
+  gIpmiFeaturePkgTokenSpaceGuid.PcdIpmiIoBaseAddress|0xCA2|UINT16|0xD0000003
+  gIpmiFeaturePkgTokenSpaceGuid.PcdSioMailboxBaseAddress|0x600|UINT32|0xD0000004
+  gIpmiFeaturePkgTokenSpaceGuid.PcdIpmiBmcReadyDelayTimer|120|UINT8|0xD0000005
+  gIpmiFeaturePkgTokenSpaceGuid.PcdIpmiSmmIoBaseAddress|0xCA2|UINT16|0xD0000006

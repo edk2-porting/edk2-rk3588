@@ -1,0 +1,50 @@
+// *++
+//
+// Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// --*/
+
+/=#
+
+#langdef en-US "English"
+
+//
+// Begin English Language Strings
+//
+#string STR_MEMORY_SUBCLASS_UNKNOWN    #language en-US  "Unknown"
+
+//
+// DIMM Device Locator strings
+
+// D03
+#string STR_LEMON_C10_DIMM_000     #language en-US "J5"
+#string STR_LEMON_C10_DIMM_001     #language en-US "J6"
+#string STR_LEMON_C10_DIMM_002     #language en-US "J7"
+#string STR_LEMON_C10_DIMM_010     #language en-US "J8"
+#string STR_LEMON_C10_DIMM_011     #language en-US "J9"
+#string STR_LEMON_C10_DIMM_012     #language en-US "J10"
+#string STR_LEMON_C10_DIMM_020     #language en-US "J11"
+#string STR_LEMON_C10_DIMM_021     #language en-US "J12"
+#string STR_LEMON_C10_DIMM_022     #language en-US "J13"
+#string STR_LEMON_C10_DIMM_030     #language en-US "J14"
+#string STR_LEMON_C10_DIMM_031     #language en-US "J15"
+#string STR_LEMON_C10_DIMM_032     #language en-US "J16"
+#string STR_LEMON_C10_DIMM_100     #language en-US "J17"
+#string STR_LEMON_C10_DIMM_101     #language en-US "J18"
+#string STR_LEMON_C10_DIMM_102     #language en-US "J19"
+#string STR_LEMON_C10_DIMM_110     #language en-US "J20"
+#string STR_LEMON_C10_DIMM_111     #language en-US "J21"
+#string STR_LEMON_C10_DIMM_112     #language en-US "J22"
+#string STR_LEMON_C10_DIMM_120     #language en-US "J23"
+#string STR_LEMON_C10_DIMM_121     #language en-US "J24"
+#string STR_LEMON_C10_DIMM_122     #language en-US "J25"
+#string STR_LEMON_C10_DIMM_130     #language en-US "J26"
+#string STR_LEMON_C10_DIMM_131     #language en-US "J27"
+#string STR_LEMON_C10_DIMM_132     #language en-US "J28"
+
+//
+// End English Language Strings
+//
+

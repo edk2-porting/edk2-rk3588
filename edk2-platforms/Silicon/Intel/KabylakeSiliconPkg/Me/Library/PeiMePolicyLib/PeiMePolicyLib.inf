@@ -1,0 +1,46 @@
+## @file
+# Component description file for the PeiMePolicyLib libbrary.
+#
+# Copyright (c) 2017 - 2020 Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+
+[Defines]
+INF_VERSION = 0x00010017
+BASE_NAME = PeiMePolicyLib
+FILE_GUID = 2655FA94-4559-F393-B0B1-85A8E79C1532
+VERSION_STRING = 1.0
+MODULE_TYPE = PEIM
+LIBRARY_CLASS = PeiMePolicyLib
+
+
+[LibraryClasses]
+DebugLib
+IoLib
+PeiServicesLib
+BaseMemoryLib
+MemoryAllocationLib
+ConfigBlockLib
+
+
+[Packages]
+MdePkg/MdePkg.dec
+KabylakeSiliconPkg/SiPkg.dec
+IntelSiliconPkg/IntelSiliconPkg.dec
+
+[Sources]
+PeiMePolicyLib.c
+PeiMePolicyLibrary.h
+
+
+[Ppis]
+gSiPolicyPpiGuid       ## PRODUCES
+gSiPreMemPolicyPpiGuid ## PRODUCES
+
+
+[Guids]
+gMePeiPreMemConfigGuid
+gMePeiConfigGuid

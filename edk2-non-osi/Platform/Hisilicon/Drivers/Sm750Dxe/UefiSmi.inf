@@ -1,0 +1,32 @@
+#/** @file
+#
+#    Copyright (c) 2016, Hisilicon Limited. All rights reserved.
+#    Copyright (c) 2016, Linaro Limited. All rights reserved.
+#
+#    This program and the accompanying materials
+#    are licensed and made available under the terms and conditions of the BSD License
+#    which accompanies this distribution. The full text of the license may be found at
+#    http://opensource.org/licenses/bsd-license.php
+#
+#    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#**/
+
+
+[Defines]
+  INF_VERSION          = 0x00010019
+  BASE_NAME            = SmiGraphicsOutput
+  FILE_GUID            = 12584EAB-60CB-43B0-8806-1AE5BEDEEF02
+  MODULE_TYPE          = UEFI_DRIVER
+  VERSION_STRING       = 1.0
+
+  PCI_VENDOR_ID        = 0x126F
+  PCI_DEVICE_ID        = 0x0750
+  PCI_CLASS_CODE       = 0x030000
+  PCI_REVISION         = 0xA1
+  COMPRESS             = TRUE
+
+[Binaries]
+  PE32|SmiGraphicsOutput.efi|*
+

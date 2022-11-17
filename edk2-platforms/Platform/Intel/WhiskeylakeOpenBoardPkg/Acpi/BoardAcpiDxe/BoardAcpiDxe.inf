@@ -1,0 +1,71 @@
+## @file
+#  Component information file for AcpiPlatform module
+#
+#
+#  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BoardAcpiDxe
+  FILE_GUID                      = E269E77D-6163-4F5D-8E59-21EAF114D307
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InstallAcpiBoard
+
+[Sources.common]
+  BoardAcpiDxe.c
+  AcpiGnvsInit.c
+  Dsdt/DSDT.ASL
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+  PcAtChipsetPkg/PcAtChipsetPkg.dec
+  WhiskeylakeOpenBoardPkg/OpenBoardPkg.dec
+  CoffeelakeSiliconPkg/SiPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  BaseLib
+  DebugLib
+  IoLib
+  PcdLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  BaseMemoryLib
+  HobLib
+  AslUpdateLib
+  BoardAcpiTableLib
+
+[Protocols]
+  gEfiAcpiTableProtocolGuid                     ## CONSUMES
+  gEfiFirmwareVolume2ProtocolGuid               ## CONSUMES
+  gEfiMpServiceProtocolGuid                     ## CONSUMES
+  gEfiGlobalNvsAreaProtocolGuid
+
+[Pcd]
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdAcpiGnvsAddress
+
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdAcpiSleepState
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdAcpiHibernate
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdLowPowerS0Idle
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdDisableActiveTripPoints
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdDisablePassiveTripPoints
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdDisableCriticalTripPoints
+
+[Depex]
+  gEfiAcpiTableProtocolGuid           AND
+  gEfiFirmwareVolume2ProtocolGuid     AND
+  gEfiPciRootBridgeIoProtocolGuid     AND
+  gEfiVariableArchProtocolGuid        AND
+  gEfiVariableWriteArchProtocolGuid
+
+
+

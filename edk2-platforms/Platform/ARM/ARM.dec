@@ -1,0 +1,22 @@
+#/** @file
+#
+#  Copyright (c) 2011-2017, ARM Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  DEC_SPECIFICATION              = 0x0001001A
+  PACKAGE_NAME                   = ARM
+  PACKAGE_GUID                   = 2a905d2b-30c9-4408-86a2-c0b328876aee
+  PACKAGE_VERSION                = 0.1
+
+[Includes]
+  Include                        # Root include for the package
+
+[LibraryClasses]
+  BdsLib|Include/Library/BdsLib.h
+
+[Guids]
+  gArmBootMonFsFileInfoGuid   = { 0x41e26b9c, 0xada6, 0x45b3, { 0x80, 0x8e, 0x23, 0x57, 0xa3, 0x5b, 0x60, 0xd6 } }

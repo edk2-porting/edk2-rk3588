@@ -1,0 +1,144 @@
+## @file
+# Declaration file for Purley based boards.
+#
+# The DEC files are used by the utilities that parse DSC and
+# INF files to generate AutoGen.c and AutoGen.h files
+# for the build infrastructure.
+#
+# Copyright (c) 2018 - 2021, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2021, American Megatrends International LLC.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = OpenBoardPkg
+  PACKAGE_GUID                   = 454FB726-6A01-49ce-B222-749CD093D3C5
+  PACKAGE_VERSION                = 0.91
+
+[Includes]
+  Include
+
+[Guids]
+  gEfiMemoryConfigDataGuid                            = { 0x80dbd530, 0xb74c, 0x4f11, { 0x8c, 0x03, 0x41, 0x86, 0x65, 0x53, 0x28, 0x31 } }
+  gCpPlatFlashTokenSpaceGuid                          = { 0xc9c39664, 0x96dd, 0x4c5c, { 0xaf, 0xd7, 0xcd, 0x65, 0x76, 0x29, 0xcf, 0xb0 } }
+  gOemSkuTokenSpaceGuid                               = { 0x9e37d253, 0xabf8, 0x4985, { 0x8e, 0x23, 0xba, 0xca, 0x10, 0x39, 0x56, 0x13 } }
+  gEfiIpmiPkgTokenSpaceGuid                           = { 0xe96431d, 0xc68e, 0x4212, { 0xa1, 0x70, 0x16, 0xa6, 0x8, 0x55, 0x12, 0xc6 } }
+  gPlatformTokenSpaceGuid                             = { 0x07dfa0d2, 0x2ac5, 0x4cab, { 0xac, 0x14, 0x30, 0x5c, 0x62, 0x48, 0x87, 0xe4 } }
+
+[Ppis]
+  gEfiPeiSystemBoardPpiGuid                           = { 0xc8d85e8c, 0xdc1c, 0x4f8c, { 0xad, 0xa7, 0x58, 0xc1, 0xd1, 0x07, 0xa3, 0x04 } }
+  gEfiSiliconRcHobsReadyPpi                           = { 0xecf149b5, 0xbf4e, 0x4ac8, { 0x8a, 0x8c, 0xce, 0x87, 0xcb, 0xac, 0x93, 0xd3 } }
+
+[Protocols]
+  gEfiPciIovPlatformProtocolGuid                      = { 0xf3a4b484, 0x9b26, 0x4eea, { 0x90, 0xe5, 0xa2, 0x06, 0x54, 0x0c, 0xa5, 0x25 } }
+  gEfiDxeSystemBoardProtocolGuid                      = { 0xa57c1118, 0x6afc, 0x46d2, { 0xba, 0xe6, 0x92, 0x92, 0x62, 0xd3, 0xeb, 0x1e } }
+
+[PcdsFixedAtBuild]
+
+  gPlatformTokenSpaceGuid.PcdCmosDebugPrintLevelReg|0x4C|UINT8|0x30000032
+
+  # Choose the default serial debug message level when CMOS is bad; in the later BIOS phase, the setup default is applied
+  # 0 - Disable; 1 - Minimum; 2 - Normal; 3 - Max
+  gPlatformTokenSpaceGuid.PcdSerialDbgLvlAtBadCmos|0x1|UINT8|0x30000033
+
+[PcdsFeatureFlag]
+  gPlatformTokenSpaceGuid.PcdFastBoot|FALSE|BOOLEAN|0x30000034
+
+  gPlatformTokenSpaceGuid.PcdUpdateConsoleInBds|TRUE|BOOLEAN|0x30000035
+
+  gPlatformTokenSpaceGuid.PcdLinuxBootEnable|FALSE|BOOLEAN|0x30000036
+  
+[PcdsDynamicEx]
+  gPlatformTokenSpaceGuid.PcdDfxAdvDebugJumper|FALSE|BOOLEAN|0x6000001D
+
+  ## This value is used to save memory address of MRC data structure.
+  gPlatformTokenSpaceGuid.PcdSyshostMemoryAddress|0x00000000|UINT64|0x30000040
+
+  gOemSkuTokenSpaceGuid.PcdForceTo1SConfigMode|FALSE|BOOLEAN|0x00000205
+
+  gOemSkuTokenSpaceGuid.PcdAcpiGnvsAddress|0|UINT64|0x00000206
+
+  gOemSkuTokenSpaceGuid.PcdOemSkuUplinkPortIndex|0xFF|UINT8|0x00000207
+
+  gOemSkuTokenSpaceGuid.PcdMemTsegSize|0x0|UINT32|0x00000208
+  gOemSkuTokenSpaceGuid.PcdMemIedSize|0x0|UINT32|0x00000209
+
+  gOemSkuTokenSpaceGuid.PcdUsb20OverCurrentMappings|0|UINT64|0x0000020A
+  gOemSkuTokenSpaceGuid.PcdUsb30OverCurrentMappings|0|UINT64|0x0000020B
+
+  gOemSkuTokenSpaceGuid.PcdIioBifurcationTable|0|UINT64|0x0000020C
+  gOemSkuTokenSpaceGuid.PcdIioBifurcationTableEntries|0|UINT8|0x0000020D
+  gOemSkuTokenSpaceGuid.PcdIioSlotTable|0|UINT64|0x0000020E
+  gOemSkuTokenSpaceGuid.PcdIioSlotTableEntries|0|UINT8|0x0000020F
+
+  gOemSkuTokenSpaceGuid.PcdAllLanesEparamTable|0|UINT64|0x00000210
+  gOemSkuTokenSpaceGuid.PcdAllLanesEparamTableSize|0|UINT32|0x00000211
+  gOemSkuTokenSpaceGuid.PcdPerLaneEparamTable|0|UINT64|0x00000212
+  gOemSkuTokenSpaceGuid.PcdPerLaneEparamTableSize|0|UINT32|0x00000213
+  gOemSkuTokenSpaceGuid.PcdBoardTypeBitmask|0|UINT32|0x00000214
+
+  gOemSkuTokenSpaceGuid.PcdSetupData|{0x0}|SYSTEM_CONFIGURATION|0x000F0001 {                       # SYSTEM_CONFIGURATION                 <== PLATFORM_SETUP_VARIABLE_NAME|gEfiSetupVariableGuid
+    <HeaderFiles>
+      Guid/SetupVariable.h
+    <Packages>
+      MdePkg/MdePkg.dec
+      PurleyRefreshSiliconPkg/SiPkg.dec
+      PurleyOpenBoardPkg/OpenBoardPkg.dec
+  }
+  gOemSkuTokenSpaceGuid.PcdPchRcConfigurationData|{0x0}|PCH_RC_CONFIGURATION|0x000F0002 {          # PCH_RC_CONFIGURATION                 <== PCH_RC_CONFIGURATION_NAME|gEfiPchRcVariableGuid
+    <HeaderFiles>
+      Guid/PchRcVariable.h
+    <Packages>
+      MdePkg/MdePkg.dec
+      PurleyRefreshSiliconPkg/SiPkg.dec
+      PurleyOpenBoardPkg/OpenBoardPkg.dec
+  }
+  gOemSkuTokenSpaceGuid.PcdSocketIioConfigData|{0x0}|SOCKET_IIO_CONFIGURATION|0x000F0003 {             # SOCKET_IIO_CONFIGURATION             <== SOCKET_IIO_CONFIGURATION_NAME|gEfiSocketIioVariableGuid
+    <HeaderFiles>
+      Guid/SocketIioVariable.h
+    <Packages>
+      MdePkg/MdePkg.dec
+      PurleyRefreshSiliconPkg/SiPkg.dec
+  }
+  gOemSkuTokenSpaceGuid.PcdSocketCommonRcConfigData|{0x0}|SOCKET_COMMONRC_CONFIGURATION|0x000F0004 {        # SOCKET_COMMONRC_CONFIGURATION        <== SOCKET_COMMONRC_CONFIGURATION_NAME|gEfiSocketCommonRcVariableGuid
+    <HeaderFiles>
+      Guid/SocketCommonRcVariable.h
+    <Packages>
+      MdePkg/MdePkg.dec
+      PurleyRefreshSiliconPkg/SiPkg.dec
+  }
+  gOemSkuTokenSpaceGuid.PcdSocketMpLinkConfigData|{0x0}|SOCKET_MP_LINK_CONFIGURATION|0x000F0005 {          # SOCKET_MP_LINK_CONFIGURATION         <== SOCKET_MP_LINK_CONFIGURATION_NAME|gEfiSocketMpLinkVariableGuid
+    <HeaderFiles>
+      Guid/SocketMpLinkVariable.h
+    <Packages>
+      MdePkg/MdePkg.dec
+      PurleyRefreshSiliconPkg/SiPkg.dec
+  }
+  gOemSkuTokenSpaceGuid.PcdSocketMemoryConfigData|{0x0}|SOCKET_MEMORY_CONFIGURATION|0x000F0006 {          # SOCKET_MEMORY_CONFIGURATION          <== SOCKET_MEMORY_CONFIGURATION_NAME|gEfiSocketMemoryVariableGuid
+    <HeaderFiles>
+      Guid/SocketMemoryVariable.h
+    <Packages>
+      MdePkg/MdePkg.dec
+      PurleyRefreshSiliconPkg/SiPkg.dec
+  }
+  gOemSkuTokenSpaceGuid.PcdSocketPowerManagementConfigData|{0x0}|SOCKET_POWERMANAGEMENT_CONFIGURATION|0x000F0007 { # SOCKET_POWERMANAGEMENT_CONFIGURATION <== SOCKET_POWERMANAGEMENT_CONFIGURATION_NAME|gEfiSocketPowermanagementVarGuid
+    <HeaderFiles>
+      Guid/SocketPowermanagementVariable.h
+    <Packages>
+      MdePkg/MdePkg.dec
+      PurleyRefreshSiliconPkg/SiPkg.dec
+  }
+  gOemSkuTokenSpaceGuid.PcdSocketProcessorCoreConfigData|{0x0}|SOCKET_PROCESSORCORE_CONFIGURATION|0x000F0008 {   # SOCKET_PROCESSORCORE_CONFIGURATION   <== SOCKET_PROCESSORCORE_CONFIGURATION_NAME|gEfiSocketProcessorCoreVarGuid
+    <HeaderFiles>
+      Guid/SocketProcessorCoreVariable.h
+    <Packages>
+      MdePkg/MdePkg.dec
+      PurleyRefreshSiliconPkg/SiPkg.dec
+  }
+
+[PcdsDynamic, PcdsDynamicEx]
+  gEfiIpmiPkgTokenSpaceGuid.PcdIpmiKcsTimeoutPeriod|5000|UINT64|0x90000020
+  gEfiIpmiPkgTokenSpaceGuid.PcdIpmiBmcSlaveAddress|0x20|UINT8|0x90000021

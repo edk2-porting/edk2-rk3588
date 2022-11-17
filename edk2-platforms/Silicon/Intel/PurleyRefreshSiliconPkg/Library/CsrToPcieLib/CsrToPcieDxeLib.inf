@@ -1,0 +1,85 @@
+## @file
+#
+# Copyright (c) 2018 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+################################################################################
+#
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = CsrToPcieDxeLib
+  FILE_GUID                      = FF3C93E7-30DE-49DE-9C02-56C2BC077561
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = CsrToPcieLib
+
+##  {FF3C93E7-30DE-49DE-9C02-56C2BC077561}
+##{ 0xff3c93e7, 0x30de, 0x49de, { 0x9c, 0x2, 0x56, 0xc2, 0xbc, 0x7, 0x75, 0x61  } };
+
+
+[Sources]
+  CsrToPcieLib.c
+  ../ProcMemInit/Chip/Common/CpuPciAccessCommon.c
+
+################################################################################
+#
+# Package Dependency Section - list of Package files that are required for
+#                              this module.
+#
+################################################################################
+
+[Packages]
+  MdePkg/MdePkg.dec
+  PurleyRefreshSiliconPkg/SiPkg.dec
+
+################################################################################
+#
+# Library Class Section - list of Library Classes that are required for
+#                         this module.
+#
+################################################################################
+
+[LibraryClasses]
+  BaseLib
+  UefiRuntimeServicesTableLib
+  DebugLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiIioUdsProtocolGuid
+
+[Guids]
+  gEfiCpRcPkgTokenSpaceGuid
+
+[FixedPcd]
+  gEfiCpRcPkgTokenSpaceGuid.PcdMaxCpuSocketCount
+
+[Depex]
+  gEfiIioUdsProtocolGuid
+
+################################################################################
+#
+# Protocol C Name Section - list of Protocol and Protocol Notify C Names
+#                           that this module uses or produces.
+#
+################################################################################
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+  gEfiCpRcPkgTokenSpaceGuid.PcdPcieSegmentSize
+  gEfiCpRcPkgTokenSpaceGuid.PcdPcieMmcfgTablePtr
+
+
+[BuildOptions.Ia32]
+  MSFT:*_*_*_CC_FLAGS     = /W4 /Gs999999 /GF /GL- /wd4214 /wd4334 /wd4142 /wd4819 /DBUILDING_FOR_IA32  /DIA32 $(DSC_GLOBAL_BUILD_OPTIONS)
+  GCC:*_*_*_CC_FLAGS     = -DBUILDING_FOR_IA32 -DIA32 $(DSC_GLOBAL_BUILD_OPTIONS)
+
+[BuildOptions.X64]
+  MSFT:*_*_X64_CC_FLAGS   = /W2 /Gs32768 /DKTI_HW_PLATFORM /DBUILDING_FOR_X64 /UIA32 /DRAS_FEATURES /wd4142 /wd4819 $(DSC_GLOBAL_BUILD_OPTIONS)
+  GCC:*_*_X64_CC_FLAGS   = -DKTI_HW_PLATFORM -DBUILDING_FOR_X64 -UIA32 -DRAS_FEATURES $(DSC_GLOBAL_BUILD_OPTIONS)

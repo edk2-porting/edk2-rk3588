@@ -1,0 +1,259 @@
+/** @file
+
+Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+  Name (SUPP, 0)
+  Name (CTRL, 0)
+  
+  Method(_PXM) {
+    if (LEqual (CLOD, 0)) {
+      Return(6)
+    } else {
+      Return(12)
+    }
+  }
+
+  Method(_OSC,4) {
+    //
+    // Create DWord-addressable fields from the capabilities Buffer
+    //
+    CreateDWordField(Arg3,0,CDW1)
+    If (LEqual(Arg0,ToUUID("33DB4D5B-1FF7-401C-9657-7441C03DD766"))) {
+        
+        //
+        // Create DWord-addressable fields from the capabilities Buffer
+        //
+        CreateDWordField(Arg3,4,CDW2)
+
+        //
+        // Fill 3rd capability DWORD only if the count is greater than 2.
+        //
+        If(LGreater(Arg2,2)) {
+            CreateDWordField(Arg3,8,CDW3)
+        }
+
+        //
+        // Save Capabilities DWord2 & 3
+        //
+        Store(CDW2,SUPP)
+        Store(CDW3,CTRL)
+
+        //
+        // Only allow native hot plug control if OS supports
+        // * ASPM
+        // * MSI/MSI-X
+        //
+        If (LOr(AHPE, LNotEqual(And(SUPP, 0x16), 0x16))) { // Conditions not met?         
+          And(CTRL, 0x1E, CTRL) // Mask bit 0 to deny.
+          Sleep(1000)
+        }
+
+        //
+        // Never allow SHPC (no SHPC controller in system)
+        //
+        And(CTRL, 0x1D, CTRL)
+
+        //
+        // Disable Native PCIe AER handling from OS so that it uses Firmware First model in WHEA
+        //
+        And (CTRL, 0x17, CTRL)
+        
+        If (Not(And(CDW1,1))) { // Query Flag Clear?
+          //
+          // Disable GPEs for Features granted native control
+          //
+          If (And(CTRL, 0x01)) { // Native Hot plug control granted?
+            \_SB.PC37.UR1A.OSHP ()
+            \_SB.PC37.UR1B.OSHP ()
+            \_SB.PC37.UR1C.OSHP ()
+            \_SB.PC37.UR1D.OSHP ()
+       
+            Store (0x01, GPSH)                // Clear Hotplug SCI Enable in GPE0
+          }
+        }
+
+        If (LNotEqual(Arg1,one)) { // unknown revision
+           Or(CDW1,0x08,CDW1)
+        }
+
+        If(LNotEqual(CDW3,CTRL)) { // capabilities bits were masked
+          Or(CDW1,0x10,CDW1)
+        }
+        //
+        // update DWORD3 in the buffer
+        //
+        Store(CTRL,CDW3)
+        Return(Arg3)
+
+      } Else {
+        //
+        // Just indicate unrecognized UUID
+        // Leave it at that
+        //
+        Or (CDW1,4,CDW1)
+        Store (0xEE, IO80)
+        Return(Arg3)
+      }
+  } // End _OSC
+
+  Method(_STA){
+    // Have to account for logical offline condition which IIOx stack is still in QPI fabric, but not OS visible
+    ShiftRight(PRBM, 6, Local1)
+    And(Local1, 0x1, Local1)
+    // Check if Socket is present
+    if(LEqual(Local1, 0x1)) {
+      // Account for Socket 6 in bitmap (8 x Socket #)
+      ShiftRight(IIOH, 48, Local1)
+      // Shift for IIO Stack 1
+      ShiftRight(Local1, 1, Local1)
+      And(Local1, 0x1, Local1)
+      // Check if IIO Stack is present
+      if(LEqual(Local1, 0x1)) {
+        // IIOx stack present and logically online
+        Return(0x0F)
+      }
+    }
+    // IIOx stack logically offline
+    Return(0x00) 
+
+  } // End Method STA
+
+  Name(PR37, ResourceTemplate() {
+    //RESOURCE_CHUNK1_OFF
+    WORDBusNumber(            //Bus number resource (0); the bridge produces bus numbers for its subsequent buses
+      ResourceProducer,       // bit 0 of general flags is 1
+      MinFixed,               // Range is fixed
+      MaxFixed,               // Range is fixed
+      PosDecode,              // PosDecode
+      0x0000,                 // Granularity (FIX1 - Patched by ACPI Platform Driver during POST)
+      0x0000,                 // Min         (FIX1 - Patched by ACPI Platform Driver during POST)
+      0x0000,                 // Max         (FIX1 - Patched by ACPI Platform Driver during POST)
+      0x0000,                 // Translation
+      0x0001,                 // Range Length = Max-Min+1 (FIX1 - Patched by ACPI Platform Driver during POST)
+            ,
+            ,
+      FIX1                    // DescriptorName populated so iASL outputs offset for it in a .h file
+    )
+
+    //: Off board video card not detected in device manager when it is connected to CPU
+    //RESOURCE_CHUNK5_OFF
+    DWORDMEMORY(              // descriptor for video RAM on video card
+      ResourceProducer,       // bit 0 of general flags is 0
+      PosDecode,
+      MinFixed,               // Range is fixed
+      MaxFixed,               // Range is Fixed
+      Cacheable,
+      ReadWrite,
+      0x00000000,             // Granularity  (FIX5 - Patched by ACPI Platform Driver during POST)
+      0x00000000,             // Min          (FIX5 - Patched by ACPI Platform Driver during POST)
+      0x00000000,             // Max          (FIX5 - Patched by ACPI Platform Driver during POST)
+      0x00000000,             // Translation
+      0x00000000,             // Range Length (FIX5 - Patched by ACPI Platform Driver during POST)
+                ,
+                ,
+      FIX5                    // DescriptorName populated so iASL outputs offset for it in a .h file
+    )
+
+    //RESOURCE_CHUNK2_OFF
+    WORDIO(                   //Consumed-and-produced resource (all I/O above CFF)
+      ResourceProducer,       // bit 0 of general flags is 0
+      MinFixed,               // Range is fixed
+      MaxFixed,               // Range is fixed
+      PosDecode,
+      EntireRange,
+      0x0000,                 // Granularity (FIX2 - Patched by ACPI Platform Driver during POST)
+      0x0000,                 // Min         (FIX2 - Patched by ACPI Platform Driver during POST)
+      0x0000,                 // Max         (FIX2 - Patched by ACPI Platform Driver during POST)
+      0x0000,                 // Translation
+      0x0001,                 // Range Length = Max-Min+1 (FIX2 - Patched by ACPI Platform Driver during POST)
+            ,
+            ,
+      FIX2                    // DescriptorName populated so iASL outputs offset for it in a .h file
+    )
+
+    //Off board video card not detected in device manager when it is connected to CPU
+    //Descriptor for IO space of the video card.
+    WORDIO(                   // Consumed-and-produced resource (all I/O below CF8)
+      ResourceProducer,       // bit 0 of general flags is 0
+      MinFixed,               // Range is fixed
+      MaxFixed,               // Range is fixed
+      PosDecode,
+      EntireRange,
+      0x0000,                 // Granularity (FIX6 - Patched by ACPI Platform Driver during POST)
+      0x0000,                 // Min         (FIX6 - Patched by ACPI Platform Driver during POST)
+      0x0000,                 // Max         (FIX6 - Patched by ACPI Platform Driver during POST) 
+      0x0000,                 // Translation
+      0x0000,                 // Range Length
+            ,
+            ,
+      FIX6                    // DescriptorName populated so iASL outputs offset for it in a .h file
+    ) 
+
+    //Off board video card not detected in device manager when it is connected to CPU
+    //Descriptor for IO space of the video card.
+    WORDIO(                   // Consumed-and-produced resource (all I/O below CF8)
+      ResourceProducer,       // bit 0 of general flags is 0
+      MinFixed,               // Range is fixed
+      MaxFixed,               // Range is fixed
+      PosDecode,
+      EntireRange,
+      0x0000,                 // Granularity (FIX7 - Patched by ACPI Platform Driver during POST)
+      0x0000,                 // Min         (FIX7 - Patched by ACPI Platform Driver during POST)
+      0x0000,                 // Max         (FIX7 - Patched by ACPI Platform Driver during POST) 
+      0x0000,                 // Translation
+      0x0000,                 // Range Length
+            ,
+            ,
+      FIX7                    // DescriptorName populated so iASL outputs offset for it in a .h file
+    ) 
+
+    //
+    // PCI RESOURCE_32bit
+    //
+    DWORDMemory(              // Consumed-and-produced resource(all of memory space)
+      ResourceProducer,       // bit 0 of general flags is 0
+      PosDecode,              // positive Decode
+      MinFixed,               // Range is fixed
+      MaxFixed,               // Range is fixed
+      NonCacheable,
+      ReadWrite,
+      0x00000000,             // Granularity (FIX3 - Patched by ACPI Platform Driver during POST)
+      0x00000000,             // Min (calculated dynamically) (FIX3 - Patched by ACPI Platform Driver during POST)
+      0x00000000,             // Max = 4GB - 1MB  (fwh + fwh alias) (FIX3 - Patched by ACPI Platform Driver during POST)
+      0x00000000,             // Translation
+      0x00000000,             // Range Length (calculated dynamically) (FIX3 - Patched by ACPI Platform Driver during POST)
+                ,
+                ,
+      FIX3                    // DescriptorName populated so iASL outputs offset for it in a .h file
+    )
+
+    //
+    // PCI RESOURCE_64bit
+    //
+    QWORDMemory(              // Consumed-and-produced resource(all of memory space)
+      ResourceProducer,       // bit 0 of general flags is 0
+      PosDecode,              // positive Decode
+      MinFixed,               // Range is fixed
+      MaxFixed,               // Range is fixed
+      NonCacheable,
+      ReadWrite,
+      0x00000000000,          // Granularity (FIX4 - Patched by ACPI Platform Driver during POST)
+      0x00000000000,          // Min (calculated dynamically) (FIX4 - Patched by ACPI Platform Driver during POST)
+      0x00000000000,          // Max = 4GB - 1MB  (fwh + fwh alias) (FIX4 - Patched by ACPI Platform Driver during POST)
+      0x00000000000,          // Translation
+      0x00000000000,          // Range Length (calculated dynamically) (FIX4 - Patched by ACPI Platform Driver during POST)
+                   ,
+                   ,
+      FIX4                    // DescriptorName populated so iASL outputs offset for it in a .h file
+    )
+  }) // end of PR37 Buffer
+
+
+  // Current resource template return
+  Method(_CRS, 0x0, NotSerialized) {
+    Return(PR37)
+  }
+

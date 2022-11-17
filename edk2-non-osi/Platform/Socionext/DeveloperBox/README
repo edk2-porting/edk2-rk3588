@@ -1,0 +1,8 @@
+
+This directory contains prebuilt firmware binaries for the
+DeveloperBox platform, based on the Socionext SynQuacer SoC.
+
+fip_all_arm_tf.bin - prebuilt ARM Trusted Firmware RELEASE binary
+Repo: https://git.linaro.org/leg/noupstream/arm-trusted-firmware.git
+Commit: aa20e0414fb3
+

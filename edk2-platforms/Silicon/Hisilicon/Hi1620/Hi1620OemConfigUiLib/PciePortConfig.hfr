@@ -1,0 +1,161 @@
+/** @file
+*
+*  PCIe Config form at Oem Config fromset.
+*
+*  Copyright (c) 2017 - 2018, Hisilicon Limited. All rights reserved.
+*  Copyright (c) 2017 - 2018, Linaro Limited. All rights reserved.
+*
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
+*
+**/
+oneof varid = OEM_CONFIG_DATA.PciePort[INDEX],
+  prompt  = STRING_TOKEN(STR_PCIE_PORT_ENABLE_PROMPT_0),
+  help    = STRING_TOKEN(STR_PCIE_PORT_ENABLE_HELP),
+  option text = STRING_TOKEN(STR_ENABLE),  value = 1, flags = RESET_REQUIRED | MANUFACTURING | DEFAULT;
+  option text = STRING_TOKEN(STR_DISABLE), value = 0, flags = RESET_REQUIRED;
+endoneof;
+
+suppressif ideqval OEM_CONFIG_DATA.PciePort[INDEX] == 0x00;
+  oneof varid     = OEM_CONFIG_DATA.PcieLinkSpeedPort[INDEX],
+    prompt          = STRING_TOKEN(STR_PCIE_PORT_LINK_SPEED_PROMPT_0),
+    help            = STRING_TOKEN(STR_PCIE_PORT_LINK_SPEED_HELP),
+    option text     = STRING_TOKEN(STR_PCIE_GEN1),  value = 1, flags = DEFAULT | MANUFACTURING | RESET_REQUIRED;
+    option text     = STRING_TOKEN(STR_PCIE_GEN2),  value = 2, flags = RESET_REQUIRED;
+    option text     = STRING_TOKEN(STR_PCIE_GEN3),  value = 3, flags = RESET_REQUIRED;
+    option text     = STRING_TOKEN(STR_PCIE_GEN4),  value = 4, flags = RESET_REQUIRED;
+  endoneof;
+
+  suppressif NOT ideqval OEM_CONFIG_DATA.PcieLinkSpeedPort[INDEX] == 2;
+    oneof varid = OEM_CONFIG_DATA.PcieLinkDeEmphasisPort[INDEX],
+      prompt  = STRING_TOKEN(STR_PCIE_PORT_DEEMPHASIS_PROMPT_0),
+      help    = STRING_TOKEN(STR_PCIE_PORT_DEEMPHASIS_HELP),
+    #if ( INDEX == 0)
+      option text = STRING_TOKEN(STR_60DB), value = 0, flags = RESET_REQUIRED | MANUFACTURING | DEFAULT;
+      option text = STRING_TOKEN(STR_35DB), value = 1, flags = RESET_REQUIRED;
+    #endif
+
+    #if ( INDEX == 1)
+      option text = STRING_TOKEN(STR_60DB), value = 0, flags = RESET_REQUIRED | MANUFACTURING | DEFAULT;
+      option text = STRING_TOKEN(STR_35DB), value = 1, flags = RESET_REQUIRED;
+    #endif
+
+    #if ( INDEX == 3)
+      option text = STRING_TOKEN(STR_60DB), value = 0, flags = RESET_REQUIRED | MANUFACTURING | DEFAULT;
+      option text = STRING_TOKEN(STR_35DB), value = 1, flags = RESET_REQUIRED;
+    #endif
+
+    #if ( INDEX == 4)
+      option text = STRING_TOKEN(STR_60DB), value = 0, flags = RESET_REQUIRED | MANUFACTURING | DEFAULT;
+      option text = STRING_TOKEN(STR_35DB), value = 1, flags = RESET_REQUIRED;
+    #endif
+
+    #if ( INDEX == 6)
+      option text = STRING_TOKEN(STR_60DB), value = 0, flags = RESET_REQUIRED | MANUFACTURING | DEFAULT;
+      option text = STRING_TOKEN(STR_35DB), value = 1, flags = RESET_REQUIRED;
+    #endif
+
+    #if ( INDEX == 7)
+      option text = STRING_TOKEN(STR_60DB), value = 0, flags = RESET_REQUIRED | MANUFACTURING | DEFAULT;
+      option text = STRING_TOKEN(STR_35DB), value = 1, flags = RESET_REQUIRED;
+    #endif
+
+    #if ( INDEX == 8)
+      option text = STRING_TOKEN(STR_60DB), value = 0, flags = RESET_REQUIRED | MANUFACTURING | DEFAULT;
+      option text = STRING_TOKEN(STR_35DB), value = 1, flags = RESET_REQUIRED;
+    #endif
+
+    #if ( INDEX == 9)
+      option text = STRING_TOKEN(STR_60DB), value = 0, flags = RESET_REQUIRED | MANUFACTURING | DEFAULT;
+      option text = STRING_TOKEN(STR_35DB), value = 1, flags = RESET_REQUIRED;
+    #endif
+
+    #if ( INDEX == 11)
+      option text = STRING_TOKEN(STR_60DB), value = 0, flags = RESET_REQUIRED | MANUFACTURING | DEFAULT;
+      option text = STRING_TOKEN(STR_35DB), value = 1, flags = RESET_REQUIRED;
+    #endif
+
+    #if ( INDEX == 14)
+      option text = STRING_TOKEN(STR_60DB), value = 0, flags = RESET_REQUIRED | MANUFACTURING | DEFAULT;
+      option text = STRING_TOKEN(STR_35DB), value = 1, flags = RESET_REQUIRED;
+    #endif
+
+    #if ( INDEX == 15)
+      option text = STRING_TOKEN(STR_60DB), value = 0, flags = RESET_REQUIRED | MANUFACTURING | DEFAULT;
+      option text = STRING_TOKEN(STR_35DB), value = 1, flags = RESET_REQUIRED;
+    #endif
+
+    #if ( INDEX == 2)
+      option text = STRING_TOKEN(STR_60DB), value = 0, flags = RESET_REQUIRED ;
+      option text = STRING_TOKEN(STR_35DB), value = 1, flags = RESET_REQUIRED| MANUFACTURING | DEFAULT;
+    #endif
+
+    #if ( INDEX == 5)
+      option text = STRING_TOKEN(STR_60DB), value = 0, flags = RESET_REQUIRED;
+      option text = STRING_TOKEN(STR_35DB), value = 1, flags = RESET_REQUIRED | MANUFACTURING | DEFAULT;
+    #endif
+
+    #if ( INDEX == 10)
+      option text = STRING_TOKEN(STR_60DB), value = 0, flags = RESET_REQUIRED;
+      option text = STRING_TOKEN(STR_35DB), value = 1, flags = RESET_REQUIRED | MANUFACTURING | DEFAULT;
+    #endif
+
+    #if ( INDEX == 12)
+      option text = STRING_TOKEN(STR_60DB), value = 0, flags = RESET_REQUIRED;
+      option text = STRING_TOKEN(STR_35DB), value = 1, flags = RESET_REQUIRED | MANUFACTURING | DEFAULT;
+    #endif
+
+    #if ( INDEX == 13)
+      option text = STRING_TOKEN(STR_60DB), value = 0, flags = RESET_REQUIRED;
+      option text = STRING_TOKEN(STR_35DB), value = 1, flags = RESET_REQUIRED | MANUFACTURING | DEFAULT;
+    #endif
+
+    endoneof;
+  endif;
+
+  grayoutif  TRUE;
+    oneof varid = OEM_CONFIG_DATA.PcieLinkStatusPort[INDEX],
+      prompt  = STRING_TOKEN(STR_LINK_STATUS),
+      help    = STRING_TOKEN(STR_BLANK_STRING),
+      option text = STRING_TOKEN(STR_LINK_STATUS_NG), value = 0, flags = MANUFACTURING | DEFAULT | RESET_REQUIRED;
+      option text = STRING_TOKEN(STR_LINK_STATUS_OK), value = 1, flags = RESET_REQUIRED;
+    endoneof;
+
+    oneof varid = OEM_CONFIG_DATA.PcieLinkMaxPort[INDEX],
+      prompt  = STRING_TOKEN(STR_MAXLINK_STATUS),
+      help    = STRING_TOKEN(STR_BLANK_STRING),
+      option text = STRING_TOKEN(STR_WIDTH1_STRING), value = 1, flags = RESET_REQUIRED;
+      option text = STRING_TOKEN(STR_WIDTH2_STRING), value = 2, flags = RESET_REQUIRED;
+      option text = STRING_TOKEN(STR_WIDTH4_STRING), value = 4, flags = RESET_REQUIRED;
+      option text = STRING_TOKEN(STR_WIDTH8_STRING), value = 8, flags = RESET_REQUIRED | MANUFACTURING | DEFAULT;
+    endoneof;
+
+    suppressif NOT ideqval OEM_CONFIG_DATA.PcieLinkStatusPort[INDEX] == 1;
+      oneof varid = OEM_CONFIG_DATA.PcieLinkSpeedRateStatusPort[INDEX],
+        prompt  = STRING_TOKEN(STR_PCIESPEED_STATUS),
+        help    = STRING_TOKEN(STR_BLANK_STRING),
+        option text = STRING_TOKEN(STR_PCIE_LINK_SPEED1_STRING), value = 0, flags = MANUFACTURING | DEFAULT | RESET_REQUIRED;
+        option text = STRING_TOKEN(STR_PCIE_LINK_SPEED2_STRING), value = 1, flags = RESET_REQUIRED;
+        option text = STRING_TOKEN(STR_PCIE_LINK_SPEED3_STRING), value = 2, flags = RESET_REQUIRED;
+      endoneof;
+    endif;
+  endif;
+
+  oneof varid = OEM_CONFIG_DATA.PcieMaxPayloadSizePort[INDEX],
+    prompt  = STRING_TOKEN(STR_PCIE_PORT_MAX_PAYLOAD_REQUEST_PROMPT),
+    help    = STRING_TOKEN(STR_PCIE_PORT_MAX_PAYLOAD_REQUEST_HELP),
+      option text = STRING_TOKEN(STR_128B), value = 0, flags = MANUFACTURING | DEFAULT | RESET_REQUIRED;
+      option text = STRING_TOKEN(STR_256B), value = 1, flags = RESET_REQUIRED;
+      option text = STRING_TOKEN(STR_512B), value = 2, flags = RESET_REQUIRED;
+  endoneof;
+
+  oneof varid = OEM_CONFIG_DATA.PcieAspmPort[INDEX],
+    prompt   = STRING_TOKEN (STR_PCIE_PORT_ASPM_PROMPT_G),
+    help     = STRING_TOKEN (STR_PCIE_GLOBAL_ASPM_HELP),
+    option text = STRING_TOKEN(STR_DISABLE),      value = 0, flags = RESET_REQUIRED | MANUFACTURING | DEFAULT;
+    option text = STRING_TOKEN(STR_L0S_ONLY),     value = 1, flags = RESET_REQUIRED;
+    option text = STRING_TOKEN(STR_L1_ONLY),      value = 2, flags = RESET_REQUIRED;
+    option text = STRING_TOKEN(STR_L0S_L1_BOTH),  value = 3, flags = RESET_REQUIRED;
+  endoneof;
+
+endif;
+

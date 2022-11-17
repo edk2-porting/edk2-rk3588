@@ -1,0 +1,375 @@
+/** @file
+ *
+ *  Copyright (c) 2018 Andrei Warkentin <andrey.warkentin@gmail.com>
+ *  Copyright (c) 2020, ARM Limited. All rights reserved.
+ *
+ *  SPDX-License-Identifier: BSD-2-Clause-Patent
+ *
+ **/
+
+#include <Guid/HiiPlatformSetupFormset.h>
+#include "ConfigDxeFormSetGuid.h"
+#include <ConfigVars.h>
+#include <IndustryStandard/Bcm2711.h>
+
+//
+// EFI Variable attributes
+//
+#define EFI_VARIABLE_NON_VOLATILE       0x00000001
+#define EFI_VARIABLE_BOOTSERVICE_ACCESS 0x00000002
+#define EFI_VARIABLE_RUNTIME_ACCESS     0x00000004
+#define EFI_VARIABLE_READ_ONLY          0x00000008
+
+formset
+    guid      = CONFIGDXE_FORM_SET_GUID,
+    title     = STRING_TOKEN(STR_FORM_SET_TITLE),
+    help      = STRING_TOKEN(STR_FORM_SET_TITLE_HELP),
+    classguid = EFI_HII_PLATFORM_SETUP_FORMSET_GUID,
+
+    efivarstore CHIPSET_CPU_CLOCK_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = CpuClock,
+      guid  = CONFIGDXE_FORM_SET_GUID;
+
+    efivarstore CHIPSET_CUSTOM_CPU_CLOCK_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = CustomCpuClock,
+      guid  = CONFIGDXE_FORM_SET_GUID;
+
+    efivarstore ADVANCED_RAM_MORE_THAN_3GB_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = RamMoreThan3GB,
+      guid  = CONFIGDXE_FORM_SET_GUID;
+
+    efivarstore ADVANCED_RAM_LIMIT_TO_3GB_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = RamLimitTo3GB,
+      guid  = CONFIGDXE_FORM_SET_GUID;
+
+    efivarstore ADVANCED_FAN_ON_GPIO_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = FanOnGpio,
+      guid  = CONFIGDXE_FORM_SET_GUID;
+
+    efivarstore ADVANCED_FANTEMP_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = FanTemp,
+      guid  = CONFIGDXE_FORM_SET_GUID;
+
+    efivarstore ADVANCED_XHCIPCI_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = XhciPci,
+      guid  = CONFIGDXE_FORM_SET_GUID;
+
+    efivarstore SYSTEM_TABLE_MODE_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = SystemTableMode,
+      guid  = CONFIGDXE_FORM_SET_GUID;
+
+    efivarstore ADVANCED_ASSET_TAG_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = AssetTag,
+      guid  = CONFIGDXE_FORM_SET_GUID;
+
+    efivarstore MMC_SD_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = SdIsArasan,
+      guid  = CONFIGDXE_FORM_SET_GUID;
+
+    efivarstore MMC_DISMULTI_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = MmcDisableMulti,
+      guid  = CONFIGDXE_FORM_SET_GUID;
+
+    efivarstore MMC_FORCE1BIT_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = MmcForce1Bit,
+      guid  = CONFIGDXE_FORM_SET_GUID;
+
+    efivarstore MMC_FORCEDS_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = MmcForceDefaultSpeed,
+      guid  = CONFIGDXE_FORM_SET_GUID;
+
+    efivarstore MMC_SD_DS_MHZ_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = MmcSdDefaultSpeedMHz,
+      guid  = CONFIGDXE_FORM_SET_GUID;
+
+    efivarstore MMC_SD_HS_MHZ_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = MmcSdHighSpeedMHz,
+      guid  = CONFIGDXE_FORM_SET_GUID;
+
+    efivarstore MMC_EMMC_DMA_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = MmcEnableDma,
+      guid  = CONFIGDXE_FORM_SET_GUID;
+
+    efivarstore DEBUG_ENABLE_JTAG_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = DebugEnableJTAG,
+      guid  = CONFIGDXE_FORM_SET_GUID;
+
+    efivarstore DISPLAY_ENABLE_SCALED_VMODES_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = DisplayEnableScaledVModes,
+      guid  = CONFIGDXE_FORM_SET_GUID;
+
+    efivarstore DISPLAY_ENABLE_SSHOT_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = DisplayEnableSShot,
+      guid  = CONFIGDXE_FORM_SET_GUID;
+
+    form formid = 1,
+        title  = STRING_TOKEN(STR_FORM_SET_TITLE);
+        subtitle text = STRING_TOKEN(STR_NULL_STRING);
+
+        goto 0x1002,
+           prompt = STRING_TOKEN(STR_CHIPSET_FORM_TITLE),
+           help = STRING_TOKEN(STR_NULL_STRING);
+
+        goto 0x1004,
+            prompt = STRING_TOKEN(STR_DISPLAY_FORM_TITLE),
+            help = STRING_TOKEN(STR_NULL_STRING);
+
+        goto 0x1006,
+           prompt = STRING_TOKEN(STR_ADVANCED_FORM_TITLE),
+           help = STRING_TOKEN(STR_NULL_STRING);
+
+        goto 0x1003,
+           prompt = STRING_TOKEN(STR_MMC_FORM_TITLE),
+           help = STRING_TOKEN(STR_NULL_STRING);
+
+        goto 0x1005,
+            prompt = STRING_TOKEN(STR_DEBUG_FORM_TITLE),
+            help = STRING_TOKEN(STR_NULL_STRING);
+    endform;
+
+    form formid = 0x1002,
+        title  = STRING_TOKEN(STR_CHIPSET_FORM_TITLE);
+        subtitle text = STRING_TOKEN(STR_CHIPSET_FORM_SUBTITLE);
+
+        oneof varid = CpuClock.Clock,
+            prompt      = STRING_TOKEN(STR_CHIPSET_CLOCK_CPU_PROMPT),
+            help        = STRING_TOKEN(STR_CHIPSET_CLOCK_CPU_HELP),
+            flags       = NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+            option text = STRING_TOKEN(STR_CHIPSET_CLOCK_CPU_LOW), value = CHIPSET_CPU_CLOCK_LOW, flags = 0;
+            option text = STRING_TOKEN(STR_CHIPSET_CLOCK_CPU_DEF), value = CHIPSET_CPU_CLOCK_DEFAULT, flags = DEFAULT;
+            option text = STRING_TOKEN(STR_CHIPSET_CLOCK_CPU_MAX), value = CHIPSET_CPU_CLOCK_MAX, flags = 0;
+            option text = STRING_TOKEN(STR_CHIPSET_CLOCK_CPU_CUSTOM), value = CHIPSET_CPU_CLOCK_CUSTOM, flags = 0;
+        endoneof;
+
+        grayoutif NOT ideqval CpuClock.Clock == 3;
+          numeric varid = CustomCpuClock.Clock,
+              prompt  = STRING_TOKEN(STR_CHIPSET_CUSTOM_CPU_CLOCK_PROMPT),
+              help    = STRING_TOKEN(STR_CHIPSET_CUSTOM_CPU_CLOCK_HELP),
+              flags   = DISPLAY_UINT_DEC | NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+              minimum = 100,
+              maximum = FixedPcdGet32 (PcdCpuMaxSpeedMHz),
+              default = FixedPcdGet32 (PcdCpuDefSpeedMHz),
+          endnumeric;
+        endif;
+    endform;
+
+    form formid = 0x1006,
+        title  = STRING_TOKEN(STR_ADVANCED_FORM_TITLE);
+        subtitle text = STRING_TOKEN(STR_NULL_STRING);
+
+        grayoutif ideqval RamMoreThan3GB.Supported == 0;
+          oneof varid = RamLimitTo3GB.Enabled,
+              prompt      = STRING_TOKEN(STR_ADVANCED_3GB_PROMPT),
+              help        = STRING_TOKEN(STR_ADVANCED_3GB_HELP),
+              flags       = NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+              option text = STRING_TOKEN(STR_ADVANCED_3GB_OFF), value = 0, flags = DEFAULT;
+              option text = STRING_TOKEN(STR_ADVANCED_3GB_ON), value = 1, flags = 0;
+          endoneof;
+        endif;
+
+        oneof varid = SystemTableMode.Mode,
+            prompt      = STRING_TOKEN(STR_ADVANCED_SYSTAB_PROMPT),
+            help        = STRING_TOKEN(STR_ADVANCED_SYSTAB_HELP),
+            flags       = NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+            option text = STRING_TOKEN(STR_ADVANCED_SYSTAB_ACPI), value = SYSTEM_TABLE_MODE_ACPI, flags = 0;
+            option text = STRING_TOKEN(STR_ADVANCED_SYSTAB_BOTH), value = SYSTEM_TABLE_MODE_BOTH, flags = DEFAULT;
+            option text = STRING_TOKEN(STR_ADVANCED_SYSTAB_DT), value = SYSTEM_TABLE_MODE_DT, flags = DEFAULT;
+        endoneof;
+
+#if (RPI_MODEL == 4)
+        grayoutif NOT ideqval SystemTableMode.Mode == SYSTEM_TABLE_MODE_ACPI;
+          oneof varid = FanOnGpio.Enabled,
+              prompt      = STRING_TOKEN(STR_ADVANCED_FANONGPIO_PROMPT),
+              help        = STRING_TOKEN(STR_ADVANCED_FANONGPIO_HELP),
+              flags       = NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+              option text = STRING_TOKEN(STR_ADVANCED_FANONGPIO_OFF), value = 0, flags = DEFAULT;
+              option text = STRING_TOKEN(STR_ADVANCED_FANONGPIO_18), value = 18, flags = 0;
+              option text = STRING_TOKEN(STR_ADVANCED_FANONGPIO_19), value = 19, flags = 0;
+          endoneof;
+        endif;
+
+        grayoutif ideqval FanOnGpio.Enabled == 0;
+          numeric varid = FanTemp.Value,
+              prompt      = STRING_TOKEN(STR_ADVANCED_FANTEMP_PROMPT),
+              help        = STRING_TOKEN(STR_ADVANCED_FANTEMP_HELP),
+              flags       = DISPLAY_UINT_DEC | NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+	      minimum = 50,
+              maximum = 80,
+              default = 60,
+          endnumeric;
+        endif;
+
+        suppressif ideqval XhciPci.Value == 2;
+          grayoutif NOT ideqval SystemTableMode.Mode == SYSTEM_TABLE_MODE_ACPI;
+            oneof varid = XhciPci.Value,
+              prompt      = STRING_TOKEN(STR_ADVANCED_XHCIPCI_PROMPT),
+              help        = STRING_TOKEN(STR_ADVANCED_XHCIPCI_HELP),
+              flags       = NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+              option text = STRING_TOKEN(STR_ADVANCED_XHCIPCI_XHCI), value = 0, flags = DEFAULT;
+              option text = STRING_TOKEN(STR_ADVANCED_XHCIPCI_PCIE), value = 1, flags = 0;
+            endoneof;
+          endif;
+        endif;
+#endif
+        string varid = AssetTag.AssetTag,
+            prompt  = STRING_TOKEN(STR_ADVANCED_ASSET_TAG_PROMPT),
+            help    = STRING_TOKEN(STR_ADVANCED_ASSET_TAG_HELP),
+            flags   = INTERACTIVE | RESET_REQUIRED,
+            minsize = 0,
+            maxsize = ASSET_TAG_STR_MAX_LEN,
+        endstring;
+    endform;
+
+    form formid = 0x1003,
+        title  = STRING_TOKEN(STR_MMC_FORM_TITLE);
+        subtitle text = STRING_TOKEN(STR_MMC_FORM_SUBTITLE);
+
+        oneof varid = SdIsArasan.Routing,
+            prompt      = STRING_TOKEN(STR_MMC_SD_PROMPT),
+            help        = STRING_TOKEN(STR_MMC_SD_HELP),
+            flags       = NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+#if (RPI_MODEL == 4)
+            option text = STRING_TOKEN(STR_MMC_SD_ARASAN), value = 1, flags = DEFAULT;
+            option text = STRING_TOKEN(STR_MMC_SD_EMMC2), value = 0, flags = 0;
+#else
+            option text = STRING_TOKEN(STR_MMC_SD_ARASAN), value = 1, flags = 0;
+            option text = STRING_TOKEN(STR_MMC_SD_SDHOST), value = 0, flags = DEFAULT;
+#endif
+        endoneof;
+
+        oneof varid = MmcDisableMulti.DisableMulti,
+            prompt      = STRING_TOKEN(STR_MMC_DISMULTI_PROMPT),
+            help        = STRING_TOKEN(STR_MMC_DISMULTI_HELP),
+            flags       = NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+            option text = STRING_TOKEN(STR_MMC_DISMULTI_N), value = 0, flags = DEFAULT;
+            option text = STRING_TOKEN(STR_MMC_DISMULTI_Y), value = 1, flags = 0;
+        endoneof;
+
+        oneof varid = MmcForce1Bit.Force1Bit,
+            prompt      = STRING_TOKEN(STR_MMC_FORCE1BIT_PROMPT),
+            help        = STRING_TOKEN(STR_MMC_FORCE1BIT_HELP),
+            flags       = NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+            option text = STRING_TOKEN(STR_MMC_FORCE1BIT_N), value = 0, flags = DEFAULT;
+            option text = STRING_TOKEN(STR_MMC_FORCE1BIT_Y), value = 1, flags = 0;
+        endoneof;
+
+        oneof varid = MmcForceDefaultSpeed.ForceDS,
+            prompt      = STRING_TOKEN(STR_MMC_FORCEDS_PROMPT),
+            help        = STRING_TOKEN(STR_MMC_FORCEDS_HELP),
+            flags       = NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+            option text = STRING_TOKEN(STR_MMC_FORCEDS_N), value = 0, flags = DEFAULT;
+            option text = STRING_TOKEN(STR_MMC_FORCEDS_Y), value = 1, flags = 0;
+        endoneof;
+
+        numeric varid = MmcSdDefaultSpeedMHz.MHz,
+             prompt  = STRING_TOKEN(STR_MMC_SD_DS_PROMPT),
+             help    = STRING_TOKEN(STR_MMC_SD_DS_HELP),
+             flags   = DISPLAY_UINT_DEC | NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+             minimum = 25,
+             maximum = 100,
+             default = 25,
+        endnumeric;
+
+        numeric varid = MmcSdHighSpeedMHz.MHz,
+             prompt  = STRING_TOKEN(STR_MMC_SD_HS_PROMPT),
+             help    = STRING_TOKEN(STR_MMC_SD_HS_HELP),
+             flags   = DISPLAY_UINT_DEC | NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+             minimum = 50,
+             maximum = 100,
+             default = 50,
+        endnumeric;
+#if (RPI_MODEL == 4)
+        grayoutif ideqval SdIsArasan.Routing == 1;
+        oneof varid = MmcEnableDma.EnableDma,
+            prompt      = STRING_TOKEN(STR_MMC_EMMC_PROMPT),
+            help        = STRING_TOKEN(STR_MMC_EMMC_HELP),
+            flags       = NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+            option text = STRING_TOKEN(STR_MMC_EMMC_PIO), value = 0, flags = 0;
+            option text = STRING_TOKEN(STR_MMC_EMMC_DMA), value = 1, flags = DEFAULT;
+        endoneof;
+        endif;
+#endif
+
+    endform;
+
+    form formid = 0x1004,
+        title  = STRING_TOKEN(STR_DISPLAY_FORM_TITLE);
+        subtitle text = STRING_TOKEN(STR_DISPLAY_FORM_SUBTITLE);
+
+        checkbox varid = DisplayEnableScaledVModes.v640,
+            prompt      = STRING_TOKEN(STR_DISPLAY_VMODES_640_PROMPT),
+            help        = STRING_TOKEN(STR_DISPLAY_VMODES_640_HELP),
+            flags       = CHECKBOX_DEFAULT | CHECKBOX_DEFAULT_MFG | RESET_REQUIRED,
+        endcheckbox;
+
+        checkbox varid = DisplayEnableScaledVModes.v800,
+            prompt      = STRING_TOKEN(STR_DISPLAY_VMODES_800_PROMPT),
+            help        = STRING_TOKEN(STR_DISPLAY_VMODES_800_HELP),
+            flags       = CHECKBOX_DEFAULT | CHECKBOX_DEFAULT_MFG | RESET_REQUIRED,
+        endcheckbox;
+
+        checkbox varid = DisplayEnableScaledVModes.v1024,
+            prompt      = STRING_TOKEN(STR_DISPLAY_VMODES_1024_PROMPT),
+            help        = STRING_TOKEN(STR_DISPLAY_VMODES_1024_HELP),
+            flags       = CHECKBOX_DEFAULT | CHECKBOX_DEFAULT_MFG | RESET_REQUIRED,
+        endcheckbox;
+
+        checkbox varid = DisplayEnableScaledVModes.v720p,
+            prompt      = STRING_TOKEN(STR_DISPLAY_VMODES_720_PROMPT),
+            help        = STRING_TOKEN(STR_DISPLAY_VMODES_720_HELP),
+            flags       = CHECKBOX_DEFAULT | CHECKBOX_DEFAULT_MFG | RESET_REQUIRED,
+        endcheckbox;
+
+        checkbox varid = DisplayEnableScaledVModes.v1080p,
+            prompt      = STRING_TOKEN(STR_DISPLAY_VMODES_1080_PROMPT),
+            help        = STRING_TOKEN(STR_DISPLAY_VMODES_1080_HELP),
+            flags       = CHECKBOX_DEFAULT | CHECKBOX_DEFAULT_MFG | RESET_REQUIRED,
+        endcheckbox;
+
+        checkbox varid = DisplayEnableScaledVModes.Physical,
+            prompt      = STRING_TOKEN(STR_DISPLAY_VMODES_REAL_PROMPT),
+            help        = STRING_TOKEN(STR_DISPLAY_VMODES_REAL_HELP),
+            flags       = CHECKBOX_DEFAULT | CHECKBOX_DEFAULT_MFG | RESET_REQUIRED,
+        endcheckbox;
+
+        oneof varid = DisplayEnableSShot.Enable,
+            prompt      = STRING_TOKEN(STR_DISPLAY_SSHOT_PROMPT),
+            help        = STRING_TOKEN(STR_DISPLAY_SSHOT_HELP),
+            flags       = NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+            option text = STRING_TOKEN(STR_DISPLAY_SSHOT_ENABLE), value = 1, flags = DEFAULT;
+            option text = STRING_TOKEN(STR_DISPLAY_SSHOT_DISABLE), value = 0, flags = 0;
+        endoneof;
+    endform;
+
+    form formid = 0x1005,
+        title  = STRING_TOKEN(STR_DEBUG_FORM_TITLE);
+        subtitle text = STRING_TOKEN(STR_DEBUG_FORM_SUBTITLE);
+
+        oneof varid = DebugEnableJTAG.Enable,
+            prompt      = STRING_TOKEN(STR_DEBUG_JTAG_PROMPT),
+            help        = STRING_TOKEN(STR_DEBUG_JTAG_HELP),
+            flags       = NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+            option text = STRING_TOKEN(STR_DEBUG_JTAG_ENABLE), value = 1, flags = 0;
+            option text = STRING_TOKEN(STR_DEBUG_JTAG_DISABLE), value = 0, flags = DEFAULT;
+        endoneof;
+    endform;
+endformset;

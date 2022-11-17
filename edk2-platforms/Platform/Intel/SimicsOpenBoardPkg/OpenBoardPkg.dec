@@ -1,0 +1,152 @@
+## @file
+#  EFI/Framework Simics platform
+#
+# Copyright (c) 2019 Intel Corporation. All rights reserved. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = SimicsOpenBoardPkg
+  PACKAGE_GUID                   = E6A03E0D-5944-4dc6-9292-090D609EDD3A
+  PACKAGE_VERSION                = 0.1
+
+[Includes]
+  Include
+
+[Guids]
+  gSimicsOpenBoardPkgTokenSpaceGuid  = {0x75fd61da, 0x3931, 0x49aa, {0x8f, 0x11, 0x18, 0x25, 0xf6, 0x31, 0x21, 0xd2}}
+  gSimicsBoardConfigGuid  = {0xeed35f57, 0x4ff2, 0x4244, {0xb8, 0x3a, 0xea, 0x71, 0x5f, 0xd3, 0x59, 0xa5}}
+
+[PcdsFixedAtBuild]
+  gSimicsOpenBoardPkgTokenSpaceGuid.PcdSimicsPeiMemFvBase|0x0|UINT32|0
+  gSimicsOpenBoardPkgTokenSpaceGuid.PcdSimicsPeiMemFvSize|0x0|UINT32|1
+  gSimicsOpenBoardPkgTokenSpaceGuid.PcdSimicsDxeMemFvBase|0x0|UINT32|0x15
+  gSimicsOpenBoardPkgTokenSpaceGuid.PcdSimicsDxeMemFvSize|0x0|UINT32|0x16
+
+  #TODO: Remove these two when we integrate new PlatformPei
+  gSimicsOpenBoardPkgTokenSpaceGuid.PcdSimicsMemFvBase|0x00800000|UINT32|2
+  gSimicsOpenBoardPkgTokenSpaceGuid.PcdSimicsMemFvSize|0x00500000|UINT32|3
+
+  gSimicsOpenBoardPkgTokenSpaceGuid.PcdSimicsFlashNvStorageEventLogBase|0x0|UINT32|0x8
+  gSimicsOpenBoardPkgTokenSpaceGuid.PcdSimicsFlashNvStorageEventLogSize|0x0|UINT32|0x9
+  gSimicsOpenBoardPkgTokenSpaceGuid.PcdSimicsFirmwareFdSize|0x0|UINT32|0xa
+  gSimicsOpenBoardPkgTokenSpaceGuid.PcdSimicsFirmwareBlockSize|0|UINT32|0xb
+  gSimicsOpenBoardPkgTokenSpaceGuid.PcdSimicsFlashNvStorageVariableBase|0x0|UINT32|0xc
+  gSimicsOpenBoardPkgTokenSpaceGuid.PcdSimicsFlashNvStorageFtwSpareBase|0x0|UINT32|0xd
+  gSimicsOpenBoardPkgTokenSpaceGuid.PcdSimicsFlashNvStorageFtwWorkingBase|0x0|UINT32|0xe
+  gSimicsOpenBoardPkgTokenSpaceGuid.PcdSimicsFdBaseAddress|0x0|UINT32|0xf
+  gSimicsOpenBoardPkgTokenSpaceGuid.PcdSimicsSecPageTablesBase|0x0|UINT32|0x11
+  gSimicsOpenBoardPkgTokenSpaceGuid.PcdSimicsSecPageTablesSize|0x0|UINT32|0x12
+  gSimicsOpenBoardPkgTokenSpaceGuid.PcdSimicsSecPeiTempRamBase|0x0|UINT32|0x13
+  gSimicsOpenBoardPkgTokenSpaceGuid.PcdSimicsSecPeiTempRamSize|0x0|UINT32|0x14
+  gSimicsOpenBoardPkgTokenSpaceGuid.PcdSimicsLockBoxStorageBase|0x0|UINT32|0x18
+  gSimicsOpenBoardPkgTokenSpaceGuid.PcdSimicsLockBoxStorageSize|0x0|UINT32|0x19
+  gSimicsOpenBoardPkgTokenSpaceGuid.PcdGuidedExtractHandlerTableSize|0x0|UINT32|0x1a
+  gSimicsOpenBoardPkgTokenSpaceGuid.PcdSimicsDecompressionScratchEnd|0x0|UINT32|0x1f
+
+[PcdsDynamic, PcdsDynamicEx]
+
+  # TODO: investigate whether next two Pcds are needed
+  gSimicsOpenBoardPkgTokenSpaceGuid.PcdEmuVariableEvent|0|UINT64|0x28
+  gSimicsOpenBoardPkgTokenSpaceGuid.PcdOvmfFlashVariablesEnable|FALSE|BOOLEAN|0x10
+  gSimicsOpenBoardPkgTokenSpaceGuid.PcdSimicsX58HostBridgePciDevId|0|UINT16|0x1b
+
+  ## The IO port aperture shared by all PCI root bridges.
+  #
+  gSimicsOpenBoardPkgTokenSpaceGuid.PcdPciIoBase|0x0|UINT64|0x22
+  gSimicsOpenBoardPkgTokenSpaceGuid.PcdPciIoSize|0x0|UINT64|0x23
+
+  ## The 32-bit MMIO aperture shared by all PCI root bridges.
+  #
+  gSimicsOpenBoardPkgTokenSpaceGuid.PcdPciMmio32Base|0x0|UINT64|0x24
+  gSimicsOpenBoardPkgTokenSpaceGuid.PcdPciMmio32Size|0x0|UINT64|0x25
+
+  ## The 64-bit MMIO aperture shared by all PCI root bridges.
+  #
+  gSimicsOpenBoardPkgTokenSpaceGuid.PcdPciMmio64Base|0x0|UINT64|0x26
+  gSimicsOpenBoardPkgTokenSpaceGuid.PcdPciMmio64Size|0x0|UINT64|0x27
+
+[PcdsFixedAtBuild, PcdsDynamic, PcdsDynamicEx, PcdsPatchableInModule]
+  ## Pcd8259LegacyModeMask defines the default mask value for platform. This value is determined<BR><BR>
+  #  1) If platform only support pure UEFI, value should be set to 0xFFFF or 0xFFFE;
+  #     Because only clock interrupt is allowed in legacy mode in pure UEFI platform.<BR>
+  #  2) If platform install CSM and use thunk module:<BR>
+  #     a) If thunk call provided by CSM binary requires some legacy interrupt support, the corresponding bit
+  #        should be opened as 0.<BR>
+  #        For example, if keyboard interfaces provided CSM binary use legacy keyboard interrupt in 8259 bit 1, then
+  #        the value should be set to 0xFFFC.<BR>
+  #     b) If all thunk call provied by CSM binary do not require legacy interrupt support, value should be set
+  #        to 0xFFFF or 0xFFFE.<BR>
+  #
+  #  The default value of legacy mode mask could be changed by EFI_LEGACY_8259_PROTOCOL->SetMask(). But it is rarely
+  #  need change it except some special cases such as when initializing the CSM binary, it should be set to 0xFFFF to
+  #  mask all legacy interrupt. Please restore the original legacy mask value if changing is made for these special case.<BR>
+  # @Prompt 8259 Legacy Mode mask.
+  gPcAtChipsetPkgTokenSpaceGuid.Pcd8259LegacyModeMask|0xFFFF|UINT16|0x00000001
+
+  ## Pcd8259LegacyModeEdgeLevel defines the default edge level for legacy mode's interrrupt controller.
+  #  For the corresponding bits, 0 = Edge triggered and 1 = Level triggered.
+  # @Prompt 8259 Legacy Mode edge level.
+  gPcAtChipsetPkgTokenSpaceGuid.Pcd8259LegacyModeEdgeLevel|0x0000|UINT16|0x00000002
+
+  ## Indicates if we need enable IsaAcpiCom1 device.<BR><BR>
+  #   TRUE  - Enables IsaAcpiCom1 device.<BR>
+  #   FALSE - Doesn't enable IsaAcpiCom1 device.<BR>
+  # @Prompt Enable IsaAcpiCom1 device.
+  gPcAtChipsetPkgTokenSpaceGuid.PcdIsaAcpiCom1Enable|TRUE|BOOLEAN|0x00000003
+
+  ## Indicates if we need enable IsaAcpiCom2 device.<BR><BR>
+  #   TRUE  - Enables IsaAcpiCom2 device.<BR>
+  #   FALSE - Doesn't enable IsaAcpiCom2 device.<BR>
+  # @Prompt Enable IsaAcpiCom12 device.
+  gPcAtChipsetPkgTokenSpaceGuid.PcdIsaAcpiCom2Enable|TRUE|BOOLEAN|0x00000004
+
+  ## Indicates if we need enable IsaAcpiPs2Keyboard device.<BR><BR>
+  #   TRUE  - Enables IsaAcpiPs2Keyboard device.<BR>
+  #   FALSE - Doesn't enable IsaAcpiPs2Keyboard device.<BR>
+  # @Prompt Enable IsaAcpiPs2Keyboard device.
+  gPcAtChipsetPkgTokenSpaceGuid.PcdIsaAcpiPs2KeyboardEnable|TRUE|BOOLEAN|0x00000005
+
+  ## Indicates if we need enable IsaAcpiPs2Mouse device.<BR><BR>
+  #   TRUE  - Enables IsaAcpiPs2Mouse device.<BR>
+  #   FALSE - Doesn't enable IsaAcpiPs2Mouse device.<BR>
+  # @Prompt Enable IsaAcpiPs2Mouse device.
+  gPcAtChipsetPkgTokenSpaceGuid.PcdIsaAcpiPs2MouseEnable|TRUE|BOOLEAN|0x00000006
+
+  ## Indicates if we need enable IsaAcpiFloppyA device.<BR><BR>
+  #   TRUE  - Enables IsaAcpiFloppyA device.<BR>
+  #   FALSE - Doesn't enable IsaAcpiFloppyA device.<BR>
+  # @Prompt Enable IsaAcpiFloppyA device.
+  gPcAtChipsetPkgTokenSpaceGuid.PcdIsaAcpiFloppyAEnable|TRUE|BOOLEAN|0x00000007
+
+  ## Indicates if we need enable IsaAcpiFloppyB device.<BR><BR>
+  #   TRUE  - Enables IsaAcpiFloppyB device.<BR>
+  #   FALSE - Doesn't enable IsaAcpiFloppyB device.<BR>
+  # @Prompt Enable IsaAcpiFloppyB device.
+  gPcAtChipsetPkgTokenSpaceGuid.PcdIsaAcpiFloppyBEnable|TRUE|BOOLEAN|0x00000008
+
+[PcdsFixedAtBuild, PcdsPatchableInModule]
+  ## FFS filename to find the shell application.
+  # @Prompt FFS Name of Shell Application
+  gSimicsOpenBoardPkgTokenSpaceGuid.PcdShellFile|{ 0x83, 0xA5, 0x04, 0x7C, 0x3E, 0x9E, 0x1C, 0x4F, 0xAD, 0x65, 0xE0, 0x52, 0x68, 0xD0, 0xB4, 0xD1 }|VOID*|0x40000004
+
+  ## ISA Bus features to support DMA, SlaveDMA and ISA Memory. <BR><BR>
+  #  BIT0 indicates if DMA is supported<BR>
+  #  BIT1 indicates if only slave DMA is supported<BR>
+  #  BIT2 indicates if ISA memory is supported<BR>
+  #  Other BITs are reseved and must be zero.
+  #  If more than one features are supported, the different BIT will be enabled at the same time.
+  # @Prompt ISA Bus Features
+  # @Expression 0x80000002 | (gSimicsOpenBoardPkgTokenSpaceGuid.PcdIsaBusSupportedFeatures & 0xF8) == 0
+  gSimicsOpenBoardPkgTokenSpaceGuid.PcdIsaBusSupportedFeatures|0x05|UINT8|0x00010040
+
+  gSimicsOpenBoardPkgTokenSpaceGuid.PcdLogoFile |{ 0x99, 0x8b, 0xB2, 0x7B, 0xBB, 0x61, 0xD5, 0x11, 0x9A, 0x5D, 0x00, 0x90, 0x27, 0x3F, 0xC1, 0x4D }|VOID*|0x00010037
+
+[Protocols]
+  ##
+  ## IntelFrameworkModulePkg
+  ##
+  gEfiOemBadgingProtocolGuid                       = { 0x170E13C0, 0xBF1B, 0x4218, { 0x87, 0x1D, 0x2A, 0xBD, 0xC6, 0xF8, 0x87, 0xBC }}

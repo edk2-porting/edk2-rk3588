@@ -1,0 +1,53 @@
+#/** @file
+#
+#  Copyright (c) 2018, Andrei Warkentin <andrey.warkentin@gmail.com>
+#  Copyright (c) 2011-2015, ARM Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = MmcDxe
+  FILE_GUID                      = b6f44cc0-9e45-11df-be21-0002a5f5f51b
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = MmcDxeInitialize
+
+[Sources.common]
+  ComponentName.c
+  Mmc.h
+  Mmc.c
+  MmcBlockIo.c
+  MmcIdentification.c
+  MmcDebug.c
+  Diagnostics.c
+
+[Packages]
+  Platform/RaspberryPi/RaspberryPi.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  UefiLib
+  UefiDriverEntryPoint
+  BaseMemoryLib
+
+[Protocols]
+  gEfiDiskIoProtocolGuid
+  gEfiBlockIoProtocolGuid
+  gEfiDevicePathProtocolGuid
+  gEfiDriverDiagnostics2ProtocolGuid
+  gRaspberryPiMmcHostProtocolGuid
+
+[Pcd]
+  gRaspberryPiTokenSpaceGuid.PcdMmcForce1Bit
+  gRaspberryPiTokenSpaceGuid.PcdMmcForceDefaultSpeed
+  gRaspberryPiTokenSpaceGuid.PcdMmcSdDefaultSpeedMHz
+  gRaspberryPiTokenSpaceGuid.PcdMmcSdHighSpeedMHz
+  gRaspberryPiTokenSpaceGuid.PcdMmcDisableMulti
+
+[Depex]
+  TRUE

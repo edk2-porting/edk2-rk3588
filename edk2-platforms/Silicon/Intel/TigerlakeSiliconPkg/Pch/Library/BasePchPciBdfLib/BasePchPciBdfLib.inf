@@ -1,0 +1,33 @@
+## @file
+# PCH PCIe Bus Device Function Library.
+#
+# All functions from this library are available in PEI, DXE, and SMM,
+# But do not support UEFI RUNTIME environment call.
+#
+#  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+INF_VERSION = 0x00010017
+BASE_NAME = PeiDxeSmmPchPciBdfLib
+FILE_GUID = ED0C4241-40FA-4A74-B061-2E45E7AAD7BA
+VERSION_STRING = 1.0
+MODULE_TYPE = BASE
+LIBRARY_CLASS = PchPciBdfLib
+
+[LibraryClasses]
+BaseLib
+IoLib
+DebugLib
+PciSegmentLib
+PchInfoLib
+PchPcieRpLib
+
+[Packages]
+MdePkg/MdePkg.dec
+TigerlakeSiliconPkg/SiPkg.dec
+
+[Sources]
+PchPciBdfLib.c

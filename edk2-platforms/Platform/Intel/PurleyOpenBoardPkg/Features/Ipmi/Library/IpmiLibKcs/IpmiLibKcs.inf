@@ -1,0 +1,40 @@
+## @file
+# Component description file for IPMI KCS Library.
+#
+# Copyright (c) 2018 - 2021, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2021, American Megatrends International LLC.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = IpmiLibKcs
+  FILE_GUID                      = 9879DB3A-C2CD-4615-ACDA-95C1B2EC00B3
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = IpmiBaseLib
+
+[sources]
+  IpmiLibKcs.c
+  KcsBmc.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  OutOfBandManagement/IpmiFeaturePkg/IpmiFeaturePkg.dec
+  PurleyOpenBoardPkg/OpenBoardPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  HobLib
+  PcdLib
+  TimerLib
+  IoLib
+  IpmiPlatformHookLib
+
+[Pcd]
+  gEfiIpmiPkgTokenSpaceGuid.PcdIpmiKcsTimeoutPeriod
+  gEfiIpmiPkgTokenSpaceGuid.PcdIpmiBmcSlaveAddress
+  gIpmiFeaturePkgTokenSpaceGuid.PcdIpmiIoBaseAddress

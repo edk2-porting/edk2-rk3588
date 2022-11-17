@@ -1,0 +1,39 @@
+## @file
+# Library description file for DXE Phase Vtd Init
+#
+#  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+
+[Defines]
+INF_VERSION = 0x00010017
+BASE_NAME = DxeVtdInitFruLib
+FILE_GUID = 18690D67-08A9-4DCE-B62D-CBE3AF7CFEE7
+VERSION_STRING = 1.0
+MODULE_TYPE = DXE_DRIVER
+LIBRARY_CLASS = DxeVtdFruLib
+
+
+[LibraryClasses]
+UefiLib
+UefiRuntimeServicesTableLib
+UefiBootServicesTableLib
+DebugLib
+DxeSaPolicyLib
+
+[Packages]
+MdePkg/MdePkg.dec
+TigerlakeSiliconPkg/SiPkg.dec
+
+[Protocols]
+gSaNvsAreaProtocolGuid                  ## CONSUMES
+
+[Sources]
+DxeVtdInitFruLib.c
+
+[FixedPcd]
+
+[Guids]
+gTcssHobGuid                            ## CONSUMES

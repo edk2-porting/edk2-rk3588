@@ -1,0 +1,43 @@
+## @file
+# DXE instance of TestPoint Library.
+#
+# Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeTestPointLib
+  FILE_GUID                      = 7963837C-17B8-4954-9E26-3D290D54D295
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = TestPointLib
+
+[Sources]
+  DxeTestPointAip.c
+  DxeTestPoint.c
+  DxeTestPoint.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  DebugLib
+  UefiBootServicesTableLib
+
+[Guids]
+## SOMETIMES_PRODUCES ## GUID
+## SOMETIMES_CONSUMES ## GUID
+  gAdapterInfoPlatformTestPointGuid
+
+[Protocols]
+## SOMETIMES_PRODUCES
+## SOMETIMES_CONSUMES
+  gEfiAdapterInformationProtocolGuid
+

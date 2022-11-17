@@ -1,0 +1,82 @@
+/*
+ * Copyright (c) 2016 Hisilicon Limited
+ *. All rights reserved.
+ * SPDX-License-Identifier: BSD-2-Clause-Patent
+ *
+ */
+
+#include <IndustryStandard/Acpi.h>
+#include "Hi1610Platform.h"
+
+#define ACPI_6_1_MCFG_VERSION  0x1
+
+#pragma pack(1)
+typedef struct
+{
+   UINT64 ullBaseAddress;
+   UINT16 usSegGroupNum;
+   UINT8  ucStartBusNum;
+   UINT8  ucEndBusNum;
+   UINT32 Reserved2;
+}EFI_ACPI_6_1_MCFG_CONFIG_STRUCTURE;
+
+typedef struct
+{
+   EFI_ACPI_DESCRIPTION_HEADER Header;
+   UINT64 Reserved1;
+}EFI_ACPI_6_1_MCFG_TABLE_CONFIG;
+
+typedef struct
+{
+   EFI_ACPI_6_1_MCFG_TABLE_CONFIG Acpi_Table_Mcfg;
+   EFI_ACPI_6_1_MCFG_CONFIG_STRUCTURE Config_Structure[3];
+}EFI_ACPI_6_1_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_TABLE;
+#pragma pack()
+
+EFI_ACPI_6_1_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_TABLE Mcfg=
+{
+  {
+      {
+        EFI_ACPI_6_1_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_BASE_ADDRESS_DESCRIPTION_TABLE_SIGNATURE,
+        sizeof (EFI_ACPI_6_1_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_TABLE),
+        ACPI_6_1_MCFG_VERSION,
+        0x00,                                                     // Checksum will be updated at runtime
+        {EFI_ACPI_ARM_OEM_ID},
+        EFI_ACPI_ARM_OEM_TABLE_ID,
+        EFI_ACPI_ARM_OEM_REVISION,
+        EFI_ACPI_ARM_CREATOR_ID,
+        EFI_ACPI_ARM_CREATOR_REVISION
+      },
+      0x0000000000000000,                                 //Reserved
+  },
+  {
+
+    {
+      0xb0000000,                                         //Base Address
+      0x0,                                                //Segment Group Number
+      0x0,                                                //Start Bus Number
+      0x1f,                                               //End Bus Number
+      0x00000000,                                         //Reserved
+    },
+    {
+      0xb0000000,                                         //Base Address
+      0x1,                                                //Segment Group Number
+      0xe0,                                               //Start Bus Number
+      0xff,                                               //End Bus Number
+      0x00000000,                                         //Reserved
+    },
+    {
+      0xa0000000,                                         //Base Address
+      0x2,                                                //Segment Group Number
+      0x80,                                               //Start Bus Number
+      0x9f,                                               //End Bus Number
+      0x00000000,                                         //Reserved
+    },
+  }
+};
+
+//
+// Reference the table being generated to prevent the optimizer from removing the
+// data structure from the executable
+//
+VOID* CONST ReferenceAcpiTable = &Mcfg;

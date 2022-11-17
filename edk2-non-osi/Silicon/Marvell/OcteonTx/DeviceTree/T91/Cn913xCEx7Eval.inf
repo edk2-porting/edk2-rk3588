@@ -1,0 +1,22 @@
+## @file
+#
+#  Device tree description of the Marvell CN9130-DB-A platform
+#
+#  Copyright (c) 2021, Semihalf. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION    = 0x0001001B
+  BASE_NAME      = Cn913xCEx7EvalDeviceTree
+  FILE_GUID      = 25462CDA-221F-47DF-AC1D-259CFAA4E326 # gDtPlatformDefaultDtbFileGuid
+  MODULE_TYPE    = USER_DEFINED
+  VERSION_STRING = 1.0
+
+[Sources]
+  cn9132-cex7.dts
+
+[Packages]
+  MdePkg/MdePkg.dec

@@ -1,0 +1,60 @@
+## @file
+# Component information file for Tbt common library
+#
+#
+#  Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010017
+  BASE_NAME                      = TbtCommonLib
+  FILE_GUID                      = 5F03614E-CB56-40B1-9989-A09E25BBA294
+  VERSION_STRING                 = 1.0
+  MODULE_TYPE                    = BASE
+  LIBRARY_CLASS                  = TbtCommonLib
+#
+# The following information is for reference only and not required by the build tools.
+#
+# VALID_ARCHITECTURES = IA32 X64 EBC
+#
+
+[LibraryClasses]
+  DebugLib
+  PchPcieRpLib
+  PciSegmentLib
+  TimerLib
+  BaseLib
+  GpioLib
+  GpioExpanderLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+  WhiskeylakeOpenBoardPkg/OpenBoardPkg.dec
+  CoffeelakeSiliconPkg/SiPkg.dec
+
+
+[Pcd]
+gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtSecurityMode        ## CONSUMES
+gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtWakeupSupport       ## CONSUMES
+gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtHotSMI              ## CONSUMES
+gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtHotNotify           ## CONSUMES
+gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtSetClkReq           ## CONSUMES
+gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtAspm                ## CONSUMES
+gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtAcDcSwitch          ## CONSUMES
+gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdRtd3Tbt                 ## CONSUMES
+gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdRtd3TbtClkReq           ## CONSUMES
+gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtPcieMemAddrRngMax   ## CONSUMES
+gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtPciePMemRsvd        ## CONSUMES
+gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtPciePMemAddrRngMax  ## CONSUMES
+gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtPcieRpNumber
+
+[Sources]
+  TbtCommonLib.c
+
+

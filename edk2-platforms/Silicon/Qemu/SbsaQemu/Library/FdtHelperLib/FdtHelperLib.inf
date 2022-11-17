@@ -1,0 +1,33 @@
+#/** @file
+#
+#  Component description file for FdtHelperLib module
+#
+#  Copyright (c) 2021, NUVIA Inc. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 1.29
+  BASE_NAME                      = FdtHelperLib
+  FILE_GUID                      = 34e4396f-c2fc-4f9e-ad58-0f98e99e3875
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = FdtHelperLib
+
+[Sources.common]
+  FdtHelperLib.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/Qemu/SbsaQemu/SbsaQemu.dec
+
+[LibraryClasses]
+  DebugLib
+  FdtLib
+  PcdLib
+
+[FixedPcd]
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdDeviceTreeBaseAddress

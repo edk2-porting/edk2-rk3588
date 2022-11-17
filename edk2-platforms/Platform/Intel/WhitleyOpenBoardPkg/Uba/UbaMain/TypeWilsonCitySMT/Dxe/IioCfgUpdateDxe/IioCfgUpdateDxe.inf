@@ -1,0 +1,48 @@
+## @file
+#
+# @copyright
+# Copyright 2019 Intel Corporation. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = IioCfgUpdateDxeWilsonCitySMT
+  FILE_GUID                      = 7934B6C8-4090-C8BD-48F5-3C8F1F0E84DA
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = IioCfgUpdateEntry
+
+[Sources]
+  IioCfgUpdateDxe.c
+  IioCfgUpdateDxe.h
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  DebugLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+  UefiLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  WhitleySiliconPkg/WhitleySiliconPkg.dec
+  WhitleySiliconPkg/CpRcPkg.dec
+  WhitleySiliconPkg/SiliconPkg.dec
+  WhitleyOpenBoardPkg/PlatformPkg.dec
+
+[Guids]
+
+[FixedPcd]
+  gEfiCpRcPkgTokenSpaceGuid.PcdMaxCpuSocketCount
+
+[Protocols]
+  gUbaConfigDatabaseProtocolGuid
+
+[Depex]
+  gEfiPlatformTypeWilsonCitySMTProtocolGuid

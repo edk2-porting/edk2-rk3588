@@ -1,0 +1,28 @@
+## @file
+#
+#  Copyright 2020 NXP
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = SerDesHelperLib
+  FILE_GUID                      = 2930e932-a700-41e8-80f9-f1a2dedd2c4f
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SerDesHelperLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  Silicon/NXP/NxpQoriqLs.dec
+
+[LibraryClasses]
+  DebugLib
+  PcdLib
+
+[Sources.common]
+  SerDesHelperLib.c
+
+[FixedPcd]
+  gNxpQoriqLsTokenSpaceGuid.PcdSerDesLanes

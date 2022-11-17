@@ -1,0 +1,36 @@
+## @file
+# Component information file for Board Init Library
+#
+# Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SmmMultiBoardAcpiSupportLib
+  FILE_GUID                      = DEA4470C-706B-42C5-93E1-5F0694182A6B
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = MultiBoardAcpiSupportLib
+  LIBRARY_CLASS                  = BoardAcpiEnableLib
+
+[LibraryClasses]
+  BaseLib
+  PcdLib
+  DebugLib
+  SmmServicesTableLib
+
+[Packages]
+  MinPlatformPkg/MinPlatformPkg.dec
+  MdePkg/MdePkg.dec
+
+[Sources]
+  SmmMultiBoardAcpiSupportLib.c
+  SmmBoardAcpiEnableLib.c
+  
+[Guids]
+  gBoardAcpiEnableGuid
+
+[Pcd]

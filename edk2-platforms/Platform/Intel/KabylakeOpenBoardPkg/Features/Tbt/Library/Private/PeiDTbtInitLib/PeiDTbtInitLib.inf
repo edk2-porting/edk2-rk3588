@@ -1,0 +1,42 @@
+### @file
+# Component description file for PEI DTBT Init library.
+#
+# Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+###
+
+[Defines]
+  INF_VERSION                    = 0x00010017
+  BASE_NAME                      = PeiDTbtInitLib
+  FILE_GUID                      = 06768A8D-8152-403f-83C1-59584FD2B438
+  VERSION_STRING                 = 1.0
+  MODULE_TYPE                    = PEIM
+  LIBRARY_CLASS                  = PeiDTbtInitLib
+
+[LibraryClasses]
+  PeiServicesLib
+  DebugLib
+  PcdLib
+  TbtCommonLib
+  PciSegmentLib
+  PeiTbtPolicyLib
+  PchPmcLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+  KabylakeOpenBoardPkg/OpenBoardPkg.dec
+  KabylakeSiliconPkg/SiPkg.dec
+
+[Ppis]
+  gPeiTbtPolicyPpiGuid                          ## CONSUMES
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress  ## CONSUMES
+  #gClientCommonModuleTokenSpaceGuid.PcdTbtSupport    ## PRODUCES
+
+[Sources]
+  PeiDTbtInitLib.c

@@ -1,0 +1,55 @@
+## @file
+#
+# @copyright
+# Copyright 2020 - 2021 Intel Corporation. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiSetCacheMtrrLib
+  FILE_GUID                      = 7E5407A1-0058-4617-AAEC-ACB0F74B4A1F
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SetCacheMtrrLib|PEIM
+
+[LibraryClasses]
+  BaseLib
+  PcdLib
+  DebugLib
+  HobLib
+  MtrrLib
+  PeiServicesLib
+  BaseMemoryLib
+
+[Packages]
+  MinPlatformPkg/MinPlatformPkg.dec
+  MdePkg/MdePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  WhitleySiliconPkg/WhitleySiliconPkg.dec
+  WhitleySiliconPkg/SiliconPkg.dec
+  WhitleySiliconPkg/CpRcPkg.dec
+  WhitleyOpenBoardPkg/PlatformPkg.dec
+
+[Sources]
+  SetCacheMtrrLib.c
+
+[Guids]
+  gEfiSmmSmramMemoryGuid                        ## CONSUMES
+  gEfiPlatformInfoGuid                          ## CONSUMES
+
+[Ppis]
+  gEfiPeiMpServicesPpiGuid
+  gDynamicSiLibraryPpiGuid                      ## CONSUMES
+
+[Pcd]
+  gMinPlatformPkgTokenSpaceGuid.PcdFlashAreaBaseAddress         ## CONSUMES
+  gMinPlatformPkgTokenSpaceGuid.PcdFlashAreaSize                ## CONSUMES
+  gMinPlatformPkgTokenSpaceGuid.PcdPciReservedMemAbove4GBBase   ## CONSUMES
+  gMinPlatformPkgTokenSpaceGuid.PcdPciReservedMemAbove4GBLimit  ## CONSUMES
+  gMinPlatformPkgTokenSpaceGuid.PcdPciReservedPMemAbove4GBBase  ## CONSUMES
+  gMinPlatformPkgTokenSpaceGuid.PcdPciReservedPMemAbove4GBLimit ## CONSUMES
+
+[Depex]
+  gDynamicSiLibraryPpiGuid

@@ -1,0 +1,32 @@
+#/** @file
+#
+#  Copyright (c) 2013-2015, ARM Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010006
+  BASE_NAME                      = ArmHwDxe
+  FILE_GUID                      = fe61bb5f-1b67-4c24-b346-73db42e873e5
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = ArmHwInitialise
+
+[Sources.common]
+  ArmHwDxe.c
+
+[Packages]
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  MdePkg/MdePkg.dec
+  Platform/ARM/ARM.dec
+
+[LibraryClasses]
+  ArmShellCmdRunAxfLib
+  DxeServicesTableLib
+  MemoryAllocationLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiDevicePathProtocolGuid

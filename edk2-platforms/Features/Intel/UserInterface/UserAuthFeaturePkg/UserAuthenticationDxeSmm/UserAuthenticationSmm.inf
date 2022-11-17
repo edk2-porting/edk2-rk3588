@@ -1,0 +1,53 @@
+## @file
+#  User Authentication Smm Driver.
+#
+#  This driver provides SMM services for DXE user authentication module.
+#
+# Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UserAuthenticationSmm
+  FILE_GUID                      = 8fc6aaaa-4561-4815-8cf7-b87312992dce
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  VERSION_STRING                 = 1.0
+  PI_SPECIFICATION_VERSION       = 0x0001000A
+  ENTRY_POINT                    = PasswordSmmInit
+
+[Sources]
+  UserAuthenticationSmm.c
+  UserAuthenticationSmm.h
+  KeyService.c
+  KeyService.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  CryptoPkg/CryptoPkg.dec
+  UserInterface/UserAuthFeaturePkg/UserAuthFeaturePkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  DebugLib
+  BaseLib
+  BaseMemoryLib
+  PrintLib
+  SmmServicesTableLib
+  MemoryAllocationLib
+  UefiLib
+  BaseCryptLib
+  PlatformPasswordLib
+
+[Guids]
+  gUserAuthenticationGuid                       ## CONSUMES  ## GUID
+
+[Protocols]
+  gEdkiiVariableLockProtocolGuid                ## CONSUMES
+  gEfiSmmVariableProtocolGuid                   ## CONSUMES
+
+[Depex]
+  gEfiSmmVariableProtocolGuid AND gEfiVariableWriteArchProtocolGuid

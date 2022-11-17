@@ -1,0 +1,91 @@
+/** @file
+* SPCR Table
+*
+* Copyright (c) 2019 Pete Batard <pete@akeo.ie>
+* Copyright (c) 2014-2021, ARM Limited. All rights reserved.
+*
+* SPDX-License-Identifier: BSD-2-Clause-Patent
+*
+**/
+
+#include <IndustryStandard/Acpi.h>
+#include <IndustryStandard/Bcm2836.h>
+#include <IndustryStandard/SerialPortConsoleRedirectionTable.h>
+#include <Library/AcpiLib.h>
+#include <Library/PcdLib.h>
+
+#include "AcpiTables.h"
+
+#define RPI_UART_FLOW_CONTROL_NONE           0
+
+#define RPI_UART_INTERFACE_TYPE              EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERFACE_TYPE_BCM2835_UART
+#define RPI_UART_BASE_ADDRESS                BCM2836_MINI_UART_BASE_ADDRESS
+#define RPI_UART_INTERRUPT                   BCM2836_MINI_UART_INTERRUPT
+
+STATIC EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE Spcr = {
+  ACPI_HEADER (
+    EFI_ACPI_6_3_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_SIGNATURE,
+    EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE,
+    EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_REVISION
+  ),
+  // UINT8                                   InterfaceType;
+  RPI_UART_INTERFACE_TYPE,
+  // UINT8                                   Reserved1[3];
+  {
+    EFI_ACPI_RESERVED_BYTE,
+    EFI_ACPI_RESERVED_BYTE,
+    EFI_ACPI_RESERVED_BYTE
+  },
+  // EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  BaseAddress;
+  ARM_GAS32 (RPI_UART_BASE_ADDRESS),
+  // UINT8                                   InterruptType;
+  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_GIC,
+  // UINT8                                   Irq;
+  0,                                         // Not used on ARM
+  // UINT32                                  GlobalSystemInterrupt;
+  RPI_UART_INTERRUPT,
+  // UINT8                                   BaudRate;
+#if (FixedPcdGet64 (PcdUartDefaultBaudRate) == 9600)
+  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_BAUD_RATE_9600,
+#elif (FixedPcdGet64 (PcdUartDefaultBaudRate) == 19200)
+  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_BAUD_RATE_19200,
+#elif (FixedPcdGet64 (PcdUartDefaultBaudRate) == 57600)
+  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_BAUD_RATE_57600,
+#elif (FixedPcdGet64 (PcdUartDefaultBaudRate) == 115200)
+  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_BAUD_RATE_115200,
+#else
+#error Unsupported SPCR Baud Rate
+#endif
+  // UINT8                                   Parity;
+  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_PARITY_NO_PARITY,
+  // UINT8                                   StopBits;
+  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_STOP_BITS_1,
+  // UINT8                                   FlowControl;
+  RPI_UART_FLOW_CONTROL_NONE,
+  // UINT8                                   TerminalType;
+  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_TERMINAL_TYPE_VT_UTF8,
+  // UINT8                                   Reserved2;
+  EFI_ACPI_RESERVED_BYTE,
+  // UINT16                                  PciDeviceId;
+  0xFFFF,
+  // UINT16                                  PciVendorId;
+  0xFFFF,
+  // UINT8                                   PciBusNumber;
+  0x00,
+  // UINT8                                   PciDeviceNumber;
+  0x00,
+  // UINT8                                   PciFunctionNumber;
+  0x00,
+  // UINT32                                  PciFlags;
+  0x00000000,
+  // UINT8                                   PciSegment;
+  0x00,
+  // UINT32                                  Reserved3;
+  EFI_ACPI_RESERVED_DWORD
+};
+
+//
+// Reference the table being generated to prevent the optimizer from removing the
+// data structure from the executable
+//
+VOID* CONST ReferenceAcpiTable = &Spcr;

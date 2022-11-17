@@ -1,0 +1,38 @@
+## @file
+# Library functions for Fsp Policy Initialization Library.
+#
+#  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+################################################################################
+#
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiSiDefaultPolicyInitLib
+  FILE_GUID                      = ADA1D87B-6891-453C-A0DB-92D4CFD46693
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL
+  CONSTRUCTOR                    = PeiSiDefaultPolicyInitLibConstructor
+
+[Packages]
+  MdePkg/MdePkg.dec
+  TigerlakeSiliconPkg/SiPkg.dec
+
+[Sources]
+  PeiSiDefaultPolicyInitLib.c
+
+[LibraryClasses]
+  PeiServicesLib
+  DebugLib
+
+[Ppis]
+  gSiDefaultPolicyInitPpiGuid             ## CONSUMES
+
+[Depex]
+  gSiDefaultPolicyInitPpiGuid

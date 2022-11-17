@@ -1,0 +1,118 @@
+## @file
+# Component information file for PEI WhiskeylakeURvp Board Init Pre-Mem Library
+#
+#
+#  Copyright (c) 2019 - 2020 Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiBoardInitPreMemLib
+  FILE_GUID                      = ec3675bc-1470-417d-826e-37378140213d
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = BoardInitLib
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  PcdLib
+  SiliconInitLib
+
+[Packages]
+  MinPlatformPkg/MinPlatformPkg.dec
+  WhiskeylakeOpenBoardPkg/OpenBoardPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  CoffeelakeSiliconPkg/SiPkg.dec
+  IntelSiliconPkg/IntelSiliconPkg.dec
+
+[Sources]
+  PeiWhiskeylakeURvpDetect.c
+  PeiWhiskeylakeURvpInitPreMemLib.c
+  WhiskeylakeURvpHsioPtssTables.c
+  PeiBoardInitPreMemLib.c
+
+[Pcd]
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdLpcSioConfigDefaultPort
+
+  # PCH-LP HSIO PTSS Table
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdSpecificLpHsioPtssTable1
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdSpecificLpHsioPtssTable2
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdSpecificLpHsioPtssTable1Size
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdSpecificLpHsioPtssTable2Size
+
+  # SA Misc Config
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdSaMiscUserBd
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdMrcRcompResistor
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdMrcRcompTarget
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdMrcDqByteMap
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdMrcDqByteMapSize
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdMrcDqsMapCpu2Dram
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdMrcDqsMapCpu2DramSize
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdMrcSpdData
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdMrcSpdDataSize
+
+  # PEG Reset By GPIO
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdPcie0WakeGpioNo
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdPcie0HoldRstExpanderNo
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdPcie0HoldRstGpioNo
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdPcie0HoldRstActive
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdPcie0PwrEnableExpanderNo
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdPcie0PwrEnableGpioNo
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdPcie0PwrEnableActive
+
+
+  # SPD Address Table
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdMrcSpdAddressTable0
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdMrcSpdAddressTable1
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdMrcSpdAddressTable2
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdMrcSpdAddressTable3
+
+  # USB 2.0 Port AFE
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port0Afe
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port1Afe
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port2Afe
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port3Afe
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port4Afe
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port5Afe
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port6Afe
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port7Afe
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port8Afe
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port9Afe
+
+  # USB 2.0 Port Over Current Pin
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort0
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort1
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort2
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort3
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort4
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort5
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort6
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort7
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort8
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort9
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort10
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort11
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort12
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort13
+
+  # USB 3.0 Port Over Current Pin
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsb30OverCurrentPinPort0
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsb30OverCurrentPinPort1
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsb30OverCurrentPinPort2
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsb30OverCurrentPinPort3
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsb30OverCurrentPinPort4
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdUsb30OverCurrentPinPort5
+
+  # Misc
+  gWhiskeylakeOpenBoardPkgTokenSpaceGuid.PcdIoExpanderPresent
+
+
+

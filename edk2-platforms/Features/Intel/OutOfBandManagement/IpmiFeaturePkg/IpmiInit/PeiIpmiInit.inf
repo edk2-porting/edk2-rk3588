@@ -1,0 +1,32 @@
+### @file
+# Component description file for IPMI initialization in PEI.
+#
+# Copyright (c) 2018 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+###
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiIpmiInit
+  FILE_GUID                      = D8F57F4E-D67D-4f2c-8351-C7092986542F
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = PeimIpmiInterfaceInit
+
+[Sources]
+  PeiIpmiInit.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  OutOfBandManagement/IpmiFeaturePkg/IpmiFeaturePkg.dec
+
+[LibraryClasses]
+  PeimEntryPoint
+  DebugLib
+  IpmiCommandLib
+
+[Depex]
+  gPeiIpmiTransportPpiGuid

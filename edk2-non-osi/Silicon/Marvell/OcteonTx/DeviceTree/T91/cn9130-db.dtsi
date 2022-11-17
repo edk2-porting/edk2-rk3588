@@ -1,0 +1,168 @@
+// SPDX-License-Identifier: GPL-2.0+
+/*
+ * Copyright (C) 2018 Marvell International Ltd.
+ */
+
+#define GPIO_ACTIVE_HIGH 0
+#define GPIO_ACTIVE_LOW  1
+
+#include "cn9130.dtsi" /* include SoC device tree */
+
+/ {
+        model = "DB-CN-9130";
+        compatible = "marvell,cn9130", "marvell,armada-ap807-quad",
+                     "marvell,armada-ap807";
+
+        cp0_reg_usb3_vbus0: cp0_usb3_vbus@0 {
+                compatible = "regulator-fixed";
+                regulator-name = "cp0-xhci0-vbus";
+                regulator-min-microvolt = <5000000>;
+                regulator-max-microvolt = <5000000>;
+                enable-active-high;
+                gpio = <&expander0 0 GPIO_ACTIVE_HIGH>;
+        };
+
+        cp0_usb3_0_phy0: cp0_usb3_phy0 {
+                compatible = "usb-nop-xceiv";
+                vcc-supply = <&cp0_reg_usb3_vbus0>;
+        };
+
+        cp0_reg_usb3_vbus1: cp0_usb3_vbus@1 {
+                compatible = "regulator-fixed";
+                regulator-name = "cp0-xhci1-vbus";
+                regulator-min-microvolt = <5000000>;
+                regulator-max-microvolt = <5000000>;
+                enable-active-high;
+                gpio = <&expander0 1 GPIO_ACTIVE_HIGH>;
+        };
+
+        cp0_usb3_0_phy1: cp0_usb3_phy1 {
+                compatible = "usb-nop-xceiv";
+                vcc-supply = <&cp0_reg_usb3_vbus1>;
+        };
+
+        cp0_reg_sd_vccq: cp0_sd_vccq@0 {
+                compatible = "regulator-gpio";
+                regulator-name = "cp0_sd_vccq";
+                regulator-min-microvolt = <1800000>;
+                regulator-max-microvolt = <3300000>;
+                gpios = <&expander0 15 GPIO_ACTIVE_HIGH>;
+                states = <1800000 0x1
+                          3300000 0x0>;
+        };
+
+        ap0_reg_sd_vccq: ap0_sd_vccq@0 {
+                compatible = "regulator-gpio";
+                regulator-name = "ap0_sd_vccq";
+                regulator-min-microvolt = <1800000>;
+                regulator-max-microvolt = <3300000>;
+                gpios = <&expander0 8 GPIO_ACTIVE_HIGH>;
+                states = <1800000 0x1
+                          3300000 0x0>;
+        };
+
+        cp0_reg_sd_vcc: cp0_sd_vcc@0 {
+                compatible = "regulator-fixed";
+                regulator-name = "cp0_sd_vcc";
+                regulator-min-microvolt = <3300000>;
+                regulator-max-microvolt = <3300000>;
+                gpio = <&expander0 14 GPIO_ACTIVE_HIGH>;
+                enable-active-high;
+                regulator-always-on;
+        };
+
+        cp0_sfp_eth0: sfp-eth0 {
+                compatible = "sff,sfp";
+                i2c-bus = <&cp0_sfpp0_i2c>;
+                los-gpio = <&cp0_moudle_expander1 11 GPIO_ACTIVE_HIGH>;
+                mod-def0-gpio = <&cp0_moudle_expander1 10 GPIO_ACTIVE_LOW>;
+                tx-disable-gpio = <&cp0_moudle_expander1 9 GPIO_ACTIVE_HIGH>;
+                tx-fault-gpio = <&cp0_moudle_expander1 8 GPIO_ACTIVE_HIGH>;
+                status = "disabled";
+        };
+};
+
+/*
+ * CP0
+ */
+&cp0_i2c0 {
+        clock-frequency = <100000>;
+
+        /* U36 */
+        expander0: pca953x@21 {
+                compatible = "nxp,pca9555";
+                pinctrl-names = "default";
+                gpio-controller;
+                #gpio-cells = <2>;
+                reg = <0x21>;
+                status = "okay";
+        };
+
+        /* U42 */
+        eeprom0: eeprom@50 {
+                compatible = "atmel,24c64";
+                reg = <0x50>;
+                pagesize = <0x20>;
+        };
+
+        /* U38 */
+        eeprom1: eeprom@57 {
+                compatible = "atmel,24c64";
+                reg = <0x57>;
+                pagesize = <0x20>;
+        };
+};
+
+&cp0_i2c1 {
+        clock-frequency = <100000>;
+
+        /* SLM-1521-V2 - U3 */
+        i2c-mux@72 { /* verify address - depends on dpr */
+                compatible = "nxp,pca9544";
+                #address-cells = <1>;
+                #size-cells = <0>;
+                reg = <0x72>;
+                cp0_sfpp0_i2c: i2c@0 {
+                        #address-cells = <1>;
+                        #size-cells = <0>;
+                        reg = <0>;
+                };
+
+                i2c@1 {
+                        #address-cells = <1>;
+                        #size-cells = <0>;
+                        reg = <1>;
+                        /* U12 */
+                        cp0_moudle_expander1: pca9555@21 {
+                                compatible = "nxp,pca9555";
+                                pinctrl-names = "default";
+                                gpio-controller;
+                                #gpio-cells = <2>;
+                                reg = <0x21>;
+                        };
+
+                };
+        };
+};
+
+
+&cp0_sdhci0 {
+        pinctrl-names = "default";
+        pinctrl-0 = <&cp0_sdhci_pins>;
+        bus-width = <4>;
+        no-1-8-v;
+        vqmmc-supply = <&cp0_reg_sd_vccq>;
+        vmmc-supply = <&cp0_reg_sd_vcc>;
+};
+
+&cp0_usb3_0 {
+        status = "okay";
+        usb-phy = <&cp0_usb3_0_phy0>;
+        phy-names = "usb";
+};
+
+&cp0_usb3_1 {
+        status = "okay";
+        usb-phy = <&cp0_usb3_0_phy1>;
+        phy-names = "usb";
+};

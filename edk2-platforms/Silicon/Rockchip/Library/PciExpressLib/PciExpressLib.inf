@@ -1,0 +1,44 @@
+## @file
+#  Instance of PCI Express Library using the 1 MB PCI Express MMIO window.
+#
+#  PCI Express Library that uses the 1 MB PCI Express MMIO window to perform
+#  PCI Configuration cycles. Layers on top of an I/O Library instance.
+#
+#  Copyright (c) 2022, Rockchip Corporation. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = BasePciExpressLib
+  FILE_GUID                      = 45fabe58-71ee-11ec-bebb-001e67b12b1b
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PciExpressLib
+
+[Sources]
+  PciExpressLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  Silicon/Rockchip/RockchipPkg.dec
+
+[FixedPcd]
+  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4DbiBaseAddress
+  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4CfgBaseAddress
+  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4MemSize
+  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4MemBaseAddress
+  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4MemBaseAddress64
+  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4MemSize64
+  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4IoSize
+  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4IoBaseAddress
+
+
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  IoLib
+  PcdLib

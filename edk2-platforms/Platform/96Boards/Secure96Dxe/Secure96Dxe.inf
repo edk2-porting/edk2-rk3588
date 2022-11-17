@@ -1,0 +1,62 @@
+## @file
+#
+#  Copyright (c) 2018, Linaro, Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = Secure96Dxe
+  FILE_GUID                      = 31519ec4-65f1-4790-b223-aa9330dd75fd
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = Secure96DxeEntryPoint
+
+[Sources]
+  Secure96.asl
+  Secure96.dts
+  Secure96.h
+  Secure96Dxe.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Platform/96Boards/96Boards.dec
+  Silicon/Atmel/AtSha204a/AtSha204a.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  DxeServicesLib
+  FdtLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Protocols]
+  g96BoardsLsConnectorProtocolGuid            ## CONSUMES
+  g96BoardsMezzanineProtocolGuid              ## PRODUCES
+
+[Guids]
+  gAtSha204aI2cDeviceGuid
+  gFdtTableGuid
+
+[FixedPcd]
+  g96BoardsTokenSpaceGuid.PcdGpioParent
+  g96BoardsTokenSpaceGuid.PcdGpioPinF
+  g96BoardsTokenSpaceGuid.PcdGpioPinG
+  g96BoardsTokenSpaceGuid.PcdGpioPinH
+  g96BoardsTokenSpaceGuid.PcdGpioPinI
+  g96BoardsTokenSpaceGuid.PcdGpioPolarity
+  g96BoardsTokenSpaceGuid.PcdI2c0Parent
+  g96BoardsTokenSpaceGuid.PcdSpiParent
+
+[Depex]
+  g96BoardsLsConnectorProtocolGuid
+
+[BuildOptions]
+  # dtc emits lots of spurious warnings for overlays
+  *_*_*_DTC_FLAGS = -q

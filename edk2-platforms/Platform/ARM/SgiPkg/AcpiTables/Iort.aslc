@@ -1,0 +1,150 @@
+/** @file
+*  I/O Remapping Table (Iort)
+*
+*  Copyright (c) 2018, ARM Ltd. All rights reserved.
+*
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
+*
+**/
+
+#include <IndustryStandard/Acpi.h>
+#include <IndustryStandard/Acpi62.h>
+#include <IndustryStandard/IoRemappingTable.h>
+#include "SgiAcpiHeader.h"
+
+#pragma pack(1)
+
+typedef struct
+{
+  EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE       ItsNode;
+  UINT32                                   ItsIdentifiers;
+} ARM_EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE;
+
+typedef struct
+{
+  EFI_ACPI_6_0_IO_REMAPPING_SMMU3_NODE     SmmuNode;
+  EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE       SmmuIdMap[2];
+} ARM_EFI_ACPI_6_0_IO_REMAPPING_SMMU3_NODE;
+
+typedef struct
+{
+  EFI_ACPI_6_0_IO_REMAPPING_RC_NODE        RcNode;
+  EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE       RcIdMap;
+} ARM_EFI_ACPI_6_0_IO_REMAPPING_RC_NODE;
+
+typedef struct
+{
+  EFI_ACPI_6_0_IO_REMAPPING_TABLE          Header;
+  ARM_EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE   ItsNode;
+  ARM_EFI_ACPI_6_0_IO_REMAPPING_SMMU3_NODE SmmuNode;
+  ARM_EFI_ACPI_6_0_IO_REMAPPING_RC_NODE    RcNode;
+} ARM_EFI_ACPI_6_0_IO_REMAPPING_TABLE;
+
+#pragma pack ()
+
+ARM_EFI_ACPI_6_0_IO_REMAPPING_TABLE Iort =
+{
+  // EFI_ACPI_6_0_IO_REMAPPING_TABLE
+  {
+     ARM_ACPI_HEADER  // EFI_ACPI_DESCRIPTION_HEADER
+     (
+       EFI_ACPI_6_2_IO_REMAPPING_TABLE_SIGNATURE,
+       ARM_EFI_ACPI_6_0_IO_REMAPPING_TABLE,
+       EFI_ACPI_IO_REMAPPING_TABLE_REVISION
+     ),
+     3,  // NumNodes
+     sizeof (EFI_ACPI_6_0_IO_REMAPPING_TABLE),  // NodeOffset
+     0,  // Reserved
+  },
+  // ARM_EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE
+  {
+    // EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE
+    {
+      // EFI_ACPI_6_0_IO_REMAPPING_NODE
+      {
+        EFI_ACPI_IORT_TYPE_ITS_GROUP,  // Type
+        sizeof (ARM_EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE), // Length
+        0,  // Revision
+        0,  // Reserved
+        0,  // NumIdMappings
+        0,  // IdReference
+      },
+      1,    // ITS count
+    },
+    0,      // GIC ITS Identifiers
+  },
+  // SMMU
+  {
+    // EFI_ACPI_6_0_IO_REMAPPING_SMMU3_NODE
+    {
+      // EFI_ACPI_6_0_IO_REMAPPING_NODE
+      {
+        EFI_ACPI_IORT_TYPE_SMMUv3, // Type
+        sizeof (ARM_EFI_ACPI_6_0_IO_REMAPPING_SMMU3_NODE), // Length
+        2, // Revision
+        0, // Reserved
+        2, // NumIdMapping
+        OFFSET_OF (ARM_EFI_ACPI_6_0_IO_REMAPPING_SMMU3_NODE, SmmuIdMap), // IdReference
+      },
+      0x4F000000, // Base address
+      EFI_ACPI_IORT_SMMUv3_FLAG_COHAC_OVERRIDE, // Flags
+      0,   // Reserved
+      0,   // VATOS address
+      EFI_ACPI_IORT_SMMUv3_MODEL_GENERIC, // SMMUv3 Model
+      260, // Event
+      0,   // Pri
+      262, // Gerror
+      261, // Sync
+      0,   // Proximity domain
+      1,   // DevIDMappingIndex
+    },
+    // EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE
+    {
+      {
+        0x0000, // InputBase
+        0xffff, // NumIds
+        0x0000, // OutputBase
+        OFFSET_OF (ARM_EFI_ACPI_6_0_IO_REMAPPING_TABLE, ItsNode), // OutputReference
+        0, // Flags
+      },
+      {
+        0x0,     // InputBase
+        0x1,     // NumIds
+        0x10000, // OutputBase
+        OFFSET_OF (ARM_EFI_ACPI_6_0_IO_REMAPPING_TABLE, ItsNode), // OutputReference
+        EFI_ACPI_IORT_ID_MAPPING_FLAGS_SINGLE, // Flags
+      },
+    },
+  },
+  // ARM_EFI_ACPI_6_0_IO_REMAPPING_RC_NODE
+  {
+    // EFI_ACPI_6_0_IO_REMAPPING_RC_NODE
+    {
+      // EFI_ACPI_6_0_IO_REMAPPING_NODE
+      {
+        EFI_ACPI_IORT_TYPE_ROOT_COMPLEX,  // Type
+        sizeof (ARM_EFI_ACPI_6_0_IO_REMAPPING_RC_NODE),  // Length
+        0,  // Revision
+        0,  // Reserved
+        1,  // NumIdMappings
+        OFFSET_OF (ARM_EFI_ACPI_6_0_IO_REMAPPING_RC_NODE, RcIdMap)  // IdReference
+      },
+      1,  // CacheCoherent
+      0,  // AllocationHints
+      0,  // Reserved
+      0,  // MemoryAccessFlags
+      EFI_ACPI_IORT_ROOT_COMPLEX_ATS_SUPPORTED,    // AtsAttribute
+      0x0,                                         // PciSegmentNumber
+    },
+    // EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE
+    {
+      0x0000,  // InputBase
+      0xffff,  // NumIds
+      0x0000,  // OutputBase
+      OFFSET_OF (ARM_EFI_ACPI_6_0_IO_REMAPPING_TABLE, SmmuNode),  // OutputReference
+      0,       // Flags
+    }
+  }
+};
+
+VOID* CONST ReferenceAcpiTable = &Iort;

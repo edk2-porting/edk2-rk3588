@@ -1,0 +1,51 @@
+#/** @file
+#
+#  Copyright (c) 2019, ARM Limited. All rights reserved.
+#  Copyright (c) 2017, Andrei Warkentin <andrey.warkentin@gmail.com>
+#  Copyright (c) Microsoft Corporation. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = SdhciHostDxe
+  FILE_GUID                      = 100c2cfa-b586-4198-9b4c-1683d195b1da
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = MMCInitialize
+
+[Sources.common]
+  SdhciHostDxe.h
+  SdhciHostDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  Silicon/Rockchip/RockchipPkg.dec
+
+[LibraryClasses]
+  ArmLib
+  BaseLib
+  BaseMemoryLib
+  CacheMaintenanceLib
+  IoLib
+  MemoryAllocationLib
+  TimerLib
+  UefiDriverEntryPoint
+  UefiLib
+  RockchipPlatformLib
+#  CruLib
+
+[Guids]
+
+[Protocols]
+  gEfiCpuArchProtocolGuid
+  gEfiDevicePathProtocolGuid
+  gEmbeddedMmcHostProtocolGuid
+[Pcd]
+  gRockchipTokenSpaceGuid.PcdSdhciDxeBaseAddress
+
+[Depex]
+  TRUE

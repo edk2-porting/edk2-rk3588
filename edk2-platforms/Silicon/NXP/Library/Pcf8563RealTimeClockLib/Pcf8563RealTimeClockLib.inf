@@ -1,0 +1,46 @@
+#/** @file
+#
+#  Copyright (c) 2017, Linaro, Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = Pcf8563RealTimeClockLib
+  FILE_GUID                      = 1e3d33f3-a671-4116-bd81-6b435296c1e0
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = RealTimeClockLib
+
+[Sources.common]
+  Pcf8563RealTimeClockLib.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/NXP/Library/Pcf8563RealTimeClockLib/Pcf8563RealTimeClockLib.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  IoLib
+  UefiBootServicesTableLib
+  UefiLib
+  UefiRuntimeLib
+
+[Guids]
+  gEfiEventVirtualAddressChangeGuid
+
+[Protocols]
+  gEfiI2cMasterProtocolGuid                       ## CONSUMES
+  gPcf8563RealTimeClockLibI2cMasterProtocolGuid   ## CONSUMES
+
+[FixedPcd]
+  gPcf8563RealTimeClockLibTokenSpaceGuid.PcdI2cSlaveAddress
+  gPcf8563RealTimeClockLibTokenSpaceGuid.PcdI2cBusFrequency
+
+[Depex]
+  gPcf8563RealTimeClockLibI2cMasterProtocolGuid

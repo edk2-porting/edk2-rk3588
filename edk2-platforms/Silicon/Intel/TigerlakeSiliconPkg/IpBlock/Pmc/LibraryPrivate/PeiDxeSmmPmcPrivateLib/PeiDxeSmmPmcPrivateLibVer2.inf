@@ -1,0 +1,39 @@
+## @file
+# PEI/DXE/SMM PCH PMC Private Lib Ver2.
+#
+# All function in this library is available for PEI, DXE, and SMM,
+# But do not support UEFI RUNTIME environment call.
+#
+#  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+
+[Defines]
+INF_VERSION = 0x00010017
+BASE_NAME = PeiDxeSmmPmcPrivateLibVer2
+FILE_GUID = EB69B12B-6D4C-4B12-BB31-66CBCC4C1DC7
+VERSION_STRING = 1.0
+MODULE_TYPE = BASE
+LIBRARY_CLASS = PmcPrivateLib
+
+
+[LibraryClasses]
+BaseLib
+IoLib
+DebugLib
+PmcLib
+
+[Packages]
+MdePkg/MdePkg.dec
+TigerlakeSiliconPkg/SiPkg.dec
+
+
+[Pcd]
+gSiPkgTokenSpaceGuid.PcdAcpiBaseAddress
+
+[FixedPcd]
+
+[Sources]
+PmcPrivateLib.c

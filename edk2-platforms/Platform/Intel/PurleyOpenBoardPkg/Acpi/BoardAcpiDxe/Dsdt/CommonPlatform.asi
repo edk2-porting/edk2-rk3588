@@ -1,0 +1,227 @@
+/** @file
+
+Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#include "MaxSocket.h"
+
+  //
+  // External declarations
+  // HECI-1/HECI-2 are in PurleyPlatPkg\Me\Sps\Acpi\SpsNm.asl
+  //
+  External(\_SB.PC00.HEC2.HPTS, MethodObj)
+  External(\_SB.PC00.HEC2.HWAK, MethodObj)
+  
+  //
+  // System Sleep States
+  //
+  Name (\_S0,Package (){0,0,0,0})
+  Name (\_S3,Package (){5,0,0,0})   // Name changed to \DS3 if disabled in Setup
+  Name (\_S4,Package (){6,0,0,0})   // Name changed to \DS4 if disabled in Setup
+  Name (\_S5,Package (){7,0,0,0})
+  
+  //
+  // Native OS hot plug support, 0->ACPI, 1->OS 
+  //
+  Name (\OSHF, 0)
+
+  //
+  // OS flag
+  //
+  #include "Os.asi"
+
+  //
+  // for determing PIC mode
+  //
+  Name (\PICM,Zero)
+  Method (\_PIC, 1, NotSerialized) {
+    Store(Arg0,\PICM)
+  }
+
+  OperationRegion (DBG0, SystemIO, 0x80, 2)
+  Field (DBG0, ByteAcc,NoLock,Preserve) {
+    IO80, 8,
+    IO81, 8
+  }
+
+  //
+  // Access CMOS range
+  //
+  OperationRegion (ACMS, SystemIO, 0x72, 2)
+  Field ( ACMS, ByteAcc, NoLock, Preserve) {
+    INDX, 8,
+    DATA, 8
+  }
+
+  // 
+  // SWGPE_CTRL
+  //
+  OperationRegion (GPCT, SystemIO, 0x442, 1)
+  Field ( GPCT, ByteAcc, NoLock, Preserve) {
+          ,   1,
+    SGPC  ,   1,
+  }
+
+  // 
+  // GPI_INV
+  //
+  OperationRegion (GPIV, SystemIO, 0x52c, 2)
+  Field ( GPIV, ByteAcc, NoLock, Preserve) {
+    GP0I  ,   1,
+  }
+
+#include "Acpi/GlobalNvs.asi"
+
+  //
+  // Operation region for GPI status bits
+  //
+  OperationRegion (GSTS, SystemIO, 0x422, 2)
+  Field ( GSTS, ByteAcc, NoLock, Preserve) {
+    GP00  , 1,
+          , 12,
+    GP13  , 1,
+  }
+
+  //
+  // GPE0 HOT_PLUG_EN
+  //
+  OperationRegion (GPE0, SystemIO, 0x428, 8)
+  Field (GPE0, ByteAcc,NoLock,Preserve) {
+    ,1,
+    GPEH,1,
+    ,1,
+    USB1,1,
+    USB2,1,
+    USB5,1,
+    ,3, 
+    PCIE,1,
+    ,1,
+    PMEE,1,
+    USB3,1,
+    PMB0,1,
+    USB4,1,
+    ,9,
+    ,1,
+    ,7,
+    USB6,1,
+    ,15,
+  }
+
+  //
+  // GPES Status
+  //
+  OperationRegion (GPES, SystemIO, 0x420, 8)
+  Field (GPES, ByteAcc,NoLock,Preserve) {
+    ,1,
+    GPSH,1,
+    SGPS,1,
+    US1S,1,
+    US2S,1,
+    US5S,1,
+    ,1, 
+    SMWS,1,
+    ,1, 
+    PEES,1,
+    ,1,
+    PMES,1,
+    
+    US3S ,1,
+    PMBS,1,
+    US4S ,1,
+    ,9,
+    ,1,
+    ,7,
+    US6S,1,
+    ,15,
+  }
+  
+  //
+  // System sleep down
+  //
+  Method (_PTS, 1, NotSerialized)
+  {
+    Store (0x72, IO80)  // Sync with EfiPostCode.h
+
+    //
+    // Clear wake event status.
+    //
+    Store(1,US1S)
+    Store(1,US2S)
+    Store(1,US5S)
+    Store(1,SMWS)
+    Store(1,PMES)
+    Store(1,US3S)
+    Store(1,PMBS)
+    Store(1,US4S)
+    Store(1,US6S)
+
+    //
+    // Enable SCI and wake event sources.
+    //
+    Store(1,GPEH)
+    Store(1,USB1)
+    Store(1,USB2)
+    Store(1,USB5)
+    Store(1,PCIE)
+    Store(1,PMEE)
+    Store(1,USB3)
+    Store(1,PMB0)
+    Store(1,USB4)
+    Store(1,USB6)
+
+    //
+    // If HECI-2 exist call its prepare-to-sleep handler.
+    // The handler checks whether HECI-2 is enabled.
+    //
+    If (CondRefOf(\_SB.PC00.HEC2.HPTS))
+    {
+      \_SB.PC00.HEC2.HPTS()
+    }
+
+    /// WA for S3 on XHCI
+    \_SB.PC00.XHCI.XHCS()
+  }
+
+  //#include "Uncore.asi"
+
+  //
+  // System Wake up
+  //
+  Method (_WAK, 1, Serialized)
+  {
+    Store (0x73, IO80)  // Sync with EfiPostCode.h
+
+    //
+    // If HECI-2 exist call its wake-up handler.
+    // The handler checks whether HECI-2 is enabled.
+    //
+    If (CondRefOf(\_SB.PC00.HEC2.HWAK))
+    {
+      \_SB.PC00.HEC2.HWAK()
+    }
+
+    //
+    // If waking from S3
+    //
+    If (LEqual(Arg0, 3)) {
+    }
+
+    Return(Package(){0, 0})
+  }
+
+  Scope(\_SB) {
+  
+    // Information on CPU and Memory for hotplug SKUs
+    // #include "CpuMemHp.asi"
+  
+    OperationRegion (IOB2, SystemIO, 0xB2, 2)  //MKF_SMIPORT
+    Field (IOB2, ByteAcc, NoLock, Preserve) {
+      SMIC, 8,                               // SW-SMI ctrl port
+      SMIS, 8,                               // SW-SMI status port
+    }
+
+  }   // end _SB scope
+
+  

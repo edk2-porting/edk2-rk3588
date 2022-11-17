@@ -1,0 +1,58 @@
+## @file
+# Platform variable initialization PEIM.
+#
+# This PEIM determines whether to load variable defaults. Ordinarily, the
+# decision is based on the boot mode, but an OEM hook is provided to override
+# that. The appropriate HOBs and PCDs are created to signal DXE code to update
+# the variable default values.
+#
+# @copyright
+# Copyright 2012 - 2021 Intel Corporation. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PlatformVariableInitPei
+  FILE_GUID                      = B88303F6-2E0E-41cc-8510-F5892BF1D9D9
+  MODULE_TYPE                    = PEIM
+  ENTRY_POINT                    = PlatformVariableInitPeiEntry
+
+[Sources]
+  PlatformVariableInitPei.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  WhitleySiliconPkg/WhitleySiliconPkg.dec
+  WhitleySiliconPkg/SiliconPkg.dec
+  WhitleyOpenBoardPkg/PlatformPkg.dec
+
+[LibraryClasses]
+  PeiServicesLib
+  PeimEntryPoint
+  DebugLib
+  HobLib
+  IoLib
+  PciLib
+  PcdLib
+  MultiPlatSupportLib
+  PlatformVariableHookLib
+  PlatformSetupVariableSyncLib
+
+[Pcd]
+  gPlatformTokenSpaceGuid.PcdSetupVariableGuid          ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetNvStoreDefaultId ## PRODUCES
+
+[Guids]
+  gPlatformVariableHobGuid                              ## PRODUCES           ## HOB
+
+[Ppis]
+  gPlatformVariableInitPpiGuid                          ## PRODUCES
+  gEfiPeiReadOnlyVariable2PpiGuid                       ## SOMETIMES_CONSUMES ## NOTIFY
+  gUpdateBootModePpiGuid                                ## CONSUMES
+
+[Depex]
+  TRUE

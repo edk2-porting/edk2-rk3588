@@ -1,0 +1,33 @@
+## @file
+#
+# @copyright
+# Copyright 2014 - 2021 Intel Corporation. <BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiIpmiBaseLib
+  FILE_GUID                      = 616A8628-9A5C-4d19-9C62-3874C5E6F4A6
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = IpmiBaseLib|PEIM PEI_CORE
+
+[sources]
+  PeiIpmiBaseLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OutOfBandManagement/IpmiFeaturePkg/IpmiFeaturePkg.dec
+
+[LibraryClasses]
+  DebugLib
+  BaseMemoryLib
+  PeiServicesLib
+
+
+[Ppis]
+  gPeiIpmiTransportPpiGuid
+
+[Depex]
+  gPeiIpmiTransportPpiGuid

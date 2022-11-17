@@ -1,0 +1,76 @@
+## @file
+#
+# Copyright (c) 2018 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SystemBoardPei
+  FILE_GUID                      = C0989520-2F0D-470a-9BE4-2969E0EC5641
+  MODULE_TYPE                    = PEIM
+  ENTRY_POINT                    = SystemBoardPeiEntry
+
+[Sources]
+  SystemBoardPei.c
+  SystemBoardCommon.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  PurleyOpenBoardPkg/OpenBoardPkg.dec
+  PurleyRefreshSiliconPkg/SiPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  PeiServicesLib
+  PeimEntryPoint
+  DebugLib
+  HobLib
+  IoLib
+  PciLib
+  PcdLib
+  PeiServicesTablePointerLib
+  PciExpressLib
+  PchInfoLib
+  GpioLib
+  TimerLib
+  PchCycleDecodingLib
+  PchSbiAccessLib
+  PchInfoLib
+  PchP2sbLib
+  PchPcrLib
+  MmPciLib
+  PcdLib
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+  gOemSkuTokenSpaceGuid.PcdIioBifurcationTable
+  gOemSkuTokenSpaceGuid.PcdIioBifurcationTableEntries
+  gOemSkuTokenSpaceGuid.PcdIioSlotTable
+  gOemSkuTokenSpaceGuid.PcdIioSlotTableEntries
+  gOemSkuTokenSpaceGuid.PcdOemSkuUplinkPortIndex
+
+  gOemSkuTokenSpaceGuid.PcdSetupData
+  gOemSkuTokenSpaceGuid.PcdPchRcConfigurationData
+  gOemSkuTokenSpaceGuid.PcdSocketIioConfigData
+  gOemSkuTokenSpaceGuid.PcdSocketCommonRcConfigData
+  gOemSkuTokenSpaceGuid.PcdSocketMpLinkConfigData
+  gOemSkuTokenSpaceGuid.PcdSocketMemoryConfigData
+  gOemSkuTokenSpaceGuid.PcdSocketPowerManagementConfigData
+  gOemSkuTokenSpaceGuid.PcdSocketProcessorCoreConfigData
+
+
+[Ppis]
+  gEfiPeiSystemBoardPpiGuid         ## PRODUCES
+  gEfiPeiSmbus2PpiGuid
+  gPchPlatformPolicyPpiGuid
+
+[Depex]
+  gEfiPeiPcdPpiGuid AND
+  gEfiPeiReadOnlyVariable2PpiGuid
+

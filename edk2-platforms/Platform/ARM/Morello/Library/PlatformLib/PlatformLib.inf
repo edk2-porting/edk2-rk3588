@@ -1,0 +1,52 @@
+## @file
+#  Platform Library for Morello platform.
+#
+#  Copyright (c) 2021, ARM Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = ArmMorelloLib
+  FILE_GUID                      = 36853D86-7200-47B4-9408-E962A00963FD
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmPlatformLib
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Platform/ARM/Morello/MorelloPlatform.dec
+
+[Sources.common]
+  PlatformLib.c
+  PlatformLibMem.c
+
+[Sources.AARCH64]
+  AArch64/Helper.S | GCC
+
+[FixedPcd]
+  gArmMorelloTokenSpaceGuid.PcdDramBlock2Base
+  gArmMorelloTokenSpaceGuid.PcdPciBusMax
+  gArmMorelloTokenSpaceGuid.PcdPciBusMin
+  gArmMorelloTokenSpaceGuid.PcdPciExpressBaseAddress
+  gArmMorelloTokenSpaceGuid.PcdPciIoSize
+  gArmMorelloTokenSpaceGuid.PcdPciMmio32Base
+  gArmMorelloTokenSpaceGuid.PcdPciMmio32Size
+  gArmMorelloTokenSpaceGuid.PcdPciMmio64Base
+  gArmMorelloTokenSpaceGuid.PcdPciMmio64Size
+
+  gArmTokenSpaceGuid.PcdArmPrimaryCore
+  gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
+  gArmTokenSpaceGuid.PcdSystemMemoryBase
+  gArmTokenSpaceGuid.PcdSystemMemorySize
+
+[Guids]
+  gEfiHobListGuid          ## CONSUMES  ## SystemTable
+
+[Ppis]
+  gArmMpCoreInfoPpiGuid

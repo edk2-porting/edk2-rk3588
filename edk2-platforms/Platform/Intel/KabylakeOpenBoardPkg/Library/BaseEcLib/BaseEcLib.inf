@@ -1,0 +1,30 @@
+## @file
+# Component information file for base EC library
+#
+# Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010017
+  BASE_NAME                      = BaseEcLib
+  FILE_GUID                      = 7FE22E12-889E-48D5-9F91-B7CBE265C94C
+  VERSION_STRING                 = 1.0
+  MODULE_TYPE                    = BASE
+  LIBRARY_CLASS                  = EcLib
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  IoLib
+  TimerLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  KabylakeOpenBoardPkg/OpenBoardPkg.dec
+
+[Sources]
+  BaseEcLib.c
+  EcCommands.c

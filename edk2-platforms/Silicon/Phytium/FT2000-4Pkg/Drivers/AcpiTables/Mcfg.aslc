@@ -1,0 +1,65 @@
+/** @file
+  Phytium ACPI ASL Sources.
+
+  Copyright (C) 2020, Phytium Technology Co Ltd. All rights reserved.<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#include <IndustryStandard/Acpi.h>
+#include <Platform.h>
+
+#define ACPI_6_1_MCFG_VERSION  0x1
+
+#pragma pack(1)
+typedef struct
+{
+  UINT64 BaseAddress;
+  UINT16 SegGroupNum;
+  UINT8  StartBusNum;
+  UINT8  EndBusNum;
+  UINT32 Reserved2;
+} EFI_ACPI_6_1_MCFG_CONFIG_STRUCTURE;
+
+typedef struct
+{
+  EFI_ACPI_DESCRIPTION_HEADER Header;
+  UINT64 Reserved1;
+} EFI_ACPI_6_1_MCFG_TABLE_CONFIG;
+
+typedef struct
+{
+  EFI_ACPI_6_1_MCFG_TABLE_CONFIG Acpi_Table_Mcfg;
+  EFI_ACPI_6_1_MCFG_CONFIG_STRUCTURE Config_Structure[1];
+} EFI_ACPI_6_1_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_TABLE;
+#pragma pack()
+
+EFI_ACPI_6_1_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_TABLE Mcfg=
+{
+  {
+    {
+      EFI_ACPI_6_1_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_BASE_ADDRESS_DESCRIPTION_TABLE_SIGNATURE,
+      sizeof (EFI_ACPI_6_1_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_TABLE),
+      ACPI_6_1_MCFG_VERSION,
+      0x00,                                             // Checksum will be updated at runtime
+      {EFI_ACPI_PHYTIUM_OEM_ID},
+      EFI_ACPI_PHYTIUM_OEM_TABLE_ID,
+      EFI_ACPI_PHYTIUM_OEM_REVISION,
+      EFI_ACPI_PHYTIUM_CREATOR_ID,
+      EFI_ACPI_PHYTIUM_CREATOR_REVISION
+    },
+    0x0000000000000000,                                 //Reserved
+  },
+  {
+    {
+      0x40000000,                                      //Base Address
+      0,                                               //Segment Group Number
+      0,                                               //Start Bus Number
+      0xff,                                            //End Bus Number
+      0x00000000,                                      //Reserved
+    },
+  }
+};
+
+VOID * CONST ReferenceAcpiTable = &Mcfg;

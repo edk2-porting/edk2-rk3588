@@ -1,0 +1,100 @@
+#/** @file
+# AmdStyx package.
+#
+# Copyright (c) 2014 - 2016, AMD Inc. All rights reserved.
+#
+#    SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = AmdStyx
+  PACKAGE_GUID                   = 58353cd1-61fb-4f9e-93f7-c43961d39b01
+  PACKAGE_VERSION                = 0.1
+
+[Includes]
+  Common
+
+[LibraryClasses]
+
+[Ppis]
+  gAmdStyxPlatInitPpiGuid    = { 0xcbff429c, 0xd3e3, 0x4c50, { 0xac, 0x1a, 0x1c, 0xd2, 0xfe, 0x15, 0x1a, 0xd7 } }
+
+[Protocols]
+  gAmdMpCoreInfoProtocolGuid = { 0x0dba25f8, 0x2da1, 0x4ec5, { 0x89, 0x5d, 0x32, 0x1e, 0xd6, 0x1e, 0x3f, 0x43 } }
+
+[Guids]
+  gAmdStyxTokenSpaceGuid     = { 0x220d9653, 0x4a0e, 0x40bc, { 0xb3, 0x65, 0x2f, 0xbb, 0xa2, 0xd9, 0x03, 0x45 } }
+  gAmdStyxMpCoreInfoGuid     = { 0x68efeabd, 0xcb77, 0x4aa5, { 0xbf, 0x0c, 0xa3, 0x31, 0xfc, 0xcf, 0x76, 0x66 } }
+
+  # 2a5e4deb-4445-4fb6-8b14-366b8e779b69
+  # EFI variable scope for Styx
+  gAmdStyxVariableGuid       = { 0x2a5e4deb, 0x4445, 0x4fb6, { 0x8b, 0x14, 0x36, 0x6b, 0x8e, 0x77, 0x9b, 0x69 } }
+
+[PcdsDynamic]
+  gAmdStyxTokenSpaceGuid.PcdSocCoreCount|1|UINT32|0x00000100
+  gAmdStyxTokenSpaceGuid.PcdSocCpuId|1|UINT32|0x00000101
+
+  gAmdStyxTokenSpaceGuid.PcdEthMacA|{0x0,0x0,0x0,0x0,0x0,0x0}|VOID*|0x000d0001
+  gAmdStyxTokenSpaceGuid.PcdEthMacB|{0x0,0x0,0x0,0x0,0x0,0x0}|VOID*|0x000d0002
+
+[PcdsFixedAtBuild]
+  # CPUID Register
+  gAmdStyxTokenSpaceGuid.PcdCpuIdRegister|0xE0000010|UINT32|0x00000200
+
+  # Synopsys SATA Controller
+  gAmdStyxTokenSpaceGuid.PcdSata0CtrlAxiSlvPort|0xE0300000|UINT32|0x00020000
+  gAmdStyxTokenSpaceGuid.PcdSata0PortCount|8|UINT8|0x00020001
+  gAmdStyxTokenSpaceGuid.PcdSataPi|0xFF|UINT32|0x00020002
+  gAmdStyxTokenSpaceGuid.PcdSataPortMode|0|UINT32|0x00020003
+  gAmdStyxTokenSpaceGuid.PcdSataPortMpsp|TRUE|BOOLEAN|0x00020004
+  gAmdStyxTokenSpaceGuid.PcdSataSmpsSupport|FALSE|BOOLEAN|0x00020005
+  gAmdStyxTokenSpaceGuid.PcdSataSssSupport|TRUE|BOOLEAN|0x00020006
+  gAmdStyxTokenSpaceGuid.PcdSataPortCpd|TRUE|BOOLEAN|0x00020007
+  gAmdStyxTokenSpaceGuid.PcdSata1CtrlAxiSlvPort|0xE0D00000|UINT32|0x00020008
+  gAmdStyxTokenSpaceGuid.PcdSata1PortCount|8|UINT8|0x00020009
+
+  # UART
+  gAmdStyxTokenSpaceGuid.PcdSerialDbgRegisterBase|0xE1010000|UINT64|0x00030000
+  gAmdStyxTokenSpaceGuid.PcdUartDbgBaudRate|115200|UINT32|0x00030001
+
+  # GIC
+  gAmdStyxTokenSpaceGuid.PcdGicVersion|0x2|UINT8|0x00040000
+  gAmdStyxTokenSpaceGuid.PcdGicHypervisorInterruptInterfaceBase|0xE1140000|UINT64|0x00040001
+  gAmdStyxTokenSpaceGuid.PcdGicVirtualInterruptInterfaceBase|0xE116F000|UINT64|0x00040002
+  gAmdStyxTokenSpaceGuid.PcdGicVirtualMaintenanceInterrupt|25|UINT32|0x00040003
+  gAmdStyxTokenSpaceGuid.PcdGicVirtualRegisterInterfaceBase|0x00000000|UINT64|0x00040004
+  gAmdStyxTokenSpaceGuid.PcdGicMSIFrameBase|0xE1180000|UINT64|0x00040005
+
+  # Timers (GTDT)
+  gAmdStyxTokenSpaceGuid.PcdCntControlBase|0xFFFFFFFFFFFFFFFF|UINT64|0x00050000
+  gAmdStyxTokenSpaceGuid.PcdCntReadBase|0x00000000E0B90000|UINT64|0x00050001
+  gAmdStyxTokenSpaceGuid.PcdCntCTLBase|0x00000000E0BD0000|UINT64|0x00050002
+  gAmdStyxTokenSpaceGuid.PcdCntBase0|0x00000000E0BE0000|UINT64|0x00050003
+  gAmdStyxTokenSpaceGuid.PcdCntEL0Base0|0x00000000E0BF0000|UINT64|0x00050004
+  gAmdStyxTokenSpaceGuid.PcdSbsaWatchDogRefreshBase|0x00000000E0BB0000|UINT64|0x00050005
+  gAmdStyxTokenSpaceGuid.PcdSbsaWatchDogControlBase|0x00000000E0BC0000|UINT64|0x00050006
+  gAmdStyxTokenSpaceGuid.PcdSbsaWakeUpGSIV|371|UINT32|0x00050007
+  gAmdStyxTokenSpaceGuid.PcdSbsaWatchDogGSIV|369|UINT32|0x00050008
+
+  # Trusted-Firmware
+  gAmdStyxTokenSpaceGuid.PcdTrustedFWMemoryBase|0x8000000000|UINT64|0x00060001
+  gAmdStyxTokenSpaceGuid.PcdTrustedFWMemorySize|0xE80000|UINT64|0x0006002
+
+  # Cores Per cluster
+  gAmdStyxTokenSpaceGuid.PcdSocCoresPerCluster|2|UINT32|0x00090000
+
+  # UEFI entry point
+  gAmdStyxTokenSpaceGuid.PcdUefiEntryAddress|0x8000E80000|UINT64|0x000a0000
+
+  # The original offset in memory of the NV store firmware volume, before
+  # relocating it to a dynamically allocated buffer. We need this to correlate
+  # flash accesses to the in-memory copy with LBAs in the actual SPI flash
+  gAmdStyxTokenSpaceGuid.PcdFlashNvStorageOriginalBase|0|UINT64|0x000c0000
+  # block size to use when invoking the ISCP FV methods
+  gAmdStyxTokenSpaceGuid.PcdFlashNvStorageBlockSize|0x1000|UINT32|0x000c0001
+
+[PcdsFixedAtBuild,PcdsDynamic]
+  gAmdStyxTokenSpaceGuid.PcdEnableSmmus|FALSE|BOOLEAN|0xe0000000
+  gAmdStyxTokenSpaceGuid.PcdEnableKcs|FALSE|BOOLEAN|0xe0000001

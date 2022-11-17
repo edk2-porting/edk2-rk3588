@@ -1,0 +1,44 @@
+#/** @file
+#
+#    Copyright (c) 2016, Hisilicon Limited. All rights reserved.
+#    Copyright (c) 2016, Linaro Limited. All rights reserved.
+#
+#    SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = FdtUpdateLib
+  FILE_GUID                      = B80B9FF1-FAB9-4BE5-B602-5ABAA6B7A3D4
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = FdtUpdateLib
+
+
+[Sources.common]
+  FdtUpdateLib.c
+
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  OpenPlatformPkg/Chips/Hisilicon/HisiPkg.dec
+
+[LibraryClasses]
+  ArmLib
+ FdtLib
+ PlatformSysCtrlLib
+ OemMiscLib
+
+[Protocols]
+ gHisiBoardNicProtocolGuid
+
+[Guids]
+
+[Pcd]
+ gHisiTokenSpaceGuid.PcdNumaEnable
+
+

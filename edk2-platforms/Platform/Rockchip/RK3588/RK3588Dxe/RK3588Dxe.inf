@@ -1,0 +1,66 @@
+#
+#  Copyright (c) 2013 - 2014, ARM Ltd. All rights reserved.
+#  Copyright (c) 2018, Linaro Ltd. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+[Defines]
+  INF_VERSION                    = 0x0001001a
+  BASE_NAME                      = RK3588Dxe
+  FILE_GUID                      = f6c64348-45ec-11ec-9726-f42a7dcb925d
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = RK3588EntryPoint
+
+[Sources.common]
+  RK3588Dxe.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Platform/Rockchip/RK3588/RK3588.dec
+  Silicon/Rockchip/RockchipPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+
+[LibraryClasses]
+  CacheMaintenanceLib
+  DebugLib
+  AcpiLib
+  IoLib
+  UefiBootManagerLib
+  UefiLib
+  UefiDriverEntryPoint
+  SpiLib
+  RK806
+  CruLib
+  ArmLib
+  NonDiscoverableDeviceRegistrationLib
+
+[Protocols]
+  gEfiDevicePathFromTextProtocolGuid
+  gEfiLoadedImageProtocolGuid
+  gEmbeddedGpioProtocolGuid
+  gPlatformBootManagerProtocolGuid
+  gPlatformVirtualKeyboardProtocolGuid
+  gAndroidBootImgProtocolGuid
+  gEfiCpuArchProtocolGuid
+
+[Pcd]
+  gRK3588TokenSpaceGuid.PcdAndroidBootDevicePath
+  gRK3588TokenSpaceGuid.PcdAndroidBootFile
+  gRK3588TokenSpaceGuid.PcdAndroidFastbootFile
+  gRK3588TokenSpaceGuid.PcdSdBootDevicePath
+  gRK3588TokenSpaceGuid.AcpiEnable
+  gRockchipTokenSpaceGuid.CruBaseAddr
+  gRockchipTokenSpaceGuid.FspiBaseAddr
+  gRK3588TokenSpaceGuid.PcdKernelBootArg
+  gRockchipTokenSpaceGuid.PcdComboPhyMode
+
+[Guids]
+  gEfiEndOfDxeEventGroupGuid
+
+[Depex]
+  TRUE

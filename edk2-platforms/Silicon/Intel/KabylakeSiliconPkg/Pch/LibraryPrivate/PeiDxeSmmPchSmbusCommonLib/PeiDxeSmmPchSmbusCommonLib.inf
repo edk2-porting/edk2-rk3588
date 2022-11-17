@@ -1,0 +1,30 @@
+## @file
+#  Component description file for the PchSmbusCommonLib
+#
+# Copyright (c) 2017 - 2020 Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiDxeSmmPchSmbusCommonLib
+  FILE_GUID                      = 490CEB45-F3A8-41CD-89CB-C47BF7F7A4B4
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PchSmbusCommonLib
+
+[Sources]
+  PchSmbusExec.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  KabylakeSiliconPkg/SiPkg.dec
+  KabylakeSiliconPkg/KabylakeSiliconPrivate.dec
+  IntelSiliconPkg/IntelSiliconPkg.dec
+
+[LibraryClasses]
+  IoLib
+  DebugLib
+  MmPciLib

@@ -1,0 +1,51 @@
+## @file
+# Component description file for Large Variable Read Library
+#
+# This library is used to retrieve large data sets using the UEFI Variable
+# Services. At time of writing, most UEFI Variable Services implementations do
+# not allow more than 64KB of data to be stored in a single UEFI variable. This
+# library will split data sets across multiple variables as needed.
+#
+# In the case where more than one variable is needed to store the data, an
+# integer number will be added to the end of the variable name. This number
+# will be incremented for each variable as needed to retrieve the entire data
+# set.
+#
+# The primary use for this library is to create binary compatible drivers
+# and OpROMs which need to work both with TianoCore and other UEFI PI
+# implementations. When customizing and recompiling the platform firmware image
+# is possible, adjusting the value of PcdMaxVariableSize may provide a simpler
+# solution to this problem.
+#
+# Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseLargeVariableReadLib
+  FILE_GUID                      = 4E9D7D31-A7A0-4004-AE93-D12F1AB08730
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = LargeVariableReadLib
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  LargeVariableReadLib.c
+  LargeVariableCommon.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  PrintLib
+  VariableReadLib

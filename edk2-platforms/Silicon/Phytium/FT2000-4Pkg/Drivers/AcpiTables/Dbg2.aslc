@@ -1,0 +1,80 @@
+/** @file
+  Phytium ACPI ASL Sources.
+
+  Copyright (C) 2020, Phytium Technology Co Ltd. All rights reserved.<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#include <IndustryStandard/Acpi.h>
+#include <IndustryStandard/DebugPort2Table.h>
+#include <Library/AcpiLib.h>
+#include <Library/ArmLib.h>
+#include <Library/PcdLib.h>
+#include <Platform.h>
+
+#define NUMBER_DEBUG_DEVICE_INFO    1
+#define NUMBER_OF_GENERIC_ADDRESS   1
+#define NAMESPACE_STRING_SIZE       8
+
+#pragma pack(1)
+
+typedef struct {
+  EFI_ACPI_DBG2_DEBUG_DEVICE_INFORMATION_STRUCT DdiHeader;
+  EFI_ACPI_6_1_GENERIC_ADDRESS_STRUCTURE Address[NUMBER_OF_GENERIC_ADDRESS];
+  UINT32 AddressSize[NUMBER_OF_GENERIC_ADDRESS];
+  CHAR8  NamespaceString[NAMESPACE_STRING_SIZE];
+} EFI_ACPI_DBG2_DDI_STRUCT;
+
+typedef struct {
+  EFI_ACPI_DEBUG_PORT_2_DESCRIPTION_TABLE Desc;
+  EFI_ACPI_DBG2_DDI_STRUCT Ddi[NUMBER_DEBUG_DEVICE_INFO];
+} EFI_ACPI_DEBUG_PORT_2_TABLE;
+
+#pragma pack()
+
+EFI_ACPI_DEBUG_PORT_2_TABLE Dbg2 = {
+  {
+    PHYTIUM_ACPI_HEADER (
+      EFI_ACPI_6_1_DEBUG_PORT_2_TABLE_SIGNATURE,
+      EFI_ACPI_DEBUG_PORT_2_TABLE,
+      EFI_ACPI_DEBUG_PORT_2_TABLE_REVISION
+      ),
+    OFFSET_OF (EFI_ACPI_DEBUG_PORT_2_TABLE, Ddi),
+    NUMBER_DEBUG_DEVICE_INFO
+  },
+  {
+    {
+      {
+        EFI_ACPI_DBG2_DEBUG_DEVICE_INFORMATION_STRUCT_REVISION,
+        sizeof (EFI_ACPI_DBG2_DDI_STRUCT),
+        NUMBER_OF_GENERIC_ADDRESS,
+        NAMESPACE_STRING_SIZE,
+        OFFSET_OF (EFI_ACPI_DBG2_DDI_STRUCT, NamespaceString),
+        0,
+        0,
+        EFI_ACPI_DBG2_PORT_TYPE_SERIAL,
+        EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_ARM_PL011_UART,
+        {EFI_ACPI_RESERVED_BYTE, EFI_ACPI_RESERVED_BYTE},
+        OFFSET_OF (EFI_ACPI_DBG2_DDI_STRUCT, Address),
+        OFFSET_OF (EFI_ACPI_DBG2_DDI_STRUCT, AddressSize),
+      },
+      {
+        {
+          EFI_ACPI_6_1_SYSTEM_MEMORY,
+          32,
+          0,
+          EFI_ACPI_6_1_DWORD,
+          FixedPcdGet64 (PcdSerialRegisterBase)
+        }
+      },
+      {
+        0x1000
+      },
+      "COM0"
+    }
+  }
+};
+
+VOID * CONST ReferenceAcpiTable = &Dbg2;

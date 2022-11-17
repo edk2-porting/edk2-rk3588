@@ -1,0 +1,51 @@
+#
+#  Copyright (c) 2017, Linaro, Ltd. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+[Defines]
+  DEC_SPECIFICATION              = 0x0001001A
+  PACKAGE_NAME                   = SynQuacer
+  PACKAGE_GUID                   = 9c782fd2-7db1-438d-b51c-2155cee2c5cc
+  PACKAGE_VERSION                = 0.1
+
+[Includes]
+  Include
+
+[Guids]
+  gSynQuacerTokenSpaceGuid = { 0x4d04555b, 0xdfdc, 0x418a, { 0x8a, 0xab, 0x07, 0xce, 0xef, 0x46, 0x82, 0xbb } }
+
+  gSynQuacerNonDiscoverableI2cMasterGuid = { 0x364ee675, 0x9e44, 0x42b7, { 0xa5, 0xe4, 0x92, 0x84, 0xdb, 0x85, 0xda, 0x09 } }
+  gSynQuacerNonDiscoverableRuntimeI2cMasterGuid = { 0x5f35aa9b, 0x8c6f, 0x4828, { 0xbd, 0x44, 0x7c, 0xc0, 0xeb, 0x2d, 0xfe, 0xb9 } }
+
+  gSynQuacerPlatformDxeFileGuid = { 0xac422cc1, 0xd916, 0x489a, { 0xb1, 0x65, 0x53, 0x6f, 0xdf, 0xc6, 0x33, 0xc2 } }
+
+  gSynQuacerPlatformFormSetGuid = { 0xe9cd576a, 0xaf9a, 0x4d41, { 0xbf, 0x1a, 0x29, 0xe1, 0xbc, 0x99, 0x99, 0x54 } }
+
+  gOpteeRngTaGuid = { 0xab7a617c, 0xb8e7, 0x4d8f, { 0x83, 0x01, 0xd0, 0x9b, 0x61, 0x03, 0x6b, 0x64 } }
+
+[Ppis]
+  gSynQuacerDramInfoPpiGuid = { 0x3e1d7356, 0xdda4, 0x4b1a, { 0x93, 0x46, 0xbf, 0x89, 0x1c, 0x86, 0x46, 0xcc } }
+
+[PcdsFixedAtBuild]
+  gSynQuacerTokenSpaceGuid.PcdDramInfoBase|0|UINT64|0x00000001
+
+  gSynQuacerTokenSpaceGuid.PcdNetsecEepromBase|0|UINT32|0x00000002
+  gSynQuacerTokenSpaceGuid.PcdNetsecPhyAddress|0|UINT8|0x00000003
+
+  # GPIO pin index [0 .. 31] or MAX_UINT8 for not implemented
+  gSynQuacerTokenSpaceGuid.PcdClearSettingsGpioPin|0xFF|UINT8|0x00000004
+  gSynQuacerTokenSpaceGuid.PcdPcie0PresenceDetectGpioPin|0xFF|UINT8|0x00000006
+
+  gSynQuacerTokenSpaceGuid.PcdI2cReferenceClock|62500000|UINT32|0x00000005
+
+  # for capsule update
+  gSynQuacerTokenSpaceGuid.PcdLowestSupportedFirmwareVersion|1|UINT32|0x00000009
+
+[PcdsPatchableInModule, PcdsDynamic]
+  # Enable both RC #0 and RC #1 by default
+  gSynQuacerTokenSpaceGuid.PcdPcieEnableMask|0x3|UINT8|0x00000007
+
+[PcdsDynamic]
+  gSynQuacerTokenSpaceGuid.PcdPlatformSettings|0x0|UINT64|0x00000008

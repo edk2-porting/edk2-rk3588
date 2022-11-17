@@ -1,0 +1,31 @@
+## @file
+# Library description file for Stall Ppi installation
+#
+# Copyright (c) 2019 Intel Corporation. All rights reserved. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+INF_VERSION = 0x00010017
+BASE_NAME = PeiStallPpiLib
+FILE_GUID = 73E3DD0E-B2C1-4429-B0B8-F8C2BD64F8CE
+VERSION_STRING = 1.0
+MODULE_TYPE = PEIM
+LIBRARY_CLASS = StallPpiLib
+
+[Sources]
+PeiStallPpiLib.c
+
+[LibraryClasses]
+BaseLib
+DebugLib
+TimerLib
+PeiServicesLib
+
+[Packages]
+MdePkg/MdePkg.dec
+
+[Ppis]
+gEfiPeiStallPpiGuid ## PRODUCES

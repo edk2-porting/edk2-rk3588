@@ -1,0 +1,53 @@
+/** @file
+*
+*  Copyright (c) 2018, Hisilicon Limited. All rights reserved.
+*  Copyright (c) 2018, Linaro Limited. All rights reserved.
+*
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
+*
+**/
+
+[defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = AcpiApei
+  FILE_GUID                      = E9570C39-EF68-4fc6-B921-C1954A87CCD2
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = ApeiEntryPoint
+
+[sources.common]
+  Apei.c
+  Bert/Bert.c
+  Einj/Einj.c
+  Erst/Erst.c
+  Hest/Hest.c
+  ErrorSource/Ghes.c
+  OemApeiHi1620.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/Hisilicon/HisiPkg.dec
+
+[LibraryClasses]
+  ArmSmcLib
+  BaseMemoryLib
+  DebugLib
+  HobLib
+  TimerLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+
+[Guids]
+  gOemConfigGuid
+
+[Protocols]
+  gEfiAcpiSdtProtocolGuid
+  gEfiAcpiTableProtocolGuid                     # PROTOCOL ALWAYS_CONSUMED
+
+[Pcd]
+  gHisiTokenSpaceGuid.PcdCpldBaseAddress
+  gHisiTokenSpaceGuid.PcdTrustedFirmwareEnable
+
+[Depex]
+  gEfiAcpiTableProtocolGuid AND gEfiAcpiSdtProtocolGuid

@@ -1,0 +1,34 @@
+/** @file
+*
+*  Copyright (c) 2017, Linaro, Ltd. All rights reserved.
+*
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
+*
+**/
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = ArmVExpressDtPlatformDtbLoaderLib
+  FILE_GUID                      = 050d6041-1508-4ae7-a69f-250155ccb567
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = DtPlatformDtbLoaderLib|DXE_DRIVER
+
+[Sources]
+  ArmVExpressDtPlatformDtbLoaderLib.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+  Platform/ARM/VExpressPkg/ArmVExpressPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+
+[LibraryClasses]
+  ArmGicLib
+  BaseLib
+  DxeServicesLib
+  IoLib
+  MemoryAllocationLib
+
+[Guids]
+  gDtPlatformDefaultDtbFileGuid

@@ -1,0 +1,43 @@
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = I2cDemoDxe
+  FILE_GUID                      = 59fc3843-d8d4-40aa-ae07-38967138509c
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = I2cDemoInitialise
+
+[Sources.common]
+  I2cDemoDxe.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/Rockchip/RockchipPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  IoLib
+  PcdLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Protocols]
+  gEfiDriverBindingProtocolGuid
+  gEfiI2cIoProtocolGuid
+  gRockchipI2cDemoProtocolGuid
+
+[Pcd]
+  gRockchipTokenSpaceGuid.PcdI2cDemoAddresses
+  gRockchipTokenSpaceGuid.PcdI2cDemoBuses
+
+[Depex]
+  TRUE

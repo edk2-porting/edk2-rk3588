@@ -1,0 +1,71 @@
+## @file
+#
+# Copyright (c) 2018 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BoardAcpiDxe
+  FILE_GUID                      = F3253A17-2AFE-419E-A5DA-B95A3F7DAB25
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InstallAcpiBoard
+
+[Sources]
+  Dsdt/WFPPlatform.asl
+  AmlOffsetTable.c
+  BoardAcpiDxe.c
+  BoardAcpiDxeDsdt.c
+
+[Packages]
+  PurleyOpenBoardPkg/OpenBoardPkg.dec
+  PurleyRefreshSiliconPkg/SiPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  BaseMemoryLib
+  DebugLib
+  UefiLib
+  UefiRuntimeServicesTableLib
+  HobLib
+  PcdLib
+  BoardAcpiTableLib
+
+[Protocols]
+  gEfiMpServiceProtocolGuid
+  gEfiIioUdsProtocolGuid
+  gEfiGlobalNvsAreaProtocolGuid
+  gEfiPciIoProtocolGuid
+  gEfiFirmwareVolume2ProtocolGuid
+  gEfiAcpiTableProtocolGuid
+  gEfiPciRootBridgeIoProtocolGuid
+
+[Guids]
+  gEfiMemoryMapGuid
+
+[Pcd]
+  gOemSkuTokenSpaceGuid.PcdPchRcConfigurationData
+  gOemSkuTokenSpaceGuid.PcdSocketIioConfigData
+  gOemSkuTokenSpaceGuid.PcdSocketMpLinkConfigData
+  gOemSkuTokenSpaceGuid.PcdSocketPowerManagementConfigData
+  gOemSkuTokenSpaceGuid.PcdSocketProcessorCoreConfigData
+  gOemSkuTokenSpaceGuid.PcdAcpiGnvsAddress
+  gMinPlatformPkgTokenSpaceGuid.PcdPcIoApicEnable
+
+[Depex]
+  gEfiAcpiTableProtocolGuid AND
+  gEfiMpServiceProtocolGuid
+
+[BuildOptions]
+  # add -vr and -so to generate offset.h
+  *_*_*_ASL_FLAGS = -oi -vr -so
+
+

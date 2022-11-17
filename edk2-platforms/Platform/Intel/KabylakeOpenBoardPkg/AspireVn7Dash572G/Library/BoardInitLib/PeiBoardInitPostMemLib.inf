@@ -1,0 +1,52 @@
+## @file
+# Component information file for AspireVn7Dash572GInitLib in PEI post memory phase.
+#
+# Copyright (c) 2017 - 2020 Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiBoardPostMemInitLib
+  FILE_GUID                      = 7fcc3900-d38d-419f-826b-72481e8b5509
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = BoardInitLib
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  PcdLib
+  SiliconInitLib
+  PchCycleDecodingLib
+  EcLib
+  BoardEcLib
+  IoLib
+  GpioLib
+  PciLib
+  PeiServicesLib
+
+[Packages]
+  MinPlatformPkg/MinPlatformPkg.dec
+  KabylakeOpenBoardPkg/OpenBoardPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  KabylakeSiliconPkg/SiPkg.dec
+  IntelSiliconPkg/IntelSiliconPkg.dec
+
+[Sources]
+  PeiAspireVn7Dash572GInitPostMemLib.c
+  AspireVn7Dash572GGpioTable.c
+  AspireVn7Dash572GHdaVerbTables.c
+  PeiBoardInitPostMemLib.c
+
+[Pcd]
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdBoardGpioTable
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdBoardGpioTableSize
+
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdHdaVerbTable
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDisplayAudioHdaVerbTable

@@ -1,0 +1,48 @@
+## @file
+# SiliconPolicyInitPreAndPostMem PEIM.
+#
+# This PEIM initializes silicon policy with the defaults from the silicon provider.
+# We publish a PPI that is consumed by a shim library instance that provides the functions used by the
+# common MinPlatformPkg PolicyInit pre and post memory code.
+# This PEIM produces SiliconPolicyInit PRE and POST memory services.  A DXE driver provides the LATE services.
+#
+# @copyright
+# Copyright 2021 Intel Corporation. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SiliconPolicyInitPreAndPostMem
+  FILE_GUID                      = ca8efb69-d7dc-4e94-aad6-9fb373649161
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = SiliconPolicyInitPreAndPostMemPeimEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32
+#
+
+[Sources]
+  SiliconPolicyInitPreAndPostMem.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+  WhitleySiliconPkg/WhitleySiliconPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  PeiServicesLib
+  PeimEntryPoint
+  DebugLib
+  SiliconPolicyInitLib
+
+[Guids]
+  gSiliconPolicyInitLibInterfaceGuid      ## ALWAYS_PRODUCES a PPI with this GUID
+
+[Depex]
+  TRUE

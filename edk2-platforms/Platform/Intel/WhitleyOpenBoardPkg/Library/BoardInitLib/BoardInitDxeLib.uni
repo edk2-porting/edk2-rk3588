@@ -1,0 +1,29 @@
+/** @file
+
+  @copyright
+  Copyright 2018 - 2021 Intel Corporation. <BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+**/
+
+//**/
+
+/=#
+
+#langdef   en-US "English"
+#langdef   fr-FR "Français"
+
+#string STR_BOOT_PROMPT                #language en-US  "\n\n"
+                                                        "     Press [Enter] to directly boot.\n"
+                                                        "     Press [F2]    to enter setup and select boot options.\n"
+                                                        "     Press [F7]    to show boot menu options.\n\n"
+                                                        "     Copyright (c) 2006 - 2021, Intel Corporation.\n"
+                                       #language fr-FR  "\n\n"
+                                                        "     Press [Enter] to directly boot.\n"
+                                                        "     Press [F2]    to enter setup and select boot options.\n"
+                                                        "     Press [F7]    to show boot menu options.\n\n"
+                                                        "     Copyright (c) 2006 - 2021, Intel Corporation.\n"
+#string STR_START_BOOT_OPTION          #language en-US  "Start boot option"
+                                       #language fr-FR  "l'option de botte de Début"
+#string STR_MFG_MODE_PROMPT            #language en-US  "\n\n\n"
+                                                        "     !!!Booting in Manufacturing Mode!!!\n"

@@ -1,0 +1,18 @@
+### @file
+#  Component information file for AcpiPlatform module
+#
+# Copyright (c) 2019 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+###
+
+[defines]
+  INF_VERSION                    = 0x00010017
+  BASE_NAME                      = MicrocodeUpdates
+  FILE_GUID                      = 86E87F4F-37A0-4ED7-AB3B-B411BC08C497
+  VERSION_STRING                 = 1.0
+  MODULE_TYPE                    = USER_DEFINED
+
+[Sources]
+  m_80_806c1_0000007e.mcb

@@ -1,0 +1,50 @@
+#
+#  Copyright (c) 2013 - 2014, ARM Ltd. All rights reserved.
+#  Copyright (c) 2018, Linaro Ltd. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+[Defines]
+  INF_VERSION                    = 0x0001001a
+  BASE_NAME                      = HiKeyDxe
+  FILE_GUID                      = f567684b-1089-4214-8881-d64b20cbda2f
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = HiKeyEntryPoint
+
+[Sources.common]
+  HiKeyDxe.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Platform/Hisilicon/HiKey/HiKey.dec
+
+[LibraryClasses]
+  CacheMaintenanceLib
+  DebugLib
+  IoLib
+  UefiBootManagerLib
+  UefiLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiDevicePathFromTextProtocolGuid
+  gEfiLoadedImageProtocolGuid
+  gEmbeddedGpioProtocolGuid
+  gPlatformBootManagerProtocolGuid
+  gPlatformVirtualKeyboardProtocolGuid
+
+[Pcd]
+  gHiKeyTokenSpaceGuid.PcdAndroidBootDevicePath
+  gHiKeyTokenSpaceGuid.PcdAndroidBootFile
+  gHiKeyTokenSpaceGuid.PcdAndroidFastbootFile
+  gHiKeyTokenSpaceGuid.PcdSdBootDevicePath
+
+[Guids]
+  gEfiEndOfDxeEventGroupGuid
+
+[Depex]
+  TRUE

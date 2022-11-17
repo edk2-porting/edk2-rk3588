@@ -1,0 +1,51 @@
+## @file
+# This package provides advanced feature functionality for ACPI Debug support.
+# This package should only depend on EDK II Core packages, IntelSiliconPkg, and MinPlatformPkg.
+#
+# The DEC files are used by the utilities that parse DSC and
+# INF files to generate AutoGen.c and AutoGen.h files
+# for the build infrastructure.
+#
+# Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION = 0x00010017
+  PACKAGE_NAME      = AcpiDebugFeaturePkg
+  PACKAGE_GUID      = 53E3E908-5DF9-4137-ABB9-6DE162C3898F
+  PACKAGE_VERSION   = 0.1
+
+[Includes]
+  Include
+
+[LibraryClasses]
+
+[Guids]
+  gAcpiDebugFeaturePkgTokenSpaceGuid  =  {0xaf2582c0, 0x93fe, 0x466d, {0xb6, 0xa4, 0x4d, 0x23, 0x77, 0xf7, 0x82, 0xa7}}
+
+[PcdsFeatureFlag]
+  gAcpiDebugFeaturePkgTokenSpaceGuid.PcdAcpiDebugFeatureEnable|FALSE|BOOLEAN|0xA0000001
+
+[PcdsFixedAtBuild,PcdsPatchableInModule,PcdsDynamic,PcdsDynamicEx]
+  ## This PCD specifies the ACPI debug message buffer size.
+  gAcpiDebugFeaturePkgTokenSpaceGuid.PcdAcpiDebugBufferSize|0x10000|UINT32|0xF0000001
+
+[PcdsDynamic, PcdsDynamicEx]
+  ## This PCD specifies whether the feature is active.
+  #
+  #  The PCD value can be modified at boot time to activate and deactivate the feature functionality.
+  #
+  #  Note that this differs from Pcd<FeatureName>FeatureEnable which determines whether the feature is included
+  #  as an advanced feature in the flash image. If enabled, the feature is then eligible to be activated/deactivated
+  #  via this PCD.
+  #
+  #  An enabled but deactivated feature will be dispatched but exit in its entry point without performing any
+  #  feature actions.
+  gAcpiDebugFeaturePkgTokenSpaceGuid.PcdAcpiDebugFeatureActive|TRUE|BOOLEAN|0xD0000001
+
+  ## This PCD specifies ACPI debug message buffer address.
+  #  The PCD value will be updated during boot time when the buffer is allocated.
+  gAcpiDebugFeaturePkgTokenSpaceGuid.PcdAcpiDebugAddress|0|UINT32|0xD0000002

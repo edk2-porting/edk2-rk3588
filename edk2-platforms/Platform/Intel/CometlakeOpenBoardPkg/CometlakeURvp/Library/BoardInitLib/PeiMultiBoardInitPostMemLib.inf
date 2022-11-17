@@ -1,0 +1,207 @@
+## @file
+# Component information file for CometlakeURvpInitLib in PEI post memory phase.
+#
+#
+#  Copyright (c) 2020, Intel Corporation. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiCometlakeURvpMultiBoardInitLib
+  FILE_GUID                      = C7D39F17-E5BA-41D9-8DFE-FF9017499280
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL
+  CONSTRUCTOR                    = PeiCometlakeURvpMultiBoardInitLibConstructor
+
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  GpioExpanderLib
+  PcdLib
+  MultiBoardInitSupportLib
+  HdaVerbTableLib
+  PeiPlatformHookLib
+  PeiPolicyInitLib
+  PchInfoLib
+  SiliconInitLib
+
+[Packages]
+  MinPlatformPkg/MinPlatformPkg.dec
+  CometlakeOpenBoardPkg/OpenBoardPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  CoffeelakeSiliconPkg/SiPkg.dec
+  SecurityPkg/SecurityPkg.dec
+  IntelSiliconPkg/IntelSiliconPkg.dec
+
+[Sources]
+  PeiCometlakeURvpInitPostMemLib.c
+  PeiMultiBoardInitPostMemLib.c
+  BoardFunc.c
+  BoardFuncInit.c
+  GpioTableDefault.c
+  GpioTableCometlakeULpddr3Rvp.c
+
+[FixedPcd]
+
+[Pcd]
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdBoardGpioTable
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdBoardGpioTableSize
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdBoardGpioTableTouchPanel
+
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdGpioExpanderTable
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdGpioExpanderTableSize
+
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdBoardUcmcGpioTable
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdBoardUcmcGpioTableSize
+
+  #===========================================================
+  gMinPlatformPkgTokenSpaceGuid.PcdFlashFvPostMemoryBase
+  # Board Init Table List
+
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdBoardGpioTablePreMem
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdBoardGpioTablePreMemSize
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdBoardGpioTableWwanOnEarlyPreMem
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdBoardGpioTableWwanOnEarlyPreMemSize
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdBoardGpioTableWwanOffEarlyPreMem
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdBoardGpioTableWwanOffEarlyPreMemSize
+
+  # WWAN Full Card Power Off and reset pins
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdWwanFullCardPowerOffGpio
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdWwanBbrstGpio
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdWwanPerstGpio
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdWwanPerstGpioPolarity
+
+  # SA Misc Config
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdSaMiscMmioSizeAdjustment
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdMrcDqPinsInterleavedControl
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdMrcDqPinsInterleaved
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdSaDdrFreqLimit
+
+  # Display DDI
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdSaDisplayConfigTable           ## PRODUCES
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdSaDisplayConfigTableSize       ## PRODUCES
+
+  # PEG Reset By GPIO
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPegGpioResetControl
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPegGpioResetSupoort
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPeg0ResetGpioPad
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPeg0ResetGpioActive
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPeg3ResetGpioPad
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPeg3ResetGpioActive
+
+  # PCIE RTD3 GPIO
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdRootPortDev
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdRootPortFunc
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdRootPortIndex
+
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcie0GpioSupport
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcie1GpioSupport
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcie1WakeGpioNo
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcie1HoldRstExpanderNo
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcie1HoldRstGpioNo
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcie1HoldRstActive
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcie1PwrEnableExpanderNo
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcie1PwrEnableGpioNo
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcie1PwrEnableActive
+
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcie2GpioSupport
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcie2WakeGpioNo
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcie2HoldRstExpanderNo
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcie2HoldRstGpioNo
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcie2HoldRstActive
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcie2PwrEnableExpanderNo
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcie2PwrEnableGpioNo
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcie2PwrEnableActive
+
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcie3GpioSupport
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcie3WakeGpioNo
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcie3HoldRstExpanderNo
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcie3HoldRstGpioNo
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcie3HoldRstActive
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcie3PwrEnableExpanderNo
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcie3PwrEnableGpioNo
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcie3PwrEnableActive
+
+  # CA Vref Configuration
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdMrcCaVrefConfig
+
+  # PCIe Clock Info
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcieClock0
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcieClock1
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcieClock2
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcieClock3
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcieClock4
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcieClock5
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcieClock6
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcieClock7
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcieClock8
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcieClock9
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcieClock10
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcieClock11
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcieClock12
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcieClock13
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcieClock14
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPcieClock15
+
+  # USB 2.0 Port AFE
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port10Afe
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port11Afe
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port12Afe
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port13Afe
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port14Afe
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port15Afe
+
+  # USB 2.0 Port Over Current Pin
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort14
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort15
+
+  # USB 3.0 Port Over Current Pin
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb30OverCurrentPinPort6
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb30OverCurrentPinPort7
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb30OverCurrentPinPort8
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdUsb30OverCurrentPinPort9
+
+  # GPIO Group Tier
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdGpioGroupToGpeDw0
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdGpioGroupToGpeDw1
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdGpioGroupToGpeDw2
+
+  # Pch PmConfig Policy
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdSlpS0VmRuntimeControl
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdSlpS0Vm070VSupport
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdSlpS0Vm075VSupport
+
+  # Misc
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPc8374SioKbcPresent
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdOddPowerInitEnable
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdIvCamInitPresent
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdRecoveryModeGpio
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdMobileDramPresent
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdCpuVboostEnable
+
+
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdSpdPresent
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdBoardRev
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdBoardBomId
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdPlatformType
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdDualDimmPerChannelBoardType
+
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdBoardGpioTable2                   ## CONSUMES
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdBoardGpioTable2Size               ## CONSUMES
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdDebugUsbUartEnable
+  gCometlakeOpenBoardPkgTokenSpaceGuid.PcdMipiCamGpioEnable
+  # TPM interrupt
+  gEfiSecurityPkgTokenSpaceGuid.PcdTpm2CurrentIrqNum
+
+[Guids]
+  gAttemptUsbFirstHotkeyInfoHobGuid             ## CONSUMES
+  gCnlPchLpChipsetInitTableDxGuid               ## CONSUMES

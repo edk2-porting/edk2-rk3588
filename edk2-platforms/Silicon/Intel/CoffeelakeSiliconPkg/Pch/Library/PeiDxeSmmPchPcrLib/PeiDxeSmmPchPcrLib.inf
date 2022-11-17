@@ -1,0 +1,35 @@
+## @file
+# PCH PCR Library.
+#
+# All function in this library is available for PEI, DXE, and SMM,
+# But do not support UEFI RUNTIME environment call.
+#
+# Copyright (c) 2019 Intel Corporation. All rights reserved. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+INF_VERSION = 0x00010017
+BASE_NAME = PeiDxeSmmPchPcrLib
+FILE_GUID = 117C8D19-445B-46BF-B624-109F63709375
+VERSION_STRING = 1.0
+MODULE_TYPE = BASE
+LIBRARY_CLASS = PchPcrLib
+
+
+[LibraryClasses]
+BaseLib
+IoLib
+DebugLib
+PchInfoLib
+
+
+[Packages]
+MdePkg/MdePkg.dec
+CoffeelakeSiliconPkg/SiPkg.dec
+
+
+[Sources]
+PchPcrLib.c

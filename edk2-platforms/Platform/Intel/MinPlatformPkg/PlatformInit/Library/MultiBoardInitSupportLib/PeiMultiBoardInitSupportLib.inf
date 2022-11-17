@@ -1,0 +1,38 @@
+## @file
+# Component information file for Board Init Library
+#
+# Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiMultiBoardInitSupportLib
+  FILE_GUID                      = E0238683-D3FD-4D97-8874-37C6157E2906
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = MultiBoardInitSupportLib
+  LIBRARY_CLASS                  = BoardInitLib
+
+[LibraryClasses]
+  BaseLib
+  PcdLib
+  DebugLib
+
+[Packages]
+  MinPlatformPkg/MinPlatformPkg.dec
+  MdePkg/MdePkg.dec
+
+[Sources]
+  PeiMultiBoardInitSupportLib.c
+  PeiBoardInitLib.c
+  
+[Guids]
+  gBoardDetectGuid
+  gBoardPreMemInitGuid
+  gBoardPostMemInitGuid
+  gBoardNotificationInitGuid
+
+[Pcd]

@@ -1,0 +1,92 @@
+/** @file
+
+Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+Name (OPAC, 0)
+
+OperationRegion(PWKE,PCI_Config,0x54,0x18)
+Field(PWKE,DWordAcc,NoLock,Preserve)
+{
+      , 8,
+  PMEE, 1, // PWR_CNTL_STS.PME_En
+      , 6,
+  PMES, 1, // PWR_CNTL_STS.PME_Sts
+  Offset (0x0E),
+      , 1,
+  PWUC, 10 // Port Wake Up Capability Mask
+}
+
+//
+// Indicate access to OperationRegions is enabled/disabled
+//
+Method (_REG, 2)
+{
+  // If OperationRegion ID = PCI_Config
+  //
+  If (LEqual (Arg0, 2))
+  {
+    // If access is enabled
+    //
+    If (LEqual(Arg1, 1))
+    {
+      // Set local flag
+      //
+      Store (One, OPAC)
+    }
+    Else
+    {
+      // Clear local flag
+      //
+      Store (One, OPAC)
+    }
+  }
+}
+
+//
+// Enable/disable ports on this controller to wake the system
+//
+Method (_PSW,1)
+{
+  If (Arg0)
+  {
+    Store (Ones,PWUC)
+  }
+  Else
+  {
+    Store (0,PWUC)
+  }
+}
+
+//
+// Initialization for this controller
+//
+Method (_INI, 0)
+{
+  // If access to OperationRegion is enabled
+  //
+  If (LEqual (OPAC, One))
+  {
+    Store (1, PMES)     // clear PME status
+    Store (0, PMEE)     // clear PME enable
+  }
+}
+
+// The CRB leaves the USB ports on in S3/S4 to allow
+// the ability to Wake from USB.  Therefore, define
+// the below control methods to state D2 entry during
+// the given S-State.
+
+Method(_S3D,0)
+{
+  Return(2)
+}
+
+Method(_S4D,0)
+{
+  Return(2)
+}
+
+

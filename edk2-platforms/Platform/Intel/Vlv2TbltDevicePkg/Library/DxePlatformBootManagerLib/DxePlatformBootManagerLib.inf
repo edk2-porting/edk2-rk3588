@@ -1,0 +1,97 @@
+### @file
+# Component name for module DxePlatformBootManagerLib
+#
+# Copyright (c) 2017 - 2019, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+###
+
+[Defines]
+  INF_VERSION                    = 0x00010017
+  BASE_NAME                      = DxePlatformBootManagerLib
+  FILE_GUID                      = A6BC385D-59E5-4B77-87D7-200ABAA83C15
+  VERSION_STRING                 = 1.0
+  MODULE_TYPE                    = DXE_DRIVER
+  UEFI_SPECIFICATION_VERSION     = 2.10
+  LIBRARY_CLASS                  = PlatformBootManagerLib|DXE_DRIVER
+#
+# The following information is for reference only and not required by the build tools.
+#
+# VALID_ARCHITECTURES = IA32 X64 EBC
+#
+
+[LibraryClasses]
+  BaseLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  BaseMemoryLib
+  DebugLib
+  PcdLib
+  PrintLib
+  DevicePathLib
+  UefiLib
+  HobLib
+  DxeServicesLib
+  DxeServicesTableLib
+  HiiLib
+  UefiBootManagerLib
+  PerformanceLib
+  TimerLib
+  Tcg2PhysicalPresenceLib
+  CapsuleLib
+  BootLogoLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+  Vlv2TbltDevicePkg/PlatformPkg.dec
+
+[Pcd]
+  gMinPlatformPkgTokenSpaceGuid.PcdTpm2Enable                    ## CONSUMES
+  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut                   ## PRODUCES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution       ## PRODUCES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution         ## PRODUCES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow                       ## PRODUCES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn                    ## PRODUCES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupConOutColumn               ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupConOutRow                  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoHorizontalResolution  ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupVideoVerticalResolution    ## CONSUMES
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConInConnectOnDemand            ## PRODUCES
+  gMinPlatformPkgTokenSpaceGuid.PcdPlatformMemoryCheckLevel      ## CONSUMES
+  gMinPlatformPkgTokenSpaceGuid.PcdBootToShellOnly               ## CONSUMES
+  gMinPlatformPkgTokenSpaceGuid.PcdTrustedConsoleInputDevicePath  ## CONSUMES
+  gMinPlatformPkgTokenSpaceGuid.PcdTrustedConsoleOutputDevicePath ## CONSUMES
+  gMinPlatformPkgTokenSpaceGuid.PcdTrustedStorageDevicePath       ## CONSUMES
+  gPlatformModuleTokenSpaceGuid.PcdBootState
+
+[Sources]
+  BdsPlatform.c
+  BdsPlatform.h
+  PlatformBootOption.c
+  MemoryTest.c
+
+[Protocols]
+  gEfiPciRootBridgeIoProtocolGuid               ## CONSUMES
+  gEfiPciIoProtocolGuid                         ## CONSUMES
+  gEfiCpuIo2ProtocolGuid                        ## CONSUMES
+  gEfiDxeSmmReadyToLockProtocolGuid             ## PRODUCES
+  gEfiGenericMemTestProtocolGuid                ## CONSUMES
+  gEfiDiskInfoProtocolGuid                      ## CONSUMES
+  gEfiDevicePathToTextProtocolGuid              ## CONSUMES
+  gEfiSimpleTextInputExProtocolGuid             ## CONSUMES
+  gEfiFirmwareVolume2ProtocolGuid               ## CONSUMES
+  gEfiFormBrowser2ProtocolGuid                  ## CONSUMES
+  gEfiGenericMemTestProtocolGuid                ## CONSUMES
+
+[Guids]
+  gEfiGlobalVariableGuid                        ## PRODUCES
+  gEfiMemoryOverwriteControlDataGuid            ## PRODUCES
+  gEfiEndOfDxeEventGroupGuid                    ## CONSUMES
+
+[Depex.common.DXE_DRIVER]
+  gEfiVariableArchProtocolGuid

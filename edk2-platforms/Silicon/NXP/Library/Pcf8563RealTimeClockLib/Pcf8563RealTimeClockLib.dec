@@ -1,0 +1,26 @@
+#/** @file
+#
+#  Copyright (c) 2017, Linaro, Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+#**/
+
+[Defines]
+  DEC_SPECIFICATION              = 0x0001001A
+  PACKAGE_NAME                   = Pcf8563RealTimeClockLib
+  PACKAGE_GUID                   = 44d63668-c86b-446a-b303-f3a5176702aa
+  PACKAGE_VERSION                = 0.1
+
+[Guids]
+  gPcf8563RealTimeClockLibTokenSpaceGuid = { 0xaaf5b169, 0x93a0, 0x4d60, { 0xba, 0xe4, 0x06, 0x07, 0x92, 0x8e, 0x63, 0xdd }}
+
+[Protocols]
+  gPcf8563RealTimeClockLibI2cMasterProtocolGuid = { 0xa6af18ae, 0x3bd5, 0x4af9, { 0xbb, 0x6a, 0xdb, 0x85, 0x07, 0x62, 0x81, 0x38 }}
+
+[PcdsFixedAtBuild]
+  gPcf8563RealTimeClockLibTokenSpaceGuid.PcdI2cSlaveAddress|0x51|UINT8|0x00000001
+
+  # preferred/max I2C bus frequency in Hz for the PCF8563
+  gPcf8563RealTimeClockLibTokenSpaceGuid.PcdI2cBusFrequency|400000|UINT32|0x00000002

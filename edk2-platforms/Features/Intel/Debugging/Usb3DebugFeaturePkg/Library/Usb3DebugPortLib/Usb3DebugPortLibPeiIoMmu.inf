@@ -1,0 +1,51 @@
+## @file
+#  USB3 Debug port library.
+#
+# Copyright (c) 2013 - 2020, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = USB3DebugPortLibPeiIoMmu
+  FILE_GUID                      = C973C5E8-A0D8-4FEE-A0F0-7DA6C3C72451
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = Usb3DebugPortLib|PEIM PEI_CORE
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF
+#
+
+[Sources]
+  Usb3DebugPortLibPeiIoMmu.c
+  Usb3DebugPortDataTransfer.c
+  Usb3DebugPortInitialize.c
+  MiscServices.c
+  Usb3DebugPortLibInternal.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Usb3DebugFeaturePkg/Usb3DebugFeaturePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  PcdLib
+  IoLib
+  PciLib
+  TimerLib
+  HobLib
+  Usb3DebugPortParamLib
+  PeiServicesTablePointerLib
+
+[Ppis]
+  gEfiPeiMemoryDiscoveredPpiGuid                ## CONSUMES
+  gEdkiiIoMmuPpiGuid                            ## SOMETIMES_CONSUMES
+
+[Pcd]
+  gUsb3DebugFeaturePkgTokenSpaceGuid.PcdXhciDefaultBaseAddress         ## SOMETIMES_CONSUMES
+  gUsb3DebugFeaturePkgTokenSpaceGuid.PcdXhciHostWaitTimeout            ## CONSUMES

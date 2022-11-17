@@ -1,0 +1,92 @@
+### @file
+# Component information file for silicon policy update library
+#
+# Copyright (c) 2019 - 2021 Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiSiliconPolicyUpdateLib
+  FILE_GUID                      = 14F5D83D-76A5-4241-BEC5-987E70E233D5
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SiliconPolicyUpdateLib
+
+[LibraryClasses]
+  BaseLib
+  PcdLib
+  DebugLib
+  ConfigBlockLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  PeiLib
+  CpuPlatformLib
+  PchPcieRpLib
+  PchInfoLib
+  MmPciLib
+  IoLib
+  PchHsioLib
+
+[Packages]
+  MinPlatformPkg/MinPlatformPkg.dec
+  MdePkg/MdePkg.dec
+  IntelFsp2Pkg/IntelFsp2Pkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  KabylakeSiliconPkg/SiPkg.dec
+  KabylakeOpenBoardPkg/OpenBoardPkg.dec
+  IntelSiliconPkg/IntelSiliconPkg.dec
+
+[Sources]
+  PeiSiliconPolicyUpdateLib.c
+
+[Guids]
+  gMemoryConfigNoCrcGuid
+  gTianoLogoGuid                                ## CONSUMES
+  gGraphicsPeiConfigGuid                        ## CONSUMES
+  gCpuConfigGuid                                ## CONSUMES
+  gHsioPciePreMemConfigGuid                     ## CONSUMES
+  gHsioSataPreMemConfigGuid                     ## CONSUMES
+  gSaMiscPeiPreMemConfigGuid                    ## CONSUMES
+  gFspNonVolatileStorageHobGuid                 ## CONSUMES
+
+[Pcd]
+  gSiPkgTokenSpaceGuid.PcdPeiMinMemorySize
+  gSiPkgTokenSpaceGuid.PcdFlashMicrocodeFvBase
+  gSiPkgTokenSpaceGuid.PcdFlashMicrocodeFvSize
+  gSiPkgTokenSpaceGuid.PcdMchBaseAddress
+  gSiPkgTokenSpaceGuid.PcdSmbusBaseAddress
+  gSiPkgTokenSpaceGuid.PcdTsegSize
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdGraphicsVbtGuid
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcRcompResistor       ## CONSUMES
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcRcompTarget         ## CONSUMES
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcDqByteMap           ## CONSUMES
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcDqsMapCpu2Dram      ## CONSUMES
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcSpdData
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcSpdDataSize
+
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUnknowLpHsioPtssTable1
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUnknowLpHsioPtssTable2
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUnknowLpHsioPtssTable1Size
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUnknowLpHsioPtssTable2Size
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdSpecificLpHsioPtssTable1
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdSpecificLpHsioPtssTable2
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdSpecificLpHsioPtssTable1Size
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdSpecificLpHsioPtssTable2Size
+
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUnknowHHsioPtssTable1
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUnknowHHsioPtssTable2
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUnknowHHsioPtssTable1Size
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUnknowHHsioPtssTable2Size
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdSpecificHHsioPtssTable1
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdSpecificHHsioPtssTable2
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdSpecificHHsioPtssTable1Size
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdSpecificHHsioPtssTable2Size
+
+  # SPD Address Table
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcSpdAddressTable0
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcSpdAddressTable1
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcSpdAddressTable2
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcSpdAddressTable3

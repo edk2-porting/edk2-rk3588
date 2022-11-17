@@ -1,0 +1,34 @@
+## @file
+# Read FFS library
+#
+# @copyright
+# Copyright 2014 - 2021 Intel Corporation. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ReadFfsLib
+  FILE_GUID                      = CD5BD27A-A122-41DE-B277-A258284BF35C
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ReadFfslib
+
+[Sources]
+  ReadFfsLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  WhitleyOpenBoardPkg/PlatformPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+
+[Pcd]
+
+[Protocols]
+
+[Guids]
+
+

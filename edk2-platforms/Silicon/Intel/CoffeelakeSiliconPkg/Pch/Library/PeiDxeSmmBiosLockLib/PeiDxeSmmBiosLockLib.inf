@@ -1,0 +1,40 @@
+## @file
+# BIOS LOCK library.
+#
+# All function in this library is available for PEI, DXE, and SMM,
+# But do not support UEFI RUNTIME environment call.
+#
+# Copyright (c) 2019 Intel Corporation. All rights reserved. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+INF_VERSION = 0x00010017
+BASE_NAME = PeiDxeSmmBiosLockLib
+FILE_GUID = 64EBA6B1-CC36-4C2E-A0F5-D90199432E6C
+VERSION_STRING = 1.0
+MODULE_TYPE = BASE
+LIBRARY_CLASS = BiosLockLib
+
+
+[LibraryClasses]
+BaseLib
+DebugLib
+PcdLib
+PciSegmentLib
+S3BootScriptLib
+
+
+[Packages]
+MdePkg/MdePkg.dec
+CoffeelakeSiliconPkg/SiPkg.dec
+
+
+[Sources]
+BiosLockLib.c
+
+
+[Pcd]
+gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress

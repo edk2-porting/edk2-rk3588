@@ -1,0 +1,35 @@
+### @file
+# Component information file for the Report Firmware Volume (FV) PEI module.
+#
+# Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+###
+
+[Defines]
+  INF_VERSION                    = 0x00010017
+  BASE_NAME                      = ReportFvPei
+  FILE_GUID                      = 3FECFD95-7CB2-4A6E-8FAC-DEFD9947E35E
+  VERSION_STRING                 = 1.0
+  MODULE_TYPE                    = PEIM
+  ENTRY_POINT                    = ReportFvEntryPoint
+
+[LibraryClasses]
+  PeimEntryPoint
+  PeiServicesLib
+  ReportFvLib
+  TestPointCheckLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+
+[Sources]
+  ReportFvPei.c
+
+[Ppis]
+  gEfiPeiMemoryDiscoveredPpiGuid
+
+[Depex]
+  TRUE

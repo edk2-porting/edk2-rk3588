@@ -1,0 +1,36 @@
+## @file
+# PCI Segment Library for SynQuacer SoC with multiple RCs
+#
+# Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2017, Linaro Ltd. All rights reserved.<BR>
+# Copyright (c) 2019, Marvell International Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = SynQuacerPciSegmentLib
+  FILE_GUID                      = 207c599e-14e6-49dc-8196-b07ab35e3681
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PciSegmentLib
+  CONSTRUCTOR                    = Armada7k8kPciSegmentLibConstructor
+
+[Sources]
+  PciSegmentLib.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/Marvell/Marvell.dec
+
+[LibraryClasses]
+  ArmadaBoardDescLib
+  ArmadaSoCDescLib
+  BaseLib
+
+[Protocols]
+  gMarvellBoardDescProtocolGuid

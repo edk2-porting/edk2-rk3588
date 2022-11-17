@@ -1,0 +1,166 @@
+## @file
+# Component information file for BoardInitLib in PEI post memory phase.
+#
+# @copyright
+#  Copyright 2018 - 2021 Intel Corporation.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+# @par Specification Reference:
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = TypeWilsonCitySMTPeiBoardInitLib
+  FILE_GUID                      = 4A17DF4D-47B2-F538-CEE5-88A2FB46C5D3
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|PEIM
+  CONSTRUCTOR                    = TypeWilsonCitySMTPeiBoardInitLibConstructor
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  PeiServicesLib
+  HobLib
+  PeiServicesTablePointerLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  WhitleySiliconPkg/WhitleySiliconPkg.dec
+  WhitleyOpenBoardPkg/PlatformPkg.dec
+  WhitleySiliconPkg/SiliconPkg.dec
+  WhitleySiliconPkg/CpRcPkg.dec
+
+[Sources]
+  PeiBoardInitLib.c
+  GpioTable.c
+  PcdData.c
+  UsbOC.c
+  AcpiTablePcds.c
+  IioBifurInit.c
+  SlotTable.c
+  KtiEparam.c
+  PchEarlyUpdate.c
+  SoftStrapFixup.c
+  PeiBoardInit.h
+
+[FixedPcd]
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+
+  gOemSkuTokenSpaceGuid.PcdOemSkuBoardID
+  gOemSkuTokenSpaceGuid.PcdOemSkuSubBoardID
+  gOemSkuTokenSpaceGuid.PcdOemSkuBoardFamily
+
+  gOemSkuTokenSpaceGuid.PcdOemSkuFamilyName
+  gOemSkuTokenSpaceGuid.PcdOemSkuBoardName
+
+  gOemSkuTokenSpaceGuid.PcdOemSkuBoardSocketCount
+
+  gOemSkuTokenSpaceGuid.PcdOemSkuMaxChannel
+  gOemSkuTokenSpaceGuid.PcdOemSkuMaxDimmPerChannel
+  gOemSkuTokenSpaceGuid.PcdOemSkuDimmLayout
+
+  gOemSkuTokenSpaceGuid.PcdOemSkuPchUsbOverCurrentPort00
+  gOemSkuTokenSpaceGuid.PcdOemSkuPchUsbOverCurrentPort01
+  gOemSkuTokenSpaceGuid.PcdOemSkuPchUsbOverCurrentPort02
+  gOemSkuTokenSpaceGuid.PcdOemSkuPchUsbOverCurrentPort03
+  gOemSkuTokenSpaceGuid.PcdOemSkuPchUsbOverCurrentPort04
+  gOemSkuTokenSpaceGuid.PcdOemSkuPchUsbOverCurrentPort05
+  gOemSkuTokenSpaceGuid.PcdOemSkuPchUsbOverCurrentPort06
+  gOemSkuTokenSpaceGuid.PcdOemSkuPchUsbOverCurrentPort07
+  gOemSkuTokenSpaceGuid.PcdOemSkuPchUsbOverCurrentPort08
+  gOemSkuTokenSpaceGuid.PcdOemSkuPchUsbOverCurrentPort09
+  gOemSkuTokenSpaceGuid.PcdOemSkuPchUsbOverCurrentPort10
+  gOemSkuTokenSpaceGuid.PcdOemSkuPchUsbOverCurrentPort11
+  gOemSkuTokenSpaceGuid.PcdOemSkuPchUsbOverCurrentPort12
+  gOemSkuTokenSpaceGuid.PcdOemSkuPchUsbOverCurrentPort13
+
+  gOemSkuTokenSpaceGuid.PcdOemSkuPchUsbPortLengthPort00
+  gOemSkuTokenSpaceGuid.PcdOemSkuPchUsbPortLengthPort01
+  gOemSkuTokenSpaceGuid.PcdOemSkuPchUsbPortLengthPort02
+  gOemSkuTokenSpaceGuid.PcdOemSkuPchUsbPortLengthPort03
+  gOemSkuTokenSpaceGuid.PcdOemSkuPchUsbPortLengthPort04
+  gOemSkuTokenSpaceGuid.PcdOemSkuPchUsbPortLengthPort05
+  gOemSkuTokenSpaceGuid.PcdOemSkuPchUsbPortLengthPort06
+  gOemSkuTokenSpaceGuid.PcdOemSkuPchUsbPortLengthPort07
+  gOemSkuTokenSpaceGuid.PcdOemSkuPchUsbPortLengthPort08
+  gOemSkuTokenSpaceGuid.PcdOemSkuPchUsbPortLengthPort09
+  gOemSkuTokenSpaceGuid.PcdOemSkuPchUsbPortLengthPort10
+  gOemSkuTokenSpaceGuid.PcdOemSkuPchUsbPortLengthPort11
+  gOemSkuTokenSpaceGuid.PcdOemSkuPchUsbPortLengthPort12
+  gOemSkuTokenSpaceGuid.PcdOemSkuPchUsbPortLengthPort13
+
+  gOemSkuTokenSpaceGuid.PcdOemSkuPchUsb3OverCurrentPort00
+  gOemSkuTokenSpaceGuid.PcdOemSkuPchUsb3OverCurrentPort01
+  gOemSkuTokenSpaceGuid.PcdOemSkuPchUsb3OverCurrentPort02
+  gOemSkuTokenSpaceGuid.PcdOemSkuPchUsb3OverCurrentPort03
+  gOemSkuTokenSpaceGuid.PcdOemSkuPchUsb3OverCurrentPort04
+  gOemSkuTokenSpaceGuid.PcdOemSkuPchUsb3OverCurrentPort05
+
+  gOemSkuTokenSpaceGuid.PcdOemSkuAcpiName
+
+  gOemSkuTokenSpaceGuid.PcdOemSkuMrlAttnLed
+  gOemSkuTokenSpaceGuid.PcdOemSkuSdpActiveFlag
+
+  gOemSkuTokenSpaceGuid.PcdOemSku_GPIO_USE_SEL_VAL
+  gOemSkuTokenSpaceGuid.PcdOemSku_GPIO_USE_SEL2_VAL
+  gOemSkuTokenSpaceGuid.PcdOemSku_GPIO_USE_SEL3_VAL
+  gOemSkuTokenSpaceGuid.PcdOemSku_GPIO_IO_SEL_VAL
+  gOemSkuTokenSpaceGuid.PcdOemSku_GPIO_IO_SEL2_VAL
+  gOemSkuTokenSpaceGuid.PcdOemSku_GPIO_IO_SEL3_VAL
+  gOemSkuTokenSpaceGuid.PcdOemSku_GPIO_LVL_VAL
+  gOemSkuTokenSpaceGuid.PcdOemSku_GPIO_LVL2_VAL
+  gOemSkuTokenSpaceGuid.PcdOemSku_GPIO_LVL3_VAL
+  gOemSkuTokenSpaceGuid.PcdOemSku_GPIO_INV_VAL
+  gOemSkuTokenSpaceGuid.PcdOemSku_GPIO_BLINK_VAL
+  gOemSkuTokenSpaceGuid.PcdOemSku_GPIO_TABLE_SIZE
+
+  gOemSkuTokenSpaceGuid.PcdOemSku_Reg78Data32
+
+  gOemSkuTokenSpaceGuid.PcdOemSkuClockGenerator00
+  gOemSkuTokenSpaceGuid.PcdOemSkuClockGenerator01
+  gOemSkuTokenSpaceGuid.PcdOemSkuClockGenerator02
+  gOemSkuTokenSpaceGuid.PcdOemSkuClockGenerator03
+  gOemSkuTokenSpaceGuid.PcdOemSkuClockGenerator04
+  gOemSkuTokenSpaceGuid.PcdOemSkuClockGenerator05
+  gOemSkuTokenSpaceGuid.PcdOemSkuClockGenerator06
+  gOemSkuTokenSpaceGuid.PcdOemSkuClockGenerator07
+  gOemSkuTokenSpaceGuid.PcdOemSkuClockGenerator08
+  gOemSkuTokenSpaceGuid.PcdOemSkuClockGenerator09
+  gOemSkuTokenSpaceGuid.PcdOemSkuClockGenerator10
+  gOemSkuTokenSpaceGuid.PcdOemSkuClockGenerator11
+
+  gOemSkuTokenSpaceGuid.PcdOemSkuPlatformName
+  gOemSkuTokenSpaceGuid.PcdOemSkuPlatformNameSize
+  gOemSkuTokenSpaceGuid.PcdOemSkuPlatformFeatureFlag
+  gOemSkuTokenSpaceGuid.PcdOemSkuAssertPostGPIO
+  gOemSkuTokenSpaceGuid.PcdOemSkuAssertPostGPIOValue
+  gOemSkuTokenSpaceGuid.PcdOemSkuBmcPciePortNumber
+  gOemSkuTokenSpaceGuid.PcdOemTableIdXhci
+  gOemSkuTokenSpaceGuid.PcdOemSkuUplinkPortIndex
+  gPlatformTokenSpaceGuid.PcdBoardTypeBitmask
+  gPlatformTokenSpaceGuid.PcdWilsonCitySvidVrP1V8
+  gPlatformTokenSpaceGuid.PcdWilsonCitySvidVrVccAna
+  gEfiCpRcPkgTokenSpaceGuid.PcdImonAddr
+  gEfiCpRcPkgTokenSpaceGuid.PcdMemSrvidMap
+
+  gPlatformTokenSpaceGuid.PcdMemInterposerMap
+  gPlatformTokenSpaceGuid.PcdOnboardVideoPciVendorId
+  gPlatformTokenSpaceGuid.PcdOnboardVideoPciDeviceId
+
+[Ppis]
+  gUbaConfigDatabasePpiGuid
+  gDynamicSiLibraryPpiGuid                  ## CONSUMES
+
+[Guids]
+  gPlatformGpioInitDataGuid
+
+[Depex]
+  gDynamicSiLibraryPpiGuid

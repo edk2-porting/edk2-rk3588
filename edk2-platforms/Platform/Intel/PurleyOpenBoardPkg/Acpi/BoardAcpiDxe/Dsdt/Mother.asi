@@ -1,0 +1,202 @@
+/** @file
+
+Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+Device (DMAC) {
+  Name (_HID, EISAID("PNP0200"))
+  Name (_CRS,ResourceTemplate() {
+    IO(Decode16, 0x0, 0x0, 0, 0x10)
+    IO(Decode16, 0x81, 0x81, 0, 0x3)
+    IO(Decode16, 0x87, 0x87, 0, 0x1)
+    IO(Decode16, 0x89, 0x89, 0, 0x3)
+    IO(Decode16, 0x8f, 0x8f, 0, 0x1)
+    IO(Decode16, 0xc0, 0xc0, 0, 0x20)
+    DMA(Compatibility,NotBusMaster,Transfer8) {4}
+  })
+}
+
+Device (RTC) {
+  Name (_HID,EISAID("PNP0B00"))
+  Name (_CRS,ResourceTemplate() {
+    IO(Decode16,0x70,0x70,0x01,0x02)
+    IO(Decode16,0x74,0x74,0x01,0x04)
+    IRQNoFlags(){8}
+  })
+}
+
+Device (PIC) {
+  Name (_HID,EISAID("PNP0000"))
+  Name (_CRS,ResourceTemplate() {
+    IO(Decode16,0x20,0x20,0x01,0x1E)        // length of 1Eh includes all aliases
+    IO(Decode16,0xA0,0xA0,0x01,0x1E)
+    IO(Decode16,0x4D0,0x4D0,0x01,0x02)
+  })
+}
+
+Device (FPU) {
+  Name (_HID,EISAID("PNP0C04"))
+  Name (_CRS,ResourceTemplate() {
+    IO(Decode16,0xF0,0xF0,0x01,0x1)
+    IRQNoFlags(){13}
+  })
+}
+
+Device(TMR)
+{
+  Name(_HID,EISAID("PNP0100"))
+
+  Name(_CRS,ResourceTemplate() {
+    IO(Decode16,0x40,0x40,0x01,0x04)
+    IO(Decode16,0x50,0x50,0x01,0x04)        // alias
+    IRQNoFlags(){0}
+  })
+}
+
+Device (SPKR) {
+  Name (_HID,EISAID("PNP0800"))
+  Name (_CRS,ResourceTemplate() {
+    IO(Decode16,0x61,0x61,0x01,0x01)
+  })
+}
+
+//
+// all "PNP0C02" devices- pieces that don't fit anywhere else
+//
+Device(XTRA) {
+  Name(_HID,EISAID("PNP0C02"))        // Generic motherboard devices
+  Name(_CRS,
+    ResourceTemplate() {
+      IO(Decode16,0x500,0x500,0x01,0x40)                  // GPIO space, ICH5
+      IO(Decode16,0x400,0x400,0x01,0x80)                  // PM IO, ICH5
+      IO(Decode16,0x92,0x92,0x01,0x01)                    // INIT & Fast A20 port, ICH5
+      //
+      // Resource conflict with COM Port
+      //
+      //IO(Decode16,0x680,0x680,0x01,0x80)                  // Runtime registers, National SIO
+      IO(Decode16,0x10,0x10,0x01,0x10)
+      IO(Decode16,0x72,0x72,0x01,0x02)
+      IO(Decode16,0x80,0x80,0x01,0x01)
+      IO(Decode16,0x84,0x84,0x01,0x03)
+      IO(Decode16,0x88,0x88,0x01,0x01)
+      IO(Decode16,0x8c,0x8c,0x01,0x03)
+      IO(Decode16,0x90,0x90,0x01,0x10)
+      //
+      // SMBus decode range 
+      //
+      IO(Decode16,0x540,0x540,0x01,0x40)
+      //
+      // Pilot Mail Box decode range
+      //
+      IO(Decode16,0x600,0x600,0x01,0x20)
+      //
+      // BMC KCS decode range
+      //
+      IO(Decode16,0xCA0,0xCA0,0x01,0x6)
+      //
+      // Performance Status and control ports decode range
+      //
+      IO(Decode16,0x880,0x880,0x01,0x4)
+
+      //IO Descriptor added for range 800-81f for S501302
+      IO(Decode16,0x800,0x800,0x01,0x20)
+      //IO Descriptor added for range 2F8-2FF for S501706
+      //IO(Decode16,0x2F8,0x2F8,0x01,0x08)
+      //IO(Decode16,0x60,0x60,0x01,0x01)
+      //IO(Decode16,0x64,0x64,0x01,0x01)
+
+      //PCH_ACPI_FLAG: RCBA is not supported in SPT
+      //
+      // RCBA memory range
+      //
+      //Memory32Fixed (ReadOnly, 0xFED1C000, 0x6FFFF) // ICH9 bios spec section 5.10 - reserved memory address space.
+      Memory32Fixed (ReadOnly, 0xFED1C000, 0x24000) // ICH9 bios spec section 5.10 - reserved memory address space.
+      // Leave FED40000-FED45000 for TPM
+      Memory32Fixed (ReadOnly, 0xFED45000, 0x47000) // ICH9 bios spec section 5.10 - reserved memory address space.
+
+      //
+      // FLASH range
+      //
+      Memory32Fixed (ReadOnly, 0xFF000000, 0x1000000) //16MB as per IIO spec
+
+      //
+      // Local APIC range(0xFEE0_0000 to 0xFEEF_FFFF)
+      //
+      Memory32Fixed (ReadOnly, 0xFEE00000, 0x100000)
+
+      //
+      // HECI range, 32 bytes from HECI1_BASE_ADDRESS (0xFE90_0000 to 0xFE90_001F)
+      //
+      //Memory32Fixed (ReadWrite, 0xFE900000, 0x20)
+      Memory32Fixed (ReadWrite, 0xFED12000, 0x10)
+
+      //
+      // HECI range, 32 bytes from HECI2_BASE_ADDRESS (0xFEA0_0000 to 0xFEA0_001F)
+      //
+      //Memory32Fixed (ReadWrite, 0xFEA00000, 0x20)
+      Memory32Fixed (ReadWrite, 0xFED12010, 0x10)
+
+      //
+      // IIO RCBA memory range
+      //
+      Memory32Fixed (ReadOnly, 0xFED1B000, 0x1000)
+    }
+  )
+}
+
+//
+// High Performance Event Timer (HPET)
+//
+Device (HPET) {
+  Name (_HID, EisaId ("PNP0103"))
+
+  Method (_STA, 0, NotSerialized) {
+    If (\HPTE) {
+      Return (0x0F)
+    } Else {
+      Return (0x00)
+    }
+  }
+
+  Name (CRS0, ResourceTemplate () {
+    Memory32Fixed (ReadWrite, 0xFED00000, 0x00000400)
+  })
+
+  Name (CRS1, ResourceTemplate () {
+    Memory32Fixed (ReadWrite, 0xFED01000, 0x00000400)
+  })
+
+  Name (CRS2, ResourceTemplate () {
+    Memory32Fixed (ReadWrite, 0xFED02000, 0x00000400)
+  })
+
+  Name (CRS3, ResourceTemplate () {
+    Memory32Fixed (ReadWrite, 0xFED03000, 0x00000400)
+  })
+
+  //
+  // Owning control method can't be re-entrant, so _CRS must be Serialized
+  //
+  Method (_CRS, 0, Serialized) {
+    Switch (ToInteger(\HPTB)) {
+      Case (0xFED00000) {
+        Return (CRS0)
+      }
+
+      Case (0xFED01000) {
+        Return (CRS1)
+      }
+
+      Case (0xFED02000) {
+        Return (CRS2)
+      }
+
+      Case (0xFED03000) {
+        Return (CRS3)
+      }
+    }
+    Return (CRS0)
+  }
+}

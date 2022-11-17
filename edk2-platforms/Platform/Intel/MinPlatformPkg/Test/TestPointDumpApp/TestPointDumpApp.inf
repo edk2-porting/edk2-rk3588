@@ -1,0 +1,40 @@
+## @file
+#
+# Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = TestPointDumpApp
+  FILE_GUID                      = C19F7B48-9D41-4975-A9CC-BC42B4DC3732
+  MODULE_TYPE                    = UEFI_APPLICATION
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = TestPointDumpAppEntrypoint
+
+[Sources]
+  TestPointDump.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+
+[LibraryClasses]
+  UefiApplicationEntryPoint
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  DebugLib
+  UefiBootServicesTableLib
+  UefiLib
+  
+[Guids]
+  gAdapterInfoPlatformTestPointGuid
+
+[Protocols]
+  gEfiAdapterInformationProtocolGuid
+
+[Depex]
+  TRUE

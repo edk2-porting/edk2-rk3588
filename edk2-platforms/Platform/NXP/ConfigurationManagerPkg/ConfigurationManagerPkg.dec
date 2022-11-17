@@ -1,0 +1,23 @@
+#  ConfigurationManager.dec
+#
+#  Copyright 2020 NXP
+#  Copyright 2020 Puresoftware Ltd
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+[Defines]
+  PACKAGE_NAME                   = ConfigurationManagerPkg
+  PACKAGE_GUID                   = 0222b1b1-247f-404e-bdc3-baab65f2ddd3
+
+################################################################################
+#
+# Include Section - list of Include Paths that are provided by this package.
+#                   Comments are used for Keywords and Module Types.
+#
+# Supported Module Types:
+#  BASE SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
+#
+################################################################################
+[Includes]
+  Include

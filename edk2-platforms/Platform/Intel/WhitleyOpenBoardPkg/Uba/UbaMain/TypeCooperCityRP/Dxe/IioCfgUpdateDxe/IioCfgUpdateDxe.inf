@@ -1,0 +1,48 @@
+## @file
+#
+# @copyright
+# Copyright 2018 - 2021 Intel Corporation. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = IioCfgUpdateDxeCooperCityRP
+  FILE_GUID                      = 073018E2-4A0A-3D61-8EA7-B08321C9364B
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = IioCfgUpdateEntry
+
+[Sources]
+  IioCfgUpdateDxe.h
+  IioCfgUpdateDxe.c
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  DebugLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiRuntimeServicesTableLib
+  UefiLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  WhitleySiliconPkg/WhitleySiliconPkg.dec
+  WhitleySiliconPkg/CpRcPkg.dec
+  WhitleySiliconPkg/SiliconPkg.dec
+  WhitleyOpenBoardPkg/PlatformPkg.dec
+
+[Guids]
+
+[FixedPcd]
+  gEfiCpRcPkgTokenSpaceGuid.PcdMaxCpuSocketCount
+
+[Protocols]
+  gUbaConfigDatabaseProtocolGuid
+
+[Depex]
+  gEfiPlatformTypeCooperCityRPProtocolGuid

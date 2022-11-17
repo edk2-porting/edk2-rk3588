@@ -1,0 +1,125 @@
+/** @file
+
+Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+  Name (PRU2, Package() {
+    //
+    // PCIe2 PortA/NTB  
+    //
+    Package() { 0x0000FFFF, 0, \_SB.PC00.LPC0.LNKA, 0 },
+    Package() { 0x0000FFFF, 1, \_SB.PC00.LPC0.LNKB, 0 },
+    Package() { 0x0000FFFF, 2, \_SB.PC00.LPC0.LNKC, 0 },
+    Package() { 0x0000FFFF, 3, \_SB.PC00.LPC0.LNKD, 0 },
+
+    Package() { 0x0008FFFF, 0, \_SB.PC00.LPC0.LNKA, 0 },
+    Package() { 0x0008FFFF, 1, \_SB.PC00.LPC0.LNKB, 0 },
+    Package() { 0x0008FFFF, 2, \_SB.PC00.LPC0.LNKC, 0 },
+    Package() { 0x0008FFFF, 3, \_SB.PC00.LPC0.LNKD, 0 },
+
+    Package() { 0x0009FFFF, 0, \_SB.PC00.LPC0.LNKA, 0 },
+    Package() { 0x0009FFFF, 1, \_SB.PC00.LPC0.LNKB, 0 },
+    Package() { 0x0009FFFF, 2, \_SB.PC00.LPC0.LNKC, 0 },
+    Package() { 0x0009FFFF, 3, \_SB.PC00.LPC0.LNKD, 0 },
+
+    Package() { 0x000AFFFF, 0, \_SB.PC00.LPC0.LNKA, 0 },
+    Package() { 0x000AFFFF, 1, \_SB.PC00.LPC0.LNKB, 0 },
+    Package() { 0x000AFFFF, 2, \_SB.PC00.LPC0.LNKC, 0 },
+    Package() { 0x000AFFFF, 3, \_SB.PC00.LPC0.LNKD, 0 },
+
+    Package() { 0x000BFFFF, 0, \_SB.PC00.LPC0.LNKA, 0 },
+    Package() { 0x000BFFFF, 1, \_SB.PC00.LPC0.LNKB, 0 },
+    Package() { 0x000BFFFF, 2, \_SB.PC00.LPC0.LNKC, 0 },
+    Package() { 0x000BFFFF, 3, \_SB.PC00.LPC0.LNKD, 0 },
+
+    Package() { 0x000CFFFF, 0, \_SB.PC00.LPC0.LNKA, 0 },
+    Package() { 0x000CFFFF, 1, \_SB.PC00.LPC0.LNKB, 0 },
+    Package() { 0x000CFFFF, 2, \_SB.PC00.LPC0.LNKC, 0 },
+    Package() { 0x000CFFFF, 3, \_SB.PC00.LPC0.LNKD, 0 },
+
+    Package() { 0x000DFFFF, 0, \_SB.PC00.LPC0.LNKA, 0 },
+    Package() { 0x000DFFFF, 1, \_SB.PC00.LPC0.LNKB, 0 },
+    Package() { 0x000DFFFF, 2, \_SB.PC00.LPC0.LNKC, 0 },
+    Package() { 0x000DFFFF, 3, \_SB.PC00.LPC0.LNKD, 0 },
+
+
+    Package() { 0x0016FFFF, 0, \_SB.PC00.LPC0.LNKA, 0 },
+    Package() { 0x0016FFFF, 1, \_SB.PC00.LPC0.LNKB, 0 },
+    Package() { 0x0016FFFF, 2, \_SB.PC00.LPC0.LNKC, 0 },
+    Package() { 0x0016FFFF, 3, \_SB.PC00.LPC0.LNKD, 0 },
+
+    Package() { 0x0017FFFF, 0, \_SB.PC00.LPC0.LNKA, 0 },
+    Package() { 0x0017FFFF, 1, \_SB.PC00.LPC0.LNKB, 0 },
+    Package() { 0x0017FFFF, 2, \_SB.PC00.LPC0.LNKC, 0 },
+    Package() { 0x0017FFFF, 3, \_SB.PC00.LPC0.LNKD, 0 },
+
+  })
+
+  Name (ARU2, Package() {
+    //
+    // PCIe2 PortA/NTB  
+    //
+    Package() { 0x0000FFFF, 0, 0, 16 },
+    Package() { 0x0000FFFF, 1, 0, 17 },
+    Package() { 0x0000FFFF, 2, 0, 18 },
+    Package() { 0x0000FFFF, 3, 0, 19 },
+
+    Package() { 0x0008FFFF, 0, 0, 16 },
+    Package() { 0x0008FFFF, 1, 0, 17 },
+    Package() { 0x0008FFFF, 2, 0, 18 },
+    Package() { 0x0008FFFF, 3, 0, 19 },
+
+    Package() { 0x0009FFFF, 0, 0, 16 },
+    Package() { 0x0009FFFF, 1, 0, 17 },
+    Package() { 0x0009FFFF, 2, 0, 18 },
+    Package() { 0x0009FFFF, 3, 0, 19 },
+
+    Package() { 0x000AFFFF, 0, 0, 16 },
+    Package() { 0x000AFFFF, 1, 0, 17 },
+    Package() { 0x000AFFFF, 2, 0, 18 },
+    Package() { 0x000AFFFF, 3, 0, 19 },
+
+    Package() { 0x000BFFFF, 0, 0, 16 },
+    Package() { 0x000BFFFF, 1, 0, 17 },
+    Package() { 0x000BFFFF, 2, 0, 18 },
+    Package() { 0x000BFFFF, 3, 0, 19 },
+
+    Package() { 0x000CFFFF, 0, 0, 16 },
+    Package() { 0x000CFFFF, 1, 0, 17 },
+    Package() { 0x000CFFFF, 2, 0, 18 },
+    Package() { 0x000CFFFF, 3, 0, 19 },
+
+    Package() { 0x000DFFFF, 0, 0, 16 },
+    Package() { 0x000DFFFF, 1, 0, 17 },
+    Package() { 0x000DFFFF, 2, 0, 18 },
+    Package() { 0x000DFFFF, 3, 0, 19 },
+
+
+    Package() { 0x0016FFFF, 0, 0, 16 },
+    Package() { 0x0016FFFF, 1, 0, 17 },
+    Package() { 0x0016FFFF, 2, 0, 18 },
+    Package() { 0x0016FFFF, 3, 0, 19 },
+
+    Package() { 0x0017FFFF, 0, 0, 16 },
+    Package() { 0x0017FFFF, 1, 0, 17 },
+    Package() { 0x0017FFFF, 2, 0, 18 },
+    Package() { 0x0017FFFF, 3, 0, 19 },
+
+  })
+
+  //
+  // Devices 8 - 31 on each stack
+  //
+  Device (UNC2) {
+    Name (_UID, "UNCORE2")
+    Name (_ADR, 0x00000000)
+    Method (_PRT, 0) {
+      If (LEqual(PICM, Zero)) {
+        Return (PRU2)
+      }
+      Return (ARU2)
+    }
+  }
+

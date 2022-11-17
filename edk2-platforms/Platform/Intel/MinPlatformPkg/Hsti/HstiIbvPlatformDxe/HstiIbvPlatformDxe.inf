@@ -1,0 +1,48 @@
+### @file
+#  Component description file for Hsti IBV Driver
+#
+# Copyright (c) 2017-2019, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+###
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = HstiPlatformDxe
+  FILE_GUID                      = 00B46EC9-2712-486B-A6A4-E2933581C28B
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = HstiPlatformDxeEntrypoint
+
+[Sources]
+  HstiIbvPlatformDxe.c
+  FirmwareTrustConfigurationCryptoStrength.c
+  NoTestKeyVerification.c
+  FirmwareVersionRollbackProtection.c
+  SecureBootBypass.c
+  ExternalDeviceDmaProtection.c
+  MorSupport.c
+  HstiIbvPlatformDxe.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  BaseLib
+  UefiLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  DebugLib
+  UefiBootServicesTableLib
+  HstiLib
+
+[Pcd]
+  gMinPlatformPkgTokenSpaceGuid.PcdHstiIbvPlatformFeature
+
+[Protocols]
+
+[Depex]
+  TRUE

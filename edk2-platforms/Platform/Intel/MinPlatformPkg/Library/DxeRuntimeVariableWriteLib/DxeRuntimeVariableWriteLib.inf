@@ -1,0 +1,49 @@
+## @file
+# Component description file for DXE Variable Write Lib
+#
+# This library provides phase agnostic access to the UEFI Variable Services.
+# This is done by implementing a wrapper on top of the phase specific mechanism
+# for writing to UEFI variables. For example, the DXE implementation accesses
+# the UEFI Runtime Services Table, and the SMM implementation uses
+# EFI_SMM_VARIABLE_PROTOCOL.
+#
+# Using this library allows code to be written in a generic manner that can be
+# used in DXE or SMM without modification.
+#
+# Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeRuntimeVariableWriteLib
+  FILE_GUID                      = 9681E383-5FD4-47A4-B4F8-6651EE603E4E
+  VERSION_STRING                 = 1.0
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  LIBRARY_CLASS                  = VariableWriteLib|DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR                    = DxeRuntimeVariableWriteLibConstructor
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[Sources]
+  DxeRuntimeVariableWriteLib.c
+
+[LibraryClasses]
+  DebugLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+
+[Guids]
+  gEfiEventExitBootServicesGuid       ## CONSUMES ## Event
+
+[Protocols]
+  gEfiVariableWriteArchProtocolGuid   ## CONSUMES
+  gEdkiiVariableLockProtocolGuid      ## CONSUMES
+
+[Depex]
+  gEfiVariableWriteArchProtocolGuid AND gEdkiiVariableLockProtocolGuid

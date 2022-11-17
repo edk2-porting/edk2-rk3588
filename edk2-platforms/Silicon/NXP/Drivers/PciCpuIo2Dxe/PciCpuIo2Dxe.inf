@@ -1,0 +1,40 @@
+## @file
+#  Produces the CPU I/O 2 Protocol by using the services of the I/O Library.
+#
+# Copyright 2018, 2020 NXP
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = PciCpuIo2Dxe
+  FILE_GUID                      = 7bff18d7-9aae-434b-9c06-f10a7e157eac
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = PciCpuIo2Initialize
+
+[Sources]
+  PciCpuIo2Dxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  Silicon/NXP/NxpQoriqLs.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  IoLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Pcd]
+  gNxpQoriqLsTokenSpaceGuid.PcdPciExp1BaseAddr
+  gNxpQoriqLsTokenSpaceGuid.PcdNumPciController
+
+[Protocols]
+  gEfiCpuIo2ProtocolGuid                         ## PRODUCES
+
+[Depex]
+  TRUE

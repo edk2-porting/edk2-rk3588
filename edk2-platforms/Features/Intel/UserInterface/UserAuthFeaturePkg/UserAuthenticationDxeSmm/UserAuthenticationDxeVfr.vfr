@@ -1,0 +1,39 @@
+///** @file
+// UserAuthentication formset.
+//
+// Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+//**/
+
+#include <Guid/HiiPlatformSetupFormset.h>
+#include "UserAuthenticationDxeFormset.h"
+
+formset
+  guid      = USER_AUTHENTICATION_FORMSET_GUID,
+  title     = STRING_TOKEN(STR_FORM_SET_TITLE),
+  help      = STRING_TOKEN(STR_FORM_SET_TITLE_HELP),
+  classguid = EFI_HII_PLATFORM_SETUP_FORMSET_GUID,
+
+  form formid = 1,
+      title  = STRING_TOKEN(STR_FORM_TITLE);
+
+      grayoutif  TRUE;
+        text
+          help  = STRING_TOKEN(STR_ADMIN_PASSWORD_STS_HELP),
+          text  = STRING_TOKEN(STR_ADMIN_PASSWORD_STS_PROMPT),
+          text  = STRING_TOKEN(STR_ADMIN_PASSWORD_STS_CONTENT);
+      endif;
+
+      password
+          prompt  = STRING_TOKEN(STR_ADMIN_PASSWORD_PROMPT),
+          help    = STRING_TOKEN(STR_ADMIN_PASSWORD_HELP),
+          flags   = INTERACTIVE,
+          key     = ADMIN_PASSWORD_KEY_ID,
+          minsize = MIN_PASSWORD_LEN,
+          maxsize = MAX_PASSWORD_LEN,
+      endpassword;
+
+  endform;
+
+endformset;

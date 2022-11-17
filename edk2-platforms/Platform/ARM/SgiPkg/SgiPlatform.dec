@@ -1,0 +1,94 @@
+#
+#  Copyright (c) 2018-2020, ARM Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+[Defines]
+  DEC_SPECIFICATION              = 0x0001001A
+  PACKAGE_NAME                   = SgiPkg
+  PACKAGE_GUID                   = e6e0f26c-0df9-4f6c-a382-37ded896c6e9
+  PACKAGE_VERSION                = 0.1
+
+################################################################################
+#
+# Include Section - list of Include Paths that are provided by this package.
+#                   Comments are used for Keywords and Module Types.
+#
+# Supported Module Types:
+#  BASE SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
+#
+################################################################################
+[Includes.common]
+  Include                        # Root include for the package
+
+[Guids.common]
+  # ARM Sgi Platform ID descriptor
+  gArmSgiPlatformIdDescriptorGuid = { 0xf56f152a, 0xad2a, 0x11e6, { 0xb1, 0xa7, 0x00, 0x50, 0x56, 0x3c, 0x44, 0xcc } }
+  gArmSgiTokenSpaceGuid      = { 0x577d6941, 0xaea1, 0x40b4, { 0x90, 0x93, 0x2a, 0x86, 0x61, 0x72, 0x5a, 0x57 } }
+  gArmSgiAcpiTablesGuid = { 0xc712719a, 0x0aaf, 0x438c, { 0x9c, 0xdd, 0x35, 0xab, 0x4d, 0x60, 0x20, 0x7d } }
+
+[PcdsFeatureFlag.common]
+  gArmSgiTokenSpaceGuid.PcdVirtioBlkSupported|FALSE|BOOLEAN|0x00000001
+  gArmSgiTokenSpaceGuid.PcdVirtioNetSupported|FALSE|BOOLEAN|0x00000010
+
+[PcdsFixedAtBuild]
+  gArmSgiTokenSpaceGuid.PcdDramBlock2Base|0|UINT64|0x00000002
+  gArmSgiTokenSpaceGuid.PcdDramBlock2Size|0|UINT64|0x00000003
+
+  # Virtio Block device
+  gArmSgiTokenSpaceGuid.PcdVirtioBlkBaseAddress|0x00000000|UINT32|0x00000004
+  gArmSgiTokenSpaceGuid.PcdVirtioBlkSize|0x00000000|UINT32|0x00000005
+  gArmSgiTokenSpaceGuid.PcdVirtioBlkInterrupt|0x00000000|UINT32|0x00000006
+
+  # Virtio Network device
+  gArmSgiTokenSpaceGuid.PcdVirtioNetBaseAddress|0x00000000|UINT32|0x00000007
+  gArmSgiTokenSpaceGuid.PcdVirtioNetSize|0x00000000|UINT32|0x00000008
+  gArmSgiTokenSpaceGuid.PcdVirtioNetInterrupt|0x00000000|UINT32|0x00000009
+
+  # Chip count on the platform
+  gArmSgiTokenSpaceGuid.PcdChipCount|1|UINT32|0x0000000B
+
+  # GIC
+  gArmSgiTokenSpaceGuid.PcdGicSize|0|UINT64|0x0000000A
+
+  gArmSgiTokenSpaceGuid.PcdSmcCs0Base|0|UINT64|0x0000000C
+  gArmSgiTokenSpaceGuid.PcdSmcCs1Base|0|UINT64|0x0000000D
+  gArmSgiTokenSpaceGuid.PcdSmcCs2Base|0|UINT64|0x00001000
+  gArmSgiTokenSpaceGuid.PcdSysPeriphBase|0x00000000|UINT64|0x0000000E
+  gArmSgiTokenSpaceGuid.PcdSysPeriphSysRegBase|0x0|UINT64|0x0000000F
+
+  # Counter, Timer and Watchdog
+  gArmSgiTokenSpaceGuid.PcdGtFrame0Gsiv|0|UINT32|0x00000011
+  gArmSgiTokenSpaceGuid.PcdGtFrame1Gsiv|0|UINT32|0x00000012
+  gArmSgiTokenSpaceGuid.PcdTimerBase0Base|0|UINT32|0x00000015
+  gArmSgiTokenSpaceGuid.PcdTimerBase0Size|0|UINT32|0x00000016
+  gArmSgiTokenSpaceGuid.PcdTimerControlBase|0|UINT32|0x00000017
+  gArmSgiTokenSpaceGuid.PcdTimerControlSize|0|UINT32|0x00000018
+  gArmSgiTokenSpaceGuid.PcdTimerCounterReadBase|0|UINT32|0x00000019
+  gArmSgiTokenSpaceGuid.PcdTimerCounterReadSize|0|UINT32|0x0000001A
+  gArmSgiTokenSpaceGuid.PcdWdogBase|0|UINT32|0x0000001B
+  gArmSgiTokenSpaceGuid.PcdWdogSize|0|UINT32|0x0000001C
+  gArmSgiTokenSpaceGuid.PcdWdogWS0Gsiv|0|UINT32|0x00000013
+  gArmSgiTokenSpaceGuid.PcdWdogWS1Gsiv|0|UINT32|0x00000014
+
+  # SMMU
+  gArmSgiTokenSpaceGuid.PcdSmmuBase|0|UINT32|0x0000001D
+  gArmSgiTokenSpaceGuid.PcdSmmuSize|0|UINT32|0x0000001E
+
+  # GPIO Controller
+  gArmSgiTokenSpaceGuid.PcdGpioController0BaseAddress|0|UINT32|0x0000001F
+  gArmSgiTokenSpaceGuid.PcdGpioController0Size|0|UINT32|0x00000020
+  gArmSgiTokenSpaceGuid.PcdGpioController0Interrupt|0|UINT32|0x00000021
+
+  # SP804 Dual Timer
+  gArmSgiTokenSpaceGuid.PcdSp804DualTimerBaseAddress|0|UINT32|0x00000022
+  gArmSgiTokenSpaceGuid.PcdSp804DualTimerSize|0|UINT32|0x00000023
+  gArmSgiTokenSpaceGuid.PcdSp804DualTimerInterrupt|0|UINT32|0x00000024
+
+  # ACPI platform wide _OSC
+  gArmSgiTokenSpaceGuid.PcdOscLpiEnable|0|UINT32|0x00000025
+  gArmSgiTokenSpaceGuid.PcdOscCppcEnable|0|UINT32|0x00000026
+
+[Ppis]
+  gNtFwConfigDtInfoPpiGuid     = { 0x6f606eb3, 0x9123, 0x4e15, { 0xa8, 0x9b, 0x0f, 0xac, 0x66, 0xef, 0xd0, 0x17 } }

@@ -1,0 +1,47 @@
+/** @file
+  Serial Port Console Redirection Table (SPCR)
+
+  Copyright (c) 2017, Linaro Limited. All rights reserved.
+  Copyright (c) 2019, Marvell International Ltd. and its affiliates.
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+  Based on the files under ArmPlatformPkg/ArmJunoPkg/AcpiTables/
+
+**/
+
+#include <IndustryStandard/SerialPortConsoleRedirectionTable.h>
+#include <Library/AcpiLib.h>
+
+#include "AcpiHeader.h"
+
+EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE Spcr = {
+  __ACPI_HEADER(EFI_ACPI_6_1_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_SIGNATURE,
+                EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE,
+                EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_REVISION
+  ),
+  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERFACE_TYPE_16450,  // InterfaceType
+  { EFI_ACPI_RESERVED_BYTE,
+    EFI_ACPI_RESERVED_BYTE,
+    EFI_ACPI_RESERVED_BYTE },                                           // Reserved1[3]
+  MV_UART_AS32 (FixedPcdGet64(PcdSerialRegisterBase)),                  // BaseAddress
+  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_GIC,    // InterruptType
+  0,                                                                    // Irq
+  51,                                                                   // GlobalSystemInterrupt
+  0,                                                                    // BaudRate
+  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_PARITY_NO_PARITY,      // Parity
+  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_STOP_BITS_1,           // StopBits
+  0,                                                                    // FlowControl
+  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_TERMINAL_TYPE_ANSI,    // TerminalType
+  EFI_ACPI_RESERVED_BYTE,                                               // Language
+  0xFFFF,                                                               // PciDeviceId
+  0xFFFF,                                                               // PciVendorId
+  0,                                                                    // PciBusNumber
+  0,                                                                    // PciDeviceNumber
+  0,                                                                    // PciFunctionNumber
+  0,                                                                    // PciFlags
+  0,                                                                    // PciSegment
+  EFI_ACPI_RESERVED_DWORD                                               // Reserved2
+};
+
+VOID CONST * CONST ReferenceAcpiTable = &Spcr;

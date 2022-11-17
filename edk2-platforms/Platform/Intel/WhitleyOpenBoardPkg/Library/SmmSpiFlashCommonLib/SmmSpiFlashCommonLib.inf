@@ -1,0 +1,57 @@
+## @file
+# SMM Library instance of Spi Flash Common Library Class
+#
+# @copyright
+# Copyright (c) 2017 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010017
+  BASE_NAME                      = SmmSpiFlashCommonLib
+  FILE_GUID                      = 9632D96E-E849-4217-9217-DC500B8AAE47
+  VERSION_STRING                 = 1.0
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  LIBRARY_CLASS                  = SpiFlashCommonLib|DXE_SMM_DRIVER
+  CONSTRUCTOR                    = SmmSpiFlashCommonLibConstructor
+#
+# The following information is for reference only and not required by the build tools.
+#
+# VALID_ARCHITECTURES = IA32 X64
+#
+
+[LibraryClasses]
+  PciLib
+  IoLib
+  MemoryAllocationLib
+  BaseLib
+  UefiLib
+  SmmServicesTableLib
+  BaseMemoryLib
+  DebugLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  WhitleySiliconPkg/WhitleySiliconPkg.dec
+  WhitleySiliconPkg/CpRcPkg.dec
+  WhitleyOpenBoardPkg/PlatformPkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+  WhitleySiliconPkg/SiliconPkg.dec
+
+[Pcd]
+  gMinPlatformPkgTokenSpaceGuid.PcdFlashAreaBaseAddress  ## CONSUMES
+  gMinPlatformPkgTokenSpaceGuid.PcdFlashAreaSize         ## CONSUMES
+
+[Sources]
+  SpiFlashCommonSmmLib.c
+  SpiFlashCommon.c
+
+[Protocols]
+  gPchSmmSpiProtocolGuid                        ## CONSUMES
+  gDynamicSiLibrarySmmProtocolGuid              ## CONSUMES
+
+[Depex.X64.DXE_SMM_DRIVER]
+  gPchSmmSpiProtocolGuid AND
+  gEfiSmmSwDispatch2ProtocolGuid AND
+  gDynamicSiLibrarySmmProtocolGuid

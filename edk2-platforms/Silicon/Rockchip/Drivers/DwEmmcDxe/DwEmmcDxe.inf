@@ -1,0 +1,59 @@
+#/** @file
+#  INF file for the eMMC Host Protocol implementation for the DesignWare MMC.
+#
+#  WARNING:
+#  This driver fails to follow the UEFI driver model without a good
+#  reason, and only remains in the tree because it is still used by
+#  a small number of platforms. It will be removed when no longer used.
+#
+#  Copyright (c) 2014-2017, Linaro Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = DwEmmcDxe
+  FILE_GUID                      = 8500ef02-317d-11ec-95b4-f42a7dcb925d
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = DwEmmcDxeInitialize
+
+[Sources.common]
+  DwEmmcDxe.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/Rockchip/Drivers/DwEmmcDxe/DwEmmcDxe.dec
+  Silicon/Rockchip/RockchipPkg.dec
+
+[LibraryClasses]
+  ArmLib
+  BaseLib
+  BaseMemoryLib
+  CacheMaintenanceLib
+  IoLib
+  MemoryAllocationLib
+  TimerLib
+  UefiDriverEntryPoint
+  UefiLib
+  RockchipPlatformLib
+  CruLib
+
+[Protocols]
+  gEfiCpuArchProtocolGuid
+  gEfiDevicePathProtocolGuid
+  gEmbeddedMmcHostProtocolGuid
+
+[Pcd]
+  gDesignWareTokenSpaceGuid.PcdDwEmmcDxeBaseAddress
+  gDesignWareTokenSpaceGuid.PcdDwEmmcDxeClockFrequencyInHz
+  gDesignWareTokenSpaceGuid.PcdDwEmmcDxeMaxClockFreqInHz
+  gDesignWareTokenSpaceGuid.PcdDwEmmcDxeFifoDepth
+  gDesignWareTokenSpaceGuid.PcdDwPermitObsoleteDrivers
+
+[Depex]
+  TRUE

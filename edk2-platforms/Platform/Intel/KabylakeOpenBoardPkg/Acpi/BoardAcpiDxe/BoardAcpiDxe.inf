@@ -1,0 +1,75 @@
+### @file
+#  Component information file for AcpiPlatform module
+#
+# Copyright (c) 2017 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+###
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BoardAcpiDxe
+  FILE_GUID                      = E269E77D-6163-4F5D-8E59-21EAF114D307
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InstallAcpiBoard
+
+[Sources.common]
+  BoardAcpiDxe.c
+  AcpiGnvsInit.c
+  UpdateDsdt.c
+  Dsdt/DSDT.ASL
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+  PcAtChipsetPkg/PcAtChipsetPkg.dec
+  KabylakeOpenBoardPkg/OpenBoardPkg.dec
+  KabylakeSiliconPkg/SiPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  BaseLib
+  DebugLib
+  IoLib
+  PcdLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  UefiLib
+  BaseMemoryLib
+  HobLib
+  AslUpdateLib
+  BoardAcpiTableLib
+
+[Protocols]
+  gEfiAcpiTableProtocolGuid                     ## CONSUMES
+  gEfiFirmwareVolume2ProtocolGuid               ## CONSUMES
+  gEfiMpServiceProtocolGuid                     ## CONSUMES
+  gEfiGlobalNvsAreaProtocolGuid
+  gSaGlobalNvsAreaProtocolGuid                  ## CONSUMES
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+  gMinPlatformPkgTokenSpaceGuid.PcdPciReservedMemBase
+  gMinPlatformPkgTokenSpaceGuid.PcdPciReservedMemLimit
+  gMinPlatformPkgTokenSpaceGuid.PcdPciReservedMemAbove4GBBase
+  gMinPlatformPkgTokenSpaceGuid.PcdPciReservedMemAbove4GBLimit
+
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdAcpiGnvsAddress
+
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdAcpiSleepState
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdAcpiHibernate
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdLowPowerS0Idle
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDisableActiveTripPoints
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDisablePassiveTripPoints
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDisableCriticalTripPoints
+
+[Depex]
+  gEfiAcpiTableProtocolGuid           AND
+  gEfiFirmwareVolume2ProtocolGuid     AND
+  gEfiPciRootBridgeIoProtocolGuid     AND
+  gEfiVariableArchProtocolGuid        AND
+  gEfiVariableWriteArchProtocolGuid

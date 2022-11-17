@@ -1,0 +1,135 @@
+## @file
+# Component information file for PEI KabylakeRvp3 Board Init Pre-Mem Library
+#
+# Copyright (c) 2017 - 2021 Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiBoardInitPreMemLib
+  FILE_GUID                      = ec3675bc-1470-417d-826e-37378140213d
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = BoardInitLib
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  PcdLib
+  SiliconInitLib
+  EcLib
+  PchResetLib
+
+[Packages]
+  MinPlatformPkg/MinPlatformPkg.dec
+  KabylakeOpenBoardPkg/OpenBoardPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  KabylakeSiliconPkg/SiPkg.dec
+  IntelSiliconPkg/IntelSiliconPkg.dec
+
+[Sources]
+  PeiKabylakeRvp3Detect.c
+  PeiKabylakeRvp3InitPreMemLib.c
+  KabylakeRvp3HsioPtssTables.c
+  KabylakeRvp3SpdTable.c
+  PeiBoardInitPreMemLib.c
+
+[Pcd]
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdLpcSioConfigDefaultPort
+
+  # PCH-LP HSIO PTSS Table
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdSpecificLpHsioPtssTable1
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdSpecificLpHsioPtssTable2
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdSpecificLpHsioPtssTable1Size
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdSpecificLpHsioPtssTable2Size
+
+  # PCH-H HSIO PTSS Table
+  #gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUnknowHHsioPtssTable1
+  #gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUnknowHHsioPtssTable2
+  #gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUnknowHHsioPtssTable1Size
+  #gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUnknowHHsioPtssTable2Size
+
+  # SA Misc Config
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdSaMiscUserBd
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcRcompResistor
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcRcompTarget
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcDqByteMap
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcDqByteMapSize
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcDqsMapCpu2Dram
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcDqsMapCpu2DramSize
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcSpdData
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcSpdDataSize
+
+  # PEG Reset By GPIO
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdPcie0WakeGpioNo
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdPcie0HoldRstExpanderNo
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdPcie0HoldRstGpioNo
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdPcie0HoldRstActive
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdPcie0PwrEnableExpanderNo
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdPcie0PwrEnableGpioNo
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdPcie0PwrEnableActive
+
+
+  # SPD Address Table
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcSpdAddressTable0
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcSpdAddressTable1
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcSpdAddressTable2
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdMrcSpdAddressTable3
+
+  # CA Vref Configuration
+
+  # Root Port Clock Info
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort0ClkInfo
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort4ClkInfo
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort5ClkInfo
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort7ClkInfo
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort8ClkInfo
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPort9ClkInfo
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdRootPortLanClkInfo
+
+  # USB 2.0 Port AFE
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port0Afe
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port1Afe
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port2Afe
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port3Afe
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port4Afe
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port5Afe
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port6Afe
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port7Afe
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port8Afe
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20Port9Afe
+
+  # USB 2.0 Port Over Current Pin
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort0
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort1
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort2
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort3
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort4
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort5
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort6
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort7
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort8
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort9
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort10
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort11
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort12
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb20OverCurrentPinPort13
+
+  # USB 3.0 Port Over Current Pin
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb30OverCurrentPinPort0
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb30OverCurrentPinPort1
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb30OverCurrentPinPort2
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb30OverCurrentPinPort3
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb30OverCurrentPinPort4
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdUsb30OverCurrentPinPort5
+
+  # Misc
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdIoExpanderPresent
+
+

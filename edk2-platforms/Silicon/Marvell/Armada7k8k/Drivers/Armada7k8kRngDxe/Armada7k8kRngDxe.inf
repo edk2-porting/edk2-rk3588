@@ -1,0 +1,41 @@
+## @file
+# This driver produces an EFI_RNG_PROTOCOL instance for the Armada 70x0 TRNG
+#
+# Copyright (C) 2017, Linaro Ltd. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = Armada7k8kRngDxe
+  FILE_GUID                      = dd87096a-cae5-4328-bec1-2ddb755f2e08
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = Armada7k8kRngDxeEntryPoint
+
+[Sources]
+  Armada7k8kRngDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  Silicon/Marvell/Marvell.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  IoLib
+  PcdLib
+  UefiDriverEntryPoint
+
+[Pcd]
+  gMarvellTokenSpaceGuid.PcdEip76TrngBaseAddress
+
+[Protocols]
+  gEfiRngProtocolGuid              ## PRODUCES
+
+[Guids]
+  gEfiRngAlgorithmRaw
+
+[Depex]
+  TRUE

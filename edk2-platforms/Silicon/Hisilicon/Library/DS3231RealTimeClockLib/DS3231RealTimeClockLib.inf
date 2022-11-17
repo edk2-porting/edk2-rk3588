@@ -1,0 +1,43 @@
+#/** @file
+#
+# Copyright (c) 2006, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2011-2013, ARM Ltd. All rights reserved.<BR>
+# Copyright (c) 2015, Hisilicon Limited. All rights reserved.
+# Copyright (c) 2015, Linaro Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+#  Based on the files under ArmPlatformPkg/Library/PL031RealTimeClockLib/PL031RealTimeClockLib.inf
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DS3231RealTimeClockLib
+  FILE_GUID                      = 5FD8127D-11E1-488F-8CF1-A143157D6BF0
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = RealTimeClockLib
+
+[Sources.common]
+  DS3231RealTimeClockLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  Silicon/Hisilicon/HisiPkg.dec
+
+[LibraryClasses]
+  IoLib
+  UefiLib
+  DebugLib
+  PcdLib
+  I2CLib
+  TimeBaseLib
+  TimerLib
+# Use EFiAtRuntime to check stage
+  UefiRuntimeLib
+
+[Pcd]
+

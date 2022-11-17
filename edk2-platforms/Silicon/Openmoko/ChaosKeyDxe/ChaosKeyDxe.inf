@@ -1,0 +1,42 @@
+## @file
+#  Device driver for the ChaosKey hardware random number generator.
+#
+#  Copyright (c) 2016 - 2017, Linaro Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = ChaosKeyDxe
+  FILE_GUID                      = 9A54122B-F5E4-40D8-AE61-A71E406ED449
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = EntryPoint
+  UNLOAD_IMAGE                   = UnloadImage
+
+#
+#  VALID_ARCHITECTURES           = AARCH64 ARM EBC IA32 IPF X64
+#
+
+[Sources]
+  ChaosKeyDriver.c
+  ChaosKeyDriver.h
+  ComponentName.c
+  DriverBinding.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Protocols]
+  gEfiRngProtocolGuid                 # PROTOCOL BY_START
+  gEfiUsbIoProtocolGuid               # PROTOCOL TO_START
+
+[Guids]
+  gEfiRngAlgorithmRaw

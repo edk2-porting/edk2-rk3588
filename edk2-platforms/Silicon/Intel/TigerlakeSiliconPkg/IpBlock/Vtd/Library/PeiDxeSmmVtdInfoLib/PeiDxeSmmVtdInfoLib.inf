@@ -1,0 +1,45 @@
+## @file
+# VTD Common Library.
+#
+# All function in this library is available for PEI, DXE, and SMM,
+# But do not support UEFI RUNTIME environment call.
+#
+#  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+
+[Defines]
+INF_VERSION = 0x00010017
+BASE_NAME = PeiDxeSmmVtdInfoLib
+FILE_GUID = A1480873-3FDA-4E90-B450-743D8031F9DE
+VERSION_STRING = 1.0
+MODULE_TYPE = BASE
+LIBRARY_CLASS = VtdInfoLib
+
+[LibraryClasses]
+BaseLib
+IoLib
+DebugLib
+PciSegmentLib
+HobLib
+VtdInfoLib
+
+[Packages]
+MdePkg/MdePkg.dec
+TigerlakeSiliconPkg/SiPkg.dec
+
+[Sources]
+VtdInfoLib.c
+
+[Pcd]
+gSiPkgTokenSpaceGuid.VtdEngine1BaseAddeess
+gSiPkgTokenSpaceGuid.VtdEngine2BaseAddeess
+gSiPkgTokenSpaceGuid.VtdEngine3BaseAddeess
+gSiPkgTokenSpaceGuid.VtdEngine4BaseAddeess
+gSiPkgTokenSpaceGuid.VtdEngine5BaseAddeess
+gSiPkgTokenSpaceGuid.VtdEngine6BaseAddeess
+gSiPkgTokenSpaceGuid.VtdEngine7BaseAddeess
+
+[FixedPcd]

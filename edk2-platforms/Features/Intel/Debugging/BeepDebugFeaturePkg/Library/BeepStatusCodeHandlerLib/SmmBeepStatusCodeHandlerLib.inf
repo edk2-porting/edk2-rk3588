@@ -1,0 +1,50 @@
+## @file
+#  Beep status code implementation.
+#
+# Copyright (c) 2010 - 2020, Intel Corporation. All rights reserved.<BR>
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+# vendor.  This file may not be modified, except as allowed by
+# additional terms of your license agreement.
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SmmBeepStatusCodeHandlerLib
+  FILE_GUID                      = 2E2BC2D4-572D-4663-9A1E-FB52FA30922A
+  MODULE_TYPE                    = DXE_SMM_DRIVER
+  VERSION_STRING                 = 1.0
+  CONSTRUCTOR                    = SmmBeepStatusCodeHandlerLibConstructor
+  LIBRARY_CLASS                  = StatusCodeHandlerLib|DXE_SMM_DRIVER
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64 IPF EBC (EBC is only for build)
+#
+
+[Sources]
+  SmmBeepStatusCodeHandlerLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  BeepDebugFeaturePkg/BeepDebugFeaturePkg.dec
+
+[LibraryClasses]
+  SmmServicesTableLib
+  PcdLib
+  DebugLib
+  ReportStatusCodeLib
+  BeepMapLib
+  BeepLib
+
+[Pcd]
+  gBeepDebugFeaturePkgTokenSpaceGuid.PcdStatusCodeUseBeep               ## CONSUMES
+
+[Protocols]
+  gEfiSmmRscHandlerProtocolGuid                 ## CONSUMES
+
+[Depex]
+  TRUE

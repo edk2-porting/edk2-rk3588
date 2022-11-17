@@ -1,0 +1,14 @@
+## @file EnablePerformanceMonitoringInfrastructurePostMemory.fdf
+#
+# @copyright
+# Copyright 2020 - 2021 Intel Corporation. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+!if $(PERFORMANCE_ENABLE) == TRUE
+  INF  MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTableDxe/FirmwarePerformanceDxe.inf
+  INF  MdeModulePkg/Universal/Acpi/FirmwarePerformanceDataTableSmm/FirmwarePerformanceSmm.inf
+  INF  MdeModulePkg/Universal/FvSimpleFileSystemDxe/FvSimpleFileSystemDxe.inf
+  INF  ShellPkg/DynamicCommand/DpDynamicCommand/DpApp.inf
+!endif

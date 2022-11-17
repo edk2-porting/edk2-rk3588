@@ -1,0 +1,49 @@
+## @file
+#
+# @copyright
+# Copyright 2012 - 2021 Intel Corporation. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+#
+#--*/
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = MultiPlatSupportLib
+  FILE_GUID                      = EA5EEAF9-2EB4-4fbf-BB28-5B3A605B8665
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = MultiPlatSupportLib|PEIM PEI_CORE
+
+[Sources]
+  MultiPlatSupportLib.c
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  SecurityPkg/SecurityPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  WhitleySiliconPkg/WhitleySiliconPkg.dec
+  WhitleySiliconPkg/SiliconPkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+  WhitleyOpenBoardPkg/PlatformPkg.dec
+
+[LibraryClasses]
+  PeiServicesTablePointerLib
+  PeiServicesLib
+  PeimEntryPoint
+  DebugLib
+  HobLib
+  IoLib
+  PciLib
+  PcdLib
+  ReadFfsLib
+  MemoryAllocationLib
+
+[Guids]
+  gDefaultDataFileGuid    ## CONSUMES ## File
+
+[Pcd]
+  gPlatformTokenSpaceGuid.PcdFailSafeVarFfsSize
+  gPlatformTokenSpaceGuid.PcdFailSafeVarFvBase

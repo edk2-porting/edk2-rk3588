@@ -1,0 +1,42 @@
+## @file
+#  Component description file for the PeiDxeSmmPchDmiLib
+#
+#  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+INF_VERSION                    = 0x00010017
+BASE_NAME                      = PeiDxeSmmPchDmiLib
+FILE_GUID                      = 067DC1C4-2668-4F06-9921-307514B66B34
+VERSION_STRING                 = 1.0
+MODULE_TYPE                    = BASE
+LIBRARY_CLASS                  = PchDmiLib
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32 X64
+#
+
+[LibraryClasses]
+  BaseLib
+  IoLib
+  DebugLib
+  PchInfoLib
+  PchPcrLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  TigerlakeSiliconPkg/SiPkg.dec
+
+
+[Sources]
+  PchDmiLib.c
+  PchDmi14.c
+  PchDmi14.h
+
+[Guids]
+  gPchDmiConfigGuid         ## CONSUMES
+
+[Pcd]

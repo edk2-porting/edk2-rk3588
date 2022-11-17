@@ -1,0 +1,72 @@
+## @file
+#  ACPI table data and ASL sources required to boot the platform.
+#
+#  Copyright (c) 2018-2021, ARM Ltd. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = RdE1EdgeAcpiTables
+  FILE_GUID                      = c712719a-0aaf-438c-9cdd-35ab4d60207d  # gArmSgiAcpiTablesGuid
+  MODULE_TYPE                    = USER_DEFINED
+  VERSION_STRING                 = 1.0
+
+[Sources]
+  Dbg2.aslc
+  SsdtRos.asl
+  Fadt.aslc
+  Gtdt.aslc
+  Iort.aslc
+  Mcfg.aslc
+  RdE1Edge/Dsdt.asl
+  RdE1Edge/Madt.aslc
+  RdE1Edge/Pptt.aslc
+  Spcr.aslc
+  Ssdt.asl
+  SsdtEvents.asl
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  Platform/ARM/SgiPkg/SgiPlatform.dec
+
+[FixedPcd]
+  gArmPlatformTokenSpaceGuid.PcdCoreCount
+  gArmPlatformTokenSpaceGuid.PcdClusterCount
+  gArmPlatformTokenSpaceGuid.PcdSerialDbgRegisterBase
+  gArmPlatformTokenSpaceGuid.PL011UartInterrupt
+
+  gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum
+  gArmTokenSpaceGuid.PcdArmArchTimerIntrNum
+  gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum
+  gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum
+  gArmTokenSpaceGuid.PcdGicDistributorBase
+  gArmTokenSpaceGuid.PcdGicRedistributorsBase
+  gArmTokenSpaceGuid.PcdGenericWatchdogControlBase
+  gArmTokenSpaceGuid.PcdGenericWatchdogRefreshBase
+  gArmTokenSpaceGuid.PcdPciBusMin
+  gArmTokenSpaceGuid.PcdPciBusMax
+
+  gArmSgiTokenSpaceGuid.PcdGpioController0BaseAddress
+  gArmSgiTokenSpaceGuid.PcdGpioController0Size
+  gArmSgiTokenSpaceGuid.PcdGpioController0Interrupt
+  gArmSgiTokenSpaceGuid.PcdGtFrame0Gsiv
+  gArmSgiTokenSpaceGuid.PcdGtFrame1Gsiv
+  gArmSgiTokenSpaceGuid.PcdSp804DualTimerBaseAddress
+  gArmSgiTokenSpaceGuid.PcdSp804DualTimerSize
+  gArmSgiTokenSpaceGuid.PcdSp804DualTimerInterrupt
+  gArmSgiTokenSpaceGuid.PcdVirtioBlkBaseAddress
+  gArmSgiTokenSpaceGuid.PcdVirtioBlkSize
+  gArmSgiTokenSpaceGuid.PcdVirtioBlkInterrupt
+  gArmSgiTokenSpaceGuid.PcdVirtioNetBaseAddress
+  gArmSgiTokenSpaceGuid.PcdVirtioNetSize
+  gArmSgiTokenSpaceGuid.PcdVirtioNetInterrupt
+  gArmSgiTokenSpaceGuid.PcdWdogWS0Gsiv
+  gArmSgiTokenSpaceGuid.PcdWdogWS1Gsiv
+
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress

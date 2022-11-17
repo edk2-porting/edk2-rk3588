@@ -1,0 +1,54 @@
+## @file
+#
+# Copyright (c) 2018 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = SiliconPolicyUpdateLib
+  FILE_GUID                      = 6EA9585C-3C15-47da-9FFC-25E9E4EA4D0C
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SiliconPolicyUpdateLib
+
+[Sources]
+  SiliconPolicyUpdateLib.c
+  PchPolicyUpdateUsb.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  PurleyOpenBoardPkg/OpenBoardPkg.dec
+  PurleyRefreshSiliconPkg/SiPkg.dec
+
+[LibraryClasses]
+  HobLib
+  MmPciLib
+  IoLib
+  PcdLib
+  PchGbeLib
+
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorId
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision
+  gOemSkuTokenSpaceGuid.PcdSocketIioConfigData
+  gOemSkuTokenSpaceGuid.PcdUsb20OverCurrentMappings
+  gOemSkuTokenSpaceGuid.PcdUsb30OverCurrentMappings
+
+  gOemSkuTokenSpaceGuid.PcdSetupData
+  gOemSkuTokenSpaceGuid.PcdPchRcConfigurationData
+
+[FixedPcd]
+
+[Ppis]
+
+[Guids]
+  gEfiAcpiVariableGuid

@@ -1,0 +1,25 @@
+## @file
+#  Socionext FIP006 High-Speed SPI Controller with NOR Flash Driver
+#
+#  Copyright (c) 2017, Socionext Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION             = 0x0001001A
+  PACKAGE_NAME                  = Fip006DxePkg
+  PACKAGE_GUID                  = ABC7870B-FE82-4DAD-8179-FEC5F5194FA0
+  PACKAGE_VERSION               = 0.1
+
+[Guids]
+  gFip006DxeTokenSpaceGuid      = {0x4D45399E, 0x98F9, 0x4127, {0x8F, 0xB9,0xF8, 0xDE, 0x22, 0xA1, 0x09, 0x2C}}
+
+[PcdsFixedAtBuild]
+  gFip006DxeTokenSpaceGuid.PcdFip006DxeRegBaseAddress|0x0|UINT32|0x00000001
+  gFip006DxeTokenSpaceGuid.PcdFip006DxeMemBaseAddress|0x0|UINT32|0x00000002
+  gFip006DxeTokenSpaceGuid.PcdN25qSlaveId|0x0|UINT8|0x00000003
+  gFip006DxeTokenSpaceGuid.PcdN25qBlockSize|256|UINT32|0x00000004
+  gFip006DxeTokenSpaceGuid.PcdN25qBlockCount|524288|UINT32|0x00000005
+

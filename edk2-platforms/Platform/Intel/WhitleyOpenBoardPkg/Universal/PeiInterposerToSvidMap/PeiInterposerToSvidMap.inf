@@ -1,0 +1,53 @@
+## @file
+# Component description file for PeiInterposerToSvidMap
+#
+# @copyright
+# Copyright 2018 - 2021 Intel Corporation. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiInterposerToSvidMap
+  FILE_GUID                      = DF11893B-FAC7-4812-8DD7-F5DD56889040
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InterposerToSvidMapEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32
+#
+
+[Sources]
+
+  PeiInterposerToSvidMap.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  WhitleyOpenBoardPkg/PlatformPkg.dec
+  WhitleySiliconPkg/CpRcPkg.dec
+  WhitleySiliconPkg/WhitleySiliconPkg.dec
+  WhitleySiliconPkg/SiliconPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  PeimEntryPoint
+  PcdLib
+  BaseMemoryLib
+
+[Ppis]
+  gMemoryPolicyPpiGuid                     ## CONSUMES
+  gDynamicSiLibraryPpiGuid                 ## CONSUMES
+
+[Guids]
+  gEfiPlatformInfoGuid
+
+[Pcd]
+  gPlatformTokenSpaceGuid.PcdMemInterposerMap
+  gEfiCpRcPkgTokenSpaceGuid.PcdMemSrvidMap
+
+[Depex]
+  gDynamicSiLibraryPpiGuid

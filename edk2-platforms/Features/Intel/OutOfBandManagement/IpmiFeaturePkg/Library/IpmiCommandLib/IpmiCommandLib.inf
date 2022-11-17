@@ -1,0 +1,32 @@
+### @file
+# Component description file for IPMI Command Library.
+#
+# Copyright (c) 2018 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+###
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = IpmiCommandLib
+  FILE_GUID                      = E599C9C7-5913-40A0-8669-67282E2BEC53
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = IpmiCommandLib
+
+[sources]
+  IpmiCommandLibNetFnApp.c
+  IpmiCommandLibNetFnTransport.c
+  IpmiCommandLibNetFnChassis.c
+  IpmiCommandLibNetFnStorage.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  OutOfBandManagement/IpmiFeaturePkg/IpmiFeaturePkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  IpmiBaseLib

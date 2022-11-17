@@ -1,0 +1,46 @@
+## @file
+#  Platform DXE driver for Morello FVP Platform
+#
+#  Copyright (c) 2021, ARM Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = PlatformDxe
+  FILE_GUID                      = 11FC8B5A-377D-47A8-AEE9-0093D3D3407F
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = ArmMorelloEntryPoint
+
+[Sources.common]
+  PlatformDxeFvp.c
+  VirtioDevices.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  OvmfPkg/OvmfPkg.dec
+  Platform/ARM/Morello/MorelloPlatform.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  VirtioMmioDeviceLib
+
+[Protocols]
+  gEfiRamDiskProtocolGuid
+
+[FeaturePcd]
+  gArmMorelloTokenSpaceGuid.PcdRamDiskSupported
+  gArmMorelloTokenSpaceGuid.PcdVirtioBlkSupported
+  gArmMorelloTokenSpaceGuid.PcdVirtioNetSupported
+
+[FixedPcd]
+  gArmMorelloTokenSpaceGuid.PcdRamDiskBase
+  gArmMorelloTokenSpaceGuid.PcdRamDiskSize
+  gArmMorelloTokenSpaceGuid.PcdVirtioBlkBaseAddress
+  gArmMorelloTokenSpaceGuid.PcdVirtioNetBaseAddress
+
+[Depex]
+  gEfiRamDiskProtocolGuid

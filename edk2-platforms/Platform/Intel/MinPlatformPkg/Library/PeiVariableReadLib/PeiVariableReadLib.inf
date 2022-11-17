@@ -1,0 +1,42 @@
+## @file
+# Component description file for PEI Variable Read Lib
+#
+# This library provides phase agnostic access to the UEFI Variable Services.
+# This is done by implementing a wrapper on top of the phase specific mechanism
+# for reading from UEFI variables. For example, the PEI implementation of this
+# library uses EFI_PEI_READ_ONLY_VARIABLE2_PPI. The DXE implementation accesses
+# the UEFI Runtime Services Table, and the SMM implementation uses
+# EFI_SMM_VARIABLE_PROTOCOL.
+#
+# Using this library allows code to be written in a generic manner that can be
+# used in PEI, DXE, or SMM without modification.
+#
+# Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PeiVariableReadLib
+  FILE_GUID                      = C8707767-5D9D-476B-81EE-8FAFA7098224
+  VERSION_STRING                 = 1.0
+  MODULE_TYPE                    = PEIM
+  LIBRARY_CLASS                  = VariableReadLib|PEI_CORE PEIM
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[Sources]
+  PeiVariableReadLib.c
+
+[LibraryClasses]
+  DebugLib
+  PeiServicesLib
+
+[Ppis]
+  gEfiPeiReadOnlyVariable2PpiGuid   ## CONSUMES
+
+[Depex]
+  gEfiPeiReadOnlyVariable2PpiGuid

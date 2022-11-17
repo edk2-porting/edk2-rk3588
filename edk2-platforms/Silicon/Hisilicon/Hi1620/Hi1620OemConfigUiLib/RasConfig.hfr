@@ -1,0 +1,166 @@
+ ///** @file
+//
+//  Memory RAS Config form.
+//
+//  Copyright (c) 2018, Hisilicon Limited. All rights reserved.
+//  Copyright (c) 2018, Linaro Limited. All rights reserved.
+//  SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+//**/
+  form formid = RAS_CONFIG_FORM_ID,
+       title  = STRING_TOKEN(STR_RAS_CONFIG_FORM_TITLE);
+
+    oneof varid = OEM_CONFIG_DATA.EnRasSupport,
+      prompt  = STRING_TOKEN(STR_SUPPORT_RAS_TITLE),
+      help    = STRING_TOKEN(STR_SUPPORT_RAS_HELP),
+      option text = STRING_TOKEN(STR_DISABLE), value = 0, flags = RESET_REQUIRED;
+      option text = STRING_TOKEN(STR_ENABLE), value = 1, flags = MANUFACTURING | DEFAULT | RESET_REQUIRED;
+    endoneof;
+
+    suppressif TRUE;
+      goto VFR_FORMID_MEMORY_RAS,
+        prompt = STRING_TOKEN(STR_MEMORY_RAS_CONFIG_FORM_TITLE),
+        help   = STRING_TOKEN(STR_MEMORY_RAS_CONFIG_FORM_HELP);
+
+      goto VFR_FORMID_PCIE_RAS,
+        prompt  = STRING_TOKEN(STR_PCIE_RAS_CONFIG_FORM_TITLE),
+        help    = STRING_TOKEN(STR_PCIE_RAS_CONFIG_FORM_HELP);
+    endif;
+  endform;
+
+  form formid = VFR_FORMID_MEMORY_RAS,
+       title  = STRING_TOKEN(STR_MEMORY_RAS_CONFIG_FORM_TITLE);
+
+    oneof varid = OEM_CONFIG_DATA.CheckAlgorithm,
+      prompt  = STRING_TOKEN(STR_CHECK_ALGORITHM_PROMPT),
+      help    = STRING_TOKEN(STR_CHECK_ALGORITHM_HELP),
+      option text = STRING_TOKEN(STR_DISABLE), value = 0, flags = MANUFACTURING | DEFAULT | RESET_REQUIRED;
+      option text = STRING_TOKEN(STR_ECC), value = 1, flags = RESET_REQUIRED;
+      option text = STRING_TOKEN(STR_SDEC), value = 2, flags = RESET_REQUIRED;
+    endoneof;
+
+    grayoutif ideqval OEM_CONFIG_DATA.CheckAlgorithm == 0;
+      oneof varid = OEM_CONFIG_DATA.EnPoison,
+        prompt  = STRING_TOKEN(STR_ENABLE_POISON_PROMPT),
+        help    = STRING_TOKEN(STR_ENABLE_POISON_HELP),
+        option text = STRING_TOKEN(STR_DISABLE), value = 0, flags = RESET_REQUIRED;
+        option text = STRING_TOKEN(STR_ENABLE), value = 1, flags = MANUFACTURING | DEFAULT | RESET_REQUIRED;
+      endoneof;
+
+      oneof varid = OEM_CONFIG_DATA.PatrolScrub,
+        prompt  = STRING_TOKEN(STR_PATROL_SCRUB_PROMPT),
+        help    = STRING_TOKEN(STR_PATROL_SCRUB_HELP),
+        option text = STRING_TOKEN(STR_DISABLE), value = 0, flags = RESET_REQUIRED;
+        option text = STRING_TOKEN(STR_ENABLE), value = 1, flags = MANUFACTURING | DEFAULT | RESET_REQUIRED;
+      endoneof;
+    endif;
+
+    grayoutif ideqval OEM_CONFIG_DATA.CheckAlgorithm == 0 OR ideqval OEM_CONFIG_DATA.PatrolScrub == 0;
+      numeric varid   = OEM_CONFIG_DATA.PatrolScrubDuration,
+        prompt  = STRING_TOKEN(STR_PATROL_SCRUB_DURATION_PROMPT),
+        help    = STRING_TOKEN(STR_PATROL_SCRUB_DURATION_HELP),
+        flags   = 0 | RESET_REQUIRED,
+        minimum = 0,
+        maximum = 24,
+        step    = 1,
+        default = 24,
+      endnumeric;
+    endif;
+
+    grayoutif ideqval OEM_CONFIG_DATA.CheckAlgorithm == 0;
+      oneof varid = OEM_CONFIG_DATA.DemandScrubMode,
+        prompt  = STRING_TOKEN(STR_DEMAND_SCRUB_PROMPT),
+        help    = STRING_TOKEN(STR_DEMAND_SCRUB_HELP),
+        option text = STRING_TOKEN(STR_DISABLE), value = 0, flags = MANUFACTURING | DEFAULT | RESET_REQUIRED;
+        option text = STRING_TOKEN(STR_ENABLE), value = 1, flags = RESET_REQUIRED;
+      endoneof;
+    endif;
+
+    suppressif ideqval OEM_CONFIG_DATA.CheckAlgorithm == 0 OR ideqval OEM_CONFIG_DATA.CheckAlgorithm == 1;
+      goto VFR_FORMID_CORRECT_ERROR,
+        prompt = STRING_TOKEN(STR_CORRECT_ERROR_FORM_TITLE),
+        help   = STRING_TOKEN(STR_CORRECT_ERROR_FORM_HELP);
+    endif;
+  endform;
+
+
+  form formid = VFR_FORMID_CORRECT_ERROR,
+       title  = STRING_TOKEN(STR_CORRECT_ERROR_FORM_TITLE);
+
+    oneof varid = OEM_CONFIG_DATA.CorrectErrorThreshold,
+      prompt  = STRING_TOKEN(STR_CORRECT_ERROR_THRESHOLD_PROMPT),
+      help    = STRING_TOKEN(STR_CORRECT_ERROR_THRESHOLD_HELP),
+      option text = STRING_TOKEN(STR_DISABLE), value = 0, flags = MANUFACTURING | DEFAULT | RESET_REQUIRED;
+      option text = STRING_TOKEN(STR_500), value = 1, flags = RESET_REQUIRED;
+      option text = STRING_TOKEN(STR_1000), value = 2, flags = RESET_REQUIRED;
+      option text = STRING_TOKEN(STR_2000), value = 3, flags = RESET_REQUIRED;
+    endoneof;
+
+    oneof varid = OEM_CONFIG_DATA.FunnelPeriod,
+      prompt  = STRING_TOKEN(STR_FUNNEL_PERIOD_PROMPT),
+      help    = STRING_TOKEN(STR_FUNNEL_PERIOD_HELP),
+      option text = STRING_TOKEN(STR_DISABLE), value = 0, flags = MANUFACTURING | DEFAULT | RESET_REQUIRED;
+      option text = STRING_TOKEN(STR_30), value = 1, flags = RESET_REQUIRED;
+      option text = STRING_TOKEN(STR_60), value = 2, flags = RESET_REQUIRED;
+    endoneof;
+
+    suppressif ideqval OEM_CONFIG_DATA.CorrectErrorThreshold == 0;
+      oneof varid = OEM_CONFIG_DATA.AdvanceDeviceCorrection ,
+        prompt  = STRING_TOKEN(STR_ADVANCE_DEVICE_CORRECTION_PROMPT),
+        help    = STRING_TOKEN(STR_ADVANCE_DEVICE_CORRECTION_HELP),
+        option text = STRING_TOKEN(STR_DISABLE), value = 0, flags = MANUFACTURING | DEFAULT | RESET_REQUIRED;
+        option text = STRING_TOKEN(STR_SR), value = 1, flags = RESET_REQUIRED;
+        option text = STRING_TOKEN(STR_MR), value = 2, flags = RESET_REQUIRED;
+      endoneof;
+
+      oneof varid = OEM_CONFIG_DATA.RankSparing,
+        prompt  = STRING_TOKEN(STR_RANK_SPARING_PROMPT),
+        help    = STRING_TOKEN(STR_RANK_SPARING_HELP),
+        option text = STRING_TOKEN(STR_DISABLE), value = 0, flags = MANUFACTURING | DEFAULT | RESET_REQUIRED;
+        option text = STRING_TOKEN(STR_ENABLE), value = 1, flags = RESET_REQUIRED;
+      endoneof;
+    endif;
+  endform;
+
+  form formid = VFR_FORMID_PCIE_RAS,
+       title  = STRING_TOKEN(STR_PCIE_RAS_CONFIG_FORM_TITLE);
+
+      oneof varid = OEM_CONFIG_DATA.DpcFeature,
+        prompt  = STRING_TOKEN(STR_DPC_FEARURE),
+        help    = STRING_TOKEN(STR_DPC_FEARURE_HELP),
+        option text = STRING_TOKEN(STR_DISABLE), value = 0, flags = MANUFACTURING | DEFAULT | RESET_REQUIRED;
+        option text = STRING_TOKEN(STR_ENABLE), value = 1, flags = RESET_REQUIRED;
+      endoneof;
+
+      oneof varid = OEM_CONFIG_DATA.EcrcFeature,
+        prompt  = STRING_TOKEN(STR_ECRC_FEARURE),
+        help    = STRING_TOKEN(STR_ECRC_FEARURE_HELP),
+        option text = STRING_TOKEN(STR_DISABLE), value = 0, flags = MANUFACTURING | DEFAULT | RESET_REQUIRED;
+        option text = STRING_TOKEN(STR_ENABLE), value = 1, flags = RESET_REQUIRED;
+      endoneof;
+
+      oneof varid = OEM_CONFIG_DATA.CompletionTimeout,
+        prompt  = STRING_TOKEN(STR_COMPLETION_TIMEOUT),
+        help    = STRING_TOKEN(STR_COMPLETION_TIMEOUT_HELP),
+        option text = STRING_TOKEN(STR_DISABLE), value = 0, flags = RESET_REQUIRED;
+        option text = STRING_TOKEN(STR_ENABLE), value = 1, flags = MANUFACTURING | DEFAULT | RESET_REQUIRED;
+      endoneof;
+
+    suppressif ideqval OEM_CONFIG_DATA.CompletionTimeout == 0;
+      oneof varid = OEM_CONFIG_DATA.CompletionTimeoutValue,
+        prompt  = STRING_TOKEN(STR_COMPLETION_TIMEOUT_VALUE),
+        help    = STRING_TOKEN(STR_COMPLETION_TIMEOUT_VALUE_HELP),
+        option text = STRING_TOKEN(STR_50US_TO_50MS), value = 0, flags = MANUFACTURING | DEFAULT | RESET_REQUIRED;
+        option text = STRING_TOKEN(STR_50US_TO_100US), value = 1, flags = RESET_REQUIRED;
+        option text = STRING_TOKEN(STR_1MS_TO_10MS), value = 2, flags = RESET_REQUIRED;
+      endoneof;
+    endif;
+
+      oneof varid = OEM_CONFIG_DATA.HotPlug,
+        prompt  = STRING_TOKEN(STR_HOT_PLUG),
+        help    = STRING_TOKEN(STR_HOT_PLUG_HELP),
+        option text = STRING_TOKEN(STR_DISABLE), value = 0, flags = RESET_REQUIRED;
+        option text = STRING_TOKEN(STR_ENABLE), value = 1, flags = MANUFACTURING | DEFAULT | RESET_REQUIRED;
+      endoneof;
+  endform;
+

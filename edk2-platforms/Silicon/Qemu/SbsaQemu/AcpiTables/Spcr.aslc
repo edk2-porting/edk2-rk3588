@@ -1,0 +1,53 @@
+/** @file
+*  Serial Port Console Redirection Table (SPCR).
+*
+*  Copyright (c) 2020 Linaro Ltd. All rights reserved.
+*
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
+*
+**/
+
+#include <IndustryStandard/Acpi.h>
+#include <IndustryStandard/SbsaQemuAcpi.h>
+#include <IndustryStandard/SerialPortConsoleRedirectionTable.h>
+
+#pragma pack(push, 1)
+
+STATIC EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE Spcr = {
+  SBSAQEMU_ACPI_HEADER (
+    EFI_ACPI_6_0_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_SIGNATURE,
+    EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE,
+    2), /* New MS definition for PL011 support */
+  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERFACE_TYPE_ARM_PL011_UART,
+  { EFI_ACPI_RESERVED_BYTE, EFI_ACPI_RESERVED_BYTE, EFI_ACPI_RESERVED_BYTE },
+  {
+    EFI_ACPI_6_0_SYSTEM_MEMORY,
+    32,
+    0,
+    EFI_ACPI_6_0_DWORD,
+    FixedPcdGet32 (PcdSerialRegisterBase)
+  },
+  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_GIC,
+  0,                      /* Irq */
+  33,                     /* GlobalSystemInterrupt */
+  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_BAUD_RATE_115200,
+  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_PARITY_NO_PARITY,
+  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_STOP_BITS_1,
+  0,                      /* Flow Control */
+  EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_TERMINAL_TYPE_ANSI,
+  EFI_ACPI_RESERVED_BYTE, /* Language */
+  0xFFFF,                 /* PciDeviceId */
+  0xFFFF,                 /* PciVendorId */
+  0x00,                   /* PciBusNumber */
+  0x00,                   /* PciDeviceNumber */
+  0x00,                   /* PciFunctionNumber */
+  0,                      /* PciFlags */
+  0,                      /* PciSegment */
+  EFI_ACPI_RESERVED_DWORD
+};
+
+#pragma pack(pop)
+
+// Reference the table being generated to prevent the optimizer from removing
+// the data structure from the executable
+VOID* CONST ReferenceAcpiTable = &Spcr;

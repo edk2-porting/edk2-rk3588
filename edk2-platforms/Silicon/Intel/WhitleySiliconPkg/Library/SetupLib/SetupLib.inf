@@ -1,0 +1,59 @@
+## @file
+# Status Code Handler Driver which produces general handlers and hook them
+# onto the status code router.
+#
+# @copyright
+# Copyright 2020 - 2021 Intel Corporation. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION             = 0x00010005
+  BASE_NAME               = SetupLib
+  FILE_GUID               = 699ECE4C-8146-4C44-97D9-D1FFC5BCDC11
+  MODULE_TYPE             = BASE
+  VERSION_STRING          = 1.0
+  LIBRARY_CLASS           = SetupLib | PEIM DXE_DRIVER DXE_SMM_DRIVER DXE_RUNTIME_DRIVER UEFI_DRIVER
+
+[Sources]
+  SetupLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  WhitleySiliconPkg/WhitleySiliconPkg.dec
+  WhitleySiliconPkg/CpRcPkg.dec
+  WhitleySiliconPkg/SiliconPkg.dec
+  WhitleyOpenBoardPkg/PlatformPkg.dec
+
+[LibraryClasses]
+  DebugLib
+
+[Guids]
+  gEfiSocketIioVariableGuid           # CONSUMES
+  gEfiSocketCommonRcVariableGuid      # CONSUMES
+  gEfiSocketMpLinkVariableGuid        # CONSUMES
+  gEfiSocketMemoryVariableGuid        # CONSUMES
+  gEfiSocketPowermanagementVarGuid    # CONSUMES
+  gEfiSocketProcessorCoreVarGuid      # CONSUMES
+  gEfiSetupVariableGuid               # CONSUMES
+  gPchSetupVariableGuid               # CONSUMES
+  gMemBootHealthGuid                  # CONSUMES
+
+[Pcd]
+  gStructPcdTokenSpaceGuid.PcdSocketIioConfig
+  gStructPcdTokenSpaceGuid.PcdSocketCommonRcConfig
+  gStructPcdTokenSpaceGuid.PcdSocketMpLinkConfig
+  gStructPcdTokenSpaceGuid.PcdSocketMemoryConfig
+  gStructPcdTokenSpaceGuid.PcdSocketPowerManagementConfig
+  gStructPcdTokenSpaceGuid.PcdSocketProcessorCoreConfig
+  gStructPcdTokenSpaceGuid.PcdSetup
+  gStructPcdTokenSpaceGuid.PcdPchSetup
+  gStructPcdTokenSpaceGuid.PcdFpgaSocketConfig
+  gStructPcdTokenSpaceGuid.PcdMemBootHealthConfig
+
+[FixedPcd]
+
+
+[Depex]
+  TRUE

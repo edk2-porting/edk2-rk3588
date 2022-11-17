@@ -1,0 +1,86 @@
+## @file
+#
+#  Component description file for the SynQuacer DXE platform driver.
+#
+#  Copyright (c) 2017, Linaro, Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = PlatformDxe
+  FILE_GUID                      = ac422cc1-d916-489a-b165-536fdfc633c2 # gSynQuacerPlatformDxeFileGuid
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = PlatformDxeEntryPoint
+
+[Sources]
+  Emmc.asl
+  EmmcDxe.c
+  Optee.asl
+  Pci.c
+  PlatformDxe.c
+  PlatformDxeHii.uni
+  PlatformDxeHii.vfr
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  NetworkPkg/NetworkPkg.dec
+  Platform/96Boards/96Boards.dec
+  Silicon/NXP/Library/Pcf8563RealTimeClockLib/Pcf8563RealTimeClockLib.dec
+  Silicon/Socionext/SynQuacer/Drivers/Net/NetsecDxe/NetsecDxe.dec
+  Silicon/Socionext/SynQuacer/SynQuacer.dec
+
+[LibraryClasses]
+  ArmGenericTimerCounterLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  DtPlatformDtbLoaderLib
+  DxeServicesLib
+  HiiLib
+  IoLib
+  MemoryAllocationLib
+  NetLib
+  NonDiscoverableDeviceRegistrationLib
+  OpteeLib
+  PcdLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+  UefiRuntimeServicesTableLib
+
+[Guids]
+  g96BoardsI2c0MasterGuid
+  gEdkiiPlatformHasAcpiGuid
+  gEfiEndOfDxeEventGroupGuid
+  gEfiHiiPlatformSetupFormsetGuid
+  gFdtTableGuid
+  gNetsecNonDiscoverableDeviceGuid
+  gSynQuacerNonDiscoverableI2cMasterGuid
+  gSynQuacerNonDiscoverableRuntimeI2cMasterGuid
+  gSynQuacerPlatformFormSetGuid
+
+[Protocols]
+  gEdkiiNonDiscoverableDeviceProtocolGuid         ## PRODUCES
+  gEdkiiSdMmcOverrideProtocolGuid                 ## PRODUCES
+  gEfiAcpiTableProtocolGuid                       ## CONSUMES
+  gEfiPciIoProtocolGuid                           ## CONSUMES
+  gPcf8563RealTimeClockLibI2cMasterProtocolGuid   ## PRODUCES
+
+[FixedPcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision
+  gSynQuacerTokenSpaceGuid.PcdNetsecEepromBase
+  gSynQuacerTokenSpaceGuid.PcdNetsecPhyAddress
+
+[Pcd]
+  gSynQuacerTokenSpaceGuid.PcdPlatformSettings
+
+[Depex]
+  gEfiVariableArchProtocolGuid

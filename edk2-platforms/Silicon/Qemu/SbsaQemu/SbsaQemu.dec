@@ -1,0 +1,69 @@
+#/** @file
+#
+#  Copyright (c) 2019, Linaro Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  DEC_SPECIFICATION              = 0x0001001B
+  PACKAGE_NAME                   = SbsaQemuPkg
+  PACKAGE_GUID                   = 8db32c5a-2821-43e2-b4ac-bc148e2b0b05
+  PACKAGE_VERSION                = 0.1
+
+################################################################################
+#
+# Include Section - list of Include Paths that are provided by this package.
+#                   Comments are used for Keywords and Module Types.
+#
+# Supported Module Types:
+#  BASE SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
+#
+################################################################################
+[Includes]
+  Include                        # Root include for the package
+
+[Guids.common]
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid   = { 0xaab3bea9, 0xa8e8, 0x4e76, { 0xb5, 0x3a, 0x35, 0x22, 0x11, 0xce, 0xf7, 0xf7 } }
+
+[PcdsFixedAtBuild.common]
+
+  # Non discoverable devices Pcds
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdPlatformAhciBase|0|UINT64|0x00000001
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdPlatformAhciSize|0x10000|UINT32|0x00000002
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdPlatformEhciBase|0|UINT64|0x00000003
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdPlatformEhciSize|0x10000|UINT32|0x00000004
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdDeviceTreeBaseAddress|0x10000000000|UINT64|0x00000005
+
+  # PCDs complementing PCIe layout pulled into ACPI tables
+  # Limit = Base + Size - 1
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdPciIoLimit|0x0000ffff|UINT32|0x00000006
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdPciMmio32Limit|0xEFFFFFFF|UINT32|0x00000007
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdPciMmio64Limit|0xFFFFFFFFFF|UINT64|0x00000008
+
+  # PCDs complementing gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+  # BarLimit = BaseAddress + BarSize - 1
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdPciExpressBarSize|0x10000000|UINT64|0x00000009
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdPciExpressBarLimit|0xFFFFFFFF|UINT64|0x00000010
+
+[PcdsDynamic.common]
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdCoreCount|0x1|UINT32|0x00000100
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdClusterCount|0x1|UINT32|0x00000101
+
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdSystemManufacturer|L""|VOID*|0x00000110
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdSystemSerialNumber|L""|VOID*|0x00000111
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdSystemSKU|L""|VOID*|0x00000112
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdSystemFamily|L""|VOID*|0x00000113
+
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdBaseBoardAssetTag|L""|VOID*|0x00000114
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdBaseBoardSerialNumber|L""|VOID*|0x00000115
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdBaseBoardManufacturer|L""|VOID*|0x00000116
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdBaseBoardSKU|L""|VOID*|0x00000117
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdBaseBoardLocation|L""|VOID*|0x00000118
+
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdChassisSerialNumber|L""|VOID*|0x00000119
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdChassisVersion|L""|VOID*|0x0000011A
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdChassisManufacturer|L""|VOID*|0x0000011B
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdChassisAssetTag|L""|VOID*|0x0000011C
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdChassisSKU|L""|VOID*|0x0000011D

@@ -1,0 +1,83 @@
+/** @file
+  Phytium ACPI ASL Sources.
+
+  Copyright (C) 2020, Phytium Technology Co Ltd. All rights reserved.<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#include <IndustryStandard/Acpi.h>
+#include <Library/AcpiLib.h>
+#include <Library/PcdLib.h>
+#include <Platform.h>
+
+#define GTDT_GLOBAL_FLAGS_MAPPED      EFI_ACPI_6_1_GTDT_GLOBAL_FLAG_MEMORY_MAPPED_BLOCK_PRESENT
+#define GTDT_GLOBAL_FLAGS_NOT_MAPPED  0
+#define GTDT_GLOBAL_FLAGS_EDGE        EFI_ACPI_6_1_GTDT_GLOBAL_FLAG_INTERRUPT_MODE
+#define GTDT_GLOBAL_FLAGS_LEVEL       0
+
+#define GTDT_TIMER_EDGE_TRIGGERED   EFI_ACPI_6_1_GTDT_TIMER_FLAG_TIMER_INTERRUPT_MODE
+#define GTDT_TIMER_LEVEL_TRIGGERED  0
+#define GTDT_TIMER_ACTIVE_LOW       EFI_ACPI_6_1_GTDT_TIMER_FLAG_TIMER_INTERRUPT_POLARITY
+#define GTDT_TIMER_ACTIVE_HIGH      0
+#define GTDT_TIMER_ALWAYS_ON_CAPABILITY EFI_ACPI_6_1_GTDT_TIMER_FLAG_ALWAYS_ON_CAPABILITY
+
+#define GTDT_GTIMER_FLAGS           (GTDT_TIMER_ACTIVE_LOW | GTDT_TIMER_LEVEL_TRIGGERED \
+                                    | EFI_ACPI_6_1_GTDT_TIMER_FLAG_ALWAYS_ON_CAPABILITY)
+
+#pragma pack (1)
+
+typedef struct {
+  EFI_ACPI_6_1_GENERIC_TIMER_DESCRIPTION_TABLE          Gtdt;
+  EFI_ACPI_6_1_GTDT_SBSA_GENERIC_WATCHDOG_STRUCTURE     Watchdogs[2];
+} EFI_ACPI_6_1_GENERIC_TIMER_DESCRIPTION_TABLES;
+
+#pragma pack ()
+
+EFI_ACPI_6_1_GENERIC_TIMER_DESCRIPTION_TABLES Gtdt = {
+  {
+    PHYTIUM_ACPI_HEADER (
+      EFI_ACPI_6_1_GENERIC_TIMER_DESCRIPTION_TABLE_SIGNATURE,
+      EFI_ACPI_6_1_GENERIC_TIMER_DESCRIPTION_TABLES,
+      EFI_ACPI_6_1_GENERIC_TIMER_DESCRIPTION_TABLE_REVISION
+    ),
+    0xFFFFFFFFFFFFFFFF,                           // UINT64  PhysicalAddress
+    0,                                            // UINT32  Reserved
+    FixedPcdGet32 (PcdArmArchTimerSecIntrNum),    // UINT32  SecurePL1TimerGSIV
+    GTDT_GTIMER_FLAGS,                            // UINT32  SecurePL1TimerFlags
+    FixedPcdGet32 (PcdArmArchTimerIntrNum),       // UINT32  NonSecurePL1TimerGSIV
+    GTDT_GTIMER_FLAGS,                            // UINT32  NonSecurePL1TimerFlags
+    FixedPcdGet32 (PcdArmArchTimerVirtIntrNum),   // UINT32  VirtualTimerGSIV
+    GTDT_GTIMER_FLAGS,                            // UINT32  VirtualTimerFlags
+    FixedPcdGet32 (PcdArmArchTimerHypIntrNum),    // UINT32  NonSecurePL2TimerGSIV
+    GTDT_GTIMER_FLAGS,                            // UINT32  NonSecurePL2TimerFlags
+    0xFFFFFFFFFFFFFFFF,                           // UINT64  CntReadBasePhysicalAddress
+    2,
+    sizeof (EFI_ACPI_6_1_GENERIC_TIMER_DESCRIPTION_TABLE)
+  },
+
+  {
+    {
+      1,           //Type
+      28,          //Size of this structure
+      0,           //reserved
+      0x2800a000,  //RefreshFrame Physical Address
+      0x2800b000,  //WatchdogControlFrame Physical Address
+      48,          //Watchdog Timer GSIV
+      0,           //Watchdog Timer Flags high level
+    },
+
+    {
+      1,
+      28,
+      0,
+      0x28016000,
+      0x28017000,
+      49,
+      0,
+    }
+  }
+};
+
+VOID * CONST ReferenceAcpiTable = &Gtdt;

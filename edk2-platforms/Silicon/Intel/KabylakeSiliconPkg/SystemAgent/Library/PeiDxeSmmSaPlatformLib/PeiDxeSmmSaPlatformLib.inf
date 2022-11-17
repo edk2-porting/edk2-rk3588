@@ -1,0 +1,33 @@
+## @file
+# Component description file for SA Platform Lib
+#
+# Copyright (c) 2017 - 2019, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+
+[Defines]
+INF_VERSION = 0x00010017
+BASE_NAME = PeiDxeSmmSaPlatformLib
+FILE_GUID = 9DB5ACB4-DB23-43AE-A283-2ABEF365CBE0
+VERSION_STRING = 1.0
+MODULE_TYPE = BASE
+LIBRARY_CLASS = SaPlatformLib
+
+
+[LibraryClasses]
+BaseLib
+BaseMemoryLib
+DebugLib
+IoLib
+
+
+[Packages]
+MdePkg/MdePkg.dec
+KabylakeSiliconPkg/SiPkg.dec
+
+[Sources]
+SaPlatformLibrary.h
+SaPlatformLibrary.c

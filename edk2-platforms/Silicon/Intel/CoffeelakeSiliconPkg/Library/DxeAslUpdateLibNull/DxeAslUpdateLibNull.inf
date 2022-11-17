@@ -1,0 +1,30 @@
+## @file
+# Provides services to update ASL tables.
+#
+# Copyright (c) 2019 Intel Corporation. All rights reserved. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+INF_VERSION = 0x00010017
+BASE_NAME = DxeAslUpdateLibNull
+FILE_GUID = C7A3725F-6146-4FAB-B2EF-B4CED222DA52
+VERSION_STRING = 1.0
+MODULE_TYPE = BASE
+LIBRARY_CLASS = AslUpdateLib
+
+
+
+
+[Packages]
+MdePkg/MdePkg.dec
+CoffeelakeSiliconPkg/SiPkg.dec
+
+
+[Sources]
+DxeAslUpdateLibNull.c
+
+
+

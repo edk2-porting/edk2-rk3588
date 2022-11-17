@@ -1,0 +1,299 @@
+## @file
+#
+# Copyright (c) 2019 Intel Corporation. All rights reserved. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+!include OpenBoardPkg.fdf.inc
+
+#
+# Build the variable store and the firmware code as one unified flash device
+# image.
+#
+[FD.BOARDX58ICH10]
+BaseAddress   = $(FW_BASE_ADDRESS)
+Size          = $(FW_SIZE)
+ErasePolarity = 1
+BlockSize     = $(BLOCK_SIZE)
+NumBlocks     = $(FW_BLOCKS)
+
+!include VarStore.fdf.inc
+
+$(VARS_SIZE)|0x00002000
+gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
+#NV_FTW_WORKING
+DATA = {
+  # EFI_FAULT_TOLERANT_WORKING_BLOCK_HEADER->Signature = gEdkiiWorkingBlockSignatureGuid         =
+  #  { 0x9e58292b, 0x7c68, 0x497d, { 0xa0, 0xce, 0x65,  0x0, 0xfd, 0x9f, 0x1b, 0x95 }}
+  0x2b, 0x29, 0x58, 0x9e, 0x68, 0x7c, 0x7d, 0x49,
+  0xa0, 0xce, 0x65,  0x0, 0xfd, 0x9f, 0x1b, 0x95,
+  # Crc:UINT32            #WorkingBlockValid:1, WorkingBlockInvalid:1, Reserved
+  0xE2, 0x33, 0xF2, 0x03, 0xFE, 0xFF, 0xFF, 0xFF,
+  # WriteQueueSize: UINT64
+  0xE0, 0x1F, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+}
+
+0x00040000|0x00040000
+gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
+#NV_FTW_SPARE
+
+0x00080000|0x0016C000
+FV = FVMAIN_COMPACT
+
+$(SECFV_OFFSET)|$(SECFV_SIZE)
+FV = FvTempMemorySilicon
+
+#
+# Build the variable store and the firmware code as separate flash device
+# images.
+#
+[FD.SIMICS_VARS]
+BaseAddress   = $(FW_BASE_ADDRESS)
+Size          = 0x80000
+ErasePolarity = 1
+BlockSize     = $(BLOCK_SIZE)
+NumBlocks     = 0x80
+
+!include VarStore.fdf.inc
+
+[FD.SIMICS_CODE]
+BaseAddress   = $(CODE_BASE_ADDRESS)
+Size          = $(CODE_SIZE)
+ErasePolarity = 1
+BlockSize     = $(BLOCK_SIZE)
+NumBlocks     = $(CODE_BLOCKS)
+
+0x00000000|0x0016C000
+FV = FVMAIN_COMPACT
+
+0x0016C000|$(SECFV_SIZE)
+FV = FvTempMemorySilicon
+
+[FD.MEMFD]
+BaseAddress   = $(MEMFD_BASE_ADDRESS)
+Size          = 0xB00000
+ErasePolarity = 1
+BlockSize     = 0x10000
+NumBlocks     = 0xB0
+
+0x000000|0x006000
+gSimicsOpenBoardPkgTokenSpaceGuid.PcdSimicsSecPageTablesBase|gSimicsOpenBoardPkgTokenSpaceGuid.PcdSimicsSecPageTablesSize
+
+0x006000|0x001000
+gSimicsOpenBoardPkgTokenSpaceGuid.PcdSimicsLockBoxStorageBase|gSimicsOpenBoardPkgTokenSpaceGuid.PcdSimicsLockBoxStorageSize
+
+0x007000|0x001000
+gEfiMdePkgTokenSpaceGuid.PcdGuidedExtractHandlerTableAddress|gSimicsOpenBoardPkgTokenSpaceGuid.PcdGuidedExtractHandlerTableSize
+
+0x010000|0x008000
+gSimicsOpenBoardPkgTokenSpaceGuid.PcdSimicsSecPeiTempRamBase|gSimicsOpenBoardPkgTokenSpaceGuid.PcdSimicsSecPeiTempRamSize
+
+0x020000|0x0E0000
+gSimicsOpenBoardPkgTokenSpaceGuid.PcdSimicsPeiMemFvBase|gSimicsOpenBoardPkgTokenSpaceGuid.PcdSimicsPeiMemFvSize
+FV = FvPreMemory
+
+0x100000|0xA00000
+gSimicsOpenBoardPkgTokenSpaceGuid.PcdSimicsDxeMemFvBase|gSimicsOpenBoardPkgTokenSpaceGuid.PcdSimicsDxeMemFvSize
+FV = DXEFV
+
+################################################################################
+
+[FV.FvTempMemorySilicon]
+FvAlignment        = 16
+FvForceRebase      = TRUE
+ERASE_POLARITY     = 1
+MEMORY_MAPPED      = TRUE
+STICKY_WRITE       = TRUE
+LOCK_CAP           = TRUE
+LOCK_STATUS        = TRUE
+WRITE_DISABLED_CAP = TRUE
+WRITE_ENABLED_CAP  = TRUE
+WRITE_STATUS       = TRUE
+WRITE_LOCK_CAP     = TRUE
+WRITE_LOCK_STATUS  = TRUE
+READ_DISABLED_CAP  = TRUE
+READ_ENABLED_CAP   = TRUE
+READ_STATUS        = TRUE
+READ_LOCK_CAP      = TRUE
+READ_LOCK_STATUS   = TRUE
+FvNameGuid         = 229EEDCE-8E76-4809-B233-EC36BFBF6989
+
+INF  RuleOverride=RESET_SECMAIN USE = IA32 $(BOARD_PKG)/SecCore/SecMain.inf
+!include $(SKT_PKG)/SktSecInclude.fdf
+
+[FV.FvPreMemory]
+FvAlignment        = 16
+FvForceRebase      = TRUE
+ERASE_POLARITY     = 1
+MEMORY_MAPPED      = TRUE
+STICKY_WRITE       = TRUE
+LOCK_CAP           = TRUE
+LOCK_STATUS        = TRUE
+WRITE_DISABLED_CAP = TRUE
+WRITE_ENABLED_CAP  = TRUE
+WRITE_STATUS       = TRUE
+WRITE_LOCK_CAP     = TRUE
+WRITE_LOCK_STATUS  = TRUE
+READ_DISABLED_CAP  = TRUE
+READ_ENABLED_CAP   = TRUE
+READ_STATUS        = TRUE
+READ_LOCK_CAP      = TRUE
+READ_LOCK_STATUS   = TRUE
+FvNameGuid         = 6522280D-28F9-4131-ADC4-F40EBFA45864
+
+##
+#  PEI Apriori file example, more PEIM module added later.
+##
+INF  MdeModulePkg/Core/Pei/PeiMain.inf
+!include $(SKT_PKG)/SktPreMemoryInclude.fdf
+!include $(PCH_PKG)/IchPreMemoryInclude.fdf
+!include MinPlatformPkg/Include/Fdf/CorePreMemoryInclude.fdf
+INF  MinPlatformPkg/PlatformInit/ReportFv/ReportFvPei.inf
+INF  MinPlatformPkg/PlatformInit/PlatformInitPei/PlatformInitPreMem.inf
+INF  MinPlatformPkg/PlatformInit/SiliconPolicyPei/SiliconPolicyPeiPreMem.inf
+!include MinPlatformPkg/Include/Fdf/CoreSecurityPreMemoryInclude.fdf
+!include AdvancedFeaturePkg/Include/PreMemory.fdf
+INF  $(BOARD_PKG)/SimicsPei/SimicsPei.inf
+!include $(SKT_PKG)/SktPostMemoryInclude.fdf
+!include $(PCH_PKG)/IchPostMemoryInclude.fdf
+!include MinPlatformPkg/Include/Fdf/CorePostMemoryInclude.fdf
+INF  MinPlatformPkg/PlatformInit/PlatformInitPei/PlatformInitPostMem.inf
+INF  MinPlatformPkg/PlatformInit/SiliconPolicyPei/SiliconPolicyPeiPostMem.inf
+!include MinPlatformPkg/Include/Fdf/CoreSecurityPostMemoryInclude.fdf
+
+INF  UefiCpuPkg/Universal/Acpi/S3Resume2Pei/S3Resume2Pei.inf
+INF  $(SKT_PKG)/Smm/Access/SmmAccessPei.inf
+# S3 SMM PEI driver
+#INF  UefiCpuPkg/PiSmmCommunication/PiSmmCommunicationPei.inf
+
+[FV.DXEFV]
+FvNameGuid         = EACAB9EA-C3C6-4438-8FD7-2270826DC0BB
+BlockSize          = 0x10000
+FvAlignment        = 16
+ERASE_POLARITY     = 1
+MEMORY_MAPPED      = TRUE
+STICKY_WRITE       = TRUE
+LOCK_CAP           = TRUE
+LOCK_STATUS        = TRUE
+WRITE_DISABLED_CAP = TRUE
+WRITE_ENABLED_CAP  = TRUE
+WRITE_STATUS       = TRUE
+WRITE_LOCK_CAP     = TRUE
+WRITE_LOCK_STATUS  = TRUE
+READ_DISABLED_CAP  = TRUE
+READ_ENABLED_CAP   = TRUE
+READ_STATUS        = TRUE
+READ_LOCK_CAP      = TRUE
+READ_LOCK_STATUS   = TRUE
+
+!include MinPlatformPkg/Include/Fdf/CoreUefiBootInclude.fdf
+!include $(SKT_PKG)/SktUefiBootInclude.fdf
+!include $(PCH_PKG)/IchUefiBootInclude.fdf
+
+INF  MdeModulePkg/Universal/EbcDxe/EbcDxe.inf
+INF  MdeModulePkg/Bus/Pci/SataControllerDxe/SataControllerDxe.inf
+INF  UefiCpuPkg/CpuDxe/CpuDxe.inf
+
+!include MinPlatformPkg/Include/Fdf/CoreOsBootInclude.fdf
+!include AdvancedFeaturePkg/Include/PostMemory.fdf
+INF  MdeModulePkg/Universal/Acpi/S3SaveStateDxe/S3SaveStateDxe.inf
+INF  MdeModulePkg/Universal/Acpi/BootScriptExecutorDxe/BootScriptExecutorDxe.inf
+INF  UefiCpuPkg/CpuS3DataDxe/CpuS3DataDxe.inf
+INF  MdeModulePkg/Universal/LockBox/SmmLockBox/SmmLockBox.inf
+INF  MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
+INF  MdeModulePkg/Universal/PrintDxe/PrintDxe.inf
+INF  MdeModulePkg/Bus/Scsi/ScsiBusDxe/ScsiBusDxe.inf
+INF  MdeModulePkg/Bus/Scsi/ScsiDiskDxe/ScsiDiskDxe.inf
+
+INF  MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
+INF  MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf
+INF  MinPlatformPkg/Flash/SpiFvbService/SpiFvbServiceSmm.inf
+INF  MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
+INF  BoardModulePkg/LegacySioDxe/LegacySioDxe.inf
+INF  BoardModulePkg/BoardBdsHookDxe/BoardBdsHookDxe.inf
+
+INF  MdeModulePkg/Bus/Isa/Ps2KeyboardDxe/Ps2KeyboardDxe.inf
+
+INF  $(BOARD_PKG)/SmbiosPlatformDxe/SmbiosPlatformDxe.inf
+
+INF  MdeModulePkg/Universal/Acpi/AcpiPlatformDxe/AcpiPlatformDxe.inf
+INF  $(BOARD_PKG)/AcpiTables/MinPlatformAcpiTables/AcpiPlatform.inf
+INF  RuleOverride=ACPITABLE $(BOARD_PKG)/AcpiTables/AcpiTables.inf
+
+INF $(BOARD_PKG)/SimicsVideoDxe/SimicsVideoDxe.inf
+INF  MinPlatformPkg/PlatformInit/PlatformInitDxe/PlatformInitDxe.inf
+INF  MinPlatformPkg/PlatformInit/PlatformInitSmm/PlatformInitSmm.inf
+INF  $(BOARD_PKG)/SimicsDxe/SimicsDxe.inf
+
+FILE FREEFORM = 7BB28B99-61BB-11D5-9A5D-0090273FC14D {
+  SECTION RAW = $(BOARD_PKG)/Logo/Logo.bmp
+}
+
+INF  ShellPkg/Application/Shell/Shell.inf
+
+#
+# Network modules
+#
+INF  SimicsIch10BinPkg/UndiBinary/UndiDxe.inf
+
+!include MinPlatformPkg/Include/Fdf/CoreSecurityLateInclude.fdf
+
+[FV.FVMAIN_COMPACT]
+FvNameGuid         = 6189987A-DDA6-4060-B313-49168DA9BD46
+FvAlignment        = 16
+ERASE_POLARITY     = 1
+MEMORY_MAPPED      = TRUE
+STICKY_WRITE       = TRUE
+LOCK_CAP           = TRUE
+LOCK_STATUS        = TRUE
+WRITE_DISABLED_CAP = TRUE
+WRITE_ENABLED_CAP  = TRUE
+WRITE_STATUS       = TRUE
+WRITE_LOCK_CAP     = TRUE
+WRITE_LOCK_STATUS  = TRUE
+READ_DISABLED_CAP  = TRUE
+READ_ENABLED_CAP   = TRUE
+READ_STATUS        = TRUE
+READ_LOCK_CAP      = TRUE
+READ_LOCK_STATUS   = TRUE
+
+FILE FV_IMAGE = 9E21FD93-9C72-4c15-8C4B-E77F1DB2D792 {
+  SECTION GUIDED EE4E5898-3914-4259-9D6E-DC7BD79403CF PROCESSING_REQUIRED = TRUE {
+    #
+    # These firmware volumes will have files placed in them uncompressed,
+    # and then both firmware volumes will be compressed in a single
+    # compression operation in order to achieve better overall compression.
+    #
+    SECTION FV_IMAGE = FvPreMemory
+    SECTION FV_IMAGE = DXEFV
+  }
+}
+
+!include DecomprScratchEnd.fdf.inc
+
+
+################################################################################
+#
+# Rules are use with the [FV] section's module INF type to define
+# how an FFS file is created for a given INF file. The following Rule are the default
+# rules for the different module type. User can add the customized rules to define the
+# content of the FFS file.
+#
+################################################################################
+
+!include MinPlatformPkg/Include/Fdf/RuleInclude.fdf
+
+[Rule.Common.SEC.RESET_VECTOR]
+  FILE RAW = $(NAMED_GUID) {
+    RAW BIN   Align = 16   |.bin
+  }
+
+[Rule.Common.SEC.RESET_SECMAIN]
+  FILE SEC = $(NAMED_GUID) RELOCS_STRIPPED {
+    UI       STRING="$(MODULE_NAME)" Optional
+    VERSION  STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
+    PE32  PE32    Align = 16      $(INF_OUTPUT)/$(MODULE_NAME).efi
+  }

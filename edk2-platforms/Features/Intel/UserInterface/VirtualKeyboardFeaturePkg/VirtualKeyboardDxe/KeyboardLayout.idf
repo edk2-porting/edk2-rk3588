@@ -1,0 +1,12 @@
+// /** @file
+// Virtual Keyboard Layout
+//
+// Copyright (c) 2019 - 2020, Intel Corporation. All rights reserved.<BR>
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+#image IMG_VK_CAPITALLETTERKEYBOARD TRANSPARENT CapitalLetterKeyboard.bmp
+#image IMG_VK_DIGITKEYBOARD         TRANSPARENT DigitKeyboard.bmp
+#image IMG_VK_FULLICON              TRANSPARENT FullIcon.bmp
+#image IMG_VK_SIMPLEICON            TRANSPARENT SimpleIcon.bmp
+#image IMG_VK_SIMPLEKEYBOARD        TRANSPARENT SimpleKeyboard.bmp

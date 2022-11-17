@@ -1,0 +1,37 @@
+### @file
+# Component description file for IPMI FRB.
+#
+# Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+###
+
+[defines]
+  INF_VERSION          = 0x00010005
+  BASE_NAME            = FrbDxe
+  FILE_GUID            = F6C7812D-81BF-4e6d-A87D-E75AF17BD511
+  MODULE_TYPE          = DXE_DRIVER
+  VERSION_STRING       = 1.0
+  ENTRY_POINT          = FrbDxeEntryPoint
+
+[Sources]
+  FrbDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  OutOfBandManagement/IpmiFeaturePkg/IpmiFeaturePkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  MemoryAllocationLib
+  UefiLib
+  DebugLib
+  BaseMemoryLib
+  IpmiCommandLib
+  PcdLib
+
+[Depex]
+  TRUE

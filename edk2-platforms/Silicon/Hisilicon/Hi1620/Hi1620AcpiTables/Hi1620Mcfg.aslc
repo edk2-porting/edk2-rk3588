@@ -1,0 +1,61 @@
+/*
+ * Copyright (c) 2018 Hisilicon Limited
+ *. All rights reserved.
+ * SPDX-License-Identifier: BSD-2-Clause-Patent
+ *
+ */
+
+#include <IndustryStandard/Acpi.h>
+#include "Hi1620Platform.h"
+
+#define MCFG_VERSION  0x1
+
+#pragma pack(1)
+typedef struct
+{
+   UINT64 ullBaseAddress;
+   UINT16 usSegGroupNum;
+   UINT8  ucStartBusNum;
+   UINT8  ucEndBusNum;
+   UINT32 Reserved2;
+}EFI_MCFG_CONFIG_STRUCTURE;
+
+typedef struct
+{
+   EFI_ACPI_DESCRIPTION_HEADER Header;
+   UINT64 Reserved1;
+}EFI_MCFG_TABLE_CONFIG;
+
+typedef struct
+{
+   EFI_MCFG_TABLE_CONFIG Acpi_Table_Mcfg;
+   EFI_MCFG_CONFIG_STRUCTURE Config_Structure;
+}EFI_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_TABLE;
+#pragma pack()
+
+EFI_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_TABLE Mcfg=
+{
+  {
+      {
+        EFI_ACPI_6_1_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_BASE_ADDRESS_DESCRIPTION_TABLE_SIGNATURE,
+        sizeof (EFI_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_TABLE),
+        MCFG_VERSION,
+        0x00,                                                     // Checksum will be updated at runtime
+        {EFI_ACPI_ARM_OEM_ID},
+        EFI_ACPI_ARM_OEM_TABLE_ID,
+        EFI_ACPI_ARM_OEM_REVISION,
+        EFI_ACPI_ARM_CREATOR_ID,
+        EFI_ACPI_ARM_CREATOR_REVISION
+      },
+      0x0000000000000000,                                 //Reserved
+  },
+  {
+    0xd0000000,                                         //Base Address
+    0x0,                                                //Segment Group Number
+    0x0,                                                //Start Bus Number
+    0xff,                                               //End Bus Number
+    0x00000000,                                         //Reserved
+  }
+};
+
+VOID* CONST ReferenceAcpiTable = &Mcfg;

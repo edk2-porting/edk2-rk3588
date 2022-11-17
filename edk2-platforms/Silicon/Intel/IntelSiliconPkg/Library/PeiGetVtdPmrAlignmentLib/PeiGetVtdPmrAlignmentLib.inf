@@ -1,0 +1,32 @@
+## @file
+# Component INF file for the GetVtdPmrAlignment library.
+#
+# Copyright (c) 2019, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+INF_VERSION   = 0x00010017
+BASE_NAME     = PeiGetVtdPmrAlignmentLib
+FILE_GUID     = 0332BE93-0547-4D87-A7FA-0D9D76C53187
+MODULE_TYPE   = BASE
+LIBRARY_CLASS = PeiGetVtdPmrAlignmentLib
+
+[Packages]
+MdePkg/MdePkg.dec
+IntelSiliconPkg/IntelSiliconPkg.dec
+
+[Sources]
+PeiGetVtdPmrAlignmentLib.c
+
+[LibraryClasses]
+DebugLib
+BaseMemoryLib
+MemoryAllocationLib
+BaseLib
+PeiServicesLib
+
+[Ppis]
+gEdkiiVTdInfoPpiGuid       ## CONSUMES

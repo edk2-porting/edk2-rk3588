@@ -1,0 +1,34 @@
+### @file
+# Component description file for IPMI initialization.
+#
+# Copyright (c) 2018 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+###
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DxeIpmiInit
+  FILE_GUID                      = 09D958D8-4646-886D-85F1-AA9249CC50FB
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = IpmiInterfaceInit
+
+[Sources]
+  DxeIpmiInit.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  OutOfBandManagement/IpmiFeaturePkg/IpmiFeaturePkg.dec
+
+[LibraryClasses]
+  UefiBootServicesTableLib
+  DebugLib
+  UefiDriverEntryPoint
+  IpmiCommandLib
+  TimerLib
+
+[Depex]
+  gIpmiTransportProtocolGuid

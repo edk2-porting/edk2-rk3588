@@ -1,0 +1,50 @@
+## @file
+#  PCI Host Bridge Library instance for Rockchip RK3588 platform.
+#
+#  Copyright (c) 2022, Rockchip Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = PciHostBridgeLib
+  FILE_GUID                      = f063a96a-71fb-11ec-bebb-001e67b12b1b
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PciHostBridgeLib|DXE_DRIVER
+
+[Sources]
+  PciHostBridgeLib.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/Rockchip/RockchipPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  DevicePathLib
+  IoLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+
+[FixedPcd]
+  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4IoBaseAddress
+  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4IoSize
+  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4MemBaseAddress
+  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4MemSize
+  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4MemBaseAddress64
+  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4MemSize64
+  gArmTokenSpaceGuid.PcdPciIoBase
+  gArmTokenSpaceGuid.PcdPciIoSize
+
+
+[Protocols]
+  gEfiCpuIo2ProtocolGuid
+
+[Depex]
+  gEfiCpuIo2ProtocolGuid

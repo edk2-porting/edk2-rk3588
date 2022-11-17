@@ -1,0 +1,644 @@
+/** @file
+
+Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+  // 
+  // BIOS parameter
+  // The address will be fixed dynamically during boot. 
+  // Will be updated by ACPI platform driver as "FIX8"
+  //
+  OperationRegion (MCTL, SystemMemory, 0x38584946, 0x04)
+  Field (MCTL, ByteAcc, NoLock, Preserve) {
+        ,   3,
+    HGPE,   1,
+        ,   7,
+        ,   8,
+        ,   8
+  }
+
+//
+// No longer needed, See PPA4
+//
+//  OperationRegion (PSTS, PCI_Config, 0xB0, 0x04) 
+//  Field (PSTS, ByteAcc, NoLock, Preserve) {
+//        ,   16,
+//    PMES,   1,               // PME Status bit 16           
+//    PMEP,   1,               //PME Pending bit 17      
+//        ,   14
+//  }
+
+
+  Method (_INI, 0, NotSerialized) {
+    Store (0x01, HGPE)          //enable GPE message generation for ACPI hotplug support
+  }
+
+  Name(_HPP, Package(){0x08, 0x40, 1, 0})
+
+  //
+  // begin hotplug code
+  //
+  Name(SHPC, 0x40)            // Slot Hot-plug Capable
+
+  Name(SPDS, 0x040)           // Slot Presence Detect State
+
+  Name(MRLS, 0x0)             // MRL Closed, Standby Power to slot is on
+  Name(CCOM, 0x010)           // Command Complete
+  Name(SPDC, 0x08)            // Slot Presence Detect Changes
+  Name(MRLC, 0x04)            // Slot MRL Changed
+  Name(SPFD, 0x02)            // Slot Power Fault Detected
+  Name(SABP, 0x01)            // Slot Attention Button Pressed
+
+  Name(SPOF, 0x10)            // Slot  Power Off
+  Name(SPON, 0x0F)            // Slot  Power On Mask
+
+  Name(ALMK, 0x1C)            // Slot Atten. LED Mask
+  Name(ALON, 0x01)            // Slot Atten. LED On
+  Name(ALBL, 0x02)            // Slot Atten LED Blink
+  Name(ALOF, 0x03)            // Slot Atten LED Off
+
+  Name(PLMK, 0x13)            // Slot Pwr. LED Mask
+  Name(PLON, 0x04)            // Slot Pwr. LED On
+  Name(PLBL, 0x08)            // Slot Pwr. LED Blink
+  Name(PLOF, 0x0C)            // Slot Pwr. LED Off
+
+  //;*************************************
+  //;   Bit 3 = Presence Detect Event
+  //;   Bit 2 = MRL Sensor Event
+  //;   Bit 1 = PWR Fault Event
+  //;   Bit 0 = Attention Button Event
+  //;*************************************
+  Name(HPEV, 0xF)             // Possible interrupt events (all)
+
+  //;************************************************************************;
+  //;
+  //; PCIe Link Control Register A0-A1h
+  //;
+  //;    Bit -   4   -  Link disable.
+  //;
+  //;************************************************************************;
+//
+// No longer needed, see PPA4
+//
+//  OperationRegion(PPA0, PCI_Config, 0xA0, 0x02)
+//  Field(PPA0,ByteAcc,NoLock,Preserve) {
+//    ,4,
+//    LDIS,1,                   // Link Disable bit4.
+//    ,11,
+//  }
+
+  //;************************************************************************;
+  //;
+  //; PCIe Slot Capabilities Register A4-A7h
+  //;    Bit - 31-5  -  Not used
+  //;    Bit -   4   -  Power Indicator Present.
+  //;    Bit -   3   -  Attention Indicator Present.
+  //;    Bit -   2   -  MRL Sensor Present.
+  //;    Bit -   1   -  Power Controller Present.
+  //;    Bit -   0   -  Attention Button Present.
+  //;
+  //; PCIe Slot control Register A8-A9h
+  //;
+  //;    Bit -  10   -  PWR Control Disable
+  //;    Bit - 9:8   -  Attn Indicator
+  //;    Bit - 7:6   -  PWR Indicator
+  //;    Bit -   5   -  Hot-Plug Interrupt Event Enable
+  //;    Bit -   4   -  Command Complete Interrupt enable
+  //;    Bit -   3   -  Presence Detect Changed Interrupt enable
+  //;    Bit -   2   -  MRL Sensor Changed Interrupt enable
+  //;    Bit -   1   -  PwrFault Detect Interrupt enable
+  //;    Bit -   0   -  Attention Button Pressed Interrupt Enable
+  //;
+  //; PCIe Slot Status Registers AA-ADh
+  //;
+  //;    Bit -   6   -  Presence Detect State.
+  //;    Bit -   5   -  MRL Sensor State.
+  //;    Bit -   4   -  Command Completed.
+  //;
+  //;    RWC Status Bits
+  //;
+  //;    Bit -   3   -  Presence Detect Changed.
+  //;    Bit -   2   -  MRL Sensor Changed.
+  //;    Bit -   1   -  Power Fault Detected.
+  //;    Bit -   0   -  Attention Button Pressed.
+  //;************************************************************************;
+  OperationRegion(PPA4, PCI_Config, 0x00, 0x100)
+  Field(PPA4,ByteAcc,NoLock,Preserve) {
+    Offset (0xA0),            // from PPA0 OpRegion
+    ,4,
+    LDIS,1,                   // Link Disable bit4.
+    ,11,
+    Offset(0xA4),             // A4-A7h PCI Slot Capabilities Register
+    ATBP,1,                   // Attention Button Present
+    ,1,                       // Skip Power Controller Present
+    MRSP,1,                   // MRL Sensor Present
+    ATIP,1,                   // Attention Indicator Present
+    PWIP,1,                   // Power Indicator Present
+    ,14,
+    PSNM,13,                  // Physical Slot Number
+    Offset(0xA8),             // PCIE Slot Control Register
+    ABIE,1,                   // Attention Button Pressed Interrupt Enable
+    PFIE,1,                   // Power Fault Detected Interrupt Enable
+    MSIE,1,                   // MRL Sensor Changed Interrupt Enable
+    PDIE,1,                   // Presence Detect Changed Interrupt Enable.
+    CCIE,1,                   // Command Complete Interrupt Enable.
+    HPIE,1,                   // Hot-plug Interrupt Enable.
+    SCTL,5,                   // Attn/Power indicator and Power controller.
+    ,5,                       // reserved
+    Offset(0xAA),             // PCIE Slot Status Register
+    SSTS,7,                   // The status bits in Slot Status Reg
+    ,1,
+    Offset (0xB0),            // from PSTS OpRegion
+        ,   16,
+    PMES,   1,                // PME Status bit 16           
+    PMEP,   1,                // PME Pending bit 17      
+        ,   14
+  }
+
+  //
+  // These Methods replace the bit field definitions in PPA8
+  //  that were bit fields within SCTL
+  //
+  Method (ATID, 0) {
+    Return (And (SCTL, 0x03))
+  }
+
+  Method (PWID, 0) {
+    Return (ShiftRight (And (SCTL, 0x0C), 2))
+  }
+
+  Method (PWCC, 0) {
+    Return (ShiftRight (And (SCTL, 0x10), 4))
+  }
+
+  //
+  // These methods replace the bit fields definitions in PPA8
+  //  that were bit fields within SSTS
+  //
+  Method (ABPS, 1) {
+    If (LEqual (Arg0, 1)) {
+      Or (SSTS, 0x01, SSTS)
+    }
+    Return (And (SSTS, 0x01))
+  }
+
+  Method (PFDS, 1) {
+    If (LEqual (Arg0, 1)) {
+      Or (SSTS, 0x02, SSTS)
+    }
+    Return (ShiftRight (And (SSTS, 0x02), 1))
+  }
+  
+  Method (MSCS, 1) {
+    If (LEqual (Arg0, 1)) {
+      Or (SSTS, 0x04, SSTS)
+    }
+    Return (ShiftRight (And (SSTS, 0x04), 2))
+  }
+  
+  Method (PDCS, 1) {
+    If (LEqual (Arg0, 1)) {
+      Or (SSTS, 0x08, SSTS)
+    }
+    Return (ShiftRight (And (SSTS, 0x08), 3))
+  }
+
+  Method (CMCS, 1) {
+    If (LEqual (Arg0, 1)) {
+      Or (SSTS, 0x10, SSTS)
+    }
+    Return (ShiftRight (And (SSTS, 0x10), 4))
+  }
+
+  Method (MSSC, 1) {
+    If (LEqual (Arg0, 1)) {
+      Or (SSTS, 0x20, SSTS)
+    }
+    Return (ShiftRight (And (SSTS, 0x20), 5))
+  }
+
+  Method (PRDS, 1) {
+    If (LEqual (Arg0, 1)) {
+      Or (SSTS, 0x40, SSTS)
+    }
+    Return (ShiftRight (And (SSTS, 0x40), 6))
+  }
+
+
+//  OperationRegion(PPA8, PCI_Config, 0x00, 0x0ff)
+//  Field(PPA8,ByteAcc,NoLock,Preserve) {
+//    Offset(0xA8),             // PCIE Slot Control Register
+//    ,6,
+//    ATID,2,                   // Attention Indicator Control.
+//    PWID,2,                   // Power Indicator Control.
+//    PWCC,1,                   // Power Controller Control.
+//    ,5,
+//    Offset(0xAA),             // RWC status
+//    ABPS,1,                   // Attention Button Pressed Status (RWC)
+//    PFDS,1,                   // Power Fault Detect Status (RWC)
+//    MSCS,1,                   // MRL Sensor Changed Status
+//    PDCS,1,                   // Presence Detect Changed Status
+//    CMCS,1,                   // Command Complete Status
+//    MSSC,1,                   // MRL Sensor State
+//    PRDS,1,                   // Presence Detect State
+//    ,1,
+//  }
+
+  //;************************************************************************;
+  //; This OSHP (Operating System Hot Plug) method is provided for each HPC
+  //; which is controlled by ACPI. This method disables ACPI access to the
+  //; HPC and restores the normal System Interrupt and Wakeup Signal
+  //; connection.
+  //;************************************************************************;
+  Method(OSHP) {              // OS call to unhook Legacy ASL PCI-Express HP code.
+    Store(0, SSTS)            // Clear any status
+    Store(0x0, HGPE)          // Disable GPE generation
+  }
+
+  //;************************************************************************;
+  //; Hot Plug Controller Command Method
+  //;
+  //; Input: Arg0 - Command to issue
+  //;
+  //;************************************************************************;
+  Method(HPCC,1) {
+    Store(SCTL, Local0)           // get current command state
+    Store(0,    Local1)           // reset the timeout value
+    If(LNotEqual(Arg0, Local0)) { // see if state is different
+      Store(Arg0, SCTL)           // Update the Slot Control
+      While(LAnd (LNot(CMCS(0)), LNotEqual(100, Local1))) { // spin while CMD complete bit is not set,
+                                                            // check for timeout to avoid dead loop
+        Store(0xFB, IO80)
+        Sleep(2)                  // allow processor time slice
+        Add(Local1, 2, Local1)
+      }
+      CMCS(1)                     // Clear the command complete status
+    }
+  }
+
+  //;************************************************************************;
+  //; Attention Indicator Command
+  //;
+  //; Input: Arg0 - Command to issue
+  //;               1 = ON
+  //;               2 = Blink
+  //;               3 = OFF
+  //;************************************************************************;
+  Method(ATCM,1) {
+    Store(SCTL, Local0)           // Get Slot Control
+    And(Local0, ALMK, Local0)     // Mask the Attention Indicator Bits
+    If(LEqual(Arg0, 0x1)){        // Attenion indicator "ON?"
+      Or(Local0, ALON, Local0)    // Set the Attention Indicator to "ON"
+    }
+    If(LEqual(Arg0, 0x2)){        // Attenion indicator "BLINK?"
+      Or(Local0, ALBL, Local0)    // Set the Attention Indicator to "BLINK"
+    }
+    If(LEqual(Arg0, 0x3)){        // Attenion indicator "OFF?"
+      Or(Local0, ALOF, Local0)    // Set the Attention Indicator to "OFF"
+    }
+    HPCC(Local0)
+  }
+
+  //;************************************************************************;
+  //; Power Indicator Command
+  //;
+  //; Input: Arg0 - Command to issue
+  //;               1 = ON
+  //;               2 = Blink
+  //;               3 = OFF
+  //;************************************************************************;
+  Method(PWCM,1){
+    Store(SCTL, Local0)           // Get Slot Control
+    And(Local0, PLMK, Local0)     // Mask the Power Indicator Bits
+    If(LEqual(Arg0, 0x1)){        // Power indicator "ON?"
+      Or(Local0, PLON, Local0)    // Set the Power Indicator to "ON"
+    }
+    If(LEqual(Arg0, 0x2)){        // Power indicator "BLINK?"
+      Or(Local0, PLBL, Local0)    // Set the Power Indicator to "BLINK"
+    }
+    If(LEqual(Arg0, 0x3)){        // Power indicator "OFF?"
+      Or(Local0, PLOF, Local0)    // Set the Power Indicator to "OFF"
+    }
+    HPCC(Local0)
+  }
+
+  //;************************************************************************;
+  //; Power Slot Command
+  //;
+  //; Input: Arg0 - Command to issue
+  //;               1 = Slot Power ON
+  //;               2 = Slot Power Off
+  //;************************************************************************;
+  Method(PWSL,1){
+    Store(SCTL, Local0)           // Get Slot Control
+    If(Arg0){                     // Power Slot "ON" Arg0 = 1
+      And(Local0, SPON, Local0)   // Turns the Power "ON"
+    } Else {                      // Power Slot "OFF"
+      Or(Local0, SPOF, Local0)    // Turns the Power "OFF"
+    }
+    HPCC(Local0)
+  }
+
+  //;************************************************************************;
+  //; _OST Methods to indicate that the device Eject/insert request is
+  //; pending, OS could not complete it
+  //;
+  //; Input: Arg0 - Value used in Notify to OS
+  //;               0x00 - card insert
+  //;               0x03 - card eject  
+  //;        Arg1 - status of Notify
+  //;               0 - success
+  //;               0x80 - Ejection not supported by OSPM
+  //;               0x81 - Device in use
+  //;               0x82 - Device Busy
+  //;               0x84 - Ejection in progress-pending
+  //;************************************************************************;
+  Method(_OST,3,Serialized) {
+    Switch(And(Arg0,0xFF)) {      // Mask to retain low byte
+      Case(0x03) {                // Ejection Request
+        Switch(ToInteger(Arg1)) {
+          Case(Package() {0x80, 0x81, 0x82, 0x83}) {
+            //
+            // Ejection Failure for some reason
+            //
+            If (Lnot(PWCC())) {     // if slot is powered
+              PWCM(0x1)           // Set PowerIndicator to ON
+              Store(0x1,ABIE)     // Set AttnBtn Interrupt ON
+            }
+          }
+        }
+      }
+    }
+  } // End _OST
+
+  //;************************************************************************;
+  //; Eject Control Methods to indicate that the device is hot-ejectable and
+  //; should "eject" the device.
+  //;
+  //;
+  //;************************************************************************;
+  Method(EJ0L){
+    Store(0xFF, IO80)
+    Store(SCTL, Local0)             // Get IIO Port Control state
+    if( LNot( LEqual( ATID(), 1))) {  // Check if Attention LED is not solid "ON"
+      And(Local0, ALMK, Local0)     //  Mask the Attention Indicator Bits 
+      Or(Local0, ALBL, Local0)      //  Set the Attention Indicator to blink
+    }
+    HPCC(Local0)                    // issue command
+
+    Store(SCTL, Local0)             // Get IIO Port Control state
+    Or(Local0, SPOF, Local0)        // Set the Power Controller Control to Power Off
+    HPCC(Local0)
+
+    Store(SCTL, Local0)             // Get IIO Port Control state
+    Or(Local0, PLOF, Local0)        // Set the Power Indicator to Off.
+    HPCC(Local0)
+
+    Store(SCTL, Local0)             // Get IIO Port Control state
+    Or(Local0, ALOF, Local0)        // Set the Attntion LED to Off.
+    HPCC(Local0)
+
+  }  // End of EJ0L
+
+  //;************************************************************************;
+  //; PM_PME Wake Handler for All Slots 
+  //;
+  //; Input: Arg0 - Slot Numnber
+  //;
+  //;************************************************************************;
+  Method(PMEH,1){                   // Handler for PCI-E PM_PME Wake Event/Interupt (GPI xxh)
+    If(And(HPEV, SSTS)){            // Check for Hot-Plug Events
+      If(ABPS(0)) {
+        Store (Arg0, IO80)          // Send slot number to Port 80
+        ABPS(1)                     // Clear the interrupt status
+        Sleep(200)                  // delay 200ms
+      }
+    }
+    Return (0xff)                   // Indicate that this controller did not interrupt
+  }  // End of Method PMEH
+
+  //;************************************************************************;
+  //; Hot-Plug Handler for All Slots.
+  //;
+  //; Input: Arg0 - Slot Number
+  //;
+  //;************************************************************************;
+  Method(HPEH,1){                   // Handler for PCI-E Hot-Plug Event/Interupt (GPI xxh)
+    Store(0xFE, IO80)
+    Sleep(100)
+    Store(0,CCIE)                   // Disable command interrupt
+    If(And(HPEV, SSTS)){            // Check for Hot-Plug Events
+      Store(0xFD, IO80)
+      Sleep(10)
+      Store (Arg0, IO80)            // Send slot number to Port 80
+      Sleep(10)
+      Store(PPXH(), Local0)         // Call Hot plug Interrupt Handler
+      Return(Local0)                // Return PPXH information
+    }
+    Else{
+      Return (0xff)                 // Indicate that this controller did not interrupt
+    }
+    Store(0xFC, IO80)
+    Sleep(10)
+  }  // End of Method HPEH
+
+  //;************************************************************************;
+  //; Interrut Event Handler
+  //;
+  //;
+  //;************************************************************************;
+  Method(PPXH){                       // Hot plug Interrupt Handler
+    //
+    // Check for the Atention Button Press, Slot Empty/Presence, Power Controller Control.
+    //
+    Sleep(200)                        // HW Workaround for AttentionButton Status to stabilise
+    If(ABPS(0)) {                     // Check if Attention Button Pressed 
+      If(LNot(PRDS(0))) {             // See if nothing installed (no card in slot)
+        Store(0x1, LDIS)              // Disable the Link associated with PCI-E port
+        PWSL(0x0)                     // make sure Power is Off
+        PWCM(0x3)                     // Set Power Indicator to "OFF"
+        //
+        // Check for MRL here and set attn indicator accordingly
+        //
+        If(LEqual(MSSC(0),MRLS)) {    // Standby power is on - MRL closed
+          ATCM(0x2)                   // Set Attention Indicator to "BLINK"
+        } else {                      // Standby power is off - MRL open
+         ATCM(0x3)                    // set attention indicator "OFF"
+        }
+        Store(0x0, ABIE)              // set Attention Button Interrupt to disable
+        ABPS(1)                       // Clear the interrupt status
+        Sleep(200)                    // delay 200ms
+        Return(0xff)                  // Attn Button pressed without card in slot. Do nothing
+      }
+      //
+      // Card is present in slot so....
+      //
+      Store(0x0, ABIE)                // set Attention Button Interrupt to disable
+                                      // Attn Btn Interrupt has to be enabled only after an insert oprn
+      ABPS(1)                         // Clear the interrupt status
+      Sleep(200)                      // delay 200ms
+      //
+      // Check for MRL here - only if SPWR is OFF blink AttnInd and retun 0xff
+      //
+      //If(LNot(LEqual(MSSC()),MRLS))) { // Standby power is off
+      //   PWSL(0x0)                    // make sure Power is Off
+      //   PWCM(0x3)                    // Set Power Indicator to "OFF"
+      //   ATCM(0x2)                    // Set Attention Indicator to "BLINK"
+      //   Return(0xff)                 // Attn Button pressed with card in slot, but MRL open. Do nothing
+      //}
+      //Card Present, if StandbyPwr is ON proceed as below with Eject Sequence
+      If(PWCC()) {                      // Slot not Powered
+        PWCM(0x3)                     // Set Power Indicator to "OFF"
+        ATCM(0x2)                     // Set Attention Indicator to "BLINK"
+        Return(0xff)                  // Attn Button pressed with card in slot, MRL closed, Slot not powered. Do nothing
+      } Else {                        // See if Slot is already Powered
+        PWCM(0x2)                     // Set power Indicator to BLINK
+        Sleep(600)                    // Wait 100ms
+        Store(600, Local0)            // set 5 second accumulator to 0
+        ABPS(1)                       // Clear the interrupt status
+        Sleep(200)                    // delay 200ms
+        While(LNot(ABPS(0))) {           // check for someone pressing Attention
+          Sleep(200)                  // Wait 200ms
+          Add(Local0, 200, Local0)
+          If(LEqual(5000, Local0)) {  // heck if 5sec has passed without pressing attnetion btn
+            ABPS(1)                   // Clear the interrupt status
+            Sleep(200)                // delay 200ms 
+            Return (0x3)              // continue with Eject request
+          }
+        }
+        PWCM(0x1)                     // Set power Indicator baCK "ON"
+        ABPS(1)                       // Clear the Attention status
+        Sleep(200)                    // delay 200ms
+        Store(0x1, ABIE)              // set Attention Button Interrupt to enable
+        Return (0xff)                 // do nothing and abort
+      }
+    }  // End if for the Attention Button Hot Plug Interrupt.
+
+    If(PFDS(0)) {                     // Check if Power Fault Detected
+      PFDS(1)                         // Clear the Power Fault Status
+      PWSL(0x0)                       // set Power Off
+      PWCM(0x3)                       // set power indicator to OFF
+      ATCM(0x1)                       // set attention indicator "ON"
+      Store(0x1, LDIS)                // Disable the Link associated with PCI-E port
+      Return(0x03)            // Eject request.
+    }  // End if for the Power Fault Interrupt.
+
+    If(MSCS(0)) {                     // Check interrupt caused by the MRL Sensor
+      MSCS(1)                         // Clear the MRL Status
+      If(LEqual(MSSC(0),MRLS)) {      // Standby power is on - MRL closed
+        If(PRDS(0)) {                 // Card is Present
+
+        ATCM(0x3)                     // Set Attention Indicator to off
+        PWCM(0x2)                     // Set Power Indicator to Blink
+        Sleep(600)                    // Wait 100ms
+        Store(600, Local0)            // set 5 second accumulator to 0
+        ABPS(1)                       // Clear the interrupt status
+        While(LNot(ABPS(0))) {           // check for someone pressing Attention
+          Sleep(200)                  // Wait 200ms
+          Add(Local0, 200, Local0)
+          If(LEqual(5000, Local0)) {  // Check if 5 sec elapsed
+            Store(0x1, ABIE)          // Enable Attention button interrupt
+            ATCM(0x3)                 // set attention indicator "OFF"
+            Store(0x0, LDIS)          // Enable the Link associated with PCI-E port
+            PWSL(0x1)                 // Power the Slot
+            Sleep(500)                // Wait for .5 Sec for the Power to Stabilize.
+            // Check for the Power Fault Detection
+            If(LNot(PFDS(0))) {                 // No Power Fault
+              PWCM(0x1)                         // Set Power Indicator to "ON"
+              // Or(LVLS, 0x000010000, LVLS)    // Enable the Device 4 Slot Clock (GPIO16)
+              // Notify the OS to load the Driver for the card
+              Store(0x00, Local1)
+              Store(0x1, ABIE)                  // Enable Attention button interrupt
+            } Else {                            // Power Fault present
+              PWSL(0x0)                         // set Slot Power Off
+              PWCM(0x3)                         // set power indicator to OFF
+              ATCM(0x1)                         // set attention indicator "ON"
+              Store(0x1, LDIS)                  // Disable the Link associated with PCI-E port
+              // And (LVLS, 0x0FFFEFFFF, LVLS)  // Disable the Device 4 Slot Clock (GPIO16)
+              Store(0x03, Local1)               // Eject request.
+            }                                   // End if for the Slot Power Fault
+              ABPS(1)                           // Clear the Attention status
+              Sleep(200)                        // delay 200ms
+              Return(Local1)
+            }
+          }
+          //
+          // someone pressed Attention Button
+          //
+          ABPS(1)                   // Clear the Attention status
+          Sleep(200)                // delay 200ms
+          PWSL(0x0)                 // Set Slot Power off
+          PWCM(0x3)                 // Set Power Indicator back to "OFF"
+          ATCM(02)                  // Set Attention Indicator to "BLINK"
+          Store(0x1, LDIS)          // Disable the Link associated with PCI-E port
+          Return(0xff)              // leave it off
+          // End of Insert sequence
+        }
+        //MRL is closed, Card is not present
+        PWSL(0x0)                   // Set Slot Power off
+        PWCM(0x3)                   // Set Power Indicator back to "OFF"
+        ATCM(02)                    // Set Attention Indicator to "BLINK"
+        Store(0x1, LDIS)            // Disable the Link associated with PCI-E port
+        Return(0xff)                // leave it off
+      } Else {                      // MRL is open i.e Stdby power is turned off
+        If(PRDS(0)) {               //card present MRL switched off
+          ATCM(0x2)                 // Set Attention Indicator to "BLINK"
+          If(Lnot(PWCC())) {        // If slot is powered
+            // This event is not supported and someone has opened the MRL and dumped the power
+            //  on the slot with possible pending transactions. This could hose the OS.
+            // Try to Notify the OS to unload the drivers.
+            PWSL(0x0)               // Set Slot Power off
+            PWCM(0x3)               // Set Power Indicator back to "OFF"
+            Store(0x1, LDIS)        // Disable the Link associated with PCI-E port
+            Return(0x03)            // Eject request.
+          } Else {                  // Slot not powered, MRL is opened, card still in slot - Eject not fully complete
+            Return(0xFF)
+          }
+        }
+        //no card present and Stdby power switched off, turn AI off
+        ATCM(0x3)                   // Set Attention Indicator to "OFF"
+        Return(0xff)                // leave it off
+      }                             // End of MRL switch open/close state
+    }                               // End of MRL Sensor State Change
+
+    If(PDCS(0)) {                   // Check if Presence Detect Changed Status
+      PDCS(1)                       // Clear the Presence Detect Changed Status
+      If(LNot(PRDS(0))) {           // Slot is Empty
+        PWSL(0x0)                   // Set Slot Power "OFF"
+        PWCM(0x3)                   // set power indicator to "OFF"
+        If(LEqual(MSSC(0),MRLS)) {  // If Standby power is on
+          ATCM(0x2)                 // Set Attention Indicator to "Blink"
+        } else {
+          ATCM(0x3)                 // Set Attention Indicator to "OFF"
+        }
+        Store(0x1, LDIS)            // Disable the Link associated with PCI-E port
+        Return(0xFF)                // Do nothing
+      } Else {                      // Slot Card is inserted
+        // Irrespective of MRL state, do the following
+        Store(0x0, LDIS)            // Enable the Link associated with PCI-E port
+        PWSL(0x1)                   // Set Slot Power ON
+        Sleep(500)                  // Wait for .5 Sec for the Power to Stabilize.
+        If(LNot(PFDS(0))) {         // No Power Fault
+          PWCM(0x1)                 // Set Power Indicator to "ON"
+          Store(0x00, Local1)
+          Store(0x1, ABIE)          // Enable Attention button interrupt
+          ATCM(0x3)                 // Set Attention Indicator to "OFF"
+        } Else {                    // Power Fault present
+          PWSL(0x0)                 // set Slot Power Off
+          PWCM(0x3)                 // set power indicator to OFF
+          ATCM(0x1)                 // set attention indicator "ON"
+          Store(0x1, LDIS)          // Disable the Link associated with PCI-E port
+          Store(0x03, Local1)       // Eject request.
+        }                           // End if for the Slot Power Fault
+        ABPS(1)                     // Clear the Attention status
+        Sleep(200)                  // delay 200ms
+        Return(Local1)
+      }
+    }  // End if for the Presence Detect Changed Hot Plug Interrupt.
+    Return(0xff)    // should not get here, but do device check if it does.
+  }  // End of method PP5H
+  //
+  // End of hotplug code
+  //

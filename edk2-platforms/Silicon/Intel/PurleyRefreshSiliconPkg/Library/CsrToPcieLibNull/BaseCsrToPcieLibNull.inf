@@ -1,0 +1,67 @@
+## @file
+#
+# Copyright (c) 2018 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+################################################################################
+#
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseCsrToPcieLibNull
+  FILE_GUID                      = 848E908E-BD11-428E-94F9-7A0EEFCD37A6
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = CsrToPcieLib
+
+##  {848E908E-BD11-428E-94F9-7A0EEFCD37A6}
+##{ 0x848e908e, 0xbd11, 0x428e, { 0x94, 0xf9, 0x7a, 0xe, 0xef, 0xcd, 0x37, 0xa6 } };
+
+
+[Sources]
+  CsrToPcieLib.c
+
+################################################################################
+#
+# Package Dependency Section - list of Package files that are required for
+#                              this module.
+#
+################################################################################
+
+[Packages]
+  MdePkg/MdePkg.dec
+  PurleyRefreshSiliconPkg/SiPkg.dec
+
+
+################################################################################
+#
+# Library Class Section - list of Library Classes that are required for
+#                         this module.
+#
+################################################################################
+
+[LibraryClasses]
+  BaseLib
+  PcdLib
+
+
+[Guids]
+  gEfiCpRcPkgTokenSpaceGuid
+
+################################################################################
+#
+# Protocol C Name Section - list of Protocol and Protocol Notify C Names
+#                           that this module uses or produces.
+#
+################################################################################
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+  gEfiCpRcPkgTokenSpaceGuid.PcdPcieSegmentSize
+  gEfiCpRcPkgTokenSpaceGuid.PcdPcieMmcfgTablePtr
+
+

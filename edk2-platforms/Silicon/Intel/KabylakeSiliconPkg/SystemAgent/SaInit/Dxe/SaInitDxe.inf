@@ -1,0 +1,102 @@
+## @file
+# Component description file for SystemAgent Initialization driver
+#
+# Copyright (c) 2017 - 2020 Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+
+[Defines]
+INF_VERSION = 0x00010017
+BASE_NAME = SaInitDxe
+FILE_GUID = DE23ACEE-CF55-4fb6-AA77-984AB53DE811
+VERSION_STRING = 1.0
+MODULE_TYPE = DXE_DRIVER
+ENTRY_POINT = SaInitEntryPointDxe
+#
+# The following information is for reference only and not required by the build tools.
+#
+# VALID_ARCHITECTURES = IA32 X64 EBC
+#
+
+
+
+[LibraryClasses]
+UefiDriverEntryPoint
+UefiLib
+UefiBootServicesTableLib
+DxeServicesTableLib
+DebugLib
+TimerLib
+PciLib
+BaseMemoryLib
+MemoryAllocationLib
+CpuPlatformLib
+IoLib
+S3BootScriptLib
+MmPciLib
+PchCycleDecodingLib
+PchP2sbLib
+GpioLib
+ConfigBlockLib
+SaPlatformLib
+HobLib
+PchPcieRpLib
+
+[Packages]
+MdePkg/MdePkg.dec
+UefiCpuPkg/UefiCpuPkg.dec
+KabylakeSiliconPkg/SiPkg.dec
+KabylakeSiliconPkg/KabylakeSiliconPrivate.dec
+IntelSiliconPkg/IntelSiliconPkg.dec
+
+[Pcd]
+gSiPkgTokenSpaceGuid.PcdAcpiDefaultOemId
+gSiPkgTokenSpaceGuid.PcdMchBaseAddress
+
+[Sources]
+SaInitDxe.h
+SaInitDxe.c
+SaInit.h
+IgdOpRegion.h
+IgdOpRegion.c
+GraphicsInit.h
+GraphicsInit.c
+SaAcpi.c
+VTd.c
+VTd.h
+
+
+[Protocols]
+gEfiAcpiTableProtocolGuid              ## CONSUMES
+gSaGlobalNvsAreaProtocolGuid           ## PRODUCES
+gSaPolicyProtocolGuid                  ## CONSUMES
+gEfiCpuArchProtocolGuid                ## CONSUMES
+gEfiPciEnumerationCompleteProtocolGuid ## CONSUMES
+gEfiPciRootBridgeIoProtocolGuid        ## CONSUMES
+gEfiPciIoProtocolGuid                  ## CONSUMES
+gEfiGlobalNvsAreaProtocolGuid          ## CONSUMES
+gIgdOpRegionProtocolGuid               ## PRODUCES
+gEfiFirmwareVolume2ProtocolGuid        ## CONSUMES
+gEfiLegacyBiosProtocolGuid             ## CONSUMES
+
+[Guids]
+gSaConfigHobGuid
+gSaAcpiTableStorageGuid
+gMiscDxeConfigGuid
+gSaSsdtAcpiTableStorageGuid
+gEfiEndOfDxeEventGroupGuid
+gSiConfigHobGuid        ## CONSUMES
+gPchConfigHobGuid       ## CONSUMES
+gGraphicsDxeConfigGuid
+
+[Depex]
+gEfiAcpiTableProtocolGuid AND
+gEfiFirmwareVolume2ProtocolGuid AND
+gSaPolicyProtocolGuid AND
+gEfiPciRootBridgeIoProtocolGuid AND
+gEfiPciHostBridgeResourceAllocationProtocolGuid AND # This is to ensure that PCI MMIO resource has been prepared and available for this driver to allocate.
+gEfiHiiDatabaseProtocolGuid
+

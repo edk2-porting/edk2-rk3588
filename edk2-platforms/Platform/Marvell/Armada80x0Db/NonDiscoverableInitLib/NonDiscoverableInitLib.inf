@@ -1,0 +1,44 @@
+## @file
+#
+#  Copyright (c) 2017, Linaro Ltd. All rights reserved.<BR>
+#  Copyright (c) 2018, Marvell International Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = Armada80x0DbNonDiscoverableInitLib
+  FILE_GUID                      = 719c91d5-25aa-4366-988a-1642ae3a6734
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NonDiscoverableInitLib
+
+#
+# The following information is for reference only and not required by the build
+# tools.
+#
+#  VALID_ARCHITECTURES           = AARCH64
+#
+
+[Sources]
+  NonDiscoverableInitLib.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Silicon/Marvell/Marvell.dec
+
+[LibraryClasses]
+  DebugLib
+  IoLib
+  MvGpioLib
+
+[Protocols]
+  gEmbeddedGpioProtocolGuid
+
+[Depex]
+  gMarvellPlatformInitCompleteProtocolGuid

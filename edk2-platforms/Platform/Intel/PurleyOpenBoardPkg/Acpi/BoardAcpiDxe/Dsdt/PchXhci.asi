@@ -1,0 +1,329 @@
+/** @file
+
+Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+Name (OPAC, Zero)
+Name (XRST, Zero)
+Name (XUSB, Zero)
+
+OperationRegion (XPRT, PCI_Config, 0x74, 0x6C)
+Field (XPRT, DWordAcc, NoLock, Preserve)
+{
+      , 8,
+  PMEE, 1,   // PWR_CNTL_STS.PME_En
+      , 6,
+  PMES, 1,   // PWR_CNTL_STS.PME_Sts
+  Offset (0x5C),
+  PR2,  32,  // XUSB2PR: xHC USB 2.0 Port Routing Register.
+  PR2M, 32,  // XUSB2PRM: xHC USB 2.0 Port Routing Mask Register.
+  PR3,  32,  // USB3_PSSEN: USB3.0 Port SuperSpeed Enable Register.
+  PR3M, 32   // USB3PRM: USB3.0 Port Routing Mask Register
+}
+
+Method (_PSW,1)
+{
+  If (Arg0)
+  {
+    Store (Ones,PMEE)
+  }
+  Else
+  {
+    Store (0,PMEE)
+  }
+}
+
+
+//
+// Indicate access to OperationRegions is enabled/disabled
+//
+Method (_REG, 2) {
+  //
+  // If OperationRegion ID = PCI_Config
+  //
+  If (LEqual (Arg0, 2)) {
+  //
+    // If access is enabled
+    //
+    If (LEqual(Arg1, 1)) {
+      //
+      // Set local flag
+      //
+      Store (One, OPAC)
+
+    } Else {
+      //
+      // Clear local flag
+      //
+      Store (One, OPAC)
+    }
+  }
+}
+
+//
+// Initialization for this controller
+//
+Method (_INI, 0) {
+  //
+  // If access to OperationRegion is enabled
+  //
+  If (LEqual (OPAC, One)) {
+    Store (1, PMES)     // clear PME status
+    Store (0, PMEE)     // clear PME enable
+  }
+}
+
+//
+// _OSC for xHCI
+// This method enables XHCI controller if available.
+//
+// Arguments:
+//  Arg0 (Integer): Revision ID - should be set to 1
+//
+//  Arg1 (Integer): Count of DWords in Arg3
+//
+//  Arg2 (Buffer) : Capabilities Buffer
+//                  DWORD #0 (Status/Error):
+//                  Bit 0 - Query Support Flag
+//                  Bit 1 - Always clear(0)
+//                  Bit 2 - Always clear(0)
+//                  Bit 3 - Always clear(0)
+//
+//                  All others - reserved
+//
+//                  DWORD #1 (Supported):
+//                  Bit 0 - 1: Switch to xHCI
+//
+//                  All others - reserved
+//
+//                  DWORD #2 (Controlled):
+//                  Bit 0 - 1: Clear Smart Auto state (disable xHCI)
+//
+//                  All others - reserved
+//
+// Returns:
+//  Capabilities Buffer:
+//                  DWORD #0 (Status):
+//                  Bit 0 - Reserved (not used)
+//
+//                  Bit 1 - _OSC failure. Platform Firmware was unable to process the request or query.
+//                          Capabilities bits may have been masked.
+//
+//                  Bit 2 - Unrecognized UUID. This bit is set to indicate that the platform firmware
+//                          does not recognize the UUID passed in _OSC Arg0.
+//                          Capabilities bits are preserved.
+//
+//                  Bit 3 - Unrecognized Revision. This bit is set to indicate that the platform firmware
+//                          does not recognize the Revision ID passed in via Arg1.
+//                          Capabilities bits beyond those comprehended by the firmware will be masked.
+//
+//                  Bit 4 - Capabilities Masked. This bit is set to indicate
+//                          that capabilities bits set by driver software
+//                          have been cleared by platform firmware.
+//
+//                  Bit 5 - 0: EHCI controller exposed to OS
+//                          1: xHCI controller exposed to OS
+//
+//                  All others - reserved (return 0)
+//
+//                  DWORD #1 (Supported):
+//                  Bit 0 - 0: EHCI supported
+//                          1: xHCI supported
+//
+//                  All others - reserved
+//
+//                  DWORD #2 (Controlled):
+//
+//                  All bits - reserved
+//
+
+Method (POSC, 3) {
+
+  Store (0x81, IO80)
+
+  //
+  // Create DWord fields from the Capabilities Buffer
+  //
+  CreateDWordField (Arg2, 0, CDW1)    // CDW1 = DWORD that starts at offset 0 of Arg2
+  CreateDWordField (Arg2, 4, CDW2)    // CDW2 = DWORD that starts at offset 4 of Arg2
+  CreateDWordField (Arg2, 8, CDW3)    // CDW3 = DWORD that starts at offset 8 of Arg2
+
+  //
+  // Are we running a version of Windows that runs the Intel xHCI driver?
+  // i.e. Windows Server 2008 through Windows Server 2008 R2 & Windows 7
+  //
+  If (LAnd (LGreaterEqual (\_SB.OSYS, 9), LLessEqual (\_SB.OSYS, 12))) {
+    //
+    // Running Windows
+    // Check revision is >= 2
+    //
+    If (LLess (Arg0, 2)) {
+      //
+      // Set unknown revision bit
+      //
+      Or (CDW1, 8, CDW1)
+      Store (0x82, IO80)
+    }
+  } Else {
+    //
+    // If the Intel xHCI driver not calling,
+    //  then it must be SVOS
+    If (LNotEqual (Arg0, 1)) {
+      //
+      // Set unknown revision bit
+      //
+      Or (CDW1, 8, CDW1)
+      Store (0x82, IO80)
+    }
+  }
+
+  //
+  // Set failure if xHCI is disabled by BIOS
+  //
+  If (LEqual (XHMD, 0)) {
+    Or (CDW1, 2, CDW1)
+    Store (0x83, IO80)
+  }
+
+  //
+  // If no error bits set
+  //
+  If (LEqual (And (CDW1, 0xE), 0)) {
+    //
+    // If not just querying support
+    //
+    If (LNot (And (CDW1, 1))) {
+      //
+      // If uninstaller calling
+      //  to switch back to EHCI
+      //
+      If (And (CDW3, 1)) {
+        //
+        // Switch to EHCI
+        //
+        ESEL()
+        Store (0x85, IO80)
+
+        //
+        // And clear ACPINVS variable
+        //  that is a copy of USB3.0 setup option
+        //  so that we will not re-enable xHCI until
+        //  the next reboot
+        //
+        Store (0, XHMD)
+      }
+
+      //
+      // Uninstaller not calling,
+      //  OS wants to enable xHCI?
+      //
+      If (And (CDW2, 1)) {
+        //
+        // Switch to xHCI
+        //
+        XSEL(0)
+        Store (0x84, IO80)
+      } Else {
+        //
+        // Switch to EHCI
+        //
+        ESEL()
+        Store (0x85, IO80)
+      }
+    }
+  }
+
+  Return(Arg2)
+}
+
+//
+// Put all ports in XHCI mode
+//
+Method (XSEL, 1, Serialized) {
+  //
+  // If xHCI in auto or smart auto mode
+  //  or Arg0 == 1
+  //
+  If ( LOr (LOr (LEqual (XHMD, 2), LEqual (XHMD, 3)), Arg0) ) {
+    //
+    // If xHCI in smart auto mode
+    //
+    If (LEqual (XHMD, 3)) {
+      //
+      // Set B0:D31:F0 ACh[16] to indicate OS has routed ports to xHCI controller
+      //
+      Store (1, \_SB.PC00.LPC0.XSMB)
+    }
+
+    //
+    // Set flags so on Sx resume, we'll know OS has previously
+    //  routed ports to xHCI
+		//
+    Store (1, XUSB)
+    Store (1, XRST) // Backup XUSB, cause it might lost in iRST G3 or DeepSx
+
+    //
+    // Enable selected SS ports, route corresponding HS ports to xHCI
+    //
+    Store (0, Local0)
+    And (PR3, 0xFFFFFFC0, Local0)
+    Or (Local0, PR3M, PR3)
+    Store (0, Local0)
+    And (PR2, 0xFFFF8000, Local0)
+    Or (Local0, PR2M, PR2)
+  }
+}
+
+//
+// Put all ports in EHCI mode
+//
+Method (ESEL, 0, Serialized) {
+  //
+  // xHCI in auto or smart auto mode
+  //
+  If (LOr (LEqual (XHMD, 2), LEqual (XHMD, 3))) {
+    //
+    // Disable all SS ports, route all HS ports to EHCI
+    //
+    And (PR3, 0xFFFFFFC0, PR3)
+    And (PR2, 0xFFFF8000, PR2)
+
+    //
+    // Mark as not routed.
+    //
+    Store (0, XUSB)
+    Store (0, XRST)
+  }
+}
+
+Method (XWAK, 0, Serialized) {
+  //
+  // If ports were routed to xHCI before sleep
+  //
+  If (LOr (LEqual (XUSB, 1), LEqual (XRST, 1))) {
+    //
+    // Restore back to xHCI, ignore XHMD
+    //
+    XSEL(1)
+
+    //
+    // And tell OS to re-enumerate xHCI
+    //
+    Notify (\_SB.PC00.XHCI, 0x00)
+  }
+}
+
+//
+// Report what D state the controller is in
+//  when the system changes to S3 and S4
+//
+Method(_S3D, 0, NotSerialized) {
+  Return(2)
+}
+
+Method(_S4D, 0, NotSerialized) {
+  Return(2)
+}
+

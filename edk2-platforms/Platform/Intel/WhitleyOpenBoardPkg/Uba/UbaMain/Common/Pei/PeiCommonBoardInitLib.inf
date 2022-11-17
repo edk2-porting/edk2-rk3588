@@ -1,0 +1,76 @@
+## @file
+# Board Init for multi-boards support in PEI phase.
+#
+# @copyright
+# Copyright 2015 - 2021 Intel Corporation. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = CommonPeiBoardInitLib
+  FILE_GUID                      = 46BF553E-2C76-41C6-A0E8-E242F46BBD5F
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|PEIM
+  CONSTRUCTOR                    = CommonPeiBoardInitLibConstructor
+
+
+[Sources]
+  PeiCommonBoardInitLib.c
+  Clockgen.c
+  GpioPlatformConfig.c
+  BoardInfo.c
+  ClocksConfig.c
+  HsioPtssTableConfig.c
+  IioPortBifurcation.c
+  IioPortBifurcationVer1.c
+  PchLbgHsioPtssTablesBx.c
+  PchLbgHsioPtssTablesBx_Ext.c
+  PchLbgHsioPtssTablesSx.c
+  PchLbgHsioPtssTablesSx_Ext.c
+  IioBifurcationSlotTable.h
+  PchHsioPtssTables.h
+  PchLbgHsioPtssTablesBx.h
+  PchLbgHsioPtssTablesBx_Ext.h
+  PchLbgHsioPtssTablesSx.h
+  PchLbgHsioPtssTablesSx_Ext.h
+  PeiCommonBoardInitLib.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  WhitleySiliconPkg/WhitleySiliconPkg.dec
+  WhitleySiliconPkg/CpRcPkg.dec
+  WhitleySiliconPkg/SiliconPkg.dec
+  WhitleyOpenBoardPkg/PlatformPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  PeiServicesLib
+  PeimEntryPoint
+  DebugLib
+  PlatformClocksLib
+  HobLib
+  PciLib
+  IoLib
+  PeiServicesTablePointerLib
+
+[Guids]
+  gPlatformKtiEparamUpdateDataGuid
+  gEfiPlatformInfoGuid
+
+[Ppis]
+  gPchPlatformPolicyPpiGuid
+  gUbaConfigDatabasePpiGuid
+  gEfiPeiSmbus2PpiGuid
+  gEfiPeiStallPpiGuid
+  gPchHsioPtssTablePpiGuid
+  gDynamicSiLibraryPpiGuid           ## CONSUMES
+
+[Pcd]
+  gOemSkuTokenSpaceGuid.PcdOemSkuClockGeneratorAddress
+
+[Depex]
+  gDynamicSiLibraryPpiGuid

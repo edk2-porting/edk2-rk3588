@@ -1,0 +1,55 @@
+### @file
+# Module that show progress bar and title above it.
+#
+# General BDS defines and produce general interfaces for platform BDS driver including:
+# 1) BDS boot policy interface;
+# 2) BDS boot device connect interface;
+# 3) BDS Misc interfaces for mainting boot variable, ouput string, etc.
+#
+# Copyright (c) 2007 - 2019 Intel Corporation. All rights reserved. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+###
+
+[Defines]
+  INF_VERSION                    = 0x00010017
+  BASE_NAME                      = DxeLogoLib
+  FILE_GUID                      = F5AE5B5C-42E8-4A9B-829D-5B631CD5367A
+  VERSION_STRING                 = 1.0
+  MODULE_TYPE                    = DXE_DRIVER
+  LIBRARY_CLASS                  = LogoLib|DXE_DRIVER UEFI_APPLICATION
+#
+# The following information is for reference only and not required by the build tools.
+#
+# VALID_ARCHITECTURES = IA32 X64 IPF EBC
+#
+
+[LibraryClasses]
+  BaseLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  UefiLib
+  BaseMemoryLib
+  DebugLib
+  PrintLib
+  PcdLib
+  DxeServicesLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  SimicsOpenBoardPkg/OpenBoardPkg.dec
+
+[FeaturePcd]
+  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
+
+[Sources]
+  Logo.c
+
+[Protocols]
+  gEfiGraphicsOutputProtocolGuid                ## SOMETIMES_CONSUMES
+  gEfiUgaDrawProtocolGuid                       ## SOMETIMES_CONSUMES
+  gEfiBootLogoProtocolGuid                      ## SOMETIMES_CONSUMES
+  gEfiUserManagerProtocolGuid                   ## CONSUMES
+  gEfiOemBadgingProtocolGuid                    ## CONSUMES

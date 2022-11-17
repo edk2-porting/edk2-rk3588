@@ -1,0 +1,45 @@
+#/** @file
+#  INF file for the Silicon Image I3132 SATA controller
+#
+#  WARNING:
+#  This driver fails to follow the UEFI driver model without a good
+#  reason, and only remains in the tree because it is still used by
+#  a small number of platforms. It will be removed when no longer used.
+#  New platforms should not use it, and no one should use this as
+#  reference code for developing new drivers.
+#
+#  Copyright (c) 2011-2020, ARM Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 1.27
+  BASE_NAME                      = SataSiI3132Dxe
+  FILE_GUID                      = 1df18da0-a18b-11df-8c3a-0002a5d5c51b
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializeSataSiI3132
+
+[Packages]
+  MdePkg/MdePkg.dec
+  Platform/ARM/JunoPkg/ArmJuno.dec
+
+[LibraryClasses]
+  MemoryAllocationLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Sources]
+  ComponentName.c
+  SataSiI3132.c
+  SiI3132AtaPassThru.c
+
+[Protocols]
+  gEfiPciIoProtocolGuid                         # CONSUMED
+  gEfiAtaPassThruProtocolGuid                   # PRODUCED
+
+[Pcd]
+  gArmJunoTokenSpaceGuid.PcdSataSiI3132FeaturePMPSupport
+  gArmJunoTokenSpaceGuid.PcdSataSiI3132FeatureDirectCommandIssuing

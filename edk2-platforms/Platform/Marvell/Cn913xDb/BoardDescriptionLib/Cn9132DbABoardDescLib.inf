@@ -1,0 +1,29 @@
+## @file
+#
+#  Copyright (C) 2019, Marvell International Ltd. and its affiliates<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = Cn9132DbABoardDescLib
+  FILE_GUID                      = cf7a0f12-45fe-417b-9c34-053605973b68
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmadaBoardDescLib
+
+[Sources]
+  Cn9132DbABoardDescLib.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/Marvell/Marvell.dec
+
+[LibraryClasses]
+  DebugLib
+  IoLib

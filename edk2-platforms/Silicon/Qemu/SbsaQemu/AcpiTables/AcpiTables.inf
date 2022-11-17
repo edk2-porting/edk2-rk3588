@@ -1,0 +1,76 @@
+## @file
+#
+#  ACPI table data and ASL sources required to boot the platform.
+#
+#  Copyright (c) 2020, Linaro Ltd. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = SbsaAcpiTables
+  FILE_GUID                      = 7E374E25-8E01-4FEE-87F2-390C23C606CD
+  MODULE_TYPE                    = USER_DEFINED
+  VERSION_STRING                 = 1.0
+
+[Sources]
+  Dbg2.aslc
+  Dsdt.asl
+  Fadt.aslc
+  Gtdt.aslc
+  Mcfg.aslc
+  Spcr.aslc
+
+[Packages]
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  ArmPkg/ArmPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Silicon/Qemu/SbsaQemu/SbsaQemu.dec
+
+[FixedPcd]
+  gArmTokenSpaceGuid.PcdGicDistributorBase
+  gArmTokenSpaceGuid.PcdGicRedistributorsBase
+
+  gArmTokenSpaceGuid.PcdArmArchTimerSecIntrNum
+  gArmTokenSpaceGuid.PcdArmArchTimerIntrNum
+  gArmTokenSpaceGuid.PcdArmArchTimerHypIntrNum
+  gArmTokenSpaceGuid.PcdArmArchTimerVirtIntrNum
+
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorId
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision
+
+  gArmTokenSpaceGuid.PcdPciBusMin
+  gArmTokenSpaceGuid.PcdPciBusMax
+
+  gArmTokenSpaceGuid.PcdPciIoBase
+  gArmTokenSpaceGuid.PcdPciIoSize
+  gArmTokenSpaceGuid.PcdPciIoTranslation
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdPciIoLimit
+
+  gArmTokenSpaceGuid.PcdPciMmio32Base
+  gArmTokenSpaceGuid.PcdPciMmio32Size
+  gArmTokenSpaceGuid.PcdPciMmio32Translation
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdPciMmio32Limit
+
+  gArmTokenSpaceGuid.PcdPciMmio64Base
+  gArmTokenSpaceGuid.PcdPciMmio64Size
+  gArmTokenSpaceGuid.PcdPciMmio64Translation
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdPciMmio64Limit
+
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdPciExpressBarSize
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdPciExpressBarLimit
+
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase
+
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdPlatformAhciBase
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdPlatformAhciSize
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdPlatformEhciBase
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdPlatformEhciSize

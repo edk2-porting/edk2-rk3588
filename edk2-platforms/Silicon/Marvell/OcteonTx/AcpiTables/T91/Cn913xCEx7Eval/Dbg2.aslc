@@ -1,0 +1,74 @@
+/** @file
+*  Debug Port Table (DBG2)
+*
+*  Copyright (c) 2020 Linaro Ltd. All rights reserved.
+*  Copyright (c) 2021 ARM Ltd. All rights reserved.
+*  Copyright (c) 2021 Semihalf. All rights reserved.
+*
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
+*
+**/
+#include <IndustryStandard/Acpi.h>
+#include <IndustryStandard/DebugPort2Table.h>
+#include <Library/AcpiLib.h>
+#include <Library/PcdLib.h>
+
+#include "AcpiHeader.h"
+#include "Cn913xCEx7Eval/Dbg2.h"
+
+#pragma pack(1)
+
+#define CN913X_UART_STR { '\\', '_', 'S', 'B', '.', 'C', 'O', 'M', '2', 0x00 }
+
+typedef struct {
+  EFI_ACPI_DBG2_DEBUG_DEVICE_INFORMATION_STRUCT Dbg2Device;
+  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE        BaseAddressRegister;
+  UINT32                                        AddressSize;
+  UINT8                                         NameSpaceString[10];
+} DBG2_DEBUG_DEVICE_INFORMATION;
+
+typedef struct {
+  EFI_ACPI_DEBUG_PORT_2_DESCRIPTION_TABLE       Description;
+  DBG2_DEBUG_DEVICE_INFORMATION                 Dbg2DeviceInfo;
+} DBG2_TABLE;
+
+
+STATIC DBG2_TABLE Dbg2 = {
+  {
+    __ACPI_HEADER (
+      EFI_ACPI_6_3_DEBUG_PORT_2_TABLE_SIGNATURE,
+      DBG2_TABLE,
+      EFI_ACPI_DBG2_DEBUG_DEVICE_INFORMATION_STRUCT_REVISION
+    ),
+    OFFSET_OF (DBG2_TABLE, Dbg2DeviceInfo),
+    1                                      /* NumberOfDebugPorts */
+  },
+  {
+    {
+      EFI_ACPI_DBG2_DEBUG_DEVICE_INFORMATION_STRUCT_REVISION,
+      sizeof (DBG2_DEBUG_DEVICE_INFORMATION),
+      1,                                   /* NumberofGenericAddressRegisters */
+      10,                                  /* NameSpaceStringLength */
+      OFFSET_OF (DBG2_DEBUG_DEVICE_INFORMATION, NameSpaceString),
+      0,                                   /* OemDataLength */
+      0,                                   /* OemDataOffset */
+      EFI_ACPI_DBG2_PORT_TYPE_SERIAL,
+      EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_16550_SUBSET_COMPATIBLE_WITH_MS_DBGP_SPEC,
+      {
+        EFI_ACPI_RESERVED_BYTE,
+        EFI_ACPI_RESERVED_BYTE
+      },
+      OFFSET_OF (DBG2_DEBUG_DEVICE_INFORMATION, BaseAddressRegister),
+      OFFSET_OF (DBG2_DEBUG_DEVICE_INFORMATION, AddressSize)
+    },
+    MV_UART_AS32 (CN913X_DBG2_UART_REG_BASE),            /* BaseAddress */
+    SIZE_4KB,                                            /* AddressSize */
+    CN913X_UART_STR,                                     /* NameSpaceString */
+  }
+};
+
+#pragma pack()
+
+// Reference the table being generated to prevent the optimizer from removing
+// the data structure from the executable
+VOID* CONST ReferenceAcpiTable = &Dbg2;

@@ -1,0 +1,66 @@
+## @file
+# Component information file for PEI Board Init Pre-Mem Library
+#
+# @copyright
+# Copyright (c) 2017 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BoardInitPreMemLib
+  FILE_GUID                      = 73AA24AE-FB20-43F9-A3BA-448953A03A78
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = BoardInitLib
+
+[LibraryClasses]
+  PeiServicesLib
+  PeimEntryPoint
+  PciLib
+  PeiServicesTablePointerLib
+  PciExpressLib
+  BaseCryptLib
+  CmosAccessLib
+  PeiPlatformHookLib
+  ReportStatusCodeLib
+  BaseLib
+  DebugLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  PcdLib
+  HobLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+  WhitleySiliconPkg/WhitleySiliconPkg.dec
+  WhitleyOpenBoardPkg/PlatformPkg.dec
+  WhitleySiliconPkg/SiliconPkg.dec
+  WhitleySiliconPkg/Cpu/CpuRcPkg.dec
+  WhitleySiliconPkg/CpRcPkg.dec
+
+[Sources]
+  BoardInitPreMemLib.c
+
+[Ppis]
+  gDynamicSiLibraryPpiGuid                 ## CONSUMES
+
+[Guids]
+  gEfiPlatformInfoGuid
+
+[Pcd]
+  gStructPcdTokenSpaceGuid.PcdSetup
+  gStructPcdTokenSpaceGuid.PcdSocketProcessorCoreConfig
+  gStructPcdTokenSpaceGuid.PcdSocketIioConfig
+  gStructPcdTokenSpaceGuid.PcdPchSetup
+  gCpuPkgTokenSpaceGuid.PcdCpuIEDRamSize
+
+[FixedPcd]
+  gSiPkgTokenSpaceGuid.PcdTcoBaseAddress
+  gSiPkgTokenSpaceGuid.PcdAcpiBaseAddress
+
+[Depex]
+  gDynamicSiLibraryPpiGuid

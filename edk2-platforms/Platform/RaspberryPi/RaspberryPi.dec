@@ -1,0 +1,74 @@
+## @file
+#
+#  Copyright (c) 2016, Linaro, Ltd. All rights reserved.
+#  Copyright (c) 2017-2018, Andrei Warkentin <andrey.warkentin@gmail.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x0001001A
+  PACKAGE_NAME                   = RaspberryPi
+  PACKAGE_GUID                   = DFA0CA8B-F3AC-4607-96AC-46FA04B84DCC
+  PACKAGE_VERSION                = 1.0
+
+[Includes]
+  Include
+
+[Protocols]
+  gRaspberryPiFirmwareProtocolGuid = { 0x0ACA9535, 0x7AD0, 0x4286, { 0xB0, 0x2E, 0x87, 0xFA, 0x7E, 0x2A, 0x57, 0x11 } }
+  gRaspberryPiConfigAppliedProtocolGuid = { 0x0ACA4444, 0x7AD0, 0x4286, { 0xB0, 0x2E, 0x87, 0xFA, 0x7E, 0x2A, 0x57, 0x11 } }
+  gRaspberryPiMmcHostProtocolGuid = { 0x3e591c00, 0x9e4a, 0x11df, {0x92, 0x44, 0x00, 0x02, 0xA5, 0xF5, 0xF5, 0x1B } }
+  gExtendedTextOutputProtocolGuid = { 0x387477ff, 0xffc7, 0xffd2, {0x8e, 0x39, 0x0, 0xff, 0xc9, 0x69, 0x72, 0x3b } }
+
+[Guids]
+  gRaspberryPiTokenSpaceGuid = {0xCD7CC258, 0x31DB, 0x11E6, {0x9F, 0xD3, 0x63, 0xB0, 0xB8, 0xEE, 0xD6, 0xB5}}
+  gRaspberryPiEventResetGuid = {0xCD7CC258, 0x31DB, 0x11E6, {0x9F, 0xD3, 0x63, 0xB4, 0xB4, 0xE4, 0xD4, 0xB4}}
+  gConfigDxeFormSetGuid = {0xCD7CC258, 0x31DB, 0x22E6, {0x9F, 0x22, 0x63, 0xB0, 0xB8, 0xEE, 0xD6, 0xB5}}
+
+[PcdsFixedAtBuild.common]
+  #
+  # Space reserved for config.txt-specced DTB follows right after the FD image
+  # in both RPi3 and RP4 implementations.
+  #
+  gRaspberryPiTokenSpaceGuid.PcdFdtBaseAddress|0x001f0000|UINT32|0x00000001
+  gRaspberryPiTokenSpaceGuid.PcdFirmwareBlockSize|0x0|UINT32|0x00000002
+  gRaspberryPiTokenSpaceGuid.PcdNvStorageEventLogBase|0x0|UINT32|0x00000003
+  gRaspberryPiTokenSpaceGuid.PcdNvStorageEventLogSize|0x0|UINT32|0x00000004
+  gRaspberryPiTokenSpaceGuid.PcdNvStorageVariableBase|0x0|UINT32|0x00000005
+  gRaspberryPiTokenSpaceGuid.PcdNvStorageFtwSpareBase|0x0|UINT32|0x00000006
+  gRaspberryPiTokenSpaceGuid.PcdNvStorageFtwWorkingBase|0x0|UINT32|0x00000007
+  gRaspberryPiTokenSpaceGuid.PcdFdtSize|0x10000|UINT32|0x00000009
+  gRaspberryPiTokenSpaceGuid.PcdCpuLowSpeedMHz|600|UINT32|0x0000000a
+  gRaspberryPiTokenSpaceGuid.PcdCpuDefSpeedMHz|800|UINT32|0x0000000b
+  gRaspberryPiTokenSpaceGuid.PcdCpuMaxSpeedMHz|1000|UINT32|0x0000000c
+  gRaspberryPiTokenSpaceGuid.PcdGicInterruptInterfaceHBase|0x0|UINT64|0x00000030
+  gRaspberryPiTokenSpaceGuid.PcdGicInterruptInterfaceVBase|0x0|UINT64|0x00000031
+  gRaspberryPiTokenSpaceGuid.PcdGicGsivId|0x0|UINT32|0x00000032
+  gRaspberryPiTokenSpaceGuid.PcdGicPmuIrq0|0x0|UINT32|0x00000033
+  gRaspberryPiTokenSpaceGuid.PcdGicPmuIrq1|0x0|UINT32|0x00000034
+  gRaspberryPiTokenSpaceGuid.PcdGicPmuIrq2|0x0|UINT32|0x00000035
+  gRaspberryPiTokenSpaceGuid.PcdGicPmuIrq3|0x0|UINT32|0x00000036
+
+[PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
+  gRaspberryPiTokenSpaceGuid.PcdCpuClock|0|UINT32|0x0000000d
+  gRaspberryPiTokenSpaceGuid.PcdSdIsArasan|0|UINT32|0x0000000e
+  gRaspberryPiTokenSpaceGuid.PcdMmcForce1Bit|0|UINT32|0x0000000f
+  gRaspberryPiTokenSpaceGuid.PcdMmcForceDefaultSpeed|0|UINT32|0x00000010
+  gRaspberryPiTokenSpaceGuid.PcdMmcSdDefaultSpeedMHz|0|UINT32|0x00000011
+  gRaspberryPiTokenSpaceGuid.PcdMmcSdHighSpeedMHz|0|UINT32|0x00000012
+  gRaspberryPiTokenSpaceGuid.PcdMmcDisableMulti|0|UINT32|0x00000013
+  gRaspberryPiTokenSpaceGuid.PcdDebugEnableJTAG|0|UINT32|0x00000014
+  gRaspberryPiTokenSpaceGuid.PcdCustomCpuClock|0|UINT32|0x00000016
+  gRaspberryPiTokenSpaceGuid.PcdDisplayEnableScaledVModes|0x3F|UINT8|0x00000017
+  gRaspberryPiTokenSpaceGuid.PcdDisplayEnableSShot|0|UINT32|0x00000018
+  gRaspberryPiTokenSpaceGuid.PcdSystemTableMode|1|UINT32|0x0000001B
+  gRaspberryPiTokenSpaceGuid.PcdRamMoreThan3GB|0|UINT32|0x00000019
+  gRaspberryPiTokenSpaceGuid.PcdRamLimitTo3GB|0|UINT32|0x0000001A
+  gRaspberryPiTokenSpaceGuid.PcdFanOnGpio|0|UINT32|0x0000001C
+  gRaspberryPiTokenSpaceGuid.PcdFanTemp|0|UINT32|0x0000001D
+  gRaspberryPiTokenSpaceGuid.PcdPlatformResetDelay|0|UINT32|0x0000001E
+  gRaspberryPiTokenSpaceGuid.PcdMmcEnableDma|0|UINT32|0x0000001F
+  gRaspberryPiTokenSpaceGuid.PcdUartInUse|1|UINT32|0x00000021
+  gRaspberryPiTokenSpaceGuid.PcdXhciPci|0|UINT32|0x00000022

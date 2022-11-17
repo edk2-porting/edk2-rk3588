@@ -1,0 +1,60 @@
+#/** @file
+#
+#  Component description file for StyxSpiFvDxe module
+#
+#  Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = StyxSpiFvDxe
+  FILE_GUID                      = F549FC67-C4A6-4E92-B9BA-297E1F82A1A8
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = StyxSpiFvDxeInitialize
+
+[Sources]
+  StyxSpiFvDxe.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Silicon/AMD/Styx/AmdModulePkg/AmdModulePkg.dec
+  Silicon/AMD/Styx/AmdStyx.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  UefiLib
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  UefiRuntimeLib
+  DxeServicesTableLib
+
+[Guids]
+  gEfiEventVirtualAddressChangeGuid
+
+[FixedPcd]
+  gArmTokenSpaceGuid.PcdFdBaseAddress
+
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
+  gAmdStyxTokenSpaceGuid.PcdFlashNvStorageOriginalBase
+  gAmdStyxTokenSpaceGuid.PcdFlashNvStorageBlockSize
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64
+
+[Protocols]
+  gAmdIscpDxeProtocolGuid                         ## CONSUMES
+  gEfiFirmwareVolumeBlockProtocolGuid             ## PRODUCES
+
+[Depex]
+  gAmdIscpDxeProtocolGuid

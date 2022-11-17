@@ -1,0 +1,27 @@
+# Copyright (C) 2018 Marvell International Ltd.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = Armada7k8kSampleAtResetLib
+  FILE_GUID                      = 03e022c7-9bd7-4608-aa21-379deaac2430
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SampleAtResetLib
+
+[Sources]
+  Armada7k8kSampleAtResetLib.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/Marvell/Marvell.dec
+
+[LibraryClasses]
+  DebugLib
+  IoLib
+
+[Depex]
+  TRUE

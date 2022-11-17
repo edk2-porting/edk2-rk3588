@@ -1,0 +1,70 @@
+## @file
+#
+# Copyright (c) 2018 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+################################################################################
+#
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PcieAddrLib
+  FILE_GUID                      = 629E0F0C-073A-475F-BF23-1F39A5D6D1C7
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PcieAddrLib
+
+##  {629E0F0C-073A-475F-BF23-1F39A5D6D1C7}
+##{ 0x629e0f0c, 0x73a, 0x475f, { 0xbf, 0x23, 0x1f, 0x39, 0xa5, 0xd6, 0xd1, 0xc7  } };
+
+
+[Sources]
+  PcieAddressLib.c
+
+################################################################################
+#
+# Package Dependency Section - list of Package files that are required for
+#                              this module.
+#
+################################################################################
+
+[Packages]
+  MdePkg/MdePkg.dec
+  PurleyRefreshSiliconPkg/SiPkg.dec
+
+################################################################################
+#
+# Library Class Section - list of Library Classes that are required for
+#                         this module.
+#
+################################################################################
+
+[LibraryClasses]
+  BaseLib
+  PcdLib
+  BaseMemoryLib
+
+
+[Guids]
+  gEfiCpRcPkgTokenSpaceGuid
+
+################################################################################
+#
+# Protocol C Name Section - list of Protocol and Protocol Notify C Names
+#                           that this module uses or produces.
+#
+################################################################################
+[Pcd]
+  gEfiMdePkgTokenSpaceGuid.PcdPciExpressBaseAddress
+  gEfiCpRcPkgTokenSpaceGuid.PcdPcieSegmentSize
+  gEfiCpRcPkgTokenSpaceGuid.PcdPcieMmcfgTablePtr
+  gEfiCpRcPkgTokenSpaceGuid.PcdNumOfPcieSeg
+
+[FixedPcd]
+  gEfiCpRcPkgTokenSpaceGuid.PcdMaxCpuSocketCount
+

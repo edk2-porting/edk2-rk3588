@@ -1,0 +1,46 @@
+## @file
+#
+# @copyright
+# Copyright 2016 - 2021 Intel Corporation. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = UbaGpioInitLib
+  FILE_GUID                      = C3597C66-784E-4215-BF24-71D8C7B5E3BE
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = UbaGpioInitLib|PEIM PEI_CORE
+
+[sources]
+  UbaGpioInitLib.c
+
+[LibraryClasses]
+  DebugLib
+  MemoryAllocationLib
+  PeiServicesLib
+  PcdLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  WhitleySiliconPkg/WhitleySiliconPkg.dec
+  WhitleySiliconPkg/SiliconPkg.dec
+  WhitleyOpenBoardPkg/PlatformPkg.dec
+  WhitleySiliconPkg/CpRcPkg.dec
+
+[Pcd]
+  gOemSkuTokenSpaceGuid.PcdOemSku_GPIO_TABLE_SIZE
+
+[Ppis]
+  gUbaConfigDatabasePpiGuid
+  gDynamicSiLibraryPpiGuid                 ## CONSUMES
+
+[Guids]
+  gPlatformGpioConfigGuid
+  gPlatformGpioInitDataGuid
+
+[Depex]
+  gUbaConfigDatabasePpiGuid AND
+  gDynamicSiLibraryPpiGuid

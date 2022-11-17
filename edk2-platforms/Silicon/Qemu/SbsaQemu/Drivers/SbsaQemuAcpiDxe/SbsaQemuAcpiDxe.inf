@@ -1,0 +1,67 @@
+## @file
+#  This driver modifies ACPI tables for the Qemu SBSA platform
+#
+#  Copyright (c) 2020, Linaro Ltd. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001d
+  BASE_NAME                      = SbsaQemuAcpiDxe
+  FILE_GUID                      = 6c592dc9-76c8-474f-93b2-bf1e8f15ae35
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = InitializeSbsaQemuAcpiDxe
+
+[Sources]
+  SbsaQemuAcpiDxe.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  ArmVirtPkg/ArmVirtPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/Qemu/SbsaQemu/SbsaQemu.dec
+
+[LibraryClasses]
+  ArmLib
+  BaseMemoryLib
+  BaseLib
+  DebugLib
+  DxeServicesLib
+  FdtHelperLib
+  PcdLib
+  PrintLib
+  UefiDriverEntryPoint
+  UefiLib
+  UefiRuntimeServicesTableLib
+
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiTableStorageFile
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdCoreCount
+  gArmVirtSbsaQemuPlatformTokenSpaceGuid.PcdClusterCount
+
+[Depex]
+  gEfiAcpiTableProtocolGuid                       ## CONSUMES
+
+[Guids]
+  gEdkiiPlatformHasAcpiGuid
+
+[Protocols]
+  gEfiAcpiTableProtocolGuid                       ## CONSUMES
+
+[FixedPcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision
+  gArmTokenSpaceGuid.PcdGicDistributorBase
+  gArmTokenSpaceGuid.PcdGicRedistributorsBase
+
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorId
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultCreatorRevision
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemId
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemTableId
+  gEfiMdeModulePkgTokenSpaceGuid.PcdAcpiDefaultOemRevision

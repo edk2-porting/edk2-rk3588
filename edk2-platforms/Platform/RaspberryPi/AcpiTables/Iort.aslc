@@ -1,0 +1,100 @@
+/** @file
+
+  Copyright (c) 2020, Arm, Ltd. All rights reserved.<BR>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#include <IndustryStandard/IoRemappingTable.h>
+
+#include "AcpiTables.h"
+
+#pragma pack(1)
+
+typedef struct {
+  EFI_ACPI_6_0_IO_REMAPPING_NAMED_COMP_NODE Node;
+  CONST CHAR8                               Name[16];
+} RPI4_NC_NODE;
+
+typedef struct {
+  EFI_ACPI_6_0_IO_REMAPPING_TABLE      Iort;
+  RPI4_NC_NODE                         NamedCompNode;
+  RPI4_NC_NODE                         NamedCompNode2;
+  RPI4_NC_NODE                         NamedCompNode3;
+} RPI4_IO_REMAPPING_STRUCTURE;
+
+STATIC RPI4_IO_REMAPPING_STRUCTURE Iort = {
+  {
+    ACPI_HEADER (EFI_ACPI_6_0_IO_REMAPPING_TABLE_SIGNATURE,
+                 RPI4_IO_REMAPPING_STRUCTURE,
+                 EFI_ACPI_IO_REMAPPING_TABLE_REVISION),
+    3,                                              // NumNodes
+    sizeof (EFI_ACPI_6_0_IO_REMAPPING_TABLE),       // NodeOffset
+    0                                               // Reserved
+  }, {
+    // XHCI named component node
+    {
+      {
+        EFI_ACPI_IORT_TYPE_NAMED_COMP,              // Type
+        sizeof (RPI4_NC_NODE),                      // Length
+        0x0,                                        // Revision
+        0x0,                                        // Reserved
+        0x0,                                        // NumIdMappings
+        0x0,                                        // IdReference
+      },
+      0x0,                                          // Flags
+      0x0,                                          // CacheCoherent
+      0x0,                                          // AllocationHints
+      0x0,                                          // Reserved
+      0x0,                                          // MemoryAccessFlags
+      31,                                           // AddressSizeLimit
+    }, {
+      "\\_SB_.SCB0.XHC0"                            // ObjectName
+    }
+  }, {
+    // gpu/dwc usb named component node
+    {
+      {
+        EFI_ACPI_IORT_TYPE_NAMED_COMP,              // Type
+        sizeof (RPI4_NC_NODE),                      // Length
+        0x0,                                        // Revision
+        0x0,                                        // Reserved
+        0x0,                                        // NumIdMappings
+        0x0,                                        // IdReference
+      },
+      0x0,                                          // Flags
+      0x0,                                          // CacheCoherent
+      0x0,                                          // AllocationHints
+      0x0,                                          // Reserved
+      0x0,                                          // MemoryAccessFlags
+      30,                                           // AddressSizeLimit
+    }, {
+      "\\_SB_.GDV0.USB0"                            // ObjectName
+    }
+  }, {
+    // emmc2 named component node
+    {
+      {
+        EFI_ACPI_IORT_TYPE_NAMED_COMP,              // Type
+        sizeof (RPI4_NC_NODE),                      // Length
+        0x0,                                        // Revision
+        0x0,                                        // Reserved
+        0x0,                                        // NumIdMappings
+        0x0,                                        // IdReference
+      },
+      0x0,                                          // Flags
+      0x0,                                          // CacheCoherent
+      0x0,                                          // AllocationHints
+      0x0,                                          // Reserved
+      0x0,                                          // MemoryAccessFlags
+      30,                                           // AddressSizeLimit
+    }, {
+      "\\_SB_.GDV1.SDC3"                            // ObjectName
+    }
+  }
+};
+
+#pragma pack()
+
+VOID* CONST ReferenceAcpiTable = &Iort;

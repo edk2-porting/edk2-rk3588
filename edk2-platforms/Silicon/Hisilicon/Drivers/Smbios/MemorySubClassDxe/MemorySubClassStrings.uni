@@ -1,0 +1,24 @@
+﻿// *++
+//
+// Copyright (c) 2006 - 2010, Intel Corporation. All rights reserved.<BR>
+// Copyright (c) 2015, Hisilicon Limited. All rights reserved.
+// Copyright (c) 2015, Linaro Limited. All rights reserved.
+//
+// SPDX-License-Identifier: BSD-2-Clause-Patent
+//
+// --*/
+
+/=#
+
+#langdef en-US "English"
+
+//
+// Begin English Language Strings
+//
+
+#string STR_MEMORY_SUBCLASS_UNKNOWN    #language en-US  "Unknown"
+
+//
+// End English Language Strings
+//
+

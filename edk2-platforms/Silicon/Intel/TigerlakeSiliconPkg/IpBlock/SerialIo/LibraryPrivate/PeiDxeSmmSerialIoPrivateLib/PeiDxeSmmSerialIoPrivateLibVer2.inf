@@ -1,0 +1,34 @@
+## @file
+# Serial Io Private Lib Ver 2
+#
+#  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION    = 0x00010017
+  BASE_NAME      = PeiDxeSmmSerialIoLibVer2
+  FILE_GUID      = 9D9F99CD-C072-48C2-BF78-ABA3D664C0FA
+  VERSION_STRING = 1.0
+  MODULE_TYPE    = BASE
+  LIBRARY_CLASS  = SerialIoPrivateLib
+
+[LibraryClasses]
+  BaseLib
+  IoLib
+  PciSegmentLib
+  SerialIoAccessLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  TigerlakeSiliconPkg/SiPkg.dec
+
+[Sources]
+  SerialIoPrivateLib.c
+  SerialIoPrivateLibI2c.c
+  SerialIoPrivateLibI2cVer2.c
+  SerialIoPrivateLibSpi.c
+  SerialIoPrivateLibSpiVer2.c
+  SerialIoPrivateLibUart.c
+  SerialIoPrivateLibUartVer2.c

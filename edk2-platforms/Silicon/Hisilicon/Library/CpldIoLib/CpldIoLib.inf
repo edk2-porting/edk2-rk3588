@@ -1,0 +1,41 @@
+#/** @file
+#
+#    Copyright (c) 2015, Hisilicon Limited. All rights reserved.
+#    Copyright (c) 2015, Linaro Limited. All rights reserved.
+#
+#    SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = CpldIoLib
+  FILE_GUID                      = 4633665C-0029-464E-9788-58B8D49FF57E
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = CpldIoLib
+
+[Sources.common]
+  CpldIoLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  Silicon/Hisilicon/HisiPkg.dec
+
+
+[LibraryClasses]
+  DebugLib
+  IoLib
+  BaseLib
+  ArmLib
+  TimerLib
+
+[BuildOptions]
+
+[Pcd]
+  gHisiTokenSpaceGuid.PcdCpldBaseAddress

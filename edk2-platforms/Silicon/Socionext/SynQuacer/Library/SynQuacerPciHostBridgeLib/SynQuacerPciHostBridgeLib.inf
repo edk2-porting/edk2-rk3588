@@ -1,0 +1,55 @@
+## @file
+#  PCI Host Bridge Library instance for Socionext SynQuacer ARM SOC
+#
+#  Copyright (c) 2017, Linaro Ltd. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = SynQuacerPciHostBridgeLib
+  FILE_GUID                      = fdc92446-65bc-4f86-b4a0-014a2119a732
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PciHostBridgeLib|DXE_DRIVER
+  CONSTRUCTOR                    = SynQuacerPciHostBridgeLibConstructor
+
+#
+# The following information is for reference only and not required by the build
+# tools.
+#
+#  VALID_ARCHITECTURES           = ARM AARCH64
+#
+
+[Sources]
+  SynQuacerPciHostBridgeLib.c
+  SynQuacerPciHostBridgeLibConstructor.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Silicon/Socionext/SynQuacer/SynQuacer.dec
+
+[LibraryClasses]
+  ArmLib
+  DebugLib
+  DevicePathLib
+  MemoryAllocationLib
+  PcdLib
+  UefiBootServicesTableLib
+
+[FixedPcd]
+  gArmTokenSpaceGuid.PcdPciIoTranslation
+
+[Pcd]
+  gSynQuacerTokenSpaceGuid.PcdPcieEnableMask
+  gSynQuacerTokenSpaceGuid.PcdPlatformSettings
+
+[Depex]
+  # gSynQuacerTokenSpaceGuid.PcdPlatformSettings may be of the dynamic HII
+  # variety, which are backed by EFI variables
+  gEfiVariableArchProtocolGuid

@@ -1,0 +1,51 @@
+## @file
+#  Library instance to create core information HOB
+#
+#  Copyright (c) 2019, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001b
+  BASE_NAME                      = SiliconSiFiveU54CoreInfoLib
+  FILE_GUID                      = 483DE090-267E-4278-A0A1-15D9836780EA
+  MODULE_TYPE                    = PEIM
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SiliconSiFiveU54CoreInfoLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = RISCV64
+#
+
+[Sources]
+ CoreInfoHob.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Silicon/RISC-V/ProcessorPkg/RiscVProcessorPkg.dec
+  Platform/RISC-V/PlatformPkg/RiscVPlatformPkg.dec
+  Platform/SiFive/U5SeriesPkg/U5SeriesPkg.dec
+  Silicon/SiFive/SiFive.dec
+
+[LibraryClasses]
+  BaseLib
+  PcdLib
+  MemoryAllocationLib
+  PrintLib
+  FirmwareContextProcessorSpecificLib
+  RiscVEdk2SbiLib
+
+[FixedPcd]
+  gUefiRiscVPkgTokenSpaceGuid.PcdProcessorSpecificDataGuidHobGuid
+  gUefiRiscVPkgTokenSpaceGuid.PcdProcessorSmbiosGuidHobGuid
+  gUefiRiscVPkgTokenSpaceGuid.PcdProcessorSmbiosType4GuidHobGuid
+  gUefiRiscVPkgTokenSpaceGuid.PcdProcessorSmbiosType7GuidHobGuid
+  gEfiSiFiveSiliconTokenSpaceGuid.PcdSiFiveU54CoreGuid
+  gEfiSiFiveSiliconTokenSpaceGuid.PcdSiFiveU5MCCoreplexGuid
+  gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdNumberofU5Cores
+  gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdE5MCSupported

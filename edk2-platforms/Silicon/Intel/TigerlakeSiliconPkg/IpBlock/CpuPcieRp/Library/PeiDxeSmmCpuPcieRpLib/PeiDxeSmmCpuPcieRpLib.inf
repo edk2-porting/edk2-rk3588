@@ -1,0 +1,32 @@
+## @file
+# CPU PCIE root port Library.
+#
+# All function in this library is available for PEI, DXE, and SMM,
+# But do not support UEFI RUNTIME environment call.
+#
+#  Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+
+[Defines]
+INF_VERSION = 0x00010017
+BASE_NAME = PeiDxeSmmCpuPcieRpLib
+FILE_GUID = 00199A03-41F4-43c7-B6D5-5A3AA1EE78D0
+VERSION_STRING = 1.0
+MODULE_TYPE = BASE
+LIBRARY_CLASS = CpuPcieRpLib
+
+[LibraryClasses]
+BaseLib
+IoLib
+DebugLib
+PciLib
+
+[Packages]
+MdePkg/MdePkg.dec
+TigerlakeSiliconPkg/SiPkg.dec
+
+[Sources]
+CpuPcieRpLib.c

@@ -1,0 +1,51 @@
+## @file
+# Component description file for Large Variable Write Library
+#
+# This library is used to store large data sets using the UEFI Variable Services.
+# At time of writting, most UEFI Variable Services implementations do not allow
+# more than 64KB of data to be stored in a single UEFI variable. This library
+# will split data sets across multiple variables as needed.
+#
+# In the case where more than one variable is needed to store the data, an
+# integer number will be added to the end of the variable name. This number
+# will be incremented for each variable as needed to store the entire data set.
+#
+# The primary use for this library is to create binary compatible drivers
+# and OpROMs which need to work both with TianoCore and other UEFI PI
+# implementations. When customizing and recompiling the platform firmware image
+# is possible, adjusting the value of PcdMaxVariableSize may provide a simpler
+# solution to this problem.
+#
+# Copyright (c) 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseLargeVariableWriteLib
+  FILE_GUID                      = 13E7DD75-FBE0-4B92-87A9-6BED253EB99E
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = LargeVariableWriteLib
+
+#
+#  VALID_ARCHITECTURES           = IA32 X64 EBC
+#
+
+[Sources]
+  LargeVariableWriteLib.c
+  LargeVariableCommon.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  PrintLib
+  VariableReadLib
+  VariableWriteLib

@@ -1,0 +1,43 @@
+/** @file
+*  ACPI Memory mapped configuration space base address Description Table (MCFG).
+*
+*  Copyright (c) 2020, Linaro Limited. All rights reserved.
+*
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
+**/
+
+#include <IndustryStandard/Acpi.h>
+#include <IndustryStandard/MemoryMappedConfigurationSpaceAccessTable.h>
+#include <IndustryStandard/SbsaQemuAcpi.h>
+
+#pragma pack(push, 1)
+
+typedef struct {
+  EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_HEADER Header;
+  EFI_ACPI_MEMORY_MAPPED_ENHANCED_CONFIGURATION_SPACE_BASE_ADDRESS_ALLOCATION_STRUCTURE Structure[2];
+} EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_DESCRIPTION_TABLE;
+
+EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_DESCRIPTION_TABLE Mcfg = {
+  {
+    SBSAQEMU_ACPI_HEADER (
+      EFI_ACPI_6_0_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_BASE_ADDRESS_DESCRIPTION_TABLE_SIGNATURE,
+      EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_DESCRIPTION_TABLE,
+      EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_TABLE_REVISION),
+    EFI_ACPI_RESERVED_QWORD
+  },
+  {
+    {
+      FixedPcdGet32 (PcdPciExpressBaseAddress),
+      0,
+      FixedPcdGet32 (PcdPciBusMin),
+      FixedPcdGet32 (PcdPciBusMax),
+      EFI_ACPI_RESERVED_DWORD
+    }
+  }
+};
+
+#pragma pack(pop)
+
+// Reference the table being generated to prevent the optimizer
+// from removing the data structure from the executable
+VOID* CONST ReferenceAcpiTable = &Mcfg;

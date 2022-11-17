@@ -1,0 +1,42 @@
+#/** @file
+#
+#  Copyright (c) 2017-2018, Andrei Warkentin <andrey.warkentin@gmail.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = PlatformUiAppLib
+  FILE_GUID                      = CCB2DCE1-5EC9-42CB-88C5-D349E134C9FC
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|DXE_DRIVER UEFI_APPLICATION
+  CONSTRUCTOR                    = PlatformUiAppLibConstructor
+  DESTRUCTOR                     = PlatformUiAppLibDestructor
+
+[Sources]
+  PlatformUiAppLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Platform/RaspberryPi/RaspberryPi.dec
+
+[LibraryClasses]
+  UefiLib
+  UefiBootServicesTableLib
+  BaseMemoryLib
+  DebugLib
+  PrintLib
+  UefiBootManagerLib
+  MemoryAllocationLib
+
+[Guids]
+
+[Protocols]
+
+[FeaturePcd]
+
+[Pcd]

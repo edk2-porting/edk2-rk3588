@@ -1,0 +1,53 @@
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+[Defines]
+  INF_VERSION = 0x00010019
+  BASE_NAME = UefiShellFUpdateCommandLib
+  FILE_GUID = 470292b2-926b-4ed8-8080-be7a260db627
+  MODULE_TYPE = UEFI_APPLICATION
+  VERSION_STRING = 0.1
+  LIBRARY_CLASS = NULL|UEFI_APPLICATION UEFI_DRIVER
+  CONSTRUCTOR = ShellFUpdateCommandConstructor
+  DESTRUCTOR = ShellFUpdateCommandDestructor
+
+[Sources]
+  FUpdate.c
+  FUpdate.uni
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/Marvell/Marvell.dec
+  ShellPkg/ShellPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  FileHandleLib
+  HandleParsingLib
+  HiiLib
+  MemoryAllocationLib
+  PcdLib
+  ShellCommandLib
+  ShellLib
+  UefiBootServicesTableLib
+  UefiLib
+  UefiRuntimeServicesTableLib
+
+[Pcd]
+  gMarvellTokenSpaceGuid.PcdSpiFlashCs
+  gMarvellTokenSpaceGuid.PcdSpiFlashMode
+
+[Protocols]
+  gEfiBlockIoProtocolGuid
+  gEfiDevicePathFromTextProtocolGuid
+  gEfiDevicePathProtocolGuid
+  gMarvellSpiFlashProtocolGuid
+  gMarvellSpiMasterProtocolGuid
+
+[Guids]
+  gShellFUpdateHiiGuid

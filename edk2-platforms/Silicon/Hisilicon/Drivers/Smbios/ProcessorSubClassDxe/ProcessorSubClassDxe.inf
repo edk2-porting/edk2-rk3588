@@ -1,0 +1,58 @@
+#/** @file
+#
+#    Copyright (c) 2015, Hisilicon Limited. All rights reserved.
+#    Copyright (c) 2015, Linaro Limited. All rights reserved.
+#
+#    SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ProcessorSubClass
+  FILE_GUID                      = 9B25B1EA-0FD4-455D-A450-AD640C8A9C1B
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = ProcessorSubClassEntryPoint
+
+[Sources]
+  ProcessorSubClassStrings.uni
+  ProcessorSubClass.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+  Silicon/Hisilicon/HisiliconNonOsi.dec
+  Silicon/Hisilicon/HisiPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  IoLib
+  HiiLib
+  MemoryAllocationLib
+  BaseMemoryLib
+  BaseLib
+  DebugLib
+  PrintLib
+  PcdLib
+
+  PlatformSysCtrlLib
+  OemMiscLib
+
+[Protocols]
+  gEfiSmbiosProtocolGuid                       # PROTOCOL ALWAYS_CONSUMED
+
+[Pcd]
+  gHisiTokenSpaceGuid.PcdCPUInfo
+  gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz
+
+[Guids]
+
+
+[Depex]
+  gEfiSmbiosProtocolGuid
+
+

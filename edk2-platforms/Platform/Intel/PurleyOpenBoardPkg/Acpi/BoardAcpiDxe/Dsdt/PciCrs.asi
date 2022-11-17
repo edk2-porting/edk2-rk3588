@@ -1,0 +1,312 @@
+/** @file
+
+Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+// Return the proximity domain/node # that this bus is on
+// With this info OSPM will know what memory and I/O resources
+//  are under the same IOH
+//
+Name(_PXM, 0)
+
+#define RESOURCE_CHUNK1_OFF     0
+#define RESOURCE_CHUNK2_OFF    16   //(RESOURCE_CHUNK1_OFF + 16)
+#define RESOURCE_CHUNK3_OFF    24   //(RESOURCE_CHUNK2_OFF +  8)
+#define RESOURCE_CHUNK4_OFF    40   //(RESOURCE_CHUNK3_OFF + 16)
+#define RESOURCE_CHUNK5_OFF    56   //(RESOURCE_CHUNK4_OFF + 16)
+#define RESOURCE_CHUNK6_OFF    82   //(RESOURCE_CHUNK5_OFF + 26)
+#define RESOURCE_CHUNK7_OFF   108   //(RESOURCE_CHUNK6_OFF + 26)
+
+#define PciResourceStart       Local0
+#define PciResourceLen         Local1
+
+Name(PBRS, ResourceTemplate() {
+  //RESOURCE_CHUNK1_OFF
+  WORDBusNumber(            //Bus number resource (0); the bridge produces bus numbers for its subsequent buses
+    ResourceProducer,       // bit 0 of general flags is 1
+    MinFixed,               // Range is fixed
+    MaxFixed,               // Range is fixed
+    PosDecode,              // PosDecode
+    0x0000,                 // Granularity
+    0x0000,                 // Min
+    0x0000,                 // Max
+    0x0000,                 // Translation
+    0x0000,,,               // Range Length = Max-Min+1
+    PB00
+  )
+
+  //RESOURCE_CHUNK2_OFF
+  IO(                       //Consumed resource (CF8-CFF)
+    Decode16, 
+    0x0cf8, 
+    0xcf8, 
+    1,
+    8
+  )
+
+  //RESOURCE_CHUNK3_OFF
+  WORDIO(                   //Consumed-and-produced resource (all I/O below CF8)
+    ResourceProducer,       // bit 0 of general flags is 0
+    MinFixed,               // Range is fixed
+    MaxFixed,               // Range is fixed
+    PosDecode,
+    EntireRange,
+    0x0000,                 // Granularity
+    0x0000,                 // Min
+    0x0cf7,                 // Max
+    0x0000,                 // Translation
+    0x0cf8                  // Range Length
+  )
+
+  //RESOURCE_CHUNK4_OFF
+  WORDIO(                   //Consumed-and-produced resource (all I/O above CFF)
+    ResourceProducer,       // bit 0 of general flags is 0
+    MinFixed,               // Range is fixed
+    MaxFixed,               // Range is fixed
+    PosDecode,
+    EntireRange,
+    0x00,                   // Granularity
+    0x0000,                 // Min
+    0x0000,                 // Max
+    0x00,                   // Translation
+    0x0000,,,               // Range Length
+    PI01
+  )
+
+  //RESOURCE_CHUNK5_OFF
+  DWORDMEMORY(              // descriptor for video RAM on video card
+    ResourceProducer,       // bit 0 of general flags is 0
+    PosDecode,
+    MinFixed,               // Range is fixed
+    MaxFixed,               // Range is fixed
+    Cacheable,
+    ReadWrite,
+    0x00000000,             // Granularity
+    0x000a0000,             // Min
+    0x000bffff,             // Max
+    0x00000000,             // Translation
+    0x00020000              // Range Length
+  )
+
+  //RESOURCE_CHUNK6_OFF
+  DWORDMEMORY(              // descriptor for Shadow RAM
+    ResourceProducer,       // bit 0 of general flags is 0
+    PosDecode,
+    MinFixed,               // Range is fixed
+    MaxFixed,               // Range is fixed
+    Cacheable,
+    ReadWrite,
+    0x00000000,             // Granularity
+    0x00000000,             // Min (calculated dynamically)
+    0x00000000,             // Max (calculated dynamically)
+    0x00000000,             // Translation
+    0x00000000,,,           // Range Length (calculated dynamically)
+    SDRM
+  )
+
+  //RESOURCE_TPM
+  DWORDMemory(              // Consumed-and-produced resource(all of memory space)
+    ResourceProducer,       // bit 0 of general flags is 0
+    PosDecode,              // positive Decode
+    MinFixed,               // Range is fixed
+    MaxFixed,               // Range is fixed
+    NonCacheable,
+    ReadWrite,
+    0x00000000,             // Granularity
+    0xFED40000,             // Min (calculated dynamically)
+    0xFEDFFFFF,             // Max = 4GB - 1MB  (fwh + fwh alias...)
+    0x00000000,             // Translation
+    0x000C0000              // Range Length (calculated dynamically)
+  )
+
+  //
+  // PCI RESOURCE_32bit
+  //
+  DWORDMemory(              // Consumed-and-produced resource(all of memory space)
+    ResourceProducer,       // bit 0 of general flags is 0
+    PosDecode,              // positive Decode
+    MinFixed,               // Range is fixed
+    MaxFixed,               // Range is fixed
+    NonCacheable,
+    ReadWrite,
+    0x00,                   // Granularity
+    0x00000000,             // Min (calculated dynamically)
+    0x00000000,             // Max = 4GB - 1MB  (fwh + fwh alias...)
+    0x00,                   // Translation
+    0x00000000,,,           // Range Length (calculated dynamically)
+    PM01
+  )
+
+  //
+  // PCI RESOURCE_64bit
+  //
+  QWORDMemory(              // Consumed-and-produced resource(all of memory space)
+    ResourceProducer,       // bit 0 of general flags is 0
+    PosDecode,              // positive Decode
+    MinFixed,               // Range is fixed
+    MaxFixed,               // Range is fixed
+    NonCacheable,
+    ReadWrite,
+    0x00,                   // Granularity
+    0x00000000000,          // Min (calculated dynamically)
+    0x00000000000,          // Max = 4GB - 1MB  (fwh + fwh alias...)
+    0x00,                   // Translation
+    0x00000000000,,,        // Range Length (calculated dynamically)
+    PM02
+  )
+}) // end of PBRS Buffer
+
+
+Method(_CRS, 0x0, NotSerialized)
+{
+  //calculate Shadow RAM
+  EROM()
+
+  // Fix up Bus Number Resources
+  CreateWordField(PBRS, ^PB00._MIN, PBMN)
+  Store(BBI0, PBMN)
+  CreateWordField(PBRS, ^PB00._MAX, PBMX)       // (MAX bus decoded - 1, assuming Uncore Bus is MAX decoded BUS Number)
+  Store(BBL0, PBMX)
+  CreateWordField(PBRS, ^PB00._LEN, PBLN)
+  Subtract(PBMX, PBMN, PBLN)
+  Add(1, PBLN, PBLN)
+
+  // Fix up 16-bit IO resources
+  CreateWordField(PBRS, ^PI01._MIN, PIMN)
+  Store(IOBA, PIMN)
+  CreateWordField(PBRS, ^PI01._MAX, PIMX)
+  Store(IOLA, PIMX)
+  CreateWordField(PBRS, ^PI01._LEN, PILN)
+  Subtract(PIMX, PIMN, PILN)
+  Add(1, PILN, PILN)
+
+  // Fix up 32-bit Memory resources
+  CreateDWordField(PBRS, ^PM01._MIN, PMMN)
+  Store(MMB0, PMMN)
+  CreateDWordField(PBRS, ^PM01._MAX, PMMX)
+  Store(MML0, PMMX)
+  CreateDWordField(PBRS, ^PM01._LEN, PMLN)
+  Subtract(PMMX, PMMN, PMLN)
+  Add(1, PMLN, PMLN)
+
+  // Fix up 64-bit Memory resources
+//  If(LAnd(MMH0, LGreater(OSFL, 8))) {
+  CreateQWordField(PBRS, ^PM02._MIN, P2MN)
+  Store(HMB0, P2MN)
+  CreateQWordField(PBRS, ^PM02._MAX, P2MX)
+  Store(HML0, P2MX)
+  CreateQWordField(PBRS, ^PM02._LEN, P2LN)
+  Subtract(P2MX, P2MN, P2LN)
+  Add(1, P2LN, P2LN)
+//  }
+
+  Return(PBRS)
+}
+
+Method(_STA,0) {
+  If (NPB0) {
+    Return(0x0F)
+  }
+  Return(0x00)
+}
+
+OperationRegion(TMEM, PCI_Config, 0x52, 0x3)
+Field(TMEM, ByteAcc, NoLock, Preserve) {
+  DIM0, 4,
+  DIM1, 4,
+  , 8,
+  DIM2, 4
+}
+
+Name(MTBL, Package(0x10) {
+  0x0,
+  0x20,
+  0x20,
+  0x30,
+  0x40,
+  0x40,
+  0x60,
+  0x80,
+  0x80,
+  0x80,
+  0x80,
+  0xc0,
+  0x100,
+  0x100,
+  0x100,
+  0x200
+})
+
+
+OperationRegion(PAMX, PCI_Config, 0x90, 0x7)
+Field(PAMX, ByteAcc, NoLock, Preserve) {
+  , 4,
+  BSEG, 4,
+  PAMS, 48
+}
+
+Name(ERNG, Package(0xd) {
+  0xc0000,
+  0xc4000,
+  0xc8000,
+  0xcc000,
+  0xd0000,
+  0xd4000,
+  0xd8000,
+  0xdc000,
+  0xe0000,
+  0xe4000,
+  0xe8000,
+  0xec000,
+  0xf0000
+})
+
+Name(PAMB, Buffer(0x7) {
+})
+
+Method(EROM, 0x0, NotSerialized) {
+  CreateDWordField(PBRS, 0x5c, RMIN)
+  CreateDWordField(PBRS, 0x60, RMAX)
+  CreateDWordField(PBRS, 0x68, RLEN)
+  CreateByteField(PAMB, 0x6, BREG)
+  Store(PAMS, PAMB)
+  Store(BSEG, BREG)
+  Store(0x0, RMIN)
+  Store(0x0, RMAX)
+  Store(0x0, RLEN)
+  Store(0x0, Local0)
+  While(LLess(Local0, 0xd)) {
+      ShiftRight(Local0, 0x1, Local1)
+      Store(DerefOf(Index(PAMB, Local1, )), Local2)
+      If(And(Local0, 0x1, )) {
+        ShiftRight(Local2, 0x4, Local2)
+      }
+      And(Local2, 0x3, Local2)
+      If(RMIN) {
+        If(Local2) {
+          Add(DerefOf(Index(ERNG, Local0, )), 0x3fff, RMAX)
+          If(LEqual(RMAX, 0xf3fff)) {
+            Store(0xfffff, RMAX)
+          }
+          Subtract(RMAX, RMIN, RLEN)
+          Increment(RLEN)
+        } Else {
+          Store(0xc, Local0)
+        }
+      } Else {
+        If(Local2) {
+          Store(DerefOf(Index(ERNG, Local0, )), RMIN)
+          Add(DerefOf(Index(ERNG, Local0, )), 0x3fff, RMAX)
+          If(LEqual(RMAX, 0xf3fff)) {
+            Store(0xfffff, RMAX)
+          }
+          Subtract(RMAX, RMIN, RLEN)
+          Increment(RLEN)
+        } Else {
+      }
+    }
+    Increment(Local0)
+  }
+}

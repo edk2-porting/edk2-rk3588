@@ -1,0 +1,49 @@
+## @file
+#
+# Copyright (c) 2018 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION          = 0x00010017
+  BASE_NAME            = PeiPchPolicyLib
+  FILE_GUID            = BB1AC992-B2CA-4744-84B7-915C185576C5
+  VERSION_STRING       = 1.0
+  MODULE_TYPE          = PEIM
+  LIBRARY_CLASS        = PchPolicyLib
+
+
+[LibraryClasses]
+  DebugLib
+  IoLib
+  PcdLib
+  PeiServicesLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  PchInfoLib
+  PchPmcLib                                   #SERVER_BIOS
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  PurleyRefreshSiliconPkg/SiPkg.dec
+
+
+[Pcd]
+  gEfiPchTokenSpaceGuid.PcdPchAcpiIoPortBaseAddress          #SERVER_BIOS
+  gEfiPchTokenSpaceGuid.PcdSmbusBaseAddress   #SERVER_BIOS
+  gEfiPchTokenSpaceGuid.PcdSerialIoUartDebugEnable
+  gEfiPchTokenSpaceGuid.PcdSerialIoUartNumber
+
+
+[Sources]
+  PeiPchPolicyLib.c
+  PeiPchPolicyLibrary.h
+  PchPrintPolicy.c
+  Rvp3PolicyLib.c
+
+
+[Ppis]
+  gPchPlatformPolicyPpiGuid            ## PRODUCES # SERVER_BIOS

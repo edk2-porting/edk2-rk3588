@@ -1,0 +1,71 @@
+#/** @file
+# Arm Versatile Express package.
+#
+#  Copyright (c) 2012-2020, Arm Limited. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = ArmVExpressPkg
+  PACKAGE_GUID                   = 9c0aaed4-74c5-4043-b417-a3223814ce76
+  PACKAGE_VERSION                = 0.1
+
+################################################################################
+#
+# Include Section - list of Include Paths that are provided by this package.
+#                   Comments are used for Keywords and Module Types.
+#
+# Supported Module Types:
+#  BASE SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
+#
+################################################################################
+[Includes.common]
+  Include                        # Root include for the package
+
+[LibraryClasses]
+  ArmPlatformSysConfigLib|Include/Library/ArmPlatformSysConfigLib.h
+
+[Guids.common]
+  gArmVExpressTokenSpaceGuid    =  { 0x9c0aaed4, 0x74c5, 0x4043, { 0xb4, 0x17, 0xa3, 0x22, 0x38, 0x14, 0xce, 0x76 } }
+
+[PcdsFeatureFlag.common]
+
+[PcdsFixedAtBuild.common]
+  #
+  # MaxMode must be one number higher than the actual max mode,
+  # i.e. for actual maximum mode 2, set the value to 3.
+  #
+  # For a list of mode numbers look in LcdArmVExpress.c
+  #
+  gArmVExpressTokenSpaceGuid.PcdPL111LcdMaxMode|3|UINT32|0x00000002
+  gArmVExpressTokenSpaceGuid.PcdPL111LcdVideoModeOscId|1|UINT32|0x00000003
+
+  gArmVExpressTokenSpaceGuid.PcdHdLcdVideoModeOscId|0|UINT32|0x00000005
+  gArmVExpressTokenSpaceGuid.PcdArmMaliDpMaxMode|0|UINT32|0x00000008
+
+  #
+  # Device path of block device on which Fastboot will flash partitions
+  #
+  gArmVExpressTokenSpaceGuid.PcdAndroidFastbootNvmDevicePath|""|VOID*|0x00000006
+  gArmVExpressTokenSpaceGuid.PcdAndroidFastbootProductName|""|VOID*|0x00000007
+
+  ## PL180 MCI
+  gArmVExpressTokenSpaceGuid.PcdPL180SysMciRegAddress|0x00000000|UINT32|0x00000009
+  gArmVExpressTokenSpaceGuid.PcdPL180MciBaseAddress|0x00000000|UINT32|0x0000000A
+
+  # LAN91x Ethernet Driver PCDs
+  gArmVExpressTokenSpaceGuid.PcdLan91xDxeBaseAddress|0x0|UINT32|0x0000000B
+
+  # LAN9118 Ethernet Driver PCDs
+  gArmVExpressTokenSpaceGuid.PcdLan9118DxeBaseAddress|0x0|UINT32|0x00000025
+  gArmVExpressTokenSpaceGuid.PcdLan9118DefaultMacAddress|0x0|UINT64|0x00000026
+  gArmVExpressTokenSpaceGuid.PcdLan9118DefaultNegotiationTimeout|4000|UINT32|0x00000027
+  # The default feature mask below disables full duplex negotiation, since full
+  # duplex operation is suspected to be broken in the driver.
+  gArmVExpressTokenSpaceGuid.PcdLan9118NegotiationFeatureMask|0xFFFFFEBF|UINT32|0x00000028
+
+  # ISP1761 USB OTG Controller
+  gArmVExpressTokenSpaceGuid.PcdIsp1761BaseAddress|0|UINT32|0x00000029

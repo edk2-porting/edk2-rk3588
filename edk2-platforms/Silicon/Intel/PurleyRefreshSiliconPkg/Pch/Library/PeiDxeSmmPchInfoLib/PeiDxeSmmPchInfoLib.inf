@@ -1,0 +1,32 @@
+## @file
+#
+# Copyright (c) 2018 - 2021, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION = 0x00010017
+  BASE_NAME = PeiDxeSmmPchInfoLib
+  FILE_GUID = D43F3086-1D7E-4FF5-AE6A-3B0E15B11329
+  VERSION_STRING = 1.0
+  MODULE_TYPE = BASE
+  LIBRARY_CLASS = PchInfoLib
+
+
+[LibraryClasses]
+  BaseLib
+  IoLib
+  DebugLib
+  MmPciLib
+
+
+[Packages]
+  MdePkg/MdePkg.dec
+  PurleyRefreshSiliconPkg/SiPkg.dec
+
+
+[Sources]
+  PchInfoLib.c
+  PchInfoStrLib.c

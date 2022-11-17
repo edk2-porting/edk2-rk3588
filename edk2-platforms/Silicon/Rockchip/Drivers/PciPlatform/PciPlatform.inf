@@ -1,0 +1,48 @@
+#/** @file
+#
+#    Copyright (c) 2016, Hisilicon Limited. All rights reserved.
+#    Copyright (c) 2016, Linaro Limited. All rights reserved.
+#
+#    SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[defines]
+  INF_VERSION          = 0x00010005
+  BASE_NAME            = PciPlatform
+  FILE_GUID            = 3de62cf0-3177-11ec-95b4-f42a7dcb925d
+  MODULE_TYPE          = DXE_DRIVER
+  VERSION_STRING       = 1.0
+  ENTRY_POINT          = PciPlatformDriverEntry
+
+[sources.common]
+  PciPlatform.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ArmPkg/ArmPkg.dec
+  Silicon/Rockchip/RockchipPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiLib
+  BaseLib
+  DebugLib
+  ArmLib
+  IoLib
+  MemoryAllocationLib
+  PciPlatformLib
+
+[Protocols]
+  gEfiPciPlatformProtocolGuid
+  gEfiFirmwareVolume2ProtocolGuid
+  gEfiPciIoProtocolGuid
+
+[Pcd]
+
+[FixedPcd]
+
+[Depex]
+  TRUE
+

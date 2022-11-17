@@ -1,0 +1,134 @@
+MinnowBoard MAX UEFI Development Kit (MB-UDK) 
+PRODUCTION LICENSE AGREEMENT 
+
+IMPORTANT – READ BEFORE COPYING, INSTALLING OR USING. 
+
+Do not copy, install, use or load software identified in this Agreement or any associated materials until you have carefully read the following terms and conditions. By copying, installing, using or loading the software identified in this Agreement or any associated materials, you agree to the terms of this Agreement. If you do not wish to so agree, do not copy, install, use or load the software or any associated materials.  If you are an employee, representative or agent of a legal entity, you represent and warrant that you have the authority to bind that legal entity to this Agreement.
+
+General Terms and Conditions 
+
+This agreement (“Agreement”) is by and between Licensee and Intel Corporation, a Delaware corporation, having its principal place of business at 2200 Mission College Boulevard, Santa Clara, California 95054 (“Intel”) and is effective as of the first date Licensee copies, installs, uses or loads the software identified in this Agreement or any associated materials (“Effective Date”).   
+
+1.0 	DEFINITIONS 
+
+1.1 	“ASL Code” means code written in the ‘ACPI source language’ and designed and delivered to Licensee by Intel and designed to be compatible with Intel products.  Such ASL Code remains ASL Code regardless of any legends in header files of the ASL Code. 
+1.2 	“Assembly Code” means code written in the ‘assembly source language’ and designed and delivered to Licensee by Intel under this Agreement. 
+1.3 	“MBM-UDK” means the MinnowBoard MAX UEFI Development Kit, which is an Intel implementation of the 
+UEFI specification, and is based on the Intel® UEFI Development Kit 2014 (Intel® UDK2014), consisting of 
+MB-UDK Libraries, ASL Code, DXE Driver, DXE Foundation Code, PEI Foundation Code, Peripheral Drivers (including GOP and UEFI UNDI), PEI Modules, Assembly Code, C Code and Reference Drivers together, as well as any and all documentation and tools, provided by Intel for the purposes of implementation. 
+1.4 	“MBM-UDK Libraries” means the core library services offered in the MinnowBoard MAX UEFI Development 
+Kit. 
+1.5 	“Boot Loader” means a device and use-case-specific firmware program a computer’s processor uses to get the computer system started after power-on, with some basic hardware initialization, until handoff to the operating system. 
+1.6 	“BSD License” means the Berkeley Software Distribution License, which is a family of permissive free software licenses created for the original Berkeley Software Distribution operating system. 
+1.7 	“C Code” means code written in the ‘C source language’ and designed and delivered to Licensee by Intel under this Agreement. 
+1.8 	“Customer” means Original Equipment Manufacturer (a company that makes computer systems for sale under its own brand name), Independent Authorized Developer (a company that performs services for Licensee in the development of Licensee’s products), or Original Design Manufacturer (a company that 
+designs and manufactures computer systems for Independent Authorized Developers and Original Equipment Manufacturers) but excluding End Users. 
+1.9 	“Derived Object Code” means the subset of Derivative Works that is the Object Code derived from Source Code or Derived Source Code. 
+1.10 	“Derived Source Code” means the subset of Derivative Works that is the source code derived from Source Code by modifying the Source Code in any way. 
+1.11 	“Derivative Works” means those bodies of work defined in 17 U.S.C. §101 as “derivative works” of existing copyrighted material.  For purposes of this Agreement, Derivative Works include both Derived Source Code and Derived Object Code. 
+1.12 	“DXE Driver” means Driver Execution Environment driver, which is a hardware device driver compliant with the execution environment as defined in the UEFI specification. 
+1.13 	“DXE Foundation Code” means the foundational Driver Execution Environment code that provides the standard function and services that are available to the DXE Drivers. 
+1.14 	“End User” means a purchaser or recipient or user of Licensee’s computer products who does not resell Licensee’s products in the normal course of the End User’s business.   
+1.15 	“Firmware” means the programming code that is inserted into the programmable read-only memory of a computer system, thus becoming a permanent part of a particular computing device. 
+1.16 	“Intel Processor” means processors designed by Intel and released by or on behalf of Intel and marketed under Intel’s (or Intel licensed) trademarks. 
+1.17 	“Licensee” means the individual accepting these terms or, if the individual is accepting these terms on behalf of a legal entity (such as a corporation, partnership, agency, etc.), “Licensee” means the legal entity. 
+1.18 	“Object Code” means the binary version of the Source Code, including all computer programming code, entirely in binary form, which is directly executable by a computer and includes those help, message, overlay, and other files necessary for supporting the intended use of the executable code. 
+1.19 	“PEI Foundation Code” means Pre-extensible firmware interface (“PEFI”) initialization foundation code, which performs basic hardware initialization in order to load and execute the DXE Foundation Code. 
+1.20 	“PEI Modules” means PEFI initialization modules, which are code modules that perform basic environmental set up prior to initialization of DXE Foundation Code. 
+1.21 	“Peripheral Drivers” means code that initializes and operates hardware devices that are peripheral to the Intel Processor. 
+1.22 	 “Reference Drivers” means those drivers supplied as part of the Source Code that are marked or tagged by Intel as ‘reference drivers’. 
+1.23 	“Source Code” means the source code of the MB-UDK Libraries and Reference Drivers delivered to Licensee by Intel under this Agreement, along with all Intel-delivered tools, documentation, specifications, and schematics related thereto. 
+1.24 	“Subsidiaries” means, with respect to any legally recognizable entity, any entity Controlling, Controlled by, or under common Control with the entity.  “Control” means (i) ownership of fifty percent (50%) or more of the outstanding shares representing the right to vote for members of the directors or other managing officers of the entity, or (ii) for an entity which does not have outstanding shares, fifty percent (50%) or more of the ownership interest representing the right to make decisions for the entity.  An entity will be deemed a Subsidiary only so long as the Control exists. 
+1.25 	“UDK2014” means the Intel® UEFI Development Kit 2014 (Intel® UDK2014), which is an openly available implementation of the UEFI framework provided by Intel under BSD License terms. 
+1.26 	 “UEFI” means the Unified Extensible Firmware Interface, which is an industry standard detailing an interface that helps hand off control of the system for the pre-boot environment (i.e., after the system is powered on, but before the operating system starts) to an operating system. 
+
+2.0 	LICENSE RIGHTS AND CONDITIONS 
+
+2.1 	LIMITED COPYRIGHT LICENSE: Subject to the terms and conditions of this Agreement, Intel grants to Licensee a limited, non-exclusive, non-transferable, non-sublicensable, worldwide and royalty-free license under Intel’s copyrights to:   
+Reproduce and prepare Derivative Works of the Source Code solely for Licensee’s own internal use, to design, develop, modify or debug Derivative Works that operate in or in conjunction only with Intel Chipsets or Intel Processors as specified in Exhibit A;   
+Reproduce and distribute MB-UDK internally for Licensee’s own use in developing and maintaining products or services supporting Intel Chipsets or Intel Processors as specified in Exhibit A; and  
+Distribute Object Code and Derived Object Code externally to Licensee’s End Users, either directly or through Licensee’s usual distribution channels and methods, but only for use with Intel Chipsets or Intel Processors as specified in Exhibit A. Licensee will distribute all Licensed Programs under an end user license agreement (“End User License”) containing at a minimum the terms and conditions set forth in Exhibit B. 
+2.2 	ADDITIONAL CONDITIONS: The rights granted under this Agreement are also subject to the following 
+limitations:   
+Licensee will not make any statement that the Derivative Works are "certified," or that performance is guaranteed, by Intel; 
+Licensee will not disassemble, reverse engineer, or decompile any Object Code provided to Licensee. 
+Licensee will not use Intel's name or trademarks without prior written permission; and 
+Licensee may not disclose, distribute or make commercial use of the MB-UDK as a stand-alone product. 
+Except as specifically permitted in Sections 2.1, above, Licensee is not licensed to use the MB-UDK in any other manner, including for Licensee’s other internal or business use or for use in association with any other products. Licensee will not license MB-UDK to any third party. Licensee will include all copyright notices in all full and partial copies of the MB-UDK, including all Derived Source Code, and will not deface, obscure or alter any copyright notices.  
+Licensee is not obligated to provide Intel with comments or suggestions regarding Derived Source Code or the MB-UDK received under this Agreement.  Should Licensee, however, provide Intel with designs, comments or suggestions for the modification, correction, improvement or enhancement of the MB-UDK or Intel products which may embody the MB-UDK (collectively, “Feedback”), then Licensee grants to Intel a non-exclusive, irrevocable, worldwide, royalty-free license, including the right to sublicense Intel licensees and customers, under Licensee’s intellectual property rights in the Feedback, and the rights to use and disclose the Feedback in any manner Intel chooses and to display, perform, copy, have copied, make, have made, use, sell, offer to sell, and otherwise dispose of Intel’s and its sublicenses’ products embodying the Feedback in any manner and via any media Intel chooses, but without reference to the source of the Feedback.   
+
+3.0 	DISCLAIMER OF WARRANTY 
+Neither Intel nor its suppliers make any representation or warranty or condition of any kind whether express or implied (either in fact or by operation of law) with respect to the MB-UDK.  Intel and its suppliers expressly disclaim all warranties or conditions of merchantability or fitness for a particular purpose.  Intel and its suppliers do not warrant that the MB-UDK is error-free or that operation of the MB-UDK will be secure or uninterrupted and hereby disclaim any and all liability on account thereof. There is also no implied warranty of non-infringement. MB-UDK is licensed on an "as is" basis and neither Intel nor its suppliers will provide any support, assistance, installation, training or other services.  Intel and its suppliers may provide any updates, enhancements or extensions at their sole discretion. 
+
+4.0 	LIMITATION OF LIABILITY 
+In no event will Intel or its suppliers be liable for: (a) any representation or warranty made to any third party by Licensee, any agent of Licensee or distributor; (b) failure of the MB-UDK to perform as expected; (c) failure of the MB-UDK to provide security; or (d) any use of the MB-UDK or the results or information obtained or decisions made by licensee’s use of the MB-UDK. 
+Intel and its suppliers will not be liable for any direct, indirect, special, incidental or consequential damages of any kind, even if advised of the possibility of these damages. 
+
+5.0 	PROTECTION AND SECURITY 
+Licensee acknowledges that information and materials disclosed or provided to Licensee pursuant to this Agreement may contain Intel trade secrets.  Such trade secrets are protected by the provisions of the applicable nondisclosure agreement(s) between the parties.  Licensee will not make MB-UDK or Derivative Works available in whole or in part or in any form, to any person other than Licensee's employees who are designated to work on Licensee's development effort authorized hereunder and who have a specific need for access to MB-UDK.  Licensee agrees to instruct these employees of his or her obligations with respect to use, copying, protection, and security of MB-UDK and associated documentation.  Notwithstanding the earlier termination of this Agreement, the obligations of this section are to remain in effect until the time as MB-UDK becomes publicly known, through no act or failure to act on Licensee's or Subsidiary’s part. 
+
+6.0 	ASSIGNMENT, SALE OR TRANSFER 
+Licensee will not assign, sublicense, or otherwise transfer this Agreement or any right or obligation hereunder without Intel's prior written consent, which consent will not be unreasonably withheld in the event Licensee is acquired by an entity that is not a competitor of Intel. Any attempt to do so will be null and void. 
+
+TERMINATION 
+
+Licensee may terminate this Agreement and the licenses granted in the Agreement at any time upon Intel’s receipt of written notice.   
+Intel may terminate this Agreement and any licenses granted in the Agreement at any time if Licensee fails to cure any material breach of this Agreement within thirty (30) days after notice of the breach.  Such termination will not prejudice Intel's right to damages or any other remedy available at law or in equity. 
+Upon termination of the Agreement or any license granted hereunder for any reason whatsoever, Licensee will completely remove MB-UDK from all Derived Source Code. In the event of any termination, Licensee will, at Intel's option, either return to Intel or destroy the original and all full or partial copies of MB-UDK, including those portions in Derived Source Code, and certify to Intel that they have been destroyed. 
+The following sections will survive expiration or termination of this Agreement: sections 2.2, 2.3, 2.4, 3, 4, 5, 7, 8, 9 and 10.  
+
+OWNERSHIP 
+
+MB-UDK and all copies, and any updates provided by Intel, in whole or in part, are and will remain the property of Intel or its suppliers.  Licensee understands and agree that no license under any Intel patent, copyright (except as expressly described in Sections 2.1, above), trade secret or other intellectual property right is granted or conferred upon Licensee in this Agreement or by the providing of the MB-UDK by Intel to Licensee hereunder, either expressly, by implication, inducement, estoppel or otherwise, and that any further license under the intellectual property rights must be express and in writing.  
+Title in and to the Derived Source Code will be held by Licensee or Licensee’s suppliers as appropriate, subject to Intel’s underlying ownership of the MB-UDK. 
+
+9.0 	EXPORT CONTROL 
+Neither party will export, either directly or indirectly, any product, service or technical data or system incorporating the MB-UDK without first obtaining any required license or other approval from the U.S. Department of Commerce or any other agency or department of the United States Government.  In the event any product or software is exported from the United States or re-exported from a foreign destination by either party, that party will ensure that the distribution and export/re-export or import of the product or software is in compliance with all laws, regulations, orders, or other restrictions of the U.S. Export Administration Regulations and the appropriate foreign government.  Both parties agree that neither it nor any of its Subsidiaries will export/re-export any software, technical data, process, product, or service, directly or indirectly, to any country for which the United States government or any agency thereof or the foreign government from where it is shipping requires an export license, or other governmental approval, without first obtaining the license or approval. 
+
+GENERAL 
+
+Any dispute arising directly under the express terms of this Agreement or the grounds for termination of any rights granted under this Agreement will be resolved as follows: First, within forty five (45) days from one party’s written request to the other, senior executives of both parties will meet to attempt to resolve the dispute. If the senior executives cannot resolve the dispute, either party may then make a written demand for formal dispute resolution by tendering to the other party notice of the dispute and its intent to invoke the terms of this Section 10.1. The parties agree to meet within ninety (90) days of the demand with an impartial mediator selected by mutual agreement to participate in a one-day, non-binding mediation. In the event the parties cannot agree on a mediator, they will each select one nominator, who will not at that time be employed by either party, and the two nominators will agree on and appoint the mediator. If the parties have not resolved the dispute or claim within thirty (30) days after the one-day, non-binding mediation, either party may begin litigation proceedings. 
+This is the complete and exclusive Agreement between the parties relating to this subject matter. No amendment will be effective unless in writing signed by authorized representatives of both parties. 
+The terms and conditions stated in the Agreement are declared to be severable. If any paragraph, provision, or clause in this Agreement will be found or be held to be invalid or unenforceable in any jurisdiction in which this Agreement is being performed, the remainder of this Agreement will be valid and enforceable and the 
+parties will use good faith to negotiate a substitute, valid and enforceable provision which most nearly effects the parties' intent in entering into this Agreement. 
+Any claim arising under or relating to this Agreement, will be governed by the laws of the State of Delaware, excluding its conflicts of laws provisions.  The parties agree that all disputes and litigation regarding the above defined claims will be subject to the exclusive jurisdiction of the courts of the State of Delaware or of the Federal courts sitting in Delaware. 
+
+[END OF GENERAL TERMS AND CONDITIONS] 
+
+EXHIBIT A 
+SUPPORTED PLATFORMS 
+ 
+List of supported platforms with which the MB-UDK may be used: 
+	BayTrail-I 	Atom 	E3825, E3845, E3815, 
+	E38xx 				E3826, E3827 
+
+EXHIBIT B 
+MINIMUM OBJECT CODE 
+END-USER LICENSING TERMS 
+ 
+Licensee will ensure that terms at least as restrictive and protective of Intel’s interests as the following minimum terms, as described below, are included in all End User Licenses. These minimum terms apply to distribution of Licensed Programs (object code) only.   
+
+An End User may: 
+Copy the Licensed Programs and accompanying materials (“Software”) onto the End User’s computers for End User’s internal use solely for development and maintenance of the End User’s products supporting Intel Chipsets or Intel Processors. 
+
+An End User may not: 
+Sublicense or further distribute the Software, or permit simultaneous use of the Software by more than one user. 
+Reverse engineer, decompile, or disassemble the Software. 
+Use, copy, modify, sell or transfer the Software except as provided in this Exhibit B. 
+Remove any copyright notices from the Software or any copies thereof. 
+Export or import Software in violation of any law, regulation, order or other restriction of the United States government and its agencies, or any foreign government. 
+
+An End User will also be made aware of and agree that: 
+
+Title to the Software and all copies thereof remain with Licensee or its suppliers, as applicable, and the Software is copyrighted and protected by United States and international copyright laws. 
+
+Except as expressly provided in this Exhibit B, End User is not granted any express or implied right under Intel patents, copyrights, trademarks or trade secret information. 
+
+The Software is provided “AS IS” without any express or implied warranty of any kind, including warranties 
+of merchantability, noninfringement of third-party intellectual property or fitness for any particular purpose. 
+
+Liability to End User is completely disclaimed to the extent allowed by law, including without limitation all indirect, special, incidental, and consequential damages of any kind. 
+
+The technical data and Software covered by this license is a “Commercial Item,” as the term is defined by the FAR 2.101 (48 C.F.R. 2.101) and is “commercial computer software” and “commercial computer software documentation” as specified under FAR 12.212 (48 C.F.R. 12.212) or DFARS 227.7202 (48 C.F.R. 227.7202), as applicable. This commercial computer software and related documentation is provided to End Users for use by and on behalf of the U.S. Government, with only those rights as are granted to all other End Users pursuant to the terms and conditions of the End User License. Use for or on behalf of the U.S. Government is permitted only if the party acquiring or using this software is properly authorized by an appropriate U.S. Government official. This use by or for the U.S. Government clause is in lieu of, and supersedes, any other FAR, DFARS, or other provision that addresses Government rights in the computer software or documentation covered by this license. 
+
+The End User License may be terminated at any time if the End User is in breach of any of its terms and conditions.  Upon termination, the End User must immediately destroy the Software or return all copies. 

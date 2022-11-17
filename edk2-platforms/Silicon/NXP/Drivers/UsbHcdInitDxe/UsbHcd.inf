@@ -1,0 +1,45 @@
+#  UsbHcd.inf
+#
+#  Copyright 2017, 2020 NXP
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#
+
+[Defines]
+  INF_VERSION                     = 0x0001001A
+  BASE_NAME                       = UsbHcdDxe
+  FILE_GUID                       = 196e7c2a-37b2-4b85-8683-718588952449
+  MODULE_TYPE                     = DXE_DRIVER
+  VERSION_STRING                  = 1.0
+  ENTRY_POINT                     = InitializeUsbHcd
+
+[Sources.common]
+  UsbHcd.c
+  UsbHcd.h
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Silicon/NXP/NxpQoriqLs.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  IoLib
+  MemoryAllocationLib
+  NonDiscoverableDeviceRegistrationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[FixedPcd]
+  gNxpQoriqLsTokenSpaceGuid.PcdNumUsbController
+  gNxpQoriqLsTokenSpaceGuid.PcdUsbBaseAddr
+  gNxpQoriqLsTokenSpaceGuid.PcdUsbSize
+
+[Guids]
+  gEfiEndOfDxeEventGroupGuid
+
+[Depex]
+  TRUE

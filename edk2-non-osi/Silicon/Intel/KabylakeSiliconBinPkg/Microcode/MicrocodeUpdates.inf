@@ -1,0 +1,28 @@
+### @file
+# Microcode update.
+#
+# Copyright (c) 2017, Intel Corporation. All rights reserved.<BR>
+#
+# This program and the accompanying materials are licensed and made available under
+# the terms and conditions of the BSD License which accompanies this distribution.
+# The full text of the license may be found at
+# http://opensource.org/licenses/bsd-license.php
+#
+# THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+# WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+###
+
+[defines]
+  INF_VERSION                    = 0x00010017
+  BASE_NAME                      = MicrocodeUpdates
+  FILE_GUID                      = 1FAE4D78-CB33-4F73-8881-A1EA8F5EDFEF
+  VERSION_STRING                 = 1.0
+  MODULE_TYPE                    = USER_DEFINED
+
+[Sources]
+  mC0406E3_000000A0.mcb
+  m80406E8_00000026.mcb
+  mC0806E9_00000030.mcb
+  mC0806EA_000000B4.mcb
+

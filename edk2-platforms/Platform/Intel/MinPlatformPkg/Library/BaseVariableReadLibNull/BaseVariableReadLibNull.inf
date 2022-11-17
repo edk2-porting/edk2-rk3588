@@ -1,0 +1,37 @@
+## @file
+# Component description file for NULL implementation of Variable Read Lib
+#
+# This library provides phase agnostic access to the UEFI Variable Services.
+# This is done by implementing a wrapper on top of the phase specific mechanism
+# for reading from UEFI variables. For example, the PEI implementation of this
+# library uses EFI_PEI_READ_ONLY_VARIABLE2_PPI. The DXE implementation accesses
+# the UEFI Runtime Services Table, and the SMM implementation uses
+# EFI_SMM_VARIABLE_PROTOCOL.
+#
+# Using this library allows code to be written in a generic manner that can be
+# used in PEI, DXE, or SMM without modification.
+#
+# @copyright
+# Copyright 2021 Intel Corporation. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+##
+## NOTICE: This library is also available in MinPlatformPkg. This copy was added
+##         for the convience of those that are using an older MinPlatformPkg.
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BaseVariableReadLibNull
+  FILE_GUID                      = 5C9E2489-329F-4D2A-90F1-F5CB2A88A3E6
+  VERSION_STRING                 = 1.0
+  MODULE_TYPE                    = BASE
+  LIBRARY_CLASS                  = VariableReadLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+
+[Sources]
+  BaseVariableReadLibNull.c

@@ -1,0 +1,56 @@
+## @file
+# Component description file for Tbt policy
+#
+# Copyright (c) 2018 - 2019, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+
+[Defines]
+INF_VERSION = 0x00010017
+BASE_NAME = PeiTbtPolicyLib
+FILE_GUID = 4A95FDBB-2535-49eb-9A79-D56D24257106
+VERSION_STRING = 1.0
+MODULE_TYPE = PEIM
+LIBRARY_CLASS = PeiTbtPolicyLib
+
+
+[LibraryClasses]
+BaseMemoryLib
+PeiServicesLib
+PeiServicesTablePointerLib
+MemoryAllocationLib
+DebugLib
+PostCodeLib
+HobLib
+GpioLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+  KabylakeOpenBoardPkg/OpenBoardPkg.dec
+  KabylakeSiliconPkg/SiPkg.dec
+  IntelSiliconPkg/IntelSiliconPkg.dec
+
+[Pcd]
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtControllerEn           ## CONSUMES
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtControllerType         ## CONSUMES
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtPcieRpNumber           ## CONSUMES
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtBootOn                 ## CONSUMES
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtUsbOn                  ## CONSUMES
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtGpio3ForcePwr          ## CONSUMES
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtGpio3ForcePwrDly       ## CONSUMES
+gKabylakeOpenBoardPkgTokenSpaceGuid.PcdDTbtCioPlugEventGpioPad    ## CONSUMES
+
+[Sources]
+PeiTbtPolicyLib.c
+
+[Guids]
+gTbtInfoHobGuid
+
+[Ppis]
+gEfiPeiReadOnlyVariable2PpiGuid
+gPeiTbtPolicyPpiGuid

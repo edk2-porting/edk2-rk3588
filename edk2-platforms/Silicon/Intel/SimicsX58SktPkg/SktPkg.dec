@@ -1,0 +1,37 @@
+## @file
+# Copyright (c) 2019 Intel Corporation. All rights reserved. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = SimicsX58SktPkg
+  PACKAGE_GUID                   = 070FEC45-BF03-41C1-8D46-8BBE032A7C0C
+  PACKAGE_VERSION                = 0.91
+
+[Includes]
+  Include
+
+[Guids]
+  gSimicsX58PkgTokenSpaceGuid   = {0x5b276d20, 0x37d0, 0x4af0, {0x8d, 0x04, 0x47, 0x91, 0x2b, 0x7c, 0x1d, 0x44}}
+
+[PcdsFixedAtBuild]
+  ## The following setting controls how many megabytes we configure as TSEG on
+  #  X58, for SMRAM purposes. Permitted values are: 1, 2, 8. Other values cause
+  #  undefined behavior.
+  #
+  #  This PCD is only consulted if PcdSmmSmramRequire is TRUE (see below).
+  gSimicsX58PkgTokenSpaceGuid.PcdX58TsegMbytes|8|UINT8|0x20
+
+[PcdsFeatureFlag]
+  ## This feature flag enables SMM/SMRAM support. Note that it also requires
+  #  such support from the underlying QEMU instance; if that support is not
+  #  present, the firmware will reject continuing after a certain point.
+  #
+  #  The flag also acts as a general "security switch"; when TRUE, many
+  #  components will change behavior, with the goal of preventing a malicious
+  #  runtime OS from tampering with firmware structures (special memory ranges
+  #  used by OVMF, the varstore pflash chip, LockBox etc).
+  gSimicsX58PkgTokenSpaceGuid.PcdSmmSmramRequire|FALSE|BOOLEAN|0x1e

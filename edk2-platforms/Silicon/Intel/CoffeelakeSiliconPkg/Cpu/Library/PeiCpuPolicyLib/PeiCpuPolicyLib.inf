@@ -1,0 +1,67 @@
+## @file
+# Component description file for the PeiCpuPolicyLib library.
+#
+# Copyright (c) 2019 - 2020 Intel Corporation. All rights reserved. <BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+INF_VERSION = 0x00010017
+BASE_NAME = PeiCpuPolicyLib
+FILE_GUID = 5baafc8f-25c6-4d19-b141-585757509372
+VERSION_STRING = 1.0
+MODULE_TYPE = PEIM
+LIBRARY_CLASS = CpuPolicyLib
+
+
+[LibraryClasses]
+DebugLib
+IoLib
+PeiServicesLib
+BaseMemoryLib
+MemoryAllocationLib
+CpuPlatformLib
+PciSegmentLib
+SaPlatformLib
+SiConfigBlockLib
+PostCodeLib
+PcdLib
+ConfigBlockLib
+
+[Packages]
+MdePkg/MdePkg.dec
+UefiCpuPkg/UefiCpuPkg.dec
+CoffeelakeSiliconPkg/SiPkg.dec
+IntelSiliconPkg/IntelSiliconPkg.dec
+
+[Sources]
+PeiCpuPolicyLib.c
+PeiCpuPolicyLibrary.h
+CpuPrintPolicy.c
+PeiCpuPolicyLibPreMem.c
+CpuPrintPolicyPreMem.c
+
+[Ppis]
+gSiPolicyPpiGuid                    ## CONSUMES
+gSiPreMemPolicyPpiGuid              ## CONSUMES
+
+[FixedPcd]
+gSiPkgTokenSpaceGuid.PcdFlashMicrocodeFvBase
+gSiPkgTokenSpaceGuid.PcdFlashMicrocodeFvSize
+
+[Pcd]
+gUefiCpuPkgTokenSpaceGuid.PcdCpuApLoopMode  ## Produces
+
+[Guids]
+gCpuConfigGuid                      ## PRODUCES
+gCpuSgxConfigGuid                   ## PRODUCES
+gCpuPowerMgmtBasicConfigGuid        ## PRODUCES
+gCpuPowerMgmtCustomConfigGuid       ## PRODUCES
+gCpuTestConfigGuid                  ## PRODUCES
+gCpuPidTestConfigGuid               ## PRODUCES
+gCpuPowerMgmtTestConfigGuid         ## PRODUCES
+gCpuConfigLibPreMemConfigGuid       ## PRODUCES
+gCpuSecurityPreMemConfigGuid        ## PRODUCES
+gCpuOverclockingPreMemConfigGuid    ## CONSUMES

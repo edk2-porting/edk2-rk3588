@@ -1,0 +1,37 @@
+#
+#  Copyright (c) 2014-2018, Linaro Limited. All rights reserved.
+#  Copyright (c) 2016-2017, Comcast. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+################################################################################
+#
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+
+[Defines]
+  INF_VERSION     = 0x0001001A
+  BASE_NAME       = RdkDriSecureLoader
+  FILE_GUID       = dd52d1d7-0de2-4552-98e0-8dbee458a502
+  MODULE_TYPE     = UEFI_APPLICATION
+  VERSION_STRING  = 1.0
+  ENTRY_POINT     = DriSecureBootEntryPoint
+
+[Sources]
+  DriSecureBoot.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ShellPkg/ShellPkg.dec
+  SecurityPkg/SecurityPkg.dec
+  NetworkPkg/NetworkPkg.dec
+  Platform/Comcast/Library/RdkBootManagerLib/RdkBootManagerLib.dec
+
+[LibraryClasses]
+  RdkBootManagerLib
+  UefiApplicationEntryPoint

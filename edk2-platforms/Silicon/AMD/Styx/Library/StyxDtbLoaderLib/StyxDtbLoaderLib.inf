@@ -1,0 +1,59 @@
+/** @file
+*
+*  Copyright (c) 2017, Linaro, Ltd. All rights reserved.
+*
+*  SPDX-License-Identifier: BSD-2-Clause-Patent
+*
+**/
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = StyxDtbLoaderLib
+  FILE_GUID                      = 3874890c-2917-46a6-8711-8fcaee92260a
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = DtPlatformDtbLoaderLib|DXE_DRIVER
+
+[Sources]
+  StyxDtbLoaderLib.c
+
+[Packages]
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  Silicon/AMD/Styx/AmdModulePkg/AmdModulePkg.dec
+  Silicon/AMD/Styx/AmdStyx.dec
+
+[LibraryClasses]
+  ArmLib
+  BaseLib
+  DebugLib
+  DxeServicesLib
+  FdtLib
+  MemoryAllocationLib
+  PcdLib
+  PrintLib
+  UefiBootServicesTableLib
+
+[Pcd]
+  gAmdStyxTokenSpaceGuid.PcdSocCpuId
+  gAmdStyxTokenSpaceGuid.PcdEthMacA
+  gAmdStyxTokenSpaceGuid.PcdEthMacB
+  gAmdStyxTokenSpaceGuid.PcdEnableSmmus
+  gArmTokenSpaceGuid.PcdSystemMemoryBase
+
+[FixedPcd]
+  gAmdModulePkgTokenSpaceGuid.PcdXgbeEnable
+  gArmPlatformTokenSpaceGuid.PcdCoreCount
+  gAmdStyxTokenSpaceGuid.PcdEnableKcs
+  gAmdStyxTokenSpaceGuid.PcdSata1PortCount
+
+[Guids]
+  gDtPlatformDefaultDtbFileGuid
+
+[Protocols]
+  gAmdMpCoreInfoProtocolGuid         ## CONSUMED
+
+[Depex]
+  gAmdMpCoreInfoProtocolGuid

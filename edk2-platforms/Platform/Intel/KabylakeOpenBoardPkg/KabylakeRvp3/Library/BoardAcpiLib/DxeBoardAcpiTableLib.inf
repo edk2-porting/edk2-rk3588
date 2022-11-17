@@ -1,0 +1,48 @@
+### @file
+# Kaby Lake RVP 3 Board ACPI library
+#
+# Copyright (c) 2017 - 2019, Intel Corporation. All rights reserved.<BR>
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+###
+
+[Defines]
+  INF_VERSION                    = 0x00010017
+  BASE_NAME                      = DxeBoardAcpiTableLib
+  FILE_GUID                      = 6562E0AE-90D8-4D41-8C97-81286B4BE7D2
+  VERSION_STRING                 = 1.0
+  MODULE_TYPE                    = BASE
+  LIBRARY_CLASS                  = BoardAcpiTableLib
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+# VALID_ARCHITECTURES = IA32 X64 IPF EBC
+#
+
+[LibraryClasses]
+  BaseLib
+  IoLib
+  PciLib
+  AslUpdateLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MinPlatformPkg/MinPlatformPkg.dec
+  KabylakeOpenBoardPkg/OpenBoardPkg.dec
+  KabylakeSiliconPkg/SiPkg.dec
+  BoardModulePkg/BoardModulePkg.dec
+
+[Pcd]
+  gBoardModulePkgTokenSpaceGuid.PcdPs2KbMsEnable
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdPciExpNative
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdNativeAspmEnable
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdLowPowerS0Idle
+  gKabylakeOpenBoardPkgTokenSpaceGuid.PcdAcpiGnvsAddress
+
+[Sources]
+  DxeKabylakeRvp3AcpiTableLib.c
+  DxeBoardAcpiTableLib.c
+

@@ -1,0 +1,54 @@
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = I2cDxe
+  FILE_GUID                      = 9335a854-4b88-11ec-a8ee-f42a7dcb925d
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = I2cInitialise
+
+[Sources.common]
+  I2cDxe.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  ArmPkg/ArmPkg.dec
+  Silicon/Rockchip/RockchipPkg.dec
+
+[LibraryClasses]
+  IoLib
+  PcdLib
+  BaseLib
+  DebugLib
+  UefiLib
+  UefiDriverEntryPoint
+  UefiBootServicesTableLib
+  RockchipPlatformLib
+  TimerLib
+
+[Protocols]
+  gEfiI2cMasterProtocolGuid
+  gEfiDevicePathProtocolGuid
+  gEfiI2cEnumerateProtocolGuid
+  gEfiI2cBusConfigurationManagementProtocolGuid
+#  gRockchipBoardDescProtocolGuid
+
+[Pcd]
+  gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses
+  gRockchipTokenSpaceGuid.PcdI2cSlaveBuses
+  gRockchipTokenSpaceGuid.PcdI2cControllersEnabled
+  gRockchipTokenSpaceGuid.PcdI2cClockFrequency
+  gRockchipTokenSpaceGuid.PcdI2cBaudRate
+  gRockchipTokenSpaceGuid.PcdI2cBusCount
+
+[Guids]
+  gEfiEndOfDxeEventGroupGuid
+
+[Depex]
+  TRUE

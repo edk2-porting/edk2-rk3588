@@ -1,0 +1,95 @@
+#/** @file
+#  Sample ACPI Platform Driver
+#
+#  Copyright (c) 2008 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2014 - 2016, AMD Inc. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+#/**
+#  Derived from:
+#   MdeModulePkg/Universal/Acpi/AcpiPlatformDxe/AcpiPlatformDxe.inf
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = AcpiPlatform
+  FILE_GUID                      = f229c831-6a35-440b-9c84-dd3bc71e3865
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = AcpiPlatformEntryPoint
+
+[Sources]
+  AcpiPlatform.c
+  Csrt.aslc
+  Dbg2.aslc
+  Dsdt.asl
+  Fadt.aslc
+  Gtdt.aslc
+  Iort.aslc
+  Madt.aslc
+  Mcfg.aslc
+  Pptt.aslc
+  Spcr.aslc
+  SsdtB1.asl
+  SsdtKcs.asl
+  SsdtXgbe.asl
+
+[Packages]
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Silicon/AMD/Styx/AmdModulePkg/AmdModulePkg.dec
+  Silicon/AMD/Styx/AmdStyx.dec
+
+[LibraryClasses]
+  ArmLib
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  DxeServicesLib
+  MemoryAllocationLib
+  PcdLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Pcd]
+  gAmdStyxTokenSpaceGuid.PcdEthMacA
+  gAmdStyxTokenSpaceGuid.PcdEthMacB
+  gAmdStyxTokenSpaceGuid.PcdEnableSmmus
+  gAmdStyxTokenSpaceGuid.PcdSocCoreCount
+  gAmdStyxTokenSpaceGuid.PcdSocCpuId
+
+[FixedPcd]
+  gAmdModulePkgTokenSpaceGuid.PcdXgbeEnable
+  gAmdStyxTokenSpaceGuid.PcdCntControlBase
+  gAmdStyxTokenSpaceGuid.PcdCntReadBase
+  gAmdStyxTokenSpaceGuid.PcdCntCTLBase
+  gAmdStyxTokenSpaceGuid.PcdCntBase0
+  gAmdStyxTokenSpaceGuid.PcdCntEL0Base0
+  gAmdStyxTokenSpaceGuid.PcdEnableKcs
+  gAmdStyxTokenSpaceGuid.PcdGicVersion
+  gAmdStyxTokenSpaceGuid.PcdGicHypervisorInterruptInterfaceBase
+  gAmdStyxTokenSpaceGuid.PcdGicVirtualInterruptInterfaceBase
+  gAmdStyxTokenSpaceGuid.PcdGicVirtualMaintenanceInterrupt
+  gAmdStyxTokenSpaceGuid.PcdGicVirtualRegisterInterfaceBase
+  gAmdStyxTokenSpaceGuid.PcdGicMSIFrameBase
+  gAmdStyxTokenSpaceGuid.PcdSata1PortCount
+  gAmdStyxTokenSpaceGuid.PcdSbsaWatchDogRefreshBase
+  gAmdStyxTokenSpaceGuid.PcdSbsaWatchDogControlBase
+  gAmdStyxTokenSpaceGuid.PcdSbsaWakeUpGSIV
+  gAmdStyxTokenSpaceGuid.PcdSbsaWatchDogGSIV
+  gAmdStyxTokenSpaceGuid.PcdSerialDbgRegisterBase
+  gArmPlatformTokenSpaceGuid.PcdCoreCount
+  gArmTokenSpaceGuid.PcdGicInterruptInterfaceBase
+  gArmTokenSpaceGuid.PcdGicDistributorBase
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase
+
+[Protocols]
+  gAmdMpCoreInfoProtocolGuid                    ## CONSUMED
+  gEfiAcpiTableProtocolGuid                     ## ALWAYS_CONSUMED
+
+[Depex]
+  gEfiAcpiTableProtocolGuid AND gAmdMpCoreInfoProtocolGuid

@@ -1,0 +1,51 @@
+#/** @file
+#
+#    Copyright (c) 2016, Hisilicon Limited. All rights reserved.
+#    Copyright (c) 2016, Linaro Limited. All rights reserved.
+#
+#    SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = OemMiscLibHi1616Evb
+  FILE_GUID                      = 751C7627-D5F8-499C-AEEEE-C87858759612
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = OemMiscLib
+
+[Sources.common]
+  BoardFeatureD05.c
+  BoardFeatureD05Strings.uni
+  OemMiscLibD05.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/Hisilicon/HisiliconNonOsi.dec
+  Silicon/Hisilicon/HisiPkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  PcdLib
+  TimerLib
+
+[BuildOptions]
+
+[Ppis]
+  gEfiPeiReadOnlyVariable2PpiGuid   ## SOMETIMES_CONSUMES
+
+[Pcd]
+  gArmTokenSpaceGuid.PcdArmArchTimerFreqInHz
+  gHisiTokenSpaceGuid.PcdIsMPBoot
+  gHisiTokenSpaceGuid.PcdSocketMask
+  gHisiTokenSpaceGuid.PcdTrustedFirmwareEnable
+
+[FixedPcd.common]
+
+[Guids]
+
+[Protocols]
+

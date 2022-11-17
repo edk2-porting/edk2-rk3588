@@ -1,0 +1,53 @@
+#/** @file
+#  INF file for the MMC Host Protocol implementation for the ARM PrimeCell PL180.
+#
+#  WARNING:
+#  This driver fails to follow the UEFI driver model without a good
+#  reason, and only remains in the tree because it is still used by
+#  a small number of platforms. It will be removed when no longer used.
+#  New platforms should not use it, and no one should use this as
+#  reference code for developing new drivers.
+#
+#  Copyright (c) 2011-2020, ARM Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = PL180MciDxe
+  FILE_GUID                      = 09831032-6fa3-4484-af4f-0a000a8d3a82
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = PL180MciDxeInitialize
+
+[Sources.common]
+  PL180Mci.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  Platform/ARM/VExpressPkg/ArmVExpressPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  UefiLib
+  UefiDriverEntryPoint
+  BaseMemoryLib
+  ArmLib
+  IoLib
+  TimerLib
+
+[Protocols]
+  gEfiCpuArchProtocolGuid
+  gEfiDevicePathProtocolGuid
+  gEmbeddedMmcHostProtocolGuid
+
+[Pcd]
+  gArmVExpressTokenSpaceGuid.PcdPL180SysMciRegAddress
+  gArmVExpressTokenSpaceGuid.PcdPL180MciBaseAddress
+
+[Depex]
+  gEfiCpuArchProtocolGuid

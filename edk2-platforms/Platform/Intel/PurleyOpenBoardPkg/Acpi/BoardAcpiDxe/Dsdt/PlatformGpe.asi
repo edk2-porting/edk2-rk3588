@@ -1,0 +1,78 @@
+/** @file
+
+Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+//  General Purpose Event
+#include "MaxSocket.h"
+
+Scope (\_GPE) {
+
+  //
+  // ME HECI2 SCI handler
+  // Note: This SCI from HECI2 is routed to ICH9 over the DMI and it
+  // sets the DMISCI status bit in TCO block. From there it is routed
+  // to bit6 GPE0 status register.
+  //
+  OperationRegion (TCOS, SystemIO, 0x464, 2) // ICH_ACPI_BASE_ADDRESS + TCO_BASE + R_TCO1_STS
+  Field (TCOS, ByteAcc, NoLock, WriteAsZeros) {
+         Offset (0x1),
+         , 1,
+         DSCI, 1,
+  }
+
+  Method(NTFI, 2){
+    If(And(Arg0, 0x01)){
+      Notify(\_SB.PC06, Arg1)
+      Notify(\_SB.PC07, Arg1)
+      Notify(\_SB.PC08, Arg1)
+      Notify(\_SB.PC09, Arg1)
+      Notify(\_SB.PC10, Arg1)
+      Notify(\_SB.PC11, Arg1)   
+    }
+    If(And(Arg0, 0x02)){
+      Notify(\_SB.PC12, Arg1)
+      Notify(\_SB.PC13, Arg1)
+      Notify(\_SB.PC14, Arg1)
+      Notify(\_SB.PC15, Arg1)
+      Notify(\_SB.PC16, Arg1)
+      Notify(\_SB.PC17, Arg1)  
+    }
+    If(And(Arg0, 0x04)){
+      Notify(\_SB.PC18, Arg1)
+      Notify(\_SB.PC19, Arg1)
+      Notify(\_SB.PC20, Arg1)
+      Notify(\_SB.PC21, Arg1)
+      Notify(\_SB.PC22, Arg1)
+      Notify(\_SB.PC23, Arg1)   
+    }
+  } //End Method NTFI
+
+  // Tell OS to run thru the new status of this device (Software SCI generated from SMM for all Hot plug events)
+  Method (_L62, 0x0, NotSerialized) {
+    if(LEqual(SCI0, 3)) { // Device ejection (Invoked with _EJ0 method called)
+      Store (0, SCI0)
+    } else {              // Device check (OS can still reject online request based on resources and capability)
+      NTFI (IIOP, 0)
+      Store (0, MEBC)
+      Store (0, CPHP)
+      Store (0, IIOP)
+    }
+    Store (0, SGPC)
+    Store (1, SGPS)
+
+  }
+
+  // PME supported for Slots, use GPE 9 for PME
+  // Hot plug on all slots for now, change later.
+  // Slot numbers on silk screen might be different than the port number, currently use port numbers.
+  //
+  // IIO PCI_E Slot Hotplug GPE Event
+  //
+  Method (_L61, 0, NotSerialized) {
+    #include "IioPcieHotPlugGpeHandler.asl"
+  }// end of _L01 GPE Method
+
+}// end of _GPE scope.

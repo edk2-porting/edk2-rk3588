@@ -1,0 +1,35 @@
+## @file
+#  Platform flash device access library.
+#
+#  Copyright (c) 2017, Linaro, Ltd. All rights reserved.<BR>
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = SynQuacerPlatformFlashAccessLib
+  FILE_GUID                      = b4e7f39f-ab67-4318-b1ad-c1e211304f0b
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = PlatformFlashAccessLib|DXE_DRIVER
+
+[Sources]
+  SynQuacerPlatformFlashAccessLib.c
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  SignedCapsulePkg/SignedCapsulePkg.dec
+
+[Protocols]
+  gEfiFirmwareVolumeBlockProtocolGuid
+
+[LibraryClasses]
+  BaseMemoryLib
+  BootLogoLib
+  DebugLib
+  DxeServicesTableLib
+  UefiBootServicesTableLib
+  UefiLib
+

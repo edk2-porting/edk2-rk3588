@@ -1,0 +1,70 @@
+## @file
+# Uba init for multi-boards support in DXE phase.
+#
+# @copyright
+# Copyright 2014 - 2021 Intel Corporation.
+#
+# SPDX-License-Identifier: BSD-2-Clause-Patent
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = BoardInitDxe
+  FILE_GUID                      = 69E6DD6D-F09E-485f-9627-EB70E9CFC82A
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = BoardInitDxeDriverEntry
+
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = IA32
+#
+
+[Sources]
+  BoardInitDxe.c
+  BoardInitDxe.h
+
+[Packages]
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  WhitleySiliconPkg/WhitleySiliconPkg.dec
+  WhitleySiliconPkg/CpRcPkg.dec
+  WhitleySiliconPkg/SiliconPkg.dec
+  WhitleyOpenBoardPkg/PlatformPkg.dec
+
+
+[LibraryClasses]
+  DebugLib
+  IoLib
+  HobLib
+  UefiLib
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  DebugLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  UefiDriverEntryPoint
+  PrintLib
+
+[Guids]
+
+[Protocols]
+  gUbaConfigDatabaseProtocolGuid                         #CONSUMER
+  gEfiPlatformTypeNeonCityEPRPProtocolGuid               #PRODUCER
+  gEfiPlatformTypeHedtCRBProtocolGuid                    #PRODUCER
+  gEfiPlatformTypeLightningRidgeEXRPProtocolGuid         #PRODUCER
+  gEfiPlatformTypeLightningRidgeEX8S1NProtocolGuid       #PRODUCER
+  gEfiPlatformTypeWilsonCityRPProtocolGuid               #PRODUCER
+  gEfiPlatformTypeWilsonCityModularProtocolGuid          #PRODUCER
+  gEfiPlatformTypeIsoscelesPeakProtocolGuid              #PRODUCER
+  gEfiPlatformTypeWilsonCitySMTProtocolGuid              #PRODUCER
+  gEfiPlatformTypeCooperCityRPProtocolGuid               #PRODUCER
+
+[FixedPcd]
+  gEfiCpRcPkgTokenSpaceGuid.PcdMaxCpuSocketCount
+
+[Depex]
+  gUbaConfigDatabaseProtocolGuid

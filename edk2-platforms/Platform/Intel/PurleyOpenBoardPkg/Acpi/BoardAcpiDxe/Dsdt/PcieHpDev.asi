@@ -1,0 +1,14 @@
+/** @file
+
+Copyright (c) 2018, Intel Corporation. All rights reserved.<BR>
+SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+  Method(SNUM, 0, Serialized) {
+    Store(PSNM, Local0)
+    Return(Local0)
+  }
+
+    Method(_SUN, 0) { Return(SNUM) } // Slot User Number
+    Method(_EJ0, 1) { EJ0L() }       // Remove all power from the slot

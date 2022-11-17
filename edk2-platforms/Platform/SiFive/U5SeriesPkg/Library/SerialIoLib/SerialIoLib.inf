@@ -1,0 +1,39 @@
+## @file
+#   Library instance for SerialIo library class
+#
+#  Copyright (c) 2019, Hewlett Packard Enterprise Development LP. All rights reserved.<BR>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001b
+  BASE_NAME                      = U5SerialPortLib
+  MODULE_UNI_FILE                = U5SerialPortLib.uni
+  FILE_GUID                      = FCC4FD2B-2FF6-4FFA-B363-7C1111E5DCE9
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SerialPortLib
+#
+# The following information is for reference only and not required by the build tools.
+#
+#  VALID_ARCHITECTURES           = RISCV64
+#
+[Packages]
+  MdePkg/MdePkg.dec
+  Platform/RISC-V/PlatformPkg/RiscVPlatformPkg.dec
+  Silicon/RISC-V/ProcessorPkg/RiscVProcessorPkg.dec
+  Platform/SiFive/U5SeriesPkg/U5SeriesPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  IoLib
+  RiscVOpensbiLib
+
+[FixedPcd]
+  gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdU5UartBase
+  gSiFiveU5SeriesPlatformsPkgTokenSpaceGuid.PcdU5PlatformSystemClock
+
+[Sources]
+  SerialPortLib.c
