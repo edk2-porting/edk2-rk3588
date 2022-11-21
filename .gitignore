@@ -10,3 +10,4 @@ ramdisk
 *.swp
 *.rej
 *.orig
+*_FLASH.img
