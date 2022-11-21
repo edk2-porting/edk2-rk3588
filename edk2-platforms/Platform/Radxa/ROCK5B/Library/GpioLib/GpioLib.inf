@@ -1,0 +1,35 @@
+#/** @file
+#
+#  RK3566/RK3568 GPIO Library.
+#
+#  Copyright (c) 2021, Jared McNeill <jmcneill@invisible.ca>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = GpioLib
+  FILE_GUID                      = FD6DFA94-101B-4DE3-8F55-D4CC1E1E642A
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = GpioLib
+
+[Sources]
+  GpioLib.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  Platform/Radxa/ROCK5B/ROCK5B.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  IoLib
+
+[FixedPcd]
+
+[Guids]
