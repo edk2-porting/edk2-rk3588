@@ -57,7 +57,7 @@
   ArmSmcLib|ArmPkg/Library/ArmSmcLib/ArmSmcLib.inf
   ArmMmuLib|ArmPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
 
-  ResetSystemLib|ArmPkg/Library/ArmSmcPsciResetSystemLib/ArmSmcPsciResetSystemLib.inf
+  # ResetSystemLib|ArmPkg/Library/ArmSmcPsciResetSystemLib/ArmSmcPsciResetSystemLib.inf # Modified
 
   # SPI Driver
   SpiLib|Silicon/Rockchip/Library/SpiLib/SpiLib.inf
@@ -67,8 +67,8 @@
   #PL011UartClockLib|ArmPlatformPkg/Library/PL011UartClockLib/PL011UartClockLib.inf
   #PL011UartLib|ArmPlatformPkg/Library/PL011UartLib/PL011UartLib.inf
   PWMLib|Silicon/Rockchip/Library/PWMLib/PWMLib.inf
-  SerialPortLib|Silicon/Rockchip/Library/SerialPortLib/SerialPortLib.inf
-  UartLib|Silicon/Rockchip/Library/SerialPortLib/UartLib.inf
+  # SerialPortLib|Silicon/Rockchip/Library/SerialPortLib/SerialPortLib.inf # Modified
+  # UartLib|Silicon/Rockchip/Library/SerialPortLib/UartLib.inf
   TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
   #RealTimeClockLib|Silicon/Rockchip/Library/Rk808RealTimeClockLib/Rk808RealTimeClockLib.inf
   #RealTimeClockLib|Silicon/Rockchip/Library/VirtualRealTimeClockLib/RealTimeClockLib.inf
@@ -224,7 +224,7 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
 
 [BuildOptions]
 #  RVCT:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG
-#  GCC:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG
+  *_GCC5_AARCH64_CC_FLAGS  = -Wno-error=uninitialized -Wno-error=stringop-overflow
 
 [BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER]
   GCC:*_*_ARM_DLINK_FLAGS = -z common-page-size=0x1000
