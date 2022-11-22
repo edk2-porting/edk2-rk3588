@@ -30,8 +30,6 @@ Device (OHC0) {
         Return (RBUF)
     }
 
-//    Name (_STA, FixedPcdGet8(PcdOhc0Status))
-
     Device (RHUB) {
         Name (_ADR, 0)
         Device (PRT1) {
@@ -55,9 +53,9 @@ Device (OHC0) {
                 PLD_EjectRequired       = 0x1,
                 )
             })
-        } // PRT1
-    } // RHUB
-} // OHC0
+        }
+    }
+}
 
 // USB EHCI Host Controller
 Device (EHC0) {
@@ -72,8 +70,6 @@ Device (EHC0) {
         })
         Return (RBUF)
     }
-
-//    Name (_STA, FixedPcdGet8(PcdEhc0Status))
 
     Device (RHUB) {
         Name (_ADR, 0)
@@ -98,9 +94,9 @@ Device (EHC0) {
                 PLD_EjectRequired       = 0x1,
             )
             })
-        } // PRT1
-    } // RHUB
-} // EHC0
+        }
+    }
+}
 
 // USB OHCI Host Controller
 Device (OHC1) {
@@ -124,8 +120,6 @@ Device (OHC1) {
         Return (RBUF)
     }
 
-//    Name (_STA, FixedPcdGet8(PcdOhc1Status))
-
     Device (RHUB) {
         Name (_ADR, 0)
         Device (PRT1) {
@@ -149,9 +143,9 @@ Device (OHC1) {
                 PLD_EjectRequired       = 0x1,
                 )
             })
-        } // PRT1
-    } // RHUB
-} // OHC1
+        }
+    }
+}
 
 // USB EHCI Host Controller
 Device (EHC1) {
@@ -167,8 +161,6 @@ Device (EHC1) {
         Return (RBUF)
     }
 
-//    Name (_STA, FixedPcdGet8(PcdEhc1Status))
-
     Device (RHUB) {
         Name (_ADR, 0)
         Device (PRT1) {
@@ -192,6 +184,6 @@ Device (EHC1) {
                 PLD_EjectRequired       = 0x1,
                 )
             })
-        } // PRT1
-    } // RHUB
-} // EHC1
+        }
+    }
+}

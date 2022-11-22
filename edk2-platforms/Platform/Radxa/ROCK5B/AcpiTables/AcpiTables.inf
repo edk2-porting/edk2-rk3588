@@ -31,6 +31,7 @@
   Spcr.aslc
   Mcfg.aslc
   RK3588PcieIort.aslc
+  Dbg2.aslc
 
 [Packages]
   ArmPkg/ArmPkg.dec
@@ -60,6 +61,4 @@
   gRockchipTokenSpaceGuid.PcdPcieRootPort3x4MemSize
   gRockchipTokenSpaceGuid.PcdPcieRootPort3x4MemBaseAddress64
   gRockchipTokenSpaceGuid.PcdPcieRootPort3x4MemSize64
-
-#[BuildOptions]
-  #GCC:*_*_*_ASL_FLAGS       = -vw3133 -vw3150
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase

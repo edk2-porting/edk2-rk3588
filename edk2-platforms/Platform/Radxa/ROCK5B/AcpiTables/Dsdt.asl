@@ -56,23 +56,56 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 2, "RPIFDN", "RPI", 2)
       }
     }
 
-    Device(DEM0) {
-      Name (_HID, "RKCP0000")
-      Name (_UID, 0)
-      Method (_STA, 0, NotSerialized)
+    Device (CPU4)
+    {
+      Name (_HID, "ACPI0007")
+      Name (_UID, 0x4)
+      Method (_STA)
       {
-        Return(0x0F)
+        Return (0xf)
       }
     }
 
-    include ("Pcie.aslc")
-    include ("Sata.asl")
-    include ("Emmc.asl")
-    include ("Gmac.asl")
-    include ("Gpio.asl")
-    include ("I2c.asl")
+    Device (CPU5)
+    {
+      Name (_HID, "ACPI0007")
+      Name (_UID, 0x5)
+      Method (_STA)
+      {
+        Return (0xf)
+      }
+    }
+
+    Device (CPU6)
+    {
+      Name (_HID, "ACPI0007")
+      Name (_UID, 0x6)
+      Method (_STA)
+      {
+        Return (0xf)
+      }
+    }
+
+    Device (CPU7)
+    {
+      Name (_HID, "ACPI0007")
+      Name (_UID, 0x7)
+      Method (_STA)
+      {
+        Return (0xf)
+      }
+    }
+
+    // include ("Pcie.aslc")
+    // include ("Sata.asl")
+    // include ("Emmc.asl")
+    // include ("Gmac.asl")
+    // include ("Gpio.asl")
+    // include ("I2c.asl")
     include ("Uart.asl")
-    include ("Spi.asl")
-    include ("Usb2.asl")
+    // include ("Spi.asl")
+
+    // won't work on Windows, will trigger bugcheck by usbehci
+    // include ("Usb2.asl")
   }
 }
