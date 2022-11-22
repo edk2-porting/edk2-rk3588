@@ -31,7 +31,6 @@ Build UEFI (ROCK 5B for example):
 
 ## TODO
  - Create gpt image in build process instead of using the prebuilt one
- - Fix GpioLib (why not working?) to enable USB Vbus
  - Fix hard reset
  - Fix resetting to maskrom (related to broken hard reset?)
 
