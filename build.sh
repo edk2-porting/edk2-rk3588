@@ -21,19 +21,11 @@ function _help(){
 
 function _error(){ echo "${@}" >&2;exit 1; }
 
-#####
 function _build_idblock(){
 	echo " => Building idblock.bin"
 	pushd ${WORKSPACE}
 	FLASHFILES="FlashHead.bin FlashData.bin FlashBoot.bin"
 	rm -f rk35*_spl_loader_*.bin idblock.bin rk35*_ddr_*.bin rk35*_usbplug*.bin UsbHead.bin ${FLASHFILES}
-
-	# Default DDR image uses 1.5M baud. Patch it to use 115200 to match UEFI first.
-	# cat `pwd`/rkbin/tools/ddrbin_param.txt					 		\
-	# 	| sed 's/^uart baudrate=.*$/uart baudrate=115200/'  		\
-	# 	| sed 's/^dis_printf_training=.*$/dis_printf_training=1/' 	\
-	# 	> `pwd`/workspace/ddrbin_param.txt
-	# ./rkbin/tools/ddrbin_tool `pwd`/workspace/ddrbin_param.txt rkbin/${DDR}
 
 	# Create idblock.bin
 	# Generate spl_loader
@@ -41,7 +33,6 @@ function _build_idblock(){
 	# Produce ${FLASHFILES} UsbHead.bin ddr usbplug
 	${ROOTDIR}/misc/rkbin/tools/boot_merger unpack -i ${SOC_L}_spl_loader_*.bin -o ${WORKSPACE}
 	cat ${FLASHFILES} > idblock.bin
-	# (cd rkbin && git checkout ${DDR})
 
 	popd
 	echo " => idblock.bin build done"
@@ -49,32 +40,27 @@ function _build_idblock(){
 
 function _build_fit(){
 	echo " => Building FIT"
-	./scripts/extractbl31.py rkbin/${BL31}
-	cp -f workspace/Build/custRkPkg/${_MODE}_GCC5/FV/CUSTRKPKG_UEFI.fd workspace/CUSTRKPKG_EFI.fd
-	cat uefi_${SOC}.its | sed "s,@DEVICE@,${DEVICE},g" > ${SOC}_${DEVICE}_EFI.its
-	./rkbin/tools/mkimage -f ${SOC}_${DEVICE}_EFI.its -E ${DEVICE}_EFI.itb
-	# ./../u-boot_rk-next/tools/mkimage -f ${SOC}_${DEVICE}_EFI.its ${DEVICE}_EFI.itb
-	rm -f bl31_0x*.bin workspace/CUSTRKPKG_EFI.fd ${SOC}_${DEVICE}_EFI.its
-	echo " => FIT build done"
-}
-#####
+	pushd ${WORKSPACE}
+	BL31=$(grep '^PATH=.*_bl31_' ${ROOTDIR}/misc/rkbin/RKTRUST/${TRUST_INI} | cut -d = -f 2-)
+	BL32=$(grep '^PATH=.*_bl32_' ${ROOTDIR}/misc/rkbin/RKTRUST/${TRUST_INI} | cut -d = -f 2-)
+	rm -f bl31_0x*.bin ${WORKSPACE}/BL33_AP_UEFI.Fv ${SOC_L}_${DEVICE}_EFI.its
 
-function _fit_repack(){
-	mkdir -p ${WORKSPACE}/unpack
-	# BL33_AP_UEFI is PrePi executable
-	cp ${WORKSPACE}/Build/${PLATFORM_NAME}/${_MODE}_${TOOLCHAIN}/FV/BL33_AP_UEFI.Fv ${WORKSPACE}/unpack/uboot
-	cp ${ROOTDIR}/misc/prebuilts/uboot_uefi.img ${WORKSPACE}/
+	${ROOTDIR}/misc/extractbl31.py ${ROOTDIR}/misc/rkbin/${BL31}
+	cp ${ROOTDIR}/misc/rkbin/${BL32} ${WORKSPACE}/bl32.bin
+	cp ${ROOTDIR}/misc/${SOC_L}_spl.dtb ${WORKSPACE}/${DEVICE}.dtb
+	cp ${WORKSPACE}/Build/${PLATFORM_NAME}/${_MODE}_${TOOLCHAIN}/FV/BL33_AP_UEFI.Fv ${WORKSPACE}/
+	cat ${ROOTDIR}/misc/uefi_${SOC_L}.its | sed "s,@DEVICE@,${DEVICE},g" > ${SOC_L}_${DEVICE}_EFI.its
+	${ROOTDIR}/misc/rkbin/tools/mkimage -f ${SOC_L}_${DEVICE}_EFI.its -E ${DEVICE}_EFI.itb
 
-	pushd ${ROOTDIR}/../git/u-boot
-	./scripts/fit-repack.sh -f ${WORKSPACE}/uboot_uefi.img -d ${WORKSPACE}/unpack/
 	popd
+	echo " => FIT build done"
 }
 
 function _pack(){
 	_build_idblock
-	_fit_repack
+	_build_fit
 
-	echo "****Build 8MB NOR FLASH IMAGE****"
+	echo " => Building 8MB NOR FLASH IMAGE"
 	cp ${WORKSPACE}/Build/${PLATFORM_NAME}/${_MODE}_${TOOLCHAIN}/FV/NOR_FLASH_IMAGE.fd ${WORKSPACE}/RK3588_NOR_FLASH.img
 
 	# backup NV_DATA at 0x007C0000
@@ -85,7 +71,7 @@ function _pack(){
 	dd if=${WORKSPACE}/idblock.bin of=${WORKSPACE}/RK3588_NOR_FLASH.img bs=1K seek=32
 	dd if=${WORKSPACE}/idblock.bin of=${WORKSPACE}/RK3588_NOR_FLASH.img bs=1K seek=544
 	# FIT Image at 0x100000
-	dd if=${WORKSPACE}/uboot_uefi.img of=${WORKSPACE}/RK3588_NOR_FLASH.img bs=1K seek=1024
+	dd if=${WORKSPACE}/${DEVICE}_EFI.itb of=${WORKSPACE}/RK3588_NOR_FLASH.img bs=1K seek=1024
 	# restore NV_DATA at 0x007C0000
 	dd if=${WORKSPACE}/NV_DATA.img of=${WORKSPACE}/RK3588_NOR_FLASH.img bs=1K seek=7936
 	cp ${WORKSPACE}/RK3588_NOR_FLASH.img ${ROOTDIR}/
@@ -112,7 +98,7 @@ function _build(){
 	typeset -l SOC_L="$SOC"
 
 	# based on the instructions from edk2-platform
-	rm -f "${OUTDIR}/RK3588_NOR_FLASH.img"
+	rm -f "${OUTDIR}/RK35*_NOR_FLASH.img"
 
 	case "${MODE}" in
 		RELEASE) _MODE=RELEASE;;
