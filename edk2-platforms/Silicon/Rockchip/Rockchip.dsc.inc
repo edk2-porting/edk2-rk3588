@@ -224,7 +224,7 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
 
 [BuildOptions]
 #  RVCT:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG
-  *_GCC5_AARCH64_CC_FLAGS  = -Wno-error=uninitialized -Wno-error=stringop-overflow
+  *_GCC5_AARCH64_CC_FLAGS  = -Wno-error=uninitialized -Wno-error=stringop-overflow -Wno-error=unused-function -Wno-error=unused-variable
 
 [BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER]
   GCC:*_*_ARM_DLINK_FLAGS = -z common-page-size=0x1000
