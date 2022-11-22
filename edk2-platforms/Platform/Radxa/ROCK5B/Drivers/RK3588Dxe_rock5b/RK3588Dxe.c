@@ -48,6 +48,7 @@ UartInit (
 {
   //UINT32     Val;
 
+  DEBUG((EFI_D_WARN, "RK3588InitPeripherals: UartInit()\n"));
   /* make UART1 out of reset */
   //MmioWrite32 (CRU_BASE + SC_PERIPH_RSTDIS3, PERIPH_RST3_UART1);
   //MmioWrite32 (CRU_BASE + SC_PERIPH_CLKEN3, PERIPH_RST3_UART1);
@@ -79,6 +80,7 @@ MtcmosInit (
 {
   //UINT32     Data;
 
+  DEBUG((EFI_D_WARN, "RK3588InitPeripherals: MtcmosInit()\n"));
   /* enable MTCMOS for GPU */
   //MmioWrite32 (AO_CTRL_BASE + SC_PW_MTCMOS_EN0, PW_EN0_G3D);
   //do {
@@ -92,6 +94,7 @@ GmacIomuxInit (
   IN VOID
   )
 {
+  DEBUG((EFI_D_WARN, "RK3588InitPeripherals: GmacIomuxInit()\n"));
   GmacIomux(0);
 }
 
@@ -328,6 +331,8 @@ RK3588InitPeripherals (
   INT32 i;
   //UINT32     Data, Bits;
 
+  DEBUG((EFI_D_WARN, "RK3588InitPeripherals: Entry\n"));
+
   /* make I2C0/I2C1/I2C2/SPI0 out of reset */
   //Bits = PERIPH_RST3_I2C0 | PERIPH_RST3_I2C1 | PERIPH_RST3_I2C2 | PERIPH_RST3_SSP;
   //MmioWrite32 (CRU_BASE + SC_PERIPH_RSTDIS3, Bits);
@@ -336,23 +341,24 @@ RK3588InitPeripherals (
   //  Data = MmioRead32 (CRU_BASE + SC_PERIPH_RSTSTAT3);
   //} while (Data & Bits);
 
-  UartInit ();
+  // UartInit ();
+
   /* MTCMOS -- Multi-threshold CMOS */
-  MtcmosInit ();
+  // MtcmosInit ();
 
   /* Set DETECT_J15_FASTBOOT (GPIO24) pin as GPIO function */
   //MmioWrite32 (IOCG_084_REG, 0);        /* configure GPIO24 as nopull */
   //MmioWrite32 (IOMG_080_REG, 0);        /* configure GPIO24 as GPIO */
-  RK806Init();
+  // RK806Init();
 
-  for (i = 0; i < ARRAY_SIZE(rk806_master); i++)
-    RK806RegulatorInit(rk806_master[i]);
-  for (i = 0; i < ARRAY_SIZE(rk806_slaver); i++)
-    RK806RegulatorInit(rk806_slaver[i]);
+  // for (i = 0; i < ARRAY_SIZE(rk806_master); i++)
+  //   RK806RegulatorInit(rk806_master[i]);
+  // for (i = 0; i < ARRAY_SIZE(rk806_slaver); i++)
+  //   RK806RegulatorInit(rk806_slaver[i]);
 
-  ComboPhyInit();
+  // ComboPhyInit();
 
-  GmacIomuxInit();
+  // GmacIomuxInit();
 
   return EFI_SUCCESS;
 }

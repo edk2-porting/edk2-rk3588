@@ -191,9 +191,9 @@ UsbPortPowerEnable (void)
   GpioPinWrite (4, GPIO_PIN_PB0, TRUE);
   GpioPinSetDirection (4, GPIO_PIN_PB0, GPIO_PIN_OUTPUT);
 
-  DEBUG((EFI_D_WARN, "Trying to enable blue led\n"));
-  GpioPinWrite (0, GPIO_PIN_PB7, TRUE);
-  GpioPinSetDirection (0, GPIO_PIN_PB7, GPIO_PIN_OUTPUT);
+  // DEBUG((EFI_D_WARN, "Trying to enable blue led\n"));
+  // GpioPinWrite (0, GPIO_PIN_PB7, TRUE);
+  // GpioPinSetDirection (0, GPIO_PIN_PB7, GPIO_PIN_OUTPUT);
 }
 
 void
