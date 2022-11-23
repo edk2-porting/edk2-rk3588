@@ -22,8 +22,8 @@ sudo pacman -S git base-devel gcc dtc aarch64-linux-gnu-binutils aarch64-linux-g
 
 Clone the repository:
 ```bash
-git clone https://github.com/strongtz/edk2-rk35xx-TESTING.git
-cd edk2-rk35xx-TESTING
+git clone https://github.com/strongtz/edk2-rk35xx.git
+cd edk2-rk35xx
 ```
 
 Build UEFI (ROCK 5B for example):
