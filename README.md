@@ -22,7 +22,7 @@ sudo pacman -S git base-devel gcc dtc aarch64-linux-gnu-binutils aarch64-linux-g
 
 Clone the repository:
 ```bash
-git clone https://github.com/strongtz/edk2-rk35xx.git
+git clone https://github.com/edk2-porting/edk2-rk35xx.git
 cd edk2-rk35xx
 ```
 
