@@ -1,0 +1,63 @@
+#/** @file
+#
+#  Copyright (c) 2021, Jared McNeill <jmcneill@invisible.ca>
+#  Copyright (c) 2017-2021, Andrei Warkentin <andrey.warkentin@gmail.com>
+#  Copyright (c) 2014-2016, Linaro Limited. All rights reserved.
+#  Copyright (c) 2011-2019, ARM Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = PlatformLib
+  FILE_GUID                      = ADAB50A9-04BE-4B17-9CBF-17B781B3CB00
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmPlatformLib|SEC PEIM
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  Platform/Rockchip/RK3588/RK3588.dec
+  Silicon/Rockchip/RK3588/RK3588.dec
+  Platform/Radxa/ROCK5B/ROCK5B.dec
+
+[LibraryClasses]
+  ArmLib
+  FdtLib
+  IoLib
+  MemoryAllocationLib
+  PcdLib
+  PrintLib
+
+[Sources.common]
+  Rk3588.c
+  Rk3588Mem.c
+
+[Sources.AARCH64]
+  Rk3588Helper.S
+
+[FixedPcd]
+  gArmTokenSpaceGuid.PcdFdBaseAddress
+  gArmTokenSpaceGuid.PcdFvBaseAddress
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase
+  gArmTokenSpaceGuid.PcdGicDistributorBase
+  gArmTokenSpaceGuid.PcdGicRedistributorsBase
+  gArmPlatformTokenSpaceGuid.PcdCoreCount
+  gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
+  gArmTokenSpaceGuid.PcdArmPrimaryCore
+  gArmTokenSpaceGuid.PcdFdSize
+  gRK3588TokenSpaceGuid.PcdTotalMemorySize
+  
+[Pcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSerialClockRate
+  gArmTokenSpaceGuid.PcdSystemMemoryBase
+  gArmTokenSpaceGuid.PcdSystemMemorySize
+
+[Ppis]
+  gArmMpCoreInfoPpiGuid

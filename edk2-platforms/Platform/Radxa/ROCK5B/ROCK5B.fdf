@@ -166,7 +166,6 @@ READ_LOCK_STATUS   = TRUE
   # INF Silicon/Rockchip/Drivers/Vop2Dxe/Vop2Dxe.inf
   # INF Silicon/Rockchip/Drivers/LcdGraphicsOutputDxe/LcdGraphicsOutputDxe.inf
   INF Platform/Rockchip/RK3588/LogoDxe/LogoDxe.inf
-  INF Platform/Rockchip/RK3588/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
 
   INF Platform/Radxa/ROCK5B/Drivers/RK3588Dxe_rock5b/RK3588Dxe.inf
 
@@ -305,6 +304,9 @@ READ_LOCK_STATUS   = TRUE
 
   # Custom
   INF Platform/Radxa/ROCK5B/Applications/maskrom/maskrom.inf
+  
+  # SCMI Driver
+  INF ArmPkg/Drivers/ArmScmiDxe/ArmScmiDxe.inf
 
   #
   # UEFI applications

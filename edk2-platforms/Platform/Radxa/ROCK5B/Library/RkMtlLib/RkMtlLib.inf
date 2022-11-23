@@ -1,0 +1,35 @@
+#/** @file
+#  Copyright (c) 2021, Jared McNeill <jmcneill@invisible.ca>
+#  Copyright (c) 2017-2018, Arm Limited. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = RkMtlLib
+  FILE_GUID                      = 8C4393C9-3012-4862-A19C-259477D6F518
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = ArmMtlLib
+
+[Sources.common]
+  RkMtlLib.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  MdePkg/MdePkg.dec
+  Platform/Radxa/ROCK5B/ROCK5B.dec
+
+[LibraryClasses]
+  ArmLib
+  ArmSmcLib
+  DebugLib
+  IoLib
+  UefiBootServicesTableLib
+
+[FixedPcd.common]
+  gROCK5BTokenSpaceGuid.PcdRkMtlMailBoxBase
+  gROCK5BTokenSpaceGuid.PcdRkMtlMailBoxSize
+  gROCK5BTokenSpaceGuid.PcdRkMtlMailBoxSmcId

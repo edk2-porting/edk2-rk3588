@@ -43,7 +43,6 @@
 [LibraryClasses.common]
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
   AcpiLib|EmbeddedPkg/Library/AcpiLib/AcpiLib.inf
-  ArmPlatformLib|Platform/Rockchip/RK3588/Library/RK3588Lib/RK3588Lib.inf
   CruLib|Silicon/Rockchip/Library/CruLib/CruLib.inf
 
   DmaLib|EmbeddedPkg/Library/NonCoherentDmaLib/NonCoherentDmaLib.inf
@@ -88,19 +87,24 @@
   LockBoxLib|MdeModulePkg/Library/LockBoxNullLib/LockBoxNullLib.inf
 
 
+  #
   # Custom libraries
+  #
+  ArmPlatformLib|Platform/Radxa/ROCK5B/Library/PlatformLib/PlatformLib.inf
   RockchipPlatformLib|Platform/Radxa/ROCK5B/Library/RockchipPlatformLib/RockchipPlatformLib.inf
   ResetSystemLib|Platform/Radxa/ROCK5B/Library/ResetSystemLib/ResetSystemLib.inf
   PlatformBootManagerLib|Platform/Radxa/ROCK5B/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
   SerialPortLib|Platform/Radxa/ROCK5B/Library/Dw8250SerialPortLib/Dw8250SerialPortLib.inf
   GpioLib|Platform/Radxa/ROCK5B/Library/GpioLib/GpioLib.inf
+  # SCMI Mailbox Transport Layer
+  ArmMtlLib|Platform/Radxa/ROCK5B/Library/RkMtlLib/RkMtlLib.inf
 
 [LibraryClasses.common.SEC]
   PrePiLib|EmbeddedPkg/Library/PrePiLib/PrePiLib.inf
   ExtractGuidedSectionLib|EmbeddedPkg/Library/PrePiExtractGuidedSectionLib/PrePiExtractGuidedSectionLib.inf
   HobLib|EmbeddedPkg/Library/PrePiHobLib/PrePiHobLib.inf
   MemoryAllocationLib|EmbeddedPkg/Library/PrePiMemoryAllocationLib/PrePiMemoryAllocationLib.inf
-  MemoryInitPeiLib|ArmPlatformPkg/MemoryInitPei/MemoryInitPeiLib.inf
+  MemoryInitPeiLib|Platform/Radxa/ROCK5B/Library/MemoryInitPeiLib/MemoryInitPeiLib.inf
   PlatformPeiLib|ArmPlatformPkg/PlatformPei/PlatformPeiLib.inf
   PrePiHobListPointerLib|ArmPlatformPkg/Library/PrePiHobListPointerLib/PrePiHobListPointerLib.inf
 
@@ -124,7 +128,7 @@
 [PcdsFixedAtBuild.common]
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|4
 
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString|L"Alpha"
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString|L"$(FIRMWARE_VER)"
 
   # System Memory (1GB)
   gArmTokenSpaceGuid.PcdSystemMemoryBase|0x00000000
@@ -132,7 +136,7 @@
   gRK3588TokenSpaceGuid.PcdTotalMemorySize|0x200000000
   
   # RK3588 CPU profile
-  gArmPlatformTokenSpaceGuid.PcdCoreCount|4
+  gArmPlatformTokenSpaceGuid.PcdCoreCount|8
   gArmPlatformTokenSpaceGuid.PcdClusterCount|1
 
   # I2C
@@ -379,7 +383,11 @@
   Silicon/Rockchip/Drivers/LcdGraphicsOutputDxe/LcdGraphicsOutputDxe.inf
 
   Platform/Rockchip/RK3588/LogoDxe/LogoDxe.inf
-  Platform/Rockchip/RK3588/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
+
+  #
+  # SCMI Driver
+  #
+  ArmPkg/Drivers/ArmScmiDxe/ArmScmiDxe.inf
 
   #
   # ACPI Support
@@ -400,7 +408,6 @@
   # GPIO
   #
   Platform/Rockchip/RK3588/RK3588GpioDxe/RK3588GpioDxe.inf
-  #ArmPlatformPkg/Drivers/PL061GpioDxe/PL061GpioDxe.inf
 
   #
   # Virtual Keyboard

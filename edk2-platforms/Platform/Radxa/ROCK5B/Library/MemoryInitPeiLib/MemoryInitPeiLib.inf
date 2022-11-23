@@ -1,0 +1,47 @@
+#/** @file
+#
+#  Copyright (c) 2021, Andrei Warkentin <andrey.warkentin@gmail.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = MemoryInitPeiLib
+  FILE_GUID                      = 4bbc9c10-a100-43fb-8311-332ba497d1b4
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = MemoryInitPeiLib|SEC PEIM
+
+[Sources]
+  MemoryInitPeiLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  Platform/Rockchip/RK3588/RK3588.dec
+  Silicon/Rockchip/RK3588/RK3588.dec
+  Platform/Radxa/ROCK5B/ROCK5B.dec
+
+[LibraryClasses]
+  DebugLib
+  HobLib
+  ArmMmuLib
+  ArmPlatformLib
+
+[Guids]
+  gEfiMemoryTypeInformationGuid
+
+[FeaturePcd]
+  gEmbeddedTokenSpaceGuid.PcdPrePiProduceMemoryTypeInformationHob
+
+[Pcd]
+  gArmTokenSpaceGuid.PcdSystemMemoryBase
+  gArmTokenSpaceGuid.PcdSystemMemorySize
+
+[Depex]
+  TRUE

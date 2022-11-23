@@ -30,3 +30,6 @@
 [PcdsFixedAtBuild.common]
   gROCK5BTokenSpaceGuid.PcdSerialPortSendDelay|500000|UINT32|0x01000010
   gROCK5BTokenSpaceGuid.PcdUartClkInHz|24000000|UINT32|0x0100001F
+  gROCK5BTokenSpaceGuid.PcdRkMtlMailBoxBase|0x0010f000|UINT64|0x00001000
+  gROCK5BTokenSpaceGuid.PcdRkMtlMailBoxSize|0x100|UINT32|0x00001001
+  gROCK5BTokenSpaceGuid.PcdRkMtlMailBoxSmcId|0x82000010|UINT32|0x00010002
