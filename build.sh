@@ -80,9 +80,9 @@ function _pack(){
 function _build(){
 	local DEVICE="${1}"
 	shift
+	[ -d "${WORKSPACE}/Conf" ]||mkdir -p "${WORKSPACE}/Conf"
 	source "${ROOTDIR}/edk2/edksetup.sh"
 	[ -d "${WORKSPACE}" ]||mkdir "${WORKSPACE}"
-	[ -d "${WORKSPACE}/Conf" ]||mkdir -p "${WORKSPACE}/Conf"
 	set -x
 	make -C "${ROOTDIR}/edk2/BaseTools"||exit "$?"
 
