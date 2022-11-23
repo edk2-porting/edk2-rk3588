@@ -17,7 +17,7 @@ Using Arch Linux as example
 Install required packages:
 ```bash
 sudo pacman -Syu
-sudo pacman -S git base-devel gcc dtc aarch64-linux-gnu-binutils aarch64-linux-gnu-gcc aarch64-linux-gnu-glibc python python-pyelftools --needed
+sudo pacman -S git base-devel gcc dtc aarch64-linux-gnu-binutils aarch64-linux-gnu-gcc aarch64-linux-gnu-glibc python python-pyelftools iasl --needed
 ```
 
 Clone the repository:
