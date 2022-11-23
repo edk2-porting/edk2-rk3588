@@ -53,13 +53,11 @@ ResetCold (
   VOID
   )
 {
-  ResetWarm();
-  // Doesn't work somehow
-  // ARM_SMC_ARGS ArmSmcArgs;
+  ARM_SMC_ARGS ArmSmcArgs;
 
-  // // Send a PSCI 0.2 SYSTEM_RESET command
-  // ArmSmcArgs.Arg0 = ARM_SMC_ID_PSCI_SYSTEM_RESET;
-  // ArmCallSmc (&ArmSmcArgs);
+  // Send a PSCI 0.2 SYSTEM_RESET command
+  ArmSmcArgs.Arg0 = ARM_SMC_ID_PSCI_SYSTEM_RESET;
+  ArmCallSmc (&ArmSmcArgs);
 }
 
 /**
@@ -105,7 +103,7 @@ ResetPlatformSpecific (
   MmioWrite32 (0xfd588080, 0xEF08A53C);
 #endif
   // Hard reset doesn't work somehow
-  ResetWarm();
+  ResetCold();
 }
 
 /**
