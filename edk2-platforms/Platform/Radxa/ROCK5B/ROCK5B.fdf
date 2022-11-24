@@ -43,7 +43,7 @@ NumBlocks     = 0x800
 # RegionType <FV, DATA, or FILE>
 #
 ################################################################################
-0x00200000|0x000F0000
+0x00200000|0x00100000
 gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvSize
 FV = BL33_AP_UEFI
 
@@ -230,7 +230,6 @@ READ_LOCK_STATUS   = TRUE
   #
   INF EmbeddedPkg/Application/AndroidFastboot/AndroidFastbootApp.inf
 
-!ifdef $(ROCKCHIP_PCIE30)
 
   #PCIe
   INF Silicon/Rockchip/Drivers/PciPlatform/PcieInitDxe.inf
@@ -248,7 +247,7 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Bus/Pci/NonDiscoverablePciDeviceDxe/NonDiscoverablePciDeviceDxe.inf
   INF MdeModulePkg/Bus/Pci/SataControllerDxe/SataControllerDxe.inf
   INF MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
-!endif
+
   #
   # Android Boot applications
   #

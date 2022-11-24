@@ -232,28 +232,26 @@ void
 EFIAPI
 Pcie30IoInit(void)
 {
-    /* Set reset and power IO to gpio output mode */
-    MmioWrite32(0xFD5F808C, 0xf << (8 + 16)); /* gpio4b6 to gpio mode -> reset */
-    MmioWrite32(0xFEC50008, 0x40004000); /* output */ 
-
-    MmioWrite32(0xFD5F8070, 0xf << (12 + 16)); /* gpio3c3 to gpio mode -> power */
-    MmioWrite32(0xFEC4000c, 0x80008); /* output */
+  /* Set reset and power IO to gpio output mode */
+  GpioPinSetDirection (4, GPIO_PIN_PB6, GPIO_PIN_OUTPUT);
+  GpioPinSetDirection (1, GPIO_PIN_PA4, GPIO_PIN_OUTPUT);
 }
 
 void
 EFIAPI
 Pcie30PowerEn(void)
 {
-    MmioWrite32(0xFEC40004, 0x80008); /* output high to enable power */
+  /* output high to enable power */
+  GpioPinWrite (1, GPIO_PIN_PA4, TRUE);
 }
 
 void
 EFIAPI
 Pcie30PeReset(BOOLEAN enable)
 {
-    if(enable)
-        MmioWrite32(0xFEC50000, 0x40000000); /* output low */
-    else
-        MmioWrite32(0xFEC50000, 0x40004000); /* output high */ 
+  if(enable)
+    GpioPinWrite (4, GPIO_PIN_PB6, FALSE); /* output low */
+  else
+    GpioPinWrite (4, GPIO_PIN_PB6, TRUE); /* output high */
 }
 
