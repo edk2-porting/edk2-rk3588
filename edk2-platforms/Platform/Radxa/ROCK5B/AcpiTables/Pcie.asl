@@ -59,35 +59,23 @@ Device (PCI0) {
 		return (RBUF)
 	}
 
-	Method (_CBA, 0, NotSerialized) {
-		return (0x900000000) //指定外设ECAM空间,acpi_pci_root_get_mcfg_addr拿到的是这个，且不能和Mcfg里面的地址一样
-	}
+	// Method (_CBA, 0, NotSerialized) {
+	// 	return (0x900000000) //指定外设ECAM空间,acpi_pci_root_get_mcfg_addr拿到的是这个，且不能和Mcfg里面的地址一样
+	// }
 
 	Device (RES0) {
-		Name (_HID, "RKCP0001") // PCIe RC config base address
-		Name (_CID, "PNP0C02") // Motherboard reserved resource
-		Name (_UID, 0x0)  //  Unique ID
+        Name (_HID, "PNP0C02")
 		Name (_CRS, ResourceTemplate (){
 			Memory32Fixed (ReadWrite, 0xf5000000 , 0x400000) //DBI for accessing RC config base address
-			QWordMemory (                              // 64-bit PCIe ECAM window
-			ResourceProducer,
-			PosDecode,
-			MinFixed,
-			MaxFixed,
-			NonCacheable,
-			ReadWrite,
-			0x0000000000000000,                       // Granularity
-			0x900000000, // Range Minimum
-			0x900ffffff, // Range Maximum
-			0x0000000000000000,                       // Translation Offset
-			0x1000000,     // Length
-			,
-			,
-			,
-			AddressRangeMemory,
-			TypeStatic
+			// 64-bit PCIe ECAM window
+			QWordMemory (ResourceProducer, PosDecode, MinFixed, MaxFixed, NonCacheable, ReadWrite,
+			0x0000000000000000,    // Granularity
+			0x0000000900000000,    // Range Minimum
+			0x0000000900ffffff,    // Range Maximum
+			0x0000000000000000,    // Translation Offset
+			0x0000000001000000,    // Length
 		)
-	})
+		})
 	}
 
 	// OS Control Handoff
@@ -128,4 +116,4 @@ Device (PCI0) {
 		Return(Arg3)
 		}
 	} // End _OSC
-} // PCI0
+}

@@ -38,4 +38,24 @@
     EFI_ACPI_CREATOR_ID,            /* UINT32  CreatorId */       \
     EFI_ACPI_CREATOR_REVISION       /* UINT32  CreatorRevision */ \
   }
+
+#define EFI_ACPI_6_0_GIC_REDISTRIBUTOR_INIT(RedisRegionAddr, RedisDiscLength) \
+  {                                                                           \
+    EFI_ACPI_6_0_GICR,                                                        \
+    sizeof (EFI_ACPI_6_0_GICR_STRUCTURE),                                     \
+    0,                                                                        \
+    RedisRegionAddr,                                                          \
+    RedisDiscLength                                                           \
+  }
+
+#define EFI_ACPI_6_0_GIC_ITS_FRAME_INIT(Id, PhysAddress)                      \
+  {                                                                           \
+    EFI_ACPI_6_0_GIC_ITS,                                                     \
+    sizeof (EFI_ACPI_6_0_GIC_ITS_STRUCTURE),                                  \
+    0,                                                                        \
+    Id,                                                                       \
+    PhysAddress,                                                              \
+    0                                                                         \
+  }
+
 #endif // __ACPITABLES_H__

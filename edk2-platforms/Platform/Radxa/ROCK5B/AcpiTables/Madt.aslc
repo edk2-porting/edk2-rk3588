@@ -27,6 +27,7 @@ typedef struct {
   EFI_ACPI_6_0_GIC_DISTRIBUTOR_STRUCTURE                GicDistributor;
   EFI_ACPI_6_0_GICR_STRUCTURE                           GicRedistributors;
   EFI_ACPI_6_0_GIC_MSI_FRAME_STRUCTURE                  GicMsiFrame;
+  // EFI_ACPI_6_0_GIC_ITS_STRUCTURE                        GicIts[2];
 } EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE;
 
 #pragma pack ()
@@ -87,13 +88,8 @@ EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE Madt = {
   EFI_ACPI_6_0_GIC_DISTRIBUTOR_INIT (0, FixedPcdGet64 (PcdGicDistributorBase),
                                      0, EFI_ACPI_6_0_GIC_V3),
   // GIC Redistributors Entry
-  {
-    EFI_ACPI_6_0_GICR,
-    sizeof (EFI_ACPI_6_0_GICR_STRUCTURE),
-    0,
-    FixedPcdGet64 (PcdGicRedistributorsBase),
-    0x100000
-  },
+  EFI_ACPI_6_0_GIC_REDISTRIBUTOR_INIT (FixedPcdGet64 (PcdGicRedistributorsBase), 
+                                       0x100000),
   // GIC MSI Frame
   {
     EFI_ACPI_6_0_GIC_MSI_FRAME,
@@ -102,9 +98,15 @@ EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE Madt = {
     0,
     FixedPcdGet64 (PcdGicDistributorBase) + 0x10000,
     EFI_ACPI_6_0_SPI_COUNT_BASE_SELECT,
-    24,
-    296
-  }
+    56,
+    424
+  },
+
+  /* ITS is broken on RK35xx!*/
+  // {
+  //   EFI_ACPI_6_0_GIC_ITS_FRAME_INIT(0, 0xfe640000),
+  //   EFI_ACPI_6_0_GIC_ITS_FRAME_INIT(1, 0xfe660000)
+  // },
 };
 
 //
