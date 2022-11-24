@@ -451,7 +451,7 @@
   #
   # SMBIOS Support
   #
-  Platform/Rockchip/RK3588/PlatformSmbiosDxe/PlatformSmbiosDxe.inf
+  Platform/Radxa/ROCK5B/Drivers/PlatformSmbiosDxe/PlatformSmbiosDxe.inf
   MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
   #
   # USB Ohci Controller
