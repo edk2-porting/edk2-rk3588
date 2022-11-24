@@ -8,7 +8,7 @@ This repository is based on the official open-source UEFI implementation from Ro
 
 Therefore, to keep up with the work from Rockchip, we should avoid modifying code from Rockchip in most cases.
 
-Discussion thread: [Windows on Rock 5 (Mega thread)](https://forum.radxa.com/t/windows-on-rock-5-mega-thread)
+Discussion thread: [Windows / UEFI on Rock 5 (Mega thread)](https://forum.radxa.com/t/windows-uefi-on-rock-5-mega-thread/12924)
 
 ## Building
 
