@@ -53,35 +53,35 @@ EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE Madt = {
     EFI_ACPI_6_0_GICC_STRUCTURE_INIT( // A55-0
         0, 0, GET_MPID(0, 0x000), 
         EFI_ACPI_6_0_GIC_ENABLED,
-        7, 0, 0, 0, 25, 0, 0),
+        23, 0, 0, 0, 25, 0, 0),
     EFI_ACPI_6_0_GICC_STRUCTURE_INIT( // A55-1
         0, 1, GET_MPID(0, 0x100), 
         EFI_ACPI_6_0_GIC_ENABLED,
-        7, 0, 0, 0, 25, 0, 0),
+        23, 0, 0, 0, 25, 0, 0),
     EFI_ACPI_6_0_GICC_STRUCTURE_INIT( // A55-2
         0, 2, GET_MPID(0, 0x200), 
         EFI_ACPI_6_0_GIC_ENABLED,
-        7, 0, 0, 0, 25, 0, 0),
+        23, 0, 0, 0, 25, 0, 0),
     EFI_ACPI_6_0_GICC_STRUCTURE_INIT( // A55-3
         0, 3, GET_MPID(0, 0x300), 
         EFI_ACPI_6_0_GIC_ENABLED,
-        7, 0, 0, 0, 25, 0, 0),
+        23, 0, 0, 0, 25, 0, 0),
     EFI_ACPI_6_0_GICC_STRUCTURE_INIT( // A76-0
         0, 4, GET_MPID(0, 0x400), 
         EFI_ACPI_6_0_GIC_ENABLED,
-        7, 0, 0, 0, 25, 0, 1),
+        23, 0, 0, 0, 25, 0, 1),
     EFI_ACPI_6_0_GICC_STRUCTURE_INIT( // A76-1
         0, 5, GET_MPID(0, 0x500), 
         EFI_ACPI_6_0_GIC_ENABLED,
-        7, 0, 0, 0, 25, 0, 1),
+        23, 0, 0, 0, 25, 0, 1),
     EFI_ACPI_6_0_GICC_STRUCTURE_INIT( // A76-2
         0, 6, GET_MPID(0, 0x600), 
         EFI_ACPI_6_0_GIC_ENABLED,
-        7, 0, 0, 0, 25, 0, 1),
+        23, 0, 0, 0, 25, 0, 1),
     EFI_ACPI_6_0_GICC_STRUCTURE_INIT( // A76-3
         0, 7, GET_MPID(0, 0x700), 
         EFI_ACPI_6_0_GIC_ENABLED,
-        7, 0, 0, 0, 25, 0, 1),
+        23, 0, 0, 0, 25, 0, 1),
   },
   // GIC Distributor Entry
   EFI_ACPI_6_0_GIC_DISTRIBUTOR_INIT (0, FixedPcdGet64 (PcdGicDistributorBase),
