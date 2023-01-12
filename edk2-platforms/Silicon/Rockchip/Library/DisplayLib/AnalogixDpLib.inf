@@ -50,5 +50,6 @@
 
 [Pcd]
   gRockchipTokenSpaceGuid.PcdLcdPixelFormat
+  gRockchipTokenSpaceGuid.PcdEdpId
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution
