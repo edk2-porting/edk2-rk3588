@@ -28,12 +28,16 @@ function _build_idblock(){
 	rm -f rk35*_spl_loader_*.bin idblock.bin rk35*_ddr_*.bin rk35*_usbplug*.bin UsbHead.bin ${FLASHFILES}
 
 	# Create idblock.bin
+	if [ "x${IDBLOCK_BUILDTOOL}" == "xmkimage" ]
+	then
+	${ROOTDIR}/misc/rkbin/tools/mkimage -n rk3588 -T rksd -d ${ROOTDIR}/misc/rkbin/bin/rk35/rk3588_ddr_lp4_2112MHz_lp5_2736MHz_v1.08.bin:${ROOTDIR}/misc/rkbin/bin/rk35/rk3588_spl_v1.11.bin idblock.bin
+	else
 	# Generate spl_loader
 	(cd ${ROOTDIR}/misc/rkbin && ./tools/boot_merger RKBOOT/${MINIALL_INI} && mv ${SOC_L}_spl_loader_*.bin ${WORKSPACE})
 	# Produce ${FLASHFILES} UsbHead.bin ddr usbplug
 	${ROOTDIR}/misc/rkbin/tools/boot_merger unpack -i ${SOC_L}_spl_loader_*.bin -o ${WORKSPACE}
 	cat ${FLASHFILES} > idblock.bin
-
+	fi
 	popd
 	echo " => idblock.bin build done"
 }
