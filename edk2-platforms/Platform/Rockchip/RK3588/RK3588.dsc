@@ -280,8 +280,8 @@
   #
   # Display
   #
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution|0x600
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|0x800
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution|0x780
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|0x438
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|0
 
@@ -358,7 +358,8 @@
   MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
 
   Silicon/Rockchip/Drivers/Vop2Dxe/Vop2Dxe.inf
-  Silicon/Rockchip/Library/DisplayLib/AnalogixDpLib.inf
+  #Silicon/Rockchip/Library/DisplayLib/AnalogixDpLib.inf
+  Silicon/Rockchip/Library/DisplayLib/DwHdmiQpLib.inf
   Silicon/Rockchip/Drivers/LcdGraphicsOutputDxe/LcdGraphicsOutputDxe.inf
 
   Platform/Rockchip/RK3588/LogoDxe/LogoDxe.inf
