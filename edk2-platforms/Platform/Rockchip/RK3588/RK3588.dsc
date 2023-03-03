@@ -264,6 +264,8 @@
   gRockchipTokenSpaceGuid.PcdLcdPixelFormat|0x00000001
   gRockchipTokenSpaceGuid.PcdEdpId|0x00000000 #edp0
   #gRockchipTokenSpaceGuid.PcdEdpId|0x00000001 #edp1
+  gRockchipTokenSpaceGuid.PcdHdmiId|0x00000000 #hdmi0
+  #gRockchipTokenSpaceGuid.PcdHdmiId|0x00000001 #hdmi1
 
   #
   # ComboPhy

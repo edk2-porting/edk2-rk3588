@@ -1,0 +1,62 @@
+#/** @file
+#
+#    Component description file for dw-hdmi-qp module
+#
+#    Copyright (c) 2017, Rockchip Inc. All rights reserved.<BR>
+#
+#    This program and the accompanying materials
+#    are licensed and made available under the terms and conditions of the BSD License
+#    which accompanies this distribution.  The full text of the license may be found at
+#    http://opensource.org/licenses/bsd-license.php
+#
+#    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DwHdmiQpLib
+  FILE_GUID                      = e4000dd0-b732-11ed-887a-f42a7dcb925d
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = DwHdmiQpInitHdmi
+
+[Sources.common]
+  DwHdmiQpLib.c
+  PhyRockchipSamsungHdptxHdmi.c
+
+[LibraryClasses]
+  TimerLib
+  DebugLib
+  IoLib
+  BaseLib
+  RockchipDisplayLib
+  MemoryAllocationLib
+  PWMLib
+  RockchipPlatformLib
+  UefiLib
+  UefiDriverEntryPoint
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Silicon/Rockchip/RockchipPkg.dec
+  Silicon/Rockchip/RK3588/RK3588.dec
+  Platform/Rockchip/RK3588/RK3588.dec
+
+[BuildOptions]
+
+[Pcd]
+  gRockchipTokenSpaceGuid.PcdLcdPixelFormat
+  gRockchipTokenSpaceGuid.PcdHdmiId
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution
+
+[Protocols]
+  gRockchipConnectorProtocolGuid
+
+[Depex]
+  TRUE
+
