@@ -20,6 +20,11 @@ sudo pacman -Syu
 sudo pacman -S git base-devel gcc dtc aarch64-linux-gnu-binutils aarch64-linux-gnu-gcc aarch64-linux-gnu-glibc python python-pyelftools iasl --needed
 ```
 
+Required packages for Ubuntu/Debian:
+```bash
+sudo apt install git gcc g++ build-essential gcc-aarch64-linux-gnu iasl python3-pyelftools
+```
+
 Clone the repository:
 ```bash
 git clone https://github.com/edk2-porting/edk2-rk35xx.git
