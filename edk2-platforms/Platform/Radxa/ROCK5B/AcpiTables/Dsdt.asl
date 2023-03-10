@@ -107,5 +107,7 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 2, "RPIFDN", "RPI", 2)
 
     // won't work on Windows, will trigger bugcheck by usbehci
     // include ("Usb2.asl")
+
+    include ("Usb3.asl")
   }
 }

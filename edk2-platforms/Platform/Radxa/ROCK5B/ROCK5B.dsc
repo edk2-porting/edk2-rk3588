@@ -453,25 +453,26 @@
   #
   Platform/Radxa/ROCK5B/Drivers/PlatformSmbiosDxe/PlatformSmbiosDxe.inf
   MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
+  
   #
   # USB Ohci Controller
   #
-  Silicon/Rockchip/Drivers/OhciDxe/OhciDxe.inf
+  #Silicon/Rockchip/Drivers/OhciDxe/OhciDxe.inf
 
   #
   # USB Ehci Controller
   #
-  Silicon/Rockchip/Drivers/EhciDxe/EhciDxe.inf
+  MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
 
   #
   # USB Dwc3 Controller
   #
-  Silicon/Rockchip/Drivers/UsbDwc3InitDxe/UsbDwc3.inf
+  Silicon/Rockchip/Drivers/UsbHcdInitDxe/UsbHcd.inf
 
   #
   # USB Xhci Controller
   #
-  Silicon/Rockchip/Drivers/XhciDxe/XhciDxe.inf
+  MdeModulePkg/Bus/Pci/XhciDxe/XhciDxe.inf
 
   #
   # USB Host Support

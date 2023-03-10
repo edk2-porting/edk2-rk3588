@@ -178,22 +178,22 @@ READ_LOCK_STATUS   = TRUE
   #
   # USB Ehci Controller
   #
-  INF Silicon/Rockchip/Drivers/EhciDxe/EhciDxe.inf
+  INF MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
 
   #
   # USB Ohci Controller
   #
-  INF Silicon/Rockchip/Drivers/OhciDxe/OhciDxe.inf
+  #INF Silicon/Rockchip/Drivers/OhciDxe/OhciDxe.inf
 
   #
   # USB Dwc3 Controller
   #
-  INF Silicon/Rockchip/Drivers/UsbDwc3InitDxe/UsbDwc3.inf
+  INF Silicon/Rockchip/Drivers/UsbHcdInitDxe/UsbHcd.inf
 
   #
   # USB Xhci Controller
   #
-  INF Silicon/Rockchip/Drivers/XhciDxe/XhciDxe.inf
+  INF MdeModulePkg/Bus/Pci/XhciDxe/XhciDxe.inf
 
   #
   # USB Host Support
