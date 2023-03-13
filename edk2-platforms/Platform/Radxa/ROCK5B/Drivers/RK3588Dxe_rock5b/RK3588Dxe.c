@@ -494,7 +494,7 @@ RK3588InitPeripherals (
   // for (i = 0; i < ARRAY_SIZE(rk806_slaver); i++)
   //   RK806RegulatorInit(rk806_slaver[i]);
 
-  // ComboPhyInit();
+  ComboPhyInit();
 
   // GmacIomuxInit();
 

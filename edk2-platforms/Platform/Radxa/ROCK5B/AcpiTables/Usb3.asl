@@ -36,12 +36,12 @@ Device (XHC1) {
     }   
 }
 
-// TODO: This requires set up of the Naneng Combo PIPE PHY2
-//       USB2 DP / DM are connected to one of the EHCI controllers instead (EHC1 on ROCK 5B).
-/*
+// This only supports USB 3.0 devices.
+// USB2 DP / DM are connected to one of the EHCI controllers instead (EHC1 on ROCK 5B).
+
 Device (XHC2) {
     Name (_HID, "PNP0D10")
-    Name (_UID, Two)
+    Name (_UID, 2)
     Name (_CCA, Zero)
 
     Method (_CRS, 0x0, Serialized) {
@@ -51,4 +51,4 @@ Device (XHC2) {
         })
         Return (RBUF)
     }   
-}*/
+}
