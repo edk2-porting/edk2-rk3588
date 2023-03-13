@@ -41,8 +41,7 @@
   gRockchipTokenSpaceGuid.PcdEhciBaseAddress
   gRockchipTokenSpaceGuid.PcdNumEhciController
   gRockchipTokenSpaceGuid.PcdEhciSize
-  gRockchipTokenSpaceGuid.PcdDwc3BaseAddress
-  gRockchipTokenSpaceGuid.PcdNumDwc3Controller
+  gRockchipTokenSpaceGuid.PcdDwc3BaseAddresses
   gRockchipTokenSpaceGuid.PcdDwc3Size
 
 [Guids]

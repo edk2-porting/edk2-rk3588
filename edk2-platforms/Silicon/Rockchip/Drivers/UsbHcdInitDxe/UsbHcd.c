@@ -2,6 +2,7 @@
 
   Copyright 2017, 2020 NXP
   Copyright 2021, Jared McNeill <jmcneill@invisible.ca>
+  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -238,7 +239,8 @@ UsbEndOfDxeCallback (
 {
   EFI_STATUS    Status;
   UINT32        NumUsb2Controller;
-  UINT32        NumUsb3Controller;
+  UINTN         XhciControllerAddrArraySize;
+  UINT8         *XhciControllerAddrArrayPtr;
   UINT32        XhciControllerAddr;
   UINT32        EhciControllerAddr;
   UINT32        OhciControllerAddr;
@@ -246,7 +248,14 @@ UsbEndOfDxeCallback (
 
   gBS->CloseEvent (Event);
 
-  NumUsb3Controller = PcdGet32 (PcdNumDwc3Controller);
+  XhciControllerAddrArrayPtr = PcdGetPtr (PcdDwc3BaseAddresses);
+  XhciControllerAddrArraySize = PcdGetSize (PcdDwc3BaseAddresses);
+  
+  if (XhciControllerAddrArraySize % sizeof(UINT32) != 0) {
+    DEBUG ((DEBUG_ERROR, "Invalid DWC3 address byte array size, skipping init.\n"));
+    XhciControllerAddrArraySize = 0;
+  }
+ 
   NumUsb2Controller = PcdGet32 (PcdNumEhciController);
 
   /* Enable USB PHYs */
@@ -257,9 +266,11 @@ UsbEndOfDxeCallback (
   UsbPortPowerEnable ();
 
   /* Register USB3 controllers */
-  for (Index = 0; Index < NumUsb3Controller; Index++) {
-    XhciControllerAddr = PcdGet32 (PcdDwc3BaseAddress) +
-                          (Index * PcdGet32 (PcdDwc3Size));
+  for (Index = 0; Index < XhciControllerAddrArraySize; Index += sizeof(UINT32)) {
+    XhciControllerAddr = XhciControllerAddrArrayPtr[Index] | 
+                         XhciControllerAddrArrayPtr[Index + 1] << 8 |
+                         XhciControllerAddrArrayPtr[Index + 2] << 16 |
+                         XhciControllerAddrArrayPtr[Index + 3] << 24;
 
     Status = RegisterNonDiscoverableMmioDevice (
                NonDiscoverableDeviceTypeXhci,
