@@ -163,8 +163,10 @@ READ_LOCK_STATUS   = TRUE
   # Display Support
   #
   
-  # INF Silicon/Rockchip/Drivers/Vop2Dxe/Vop2Dxe.inf
-  # INF Silicon/Rockchip/Drivers/LcdGraphicsOutputDxe/LcdGraphicsOutputDxe.inf
+  INF Silicon/Rockchip/Drivers/Vop2Dxe/Vop2Dxe.inf
+  #INF Silicon/Rockchip/Library/DisplayLib/AnalogixDpLib.inf
+  INF Silicon/Rockchip/Library/DisplayLib/DwHdmiQpLib.inf
+  INF Silicon/Rockchip/Drivers/LcdGraphicsOutputDxe/LcdGraphicsOutputDxe.inf
   INF Platform/Rockchip/RK3588/LogoDxe/LogoDxe.inf
 
   INF Platform/Radxa/ROCK5B/Drivers/RK3588Dxe_rock5b/RK3588Dxe.inf

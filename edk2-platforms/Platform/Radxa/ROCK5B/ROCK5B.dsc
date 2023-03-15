@@ -80,8 +80,6 @@
   AndroidBootImgLib|edk2/EmbeddedPkg/Library/AndroidBootImgLib/AndroidBootImgLib.inf
 
   RockchipDisplayLib|Silicon/Rockchip/Library/DisplayLib/RockchipDisplayLib.inf
-  # to delete
-  AnalogixDpLib|Silicon/Rockchip/Library/DisplayLib/AnalogixDpLib.inf
 
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
   LockBoxLib|MdeModulePkg/Library/LockBoxNullLib/LockBoxNullLib.inf
@@ -254,6 +252,10 @@
   # Display
   #
   gRockchipTokenSpaceGuid.PcdLcdPixelFormat|0x00000001
+  gRockchipTokenSpaceGuid.PcdEdpId|0x00000000 #edp0
+  #gRockchipTokenSpaceGuid.PcdEdpId|0x00000001 #edp1
+  gRockchipTokenSpaceGuid.PcdHdmiId|0x00000000 #hdmi0
+  #gRockchipTokenSpaceGuid.PcdHdmiId|0x00000001 #hdmi1
 
   #
   # ComboPhy
@@ -297,8 +299,8 @@
   #
   # Display
   #
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution|0x600
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|0x800
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution|0x780
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|0x438
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|0
 
@@ -372,6 +374,8 @@
   MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
 
   Silicon/Rockchip/Drivers/Vop2Dxe/Vop2Dxe.inf
+  #Silicon/Rockchip/Library/DisplayLib/AnalogixDpLib.inf
+  Silicon/Rockchip/Library/DisplayLib/DwHdmiQpLib.inf
   Silicon/Rockchip/Drivers/LcdGraphicsOutputDxe/LcdGraphicsOutputDxe.inf
 
   Platform/Rockchip/RK3588/LogoDxe/LogoDxe.inf
