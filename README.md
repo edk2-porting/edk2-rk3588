@@ -38,8 +38,4 @@ Build UEFI (ROCK 5B for example):
 
 ## TODO
  - Create gpt image in build process instead of using the prebuilt one
- - Fix hard reset
- - Fix resetting to maskrom (related to broken hard reset?)
-
-## Suggestions for Rockchip
- - Use `Platform/Radxa/ROCK5B/Library/Dw8250SerialPortLib` as SerialPortLib, `Silicon/Rockchip/Library/SerialPortLib` looks very broken
+ - Fix resetting to maskrom
