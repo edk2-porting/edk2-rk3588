@@ -42,6 +42,11 @@ typedef enum {
   ROCKCHIP_FMT_YUV444SP,
 } DATA_FORMAT;
 
+#define ROCKCHIP_OUTPUT_DUAL_CHANNEL_LEFT_RIGHT_MODE    BIT(0)
+#define ROCKCHIP_OUTPUT_DUAL_CHANNEL_ODD_EVEN_MODE      BIT(1)
+#define ROCKCHIP_OUTPUT_DATA_SWAP                       BIT(2)
+#define ROCKCHIP_OUTPUT_MIPI_DS_MODE                    BIT(3)
+
 /*
  * display output interface supported by rockchip lcdc
  */

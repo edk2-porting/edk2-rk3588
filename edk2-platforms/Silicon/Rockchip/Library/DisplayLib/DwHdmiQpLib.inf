@@ -1,6 +1,6 @@
 #/** @file
 #
-#    Component description file for analogix dp module
+#    Component description file for dw-hdmi-qp module
 #
 #    Copyright (c) 2017, Rockchip Inc. All rights reserved.<BR>
 #
@@ -16,16 +16,15 @@
 
 [Defines]
   INF_VERSION                    = 0x00010005
-  BASE_NAME                      = AnalogixDpLib
-  FILE_GUID                      = 10142bcc-7b5c-11ec-b45f-f42a7dcb925d
+  BASE_NAME                      = DwHdmiQpLib
+  FILE_GUID                      = e4000dd0-b732-11ed-887a-f42a7dcb925d
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  ENTRY_POINT                    = AnalogixDpInitDp
+  ENTRY_POINT                    = DwHdmiQpInitHdmi
 
 [Sources.common]
-  AnalogixDpLib.c
-  AnalogixDpReg.c
-  PhyRockchipSamsungHdptx.c
+  DwHdmiQpLib.c
+  PhyRockchipSamsungHdptxHdmi.c
 
 [LibraryClasses]
   TimerLib
@@ -51,7 +50,7 @@
 
 [Pcd]
   gRockchipTokenSpaceGuid.PcdLcdPixelFormat
-  gRockchipTokenSpaceGuid.PcdEdpId
+  gRockchipTokenSpaceGuid.PcdHdmiId
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution
 

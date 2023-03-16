@@ -11,15 +11,20 @@
 #define __ANALOGIXDP_H__
 
 #include <Library/RockchipDisplayLib.h>
+#include <Uefi/UefiSpec.h>
+#include <Uefi/UefiBaseType.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Protocol/RockchipConnectorProtocol.h>
+#include <Library/DrmModes.h>
 
-#define ARMPC 0
-#define RK3588S_EVB1 1
 #define REG_DUMP 0
 
-#define EREMOTEIO       121     /* Remote I/O error */ 
+#define EREMOTEIO       121     /* Remote I/O error */
 #define EINVAL          22      /* Invalid argument */
+#define ETIMEDOUT       110     /* Connection timed out */
 
-#define ANALOGIX_DP_REG_BASE                    0xFDEC0000
+#define ANALOGIX_DP0_REG_BASE                    0xFDEC0000
+#define ANALOGIX_DP1_REG_BASE                    0xFDED0000
 
 #define ANALOGIX_DP_TX_SW_RESET                 0x14
 #define ANALOGIX_DP_FUNC_EN_1                   0x18
@@ -30,6 +35,24 @@
 
 #define ANALOGIX_DP_VIDEO_CTL_8                 0x3C
 #define ANALOGIX_DP_VIDEO_CTL_10                0x44
+
+#define ANALOGIX_DP_TOTAL_LINE_CFG_L            0x48
+#define ANALOGIX_DP_TOTAL_LINE_CFG_H            0x4C
+#define ANALOGIX_DP_ACTIVE_LINE_CFG_L           0x50
+#define ANALOGIX_DP_ACTIVE_LINE_CFG_H           0x54
+#define ANALOGIX_DP_V_F_PORCH_CFG               0x58
+#define ANALOGIX_DP_V_SYNC_WIDTH_CFG            0x5C
+#define ANALOGIX_DP_V_B_PORCH_CFG               0x60
+#define ANALOGIX_DP_TOTAL_PIXEL_CFG_L           0x64
+#define ANALOGIX_DP_TOTAL_PIXEL_CFG_H           0x68
+#define ANALOGIX_DP_ACTIVE_PIXEL_CFG_L          0x6C
+#define ANALOGIX_DP_ACTIVE_PIXEL_CFG_H          0x70
+#define ANALOGIX_DP_H_F_PORCH_CFG_L             0x74
+#define ANALOGIX_DP_H_F_PORCH_CFG_H             0x78
+#define ANALOGIX_DP_H_SYNC_CFG_L                0x7C
+#define ANALOGIX_DP_H_SYNC_CFG_H                0x80
+#define ANALOGIX_DP_H_B_PORCH_CFG_L             0x84
+#define ANALOGIX_DP_H_B_PORCH_CFG_H             0x88
 
 #define ANALOGIX_DP_PLL_REG_1                   0xfc
 #define ANALOGIX_DP_PLL_REG_2                   0x9e4
@@ -172,6 +195,57 @@
 #define INTERACE_SCAN_CFG			(0x1 << 2)
 #define VSYNC_POLARITY_CFG			(0x1 << 1)
 #define HSYNC_POLARITY_CFG			(0x1 << 0)
+
+/* ANALOGIX_DP_TOTAL_LINE_CFG_L */
+#define TOTAL_LINE_CFG_L(x)			(((x) & 0xff) << 0)
+
+/* ANALOGIX_DP_TOTAL_LINE_CFG_H */
+#define TOTAL_LINE_CFG_H(x)			(((x) & 0xf) << 0)
+
+/* ANALOGIX_DP_ACTIVE_LINE_CFG_L */
+#define ACTIVE_LINE_CFG_L(x)			(((x) & 0xff) << 0)
+
+/* ANALOGIX_DP_ACTIVE_LINE_CFG_H */
+#define ACTIVE_LINE_CFG_H(x)			(((x) & 0xf) << 0)
+
+/* ANALOGIX_DP_V_F_PORCH_CFG */
+#define V_F_PORCH_CFG(x)			(((x) & 0xff) << 0)
+
+/* ANALOGIX_DP_V_SYNC_WIDTH_CFG */
+#define V_SYNC_WIDTH_CFG(x)			(((x) & 0xff) << 0)
+
+/* ANALOGIX_DP_V_B_PORCH_CFG */
+#define V_B_PORCH_CFG(x)			(((x) & 0xff) << 0)
+
+/* ANALOGIX_DP_TOTAL_PIXEL_CFG_L */
+#define TOTAL_PIXEL_CFG_L(x)			(((x) & 0xff) << 0)
+
+/* ANALOGIX_DP_TOTAL_PIXEL_CFG_H */
+#define TOTAL_PIXEL_CFG_H(x)			(((x) & 0x3f) << 0)
+
+/* ANALOGIX_DP_ACTIVE_PIXEL_CFG_L */
+#define ACTIVE_PIXEL_CFG_L(x)			(((x) & 0xff) << 0)
+
+/* ANALOGIX_DP_ACTIVE_PIXEL_CFG_H */
+#define ACTIVE_PIXEL_CFG_H(x)			(((x) & 0x3f) << 0)
+
+/* ANALOGIX_DP_H_F_PORCH_CFG_L */
+#define H_F_PORCH_CFG_L(x)			(((x) & 0xff) << 0)
+
+/* ANALOGIX_DP_H_F_PORCH_CFG_H */
+#define H_F_PORCH_CFG_H(x)			(((x) & 0xf) << 0)
+
+/* ANALOGIX_DP_H_SYNC_CFG_L */
+#define H_SYNC_CFG_L(x)				(((x) & 0xff) << 0)
+
+/* ANALOGIX_DP_H_SYNC_CFG_H */
+#define H_SYNC_CFG_H(x)				(((x) & 0xf) << 0)
+
+/* ANALOGIX_DP_H_B_PORCH_CFG_L */
+#define H_B_PORCH_CFG_L(x)			(((x) & 0xff) << 0)
+
+/* ANALOGIX_DP_H_B_PORCH_CFG_H */
+#define H_B_PORCH_CFG_H(x)			(((x) & 0xf) << 0)
 
 /* ANALOGIX_DP_PLL_REG_1 */
 #define REF_CLK_24M				(0x1 << 0)
@@ -388,7 +462,7 @@
 #define VIDEO_MODE_SLAVE_MODE			(0x1 << 0)
 #define VIDEO_MODE_MASTER_MODE			(0x0 << 0)
 
-#define DP_TIMEOUT_LOOP_COUNT 200
+#define DP_TIMEOUT_LOOP_COUNT 100
 #define MAX_CR_LOOP 5
 #define MAX_EQ_LOOP 5
 
@@ -416,6 +490,7 @@
 
 /* HDPTXPHy_GRF*/
 #define HDPTXPHY0_GRF_BASE                      0xFD5E0000
+#define HDPTXPHY1_GRF_BASE                      0xFD5E4000
 #define HDPTXPHY_GRF_CON0                       0x00
 #define HDPTXPHY_GRF_CON1                       0x04
 #define HDPTXPHY_GRF_STATUS0                    0x80
@@ -423,239 +498,535 @@
 #define O_PLL_LOCK                              0x280
 #define O_PLL_LOCK_done                         (0x1<<3)
 #define O_PHY_RDY                               ((0x1<<1)&(0x1<<3))
+
 /* ENABLE_BIASES */
 #define ENABLE_BIASES_LANE6                     (0x1<<6)
 #define ENABLE_BIASES_LANE7                     (0x1<<7)
 
 /* INITIAL POR RESET*/
-#define INITIAL_POR_RESET_LANE2                 (0X1<<2)
-#define INITIAL_POR_RESET_LANE3                 (0X1<<3)
+#define INITIAL_POR_RESET_LANE2                 (0x1<<2)
+#define INITIAL_POR_RESET_LANE3                 (0x1<<3)
 
-#define EDPTX_PHY_BASE                          0xFED60000
+/* DRM_DP_HELPER */
+#define DP_RECEIVER_CAP_SIZE                    0xf
+#define EDP_PSR_RECEIVER_CAP_SIZE	              2
+#define EDP_DISPLAY_CTL_CAP_SIZE	              3
+
+#define DP_TRAINING_AUX_RD_INTERVAL             0x00e   /* XXX 1.2? */
+# define DP_TRAINING_AUX_RD_MASK                0x7F    /* XXX 1.2? */
+# define DP_EXTENDED_RECEIVER_CAP_FIELD_PRESENT (1 << 7) /* DP 1.3 */
+
+#define DP_SET_POWER                        0x600
+# define DP_SET_POWER_D0                    0x1
+# define DP_SET_POWER_D3                    0x2
+# define DP_SET_POWER_MASK                  0x3
+# define DP_SET_POWER_D3_AUX_ON             0x5
+
+#define DP_EDP_DPCD_REV			    0x700    /* eDP 1.2 */
+# define DP_EDP_11			    0x00
+# define DP_EDP_12			    0x01
+# define DP_EDP_13			    0x02
+# define DP_EDP_14			    0x03
+
+#define DP_TRAINING_LANE0_SET		    0x103
+#define DP_TRAINING_LANE1_SET		    0x104
+#define DP_TRAINING_LANE2_SET		    0x105
+#define DP_TRAINING_LANE3_SET		    0x106
+
+# define DP_TRAIN_VOLTAGE_SWING_MASK	    0x3
+# define DP_TRAIN_VOLTAGE_SWING_SHIFT	    0
+# define DP_TRAIN_MAX_SWING_REACHED	    (1 << 2)
+# define DP_TRAIN_VOLTAGE_SWING_LEVEL_0 (0 << 0)
+# define DP_TRAIN_VOLTAGE_SWING_LEVEL_1 (1 << 0)
+# define DP_TRAIN_VOLTAGE_SWING_LEVEL_2 (2 << 0)
+# define DP_TRAIN_VOLTAGE_SWING_LEVEL_3 (3 << 0)
+
+# define DP_TRAIN_PRE_EMPHASIS_MASK	    (3 << 3)
+# define DP_TRAIN_PRE_EMPH_LEVEL_0		(0 << 3)
+# define DP_TRAIN_PRE_EMPH_LEVEL_1		(1 << 3)
+# define DP_TRAIN_PRE_EMPH_LEVEL_2		(2 << 3)
+# define DP_TRAIN_PRE_EMPH_LEVEL_3		(3 << 3)
+
+# define DP_TRAIN_PRE_EMPHASIS_SHIFT	    3
+# define DP_TRAIN_MAX_PRE_EMPHASIS_REACHED  (1 << 5)
+
+#define DP_TEST_REQUEST         0x218
+# define DP_TEST_LINK_TRAINING        (1 << 0)
+# define DP_TEST_LINK_VIDEO_PATTERN     (1 << 1)
+# define DP_TEST_LINK_EDID_READ       (1 << 2)
+# define DP_TEST_LINK_PHY_TEST_PATTERN      (1 << 3) /* DPCD >= 1.1 */
+# define DP_TEST_LINK_FAUX_PATTERN      (1 << 4) /* DPCD >= 1.2 */
+
+#define DP_ADJUST_REQUEST_LANE0_1     0x206
+#define DP_TEST_RESPONSE        0x260
+# define DP_TEST_ACK          (1 << 0)
+# define DP_TEST_NAK          (1 << 1)
+# define DP_TEST_EDID_CHECKSUM_WRITE      (1 << 2)
+
+#define DP_TEST_EDID_CHECKSUM       0x261
+
+/* AUX CH addresses */
+/* DPCD */
+#define DP_DPCD_REV                         0x000
+# define DP_DPCD_REV_10                     0x10
+# define DP_DPCD_REV_11                     0x11
+# define DP_DPCD_REV_12                     0x12
+# define DP_DPCD_REV_13                     0x13
+# define DP_DPCD_REV_14                     0x14
+
+#define EDP0TX_PHY_BASE                      0xFED60000
+#define EDP1TX_PHY_BASE                      0xFED70000
+
+#define DP_MAX_LANE_COUNT                   0x002
+# define DP_MAX_LANE_COUNT_MASK             0x1f
+# define DP_TPS3_SUPPORTED                  (1 << 6) /* 1.2 */
+# define DP_ENHANCED_FRAME_CAP              (1 << 7)
+#define DP_INC_BG                           (0x1 << 7)
+#define DP_EXP_BG                           (0x1 << 6)
+#define RK_AUX_PD                           (0x1 << 5)
+#define AUX_PD                              (0x1 << 4)
+#define RK_PLL_PD                           (0x1 << 4)
+#define CH3_PD                              (0x1 << 3)
+#define CH2_PD                              (0x1 << 2)
+#define CH1_PD                              (0x1 << 1)
+#define CH0_PD                              (0x1 << 0)
 
 enum LinkLaneCountType {
-	LANE_COUNT1 = 1,
-	LANE_COUNT2 = 2,
-	LANE_COUNT4 = 4
+  LANE_COUNT1 = 1,
+  LANE_COUNT2 = 2,
+  LANE_COUNT4 = 4
 };
 
 enum LinkTrainingState {
-	START,
-	CLOCK_RECOVERY,
-	EQUALIZER_TRAINING,
-	FINISHED,
-	FAILED
+  START,
+  CLOCK_RECOVERY,
+  EQUALIZER_TRAINING,
+  FINISHED,
+  FAILED
 };
 
 enum VoltageSwingLevel {
-	VOLTAGE_LEVEL_0,
-	VOLTAGE_LEVEL_1,
-	VOLTAGE_LEVEL_2,
-	VOLTAGE_LEVEL_3,
+  VOLTAGE_LEVEL_0,
+  VOLTAGE_LEVEL_1,
+  VOLTAGE_LEVEL_2,
+  VOLTAGE_LEVEL_3,
 };
 
 enum PreEmphasisLevel {
-	PRE_EMPHASIS_LEVEL_0,
-	PRE_EMPHASIS_LEVEL_1,
-	PRE_EMPHASIS_LEVEL_2,
-	PRE_EMPHASIS_LEVEL_3,
+  PRE_EMPHASIS_LEVEL_0,
+  PRE_EMPHASIS_LEVEL_1,
+  PRE_EMPHASIS_LEVEL_2,
+  PRE_EMPHASIS_LEVEL_3,
 };
 
 enum PatternSet {
-	PRBS7,
-	D10_2,
-	TRAINING_PTN1,
-	TRAINING_PTN2,
-	TRAINING_PTN3,
-	DP_NONE
+  PRBS7,
+  D10_2,
+  TRAINING_PTN1,
+  TRAINING_PTN2,
+  TRAINING_PTN3,
+  DP_NONE
 };
 
 enum ColorSpace {
-	COLOR_RGB,
-	COLOR_YCBCR422,
-	COLOR_YCBCR444
+  COLOR_RGB,
+  COLOR_YCBCR422,
+  COLOR_YCBCR444
 };
 
 enum ColorDepth {
-	COLOR_6,
-	COLOR_8,
-	COLOR_10,
-	COLOR_12
+  COLOR_6,
+  COLOR_8,
+  COLOR_10,
+  COLOR_12
 };
 
 enum ColorCoefficient {
-	COLOR_YCBCR601,
-	COLOR_YCBCR709
+  COLOR_YCBCR601,
+  COLOR_YCBCR709
 };
 
 enum DynamicRange {
-	VESA,
-	CEA
+  VESA,
+  CEA
 };
 
 enum PllStatus {
-	PLL_UNLOCKED,
-	PLL_LOCKED
+  PLL_UNLOCKED,
+  PLL_LOCKED
 };
 
 enum ClockRecoveryMValueType {
-	CALCULATED_M,
-	REGISTER_M
+  CALCULATED_M,
+  REGISTER_M
 };
 
 enum VideoTimingRecognitionType {
-	VIDEO_TIMING_FROM_CAPTURE,
-	VIDEO_TIMING_FROM_REGISTER
+  VIDEO_TIMING_FROM_CAPTURE,
+  VIDEO_TIMING_FROM_REGISTER
 };
 
 enum AnalogPowerBlock {
-	AUX_BLOCK,
-	CH0_BLOCK,
-	CH1_BLOCK,
-	CH2_BLOCK,
-	CH3_BLOCK,
-	ANALOG_TOTAL,
-	POWER_ALL
+  AUX_BLOCK,
+  CH0_BLOCK,
+  CH1_BLOCK,
+  CH2_BLOCK,
+  CH3_BLOCK,
+  ANALOG_TOTAL,
+  POWER_ALL
 };
-
-enum DpIrqType {
-	DP_IRQ_TYPE_HP_CABLE_IN  = BIT0,
-	DP_IRQ_TYPE_HP_CABLE_OUT = BIT1,
-	DP_IRQ_TYPE_HP_CHANGE    = BIT2,
-	DP_IRQ_TYPE_UNKNOWN      = BIT3,
-};
-
 
 struct VideoInfo {
-char *Name;
+  char *Name;
 
-	BOOLEAN H_Sync_Polarity;
-	BOOLEAN V_Sync_Polarity;
-	BOOLEAN Interlaced;
+  BOOLEAN HSyncPolarity;
+  BOOLEAN VSyncPolarity;
+  BOOLEAN Interlaced;
 
-	enum ColorSpace ColorSpace;
-	enum DynamicRange DynamicRange;
-	enum ColorCoefficient Ycbcr_Coeff;
-	enum ColorDepth ColorDepth;
+  enum ColorSpace ColorSpace;
+  enum DynamicRange DynamicRange;
+  enum ColorCoefficient Ycbcr_Coeff;
+  enum ColorDepth ColorDepth;
 
-	UINTN MaxLinkRate;
-	enum LinkLaneCountType MaxLaneCount;
+  UINTN MaxLinkRate;
+  enum LinkLaneCountType MaxLaneCount;
 };
 
 struct LinkTrain {
-	UINTN Eq_Loop;
-	UINTN Cr_Loop[4];
+  INT32 EqLoop;
+  INT32 CrLoop[4];
+  UINT8 LinkRate;
+  UINT8 LaneCount;
+  UINT8 TrainingLane[4];
+  BOOLEAN SSC;
 
-	UINT8 Link_Rate;
-	UINT8 LaneCount;
-	UINT8 TrainingLane[4];
-	BOOLEAN SSC;
-
-	enum LinkTrainingState LtState;
-};
-
-enum AnalogixDp_Devtype {
-	EXYNOS_DP,
-	ROCKCHIP_DP,
-};
-
-enum AnalogixDp_Sub_Devtype {
-	RK3288_DP,
-	RK3368_EDP,
-	RK3399_EDP,
-	RK3568_EDP,
-	RK3588_EDP
-};
-
-struct AnalogixDp_Plat_Data {
-	enum AnalogixDp_Devtype Dev_Type;
-	enum AnalogixDp_Sub_Devtype SubDev_Type;
-	BOOLEAN SSC;
+  enum LinkTrainingState LtState;
 };
 
 struct AnalogixDpDevice {
-	int ID;
-	struct Udevice *dev;
-	VOID *Reg_Base;
-	struct Regmap *GRF;
-	BOOLEAN Force_Hpd;
-	struct VideoInfo	VideoInfo;
-	struct LinkTrain	LinkTrain;
-	struct DRM_DSIPALY_MODE *MODE;
-	struct AnalogixDp_Plat_Data Plat_Data;
-	unsigned char edID[EDID_BLOCK_LENGTH * 2];
+  UINT32 Id;
+  BOOLEAN ForceHpd;
+  struct VideoInfo	VideoInfo;
+  struct LinkTrain	LinkTrain;
+  struct DrmDisplayMode *MODE;
+  unsigned char EDID[EDID_BLOCK_LENGTH * 2];
+  UINT8 Dpcd[DP_RECEIVER_CAP_SIZE];
+  UINT8 Edid[EDID_BLOCK_LENGTH * 2];
+  UINT32 LaneMap[4];
 }; 
 
-/* AnalogixDp_reg.c */
-VOID AnalogixDpRegWrite(IN  UINT32 Offset, IN  UINT32 Value);
-UINT32 AnalogixDpRegRead (IN  UINT32 Offset);
-VOID EnablePwm(VOID);
-VOID AnalogixDpEnableVideoMute(BOOLEAN Enable);
-VOID AnalogixDpLaneSwap(BOOLEAN Enable);
-VOID AnalogixDpStopVideo(VOID);
-VOID AnalogixDpReset(VOID);
-VOID AnalogixDpSwreset(VOID);
-VOID AnalogixDpInitAnalogParam(VOID);
-VOID AnalogixDpInitInterrupt(VOID);
-VOID AnalogixDpEnableSwFunction(VOID);
-VOID AnalogixDpConfigInterrupt(VOID);
-VOID AnalogixDpSetPllPowerDown(BOOLEAN Enable);
-VOID AnalogixDpInitHpd(VOID);
-VOID AnalogixDpClearHotplugInterrupts(VOID);
-VOID AnalogixDpInitAux(VOID);
-VOID AnalogixDpResetAux(VOID);
-VOID AnalogixDpInitAnalogFunc(VOID);
-VOID AnalogixDpSetAnalogPowerDown(VOID);
+/* Rockchip Htx Phy */
 
-VOID PrintkHDptxReg(VOID);
-UINTN AnalogixDpReadByteFromDpcd(OUT struct AnalogixDpDevice *Dp,IN UINTN Reg_Addr,IN UINT8 *Data);
-UINTN AnalogixDpStartAuxTransaction(VOID);
-UINTN AnalogixDpReadBytesFromDpcd(OUT struct AnalogixDpDevice *Dp,IN  UINTN Reg_Addr, IN  UINTN Count,IN  UINT8 Data[] );
-UINTN AnalogixDpWriteBytesToDpcd(OUT struct AnalogixDpDevice *Dp,IN  UINTN Reg_Addr, IN  UINTN Count,IN  UINT8 Data[] );
-VOID  AnalogixDpSetTrainingPattern(OUT struct AnalogixDpDevice *Dp,OUT enum PatternSet Pattern);
-UINT32 AnalogixDpGetLaneLinkTraining(OUT struct AnalogixDpDevice *Dp,IN UINT8 Lane);
-VOID AnalogixDpGetLinkBandwidth(OUT struct AnalogixDpDevice *Dp,UINT32 *bwtype);
-VOID AnalogixDpGetLaneCount(OUT struct AnalogixDpDevice *Dp,UINT32 *Count);
-VOID AnalogixDpEnableVideoMaster(OUT struct AnalogixDpDevice *Dp,BOOLEAN Enable);
-VOID AnalogixDpStartVideo(OUT struct AnalogixDpDevice *Dp);
-INTN AnalogixDpIsVideoStreamOn(OUT struct AnalogixDpDevice *Dp);
-VOID AnalogixDpSetVideoFormat(OUT struct AnalogixDpDevice *Dp);
-VOID RockchipHdptxPhySetVoltage(VOID);
-VOID RockchipHdptxPhyInit(VOID);
-VOID RockchipHdpPhySetRate(VOID);
-VOID Initialize(VOID);
-VOID PrinteDPReg(VOID);
-VOID PrintCruReg(VOID);
+struct RockchipHdptxPhy {
+  UINT32  Id;
+  UINT32 LANE_POLARITY_INVERT[4];
+};
+
+struct PhyConfigureOptsDp {
+  UINTN LINKRATE;
+  UINTN LANES;
+  UINTN VOLTAGE[4];
+  UINTN PRE[4];
+  UINT8 SSC : 1;
+  UINT8 SETRATE : 1;
+  UINT8 SETLANES : 1;
+  UINT8 SETVOLTAGES : 1;
+};
+
+/* AnalogixDpReg.c */
+VOID
+AnalogixDpRegWrite (
+  OUT struct AnalogixDpDevice *Dp,
+  IN  UINT32 Offset,
+  IN  UINT32 Value
+  );
+
+UINT32
+AnalogixDpRegRead (
+  OUT struct AnalogixDpDevice *Dp,
+  IN  UINT32 Offset
+  );
+
+VOID
+AnalogixDpEnableVideoMute (
+  OUT struct AnalogixDpDevice *Dp,
+  BOOLEAN Enable
+  );
+
+VOID 
+AnalogixDpLaneSwap (
+  OUT struct AnalogixDpDevice *Dp,
+  BOOLEAN  Enable
+  );
+
+VOID 
+AnalogixDpStopVideo (
+  OUT struct AnalogixDpDevice *Dp
+  );
+
+VOID
+AnalogixDpReset (
+  OUT struct AnalogixDpDevice *Dp
+  );
+
+VOID
+AnalogixDpSwreset (
+  OUT struct AnalogixDpDevice *Dp
+  );
+
+VOID
+AnalogixDpInitAnalogParam (
+  OUT struct AnalogixDpDevice *Dp
+  );
+
+VOID
+AnalogixDpInitInterrupt (
+  OUT struct AnalogixDpDevice *Dp
+  );
+
+VOID
+AnalogixDpEnableSwFunction (
+  OUT struct AnalogixDpDevice *Dp
+  );
+
+VOID
+AnalogixDpConfigInterrupt (
+  OUT struct AnalogixDpDevice *Dp
+  );
+
+VOID
+AnalogixDpSetPllPowerDown (
+  OUT struct AnalogixDpDevice *Dp,
+  BOOLEAN Enable
+  );
+
+VOID
+AnalogixDpInitHpd (
+  OUT struct AnalogixDpDevice *Dp
+  );
+
+VOID
+AnalogixDpClearHotplugInterrupts (
+  OUT struct AnalogixDpDevice *Dp
+  );
+
+VOID
+AnalogixDpInitAux (
+  OUT struct AnalogixDpDevice *Dp
+  );
+
+VOID
+AnalogixDpResetAux (
+  OUT struct AnalogixDpDevice *Dp
+  );
+
+VOID
+AnalogixDpInitAnalogFunc (
+  OUT struct AnalogixDpDevice *Dp
+  );
+
+VOID
+AnalogixDpSetAnalogPowerDown (
+  OUT struct AnalogixDpDevice *Dp,
+  enum AnalogPowerBlock Block,
+  BOOLEAN Enable
+  );
+
+BOOLEAN
+AnalogixDpTps3Supported (
+  OUT struct AnalogixDpDevice *Dp
+  );
 
 INT32
+AnalogixDpReadByteFromDpcd (
+  OUT struct AnalogixDpDevice *Dp,
+  IN UINT32 RegAddr,
+  IN UINT8 *Data
+  );
+
+INT32
+AnalogixDpWriteByteToDpcd (
+  OUT struct AnalogixDpDevice *Dp,
+  IN UINT32 RegAddr,
+  IN UINT8  Data
+  );
+
+INT32 
+AnalogixDpStartAuxTransaction (
+  OUT struct AnalogixDpDevice *Dp
+  );
+
+INT32
+AnalogixDpReadBytesFromDpcd (
+  OUT struct AnalogixDpDevice *Dp,
+  IN  UINT32 RegAddr,
+  IN  UINT32 Count,
+  IN  UINT8 Data[]
+  );
+
+INT32 
+AnalogixDpWriteBytesToDpcd (
+  OUT struct AnalogixDpDevice *Dp,
+  IN  UINT32 RegAddr,
+  IN  UINT32 Count,
+  IN  UINT8 Data[]
+  );
+
+VOID
+AnalogixDpSetTrainingPattern (
+  OUT struct AnalogixDpDevice *Dp,
+  OUT enum PatternSet Pattern
+  );
+
+UINT32
+AnalogixDpGetLaneLinkTraining (
+  OUT struct AnalogixDpDevice *Dp,
+  IN UINT8 Lane
+  );
+
+VOID
+AnalogixDpGetLinkBandwidth (
+  OUT struct AnalogixDpDevice *Dp,
+  UINT32 *BwType
+  );
+
+VOID
+AnalogixDpGetLaneCount (
+  OUT struct AnalogixDpDevice *Dp,
+  UINT32 *Count
+  );
+
+VOID 
+AnalogixDpEnableVideoMaster (
+  OUT struct AnalogixDpDevice *Dp,
+  BOOLEAN Enable
+  );
+
+VOID 
+AnalogixDpStartVideo (
+  OUT struct AnalogixDpDevice *Dp
+  );
+
+INTN AnalogixDpIsVideoStreamOn (
+  OUT struct AnalogixDpDevice *Dp
+  );
+
+VOID
+AnalogixDpEnableScrambling (
+  OUT struct AnalogixDpDevice *Dp
+  );
+
+VOID
+AnalogixDpDisableScrambling (
+  OUT struct AnalogixDpDevice *Dp
+  );
+
+VOID
+AnalogixDpSetVideoFormat (
+  OUT struct AnalogixDpDevice *Dp,
+  OUT CONST DRM_DISPLAY_MODE *Mode
+  );
+
+INTN
+AnalogixDpSelectI2cDevice (
+  OUT struct AnalogixDpDevice *Dp,
+  UINTN DeviceAddr,
+  UINTN RegAddr
+  );
+
+INTN 
+AnalogixDpReadByteFromI2c (
+  struct AnalogixDpDevice *dp,
+  UINTN DeviceAddr,
+  UINTN RegAddr,
+  UINTN *DATA
+  );
+
+INTN 
+AnalogixDpReadBytesFromI2c (
+  OUT struct AnalogixDpDevice *Dp,
+  UINTN DeviceAddr,
+  UINTN RegAddr,
+  UINTN Count,
+  UINT8 Edid[]
+  );
+
+VOID
+AnalogixDpSetLaneLinkTraining (
+  OUT struct AnalogixDpDevice *Dp
+  );
+
+VOID 
+RockchipHdptxPhyInit (
+  OUT struct RockchipHdptxPhy *Hdptx
+  );
+		
+INTN 
+RockchipHdptxPhySetRate (
+  OUT struct RockchipHdptxPhy *Hdptx,
+  OUT struct PhyConfigureOptsDp *Dp
+  );
+
+INTN 
+RockchipHdptxPhySetVoltages (
+  OUT struct RockchipHdptxPhy *Hdptx,
+  OUT struct PhyConfigureOptsDp *Dp
+  );
+
+INTN 
+RockchipHdptxPhyConfigure (
+  OUT struct RockchipHdptxPhy *Hdptx,
+  OUT struct PhyConfigureOptsDp *Dp
+  );
+
+INT32 
+AnalogixDpIsSlaveVideoStreamClockOn (
+  OUT struct AnalogixDpDevice *Dp
+  );
+
+VOID
+DumpDpRegisters (
+  OUT struct AnalogixDpDevice *Dp
+  );
+
+VOID
+DumpHdptxPhyRegisters (
+  OUT struct AnalogixDpDevice *Dp
+  );
+
+EFI_STATUS
 AnalogixDpConnectorPreInit (
-  OUT DISPLAY_STATE                        *DisplayState 
+  OUT ROCKCHIP_CONNECTOR_PROTOCOL          *This,
+  OUT DISPLAY_STATE                        *DisplayState
   );
 
-INT32
+EFI_STATUS
 AnalogixDpConnectorInit (
-  OUT DISPLAY_STATE                        *DisplayState  
+  OUT ROCKCHIP_CONNECTOR_PROTOCOL          *This,
+  OUT DISPLAY_STATE                        *DisplayState
   );
 
-INT32
+EFI_STATUS
 AnalogixDpConnectorGetEdid (
+  OUT ROCKCHIP_CONNECTOR_PROTOCOL          *This,
   OUT DISPLAY_STATE                        *DisplayState
   );
 
-INT32
+EFI_STATUS
 AnalogixDpConnectorEnable (
-  OUT DISPLAY_STATE                        *DisplayState,
-  OUT struct AnalogixDpDevice            *Dp
+  OUT ROCKCHIP_CONNECTOR_PROTOCOL          *This,
+  OUT DISPLAY_STATE                        *DisplayState
   );
 
-INT32
+EFI_STATUS
 AnalogixDpConnectorDisable (
+  OUT ROCKCHIP_CONNECTOR_PROTOCOL          *This,
   OUT DISPLAY_STATE                        *DisplayState
   );
 
-INT32
+EFI_STATUS
 AnalogixDpConnectorDetect (
+  OUT ROCKCHIP_CONNECTOR_PROTOCOL          *This,
   OUT DISPLAY_STATE                        *DisplayState
   );
-
 #endif

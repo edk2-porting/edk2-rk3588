@@ -39,6 +39,16 @@ VOID *buf,
 UINT32 width,
 UINT32 len);
 
+VOID
+EFIAPI
+EnableBacklight(
+IN BOOLEAN en);
+
+VOID
+EFIAPI
+EnablePWM(
+IN BOOLEAN en);
+
 EFI_STATUS
 EFIAPI
 SdhciGetClockRate (

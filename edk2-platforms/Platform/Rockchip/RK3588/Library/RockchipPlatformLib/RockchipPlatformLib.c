@@ -8,6 +8,7 @@
 #include <Base.h>
 #include <Library/DebugLib.h>
 #include <Library/IoLib.h>
+#include <Library/PWMLib.h>
 #include <Soc.h>
 
 void DebugPrintHex(void *buf, UINT32 width, UINT32 len)
@@ -44,6 +45,41 @@ EFIAPI
 DwEmmcDxeIoMux(void)
 {
   /* sdmmc0 iomux */
+}
+
+void
+EFIAPI
+EnableBacklight(IN BOOLEAN en) {
+  if (en) {
+    // rk3588s-evb1 pull high gpio1_a5
+    MmioWrite32(0xFEC20000, 0x00200020);
+    MmioWrite32(0xFEC20008, 0x00200020);
+    DEBUG ((EFI_D_WARN, "RK3588s evb1 Enable Display end \n"));
+  } else {
+    // rk3588s-evb1 pull low gpio1_a5
+    MmioWrite32(0xFEC20000, 0x00200000);
+    MmioWrite32(0xFEC20008, 0x00200020);
+    DEBUG ((EFI_D_WARN, "RK3588s evb1 Disabled Display end \n"));
+  }
+}
+
+void
+EFIAPI
+EnablePWM(IN BOOLEAN en) {
+  PWM_DATA PwmData = {
+    .ControllerID = PWM_CONTROLLER3,
+    .ChannelID = PWM_CHANNEL0,
+    .PeriodNs = 1000,
+    .DutyNs = 500,
+    .Polarity = 0
+  };
+
+  if (en) {
+    MmioWrite32(0xFD5F808C, 0x00F000B0);//PWM12 IOMUX
+    RkPwmSetConfig(&PwmData);
+    RkPwmEnable(&PwmData);
+  } else
+    RkPwmDisable(&PwmData);
 }
 
 void

@@ -75,20 +75,3 @@ DisplaySetCrtcInfo (
 
   return EFI_SUCCESS;
 }
-
-EFIAPI
-EFI_STATUS
-DisplaySetFramebuffer (
-  OUT EFI_PHYSICAL_ADDRESS*                VramBaseAddress,
-  OUT UINTN*                               VramSize
-  )
-{
-  // Set the VRAM size.
-  *VramSize = SIZE_128MB;
-
-  // Check if base address is already reserved for the framebuffer.
-  *VramBaseAddress = (EFI_PHYSICAL_ADDRESS)AllocatePool(SIZE_128MB);
-
-  return EFI_SUCCESS;
-}
-

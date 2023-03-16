@@ -41,8 +41,6 @@
   UefiDriverEntryPoint
   UefiLib
   RockchipDisplayLib
-  //to delete
-  AnalogixDpLib
 
 [Protocols]
   gEfiCpuArchProtocolGuid
@@ -60,4 +58,4 @@
   gArmPlatformTokenSpaceGuid.PcdGopDisableOnExitBootServices
 
 [Depex]
-  TRUE
+  gEfiCpuArchProtocolGuid

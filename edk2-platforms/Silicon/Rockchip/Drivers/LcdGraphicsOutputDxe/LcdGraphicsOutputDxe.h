@@ -17,6 +17,7 @@
 #include <Library/UefiLib.h>
 #include <Library/RockchipDisplayLib.h>
 
+#include <Protocol/Cpu.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/RockchipCrtcProtocol.h>
 #include <Protocol/RockchipConnectorProtocol.h>

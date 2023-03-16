@@ -58,12 +58,22 @@
 
 #define VOP_FEATURE_OUTPUT_10BIT	BIT(0)
 
+/* KHz */
+#define VOP2_MAX_DCLK_RATE			600000
+
 typedef enum {
   CSC_BT601L,
   CSC_BT709L,
   CSC_BT601F,
   CSC_BT2020,
 } VOP2_CSC_FORMAT;
+
+typedef enum {
+	HSYNC_POSITIVE = 0,
+	VSYNC_POSITIVE = 1,
+	DEN_NEGATIVE   = 2,
+	DCLK_INVERT    = 3
+} VOP2_POL;
 
 typedef enum {
   BCSH_OUT_MODE_BLACK,
