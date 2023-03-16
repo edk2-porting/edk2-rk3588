@@ -232,16 +232,8 @@
   #
   # DWC3 controller
   #
-  gRockchipTokenSpaceGuid.PcdDwc3BaseAddress|0xfc000000
-  gRockchipTokenSpaceGuid.PcdNumDwc3Controller|2
+  gRockchipTokenSpaceGuid.PcdDwc3BaseAddresses|{ UINT32(0xfc000000), UINT32(0xfc400000), UINT32(0xfcd00000) }
   gRockchipTokenSpaceGuid.PcdDwc3Size|0x400000
-
-  #
-  # USB XHCI controller
-  #
-  gRockchipTokenSpaceGuid.PcdXhciBaseAddress|0xfc000000
-  gRockchipTokenSpaceGuid.PcdNumXhciController|2
-  gRockchipTokenSpaceGuid.PcdXhciSize|0x400000
 
   #
   # Android Loader
@@ -266,7 +258,7 @@
   #
   # ComboPhy
   #
-  gRockchipTokenSpaceGuid.PcdComboPhyMode|{ $(CP_SATA), $(CP_USB3), $(CP_PCIE) }
+  gRockchipTokenSpaceGuid.PcdComboPhyMode|{ $(CP_SATA), $(CP_PCIE), $(CP_USB3) }
 
   #  BIT0  - Initialization message.<BR>
   #  BIT1  - Warning message.<BR>
@@ -453,25 +445,26 @@
   #
   Platform/Radxa/ROCK5B/Drivers/PlatformSmbiosDxe/PlatformSmbiosDxe.inf
   MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
+  
   #
   # USB Ohci Controller
   #
-  Silicon/Rockchip/Drivers/OhciDxe/OhciDxe.inf
+  #Silicon/Rockchip/Drivers/OhciDxe/OhciDxe.inf
 
   #
   # USB Ehci Controller
   #
-  Silicon/Rockchip/Drivers/EhciDxe/EhciDxe.inf
+  MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
 
   #
   # USB Dwc3 Controller
   #
-  Silicon/Rockchip/Drivers/UsbDwc3InitDxe/UsbDwc3.inf
+  Silicon/Rockchip/Drivers/UsbHcdInitDxe/UsbHcd.inf
 
   #
   # USB Xhci Controller
   #
-  Silicon/Rockchip/Drivers/XhciDxe/XhciDxe.inf
+  MdeModulePkg/Bus/Pci/XhciDxe/XhciDxe.inf
 
   #
   # USB Host Support

@@ -74,7 +74,7 @@ I2cGetBase (
 
 void
 EFIAPI
-UdPhyU3PortDisable (void);
+UsbDpPhyEnable (void);
 
 void
 EFIAPI

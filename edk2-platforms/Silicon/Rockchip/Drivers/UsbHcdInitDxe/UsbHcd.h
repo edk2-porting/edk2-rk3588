@@ -6,11 +6,10 @@
 
 **/
 
-#ifndef USB_DWC3_H_
-#define USB_DWC3_H_
+#ifndef USB_HCD_H_
+#define USB_HCD_H_
 
 #include <Base.h>
-#include <Library/RockchipPlatformLib.h>
 
 /* Global constants */
 #define DWC3_GSNPSID_MASK                      0xffff0000
@@ -34,11 +33,21 @@
 #define DWC3_GHWPARAMS1_EN_PWROPT(N)           (((N) & (3 << 24)) >> 24)
 #define DWC3_GHWPARAMS1_EN_PWROPT_CLK          1
 
+/* Global UCTL1 Register */
+#define DWC3_GUCTL1_TX_IPGAP_LINECHECK_DIS     BIT28
+
 /* Global USB2 PHY Configuration Register */
 #define DWC3_GUSB2PHYCFG_PHYSOFTRST            BIT31
+#define DWC3_GUSB2PHYCFG_U2_FREECLK_EXISTS     BIT30
+#define DWC3_GUSB2PHYCFG_USBTRDTIM(N)          (((N) & 0xf) << 10)
+#define DWC3_GUSB2PHYCFG_USBTRDTIM_MASK        DWC3_GUSB2PHYCFG_USBTRDTIM(0xf)
+#define DWC3_GUSB2PHYCFG_SUSPHY                BIT6
+#define DWC3_GUSB2PHYCFG_PHYIF                 BIT3
+#define DWC3_GUSB2PHYCFG_ENBLSLPM              BIT0
 
 /* Global USB3 PIPE Control Register */
 #define DWC3_GUSB3PIPECTL_PHYSOFTRST           BIT31
+#define DWC3_GUSB3PIPECTL_DEPOCHANGE           BIT18
 
 /* Global Frame Length Adjustment Register */
 #define GFLADJ_30MHZ_REG_SEL                   BIT7
@@ -49,6 +58,14 @@
 #define USB3_ENABLE_BEAT_BURST                 0xF
 #define USB3_ENABLE_BEAT_BURST_MASK            0xFF
 #define USB3_SET_BEAT_BURST_LIMIT              0xF00
+
+/* DCFG Register */
+#define DCFG_SPEED_MASK                        (BIT2|BIT1|BIT0)
+#define DCFG_SPEED_HS                          0
+#define DCFG_SPEED_FS                          1
+#define DCFG_SPEED_LS                          2
+#define DCFG_SPEED_SS                          4
+#define DCFG_SPEED_SS_PLUS                     5
 
 typedef struct {
   UINT32 GEvntAdrLo;
@@ -72,7 +89,7 @@ typedef struct {
   UINT32 GCtl;
   UINT32 Res1;
   UINT32 GSts;
-  UINT32 Res2;
+  UINT32 GUctl1;
   UINT32 GSnpsId;
   UINT32 GGpio;
   UINT32 GUid;

@@ -209,6 +209,7 @@ void
 EFIAPI
 Usb2PhyResume (void)
 {
+  MmioWrite32(0xfd5d0008, 0x20000000);
   MmioWrite32(0xfd5d4008, 0x20000000);
   MmioWrite32(0xfd5d8008, 0x20000000);
   MmioWrite32(0xfd5dc008, 0x20000000);
@@ -218,12 +219,13 @@ Usb2PhyResume (void)
 
 void
 EFIAPI
-UdPhyU3PortDisable (void)
+UsbDpPhyEnable (void)
 {
-  /* disable U3 port */
-  MmioWrite32 (0xfd5ac01c, 0xf08d0089);
-  MmioWrite32 (0xfd5ac034, 0xf08d0089);
-  /* remove rx-termination */
+  /* enable rx_lfps_en & usbdp_low_pwrn */
+  MmioWrite32(0xfd5c8004, 0x60006000);
+  MmioWrite32(0xfd5cc004, 0x60006000);
+  
+  /* remove rx-termination, we don't support SS yet */
   MmioWrite32 (0xfd5c800c, 0x00030001);
   MmioWrite32 (0xfd5cc00c, 0x00030001);
 }
