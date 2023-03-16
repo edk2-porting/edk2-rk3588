@@ -29,6 +29,8 @@ STATIC LIST_ENTRY mDisplayStateList;
 
 //STATIC DISPLAY_PROTOCOL mDisplayProtocol;
 
+STATIC EFI_CPU_ARCH_PROTOCOL *mCpu;
+
 typedef enum {
   ROCKCHIP_VOP2_CLUSTER0 = 0,
   ROCKCHIP_VOP2_CLUSTER1,
@@ -252,6 +254,7 @@ InitializeDisplay (
   EFI_STATUS                  Status;
   EFI_PHYSICAL_ADDRESS        VramBaseAddress;
   UINTN                       VramSize;
+  UINTN                       NumVramPages;
   DISPLAY_STATE               *StateInterate;
   CRTC_STATE                  *CrtcState;
   CONNECTOR_STATE             *ConnectorState;
@@ -260,8 +263,21 @@ InitializeDisplay (
   LCD_BPP                     LcdBpp;
   ROCKCHIP_CONNECTOR_PROTOCOL *Connector;
 
-  Status = DisplaySetFramebuffer (&VramBaseAddress, &VramSize);
+  VramSize = SIZE_128MB;
+  NumVramPages = EFI_SIZE_TO_PAGES (VramSize);
+
+  Status = gBS->AllocatePages (AllocateAnyPages, EfiRuntimeServicesData,
+                               NumVramPages, &VramBaseAddress);                      
   if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "Failed to allocate %u pages for framebuffer: %r\n", NumVramPages, Status));
+      goto EXIT;
+  }
+
+  Status = mCpu->SetMemoryAttributes (mCpu, VramBaseAddress,
+                                      ALIGN_VALUE (VramSize, EFI_PAGE_SIZE),
+                                      EFI_MEMORY_WC);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "Couldn't set framebuffer attributes: %r\n", Status));
     goto EXIT;
   }
 
@@ -405,6 +421,13 @@ LcdGraphicsOutputDxeInitialize (
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "LcdGraphicsOutputDxeInitialize: Can not install the protocol. Exit Status=%r\n", Status));
     goto EXIT;
+  }
+
+  Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL,
+                                (VOID**)&mCpu);
+  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
   InitializeListHead (&mDisplayStateList);

@@ -58,4 +58,4 @@
   gArmPlatformTokenSpaceGuid.PcdGopDisableOnExitBootServices
 
 [Depex]
-  TRUE
+  gEfiCpuArchProtocolGuid
