@@ -378,7 +378,7 @@
   Silicon/Rockchip/Library/DisplayLib/DwHdmiQpLib.inf
   Silicon/Rockchip/Drivers/LcdGraphicsOutputDxe/LcdGraphicsOutputDxe.inf
 
-  Platform/Rockchip/RK3588/LogoDxe/LogoDxe.inf
+  Platform/Radxa/Drivers/LogoDxe/LogoDxe.inf
 
   #
   # SCMI Driver
