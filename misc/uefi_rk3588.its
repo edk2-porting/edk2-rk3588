@@ -59,18 +59,6 @@
 				algo = "sha256";
 			};
 		};
-		// atf-4 {
-		// 	description = "ARM Trusted Firmware";
-		// 	data = /incbin/("./bl31_0xff001000.bin");
-		// 	type = "firmware";
-		// 	arch = "arm64";
-		// 	os = "arm-trusted-firmware";
-		// 	compression = "none";
-		// 	load = <0xff001000>;
-		// 	hash {
-		// 		algo = "sha256";
-		// 	};
-		// };
 		optee {
 			description = "OP-TEE";
 			data = /incbin/("./bl32.bin");
