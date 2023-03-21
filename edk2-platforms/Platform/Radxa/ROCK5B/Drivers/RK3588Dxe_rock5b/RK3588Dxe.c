@@ -226,15 +226,6 @@ MtcmosInit (
   //} while ((Data & PW_EN0_G3D) == 0);
 }
 
-STATIC
-VOID
-GmacIomuxInit (
-  IN VOID
-  )
-{
-  // do nothing - Rock 5B uses PCIE instead of GMAC for Ethernet
-}
-
 static struct regulator_init_data rk806_master[] = {
 	RK8XX_VOLTAGE_INIT(MASTER_BUCK1, 750000),
 	RK8XX_VOLTAGE_INIT(MASTER_BUCK2, 750000),
@@ -494,8 +485,6 @@ RK3588InitPeripherals (
   //   RK806RegulatorInit(rk806_slaver[i]);
 
   ComboPhyInit();
-
-  // GmacIomuxInit();
 
   return EFI_SUCCESS;
 }
