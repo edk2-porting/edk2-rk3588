@@ -261,7 +261,7 @@
   #
   # ComboPhy
   #
-  gRockchipTokenSpaceGuid.PcdComboPhyMode|{ $(CP_SATA), $(CP_PCIE), $(CP_USB3) }
+  gRockchipTokenSpaceGuid.PcdComboPhyMode|{ $(CP_PCIE), $(CP_PCIE), $(CP_USB3) }
 
   #  BIT0  - Initialization message.<BR>
   #  BIT1  - Warning message.<BR>
