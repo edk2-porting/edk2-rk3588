@@ -232,8 +232,7 @@ GmacIomuxInit (
   IN VOID
   )
 {
-  DEBUG((EFI_D_WARN, "RK3588InitPeripherals: GmacIomuxInit()\n"));
-  GmacIomux(0);
+  // do nothing - Rock 5B uses PCIE instead of GMAC for Ethernet
 }
 
 static struct regulator_init_data rk806_master[] = {
