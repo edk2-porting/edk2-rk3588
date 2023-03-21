@@ -10,7 +10,7 @@ function _help(){
 	echo "	--all, -a:               build all devices."
 	echo "	--release MODE, -r MODE: Release mode for building, default is 'DEBUG', 'RELEASE' alternatively."
 	echo "	--toolchain TOOLCHAIN:   Set toolchain, default is 'GCC5'."
-	# echo " 	--skip-rootfs-gen:       skip generating SimpleInit rootfs to speed up building."
+	echo " 	--skip-rootfs-gen:       skip generating SimpleInit rootfs to speed up building."
 	echo "	--clean, -C:             clean workspace and output."
 	echo "	--distclean, -D:         clean up all files that are not in repo."
 	echo "	--outputdir, -O:         output folder."
@@ -161,44 +161,44 @@ then
 	set +e
 fi
 
-# for i in "${SIMPLE_INIT}" Platform/RenegadePkg/Library/SimpleInit ./simple-init ../simple-init
-# do
-# 	if [ -n "${i}" ]&&[ -f "${i}/SimpleInit.inc" ]
-# 	then
-# 		_SIMPLE_INIT="$(realpath "${i}")"
-# 		break
-# 	fi
-# done
+for i in "${SIMPLE_INIT}" ./simple-init ../simple-init
+do
+	if [ -n "${i}" ]&&[ -f "${i}/SimpleInit.inc" ]
+	then
+		_SIMPLE_INIT="$(realpath "${i}")"
+		break
+	fi
+done
 
-# [ -n "${_SIMPLE_INIT}" ]||_error "SimpleInit not found, please see README.md"
+[ -n "${_SIMPLE_INIT}" ]||_error "SimpleInit not found, please see README.md"
 [ -f "configs/${DEVICE}.conf" ]||_error "Device configuration not found"
 
 export CROSS_COMPILE="${CROSS_COMPILE:-aarch64-linux-gnu-}"
 export GCC5_AARCH64_PREFIX="${CROSS_COMPILE}"
 export CLANG38_AARCH64_PREFIX="${CROSS_COMPILE}"
 # export PACKAGES_PATH="$_EDK2:$_EDK2_PLATFORMS:$_SIMPLE_INIT:$PWD"
-export PACKAGES_PATH="${ROOTDIR}/edk2:${ROOTDIR}/edk2-platforms:${ROOTDIR}/edk2-non-osi:${ROOTDIR}"
+export PACKAGES_PATH="${ROOTDIR}/edk2:${ROOTDIR}/edk2-platforms:${ROOTDIR}/edk2-non-osi:${ROOTDIR}:${_SIMPLE_INIT}"
 export WORKSPACE="${OUTDIR}/workspace"
 GITCOMMIT="$(git describe --tags --always)"||GITCOMMIT="unknown"
 export GITCOMMIT
 set -e
 
-# mkdir -p "${_SIMPLE_INIT}/build" "${_SIMPLE_INIT}/root/usr/share/locale"
-# for i in "${_SIMPLE_INIT}/po/"*.po
-# do
-# 	[ -f "${i}" ]||continue
-# 	_name="$(basename "$i" .po)"
-# 	_path="${_SIMPLE_INIT}/root/usr/share/locale/${_name}/LC_MESSAGES"
-# 	mkdir -p "${_path}"
-# 	msgfmt -o "${_path}/simple-init.mo" "${i}"
-# done
+mkdir -p "${_SIMPLE_INIT}/build" "${_SIMPLE_INIT}/root/usr/share/locale"
+for i in "${_SIMPLE_INIT}/po/"*.po
+do
+	[ -f "${i}" ]||continue
+	_name="$(basename "$i" .po)"
+	_path="${_SIMPLE_INIT}/root/usr/share/locale/${_name}/LC_MESSAGES"
+	mkdir -p "${_path}"
+	msgfmt -o "${_path}/simple-init.mo" "${i}"
+done
 
-# if "${GEN_ROOTFS}"
-# then
-# 	 bash "${_SIMPLE_INIT}/scripts/gen-rootfs-source.sh" \
-# 		"${_SIMPLE_INIT}" \
-# 		"${_SIMPLE_INIT}/build"
-# fi
+if "${GEN_ROOTFS}"
+then
+	 bash "${_SIMPLE_INIT}/scripts/gen-rootfs-source.sh" \
+		"${_SIMPLE_INIT}" \
+		"${_SIMPLE_INIT}/build"
+fi
 
 if [ "${DEVICE}" == "all" ]
 then

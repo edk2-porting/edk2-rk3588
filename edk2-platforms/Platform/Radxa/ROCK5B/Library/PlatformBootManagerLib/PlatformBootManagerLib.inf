@@ -34,7 +34,7 @@
   MdePkg/MdePkg.dec
   ShellPkg/ShellPkg.dec
   Platform/Radxa/ROCK5B/ROCK5B.dec
-  # SimpleInit.dec
+  SimpleInit.dec
 
 [LibraryClasses]
   BaseLib
@@ -82,7 +82,7 @@
   gEfiEndOfDxeEventGroupGuid
   gEfiTtyTermGuid
   gUefiShellFileGuid
-  # gSimpleInitFileGuid
+  gSimpleInitFileGuid
   gMaskromFileGuid
 
 [Protocols]

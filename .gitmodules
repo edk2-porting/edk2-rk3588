@@ -1,0 +1,4 @@
+[submodule "simple-init"]
+	path = simple-init
+	url = https://github.com/BigfootACA/simple-init.git
+	branch = master

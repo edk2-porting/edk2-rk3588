@@ -43,7 +43,7 @@ NumBlocks     = 0x800
 # RegionType <FV, DATA, or FILE>
 #
 ################################################################################
-0x00200000|0x00100000
+0x00200000|0x00500000
 gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvSize
 FV = BL33_AP_UEFI
 
@@ -326,6 +326,11 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
   INF MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
   INF MdeModulePkg/Application/UiApp/UiApp.inf
+
+  #
+  # Simple Init GUI
+  #
+  INF src/main/SimpleInitMain.inf
 
 [FV.BL33_AP_UEFI]
 FvAlignment        = 8

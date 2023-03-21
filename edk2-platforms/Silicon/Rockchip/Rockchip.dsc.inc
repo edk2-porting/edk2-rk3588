@@ -224,6 +224,7 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
 
 [BuildOptions]
 #  RVCT:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG
+  *_*_*_CC_FLAGS = -DDEFAULT_DARK
   *_GCC5_AARCH64_CC_FLAGS  = -Wno-error=uninitialized -Wno-error=stringop-overflow -Wno-error=unused-function -Wno-error=unused-variable
 
 [BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER]
