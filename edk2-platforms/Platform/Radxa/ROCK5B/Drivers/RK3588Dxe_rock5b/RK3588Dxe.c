@@ -571,13 +571,15 @@ GetPlatformBootOptionsAndKeys (
   EFI_STATUS                             Status;
   UINTN                                  Size;
 
-  Size = sizeof (EFI_BOOT_MANAGER_LOAD_OPTION) * HIKEY_BOOT_OPTION_NUM;
+  *BootCount = 4;
+
+  Size = sizeof (EFI_BOOT_MANAGER_LOAD_OPTION) * *BootCount;
   *BootOptions = (EFI_BOOT_MANAGER_LOAD_OPTION *)AllocateZeroPool (Size);
   if (*BootOptions == NULL) {
     DEBUG ((DEBUG_ERROR, "Failed to allocate memory for BootOptions\n"));
     return EFI_OUT_OF_RESOURCES;
   }
-  Size = sizeof (EFI_INPUT_KEY) * HIKEY_BOOT_OPTION_NUM;
+  Size = sizeof (EFI_INPUT_KEY) * *BootCount;
   *BootKeys = (EFI_INPUT_KEY *)AllocateZeroPool (Size);
   if (*BootKeys == NULL) {
     DEBUG ((DEBUG_ERROR, "Failed to allocate memory for BootKeys\n"));
@@ -622,8 +624,6 @@ GetPlatformBootOptionsAndKeys (
   ASSERT_EFI_ERROR (Status);
   (*BootKeys)[3].ScanCode = SCAN_NULL;
   (*BootKeys)[3].UnicodeChar = 'f';
-
-  *BootCount = 4;
 
   return EFI_SUCCESS;
 Error:
