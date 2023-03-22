@@ -43,7 +43,7 @@ NumBlocks     = 0x800
 # RegionType <FV, DATA, or FILE>
 #
 ################################################################################
-0x00200000|0x00500000
+0x00200000|0x00100000
 gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvSize
 FV = BL33_AP_UEFI
 
@@ -131,7 +131,7 @@ READ_LOCK_STATUS   = TRUE
   #
   INF MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
   INF MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
-  INF RuleOverride = ACPITABLE Platform/Radxa/ROCK5B/AcpiTables/AcpiTables.inf
+  INF RuleOverride = ACPITABLE Platform/OrangePi/OrangePi5/AcpiTables/AcpiTables.inf
 
   #
   # Device tree
@@ -167,14 +167,14 @@ READ_LOCK_STATUS   = TRUE
   #INF Silicon/Rockchip/Library/DisplayLib/AnalogixDpLib.inf
   INF Silicon/Rockchip/Library/DisplayLib/DwHdmiQpLib.inf
   INF Silicon/Rockchip/Drivers/LcdGraphicsOutputDxe/LcdGraphicsOutputDxe.inf
-  INF Platform/Radxa/Drivers/LogoDxe/LogoDxe.inf
+  INF Platform/Rockchip/RK3588/LogoDxe/LogoDxe.inf
 
-  INF Platform/Radxa/ROCK5B/Drivers/RK3588Dxe_rock5b/RK3588Dxe.inf
+  INF Platform/OrangePi/OrangePi5/Drivers/RK3588Dxe_opi5/RK3588Dxe.inf
 
   #
   # SMBIOS Support
   #
-  INF Platform/Radxa/ROCK5B/Drivers/PlatformSmbiosDxe/PlatformSmbiosDxe.inf
+  INF Platform/OrangePi/OrangePi5/Drivers/PlatformSmbiosDxe/PlatformSmbiosDxe.inf
   INF MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
 
   #
@@ -234,14 +234,14 @@ READ_LOCK_STATUS   = TRUE
 
 
   #PCIe
-  INF Silicon/Rockchip/Drivers/PciPlatform/PcieInitDxe.inf
+  #INF Silicon/Rockchip/Drivers/PciPlatform/PcieInitDxe.inf
 
   # Required by PCI
   INF ArmPkg/Drivers/ArmPciCpuIo2Dxe/ArmPciCpuIo2Dxe.inf
 
   # PCI Support
   INF MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
-  INF MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
+  #INF MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
   INF MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
   #INF MdeModulePkg/Bus/Pci/NvmExpressPei/NvmExpressPei.inf
 
@@ -278,7 +278,7 @@ READ_LOCK_STATUS   = TRUE
   #
   # INF Silicon/Synopsys/DesignWare/Drivers/DwEmmcDxe/DwEmmcDxe.inf
   INF Silicon/Rockchip/Drivers/MmcDxe/MmcDxe.inf
-  INF Platform/Radxa/ROCK5B/Drivers/DwEmmcDxe/DwEmmcDxe.inf
+  # INF Silicon/Rockchip/Drivers/DwEmmcDxe/DwEmmcDxe.inf
   
   # Needs to be disabled if booting from eMMC
   # INF Silicon/Rockchip/Drivers/SdhciHostDxe/SdhciHostDxe.inf
@@ -326,11 +326,6 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
   INF MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
   INF MdeModulePkg/Application/UiApp/UiApp.inf
-
-  #
-  # Simple Init GUI
-  #
-  INF src/main/SimpleInitMain.inf
 
 [FV.BL33_AP_UEFI]
 FvAlignment        = 8

@@ -44,17 +44,14 @@ void
 EFIAPI
 DwEmmcDxeIoMux(void)
 {
-  /* sdmmc0 iomux (microSD socket) */
-  BUS_IOC->GPIO4D_IOMUX_SEL_L = (0xFFFFUL << 16) | (0x1111); //SDMMC_D0,SDMMC_D1,SDMMC_D2,SDMMC_D3
-  BUS_IOC->GPIO4D_IOMUX_SEL_H = (0x00FFUL << 16) | (0x0011); //SDMMC_CLK,SDMMC_CMD
-  PMU1_IOC->GPIO0A_IOMUX_SEL_H = (0x000FUL << 16) | (0x0001); //SDMMC_DET
+  /* sdmmc0 iomux */
 }
 
 void
 EFIAPI
 SdhciEmmcDxeIoMux(void)
 {
-  /* sdhci0 iomux (eMMC socket) */
+  /* sdmmc0 iomux */
   BUS_IOC->GPIO2A_IOMUX_SEL_L = (0xFFFFUL << 16) | (0x1111); //EMMC_CMD,EMMC_CLKOUT,EMMC_DATASTROBE,EMMC_RSTN
   BUS_IOC->GPIO2D_IOMUX_SEL_L = (0xFFFFUL << 16) | (0x1111); //EMMC_D0,EMMC_D1,EMMC_D2,EMMC_D3
   BUS_IOC->GPIO2D_IOMUX_SEL_H = (0xFFFFUL << 16) | (0x1111); //EMMC_D4,EMMC_D5,EMMC_D6,EMMC_D7
@@ -190,13 +187,13 @@ EFIAPI
 UsbPortPowerEnable (void)
 {
   DEBUG((EFI_D_WARN, "UsbPortPowerEnable called\n"));
-  /* Set GPIO4 PB0 (USB_HOST_PWREN) output high to power USB ports */
-  GpioPinWrite (4, GPIO_PIN_PB0, TRUE);
-  GpioPinSetDirection (4, GPIO_PIN_PB0, GPIO_PIN_OUTPUT);
+  /* Set GPIO3 PC0 (TYPEC_EN) output high to power Type-C/USB2.0 ports */
+  GpioPinWrite (3, GPIO_PIN_PC0, TRUE);
+  GpioPinSetDirection (3, GPIO_PIN_PC0, GPIO_PIN_OUTPUT);
 
-  // DEBUG((EFI_D_WARN, "Trying to enable blue led\n"));
-  // GpioPinWrite (0, GPIO_PIN_PB7, TRUE);
-  // GpioPinSetDirection (0, GPIO_PIN_PB7, GPIO_PIN_OUTPUT);
+  // DEBUG((EFI_D_WARN, "Trying to enable green led\n"));
+  // GpioPinWrite (1, GPIO_PIN_PA2, TRUE);
+  // GpioPinSetDirection (1, GPIO_PIN_PA2, GPIO_PIN_OUTPUT);
 }
 
 void

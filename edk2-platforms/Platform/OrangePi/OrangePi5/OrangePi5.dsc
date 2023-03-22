@@ -11,7 +11,7 @@
 #
 ################################################################################
 [Defines]
-  PLATFORM_NAME                  = ROCK5B
+  PLATFORM_NAME                  = OrangePi5
   PLATFORM_GUID                  = d080df36-45e7-11ec-9726-f42a7dcb925d
   PLATFORM_VERSION               = 0.2
   DSC_SPECIFICATION              = 0x00010019
@@ -19,7 +19,7 @@
   SUPPORTED_ARCHITECTURES        = AARCH64
   BUILD_TARGETS                  = DEBUG|RELEASE
   SKUID_IDENTIFIER               = DEFAULT
-  FLASH_DEFINITION               = Platform/Radxa/ROCK5B/ROCK5B.fdf
+  FLASH_DEFINITION               = Platform/OrangePi/OrangePi5/OrangePi5.fdf
 
   DEFINE CONFIG_NO_DEBUGLIB      = TRUE
 
@@ -39,7 +39,6 @@
   DEFINE NETWORK_VLAN_ENABLE            = FALSE
 !include Silicon/Rockchip/Rockchip.dsc.inc
 !include MdePkg/MdeLibs.dsc.inc
-!include SimpleInit.inc
 
 [LibraryClasses.common]
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
@@ -67,8 +66,8 @@
 
   # PCIe
   PciSegmentLib|MdePkg/Library/BasePciSegmentLibPci/BasePciSegmentLibPci.inf
-  PciHostBridgeLib|Silicon/Rockchip/Library/PciHostBridgeLib/PciHostBridgeLib.inf
-  PciExpressLib|Silicon/Rockchip/Library/PciExpressLib/PciExpressLib.inf
+  #PciHostBridgeLib|Silicon/Rockchip/Library/PciHostBridgeLib/PciHostBridgeLib.inf
+  #PciExpressLib|Silicon/Rockchip/Library/PciExpressLib/PciExpressLib.inf
   PciLib|MdePkg/Library/BasePciLibPciExpress/BasePciLibPciExpress.inf
 
 
@@ -90,7 +89,7 @@
   # Custom libraries
   #
   ArmPlatformLib|Platform/Radxa/ROCK5B/Library/PlatformLib/PlatformLib.inf
-  RockchipPlatformLib|Platform/Radxa/ROCK5B/Library/RockchipPlatformLib/RockchipPlatformLib.inf
+  RockchipPlatformLib|Platform/OrangePi/OrangePi5/Library/RockchipPlatformLib/RockchipPlatformLib.inf
   ResetSystemLib|Platform/Radxa/ROCK5B/Library/ResetSystemLib/ResetSystemLib.inf
   PlatformBootManagerLib|Platform/Radxa/ROCK5B/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
   SerialPortLib|Platform/Radxa/ROCK5B/Library/Dw8250SerialPortLib/Dw8250SerialPortLib.inf
@@ -108,7 +107,7 @@
   PrePiHobListPointerLib|ArmPlatformPkg/Library/PrePiHobListPointerLib/PrePiHobListPointerLib.inf
 
 [LibraryClasses.common.DXE_RUNTIME_DRIVER]
-  RockchipPlatformLib|Platform/Radxa/ROCK5B/Library/RockchipPlatformLib/RockchipPlatformLib.inf
+  RockchipPlatformLib|Platform/OrangePi/OrangePi5/Library/RockchipPlatformLib/RockchipPlatformLib.inf
 
 [BuildOptions]
   GCC:*_*_*_PLATFORM_FLAGS = -I$(WORKSPACE)/Silicon/Rockchip/RK3588/Include -I$(WORKSPACE)/Platform/Rockchip/RK3588/Include -I$(WORKSPACE)/Silicon/Rockchip/Include
@@ -244,7 +243,7 @@
   #
   # Make VariableRuntimeDxe work at emulated non-volatile variable mode.
   #
-  # gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable|TRUE
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable|TRUE
 
   # ACPI Enable
   gRK3588TokenSpaceGuid.AcpiEnable|TRUE
@@ -261,7 +260,7 @@
   #
   # ComboPhy
   #
-  gRockchipTokenSpaceGuid.PcdComboPhyMode|{ $(CP_PCIE), $(CP_PCIE), $(CP_USB3) }
+  gRockchipTokenSpaceGuid.PcdComboPhyMode|{ $(CP_SATA), $(CP_PCIE), $(CP_USB3) }
 
   #  BIT0  - Initialization message.<BR>
   #  BIT1  - Warning message.<BR>
@@ -349,13 +348,13 @@
   MdeModulePkg/Universal/SerialDxe/SerialDxe.inf
 
   #PCIe
-  Silicon/Rockchip/Library/PciExpressLib/PciExpressLib.inf
-  Silicon/Rockchip/Library/PciHostBridgeLib/PciHostBridgeLib.inf
-  Silicon/Rockchip/Drivers/PciPlatform/PcieInitDxe.inf
+  #Silicon/Rockchip/Library/PciExpressLib/PciExpressLib.inf
+  #Silicon/Rockchip/Library/PciHostBridgeLib/PciHostBridgeLib.inf
+  #Silicon/Rockchip/Drivers/PciPlatform/PcieInitDxe.inf
   ArmPkg/Drivers/ArmPciCpuIo2Dxe/ArmPciCpuIo2Dxe.inf
 
   MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
-  MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
+  #MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
   MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
   #MdeModulePkg/Bus/Pci/NvmExpressPei/NvmExpressPei.inf
   MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
@@ -379,7 +378,7 @@
   Silicon/Rockchip/Library/DisplayLib/DwHdmiQpLib.inf
   Silicon/Rockchip/Drivers/LcdGraphicsOutputDxe/LcdGraphicsOutputDxe.inf
 
-  Platform/Radxa/Drivers/LogoDxe/LogoDxe.inf
+  Platform/Rockchip/RK3588/LogoDxe/LogoDxe.inf
 
   #
   # SCMI Driver
@@ -391,7 +390,7 @@
   #
   MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
   MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
-  Platform/Radxa/ROCK5B/AcpiTables/AcpiTables.inf
+  Platform/OrangePi/OrangePi5/AcpiTables/AcpiTables.inf
 
   #
   # Device tree
@@ -423,7 +422,7 @@
   #EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
   #Silicon/Synopsys/DesignWare/Drivers/DwEmmcDxe/DwEmmcDxe.inf
   Silicon/Rockchip/Drivers/MmcDxe/MmcDxe.inf
-  Platform/Radxa/ROCK5B/Drivers/DwEmmcDxe/DwEmmcDxe.inf
+  #Silicon/Rockchip/Drivers/DwEmmcDxe/DwEmmcDxe.inf
   Silicon/Rockchip/Drivers/SdhciHostDxe/SdhciHostDxe.inf
 
   #
@@ -448,7 +447,7 @@
   #
   # SMBIOS Support
   #
-  Platform/Radxa/ROCK5B/Drivers/PlatformSmbiosDxe/PlatformSmbiosDxe.inf
+  Platform/OrangePi/OrangePi5/Drivers/PlatformSmbiosDxe/PlatformSmbiosDxe.inf
   MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
   
   #
@@ -578,5 +577,5 @@
   Platform/Radxa/ROCK5B/Applications/maskrom/maskrom.inf
 
   # Platform drivers
-  Platform/Radxa/ROCK5B/Drivers/RK3588Dxe_rock5b/RK3588Dxe.inf
+  Platform/OrangePi/OrangePi5/Drivers/RK3588Dxe_opi5/RK3588Dxe.inf
 
