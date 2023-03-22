@@ -278,7 +278,7 @@ READ_LOCK_STATUS   = TRUE
   #
   # INF Silicon/Synopsys/DesignWare/Drivers/DwEmmcDxe/DwEmmcDxe.inf
   INF Silicon/Rockchip/Drivers/MmcDxe/MmcDxe.inf
-  # INF Silicon/Rockchip/Drivers/DwEmmcDxe/DwEmmcDxe.inf
+  INF Platform/Radxa/ROCK5B/Drivers/DwEmmcDxe/DwEmmcDxe.inf
   
   # Needs to be disabled if booting from eMMC
   # INF Silicon/Rockchip/Drivers/SdhciHostDxe/SdhciHostDxe.inf

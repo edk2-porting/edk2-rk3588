@@ -1,0 +1,48 @@
+#/** @file
+# Framework Module Development Environment Industry Standards
+#
+# This Package provides headers and libraries that conform to EFI/PI Industry standards.
+# Copyright (c) 2007, Intel Corporation. All rights reserved.<BR>
+# Copyright (c) 2012-2014, ARM Ltd. All rights reserved.<BR>
+# Copyright (c) 2015-2017, Linaro. All rights reserved.<BR>
+# Copyright (c) 2017, Rockchip Inc. All rights reserved.<BR>
+#
+#    This program and the accompanying materials are licensed and made available under
+#    the terms and conditions of the BSD License which accompanies this distribution.
+#    The full text of the license may be found at
+#    http://opensource.org/licenses/bsd-license.php
+#
+#    THE PROGRAM IS DISTRIBUTED UNDER THE BSD LICENSE ON AN "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR REPRESENTATIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED.
+#
+#**/
+
+[Defines]
+  DEC_SPECIFICATION              = 1.27
+  PACKAGE_NAME                   = DesignWarePkg
+  PACKAGE_GUID                   = 91eba445-28f3-47ce-9570-87bc701f336c
+  PACKAGE_VERSION                = 0.1
+
+################################################################################
+#
+# Include Section - list of Include Paths that are provided by this package.
+#                   Comments are used for Keywords and Module Types.
+#
+# Supported Module Types:
+#  BASE SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
+#
+################################################################################
+
+[Guids.common]
+  gDesignWareTokenSpaceGuid       = { 0x6fdd76a9, 0xf220, 0x4f1d,  { 0x9c, 0xcf, 0xbc, 0x2d, 0x68, 0x29, 0xab, 0x9c }}
+
+[PcdsFixedAtBuild.common]
+  #
+  # Permit the use of obsolete drivers in this package
+  #
+  gDesignWareTokenSpaceGuid.PcdDwPermitObsoleteDrivers|FALSE|BOOLEAN|0x00000001
+
+  gDesignWareTokenSpaceGuid.PcdDwEmmcDxeBaseAddress|0x0|UINT32|0x00000002
+  gDesignWareTokenSpaceGuid.PcdDwEmmcDxeClockFrequencyInHz|0x0|UINT32|0x00000003
+  gDesignWareTokenSpaceGuid.PcdDwEmmcDxeMaxClockFreqInHz|0x0|UINT32|0x00000004
+  gDesignWareTokenSpaceGuid.PcdDwEmmcDxeFifoDepth|0x0|UINT32|0x00000005
