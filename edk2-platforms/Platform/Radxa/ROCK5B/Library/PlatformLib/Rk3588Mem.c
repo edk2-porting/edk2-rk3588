@@ -113,6 +113,24 @@ ArmPlatformGetVirtualMemoryMap (
   VirtualMemoryTable[Index].Attributes      = ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED;
   VirtualMemoryInfo[Index].Type             = RK3588_MEM_RESERVED_REGION;
   VirtualMemoryInfo[Index++].Name           = L"SCMI";
+
+  if (mSystemMemoryBase + mSystemMemorySize > 0x3fc000000UL) {
+    // Bad memory range 1
+    VirtualMemoryTable[Index].PhysicalBase    = 0x3fc000000;
+    VirtualMemoryTable[Index].VirtualBase     = VirtualMemoryTable[Index].PhysicalBase;
+    VirtualMemoryTable[Index].Length          = 0x500000;
+    VirtualMemoryTable[Index].Attributes      = ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED;
+    VirtualMemoryInfo[Index].Type             = RK3588_MEM_RESERVED_REGION;
+    VirtualMemoryInfo[Index++].Name           = L"BAD1";
+
+    // Bad memory range 2
+    VirtualMemoryTable[Index].PhysicalBase    = 0x3fff00000;
+    VirtualMemoryTable[Index].VirtualBase     = VirtualMemoryTable[Index].PhysicalBase;
+    VirtualMemoryTable[Index].Length          = 0x100000;
+    VirtualMemoryTable[Index].Attributes      = ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED;
+    VirtualMemoryInfo[Index].Type             = RK3588_MEM_RESERVED_REGION;
+    VirtualMemoryInfo[Index++].Name           = L"BAD2";
+  }
   
   // Firmware Volume
   // VirtualMemoryTable[Index].PhysicalBase    = FixedPcdGet64 (PcdFdBaseAddress);
