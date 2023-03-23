@@ -15,6 +15,7 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
 #include <Library/Rk3588Mem.h>
+#include <Library/SdramLib.h>
 
 UINT64 mSystemMemoryBase = FixedPcdGet64 (PcdSystemMemoryBase);
 STATIC UINT64 mSystemMemorySize = FixedPcdGet64 (PcdSystemMemorySize);
@@ -45,8 +46,8 @@ ArmPlatformGetVirtualMemoryMap (
   UINTN                         Index = 0;
   ARM_MEMORY_REGION_DESCRIPTOR  *VirtualMemoryTable;
 
-  mSystemMemorySize = PcdGet64 (PcdTotalMemorySize);
-  DEBUG ((DEBUG_INFO, "RAM: 0x%ll08X (FIXED Size 0x%ll08X)\n", mSystemMemoryBase, mSystemMemorySize));
+  mSystemMemorySize = SdramGetMemorySize ();
+  DEBUG ((DEBUG_INFO, "RAM: 0x%ll08X (Size 0x%ll08X)\n", mSystemMemoryBase, mSystemMemorySize));
 
   VirtualMemoryTable = (ARM_MEMORY_REGION_DESCRIPTOR*)AllocatePages
                        (EFI_SIZE_TO_PAGES (sizeof (ARM_MEMORY_REGION_DESCRIPTOR) *

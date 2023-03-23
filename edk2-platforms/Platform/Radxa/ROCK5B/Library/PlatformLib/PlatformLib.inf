@@ -34,6 +34,7 @@
   MemoryAllocationLib
   PcdLib
   PrintLib
+  SdramLib
 
 [Sources.common]
   Rk3588.c
@@ -52,7 +53,6 @@
   gArmTokenSpaceGuid.PcdArmPrimaryCoreMask
   gArmTokenSpaceGuid.PcdArmPrimaryCore
   gArmTokenSpaceGuid.PcdFdSize
-  gRK3588TokenSpaceGuid.PcdTotalMemorySize
   
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialClockRate

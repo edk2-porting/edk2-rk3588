@@ -50,6 +50,7 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/PrintLib.h>
+#include <Library/SdramLib.h>
 #define ASSET_TAG_STR_STORAGE_SIZE  33
 #define SMB_IS_DIGIT(c)  (((c) >= '0') && ((c) <= '9'))
 
@@ -1023,7 +1024,7 @@ MemArrMapInfoUpdateSmbiosType19 (
   // The memory layout used in all known Pi SoC's starts at 0
   mMemArrMapInfoType19.StartingAddress = 0;
   mMemArrMapInfoType19.EndingAddress = 1024 * 1024;
-  mMemArrMapInfoType19.EndingAddress = 8192 * 1024;
+  mMemArrMapInfoType19.EndingAddress = SdramGetMemorySize () / 1024;
   mMemArrMapInfoType19.EndingAddress -= 1;
 
   LogSmbiosData ((EFI_SMBIOS_TABLE_HEADER*)&mMemArrMapInfoType19, mMemArrMapInfoType19Strings, NULL);
