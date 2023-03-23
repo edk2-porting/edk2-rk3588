@@ -1,0 +1,36 @@
+#/** @file
+#
+#  Rockchip SDRAM Library.
+#
+#  Copyright (c) 2022, Jared McNeill <jmcneill@invisible.ca>
+#  Copyright (c) 2023, Gábor Stefanik <netrolller.3d@gmail.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = SdramLib
+  FILE_GUID                      = F1722CDD-AB5E-4341-8E98-C04CA151D5FB
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SdramLib
+
+[Sources]
+  SdramLib.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  Silicon/Rockchip/Rk3588/Rk3588.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  IoLib
+
+[FixedPcd]
+
+[Guids]
