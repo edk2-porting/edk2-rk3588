@@ -1,0 +1,80 @@
+name: Build
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  prepare_release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Get time
+        id: time
+        uses: nanzm/get-time-action@v1.1
+        with:
+          format: 'YYYYMMDD-HHmm'
+      - name: Create empty release
+        id: release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.time.outputs.time }}
+          body_path: README.md
+          token: ${{ secrets.GITHUB_TOKEN }}
+          target_commitish: master
+          draft: false
+    outputs:
+      release_id: ${{ steps.release.outputs.id }}
+  build:
+    runs-on: ubuntu-latest
+    needs: prepare_release
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install and cache packages
+        uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: luajit
+          version: 1.0
+      - name: Submodule init
+        shell: bash
+        run: |
+          git submodule init
+          git submodule update
+      - name: Install deps
+        shell: bash
+        run: |
+          sudo apt-get install -y \
+          acpica-tools \
+          binutils-aarch64-linux-gnu \
+          build-essential \
+          device-tree-compiler \
+          git \
+          gcc-11-aarch64-linux-gnu \
+          libc6-dev-arm64-cross \
+          python3 \
+          python3-pyelftools
+      - name: Install deps
+        shell: bash
+        run: |
+          ./build.sh -d rock-5b
+      - name: Upload
+        uses: xresloader/upload-to-github-release@v1
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ needs.prepare_release.outputs.release_id }}
+          file: "./*.img"
+          draft: false
+      - name: Rollback release
+        if: failure()
+        uses: author/action-rollback@stable
+        env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          release_id: ${{ needs.prepare_release.outputs.release_id }}
