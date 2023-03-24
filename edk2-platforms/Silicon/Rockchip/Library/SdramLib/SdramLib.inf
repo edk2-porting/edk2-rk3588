@@ -24,7 +24,7 @@
   ArmPkg/ArmPkg.dec
   MdePkg/MdePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
-  Silicon/Rockchip/Rk3588/Rk3588.dec
+  Silicon/Rockchip/RK3588/RK3588.dec
 
 [LibraryClasses]
   BaseLib
