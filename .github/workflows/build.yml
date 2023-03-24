@@ -45,8 +45,7 @@ jobs:
       - name: Submodule init
         shell: bash
         run: |
-          git submodule init
-          git submodule update
+          git submodule update --init --recursive
       - name: Install deps
         shell: bash
         run: |
