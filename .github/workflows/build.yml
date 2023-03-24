@@ -57,7 +57,7 @@ jobs:
           device-tree-compiler \
           gettext \
           git \
-          gcc-11-aarch64-linux-gnu \
+          gcc-aarch64-linux-gnu \
           libc6-dev-arm64-cross \
           python3 \
           python3-pyelftools
