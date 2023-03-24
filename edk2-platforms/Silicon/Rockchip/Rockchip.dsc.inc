@@ -59,6 +59,9 @@
 
   # ResetSystemLib|ArmPkg/Library/ArmSmcPsciResetSystemLib/ArmSmcPsciResetSystemLib.inf # Modified
 
+  # SDRAM detection Library
+  SdramLib|Silicon/Rockchip/Library/SdramLib/SdramLib.inf
+
   # SPI Driver
   SpiLib|Silicon/Rockchip/Library/SpiLib/SpiLib.inf
   RK806|Silicon/Rockchip/Library/SpiLib/RK806.inf
