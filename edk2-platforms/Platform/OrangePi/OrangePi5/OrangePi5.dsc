@@ -42,6 +42,7 @@
 
 [LibraryClasses.common]
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
+  ArmPlatformLib|Silicon/Rockchip/RK3588/Library/PlatformLib/PlatformLib.inf
   AcpiLib|EmbeddedPkg/Library/AcpiLib/AcpiLib.inf
   CruLib|Silicon/Rockchip/Library/CruLib/CruLib.inf
 
@@ -88,7 +89,6 @@
   #
   # Custom libraries
   #
-  ArmPlatformLib|Platform/Radxa/ROCK5B/Library/PlatformLib/PlatformLib.inf
   RockchipPlatformLib|Platform/OrangePi/OrangePi5/Library/RockchipPlatformLib/RockchipPlatformLib.inf
   ResetSystemLib|Platform/Radxa/ROCK5B/Library/ResetSystemLib/ResetSystemLib.inf
   PlatformBootManagerLib|Platform/Radxa/ROCK5B/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
