@@ -55,6 +55,7 @@ jobs:
           binutils-aarch64-linux-gnu \
           build-essential \
           device-tree-compiler \
+          gettext \
           git \
           gcc-11-aarch64-linux-gnu \
           libc6-dev-arm64-cross \
