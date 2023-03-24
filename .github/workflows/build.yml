@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - master
+      - github-workflow
 
 jobs:
   prepare_release:
