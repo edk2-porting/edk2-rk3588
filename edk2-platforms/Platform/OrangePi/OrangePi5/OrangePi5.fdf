@@ -185,7 +185,7 @@ READ_LOCK_STATUS   = TRUE
   #
   # USB Ohci Controller
   #
-  #INF Silicon/Rockchip/Drivers/OhciDxe/OhciDxe.inf
+  INF Silicon/Rockchip/Drivers/OhciDxe/OhciDxe.inf
 
   #
   # USB Dwc3 Controller

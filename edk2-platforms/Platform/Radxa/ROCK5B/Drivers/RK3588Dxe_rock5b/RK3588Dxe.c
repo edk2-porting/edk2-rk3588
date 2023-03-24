@@ -486,6 +486,12 @@ RK3588InitPeripherals (
 
   ComboPhyInit();
 
+  /* Enable USB PHYs */
+  Usb2PhyResume (); 
+  UsbDpPhyEnable ();
+  
+  UsbPortPowerEnable ();
+  
   return EFI_SUCCESS;
 }
 

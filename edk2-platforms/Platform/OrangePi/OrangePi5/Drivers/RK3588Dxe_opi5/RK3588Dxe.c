@@ -498,6 +498,12 @@ RK3588InitPeripherals (
 
   // GmacIomuxInit();
 
+  /* Enable USB PHYs */
+  Usb2PhyResume (); 
+  UsbDpPhyEnable ();
+  
+  UsbPortPowerEnable ();
+
   return EFI_SUCCESS;
 }
 

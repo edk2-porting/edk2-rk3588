@@ -453,7 +453,7 @@
   #
   # USB Ohci Controller
   #
-  #Silicon/Rockchip/Drivers/OhciDxe/OhciDxe.inf
+  Silicon/Rockchip/Drivers/OhciDxe/OhciDxe.inf
 
   #
   # USB Ehci Controller
