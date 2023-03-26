@@ -17,7 +17,7 @@ jobs:
         CONFIGURATION: [Debug, Release]
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Submodule init
         shell: bash
         run: git submodule update --init --recursive
