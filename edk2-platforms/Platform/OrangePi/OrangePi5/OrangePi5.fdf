@@ -167,7 +167,7 @@ READ_LOCK_STATUS   = TRUE
   #INF Silicon/Rockchip/Library/DisplayLib/AnalogixDpLib.inf
   INF Silicon/Rockchip/Library/DisplayLib/DwHdmiQpLib.inf
   INF Silicon/Rockchip/Drivers/LcdGraphicsOutputDxe/LcdGraphicsOutputDxe.inf
-  INF Platform/Rockchip/RK3588/LogoDxe/LogoDxe.inf
+  INF Platform/OrangePi/Drivers/LogoDxe/LogoDxe.inf
 
   INF Platform/OrangePi/OrangePi5/Drivers/RK3588Dxe_opi5/RK3588Dxe.inf
 
