@@ -331,7 +331,9 @@ READ_LOCK_STATUS   = TRUE
   #
   # Simple Init GUI
   #
+!if $(ENABLE_SIMPLE_INIT)
   INF src/main/SimpleInitMain.inf
+!endif
 
 [FV.BL33_AP_UEFI]
 FvAlignment        = 8

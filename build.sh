@@ -8,6 +8,7 @@ function _help(){
 	echo "Options: "
 	echo "	--device DEV, -d DEV:    build for DEV."
 	echo "	--all, -a:               build all devices."
+	echo "	--gui:                   Enable simple-init GUI."
 	echo "	--release MODE, -r MODE: Release mode for building, default is 'DEBUG', 'RELEASE' alternatively."
 	echo "	--toolchain TOOLCHAIN:   Set toolchain, default is 'GCC5'."
 	echo " 	--skip-rootfs-gen:       skip generating SimpleInit rootfs to speed up building."
@@ -109,6 +110,7 @@ function _build(){
 		-p "${ROOTDIR}/${DSC_FILE}" \
 		-b "${_MODE}" \
 		-D FIRMWARE_VER="${GITCOMMIT}" \
+		-D ENABLE_SIMPLE_INIT="${BUILD_GUI}" \
 		||return "$?"
 
 	_pack
@@ -133,7 +135,8 @@ DISTCLEAN=false
 TOOLCHAIN=GCC5
 export ROOTDIR OUTDIR
 export GEN_ROOTFS=true
-OPTS="$(getopt -o t:d:haCDO:r -l toolchain:,device:,help,all,skip-rootfs-gen,clean,distclean,outputdir:,release: -n 'build.sh' -- "$@")"||exit 1
+export BUILD_GUI=false
+OPTS="$(getopt -o t:d:haCDO:r -l toolchain:,device:,help,all,skip-rootfs-gen,gui,clean,distclean,outputdir:,release: -n 'build.sh' -- "$@")"||exit 1
 eval set -- "${OPTS}"
 while true
 do	case "${1}" in
@@ -143,6 +146,7 @@ do	case "${1}" in
 		-D|--distclean) DISTCLEAN=true;shift;;
 		-O|--outputdir) OUTDIR="${2}";shift 2;;
 		--skip-rootfs-gen) GEN_ROOTFS=false;shift;;
+		--gui) BUILD_GUI=true;shift;;
 		-r|--release) MODE="${2}";shift 2;;
 		-t|--toolchain) TOOLCHAIN="${2}";shift 2;;
 		-h|--help) _help 0;shift;;
