@@ -1,18 +1,19 @@
 ## @file
 #  Implementation for PlatformBootManagerLib library class interfaces.
 #
-#  Copyright (c) 2018, ARM Ltd. All rights reserved.<BR>
-#  Copyright (c) 2018, Hisilicon Limited. All rights reserved.
-#  Copyright (c) 2018, Linaro Ltd. All rights reserved.<BR>
+#  Copyright (C) 2015-2016, Red Hat, Inc.
+#  Copyright (c) 2014, ARM Ltd. All rights reserved.<BR>
+#  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
+#  Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 ##
 
 [Defines]
-  INF_VERSION                    = 0x0001001A
+  INF_VERSION                    = 0x00010005
   BASE_NAME                      = PlatformBootManagerLib
-  FILE_GUID                      = 7cee5710-3177-11ec-95b4-f42a7dcb925d
+  FILE_GUID                      = 92FD2DE3-B9CB-4B35-8141-42AD34D73C9F
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = PlatformBootManagerLib|DXE_DRIVER
@@ -25,48 +26,72 @@
 
 [Sources]
   PlatformBm.c
+  PlatformBm.h
 
 [Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
-  Silicon/Rockchip/RockchipNonOsi.dec
-  Silicon/Rockchip/RockchipPkg.dec
+  ShellPkg/ShellPkg.dec
+  Platform/Radxa/ROCK5B/ROCK5B.dec
+  SimpleInit.dec
 
 [LibraryClasses]
   BaseLib
   BaseMemoryLib
   BootLogoLib
-  BmcConfigBootLib
+  CapsuleLib
   DebugLib
   DevicePathLib
   DxeServicesLib
-  IpmiCmdLib
+  HobLib
   MemoryAllocationLib
   PcdLib
   PrintLib
-  TimerLib
   UefiBootManagerLib
   UefiBootServicesTableLib
   UefiLib
+  UefiRuntimeServicesTableLib
+
+[FeaturePcd]
+  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
 
 [FixedPcd]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultDataBits
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType
-  gRockchipTokenSpaceGuid.PcdShellFile
 
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
+  gEfiMdeModulePkgTokenSpaceGuid.PcdBootDiscoveryPolicy
 
 [Guids]
+  gBootDiscoveryPolicyMgrFormsetGuid
+  gEdkiiNonDiscoverableEhciDeviceGuid
+  gEdkiiNonDiscoverableUhciDeviceGuid
+  gEdkiiNonDiscoverableXhciDeviceGuid
+  gEfiBootManagerPolicyNetworkGuid
+  gEfiBootManagerPolicyConnectAllGuid
+  gEfiFileInfoGuid
+  gEfiFileSystemInfoGuid
+  gEfiFileSystemVolumeLabelInfoIdGuid
   gEfiEndOfDxeEventGroupGuid
   gEfiTtyTermGuid
-  gOemConfigGuid
+  gUefiShellFileGuid
+  gSimpleInitFileGuid
+  gMaskromFileGuid
 
 [Protocols]
-  gEfiGenericMemTestProtocolGuid
+  gEdkiiNonDiscoverableDeviceProtocolGuid
+  gEfiBootManagerPolicyProtocolGuid
+  gEfiDevicePathProtocolGuid
+  gEfiGraphicsOutputProtocolGuid
   gEfiLoadedImageProtocolGuid
+  gEfiPciRootBridgeIoProtocolGuid
+  gEfiSimpleFileSystemProtocolGuid
   gEsrtManagementProtocolGuid
-  gPlatformSasNotifyProtocolGuid
+  gPlatformBootManagerProtocolGuid
