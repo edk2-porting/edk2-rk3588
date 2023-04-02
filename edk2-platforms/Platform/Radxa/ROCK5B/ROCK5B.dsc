@@ -39,7 +39,10 @@
   DEFINE NETWORK_VLAN_ENABLE            = FALSE
 !include Silicon/Rockchip/Rockchip.dsc.inc
 !include MdePkg/MdeLibs.dsc.inc
-!include SimpleInit.inc
+
+!if $(ENABLE_SIMPLE_INIT)
+  !include SimpleInit.inc
+!endif
 
 [LibraryClasses.common]
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
