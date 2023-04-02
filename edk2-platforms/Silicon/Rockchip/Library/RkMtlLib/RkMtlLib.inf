@@ -20,7 +20,7 @@
   ArmPkg/ArmPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
   MdePkg/MdePkg.dec
-  Platform/Radxa/ROCK5B/ROCK5B.dec
+  Silicon/Rockchip/RockchipPkg.dec
 
 [LibraryClasses]
   ArmLib
@@ -30,6 +30,6 @@
   UefiBootServicesTableLib
 
 [FixedPcd.common]
-  gROCK5BTokenSpaceGuid.PcdRkMtlMailBoxBase
-  gROCK5BTokenSpaceGuid.PcdRkMtlMailBoxSize
-  gROCK5BTokenSpaceGuid.PcdRkMtlMailBoxSmcId
+  gRockchipTokenSpaceGuid.PcdRkMtlMailBoxBase
+  gRockchipTokenSpaceGuid.PcdRkMtlMailBoxSize
+  gRockchipTokenSpaceGuid.PcdRkMtlMailBoxSmcId

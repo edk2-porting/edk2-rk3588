@@ -96,7 +96,7 @@
   SerialPortLib|Platform/Radxa/ROCK5B/Library/Dw8250SerialPortLib/Dw8250SerialPortLib.inf
   GpioLib|Platform/Radxa/ROCK5B/Library/GpioLib/GpioLib.inf
   # SCMI Mailbox Transport Layer
-  ArmMtlLib|Platform/Radxa/ROCK5B/Library/RkMtlLib/RkMtlLib.inf
+  ArmMtlLib|Silicon/Rockchip/Library/RkMtlLib/RkMtlLib.inf
 
 [LibraryClasses.common.SEC]
   PrePiLib|EmbeddedPkg/Library/PrePiLib/PrePiLib.inf
