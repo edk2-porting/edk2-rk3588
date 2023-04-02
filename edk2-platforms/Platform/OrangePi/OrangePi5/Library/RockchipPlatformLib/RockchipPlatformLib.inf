@@ -20,7 +20,6 @@
   Platform/Rockchip/RK3588/RK3588.dec
   Silicon/Rockchip/RK3588/RK3588.dec
   Silicon/Rockchip/RockchipPkg.dec
-  Platform/OrangePi/OrangePi5/OrangePi5.dec
 
 [LibraryClasses]
   ArmLib
