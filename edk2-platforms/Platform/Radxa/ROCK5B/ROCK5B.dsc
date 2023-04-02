@@ -575,7 +575,7 @@
   #
   # Custom Applications and drivers
   #
-  Platform/Radxa/ROCK5B/Applications/maskrom/maskrom.inf
+  Silicon/Rockchip/Applications/MaskromReset/maskrom.inf
 
   # Platform drivers
   Platform/Radxa/ROCK5B/Drivers/RK3588Dxe_rock5b/RK3588Dxe.inf

@@ -305,7 +305,7 @@ READ_LOCK_STATUS   = TRUE
   INF MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf
 
   # Custom
-  INF Platform/Radxa/ROCK5B/Applications/maskrom/maskrom.inf
+  INF Silicon/Rockchip/Applications/MaskromReset/maskrom.inf
   
   # SCMI Driver
   INF ArmPkg/Drivers/ArmScmiDxe/ArmScmiDxe.inf

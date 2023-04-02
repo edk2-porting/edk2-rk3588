@@ -575,7 +575,7 @@
   #
   # Custom Applications and drivers
   #
-  Platform/Radxa/ROCK5B/Applications/maskrom/maskrom.inf
+  Silicon/Rockchip/Applications/MaskromReset/maskrom.inf
 
   # Platform drivers
   Platform/OrangePi/OrangePi5/Drivers/RK3588Dxe_opi5/RK3588Dxe.inf

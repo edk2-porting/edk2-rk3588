@@ -12,7 +12,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  Platform/Radxa/ROCK5B/ROCK5B.dec
+  Silicon/Rockchip/RockchipPkg.dec
 
 [LibraryClasses]
   UefiApplicationEntryPoint

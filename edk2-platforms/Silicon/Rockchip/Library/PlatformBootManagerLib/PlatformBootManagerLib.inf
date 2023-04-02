@@ -33,7 +33,7 @@
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
   ShellPkg/ShellPkg.dec
-  Platform/Radxa/ROCK5B/ROCK5B.dec
+  Silicon/Rockchip/RockchipPkg.dec
   SimpleInit.dec
 
 [LibraryClasses]
