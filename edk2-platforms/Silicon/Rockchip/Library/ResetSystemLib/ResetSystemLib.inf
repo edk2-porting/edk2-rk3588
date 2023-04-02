@@ -22,7 +22,7 @@
   ArmPkg/ArmPkg.dec
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
-  Platform/Radxa/ROCK5B/ROCK5B.dec
+  Silicon/Rockchip/RockchipPkg.dec
 
 [LibraryClasses]
   ArmSmcLib
