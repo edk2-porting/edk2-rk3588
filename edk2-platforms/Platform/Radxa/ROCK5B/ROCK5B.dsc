@@ -94,7 +94,7 @@
   ResetSystemLib|Silicon/Rockchip/Library/ResetSystemLib/ResetSystemLib.inf
   PlatformBootManagerLib|Silicon/Rockchip/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
   SerialPortLib|Platform/Radxa/ROCK5B/Library/Dw8250SerialPortLib/Dw8250SerialPortLib.inf
-  GpioLib|Platform/Radxa/ROCK5B/Library/GpioLib/GpioLib.inf
+  GpioLib|Silicon/Rockchip/RK3588/Library/GpioLib/GpioLib.inf
   # SCMI Mailbox Transport Layer
   ArmMtlLib|Silicon/Rockchip/Library/RkMtlLib/RkMtlLib.inf
 
