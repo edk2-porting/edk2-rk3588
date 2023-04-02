@@ -423,7 +423,7 @@
   #Silicon/Synopsys/DesignWare/Drivers/DwEmmcDxe/DwEmmcDxe.inf
   Silicon/Rockchip/Drivers/MmcDxe/MmcDxe.inf
   # sdcard is dwemmc, sdhci is for eMMC.
-  Platform/Radxa/ROCK5B/Drivers/DwEmmcDxe/DwEmmcDxe.inf
+  Silicon/Rockchip/RK3588/Drivers/DwEmmcDxe/DwEmmcDxe.inf
   Silicon/Rockchip/Drivers/SdhciHostDxe/SdhciHostDxe.inf
 
   #

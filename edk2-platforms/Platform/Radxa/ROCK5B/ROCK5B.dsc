@@ -422,7 +422,7 @@
   #EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
   #Silicon/Synopsys/DesignWare/Drivers/DwEmmcDxe/DwEmmcDxe.inf
   Silicon/Rockchip/Drivers/MmcDxe/MmcDxe.inf
-  Platform/Radxa/ROCK5B/Drivers/DwEmmcDxe/DwEmmcDxe.inf
+  Silicon/Rockchip/RK3588/Drivers/DwEmmcDxe/DwEmmcDxe.inf
   Silicon/Rockchip/Drivers/SdhciHostDxe/SdhciHostDxe.inf
 
   #
