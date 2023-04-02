@@ -92,7 +92,7 @@
   RockchipPlatformLib|Platform/OrangePi/OrangePi5/Library/RockchipPlatformLib/RockchipPlatformLib.inf
   ResetSystemLib|Silicon/Rockchip/Library/ResetSystemLib/ResetSystemLib.inf
   PlatformBootManagerLib|Silicon/Rockchip/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
-  SerialPortLib|Platform/Radxa/ROCK5B/Library/Dw8250SerialPortLib/Dw8250SerialPortLib.inf
+  SerialPortLib|Silicon/Hisilicon/Library/Dw8250SerialPortLib/Dw8250SerialPortLib.inf
   GpioLib|Silicon/Rockchip/RK3588/Library/GpioLib/GpioLib.inf
   # SCMI Mailbox Transport Layer
   ArmMtlLib|Silicon/Rockchip/Library/RkMtlLib/RkMtlLib.inf
@@ -151,6 +151,8 @@
   DEFINE SERIAL_BASE = 0xFEB50000 # UART2
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|$(SERIAL_BASE)
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|1500000
+  gHisiTokenSpaceGuid.PcdSerialPortSendDelay|500000
+  gHisiTokenSpaceGuid.PcdUartClkInHz|24000000
 
   ## SPI - SPI2 for test
   gRockchipTokenSpaceGuid.SpiTestBaseAddr|0xFEB20000
