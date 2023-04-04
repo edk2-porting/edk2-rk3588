@@ -1,8 +1,10 @@
+
 #/** @file
 #
-#  SMBIOS Table for the RaspberryPi platform
+#  SMBIOS Table for RK35xx platforms
 #
-#  Copyright (c) 2017, Andrei Warkentin <andrey.warkentin@gmail.com>
+#  Copyright (c) 2021 Jared McNeill <jmcneill@invisible.ca>
+#  Copyright (c) 2017-2021 Andrei Warkentin <andrey.warkentin@gmail.com>
 #  Copyright (c) Microsoft Corporation. All rights reserved.
 #  Copyright (c) 2013 Linaro.org
 #  Copyright (c) 2020, ARM Limited. All rights reserved.
@@ -14,7 +16,7 @@
 [Defines]
   INF_VERSION                    = 0x0001001A
   BASE_NAME                      = PlatformSmbiosDxe
-  FILE_GUID                      = BAD0554E-22E9-4D83-9AFD-CC87727A1A45
+  FILE_GUID                      = 196E5BEB-983E-4B58-8292-BC310F6962DF
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = PlatformSmbiosDriverEntryPoint
@@ -27,8 +29,8 @@
   MdeModulePkg/MdeModulePkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
   ArmPkg/ArmPkg.dec
-  Platform/Rockchip/RK3588/RK3588.dec
   EmbeddedPkg/EmbeddedPkg.dec
+  Silicon/Rockchip/RockchipPkg.dec
 
 [LibraryClasses]
   ArmLib
@@ -41,25 +43,27 @@
   DebugLib
   PrintLib
   TimeBaseLib
+  CruLib
   SdramLib
+  OtpLib
 
 [Protocols]
   gEfiSmbiosProtocolGuid           # PROTOCOL SOMETIMES_CONSUMED
-#  gRaspberryPiFirmwareProtocolGuid ## CONSUMES
 
 [Guids]
-# gConfigDxeFormSetGuid
 
 [Depex]
   gEfiSmbiosProtocolGuid
-#  AND gRaspberryPiFirmwareProtocolGuid
 
 [Pcd]
   gArmTokenSpaceGuid.PcdFdBaseAddress
   gArmTokenSpaceGuid.PcdFdSize
+  gArmTokenSpaceGuid.PcdSystemMemoryBase
   gArmTokenSpaceGuid.PcdSystemMemorySize
+  gRockchipTokenSpaceGuid.PcdPlatformName
+  gRockchipTokenSpaceGuid.PcdPlatformVendorName
+  gRockchipTokenSpaceGuid.PcdProductUrl
+  gRockchipTokenSpaceGuid.PcdFamilyName
+  gRockchipTokenSpaceGuid.PcdMemoryVendorName
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVendor
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString
-#  gRaspberryPiTokenSpaceGuid.PcdFdtSize
-#  gRaspberryPiTokenSpaceGuid.PcdRamMoreThan3GB
-#  gRaspberryPiTokenSpaceGuid.PcdRamLimitTo3GB

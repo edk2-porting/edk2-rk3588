@@ -85,6 +85,8 @@
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
   LockBoxLib|MdeModulePkg/Library/LockBoxNullLib/LockBoxNullLib.inf
 
+  # OTP Library
+  OtpLib|Silicon/Rockchip/RK3588/Library/OtpLib/OtpLib.inf
 
   #
   # Custom libraries
@@ -136,6 +138,13 @@
   # RK3588 CPU profile
   gArmPlatformTokenSpaceGuid.PcdCoreCount|8
   gArmPlatformTokenSpaceGuid.PcdClusterCount|1
+
+  # SMBIOS platform config
+  gRockchipTokenSpaceGuid.PcdPlatformName|"Orange Pi 5"
+  gRockchipTokenSpaceGuid.PcdPlatformVendorName|"Orange Pi"
+  gRockchipTokenSpaceGuid.PcdFamilyName|"Orange Pi 5"
+  gRockchipTokenSpaceGuid.PcdProductUrl|"http://www.orangepi.org/html/hardWare/computerAndMicrocontrollers/details/Orange-Pi-5.html"
+  gRockchipTokenSpaceGuid.PcdMemoryVendorName|"TBD"
 
   # I2C
   gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x51 }
@@ -450,7 +459,7 @@
   #
   # SMBIOS Support
   #
-  Platform/OrangePi/OrangePi5/Drivers/PlatformSmbiosDxe/PlatformSmbiosDxe.inf
+  Silicon/Rockchip/Drivers/PlatformSmbiosDxe/PlatformSmbiosDxe.inf
   MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
   
   #

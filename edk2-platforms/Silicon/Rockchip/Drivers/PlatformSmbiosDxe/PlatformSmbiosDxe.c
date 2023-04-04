@@ -1,7 +1,7 @@
 /** @file
  *
- *  Static SMBIOS Table for the RaspberryPi platform
- *  Derived from EmulatorPkg package
+ *  Static SMBIOS Table for RK35xx based platforms
+ *  Derived from the quartz64_uefi, RaspberryPi and EmulatorPkg packages.
  *
  *  Note - Arm SBBR ver 1.2 required and recommended SMBIOS structures:
  *    BIOS Information (Type 0)
@@ -23,12 +23,13 @@
  *    Onboard Devices Extended Information (Type 41) - Recommended
  *    Redfish Host Interface (Type 42) - Required for platforms supporting Redfish Host Interface (not applicable to RPi)
  *
- *  Copyright (c) 2017-2018, Andrey Warkentin <andrey.warkentin@gmail.com>
+ *  Copyright (c) 2017-2021, Andrey Warkentin <andrey.warkentin@gmail.com>
  *  Copyright (c) 2013, Linaro.org
  *  Copyright (c) 2012, Apple Inc. All rights reserved.<BR>
  *  Copyright (c) Microsoft Corporation. All rights reserved.
  *  Copyright (c) 2020, ARM Limited. All rights reserved.
- *  Copyright (c) 2021-2022 Rockchip Electronics Co., Ltd.
+ *  Copyright (c) 2021 Jared McNeill <jmcneill@invisible.ca>
+ *  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
  *
  *  SPDX-License-Identifier: BSD-2-Clause-Patent
  *
@@ -50,9 +51,39 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/PrintLib.h>
+#include <Library/CruLib.h>
 #include <Library/SdramLib.h>
-#define ASSET_TAG_STR_STORAGE_SIZE  33
+#include <Library/OtpLib.h>
+#include <Protocol/ArmScmiClockProtocol.h>
+#include "Crc32Table.h"
+
 #define SMB_IS_DIGIT(c)  (((c) >= '0') && ((c) <= '9'))
+
+STATIC UINT64 mMemorySize = 0;
+
+UINT32
+EFIAPI
+CalculateCrc32NoComp(
+  IN  UINT32                       Crc,
+  IN  VOID                         *Buffer,
+  IN  UINTN                        Length
+  )
+{
+  UINTN   Index;
+  UINT8   *Ptr;
+
+  ASSERT (Buffer != NULL);
+  ASSERT (Length <= (MAX_ADDRESS - ((UINTN) Buffer) + 1));
+
+  //
+  // Compute CRC
+  //
+  for (Index = 0, Ptr = Buffer; Index < Length; Index++, Ptr++) {
+    Crc = (Crc >> 8) ^ mCrcTable[(UINT8) Crc ^ *Ptr];
+  }
+
+  return Crc;
+}
 
 /***********************************************************************
         SMBIOS data definition  TYPE0  BIOS Information
@@ -120,12 +151,12 @@ SMBIOS_TABLE_TYPE0 mBIOSInfoType0 = {
   0,                       // SystemBiosMinorRelease
   0,                       // EmbeddedControllerFirmwareMajorRelease
   0,                       // EmbeddedControllerFirmwareMinorRelease
-  //{ (UINT16) ((FixedPcdGet32 (PcdFdSize) + FixedPcdGet32 (PcdFdtSize)) / 0x100000) }, // BiosSize (in MB since Bits 15:14 = 00b)
+  { (UINT16) (FixedPcdGet32 (PcdFdSize) / 0x100000) }, // BiosSize (in MB since Bits 15:14 = 00b)
 };
 
 CHAR8 mBiosVendor[128]  = "EDK2";
 CHAR8 mBiosVersion[128] = "EDK2-DEV";
-CHAR8 mBiosDate[12]     = "13/05/2022";
+CHAR8 mBiosDate[12]     = "00/00/0000";
 
 CHAR8 *mBIOSInfoType0Strings[] = {
   mBiosVendor,              // Vendor
@@ -151,6 +182,7 @@ SMBIOS_TABLE_TYPE1 mSysInfoType1 = {
 
 CHAR8 mSysInfoManufName[128];
 CHAR8 mSysInfoProductName[128];
+CHAR8 mSysInfoFamilyName[128];
 CHAR8 mSysInfoVersionName[128];
 CHAR8 mSysInfoSerial[sizeof (UINT64) * 2 + 1];
 CHAR8 mSysInfoSKU[sizeof (UINT64) * 2 + 1];
@@ -161,7 +193,7 @@ CHAR8 *mSysInfoType1Strings[] = {
   mSysInfoVersionName,
   mSysInfoSerial,
   mSysInfoSKU,
-  "Rockchip",
+  mSysInfoFamilyName,
   NULL
 };
 
@@ -284,7 +316,7 @@ SMBIOS_TABLE_TYPE4 mProcessorInfoType4 = {
   0,                      // ThreadCount2;
 };
 
-CHAR8 mCpuName[128] = "RK3588s";
+CHAR8 mCpuName[128] = "Unknown ARM CPU";
 
 CHAR8 *mProcessorInfoType4Strings[] = {
   "Socket",
@@ -307,13 +339,8 @@ SMBIOS_TABLE_TYPE7 mCacheInfoType7_L1I = {
        //Enabled/Disabled   :1  (Enabled)
        //Operational Mode   :2  (Unknown)
        //Reserved           :6
-#if (RPI_MODEL == 4)
-  0x0030,                   // Maximum Size (RPi4: 48KB)
-  0x0030,                   // Install Size (RPi4: 48KB)
-#else
-  0x0010,                   // Maximum Size (RPi3: 16KB)
-  0x0010,                   // Install Size (RPi3: 16KB)
-#endif
+  0x0020,                   // Maximum Size (32KB)
+  0x0020,                   // Install Size (32KB)
   {                         // Supported SRAM Type
     0,  //Other             :1
     0,  //Unknown           :1
@@ -355,13 +382,8 @@ SMBIOS_TABLE_TYPE7 mCacheInfoType7_L1D = {
        //Enabled/Disabled   :1  (Enabled)
        //Operational Mode   :2  (WB)
        //Reserved           :6
-#if (RPI_MODEL == 4)
-  0x0020,                   // Maximum Size (RPi4: 32KB)
-  0x0020,                   // Install Size (RPi4: 32KB)
-#else
-  0x0010,                   // Maximum Size (RPi3: 16KB)
-  0x0010,                   // Install Size (RPi3: 16KB)
-#endif
+  0x0020,                   // Maximum Size (32KB)
+  0x0020,                   // Install Size (32KB)
   {                         // Supported SRAM Type
     0,  //Other             :1
     0,  //Unknown           :1
@@ -407,8 +429,8 @@ SMBIOS_TABLE_TYPE7 mCacheInfoType7_L2 = {
        //Enabled/Disabled   :1  (Enabled)
        //Operational Mode   :2  (WB)
        //Reserved           :6
-  0x0400,                   // Maximum Size (1MB)
-  0x0400,                   // Install Size (1MB)
+  0x0200,                   // Maximum Size (512KB)
+  0x0200,                   // Install Size (512KB)
   {                         // Supported SRAM Type
     0,  //Other             :1
     0,  //Unknown           :1
@@ -479,12 +501,14 @@ CHAR8 *mSysSlotInfoType9Strings[] = {
         SMBIOS data definition  TYPE 11  OEM Strings
 ************************************************************************/
 
+CHAR8 mOemInfoProductUrl[128];
+
 SMBIOS_TABLE_TYPE11 mOemStringsType11 = {
   { EFI_SMBIOS_TYPE_OEM_STRINGS, sizeof (SMBIOS_TABLE_TYPE11), 0 },
   1 // StringCount
 };
 CHAR8 *mOemStringsType11Strings[] = {
-  "https://github/tianocore/edk2-platforms",
+  mOemInfoProductUrl,
   NULL
 };
 
@@ -508,6 +532,8 @@ CHAR8 *mPhyMemArrayInfoType16Strings[] = {
 /***********************************************************************
         SMBIOS data definition  TYPE17  Memory Device Information
 ************************************************************************/
+CHAR8 mMemDevInfoVendor[128];
+
 SMBIOS_TABLE_TYPE17 mMemDevInfoType17 = {
   { EFI_SMBIOS_TYPE_MEMORY_DEVICE, sizeof (SMBIOS_TABLE_TYPE17), 0 },
   0,                    // MemoryArrayHandle; // Should match SMBIOS_TABLE_TYPE16.Handle, initialized at runtime, refer to PhyMemArrayInfoUpdateSmbiosType16()
@@ -575,7 +601,7 @@ SMBIOS_TABLE_TYPE17 mMemDevInfoType17 = {
 };
 CHAR8 *mMemDevInfoType17Strings[] = {
   "SDRAM",
-  "Micron",
+  mMemDevInfoVendor,
   NULL
 };
 
@@ -607,6 +633,7 @@ SMBIOS_TABLE_TYPE32 mBootInfoType32 = {
 CHAR8 *mBootInfoType32Strings[] = {
   NULL
 };
+
 
 /**
 
@@ -728,30 +755,22 @@ BIOSInfoUpdateSmbiosType0 (
   VOID
   )
 {
-  UINT32 EpochSeconds = 0;
-  EFI_TIME Time;
-  INTN   State = 0;
   INTN   i;
+  INTN   State = 0;
   INTN   Value[2];
   INTN   Year = TIME_BUILD_YEAR;
   INTN   Month = TIME_BUILD_MONTH;
   INTN   Day = TIME_BUILD_DAY;
 
-  // Populate the Firmware major and minor.
-    // The firmware revision is really an epoch time which we convert to a
-    // YY.MM major.minor. This is good enough for our purpose, where this
-    // revision is merely provided as a loose indicator of when the
-    // VideoCore firmware was generated.
-    EpochToEfiTime (EpochSeconds, &Time);
-    ASSERT (Time.Year >= 2000 && Time.Year <= 2255);
-    mBIOSInfoType0.EmbeddedControllerFirmwareMajorRelease = (UINT8)(Time.Year - 2000);
-    mBIOSInfoType0.EmbeddedControllerFirmwareMinorRelease = Time.Month;
+  mBIOSInfoType0.EmbeddedControllerFirmwareMajorRelease = 0;
+  mBIOSInfoType0.EmbeddedControllerFirmwareMinorRelease = 0;
+
   // mBiosVendor and mBiosVersion, which are referenced in mBIOSInfoType0Strings,
   // are left unchanged if the following calls fail.
   UnicodeStrToAsciiStrS ((CHAR16*)PcdGetPtr (PcdFirmwareVendor),
-    mBiosVendor, sizeof (mBiosVendor));
+                         mBiosVendor, sizeof (mBiosVendor));
   UnicodeStrToAsciiStrS ((CHAR16*)PcdGetPtr (PcdFirmwareVersionString),
-    mBiosVersion, sizeof (mBiosVersion));
+                         mBiosVersion, sizeof (mBiosVersion));
   ASSERT (Year >= 0 && Year <= 9999);
   ASSERT (Month >= 1 && Month <= 12);
   ASSERT (Day >= 1 && Day <= 31);
@@ -840,15 +859,32 @@ SysInfoUpdateSmbiosType1 (
   VOID
   )
 {
+  UINT8 OtpData[16];
+  UINT8 SerialLo[8];
+  UINT8 SerialHi[8];
   UINT32 BoardRevision = 0;
   UINT64 BoardSerial = 0;
+  UINTN Index;
 
-  AsciiStrCpyS (mSysInfoProductName, sizeof (mSysInfoProductName),"OrangePi 5");
-  AsciiStrCpyS (mSysInfoManufName, sizeof (mSysInfoManufName),"OrangePi");
+  // Get serial number from OTP
+  OtpReadId (OtpData);
+  for (Index = 0; Index < 8; Index++) {
+    SerialLo[Index] = OtpData[Index * 2 + 1];
+    SerialHi[Index] = OtpData[Index * 2];
+  }
+  BoardSerial = CalculateCrc32NoComp (0, SerialLo, sizeof SerialLo);
+  BoardSerial |= (UINT64)CalculateCrc32NoComp (BoardSerial, SerialHi, sizeof SerialHi) << 32;
+
+  AsciiStrCpyS (mSysInfoProductName, sizeof (mSysInfoProductName), (CHAR8 *) PcdGetPtr(PcdPlatformName));
+  AsciiStrCpyS (mSysInfoFamilyName, sizeof (mSysInfoFamilyName), (CHAR8 *) PcdGetPtr(PcdFamilyName));
+  AsciiStrCpyS (mSysInfoManufName, sizeof (mSysInfoManufName), (CHAR8 *) PcdGetPtr(PcdPlatformVendorName));
   AsciiSPrint (mSysInfoVersionName, sizeof (mSysInfoVersionName), "%X", BoardRevision);
+
   I64ToHexString (mSysInfoSKU, sizeof (mSysInfoSKU), BoardRevision);
   I64ToHexString (mSysInfoSerial, sizeof (mSysInfoSerial), BoardSerial);
+
   DEBUG ((DEBUG_ERROR, "Board Serial Number: %a\n", mSysInfoSerial));
+
   mSysInfoType1.Uuid.Data1 = BoardRevision;
   mSysInfoType1.Uuid.Data2 = 0x0;
   mSysInfoType1.Uuid.Data3 = 0x0;
@@ -881,10 +917,46 @@ EnclosureInfoUpdateSmbiosType3 (
 {
   EFI_SMBIOS_HANDLE SmbiosHandle;
 
+  // SMBIOS referenced strings cannot be NULL. If no AssetTag is set, default to a blank space.
+  UnicodeStrToAsciiStrS(L" ", mChassisAssetTag, sizeof(mChassisAssetTag));
+
   LogSmbiosData ((EFI_SMBIOS_TABLE_HEADER*)&mEnclosureInfoType3, mEnclosureInfoType3Strings, &SmbiosHandle);
 
   // Set Type2 ChassisHandle to point to the newly added Type3 handle
   mBoardInfoType2.ChassisHandle = (UINT16) SmbiosHandle;
+}
+
+
+STATIC UINT32
+ProcessorGetRate (
+  VOID
+  )
+{
+  EFI_STATUS Status;
+  SCMI_CLOCK_PROTOCOL *ClockProtocol;
+  EFI_GUID ClockProtocolGuid = ARM_SCMI_CLOCK_PROTOCOL_GUID;
+  UINT64 Rate;
+  UINT32 ClockId = 0;
+
+  // If we can't query SCMI, fallback to reading from CRU registers
+  //Rate = CruGetCoreClockRate ();
+
+  Rate = 1200;
+  
+  Status = gBS->LocateProtocol (
+                  &ClockProtocolGuid,
+                  NULL,
+                  (VOID**)&ClockProtocol
+                  );
+  if (EFI_ERROR (Status)) {
+    return (UINT32)Rate;
+  }
+
+  ClockProtocol->RateGet (ClockProtocol, ClockId, &Rate);
+
+  DEBUG ((DEBUG_INFO, "SCMI: SMBIOS reported rate %luHz\n", Rate));
+  
+  return (UINT32)Rate;
 }
 
 /***********************************************************************
@@ -895,9 +967,10 @@ ProcessorInfoUpdateSmbiosType4 (
   IN UINTN MaxCpus
   )
 {
-  //EFI_STATUS Status;
- // UINT32     Rate;
-  UINT64     *ProcessorId;
+  UINT32 Rate;
+  UINT64 *ProcessorId;
+  UINT16 CpuCode;
+  UINT8 CpuVersion;
 
   mProcessorInfoType4.CoreCount = (UINT8)MaxCpus;
   mProcessorInfoType4.CoreCount2 = (UINT8)MaxCpus;
@@ -905,8 +978,24 @@ ProcessorInfoUpdateSmbiosType4 (
   mProcessorInfoType4.EnabledCoreCount2 = (UINT8)MaxCpus;
   mProcessorInfoType4.ThreadCount = (UINT8)MaxCpus;
   mProcessorInfoType4.ThreadCount2 = (UINT8)MaxCpus;
-  mProcessorInfoType4.MaxSpeed = 2100;    /*2100 MHZ*/
-  mProcessorInfoType4.CurrentSpeed = 1800;/*1800 MHZ*/
+
+  Rate = ProcessorGetRate ();
+  mProcessorInfoType4.MaxSpeed = Rate / 1000000;
+  mProcessorInfoType4.CurrentSpeed = Rate / 1000000;
+
+  OtpReadCpuCode(&CpuCode);
+  OtpReadCpuVersion(&CpuVersion);
+  CpuCode = (CpuCode >> 8) | (CpuCode << 8);
+  
+  AsciiSPrint(mCpuName, sizeof(mCpuName), "Rockchip RK%04X", CpuCode);
+
+  if (CpuVersion & BIT3) {
+    switch (CpuCode) {
+      case 0x3588:
+        AsciiStrCatS(mCpuName, sizeof(mCpuName), "S");
+        break;
+    }
+  }
 
   ProcessorId = (UINT64 *)&(mProcessorInfoType4.ProcessorId);
   *ProcessorId = ArmReadMidr();
@@ -954,6 +1043,8 @@ OemStringsUpdateSmbiosType11 (
   VOID
   )
 {
+  AsciiStrCpyS (mOemInfoProductUrl, sizeof (mOemInfoProductUrl), (CHAR8 *) PcdGetPtr(PcdProductUrl));
+
   LogSmbiosData ((EFI_SMBIOS_TABLE_HEADER*)&mOemStringsType11, mOemStringsType11Strings, NULL);
 }
 
@@ -966,8 +1057,6 @@ PhyMemArrayInfoUpdateSmbiosType16 (
   )
 {
   EFI_SMBIOS_HANDLE MemArraySmbiosHandle;
-  EFI_STATUS        Status = 0;
-  UINT32            InstalledMB = 0;
 
  //
  // Update memory size fields:
@@ -976,15 +1065,7 @@ PhyMemArrayInfoUpdateSmbiosType16 (
  //  - Type 17 VolatileSize in Bytes
  //
 
- // The minimum RAM size used on any Raspberry Pi model is 256 MB
-  mMemDevInfoType17.Size = 256;
-
-  //Status = mFwProtocol->GetModelInstalledMB (&InstalledMB);
-  if (Status != EFI_SUCCESS) {
-    DEBUG ((DEBUG_WARN, "Couldn't get the board memory size - defaulting to 256 MB: %r\n", Status));
-  } else {
-    mMemDevInfoType17.Size = InstalledMB; // Size in MB
-  }
+  mMemDevInfoType17.Size = mMemorySize / (1024 * 1024);
 
   mPhyMemArrayInfoType16.MaximumCapacity = mMemDevInfoType17.Size * 1024; // Size in KB
   mMemDevInfoType17.VolatileSize = MultU64x32 (mMemDevInfoType17.Size, 1024 * 1024);  // Size in Bytes
@@ -1006,6 +1087,8 @@ MemDevInfoUpdateSmbiosType17 (
   VOID
   )
 {
+  AsciiStrCpyS (mMemDevInfoVendor, sizeof (mMemDevInfoVendor), (CHAR8 *) PcdGetPtr(PcdMemoryVendorName));
+
   LogSmbiosData ((EFI_SMBIOS_TABLE_HEADER*)&mMemDevInfoType17, mMemDevInfoType17Strings, NULL);
 }
 
@@ -1017,15 +1100,11 @@ MemArrMapInfoUpdateSmbiosType19 (
   VOID
   )
 {
-  //EFI_STATUS Status;
-  //UINT32 InstalledMB = 0;
-
   // Note: Type 19 addresses are expressed in KB, not bytes
-  // The memory layout used in all known Pi SoC's starts at 0
-  mMemArrMapInfoType19.StartingAddress = 0;
-  mMemArrMapInfoType19.EndingAddress = 1024 * 1024;
-  mMemArrMapInfoType19.EndingAddress = SdramGetMemorySize () / 1024;
-  mMemArrMapInfoType19.EndingAddress -= 1;
+  mMemArrMapInfoType19.StartingAddress = PcdGet64(PcdSystemMemoryBase) / 1024;
+
+  mMemArrMapInfoType19.EndingAddress = mMemArrMapInfoType19.StartingAddress +
+    mMemorySize / 1024 - 1;
 
   LogSmbiosData ((EFI_SMBIOS_TABLE_HEADER*)&mMemArrMapInfoType19, mMemArrMapInfoType19Strings, NULL);
 }
@@ -1052,6 +1131,11 @@ PlatformSmbiosDriverEntryPoint (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
+
+  DEBUG ((DEBUG_INFO, "PlatformSmbiosDriverEntryPoint() called\n"));
+
+  mMemorySize = SdramGetMemorySize ();
+
   BIOSInfoUpdateSmbiosType0 ();
 
   SysInfoUpdateSmbiosType1 ();
@@ -1075,6 +1159,8 @@ PlatformSmbiosDriverEntryPoint (
   MemArrMapInfoUpdateSmbiosType19 ();
 
   BootInfoUpdateSmbiosType32 ();
+
+  DEBUG ((DEBUG_INFO, "PlatformSmbiosDriverEntryPoint() returning\n"));
 
   return EFI_SUCCESS;
 }

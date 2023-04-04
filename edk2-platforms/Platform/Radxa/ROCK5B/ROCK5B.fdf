@@ -174,7 +174,7 @@ READ_LOCK_STATUS   = TRUE
   #
   # SMBIOS Support
   #
-  INF Platform/Radxa/ROCK5B/Drivers/PlatformSmbiosDxe/PlatformSmbiosDxe.inf
+  INF Silicon/Rockchip/Drivers/PlatformSmbiosDxe/PlatformSmbiosDxe.inf
   INF MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
 
   #

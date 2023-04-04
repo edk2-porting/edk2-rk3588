@@ -89,6 +89,8 @@
   UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
   LockBoxLib|MdeModulePkg/Library/LockBoxNullLib/LockBoxNullLib.inf
 
+  # OTP Library
+  OtpLib|Silicon/Rockchip/RK3588/Library/OtpLib/OtpLib.inf
 
   #
   # Custom libraries
@@ -139,6 +141,13 @@
   # RK3588 CPU profile
   gArmPlatformTokenSpaceGuid.PcdCoreCount|8
   gArmPlatformTokenSpaceGuid.PcdClusterCount|1
+
+  # SMBIOS platform config
+  gRockchipTokenSpaceGuid.PcdPlatformName|"Radxa ROCK 5 Model B"
+  gRockchipTokenSpaceGuid.PcdPlatformVendorName|"Radxa"
+  gRockchipTokenSpaceGuid.PcdFamilyName|"ROCK 5"
+  gRockchipTokenSpaceGuid.PcdProductUrl|"https://wiki.radxa.com/Rock5/hardware/5b"
+  gRockchipTokenSpaceGuid.PcdMemoryVendorName|"TBD"
 
   # I2C
   gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x51 }
@@ -452,7 +461,7 @@
   #
   # SMBIOS Support
   #
-  Platform/Radxa/ROCK5B/Drivers/PlatformSmbiosDxe/PlatformSmbiosDxe.inf
+  Silicon/Rockchip/Drivers/PlatformSmbiosDxe/PlatformSmbiosDxe.inf
   MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
   
   #
