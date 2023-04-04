@@ -1,0 +1,35 @@
+#/** @file
+#
+#  RK3588 OTP Library.
+#
+#  Copyright (c) 2022, Jared McNeill <jmcneill@invisible.ca>
+#  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = OtpLib
+  FILE_GUID                      = 412C6116-58A9-4512-B98E-0EF837D1D622
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = OtpLib
+
+[Sources]
+  OtpLib.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  Silicon/Rockchip/RK3588/RK3588.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  IoLib
+  TimerLib
+
+[Guids]
