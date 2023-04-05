@@ -17,84 +17,7 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 2, "RPIFDN", "RPI", 2)
 {
   Scope (\_SB_)
   {
-    Device (CPU0)
-    {
-      Name (_HID, "ACPI0007")
-      Name (_UID, 0x0)
-      Method (_STA)
-      {
-        Return (0xf)
-      }
-    }
-    Device (CPU1)
-    {
-      Name (_HID, "ACPI0007")
-      Name (_UID, 0x1)
-      Method (_STA)
-      {
-        Return (0xf)
-      }
-    }
-
-    Device (CPU2)
-    {
-      Name (_HID, "ACPI0007")
-      Name (_UID, 0x2)
-      Method (_STA)
-      {
-        Return (0xf)
-      }
-    }
-
-    Device (CPU3)
-    {
-      Name (_HID, "ACPI0007")
-      Name (_UID, 0x3)
-      Method (_STA)
-      {
-        Return (0xf)
-      }
-    }
-
-    Device (CPU4)
-    {
-      Name (_HID, "ACPI0007")
-      Name (_UID, 0x4)
-      Method (_STA)
-      {
-        Return (0xf)
-      }
-    }
-
-    Device (CPU5)
-    {
-      Name (_HID, "ACPI0007")
-      Name (_UID, 0x5)
-      Method (_STA)
-      {
-        Return (0xf)
-      }
-    }
-
-    Device (CPU6)
-    {
-      Name (_HID, "ACPI0007")
-      Name (_UID, 0x6)
-      Method (_STA)
-      {
-        Return (0xf)
-      }
-    }
-
-    Device (CPU7)
-    {
-      Name (_HID, "ACPI0007")
-      Name (_UID, 0x7)
-      Method (_STA)
-      {
-        Return (0xf)
-      }
-    }
+    include ("Cpu.asl")
 
     include ("Pcie.asl")
     // include ("Sata.asl")
@@ -109,6 +32,8 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 2, "RPIFDN", "RPI", 2)
     // won't work on Windows, will trigger bugcheck by usbehci
     // include ("Usb2.asl")
 
-    include ("Usb3.asl")
+    include ("Usb3Host0.asl")
+    include ("Usb3Host1.asl")
+    include ("Usb3Host2.asl")
   }
 }

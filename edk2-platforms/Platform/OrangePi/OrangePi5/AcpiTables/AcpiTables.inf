@@ -15,6 +15,7 @@
   FILE_GUID                      = 7E374E25-8E01-4FEE-87F2-390C23C606CD
   MODULE_TYPE                    = USER_DEFINED
   VERSION_STRING                 = 1.0
+  RK_COMMON_ACPI_DIR             = Silicon/Rockchip/RK3588/AcpiTables
 
 #
 # The following information is for reference only and not required by the build tools.
@@ -23,15 +24,14 @@
 #
 
 [Sources]
-  AcpiTables.h
-  Madt.aslc
-  Fadt.aslc
-  Gtdt.aslc
   Dsdt.asl
-  Spcr.aslc
-  Mcfg.aslc
-  RK3588PcieIort.aslc
-  Dbg2.aslc
+  $(RK_COMMON_ACPI_DIR)/Madt.aslc
+  $(RK_COMMON_ACPI_DIR)/Fadt.aslc
+  $(RK_COMMON_ACPI_DIR)/Gtdt.aslc
+  $(RK_COMMON_ACPI_DIR)/Spcr.aslc
+  $(RK_COMMON_ACPI_DIR)/Mcfg.aslc
+  $(RK_COMMON_ACPI_DIR)/RK3588PcieIort.aslc
+  $(RK_COMMON_ACPI_DIR)/Dbg2.aslc
 
 [Packages]
   ArmPkg/ArmPkg.dec
