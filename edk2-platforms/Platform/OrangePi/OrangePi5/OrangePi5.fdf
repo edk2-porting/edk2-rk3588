@@ -169,7 +169,7 @@ READ_LOCK_STATUS   = TRUE
   INF Silicon/Rockchip/Drivers/LcdGraphicsOutputDxe/LcdGraphicsOutputDxe.inf
   INF Platform/OrangePi/Drivers/LogoDxe/LogoDxe.inf
 
-  INF Platform/OrangePi/OrangePi5/Drivers/RK3588Dxe_opi5/RK3588Dxe.inf
+  INF Silicon/Rockchip/RK3588/Drivers/RK3588Dxe/RK3588Dxe.inf
 
   #
   # SMBIOS Support

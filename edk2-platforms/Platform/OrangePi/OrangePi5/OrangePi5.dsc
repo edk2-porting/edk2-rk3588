@@ -589,5 +589,5 @@
   Silicon/Rockchip/Applications/MaskromReset/maskrom.inf
 
   # Platform drivers
-  Platform/OrangePi/OrangePi5/Drivers/RK3588Dxe_opi5/RK3588Dxe.inf
+  Silicon/Rockchip/RK3588/Drivers/RK3588Dxe/RK3588Dxe.inf
 
