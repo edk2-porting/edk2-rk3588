@@ -48,7 +48,7 @@
 
 STATIC
 EFI_STATUS
-BoardInitSetCpuSpeed (
+SetMaxCpuSpeed (
   VOID
   )
 {
@@ -65,6 +65,7 @@ BoardInitSetCpuSpeed (
   SCMI_CLOCK_RATE        *ClockRate;
   SCMI_CLOCK_RATE_FORMAT ClockRateFormat;
   UINT32                 ClockIds[3]= {SCMI_CLK_CPUL, SCMI_CLK_CPUB01, SCMI_CLK_CPUB23};
+  UINT32                 ClockIndex;
 
   Status = gBS->LocateProtocol (
                   &ClockProtocolGuid,
@@ -84,11 +85,9 @@ BoardInitSetCpuSpeed (
   DEBUG ((DEBUG_ERROR, "SCMI clock management protocol version = %x\n",
     ClockProtocolVersion));
 
-  ClockId = 0;
-
-  for (int i=0 ; i<3; i=i+1 )
+  for (ClockIndex = 0; ClockIndex < ARRAY_SIZE(ClockIds); ClockIndex++)
   {
-    ClockId = ClockIds[i];
+    ClockId = ClockIds[ClockIndex];
     Status = ClockProtocol->GetClockAttributes (
                               ClockProtocol,
                               ClockId,
@@ -153,6 +152,10 @@ BoardInitSetCpuSpeed (
 
     CpuRate = ClockRate[TotalRates - 1].DiscreteRate.Rate;
     FreePool (ClockRate);
+
+    // The maximum discrete rates returned are 63 Hz higher than supported,
+    // causing SCMI to ignore the setting.
+    CpuRate -= CpuRate % 100;
 
     DEBUG ((EFI_D_WARN, "SCMI: %a: New rate is %uHz\n", ClockName, CpuRate));
 
@@ -785,11 +788,7 @@ RK3588EntryPoint (
 {
   EFI_STATUS            Status;
 
-  /* Update CPU speed */
-  // looks like the BL31 firmware in rk3588 isn't able to change frequency anymore
-  // You can get current CPU freq with it, and even set a new freq without error
-  // but it won't take effect.
-  // BoardInitSetCpuSpeed();
+  SetMaxCpuSpeed ();
   
   Status = RK3588InitPeripherals ();
   if (EFI_ERROR (Status)) {
