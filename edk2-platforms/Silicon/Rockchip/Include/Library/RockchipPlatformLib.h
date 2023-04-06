@@ -66,6 +66,12 @@ void
 EFIAPI
 Rk806SpiIomux(void);
 
+VOID
+EFIAPI
+Rk806Configure(
+  VOID
+  );
+
 void
 EFIAPI
 NorFspiIomux(void);
