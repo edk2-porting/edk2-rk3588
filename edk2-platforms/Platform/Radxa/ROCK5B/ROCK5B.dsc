@@ -143,7 +143,7 @@
   gArmPlatformTokenSpaceGuid.PcdClusterCount|1
 
   # SMBIOS platform config
-  gRockchipTokenSpaceGuid.PcdPlatformName|"Radxa ROCK 5 Model B"
+  gRockchipTokenSpaceGuid.PcdPlatformName|"ROCK 5 Model B"
   gRockchipTokenSpaceGuid.PcdPlatformVendorName|"Radxa"
   gRockchipTokenSpaceGuid.PcdFamilyName|"ROCK 5"
   gRockchipTokenSpaceGuid.PcdProductUrl|"https://wiki.radxa.com/Rock5/hardware/5b"
