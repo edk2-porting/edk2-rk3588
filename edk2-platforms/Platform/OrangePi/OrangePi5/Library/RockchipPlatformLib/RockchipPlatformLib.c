@@ -14,33 +14,31 @@
 
 static struct regulator_init_data rk806_init_data[] = {
   /* Master PMIC */
-
-  /* TODO: Figure out the correct voltages
-
-  RK8XX_VOLTAGE_INIT(MASTER_BUCK1, 750000),
-  RK8XX_VOLTAGE_INIT(MASTER_BUCK2, 750000),
+  RK8XX_VOLTAGE_INIT(MASTER_BUCK1, 850000),
+  /* The CPU voltage also needs to be fine-tuned for the desired frequency */
+  RK8XX_VOLTAGE_INIT(MASTER_BUCK2, 950000),
   RK8XX_VOLTAGE_INIT(MASTER_BUCK3, 750000),
   RK8XX_VOLTAGE_INIT(MASTER_BUCK4, 750000),
-  RK8XX_VOLTAGE_INIT(MASTER_BUCK5, 750000),
-  RK8XX_VOLTAGE_INIT(MASTER_BUCK6, 750000),
+  RK8XX_VOLTAGE_INIT(MASTER_BUCK5, 850000),
+  /* This is not configured in the OrangePi5's Linux device tree
+  RK8XX_VOLTAGE_INIT(MASTER_BUCK6, 1100000), */
   RK8XX_VOLTAGE_INIT(MASTER_BUCK7, 2000000),
-  RK8XX_VOLTAGE_INIT(MASTER_BUCK8, 750000),
-  RK8XX_VOLTAGE_INIT(MASTER_BUCK10, 1100000),
+  RK8XX_VOLTAGE_INIT(MASTER_BUCK8, 3300000),
+  RK8XX_VOLTAGE_INIT(MASTER_BUCK10, 1800000),
 
   RK8XX_VOLTAGE_INIT(MASTER_NLDO1, 750000),
-  RK8XX_VOLTAGE_INIT(MASTER_NLDO2, 900000),
-  RK8XX_VOLTAGE_INIT(MASTER_NLDO3, 750000),
-  RK8XX_VOLTAGE_INIT(MASTER_NLDO4, 750000),
-  RK8XX_VOLTAGE_INIT(MASTER_NLDO5, 850000),
+  RK8XX_VOLTAGE_INIT(MASTER_NLDO2, 850000),
+  /* The OPi is officially configured for the 837500 voltage, but is still marked as avdd_0v75_s0 in the schematic and Linux device tree. rockchip says this voltage is set to improve HDMI stability. */
+  RK8XX_VOLTAGE_INIT(MASTER_NLDO3, 837500),
+  RK8XX_VOLTAGE_INIT(MASTER_NLDO4, 850000),
+  RK8XX_VOLTAGE_INIT(MASTER_NLDO5, 750000),
 
   RK8XX_VOLTAGE_INIT(MASTER_PLDO1, 1800000),
   RK8XX_VOLTAGE_INIT(MASTER_PLDO2, 1800000),
-  RK8XX_VOLTAGE_INIT(MASTER_PLDO3, 1800000),
+  RK8XX_VOLTAGE_INIT(MASTER_PLDO3, 1200000),
   RK8XX_VOLTAGE_INIT(MASTER_PLDO4, 3300000),
-  RK8XX_VOLTAGE_INIT(MASTER_PLDO5, 1800000),
+  RK8XX_VOLTAGE_INIT(MASTER_PLDO5, 3300000),
   RK8XX_VOLTAGE_INIT(MASTER_PLDO6, 1800000),
-  */
-
   /* No dual PMICs on this platform */
 };
 
@@ -294,11 +292,12 @@ Dwc3Force20ClkFor30Clk (UINT32 Address, BOOLEAN enable)
   }
 }
 
+/* Orange Pi5 does not have PCIe3.0, wait for PCIe2 support and re-add it.
 void
 EFIAPI
 Pcie30IoInit(void)
 {
-  /* Set reset and power IO to gpio output mode */
+  // Set reset and power IO to gpio output mode
   GpioPinSetDirection (4, GPIO_PIN_PB6, GPIO_PIN_OUTPUT);
   GpioPinSetDirection (1, GPIO_PIN_PA4, GPIO_PIN_OUTPUT);
 }
@@ -307,7 +306,7 @@ void
 EFIAPI
 Pcie30PowerEn(void)
 {
-  /* output high to enable power */
+  // output high to enable power
   GpioPinWrite (1, GPIO_PIN_PA4, TRUE);
 }
 
@@ -316,8 +315,8 @@ EFIAPI
 Pcie30PeReset(BOOLEAN enable)
 {
   if(enable)
-    GpioPinWrite (4, GPIO_PIN_PB6, FALSE); /* output low */
+    GpioPinWrite (4, GPIO_PIN_PB6, FALSE); // output low
   else
-    GpioPinWrite (4, GPIO_PIN_PB6, TRUE); /* output high */
+    GpioPinWrite (4, GPIO_PIN_PB6, TRUE); // output high
 }
-
+*/
