@@ -328,6 +328,12 @@ UsbEndOfDxeCallback (
  
   NumUsb2Controller = PcdGet32 (PcdNumEhciController);
 
+  /* Enable USB PHYs */
+  Usb2PhyResume (); 
+  UsbDpPhyEnable ();
+  
+  UsbPortPowerEnable ();
+
   /* Register USB3 controllers */
   for (Index = 0; Index < XhciControllerAddrArraySize; Index += sizeof(UINT32)) {
     XhciControllerAddr = XhciControllerAddrArrayPtr[Index] | 
