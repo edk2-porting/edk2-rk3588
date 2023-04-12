@@ -36,8 +36,6 @@
   DevicePathLib
 
 [FixedPcd]
-  gRockchipTokenSpaceGuid.PcdOhciBaseAddress
-  gRockchipTokenSpaceGuid.PcdNumOhciController
   gRockchipTokenSpaceGuid.PcdOhciSize
   gRockchipTokenSpaceGuid.PcdEhciBaseAddress
   gRockchipTokenSpaceGuid.PcdNumEhciController

@@ -308,9 +308,7 @@
   gRockchipTokenSpaceGuid.PcdEhciBaseAddress|0|UINT32|0x50000060
   gRockchipTokenSpaceGuid.PcdNumEhciController|0|UINT32|0x50000061
   gRockchipTokenSpaceGuid.PcdEhciSize|0|UINT32|0x50000062
-  gRockchipTokenSpaceGuid.PcdOhciBaseAddress|0|UINT32|0x50000063
-  gRockchipTokenSpaceGuid.PcdNumOhciController|0|UINT32|0x50000064
-  gRockchipTokenSpaceGuid.PcdOhciSize|0|UINT32|0x50000065
+  gRockchipTokenSpaceGuid.PcdOhciSize|0|UINT32|0x50000063
 
   gRockchipTokenSpaceGuid.PcdDwc3BaseAddresses|{ 0x0 }|VOID*|0x50000069
   gRockchipTokenSpaceGuid.PcdDwc3Size|0|UINT32|0x50000071

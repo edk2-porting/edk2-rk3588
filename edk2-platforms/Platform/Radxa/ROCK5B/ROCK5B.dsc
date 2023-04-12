@@ -228,18 +228,12 @@
   gEmbeddedTokenSpaceGuid.PcdAndroidFastbootUsbProductId|0x0001
 
   #
-  # USB OHCI controller
-  #
-  gRockchipTokenSpaceGuid.PcdOhciBaseAddress|0xfc840000
-  gRockchipTokenSpaceGuid.PcdNumOhciController|2
-  gRockchipTokenSpaceGuid.PcdOhciSize|0x80000
-
-  #
-  # USB2 EHCI controller
+  # USB2 EHCI + OHCI companion controllers
   #
   gRockchipTokenSpaceGuid.PcdEhciBaseAddress|0xfc800000
   gRockchipTokenSpaceGuid.PcdNumEhciController|2
-  gRockchipTokenSpaceGuid.PcdEhciSize|0x80000
+  gRockchipTokenSpaceGuid.PcdEhciSize|0x40000
+  gRockchipTokenSpaceGuid.PcdOhciSize|0x40000
 
   #
   # DWC3 controller
