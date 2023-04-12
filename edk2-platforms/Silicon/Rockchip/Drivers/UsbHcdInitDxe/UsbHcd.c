@@ -14,6 +14,11 @@
 #include <Library/NonDiscoverableDeviceRegistrationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/RockchipPlatformLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/BaseMemoryLib.h>
+#include <Library/DevicePathLib.h>
+
+#include <Protocol/OhciDeviceProtocol.h>
 
 #include "UsbHcd.h"
 
@@ -223,6 +228,71 @@ InitializeXhciController (
   return EFI_SUCCESS;
 }
 
+#pragma pack (1)
+typedef struct {
+  VENDOR_DEVICE_PATH        Vendor;
+  UINT32                    BaseAddress;
+  EFI_DEVICE_PATH_PROTOCOL  End;
+} OHCI_DEVICE_PATH;
+#pragma pack ()
+
+STATIC
+EFI_STATUS
+EFIAPI
+RegisterOhciController (
+  IN UINT32 BaseAddress
+  )
+{
+  EFI_STATUS            Status;
+  OHCI_DEVICE_PROTOCOL  *OhciDevice;
+  OHCI_DEVICE_PATH      *OhciDevicePath;
+  EFI_HANDLE            Handle;
+
+  OhciDevice = (OHCI_DEVICE_PROTOCOL*)AllocateZeroPool (sizeof(*OhciDevice));
+  if (OhciDevice == NULL) {
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  OhciDevice->BaseAddress = BaseAddress;
+
+  OhciDevicePath = (OHCI_DEVICE_PATH*)CreateDeviceNode (
+                                          HARDWARE_DEVICE_PATH,
+                                          HW_VENDOR_DP,
+                                          sizeof (*OhciDevicePath)
+                                          );
+  if (OhciDevicePath == NULL) {
+    Status = EFI_OUT_OF_RESOURCES;
+    goto FreeOhciDevice;
+  }
+
+  CopyGuid (&OhciDevicePath->Vendor.Guid, &gOhciDeviceProtocol);
+
+  /* Device paths must be unique */
+  OhciDevicePath->BaseAddress = OhciDevice->BaseAddress;
+
+  SetDevicePathNodeLength (&OhciDevicePath->Vendor, 
+                            sizeof (*OhciDevicePath) - sizeof (OhciDevicePath->End));
+  SetDevicePathEndNode (&OhciDevicePath->End);
+
+  Handle = NULL;
+  Status = gBS->InstallMultipleProtocolInterfaces (&Handle,
+                  &gEfiDevicePathProtocolGuid, OhciDevicePath,
+                  &gOhciDeviceProtocol, OhciDevice,
+                  NULL);
+  if (EFI_ERROR (Status)) {
+    goto FreeOhciDevicePath;
+  }
+
+  return EFI_SUCCESS;
+
+FreeOhciDevicePath:
+  FreePool (OhciDevicePath);
+FreeOhciDevice:
+  FreePool (OhciDevice);
+
+  return Status;
+}
+
 /**
   This function gets registered as a callback to perform USB controller intialization
 
@@ -283,8 +353,8 @@ UsbEndOfDxeCallback (
   /* Register USB2 controllers */
   for (Index = 0; Index < NumUsb2Controller; Index++) {
     EhciControllerAddr = PcdGet32 (PcdEhciBaseAddress) +
-                          (Index * PcdGet32 (PcdEhciSize));
-    OhciControllerAddr = EhciControllerAddr + 0x10000;
+                          (Index * (PcdGet32 (PcdEhciSize) + PcdGet32 (PcdOhciSize)));
+    OhciControllerAddr = EhciControllerAddr + PcdGet32 (PcdOhciSize);
 
     Status = RegisterNonDiscoverableMmioDevice (
                NonDiscoverableDeviceTypeEhci,
@@ -292,7 +362,7 @@ UsbEndOfDxeCallback (
                NULL,
                NULL,
                1,
-               EhciControllerAddr, 0x10000
+               EhciControllerAddr, PcdGet32 (PcdEhciSize)
              );
 
     if (EFI_ERROR (Status)) {
@@ -300,14 +370,7 @@ UsbEndOfDxeCallback (
         EhciControllerAddr, Status));
     }
 
-    Status = RegisterNonDiscoverableMmioDevice (
-               NonDiscoverableDeviceTypeOhci,
-               NonDiscoverableDeviceDmaTypeNonCoherent,
-               NULL,
-               NULL,
-               1,
-               OhciControllerAddr, 0x10000
-             );
+    Status = RegisterOhciController (OhciControllerAddr);
 
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "Failed to register OHCI device 0x%x, error 0x%r \n",

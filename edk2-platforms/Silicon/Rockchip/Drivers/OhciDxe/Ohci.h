@@ -31,6 +31,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/DebugLib.h>
 #include <Library/BaseMemoryLib.h>
 
+#include <Protocol/OhciDeviceProtocol.h>
+
 typedef struct _USB_OHCI_HC_DEV USB_OHCI_HC_DEV;
 
 #include "UsbHcMem.h"
@@ -39,6 +41,11 @@ typedef struct _USB_OHCI_HC_DEV USB_OHCI_HC_DEV;
 #include "OhciUrb.h"
 #include "Descriptor.h"
 #include "OhciDebug.h"
+#include "ComponentName.h"
+
+extern EFI_DRIVER_BINDING_PROTOCOL   gOhciDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL   gOhciComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gOhciComponentName2;
 
 #define USB_OHCI_HC_DEV_SIGNATURE     SIGNATURE_32('o','h','c','i')
 
@@ -60,7 +67,6 @@ struct _USB_OHCI_HC_DEV {
   UINTN                     Signature;
   EFI_USB_HC_PROTOCOL       UsbHc;
   EFI_USB2_HC_PROTOCOL      Usb2Hc;
-  EFI_HANDLE                Controller;
   UINT32                    UsbHcBaseAddress;
   HCCA_MEMORY_BLOCK         *HccaMemoryBlock;
   VOID                      *HccaMemoryBuf;
@@ -80,6 +86,8 @@ struct _USB_OHCI_HC_DEV {
   EFI_EVENT                  ExitBootServiceEvent;
 
   EFI_UNICODE_STRING_TABLE  *ControllerNameTable;
+
+  OHCI_DEVICE_PROTOCOL      *Protocol;
 };
 
 #define USB_OHCI_HC_DEV_FROM_THIS(a)    CR(a, USB_OHCI_HC_DEV, UsbHc, USB_OHCI_HC_DEV_SIGNATURE)

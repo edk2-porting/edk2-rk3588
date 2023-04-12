@@ -2109,6 +2109,53 @@ OhcExitBootService (
 }
 
 /**
+  Test to see if this driver supports ControllerHandle. Any
+  ControllerHandle that has UsbHcProtocol installed will be supported.
+
+  @param  This                 Protocol instance pointer.
+  @param  Controller           Handle of device to test.
+  @param  RemainingDevicePath  Not used.
+
+  @return EFI_SUCCESS          This driver supports this device.
+  @return EFI_UNSUPPORTED      This driver does not support this device.
+
+**/
+EFI_STATUS
+EFIAPI
+OHCIDriverBindingSupported (
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   ControllerHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
+  )
+{
+  OHCI_DEVICE_PROTOCOL               *Dev;
+  EFI_STATUS                         Status;
+
+  //
+  //  Connect to the non-discoverable device
+  //
+  Status = gBS->OpenProtocol (ControllerHandle,
+                              &gOhciDeviceProtocol,
+                              (VOID **)&Dev,
+                              This->DriverBindingHandle,
+                              ControllerHandle,
+                              EFI_OPEN_PROTOCOL_BY_DRIVER);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Clean up.
+  //
+  gBS->CloseProtocol (ControllerHandle,
+                      &gOhciDeviceProtocol,
+                      This->DriverBindingHandle,
+                      ControllerHandle);
+
+  return EFI_SUCCESS;
+}
+
+/**
 
   Allocate and initialize the empty OHCI device.
 
@@ -2120,8 +2167,10 @@ OhcExitBootService (
 
 EFI_STATUS
 EFIAPI
-OhciInitialiseController (
-  IN UINT32               OhciNum
+OHCIDriverBindingStart (
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   ControllerHandle,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath   OPTIONAL
   )
 {
   USB_OHCI_HC_DEV         *Ohc;
@@ -2132,18 +2181,21 @@ OhciInitialiseController (
   UINTN                   Pages;
   UINTN                   Bytes;
 
-  OHCI_DEVICE_PATH        *DevicePath;
-  STATIC INTN Bus = 0;
-  DevicePath = AllocateCopyPool (sizeof(OhciDevicePathProtocol),
-                                  &OhciDevicePathProtocol);
-  if (DevicePath == NULL) {
-    return EFI_OUT_OF_RESOURCES;
-  }
-  DevicePath->Instance = Bus;
-
   Ohc = AllocateZeroPool (sizeof (USB_OHCI_HC_DEV));
   if (Ohc == NULL) {
     return EFI_OUT_OF_RESOURCES;
+  }
+
+  Status = gBS->OpenProtocol (ControllerHandle,
+                              &gOhciDeviceProtocol,
+                              (VOID **)&Ohc->Protocol,
+                              This->DriverBindingHandle,
+                              ControllerHandle,
+                              EFI_OPEN_PROTOCOL_BY_DRIVER);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR,
+      "%a: Couldn't open protocol: %r\n", __FUNCTION__, Status));
+    goto FREE_OHC;
   }
 
   Ohc->Signature                      = USB_OHCI_HC_DEV_SIGNATURE;
@@ -2163,7 +2215,7 @@ OhciInitialiseController (
   Ohc->UsbHc.ClearRootHubPortFeature  = OhciClearRootHubPortFeature;
   Ohc->UsbHc.MajorRevision            = 0x1;
   Ohc->UsbHc.MinorRevision            = 0x1;
-  Ohc->UsbHcBaseAddress               = PcdGet32(PcdOhciBaseAddress) + OhciNum * PcdGet32(PcdOhciSize);
+  Ohc->UsbHcBaseAddress               = Ohc->Protocol->BaseAddress;
   Ohc->HccaMemoryBlock = NULL;
   Ohc->HccaMemoryMapping   = NULL;
   Ohc->HccaMemoryBuf = NULL;
@@ -2207,16 +2259,36 @@ OhciInitialiseController (
   Ohc->HccaMemoryBuf = (VOID *)(UINTN)Buf;
   Ohc->HccaMemoryPages = Pages;
 
-  Status = gBS->InstallMultipleProtocolInterfaces(
-        &Ohc->Controller,
-        &gEfiUsbHcProtocolGuid,
-        &Ohc->UsbHc,
-        &gEfiDevicePathProtocolGuid,
-        (EFI_DEVICE_PATH_PROTOCOL *) DevicePath,
-        NULL);
-  if(EFI_ERROR (Status)) {
+  //
+  //Install Host Controller Protocol
+  //
+  Status = gBS->InstallProtocolInterface (
+                  &ControllerHandle,
+                  &gEfiUsbHcProtocolGuid,
+                  EFI_NATIVE_INTERFACE,
+                  &Ohc->UsbHc
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_INFO, "Install protocol error"));
+    goto FREE_OHC;
+  }
+
+  //
+  // Create event to stop the HC on exit boot services.
+  //
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_NOTIFY,
+                  OhcExitBootService,
+                  Ohc,
+                  &gEfiEventExitBootServicesGuid,
+                  &Ohc->ExitBootServiceEvent
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((EFI_D_INFO, "Create exit boot event error"));
     goto UNINSTALL_USBHC;
   }
+
   //
   // Set 0.01 s timer
   //
@@ -2242,19 +2314,23 @@ OhciInitialiseController (
   if (EFI_ERROR (Status)) {
     goto FREE_OHC;
   }
-  DEBUG ((EFI_D_ERROR, "OHCI started for controller @ %p\n", Ohc->Controller));
-  Bus++;
+  DEBUG ((EFI_D_ERROR, "OHCI started for controller @ %p, base address: 0x%p\n", 
+          ControllerHandle, Ohc->UsbHcBaseAddress));
   return EFI_SUCCESS;
 
 FREE_OHC:
   OhciFreeDev (Ohc);
 UNINSTALL_USBHC:
   gBS->UninstallMultipleProtocolInterfaces (
-         Ohc->Controller,
+         ControllerHandle,
          &gEfiUsbHcProtocolGuid,
          &Ohc->UsbHc,
          NULL
          );
+  gBS->CloseProtocol (ControllerHandle,
+        &gOhciDeviceProtocol,
+        This->DriverBindingHandle,
+        ControllerHandle); 
 FREE_MEM_PAGE:
   DmaFreeBuffer (Pages, Buf);
 FREE_MEM_POOL:
@@ -2265,48 +2341,62 @@ FREE_DEV_BUFFER:
   return Status;
 }
 
-STATIC
-VOID
+/**
+  Stop this driver on ControllerHandle. Support stopping any child handles
+  created by this driver.
+
+  @param  This                  Protocol instance pointer.
+  @param  Controller            Handle of device to stop driver on.
+  @param  NumberOfChildren      Number of Children in the ChildHandleBuffer.
+  @param  ChildHandleBuffer     List of handles for the children we need to stop.
+
+  @return EFI_SUCCESS
+  @return others
+
+**/
+EFI_STATUS
 EFIAPI
-OnEndOfDxe (
-  IN EFI_EVENT  Event,
-  IN VOID       *Context
+OHCIDriverBindingStop (
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN UINTN                        NumberOfChildren,
+  IN EFI_HANDLE                   *ChildHandleBuffer
   )
 {
-  OHCI_DEVICE_PATH          *DevicePath;
-  EFI_DEVICE_PATH_PROTOCOL  *DevicePathPointer;
-  EFI_HANDLE                DeviceHandle;
-  EFI_STATUS                Status;
+  EFI_STATUS           Status;
+  EFI_USB_HC_PROTOCOL  *UsbHc;
 
-  gBS->CloseEvent (Event);
-
-  DevicePath = AllocateCopyPool (sizeof (OhciDevicePathProtocol),
-                 &OhciDevicePathProtocol);
-  if (DevicePath == NULL) {
-    DEBUG ((EFI_D_ERROR, "Ohci device path allocate failed\n"));
-    return;
+  Status = gBS->OpenProtocol (
+                  Controller,
+                  &gEfiUsbHcProtocolGuid,
+                  (VOID **)&UsbHc,
+                  This->DriverBindingHandle,
+                  Controller,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
   }
 
-  do {
-    DevicePathPointer = (EFI_DEVICE_PATH_PROTOCOL *)DevicePath;
-    Status = gBS->LocateDevicePath (&gEfiUsbHcProtocolGuid,
-                    &DevicePathPointer,
-                    &DeviceHandle);
-    if (EFI_ERROR (Status)) {
-      break;
-    }
+  OhciCleanDevUp(Controller, UsbHc);
 
-    Status = gBS->ConnectController (DeviceHandle, NULL, NULL, TRUE);
-    DEBUG ((EFI_D_ERROR,
-      "%a: ConnectController () returned %r\n",
-      __FUNCTION__,
-      Status));
-
-    DevicePath->Instance++;
-  } while (TRUE);
-
-  gBS->FreePool (DevicePath);
+  gBS->CloseProtocol (
+         Controller,
+         &gOhciDeviceProtocol,
+         This->DriverBindingHandle,
+         Controller
+         );
+  return EFI_SUCCESS;
 }
+
+EFI_DRIVER_BINDING_PROTOCOL gOhciDriverBinding = {
+  OHCIDriverBindingSupported,
+  OHCIDriverBindingStart,
+  OHCIDriverBindingStop,
+  0x10,
+  NULL,
+  NULL
+};
 
 EFI_STATUS
 EFIAPI
@@ -2315,26 +2405,12 @@ OhciInitialise (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_EVENT     EndOfDxeEvent;
-  EFI_STATUS    Status;
-  UINT32        Index;
-  UINT32        OhciNum;
-
-  /* Initialize enabled chips */
-  OhciNum = PcdGet32(PcdNumOhciController);
-  for(Index = 0; Index < OhciNum; Index++) {
-    Status = OhciInitialiseController(
-          Index
-          );
-    DEBUG ((EFI_D_ERROR, "OhciInitialise OhciInitialiseController %d Status = %r\n",Index, Status));
-  }
-  Status = gBS->CreateEventEx (EVT_NOTIFY_SIGNAL,
-                  TPL_CALLBACK,
-                  OnEndOfDxe,
-                  NULL,
-                  &gEfiEndOfDxeEventGroupGuid,
-                  &EndOfDxeEvent);
-  ASSERT_EFI_ERROR (Status);
-  return EFI_SUCCESS;
+  return EfiLibInstallDriverBindingComponentName2 (
+              ImageHandle,
+              SystemTable,
+              &gOhciDriverBinding,
+              ImageHandle,
+              &gOhciComponentName,
+              &gOhciComponentName2
+              );
 }
-

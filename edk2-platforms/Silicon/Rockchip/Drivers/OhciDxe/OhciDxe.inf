@@ -35,6 +35,8 @@
   OhciDebug.h
   UsbHcMem.c
   UsbHcMem.h
+  ComponentName.c
+  ComponentName.h
 
 [Packages]
   EmbeddedPkg/EmbeddedPkg.dec
@@ -60,12 +62,8 @@
   gEfiEndOfDxeEventGroupGuid
 
 [Protocols]
+  gOhciDeviceProtocol                           ## TO_START
   gEfiUsbHcProtocolGuid                         ## BY_START
-
-[Pcd]
-  gRockchipTokenSpaceGuid.PcdOhciBaseAddress
-  gRockchipTokenSpaceGuid.PcdOhciSize|0x80000
-  gRockchipTokenSpaceGuid.PcdNumOhciController|2
 
 [Depex]
   TRUE

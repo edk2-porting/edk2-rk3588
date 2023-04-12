@@ -33,6 +33,7 @@
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   RockchipPlatformLib
+  DevicePathLib
 
 [FixedPcd]
   gRockchipTokenSpaceGuid.PcdOhciBaseAddress
@@ -43,6 +44,9 @@
   gRockchipTokenSpaceGuid.PcdEhciSize
   gRockchipTokenSpaceGuid.PcdDwc3BaseAddresses
   gRockchipTokenSpaceGuid.PcdDwc3Size
+
+[Protocols]
+  gOhciDeviceProtocol           ## PRODUCES
 
 [Guids]
   gEfiEndOfDxeEventGroupGuid
