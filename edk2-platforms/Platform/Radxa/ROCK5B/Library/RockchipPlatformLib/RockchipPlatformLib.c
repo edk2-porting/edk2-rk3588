@@ -195,6 +195,9 @@ I2cGetBase (
   switch (id) {
   case 0:
     Base = 0xFD880000;
+    /* io mux M2 */
+    PMU2_IOC->GPIO0D_IOMUX_SEL_L = (0x0F00UL << 16) | 0x0300;
+    PMU2_IOC->GPIO0D_IOMUX_SEL_L = (0x00F0UL << 16) | 0x0030;
     break;
   case 1:
     Base = 0xFEA90000;

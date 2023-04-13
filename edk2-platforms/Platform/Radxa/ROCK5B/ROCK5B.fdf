@@ -153,6 +153,7 @@ READ_LOCK_STATUS   = TRUE
   INF Silicon/Rockchip/Drivers/I2c/I2cDxe/I2cDxe.inf
   INF MdeModulePkg/Bus/I2c/I2cDxe/I2cDxe.inf
   # INF Silicon/Rockchip/Drivers/I2c/I2cDemoDxe/I2cDemoDxe.inf
+  INF Silicon/Rockchip/Drivers/I2c/Rk860xRegulatorDxe/Rk860xRegulatorDxe.inf
 
   #
   # Virtual Keyboard
