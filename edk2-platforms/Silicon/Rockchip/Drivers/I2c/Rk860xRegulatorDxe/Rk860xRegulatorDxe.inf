@@ -1,0 +1,51 @@
+#/** @file
+#
+#  RK860X voltage regulator driver
+#
+#  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Rk860xRegulatorDxe
+  FILE_GUID                      = cd5a650e-20e1-47b4-b33a-5e77bf9be42a
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = Rk860xRegulatorInitialise
+
+[Sources.common]
+  Rk860xRegulatorDxe.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  ArmPlatformPkg/ArmPlatformPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/Rockchip/RockchipPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  IoLib
+  PcdLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Protocols]
+  gEfiI2cIoProtocolGuid           ## CONSUMES
+  gEfiDriverBindingProtocolGuid   ## PRODUCES
+  gRk860xRegulatorProtocolGuid    ## PRODUCES
+
+[Pcd]
+  gRockchipTokenSpaceGuid.PcdRk860xRegulatorAddresses
+  gRockchipTokenSpaceGuid.PcdRk860xRegulatorBuses
+  gRockchipTokenSpaceGuid.PcdRk860xRegulatorMinVoltages
+  gRockchipTokenSpaceGuid.PcdRk860xRegulatorMaxVoltages
+
+[Depex]
+  TRUE
