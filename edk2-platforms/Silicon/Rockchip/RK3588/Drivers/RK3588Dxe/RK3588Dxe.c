@@ -31,6 +31,8 @@
 #include <Protocol/NonDiscoverableDevice.h>
 #include <Protocol/ArmScmi.h>
 #include <Protocol/ArmScmiClockProtocol.h>
+#include <Protocol/Rk860xRegulator.h>
+#include <Protocol/I2c.h>
 
 #include <Soc.h>
 #include <Library/CruLib.h>
@@ -179,6 +181,83 @@ SetMaxCpuSpeed (
   }
 
   return EFI_SUCCESS;
+}
+
+STATIC
+VOID
+EFIAPI
+ConfigureRk860xRegulator (
+  VOID
+  )
+{
+  EFI_STATUS                  Status;
+  EFI_HANDLE                  *HandleBuffer;
+  RK860X_REGULATOR_PROTOCOL   *Rk860xRegulator;
+  UINTN                       NumRegulators;
+  UINT32                      Index;
+  UINT32                      Voltage;
+
+  Status = gBS->LocateHandleBuffer (ByProtocol,
+                                    &gRk860xRegulatorProtocolGuid,
+                                    NULL,
+                                    &NumRegulators,
+                                    &HandleBuffer);
+  if (EFI_ERROR(Status)) {
+    return;
+  }
+
+  DEBUG((EFI_D_WARN, "%u regulators found:\n", NumRegulators));
+
+  for (Index = 0; Index < NumRegulators; Index++) {
+    Status = gBS->OpenProtocol (HandleBuffer[Index],
+                                &gRk860xRegulatorProtocolGuid,
+                                (VOID **) &Rk860xRegulator,
+                                gImageHandle,
+                                NULL,
+                                EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL);
+
+    if (EFI_ERROR(Status)) {
+      DEBUG((DEBUG_ERROR, " Failed to open protocol for reg %d\n", Index));
+    }
+
+    DEBUG((EFI_D_WARN," 0x%x on I2C bus %d\n", 
+          I2C_DEVICE_ADDRESS(Rk860xRegulator->Identifier), 
+          I2C_DEVICE_BUS(Rk860xRegulator->Identifier)));
+
+    DEBUG((EFI_D_WARN,"   SupportedVoltageRange: [%d, %d]\n", 
+          Rk860xRegulator->SupportedVoltageRange.Min, Rk860xRegulator->SupportedVoltageRange.Max));
+    DEBUG((EFI_D_WARN,"   PreferredVoltageRange: [%d, %d]\n",
+          Rk860xRegulator->PreferredVoltageRange.Min, Rk860xRegulator->PreferredVoltageRange.Max));
+
+    Status = Rk860xRegulator->GetVoltage (Rk860xRegulator, &Voltage, FALSE);
+    if (EFI_ERROR(Status)) {
+      DEBUG((DEBUG_ERROR, "   Failed to get voltage. Status=%lx\n", Status));
+      goto CloseProtocol;
+    }
+    DEBUG((EFI_D_WARN,"   Current voltage: %d mV\n", Voltage));
+
+    Voltage = Rk860xRegulator->PreferredVoltageRange.Max;
+
+    DEBUG((EFI_D_WARN,"   Setting voltage to preferred max: %d mV\n", Voltage));
+    Status = Rk860xRegulator->SetVoltage (Rk860xRegulator, Voltage, FALSE);
+    if (EFI_ERROR(Status)) {
+      DEBUG((DEBUG_ERROR, "   Failed to set voltage. Status=%lx\n", Status));
+      goto CloseProtocol;
+    }
+
+    Status = Rk860xRegulator->GetVoltage (Rk860xRegulator, &Voltage, FALSE);
+    if (EFI_ERROR(Status)) {
+      DEBUG((DEBUG_ERROR, "   Failed to get voltage. Status=%lx\n", Status));
+      goto CloseProtocol;
+    }
+    DEBUG((EFI_D_WARN,"   Current voltage: %d mV\n", Voltage));
+  }
+
+CloseProtocol:
+  gBS->CloseProtocol (HandleBuffer[Index],
+                      &gRk860xRegulatorProtocolGuid,
+                      gImageHandle,
+                      NULL);
 }
 
 STATIC
@@ -782,6 +861,7 @@ RK3588EntryPoint (
 {
   EFI_STATUS            Status;
 
+  ConfigureRk860xRegulator ();
   SetMaxCpuSpeed ();
   
   Status = RK3588InitPeripherals ();

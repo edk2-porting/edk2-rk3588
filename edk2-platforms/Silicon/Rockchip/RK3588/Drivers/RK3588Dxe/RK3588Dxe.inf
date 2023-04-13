@@ -47,6 +47,7 @@
   gPlatformVirtualKeyboardProtocolGuid
   gAndroidBootImgProtocolGuid
   gEfiCpuArchProtocolGuid
+  gRk860xRegulatorProtocolGuid
 
 [Pcd]
   gRK3588TokenSpaceGuid.PcdAndroidBootDevicePath
@@ -63,4 +64,4 @@
   gEfiEndOfDxeEventGroupGuid
 
 [Depex]
-  TRUE
+  gRk860xRegulatorProtocolGuid
