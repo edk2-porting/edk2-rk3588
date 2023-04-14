@@ -198,8 +198,6 @@ OnRk860xRegulatorRegistrationEvent (
   UINT32                      Index;
   UINT32                      Voltage;
 
-  gBS->CloseEvent (Event);
-
   Status = gBS->LocateHandleBuffer (ByProtocol,
                                     &gRk860xRegulatorProtocolGuid,
                                     NULL,
@@ -212,6 +210,8 @@ OnRk860xRegulatorRegistrationEvent (
     return;
   }
 
+  gBS->CloseEvent (Event);
+
   DEBUG((EFI_D_WARN, "%u regulators found:\n", NumRegulators));
 
   for (Index = 0; Index < NumRegulators; Index++) {
@@ -223,7 +223,8 @@ OnRk860xRegulatorRegistrationEvent (
                                 EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL);
 
     if (EFI_ERROR(Status)) {
-      DEBUG((DEBUG_ERROR, " Failed to open protocol for reg %d\n", Index));
+      DEBUG((DEBUG_ERROR, " Failed to open protocol for reg %d. Status=%r\n", Index));
+      return;
     }
 
     DEBUG((EFI_D_WARN," 0x%x on I2C bus %d\n", 
@@ -237,7 +238,7 @@ OnRk860xRegulatorRegistrationEvent (
 
     Status = Rk860xRegulator->GetVoltage (Rk860xRegulator, &Voltage, FALSE);
     if (EFI_ERROR(Status)) {
-      DEBUG((DEBUG_ERROR, "   Failed to get voltage. Status=%lx\n", Status));
+      DEBUG((DEBUG_ERROR, "   Failed to get voltage. Status=%r\n", Status));
       goto CloseProtocol;
     }
     DEBUG((EFI_D_WARN,"   Current voltage: %d mV\n", Voltage));
@@ -247,23 +248,23 @@ OnRk860xRegulatorRegistrationEvent (
     DEBUG((EFI_D_WARN,"   Setting voltage to preferred max: %d mV\n", Voltage));
     Status = Rk860xRegulator->SetVoltage (Rk860xRegulator, Voltage, FALSE);
     if (EFI_ERROR(Status)) {
-      DEBUG((DEBUG_ERROR, "   Failed to set voltage. Status=%lx\n", Status));
+      DEBUG((DEBUG_ERROR, "   Failed to set voltage. Status=%r\n", Status));
       goto CloseProtocol;
     }
 
     Status = Rk860xRegulator->GetVoltage (Rk860xRegulator, &Voltage, FALSE);
     if (EFI_ERROR(Status)) {
-      DEBUG((DEBUG_ERROR, "   Failed to get voltage. Status=%lx\n", Status));
+      DEBUG((DEBUG_ERROR, "   Failed to get voltage. Status=%r\n", Status));
       goto CloseProtocol;
     }
     DEBUG((EFI_D_WARN,"   Current voltage: %d mV\n", Voltage));
-  }
 
 CloseProtocol:
-  gBS->CloseProtocol (HandleBuffer[Index],
-                      &gRk860xRegulatorProtocolGuid,
-                      gImageHandle,
-                      NULL);
+    gBS->CloseProtocol (HandleBuffer[Index],
+                        &gRk860xRegulatorProtocolGuid,
+                        gImageHandle,
+                        NULL);
+  }
 }
 
 STATIC
