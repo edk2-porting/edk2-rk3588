@@ -147,14 +147,18 @@
   gRockchipTokenSpaceGuid.PcdMemoryVendorName|"TBD"
 
   # I2C
-  gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x51 }
-  gRockchipTokenSpaceGuid.PcdI2cSlaveBuses|{ 0x2 }
-  gRockchipTokenSpaceGuid.PcdI2cControllersEnabled|{ 0x2 }
+  gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x42, 0x43 }
+  gRockchipTokenSpaceGuid.PcdI2cSlaveBuses|{ 0x0, 0x0 }
+  gRockchipTokenSpaceGuid.PcdI2cControllersEnabled|{ 0x0 }
   gRockchipTokenSpaceGuid.PcdI2cClockFrequency|198000000
   gRockchipTokenSpaceGuid.PcdI2cBaudRate|100000
   gRockchipTokenSpaceGuid.PcdI2cBusCount|1
   gRockchipTokenSpaceGuid.PcdI2cDemoAddresses|{ 0x51 } #/* RTCYM8563TS 0x51@bus2 */
   gRockchipTokenSpaceGuid.PcdI2cDemoBuses|{ 0x2 }
+  gRockchipTokenSpaceGuid.PcdRk860xRegulatorAddresses|{ 0x42, 0x43 }
+  gRockchipTokenSpaceGuid.PcdRk860xRegulatorBuses|{ 0x0, 0x0 }
+  gRockchipTokenSpaceGuid.PcdRk860xRegulatorMinVoltages|{ UINT32(550000), UINT32(550000) }
+  gRockchipTokenSpaceGuid.PcdRk860xRegulatorMaxVoltages|{ UINT32(1050000), UINT32(1050000) }
 
   ## UART2 - Serial Terminal
   DEFINE SERIAL_BASE = 0xFEB50000 # UART2
@@ -420,6 +424,7 @@
   MdeModulePkg/Bus/I2c/I2cDxe/I2cDxe.inf
   Silicon/Rockchip/Drivers/I2c/I2cDemoDxe/I2cDemoDxe.inf
   Silicon/Rockchip/Applications/I2cDemoTest/I2cDemoTest.inf
+  Silicon/Rockchip/Drivers/I2c/Rk860xRegulatorDxe/Rk860xRegulatorDxe.inf
 
   #
   # MMC/SD
