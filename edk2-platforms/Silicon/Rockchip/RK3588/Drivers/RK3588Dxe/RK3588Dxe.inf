@@ -64,4 +64,4 @@
   gEfiEndOfDxeEventGroupGuid
 
 [Depex]
-  gRk860xRegulatorProtocolGuid
+  TRUE

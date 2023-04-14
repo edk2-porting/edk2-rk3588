@@ -186,8 +186,9 @@ SetMaxCpuSpeed (
 STATIC
 VOID
 EFIAPI
-ConfigureRk860xRegulator (
-  VOID
+OnRk860xRegulatorRegistrationEvent (
+  IN  EFI_EVENT   Event,
+  IN  VOID        *Context
   )
 {
   EFI_STATUS                  Status;
@@ -197,12 +198,17 @@ ConfigureRk860xRegulator (
   UINT32                      Index;
   UINT32                      Voltage;
 
+  gBS->CloseEvent (Event);
+
   Status = gBS->LocateHandleBuffer (ByProtocol,
                                     &gRk860xRegulatorProtocolGuid,
                                     NULL,
                                     &NumRegulators,
                                     &HandleBuffer);
   if (EFI_ERROR(Status)) {
+    if (Status != EFI_NOT_FOUND) {
+        DEBUG((DEBUG_WARN, "Couldn't locate gRk860xRegulatorProtocolGuid. Status=%r\n", Status));
+    }
     return;
   }
 
@@ -860,8 +866,15 @@ RK3588EntryPoint (
   )
 {
   EFI_STATUS            Status;
+  VOID                  *Rk860xRegulatorRegistration;
 
-  ConfigureRk860xRegulator ();
+  /* Configure regulators when/if the protocol gets installed */
+  EfiCreateProtocolNotifyEvent (&gRk860xRegulatorProtocolGuid,
+                                TPL_CALLBACK,
+                                OnRk860xRegulatorRegistrationEvent,
+                                NULL,
+                                &Rk860xRegulatorRegistration);
+
   SetMaxCpuSpeed ();
   
   Status = RK3588InitPeripherals ();
