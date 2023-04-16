@@ -120,4 +120,10 @@ void
 EFIAPI
 Pcie30PeReset(BOOLEAN enable);
 
+VOID
+EFIAPI
+PlatformMiscInit (
+  VOID
+);
+
 #endif

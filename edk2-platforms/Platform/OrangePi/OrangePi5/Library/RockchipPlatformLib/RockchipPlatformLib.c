@@ -323,3 +323,12 @@ Pcie30PeReset(BOOLEAN enable)
     GpioPinWrite (4, GPIO_PIN_PB6, TRUE); // output high
 }
 */
+
+VOID
+EFIAPI
+PlatformMiscInit (
+  VOID
+  )
+{
+  // Configure various things specific to this platform
+}
