@@ -222,11 +222,13 @@ SMBIOS_TABLE_TYPE2 mBoardInfoType2 = {
   { 0 }                     // ContainedObjectHandles[1];
 };
 
+CHAR8 mBoardInfoManufName[128];
+CHAR8 mBoardInfoProductName[128];
 CHAR8 mChassisAssetTag[128];
 
 CHAR8 *mBoardInfoType2Strings[] = {
-  mSysInfoManufName,
-  mSysInfoProductName,
+  mBoardInfoManufName,
+  mBoardInfoProductName,
   mSysInfoVersionName,
   mSysInfoSerial,
   mChassisAssetTag,
@@ -903,6 +905,21 @@ BoardInfoUpdateSmbiosType2 (
   VOID
   )
 {
+  CHAR8 *BoardName;
+  CHAR8 *BoardManuf;
+  CHAR8 *PlatformName;
+  CHAR8 *PlatformManuf;
+
+  BoardName = (CHAR8 *) PcdGetPtr(PcdBoardName);
+  BoardManuf = (CHAR8 *) PcdGetPtr(PcdBoardVendorName);
+  PlatformName = (CHAR8 *) PcdGetPtr(PcdPlatformName);
+  PlatformManuf = (CHAR8 *) PcdGetPtr(PcdPlatformVendorName);
+
+  AsciiStrCpyS (mBoardInfoProductName, sizeof (mBoardInfoProductName),
+                (AsciiStrCmp(BoardName, "Unknown") == 0) ? PlatformName : BoardName);
+
+  AsciiStrCpyS (mBoardInfoManufName, sizeof (mBoardInfoManufName),
+                (AsciiStrCmp(BoardManuf, "Unknown") == 0) ? PlatformManuf : BoardManuf);
 
   LogSmbiosData ((EFI_SMBIOS_TABLE_HEADER*)&mBoardInfoType2, mBoardInfoType2Strings, NULL);
 }

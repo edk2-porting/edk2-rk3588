@@ -58,9 +58,11 @@
 [PcdsFixedAtBuild]
   gRockchipTokenSpaceGuid.PcdPlatformName|"Unknown"|VOID*|0x00000001
   gRockchipTokenSpaceGuid.PcdPlatformVendorName|"Unknown"|VOID*|0x00000002
-  gRockchipTokenSpaceGuid.PcdProductUrl|"Unknown"|VOID*|0x00000003
-  gRockchipTokenSpaceGuid.PcdMemoryVendorName|"Unknown"|VOID*|0x00000004
-  gRockchipTokenSpaceGuid.PcdFamilyName|"Unknown"|VOID*|0x00000005
+  gRockchipTokenSpaceGuid.PcdBoardName|"Unknown"|VOID*|0x00000003
+  gRockchipTokenSpaceGuid.PcdBoardVendorName|"Unknown"|VOID*|0x00000004
+  gRockchipTokenSpaceGuid.PcdProductUrl|"Unknown"|VOID*|0x00000005
+  gRockchipTokenSpaceGuid.PcdMemoryVendorName|"Unknown"|VOID*|0x00000006
+  gRockchipTokenSpaceGuid.PcdFamilyName|"Unknown"|VOID*|0x00000007
 
   gRockchipTokenSpaceGuid.PcdNORFlashBase|0x00000000|UINT64|0x01000008
   gRockchipTokenSpaceGuid.PcdNORFlashCachableSize|0x1000000|UINT32|0x0100000c
