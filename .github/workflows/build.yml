@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        PLATFORM: [rock-5b, orangepi-5, indiedroid-nova] # rk3588-evb is currently failing
+        PLATFORM: [rock-5b, orangepi-5, indiedroid-nova, roc-rk3588s-pc, station-m3] # rk3588-evb is currently failing
         CONFIGURATION: [Debug, Release]
     steps:
       - name: Checkout
