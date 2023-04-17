@@ -10,6 +10,7 @@
 #include "SdhciHostDxe.h"
 #include <Library/PcdLib.h>
 #include <Library/RockchipPlatformLib.h>
+#include <Library/RockchipSdhciLib.h>
 #include <Library/CacheMaintenanceLib.h>
 #include <Library/TimerLib.h>
 #include <string.h>

@@ -869,7 +869,7 @@ RK3588EntryPoint (
   EFI_STATUS            Status;
   VOID                  *Rk860xRegulatorRegistration;
 
-  PlatformMiscInit();
+  PlatformEarlyInit();
 
   /* Configure regulators when/if the protocol gets installed */
   EfiCreateProtocolNotifyEvent (&gRk860xRegulatorProtocolGuid,

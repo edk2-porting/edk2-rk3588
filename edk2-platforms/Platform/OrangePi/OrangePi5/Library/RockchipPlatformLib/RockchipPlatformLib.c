@@ -42,45 +42,20 @@ static struct regulator_init_data rk806_init_data[] = {
   /* No dual PMICs on this platform */
 };
 
-void DebugPrintHex(void *buf, UINT32 width, UINT32 len)
-{
-  UINT32 i,j;
-  UINT8 *p8 = (UINT8 *) buf;
-  UINT16 *p16 = (UINT16 *) buf;
-  UINT32 *p32 =(UINT32 *) buf;
-
-  j = 0;
-  for (i = 0; i < len; i++) {
-    if (j == 0) {
-      DebugPrint(DEBUG_ERROR, "%p + 0x%x:",buf, i * width);
-    }
-
-    if (width == 4) {
-      DebugPrint(DEBUG_ERROR, "0x%08x,", p32[i]);
-    } else if (width == 2) {
-      DebugPrint(DEBUG_ERROR, "0x%04x,", p16[i]);
-    } else {
-      DebugPrint(DEBUG_ERROR, "0x%02x,", p8[i]);
-    }
-
-    if (++j >= (16/width)) {
-      j = 0;
-      DebugPrint(DEBUG_ERROR, "\n","");
-    }
-  }
-  DebugPrint(DEBUG_ERROR, "\n","");
-}
-
-void
+VOID
 EFIAPI
-DwEmmcDxeIoMux(void)
+DwEmmcDxeIoMux (
+  VOID
+  )
 {
   /* sdmmc0 iomux */
 }
 
-void
+VOID
 EFIAPI
-SdhciEmmcDxeIoMux(void)
+SdhciEmmcDxeIoMux (
+  VOID
+  )
 {
   /* sdmmc0 iomux */
   BUS_IOC->GPIO2A_IOMUX_SEL_L = (0xFFFFUL << 16) | (0x1111); //EMMC_CMD,EMMC_CLKOUT,EMMC_DATASTROBE,EMMC_RSTN
@@ -92,9 +67,11 @@ SdhciEmmcDxeIoMux(void)
 #define CRU_CLKSEL_CON59    0x03EC
 #define CRU_CLKSEL_CON78    0x0438
 
-void
+VOID
 EFIAPI
-Rk806SpiIomux(void)
+Rk806SpiIomux (
+  VOID
+  )
 {
   /* io mux */
   //BUS_IOC->GPIO1A_IOMUX_SEL_H = (0xFFFFUL << 16) | 0x8888;
@@ -106,9 +83,9 @@ Rk806SpiIomux(void)
 
 VOID
 EFIAPI
-Rk806Configure(
+Rk806Configure (
   VOID
-)
+  )
 {
   UINTN RegCfgIndex;
 
@@ -118,9 +95,11 @@ Rk806Configure(
     RK806RegulatorInit(rk806_init_data[RegCfgIndex]);
 }
 
-void
+VOID
 EFIAPI
-NorFspiIomux(void)
+NorFspiIomux (
+  VOID
+  )
 {
   /* io mux */
   MmioWrite32(NS_CRU_BASE + CRU_CLKSEL_CON78,
@@ -144,11 +123,11 @@ NorFspiIomux(void)
 #endif
 }
 
-void
+VOID
 EFIAPI
 GmacIomux (
    UINT32 id
-)
+  )
 {
   switch (id) {
   case 0:
@@ -168,40 +147,35 @@ GmacIomux (
   }
 }
 
-void
+VOID
 EFIAPI
 NorFspiEnableClock (
   UINT32 *CruBase
-)
+  )
 {
   UINTN BaseAddr = (UINTN) CruBase;
 
   MmioWrite32(BaseAddr + 0x087C, 0x0E000000);
 }
 
-UINT32
+VOID
 EFIAPI
-I2cGetBase (
+I2cIomux (
    UINT32 id
-)
+  )
 {
-  UINT32 Base = 0;
-
   switch (id) {
   case 0:
-    Base = 0xFD880000;
     /* io mux M2 */
     PMU2_IOC->GPIO0D_IOMUX_SEL_L = (0x0F00UL << 16) | 0x0300;
     PMU2_IOC->GPIO0D_IOMUX_SEL_L = (0x00F0UL << 16) | 0x0030;
     break;
   case 1:
-    Base = 0xFEA90000;
     /* io mux */
     //BUS_IOC->GPIO0B_IOMUX_SEL_H = (0x0FF0UL << 16) | 0x0990;
     //PMU2_IOC->GPIO0B_IOMUX_SEL_H = (0x0FF0UL << 16) | 0x0880;
     break;
   case 2:
-    Base = 0xFEAA0000;
     /* io mux */
     BUS_IOC->GPIO0B_IOMUX_SEL_H = (0xF000UL << 16) | 0x9000;
     BUS_IOC->GPIO0C_IOMUX_SEL_L = (0x000FUL << 16) | 0x0009;
@@ -209,30 +183,21 @@ I2cGetBase (
     PMU2_IOC->GPIO0C_IOMUX_SEL_L = (0x000FUL << 16) | 0x0008;
     break;
   case 3:
-    Base = 0xFEAB0000;
     break;
   case 4:
-    Base = 0xFEAC0000;
     break;
   case 5:
-    Base = 0xFEAD0000;
     break;
   default:
     break;
   }
-
-  return Base;
 }
 
-#define GPIO4_BASE         0xFEC50000
-#define GPIO_SWPORT_DR_L   0x0000
-#define GPIO_SWPORT_DR_H   0x0004
-#define GPIO_SWPORT_DDR_L  0x0008
-#define GPIO_SWPORT_DDR_H  0x000C
-
-void
+VOID
 EFIAPI
-UsbPortPowerEnable (void)
+UsbPortPowerEnable (
+  VOID
+  )
 {
   DEBUG((EFI_D_WARN, "UsbPortPowerEnable called\n"));
   /* Set GPIO3 PC0 (TYPEC_EN) output high to power Type-C/USB2.0 ports */
@@ -244,18 +209,22 @@ UsbPortPowerEnable (void)
   // GpioPinSetDirection (1, GPIO_PIN_PA2, GPIO_PIN_OUTPUT);
 }
 
-void
+VOID
 EFIAPI
-Usb2PhySuspend (void)
+Usb2PhySuspend (
+  VOID
+  )
 {
   MmioWrite32(0xfd5d4008, 0x20000000);
   MmioWrite32(0xfd5d8008, 0x20000000);
   MmioWrite32(0xfd5dc008, 0x20000000);
 }
 
-void
+VOID
 EFIAPI
-Usb2PhyResume (void)
+Usb2PhyResume (
+  VOID
+  )
 {
   MmioWrite32(0xfd5d0008, 0x20000000);
   MmioWrite32(0xfd5d4008, 0x20000000);
@@ -265,9 +234,11 @@ Usb2PhyResume (void)
   MmioWrite32(0xfd7f0a10, 0x07000000);
 }
 
-void
+VOID
 EFIAPI
-UsbDpPhyEnable (void)
+UsbDpPhyEnable (
+  VOID
+  )
 {
   /* enable rx_lfps_en & usbdp_low_pwrn */
   MmioWrite32(0xfd5c8004, 0x60006000);
@@ -278,42 +249,25 @@ UsbDpPhyEnable (void)
   MmioWrite32 (0xfd5cc00c, 0x00030001);
 }
 
-void
-EFIAPI
-Dwc3Force20ClkFor30Clk (UINT32 Address, BOOLEAN enable)
-{
-  UINT32 Reg;
-
-  if (enable) {
-    Reg = MmioRead32(Address);
-    Reg |= (1 << 26);
-    MmioWrite32((Address), Reg);
-  } else {
-    Reg = MmioRead32(Address);
-    Reg &= ~(1 << 26);
-    MmioWrite32(Address, Reg);
-  }
-}
-
 /* Orange Pi5 does not have PCIe3.0, wait for PCIe2 support and re-add it.
-void
+VOID
 EFIAPI
-Pcie30IoInit(void)
+Pcie30IoInit(VOID)
 {
   // Set reset and power IO to gpio output mode
   GpioPinSetDirection (4, GPIO_PIN_PB6, GPIO_PIN_OUTPUT);
   GpioPinSetDirection (1, GPIO_PIN_PA4, GPIO_PIN_OUTPUT);
 }
 
-void
+VOID
 EFIAPI
-Pcie30PowerEn(void)
+Pcie30PowerEn(VOID)
 {
   // output high to enable power
   GpioPinWrite (1, GPIO_PIN_PA4, TRUE);
 }
 
-void
+VOID
 EFIAPI
 Pcie30PeReset(BOOLEAN enable)
 {
@@ -326,7 +280,7 @@ Pcie30PeReset(BOOLEAN enable)
 
 VOID
 EFIAPI
-PlatformMiscInit (
+PlatformEarlyInit (
   VOID
   )
 {

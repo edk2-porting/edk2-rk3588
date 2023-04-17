@@ -7,7 +7,7 @@
  *
  **/
 
-#include "RockchipSdhci.h"
+#include <Library/RockchipSdhciLib.h>
 #include <Library/PcdLib.h>
 #include <Library/TimerLib.h>
 

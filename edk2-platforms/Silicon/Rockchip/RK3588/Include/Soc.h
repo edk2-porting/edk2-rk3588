@@ -40,6 +40,9 @@
 #define RK3588_PERIPH_BASE      0xF0000000
 #define RK3588_PERIPH_SZ        0x10000000
 
+#define I2C_BASE(id)            ((id == 0) ? 0xFD880000 : (0xFEA90000 + ((id - 1) * 0x10000)))
+#define I2C_COUNT               9
+
 /******************************************CRU*******************************************/
 #define PLL_INPUT_OSC_RATE (24 * 1000 * 1000)
 

@@ -48,8 +48,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #define I2C_FAST           0x2
 #define I2C_FASTEST        0x3
 
-#define DIV_ROUND_UP(n, d)  (((n) + (d) - 1) / (d))
-
 /* rk i2c fifo max transfer bytes */
 #define RK_I2C_FIFO_SIZE	32
 

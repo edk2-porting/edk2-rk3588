@@ -21,6 +21,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/RockchipPlatformLib.h>
 
+#include <Soc.h>
+
 #include "I2cDxe.h"
 
 #define RK_I2C_DUMPREG 1
@@ -280,16 +282,23 @@ I2cInitialise (
    DeviceBusPcd = PcdGetPtr (PcdI2cSlaveBuses);
   /* Initialize enabled chips */
   for (Index = 0; Index < PcdGet32 (PcdI2cBusCount); Index++) {
-    BaseAddress = I2cGetBase(DeviceBusPcd[Index]);
+    if (DeviceBusPcd[Index] > I2C_COUNT - 1) {
+      DEBUG ((EFI_D_WARN, "I2cInitialise: invalid bus %d for DeviceBusPcd index %d. Skipping.\n",
+              DeviceBusPcd[Index], Index));
+      continue;
+    }
 
-    if (!BaseAddress)
-        continue;
-      Status = I2cInitialiseController(
-        ImageHandle,
-        SystemTable,
-        BaseAddress,
-        DeviceBusPcd[Index]
-        );
+    BaseAddress = I2C_BASE (DeviceBusPcd[Index]);
+
+    I2cIomux (DeviceBusPcd[Index]);
+
+    Status = I2cInitialiseController(
+      ImageHandle,
+      SystemTable,
+      BaseAddress,
+      DeviceBusPcd[Index]
+      );
+      
     if (EFI_ERROR(Status))
       return Status;
   }

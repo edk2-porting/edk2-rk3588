@@ -17,113 +17,112 @@
 
 #include <Uefi.h>
 
-/**
-  Check to see if any data is available to be read from the debug device.
-
-  @retval TRUE       At least one byte of data is available to be read
-  @retval FALSE      No data is available to be read
-
-**/
 VOID
 EFIAPI
-DwEmmcDxeIoMux ();
-
-void
-EFIAPI
-SdhciEmmcDxeIoMux();
-
-VOID
-EFIAPI
-DebugPrintHex(
-VOID *buf,
-UINT32 width,
-UINT32 len);
-
-VOID
-EFIAPI
-EnableBacklight(
-IN BOOLEAN en);
-
-VOID
-EFIAPI
-EnablePWM(
-IN BOOLEAN en);
-
-EFI_STATUS
-EFIAPI
-SdhciGetClockRate (
-  IN UINTN TargetFreq,
-  OUT UINTN *BaseFreq
+DwEmmcDxeIoMux (
+  VOID
   );
 
-void
+VOID
 EFIAPI
-GmacIomux(
+SdhciEmmcDxeIoMux (
+  VOID
+  );
+
+VOID
+EFIAPI
+EnableBacklight (
+  IN BOOLEAN en
+  );
+
+VOID
+EFIAPI
+EnablePWM (
+  IN BOOLEAN en
+  );
+
+VOID
+EFIAPI
+GmacIomux (
   UINT32 id
   );
 
-void
-EFIAPI
-Rk806SpiIomux(void);
-
 VOID
 EFIAPI
-Rk806Configure(
+Rk806SpiIomux (
   VOID
   );
 
-void
+VOID
 EFIAPI
-NorFspiIomux(void);
-
-void
-EFIAPI
-NorFspiEnableClock (
-  UINT32 *CruBase
-);
-
-UINT32
-EFIAPI
-I2cGetBase (
-   UINT32 id
-);
-
-void
-EFIAPI
-UsbDpPhyEnable (void);
-
-void
-EFIAPI
-UsbPortPowerEnable (void);
-
-void
-EFIAPI
-Usb2PhySuspend (void);
-
-void
-EFIAPI
-Usb2PhyResume (void);
-
-void
-EFIAPI
-Dwc3Force20ClkFor30Clk (UINT32 Address, BOOLEAN enable);
-
-void
-EFIAPI
-Pcie30IoInit(void);
-
-void
-EFIAPI
-Pcie30PowerEn(void);
-
-void
-EFIAPI
-Pcie30PeReset(BOOLEAN enable);
+Rk806Configure (
+  VOID
+  );
 
 VOID
 EFIAPI
-PlatformMiscInit (
+NorFspiIomux (
   VOID
-);
+  );
+
+VOID
+EFIAPI
+NorFspiEnableClock (
+  UINT32 *CruBase
+  );
+
+VOID
+EFIAPI
+I2cIomux (
+   UINT32 id
+  );
+
+VOID
+EFIAPI
+UsbDpPhyEnable (
+  VOID
+  );
+
+VOID
+EFIAPI
+UsbPortPowerEnable (
+  VOID
+  );
+
+VOID
+EFIAPI
+Usb2PhySuspend (
+  VOID
+  );
+
+VOID
+EFIAPI
+Usb2PhyResume (
+  VOID
+  );
+
+VOID
+EFIAPI
+Pcie30IoInit (
+  VOID
+  );
+
+VOID
+EFIAPI
+Pcie30PowerEn (
+  VOID
+  );
+
+VOID
+EFIAPI
+Pcie30PeReset (
+  BOOLEAN enable
+  );
+
+VOID
+EFIAPI
+PlatformEarlyInit (
+  VOID
+  );
 
 #endif
