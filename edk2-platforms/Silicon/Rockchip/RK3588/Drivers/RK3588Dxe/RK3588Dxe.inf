@@ -15,6 +15,9 @@
 
 [Sources.common]
   RK3588Dxe.c
+  CpuPerformance.c
+  RK3588DxeHii.uni
+  RK3588DxeHii.vfr
 
 [Packages]
   ArmPkg/ArmPkg.dec
@@ -22,6 +25,7 @@
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
   Platform/Rockchip/RK3588/RK3588.dec
+  Silicon/Rockchip/RK3588/RK3588.dec
   Silicon/Rockchip/RockchipPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
 
@@ -38,6 +42,9 @@
   CruLib
   ArmLib
   NonDiscoverableDeviceRegistrationLib
+  HiiLib
+  PcdLib
+  UefiRuntimeServicesTableLib
 
 [Protocols]
   gEfiDevicePathFromTextProtocolGuid
@@ -48,6 +55,7 @@
   gAndroidBootImgProtocolGuid
   gEfiCpuArchProtocolGuid
   gRk860xRegulatorProtocolGuid
+  gEfiVariableWriteArchProtocolGuid
 
 [Pcd]
   gRK3588TokenSpaceGuid.PcdAndroidBootDevicePath
@@ -60,7 +68,21 @@
   gRK3588TokenSpaceGuid.PcdKernelBootArg
   gRockchipTokenSpaceGuid.PcdComboPhyMode
 
+  gRK3588TokenSpaceGuid.PcdCPULClusterClockPreset
+  gRK3588TokenSpaceGuid.PcdCPULClusterClockCustom
+  gRK3588TokenSpaceGuid.PcdCPUB01ClusterClockPreset
+  gRK3588TokenSpaceGuid.PcdCPUB01ClusterClockCustom
+  gRK3588TokenSpaceGuid.PcdCPUB23ClusterClockPreset
+  gRK3588TokenSpaceGuid.PcdCPUB23ClusterClockCustom
+  gRK3588TokenSpaceGuid.PcdCPULClusterVoltageMode
+  gRK3588TokenSpaceGuid.PcdCPULClusterVoltageCustom
+  gRK3588TokenSpaceGuid.PcdCPUB01ClusterVoltageMode
+  gRK3588TokenSpaceGuid.PcdCPUB01ClusterVoltageCustom
+  gRK3588TokenSpaceGuid.PcdCPUB23ClusterVoltageMode
+  gRK3588TokenSpaceGuid.PcdCPUB23ClusterVoltageCustom
+
 [Guids]
+  gRK3588DxeFormSetGuid
   gEfiEndOfDxeEventGroupGuid
 
 [Depex]

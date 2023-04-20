@@ -1,0 +1,77 @@
+/** @file
+ *
+ *  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com> 
+ *
+ *  SPDX-License-Identifier: BSD-2-Clause-Patent
+ *
+ **/
+
+#langdef en-US  "English"
+
+#string STR_NULL_STRING   #language en-US ""
+
+#string STR_FORM_SET_TITLE              #language en-US "Rockchip Platform Configuration"
+#string STR_FORM_SET_TITLE_HELP         #language en-US "Configure various platform settings."
+#string STR_FORM_SET_TITLE_SUBTITLE     #language en-US "Configuration Options"
+
+/*
+ * CPU Performance configuration
+ */
+#string STR_CPU_PERF_FORM_TITLE                            #language en-US "CPU Performance"
+#string STR_CPU_PERF_FORM_HELP                             #language en-US "Adjust CPU clocks and voltages."
+#string STR_CPU_PERF_FORM_SUBTITLE                         #language en-US "Note: All these settings may be overridden by the OS if supported."
+
+#string STR_CPU_PERF_CLUSTER_CLOCKS_SUBTITLE               #language en-US "Cluster Clocks"
+
+#string STR_CPU_PERF_CPUL_CLUSTER_CLOCK_PRESET_PROMPT      #language en-US "CPUL Clock Preset"
+#string STR_CPU_PERF_CPUL_CLUSTER_CLOCK_PRESET_HELP        #language en-US "Clock preset for the Arm LITTLE cores (Cortex-A55) cluster.\n\nBoot default will retain the frequency set by earlier boot stages.\n\nWARNING! Setting Maximum clock rate is NOT recommended without adequate cooling and power supply."
+#string STR_CPU_PERF_CPUL_CLUSTER_CLOCK_CUSTOM_PROMPT      #language en-US "CPUL Custom Clock (MHz)"
+#string STR_CPU_PERF_CPUL_CLUSTER_CLOCK_CUSTOM_HELP        #language en-US "Custom target clock for the Arm LITTLE cores (Cortex-A55) cluster.\n\nNote that the actual frequency will vary with voltage starting from 816 MHz."
+
+#string STR_CPU_PERF_CPUB01_CLUSTER_CLOCK_PRESET_PROMPT    #language en-US "CPUB01 Clock Preset"
+#string STR_CPU_PERF_CPUB01_CLUSTER_CLOCK_CUSTOM_PROMPT    #language en-US "CPUB01 Custom Clock (MHz)"
+
+#string STR_CPU_PERF_CPUB23_CLUSTER_CLOCK_PRESET_PROMPT    #language en-US "CPUB23 Clock Preset"
+#string STR_CPU_PERF_CPUB23_CLUSTER_CLOCK_CUSTOM_PROMPT    #language en-US "CPUB23 Custom Clock (MHz)"
+
+#string STR_CPU_PERF_CPUB_CLUSTER_CLOCK_PRESET_HELP        #language en-US "Clock preset for the selected Arm big cores (Cortex-A76) cluster.\n\nBoot default will retain the frequency set by earlier boot stages.\n\nWARNING! Setting Maximum clock rate is NOT recommended without adequate cooling and power supply."
+#string STR_CPU_PERF_CPUB_CLUSTER_CLOCK_CUSTOM_HELP        #language en-US "Custom target clock for the selected Arm big cores (Cortex-A76) cluster.\n\nNote that the actual frequency will vary with voltage starting from 816 MHz."
+
+#string STR_CPU_PERF_CLUSTER_CLOCK_PRESET_BOOTDEF          #language en-US "Boot default"
+#string STR_CPU_PERF_CLUSTER_CLOCK_PRESET_MIN              #language en-US "Minimum"
+#string STR_CPU_PERF_CLUSTER_CLOCK_PRESET_MAX              #language en-US "Maximum"
+#string STR_CPU_PERF_CLUSTER_CLOCK_PRESET_CUSTOM           #language en-US "Custom"
+
+#string STR_CPU_PERF_CLUSTER_CLOCK_CUSTOM_408              #language en-US "408"
+#string STR_CPU_PERF_CLUSTER_CLOCK_CUSTOM_600              #language en-US "600"
+#string STR_CPU_PERF_CLUSTER_CLOCK_CUSTOM_816              #language en-US "816"
+#string STR_CPU_PERF_CLUSTER_CLOCK_CUSTOM_1008             #language en-US "1008"
+#string STR_CPU_PERF_CLUSTER_CLOCK_CUSTOM_1200             #language en-US "1200"
+#string STR_CPU_PERF_CLUSTER_CLOCK_CUSTOM_1416             #language en-US "1416"
+#string STR_CPU_PERF_CLUSTER_CLOCK_CUSTOM_1608             #language en-US "1608"
+#string STR_CPU_PERF_CLUSTER_CLOCK_CUSTOM_1800             #language en-US "1800"
+#string STR_CPU_PERF_CLUSTER_CLOCK_CUSTOM_2016             #language en-US "2016"
+#string STR_CPU_PERF_CLUSTER_CLOCK_CUSTOM_2208             #language en-US "2208"
+#string STR_CPU_PERF_CLUSTER_CLOCK_CUSTOM_2256             #language en-US "2256"
+#string STR_CPU_PERF_CLUSTER_CLOCK_CUSTOM_2304             #language en-US "2304"
+#string STR_CPU_PERF_CLUSTER_CLOCK_CUSTOM_2352             #language en-US "2352"
+#string STR_CPU_PERF_CLUSTER_CLOCK_CUSTOM_2400             #language en-US "2400"
+
+#string STR_CPU_PERF_CLUSTER_VOLTAGES_SUBTITLE             #language en-US "Cluster Voltages"
+
+#string STR_CPU_PERF_CPUL_CLUSTER_VOLTAGE_MODE_PROMPT      #language en-US "CPUL Voltage Mode"
+#string STR_CPU_PERF_CPUL_CLUSTER_VOLTAGE_MODE_HELP        #language en-US "Voltage mode for the Arm LITTLE cores (Cortex-A55) cluster.\n\n Automatic = voltage is set according to predefined OPP table.\n Custom = voltage is user-controlled, affecting clock rate too due to PVTPLL."
+#string STR_CPU_PERF_CPUL_CLUSTER_VOLTAGE_CUSTOM_PROMPT    #language en-US "CPUL Custom Volt (uV)"
+#string STR_CPU_PERF_CPUL_CLUSTER_VOLTAGE_CUSTOM_HELP      #language en-US "Custom regulator voltage for the Arm LITTLE cores (Cortex-A55) cluster.\n\nUse +/- keys to increment/decrement value by the predefined step.\n\nWARNING! Higher custom voltage may cause system instability and excessive heat."
+
+#string STR_CPU_PERF_CPUB01_CLUSTER_VOLTAGE_MODE_PROMPT    #language en-US "CPUB01 Voltage Mode"
+#string STR_CPU_PERF_CPUB01_CLUSTER_VOLTAGE_CUSTOM_PROMPT  #language en-US "CPUB01 Custom Volt (uV)"
+
+#string STR_CPU_PERF_CPUB23_CLUSTER_VOLTAGE_MODE_PROMPT    #language en-US "CPUB23 Voltage Mode"
+#string STR_CPU_PERF_CPUB23_CLUSTER_VOLTAGE_CUSTOM_PROMPT  #language en-US "CPUB23 Custom Volt (uV)"
+
+#string STR_CPU_PERF_CPUB_CLUSTER_VOLTAGE_MODE_HELP        #language en-US "Voltage mode for the selected Arm big cores (Cortex-A76) cluster.\n\n Automatic = voltage is set according to predefined OPP table.\n Custom = voltage is user-controlled, affecting clock rate too due to PVTPLL."
+#string STR_CPU_PERF_CPUB_CLUSTER_VOLTAGE_CUSTOM_HELP      #language en-US "Custom regulator voltage for the selected Arm big cores (Cortex-A76) cluster.\n\nUse +/- keys to increment/decrement value by the predefined step.\n\nWARNING! Higher custom voltage may cause system instability and excessive heat."
+
+#string STR_CPU_PERF_CLUSTER_VOLTAGE_MODE_AUTO             #language en-US "Automatic"
+#string STR_CPU_PERF_CLUSTER_VOLTAGE_MODE_CUSTOM           #language en-US "Custom"

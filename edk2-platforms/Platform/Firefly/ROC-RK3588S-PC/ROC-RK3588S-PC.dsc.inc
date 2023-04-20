@@ -303,6 +303,23 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|0
 
+[PcdsDynamicHii.common.DEFAULT]
+  #
+  # CPU Performance
+  #
+  gRK3588TokenSpaceGuid.PcdCPULClusterClockPreset|L"CpuPerf_CPULClusterClockPreset"|gRK3588DxeFormSetGuid|0x0|2
+  gRK3588TokenSpaceGuid.PcdCPULClusterClockCustom|L"CpuPerf_CPULClusterClockCustom"|gRK3588DxeFormSetGuid|0x0|1800
+  gRK3588TokenSpaceGuid.PcdCPUB01ClusterClockPreset|L"CpuPerf_CPUB01ClusterClockPreset"|gRK3588DxeFormSetGuid|0x0|2
+  gRK3588TokenSpaceGuid.PcdCPUB01ClusterClockCustom|L"CpuPerf_CPUB01ClusterClockCustom"|gRK3588DxeFormSetGuid|0x0|2400
+  gRK3588TokenSpaceGuid.PcdCPUB23ClusterClockPreset|L"CpuPerf_CPUB23ClusterClockPreset"|gRK3588DxeFormSetGuid|0x0|2
+  gRK3588TokenSpaceGuid.PcdCPUB23ClusterClockCustom|L"CpuPerf_CPUB23ClusterClockCustom"|gRK3588DxeFormSetGuid|0x0|2400
+  gRK3588TokenSpaceGuid.PcdCPULClusterVoltageMode|L"CpuPerf_CPULClusterVoltageMode"|gRK3588DxeFormSetGuid|0x0|0
+  gRK3588TokenSpaceGuid.PcdCPULClusterVoltageCustom|L"CpuPerf_CPULClusterVoltageCustom"|gRK3588DxeFormSetGuid|0x0|950000
+  gRK3588TokenSpaceGuid.PcdCPUB01ClusterVoltageMode|L"CpuPerf_CPUB01ClusterVoltageMode"|gRK3588DxeFormSetGuid|0x0|0
+  gRK3588TokenSpaceGuid.PcdCPUB01ClusterVoltageCustom|L"CpuPerf_CPUB01ClusterVoltageCustom"|gRK3588DxeFormSetGuid|0x0|1000000
+  gRK3588TokenSpaceGuid.PcdCPUB23ClusterVoltageMode|L"CpuPerf_CPUB23ClusterVoltageMode"|gRK3588DxeFormSetGuid|0x0|0
+  gRK3588TokenSpaceGuid.PcdCPUB23ClusterVoltageCustom|L"CpuPerf_CPUB23ClusterVoltageCustom"|gRK3588DxeFormSetGuid|0x0|1000000
+
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform

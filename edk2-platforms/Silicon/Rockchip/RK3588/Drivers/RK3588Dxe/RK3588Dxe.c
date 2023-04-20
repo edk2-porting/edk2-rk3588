@@ -16,6 +16,8 @@
 #include <Library/PcdLib.h>
 #include <Library/UefiBootManagerLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiRuntimeServicesTableLib.h>
+#include <Library/HiiLib.h>
 #include <Library/UefiLib.h>
 #include <Library/RK806.h>
 #include <Library/AcpiLib.h>
@@ -28,243 +30,107 @@
 #include <Protocol/AndroidBootImg.h>
 #include <Library/DxeServicesTableLib.h>
 #include <Library/NonDiscoverableDeviceRegistrationLib.h>
-#include <Protocol/NonDiscoverableDevice.h>
-#include <Protocol/ArmScmi.h>
-#include <Protocol/ArmScmiClockProtocol.h>
-#include <Protocol/Rk860xRegulator.h>
-#include <Protocol/I2c.h>
-
-#include <Soc.h>
 #include <Library/CruLib.h>
+#include <Protocol/NonDiscoverableDevice.h>
+#include <VarStoreData.h>
+#include <Soc.h>
 #include <RK3588RegsPeri.h>
-#include "RK3588Dxe.h"
 
-#define SCMI_CLK_CPUL			0
-#define SCMI_CLK_CPUB01			2
-#define SCMI_CLK_CPUB23			3
+#include "RK3588Dxe.h"
+#include "RK3588DxeFormSetGuid.h"
+#include "CpuPerformance.h"
 
 #define CP_UNCONNECTED    0x0
-#define  CP_PCIE          0x01
-#define  CP_SATA          0x10
-#define  CP_USB3          0x20
+#define CP_PCIE           0x01
+#define CP_SATA           0x10
+#define CP_USB3           0x20
+
+extern UINT8 RK3588DxeHiiBin[];
+extern UINT8 RK3588DxeStrings[];
+
+typedef struct {
+  VENDOR_DEVICE_PATH VendorDevicePath;
+  EFI_DEVICE_PATH_PROTOCOL End;
+} HII_VENDOR_DEVICE_PATH;
+
+STATIC HII_VENDOR_DEVICE_PATH mVendorDevicePath = {
+  {
+    {
+      HARDWARE_DEVICE_PATH,
+      HW_VENDOR_DP,
+      {
+        (UINT8)(sizeof (VENDOR_DEVICE_PATH)),
+        (UINT8)((sizeof (VENDOR_DEVICE_PATH)) >> 8)
+      }
+    },
+    RK3588DXE_FORMSET_GUID
+  },
+  {
+    END_DEVICE_PATH_TYPE,
+    END_ENTIRE_DEVICE_PATH_SUBTYPE,
+    {
+      (UINT8)(END_DEVICE_PATH_LENGTH),
+      (UINT8)((END_DEVICE_PATH_LENGTH) >> 8)
+    }
+  }
+};
 
 STATIC
 EFI_STATUS
-SetMaxCpuSpeed (
+EFIAPI
+InstallHiiPages (
   VOID
   )
 {
-  EFI_STATUS             Status;
-  SCMI_CLOCK_PROTOCOL    *ClockProtocol;
-  EFI_GUID               ClockProtocolGuid = ARM_SCMI_CLOCK_PROTOCOL_GUID;
-  UINT64                 CpuRate;
-  UINT32                 ClockId;
-  UINT32                 ClockProtocolVersion;
-  BOOLEAN                Enabled;
-  CHAR8                  ClockName[SCMI_MAX_STR_LEN];
-  UINT32                 TotalRates = 0;
-  UINT32                 ClockRateSize;
-  SCMI_CLOCK_RATE        *ClockRate;
-  SCMI_CLOCK_RATE_FORMAT ClockRateFormat;
-  UINT32                 ClockIds[3]= {SCMI_CLK_CPUL, SCMI_CLK_CPUB01, SCMI_CLK_CPUB23};
-  UINT32                 ClockIndex;
+  EFI_STATUS     Status;
+  EFI_HII_HANDLE HiiHandle;
+  EFI_HANDLE     DriverHandle;
 
-  Status = gBS->LocateProtocol (
-                  &ClockProtocolGuid,
-                  NULL,
-                  (VOID**)&ClockProtocol
-                  );
+  DriverHandle = NULL;
+  Status = gBS->InstallMultipleProtocolInterfaces (&DriverHandle,
+                  &gEfiDevicePathProtocolGuid,
+                  &mVendorDevicePath,
+                  NULL);
   if (EFI_ERROR (Status)) {
-    ASSERT_EFI_ERROR (Status);
     return Status;
   }
 
-  Status = ClockProtocol->GetVersion (ClockProtocol, &ClockProtocolVersion);
-  if (EFI_ERROR (Status)) {
-    ASSERT_EFI_ERROR (Status);
-    return Status;
+  HiiHandle = HiiAddPackages (&gRK3588DxeFormSetGuid,
+                DriverHandle,
+                RK3588DxeStrings,
+                RK3588DxeHiiBin,
+                NULL);
+
+  if (HiiHandle == NULL) {
+    gBS->UninstallMultipleProtocolInterfaces (DriverHandle,
+           &gEfiDevicePathProtocolGuid,
+           &mVendorDevicePath,
+           NULL);
+    return EFI_OUT_OF_RESOURCES;
   }
-  DEBUG ((DEBUG_ERROR, "SCMI clock management protocol version = %x\n",
-    ClockProtocolVersion));
-
-  for (ClockIndex = 0; ClockIndex < ARRAY_SIZE(ClockIds); ClockIndex++)
-  {
-    ClockId = ClockIds[ClockIndex];
-    Status = ClockProtocol->GetClockAttributes (
-                              ClockProtocol,
-                              ClockId,
-                              &Enabled,
-                              ClockName
-                              );
-    if (EFI_ERROR (Status)) {
-      ASSERT_EFI_ERROR (Status);
-      return Status;
-    }
-
-    Status = ClockProtocol->RateGet (ClockProtocol, ClockId, &CpuRate);
-    if (EFI_ERROR (Status)) {
-      ASSERT_EFI_ERROR (Status);
-      return Status;
-    }
-
-    DEBUG ((EFI_D_WARN, "SCMI: %a: Current rate is %uHz\n", ClockName, CpuRate));
-
-    TotalRates = 0;
-    ClockRateSize = 0;
-    Status = ClockProtocol->DescribeRates (
-                              ClockProtocol,
-                              ClockId,
-                              &ClockRateFormat,
-                              &TotalRates,
-                              &ClockRateSize,
-                              ClockRate
-                              );
-    if (EFI_ERROR (Status) && Status != EFI_BUFFER_TOO_SMALL) {
-      ASSERT_EFI_ERROR (Status);
-      return Status;
-    }
-    ASSERT (Status == EFI_BUFFER_TOO_SMALL);
-    ASSERT (TotalRates > 0);
-    ASSERT (ClockRateFormat == ScmiClockRateFormatDiscrete);
-    if (Status != EFI_BUFFER_TOO_SMALL ||
-        TotalRates == 0 ||
-        ClockRateFormat != ScmiClockRateFormatDiscrete) {
-      return EFI_DEVICE_ERROR;
-    }
-    
-    ClockRateSize = sizeof (*ClockRate) * TotalRates;
-    ClockRate = AllocatePool (ClockRateSize);
-    ASSERT (ClockRate != NULL);
-    if (ClockRate == NULL) {
-      return EFI_OUT_OF_RESOURCES;
-    }
-    Status = ClockProtocol->DescribeRates (
-                              ClockProtocol,
-                              ClockId,
-                              &ClockRateFormat,
-                              &TotalRates,
-                              &ClockRateSize,
-                              ClockRate
-                              );
-    if (EFI_ERROR (Status)) {
-      ASSERT_EFI_ERROR (Status);
-      FreePool (ClockRate);
-      return Status;
-    }
-
-    CpuRate = ClockRate[TotalRates - 1].DiscreteRate.Rate;
-    FreePool (ClockRate);
-
-    // The maximum discrete rates returned are 63 Hz higher than supported,
-    // causing SCMI to ignore the setting.
-    CpuRate -= CpuRate % 100;
-
-    DEBUG ((EFI_D_WARN, "SCMI: %a: New rate is %uHz\n", ClockName, CpuRate));
-
-    Status = ClockProtocol->RateSet (
-                              ClockProtocol,
-                              ClockId,
-                              CpuRate
-                              );
-    if (EFI_ERROR (Status)) {
-      ASSERT_EFI_ERROR (Status);
-      return Status;
-    }
-
-    Status = ClockProtocol->RateGet (ClockProtocol, ClockId, &CpuRate);
-    if (EFI_ERROR (Status)) {
-      ASSERT_EFI_ERROR (Status);
-      return Status;
-    }
-
-    DEBUG ((EFI_D_WARN, "SCMI: %a: Current rate is %uHz\n", ClockName, CpuRate));
-  }
-
   return EFI_SUCCESS;
+}
+
+STATIC 
+EFI_STATUS
+EFIAPI
+SetupVariables (
+  VOID
+  )
+{
+  SetupCpuPerfVariables();
+
+  return EFI_SUCCESS; 
 }
 
 STATIC
 VOID
 EFIAPI
-OnRk860xRegulatorRegistrationEvent (
-  IN  EFI_EVENT   Event,
-  IN  VOID        *Context
+ApplyVariables (
+  VOID
   )
 {
-  EFI_STATUS                  Status;
-  EFI_HANDLE                  *HandleBuffer;
-  RK860X_REGULATOR_PROTOCOL   *Rk860xRegulator;
-  UINTN                       NumRegulators;
-  UINT32                      Index;
-  UINT32                      Voltage;
-
-  Status = gBS->LocateHandleBuffer (ByProtocol,
-                                    &gRk860xRegulatorProtocolGuid,
-                                    NULL,
-                                    &NumRegulators,
-                                    &HandleBuffer);
-  if (EFI_ERROR(Status)) {
-    if (Status != EFI_NOT_FOUND) {
-        DEBUG((DEBUG_WARN, "Couldn't locate gRk860xRegulatorProtocolGuid. Status=%r\n", Status));
-    }
-    return;
-  }
-
-  gBS->CloseEvent (Event);
-
-  DEBUG((EFI_D_WARN, "%u regulators found:\n", NumRegulators));
-
-  for (Index = 0; Index < NumRegulators; Index++) {
-    Status = gBS->OpenProtocol (HandleBuffer[Index],
-                                &gRk860xRegulatorProtocolGuid,
-                                (VOID **) &Rk860xRegulator,
-                                gImageHandle,
-                                NULL,
-                                EFI_OPEN_PROTOCOL_BY_HANDLE_PROTOCOL);
-
-    if (EFI_ERROR(Status)) {
-      DEBUG((DEBUG_ERROR, " Failed to open protocol for reg %d. Status=%r\n", Index));
-      return;
-    }
-
-    DEBUG((EFI_D_WARN," 0x%x on I2C bus %d\n", 
-          I2C_DEVICE_ADDRESS(Rk860xRegulator->Identifier), 
-          I2C_DEVICE_BUS(Rk860xRegulator->Identifier)));
-
-    DEBUG((EFI_D_WARN,"   SupportedVoltageRange: [%d, %d]\n", 
-          Rk860xRegulator->SupportedVoltageRange.Min, Rk860xRegulator->SupportedVoltageRange.Max));
-    DEBUG((EFI_D_WARN,"   PreferredVoltageRange: [%d, %d]\n",
-          Rk860xRegulator->PreferredVoltageRange.Min, Rk860xRegulator->PreferredVoltageRange.Max));
-
-    Status = Rk860xRegulator->GetVoltage (Rk860xRegulator, &Voltage, FALSE);
-    if (EFI_ERROR(Status)) {
-      DEBUG((DEBUG_ERROR, "   Failed to get voltage. Status=%r\n", Status));
-      goto CloseProtocol;
-    }
-    DEBUG((EFI_D_WARN,"   Current voltage: %d mV\n", Voltage));
-
-    Voltage = Rk860xRegulator->PreferredVoltageRange.Max;
-
-    DEBUG((EFI_D_WARN,"   Setting voltage to preferred max: %d mV\n", Voltage));
-    Status = Rk860xRegulator->SetVoltage (Rk860xRegulator, Voltage, FALSE);
-    if (EFI_ERROR(Status)) {
-      DEBUG((DEBUG_ERROR, "   Failed to set voltage. Status=%r\n", Status));
-      goto CloseProtocol;
-    }
-
-    Status = Rk860xRegulator->GetVoltage (Rk860xRegulator, &Voltage, FALSE);
-    if (EFI_ERROR(Status)) {
-      DEBUG((DEBUG_ERROR, "   Failed to get voltage. Status=%r\n", Status));
-      goto CloseProtocol;
-    }
-    DEBUG((EFI_D_WARN,"   Current voltage: %d mV\n", Voltage));
-
-CloseProtocol:
-    gBS->CloseProtocol (HandleBuffer[Index],
-                        &gRk860xRegulatorProtocolGuid,
-                        gImageHandle,
-                        NULL);
-  }
+  ApplyCpuClockVariables();
 }
 
 STATIC
@@ -859,6 +725,67 @@ STATIC VOID SetFlashAttributeToUncache(VOID)
 
 }
 
+STATIC
+VOID
+EFIAPI
+OnEfiVariableWriteArchRegistrationEvent (
+  IN  EFI_EVENT   Event,
+  IN  VOID        *Context
+  )
+{
+  EFI_STATUS                  Status;
+  EFI_HANDLE                  *HandleBuffer;
+  UINTN                       NumProtocols;
+
+  Status = gBS->LocateHandleBuffer (ByProtocol,
+                                    &gEfiVariableWriteArchProtocolGuid,
+                                    NULL,
+                                    &NumProtocols,
+                                    &HandleBuffer);
+  if (EFI_ERROR(Status)) {
+    if (Status != EFI_NOT_FOUND) {
+        DEBUG((DEBUG_WARN, "Couldn't locate gEfiVariableWriteArchProtocolGuid. Status=%r\n", Status));
+    }
+    return; // false alert
+  }
+
+  gBS->CloseEvent (Event);
+
+  Status = SetupVariables ();
+  if (Status != EFI_SUCCESS) {
+    DEBUG ((DEBUG_ERROR, "Couldn't setup NV vars. Status=%r\n", Status));
+  }
+
+  ApplyVariables ();
+
+  Status = InstallHiiPages ();
+  if (Status != EFI_SUCCESS) {
+    DEBUG ((DEBUG_ERROR, "Couldn't install RK3588Dxe HII pages. Status=%r\n", Status));
+  }
+}
+
+VOID
+EFIAPI
+RK3588NotifyReadyToBoot (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  //
+  // We set CPU voltages late on first notification of the ReadyToBoot event because
+  // the user should have a chance to dial settings back in case they've set values that are
+  // too high and/or the power supply is insufficient. Setting them earlier may prevent this.
+  // The default values provide enough performance for the UEFI environment, so there's
+  // really no need to set them early.
+  //
+
+  DEBUG ((DEBUG_ERROR, "%a: called. Configure CPU voltages once.\n", __FUNCTION__));
+
+  ApplyCpuVoltageVariables ();
+
+  gBS->CloseEvent (Event);
+}
+
 EFI_STATUS
 EFIAPI
 RK3588EntryPoint (
@@ -868,18 +795,28 @@ RK3588EntryPoint (
 {
   EFI_STATUS            Status;
   VOID                  *Rk860xRegulatorRegistration;
+  VOID                  *EfiVariableArchRegistrationEvent;
+  EFI_EVENT             ReadyToBootEvent;
 
   PlatformEarlyInit();
 
-  /* Configure regulators when/if the protocol gets installed */
-  EfiCreateProtocolNotifyEvent (&gRk860xRegulatorProtocolGuid,
+  //
+  // We actually depend on gEfiVariableWriteArchProtocolGuid but don't want to
+  // delay the entire driver, so we create a notify event on protocol arrival instead
+  // and set up the variables & HII data in the callback.
+  //
+  EfiCreateProtocolNotifyEvent (&gEfiVariableWriteArchProtocolGuid,
                                 TPL_CALLBACK,
-                                OnRk860xRegulatorRegistrationEvent,
+                                OnEfiVariableWriteArchRegistrationEvent,
                                 NULL,
-                                &Rk860xRegulatorRegistration);
+                                &EfiVariableArchRegistrationEvent);
 
-  SetMaxCpuSpeed ();
-  
+  Status = EfiCreateEventReadyToBootEx (TPL_CALLBACK,
+                                        RK3588NotifyReadyToBoot,
+                                        NULL,
+                                        &ReadyToBootEvent);
+  ASSERT_EFI_ERROR (Status);
+
   Status = RK3588InitPeripherals ();
   if (EFI_ERROR (Status)) {
     return Status;

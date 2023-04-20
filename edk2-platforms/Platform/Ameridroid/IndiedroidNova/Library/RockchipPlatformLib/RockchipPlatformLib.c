@@ -15,8 +15,6 @@
 static struct regulator_init_data rk806_init_data[] = {
   /* Master PMIC */
   RK8XX_VOLTAGE_INIT(MASTER_BUCK1, 750000),
-  /* Little cores cluster voltage */
-  RK8XX_VOLTAGE_INIT(MASTER_BUCK2, 950000),
   RK8XX_VOLTAGE_INIT(MASTER_BUCK3, 750000),
   RK8XX_VOLTAGE_INIT(MASTER_BUCK4, 750000),
   RK8XX_VOLTAGE_INIT(MASTER_BUCK5, 850000),
@@ -92,6 +90,18 @@ Rk806Configure (
 
   for (RegCfgIndex = 0; RegCfgIndex < ARRAY_SIZE(rk806_init_data); RegCfgIndex++)
     RK806RegulatorInit(rk806_init_data[RegCfgIndex]);
+}
+
+VOID
+EFIAPI
+SetCPULittleVoltage (
+  IN UINT32 Microvolts
+  )
+{
+  struct regulator_init_data Rk806CpuLittleSupply =
+        RK8XX_VOLTAGE_INIT(MASTER_BUCK2, Microvolts);
+
+  RK806RegulatorInit(Rk806CpuLittleSupply);
 }
 
 VOID

@@ -26,8 +26,22 @@
   gRK3588TokenSpaceGuid      =  { 0x32594b40, 0x45e7, 0x11ec, { 0xbb, 0xc1, 0xf4, 0x2a, 0x7d, 0xcb, 0x92, 0x5d} }
   gRockchipDemoProtocolGuid   = { 0x71954bda, 0x60d3, 0x4ef8, { 0x8e, 0x3c, 0x0e, 0x33, 0x9f, 0x3b, 0xc2, 0x2b } }
   gShellI2cDemoHiiGuid = { 0xb2f4c714, 0x147f, 0x4ff7, { 0x82, 0x1b, 0xce, 0x7b, 0x91, 0x7f, 0x5f, 0x2f } }
+  gRK3588DxeFormSetGuid = { 0x10f41c33, 0xa468, 0x42cd, { 0x85, 0xee, 0x70, 0x43, 0x21, 0x3f, 0x73, 0xa3 } }
 
 
 [Protocols]
   gRockchipI2cDemoProtocolGuid    = { 0x71954bda, 0x60d3, 0x4ef8, { 0x8e, 0x3c, 0x0e, 0x33, 0x9f, 0x3b, 0xc2, 0x2b }}
 
+[PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
+  gRK3588TokenSpaceGuid.PcdCPULClusterClockPreset|0|UINT32|0x00000001
+  gRK3588TokenSpaceGuid.PcdCPULClusterClockCustom|0|UINT32|0x00000002
+  gRK3588TokenSpaceGuid.PcdCPUB01ClusterClockPreset|0|UINT32|0x00000003
+  gRK3588TokenSpaceGuid.PcdCPUB01ClusterClockCustom|0|UINT32|0x00000004
+  gRK3588TokenSpaceGuid.PcdCPUB23ClusterClockPreset|0|UINT32|0x00000005
+  gRK3588TokenSpaceGuid.PcdCPUB23ClusterClockCustom|0|UINT32|0x00000006
+  gRK3588TokenSpaceGuid.PcdCPULClusterVoltageMode|0|UINT32|0x00000007
+  gRK3588TokenSpaceGuid.PcdCPULClusterVoltageCustom|0|UINT32|0x00000008
+  gRK3588TokenSpaceGuid.PcdCPUB01ClusterVoltageMode|0|UINT32|0x00000009
+  gRK3588TokenSpaceGuid.PcdCPUB01ClusterVoltageCustom|0|UINT32|0x0000000A
+  gRK3588TokenSpaceGuid.PcdCPUB23ClusterVoltageMode|0|UINT32|0x0000000B
+  gRK3588TokenSpaceGuid.PcdCPUB23ClusterVoltageCustom|0|UINT32|0x0000000C

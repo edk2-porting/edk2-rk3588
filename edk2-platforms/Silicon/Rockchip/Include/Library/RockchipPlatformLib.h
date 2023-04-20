@@ -61,6 +61,12 @@ Rk806Configure (
 
 VOID
 EFIAPI
+SetCPULittleVoltage (
+  IN UINT32 Microvolts
+  );
+
+VOID
+EFIAPI
 NorFspiIomux (
   VOID
   );
