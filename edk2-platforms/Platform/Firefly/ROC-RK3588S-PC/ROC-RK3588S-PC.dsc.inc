@@ -146,6 +146,7 @@
   gRockchipTokenSpaceGuid.PcdI2cDemoBuses|{ 0x2 }
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorAddresses|{ 0x42, 0x43 }
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorBuses|{ 0x0, 0x0 }
+  gRockchipTokenSpaceGuid.PcdRk860xRegulatorTags|{ 2, 3 } # SCMI_CLK_CPUB01, SCMI_CLK_CPUB23
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorMinVoltages|{ UINT32(550000), UINT32(550000) }
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorMaxVoltages|{ UINT32(1050000), UINT32(1050000) }
 

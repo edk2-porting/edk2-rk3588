@@ -65,6 +65,7 @@ struct _RK860X_REGULATOR_PROTOCOL {
   EFI_RK860X_REGULATOR_SET_ENABLE    SetEnable;
   VOLTAGE_RANGE                      SupportedVoltageRange;
   VOLTAGE_RANGE                      PreferredVoltageRange;
+  UINT8                              Tag;
   UINT32                             Identifier;
 };
 

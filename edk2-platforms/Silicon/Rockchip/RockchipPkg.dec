@@ -108,6 +108,7 @@
   gRockchipTokenSpaceGuid.PcdI2cDemoBuses|{ 0x0 }|VOID*|0x02000008
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorAddresses|{ 0x0 }|VOID*|0x02000009
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorBuses|{ 0x0 }|VOID*|0x0200000A
+  gRockchipTokenSpaceGuid.PcdRk860xRegulatorTags|{ 0x0 }|VOID*|0x0200000B
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorMinVoltages|{ 0x0 }|VOID*|0x0200000C
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorMaxVoltages|{ 0x0 }|VOID*|0x0200000D
 

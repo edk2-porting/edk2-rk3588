@@ -381,6 +381,7 @@ Rk860xRegulatorStart (
   UINT8 *Rk860xRegulatorAddresses;
   UINTN Rk860xRegulatorAddressesSize;
   UINT8 *Rk860xRegulatorBuses;
+  UINT8 *Rk860xRegulatorTags;
   UINT8 *Rk860xRegulatorMinVoltagesPtr;
   UINTN Rk860xRegulatorMinVoltagesSize;
   UINT8 *Rk860xRegulatorMaxVoltagesPtr;
@@ -441,6 +442,7 @@ Rk860xRegulatorStart (
   Rk860xRegulatorAddresses = PcdGetPtr (PcdRk860xRegulatorAddresses);
   Rk860xRegulatorAddressesSize = PcdGetSize (PcdRk860xRegulatorAddresses);
   Rk860xRegulatorBuses = PcdGetPtr (PcdRk860xRegulatorBuses);
+  Rk860xRegulatorTags = PcdGetPtr (PcdRk860xRegulatorTags);
   Rk860xRegulatorMinVoltagesPtr = PcdGetPtr (PcdRk860xRegulatorMinVoltages);
   Rk860xRegulatorMinVoltagesSize = PcdGetSize (PcdRk860xRegulatorMinVoltages);
   Rk860xRegulatorMaxVoltagesPtr = PcdGetPtr (PcdRk860xRegulatorMaxVoltages);
@@ -449,6 +451,9 @@ Rk860xRegulatorStart (
   for (Index = 0; Rk860xRegulatorAddresses[Index] != '\0'; Index++) {
     if (Rk860xRegulatorContext->I2cIo->DeviceIndex == I2C_DEVICE_INDEX(Rk860xRegulatorBuses[Index],
           Rk860xRegulatorAddresses[Index])) { 
+            
+      Rk860xRegulatorProtocol->Tag = Rk860xRegulatorTags[Index];
+
       Index *= sizeof(UINT32);
 
       if (Rk860xRegulatorMinVoltagesSize / sizeof(UINT32) == Rk860xRegulatorAddressesSize) {
