@@ -282,8 +282,10 @@ READ_LOCK_STATUS   = TRUE
   # sdcard is dwemmc, sdhci is for eMMC.
   INF Silicon/Rockchip/RK3588/Drivers/DwEmmcDxe/DwEmmcDxe.inf
   
-  # Needs to be disabled if booting from eMMC
-  # INF Silicon/Rockchip/Drivers/SdhciHostDxe/SdhciHostDxe.inf
+  #
+  # DWC SDHCI (for eMMC slot)
+  #
+  INF Silicon/Rockchip/Drivers/SdhciHostDxe/SdhciHostDxe.inf
 
   #
   # AHCI Support
