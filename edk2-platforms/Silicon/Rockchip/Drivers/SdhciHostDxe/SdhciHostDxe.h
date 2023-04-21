@@ -37,4 +37,10 @@
 
 #define MAX_DIVISOR_VALUE 1023
 
+typedef enum _CARD_DETECT_STATE {
+  CardDetectRequired = 0,
+  CardDetectInProgress,
+  CardDetectCompleted
+} CARD_DETECT_STATE;
+
 #endif
