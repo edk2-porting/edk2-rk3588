@@ -1014,7 +1014,7 @@ MMCNotifyState (
       DEBUG ((DEBUG_MMCHOST_SD, "MMCHost: CAP %X CAPH %X\n", MmioRead32(MMCHS_CAPA),MmioRead32(MMCHS_CUR_CAPA)));
 
       // Lets switch to card detect test mode.
-      //SdMmioOr32 (MMCHS_HCTL, BIT7|BIT6);
+      SdMmioOr32 (MMCHS_HCTL, BIT7|BIT6);
 
       // set card voltage
       SdMmioAnd32 (MMCHS_HCTL, ~SDBP_ON);
@@ -1120,6 +1120,24 @@ MMCIsCardPresent (
   Status = MMCSendCommand (This, MMC_CMD8, CMD8_SD_ARG);
   if (!EFI_ERROR (Status)) {
      DEBUG ((EFI_D_WARN, "MMCIsCardPresent: Maybe SD card or EMMC detected.\n"));
+     mCardIsPresent = TRUE;
+     goto out;
+  }
+
+  //
+  // Reinitialize the host controller, otherwise the next command 
+  // may timeout even if a card is present.
+  // We can't simply switch the command order as both can fail depending 
+  // on the platform / card.
+  //
+  MMCNotifyState (This, MmcHwInitializationState);
+
+  //
+  // MMC/eMMC might not accept CMD8, but we can try CMD1.
+  //
+  Status = MMCSendCommand (This, MMC_CMD1, EMMC_CMD1_CAPACITY_GREATER_THAN_2GB);
+  if (!EFI_ERROR (Status)) {
+     DEBUG ((EFI_D_WARN, "MMCIsCardPresent: Maybe EMMC card detected.\n"));
      mCardIsPresent = TRUE;
      goto out;
   }
