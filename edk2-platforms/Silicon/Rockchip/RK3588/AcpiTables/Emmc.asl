@@ -9,13 +9,13 @@
 
 
   Device (SDC3) {
-    Name (_HID, "PRP0001")
+    Name (_HID, "RKCP0D40")
     Name (_UID, 3)
     Name (_CCA, 0)
 
     Method (_CRS, 0x0, Serialized) {
       Name (RBUF, ResourceTemplate() {
-        Memory32Fixed (ReadWrite, 0xfe2e0000, 0x1000)
+        Memory32Fixed (ReadWrite, 0xfe2e0000, 0x10000)
         Interrupt (ResourceConsumer, Level, ActiveHigh, Exclusive) { 237 }
       })
       Return (RBUF)
@@ -35,10 +35,50 @@
     })
 
     OperationRegion(EMMC, SystemMemory, 0xFD7C0434, 0x4)
-      Field(EMMC, DWordAcc, Lock, WriteAsZeros) {
+      Field(EMMC, DWordAcc, NoLock, WriteAsZeros) {
       PLLE, 32,
     }
 
+    Method (_DSM, 4) {
+      If (LEqual (Arg0, ToUUID("434addb0-8ff3-49d5-a724-95844b79ad1f"))) {
+        Switch (ToInteger (Arg2)) {
+          Case (0) {
+            Return (0x3)
+          }
+          Case (1) {
+            Local0 = DerefOf (Arg3 [0])
+            If (Local0 >= 200000000) {
+              Store (0xFF000500, PLLE)
+              Return (200000000)
+            }
+            If (Local0 >= 150000000) {
+              Store (0xFF000700, PLLE)
+              Return (150000000)
+            }
+            If (Local0 >= 100000000) {
+              Store (0xFF000B00, PLLE)
+              Return (100000000)
+            }
+            If (Local0 >= 50000000) {
+              Store (0xFF001700, PLLE)
+              Return (50000000)
+            }
+            If (Local0 >= 24000000) {
+              Store (0xFF008000, PLLE)
+              Return (24000000)
+            }
+            if (Local0 >= 375000) {
+              Store (0xFF00BF00, PLLE)
+              Return (375000)
+            }
+            Return (0)
+          }
+        }
+      }
+      Return (0)
+    }
+
+    // Used by downstream Linux driver.
     Method(SCLK, 1, Serialized) {
       If (Arg0 <= 400000)
       {
@@ -54,6 +94,7 @@
       }
     }
 
+    /* TODO:
     Method(_PS3) {
 
     }
@@ -72,5 +113,21 @@
 
     Method(_PSC) {
       Return(0x01)
+    }
+    */
+
+    //
+    // A child device that represents the non-removable eMMC.
+    //
+    Device (SDMM)
+    {
+      Method (_ADR)
+      {
+        Return (0)
+      }
+      Method (_RMV) // Is removable
+      {
+        Return (0) // 0 - fixed
+      }
     }
   }
