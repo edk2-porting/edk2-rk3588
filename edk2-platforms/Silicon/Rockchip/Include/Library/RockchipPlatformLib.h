@@ -97,12 +97,6 @@ UsbPortPowerEnable (
 
 VOID
 EFIAPI
-Usb2PhySuspend (
-  VOID
-  );
-
-VOID
-EFIAPI
 Usb2PhyResume (
   VOID
   );

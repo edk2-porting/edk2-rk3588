@@ -227,17 +227,6 @@ UsbPortPowerEnable (
 
 VOID
 EFIAPI
-Usb2PhySuspend (
-  VOID
-  )
-{
-  MmioWrite32(0xfd5d4008, 0x20000000);
-  MmioWrite32(0xfd5d8008, 0x20000000);
-  MmioWrite32(0xfd5dc008, 0x20000000);
-}
-
-VOID
-EFIAPI
 Usb2PhyResume (
   VOID
   )
