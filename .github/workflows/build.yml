@@ -21,6 +21,7 @@ jobs:
           - station-m3
           - r58x
           - r58-mini
+          - edge2
           # - rk3588-evb is currently failing
         CONFIGURATION: [Debug, Release]
     steps:
