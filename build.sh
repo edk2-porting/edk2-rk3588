@@ -111,6 +111,7 @@ function _build(){
 		-b "${_MODE}" \
 		-D FIRMWARE_VER="${GITCOMMIT}" \
 		-D ENABLE_SIMPLE_INIT="${BUILD_GUI}" \
+		-D CONFIG_SOC="${SOC}" \
 		||return "$?"
 
 	_pack
@@ -119,7 +120,7 @@ function _build(){
 	echo "Build done: RK3588_NOR_FLASH.img"
 }
 
-function _clean(){ rm --one-file-system --recursive --force "${WORKSPACE}" "${OUTDIR}"/boot-*.img "${OUTDIR}"/uefi-*.img*; }
+function _clean(){ rm --one-file-system --recursive --force "${OUTDIR}"/workspace "${OUTDIR}"/RK3588_*.img "${OUTDIR}"/uefi-*.img*; }
 
 function _distclean(){ if [ -d .git ];then git clean -xdf;else _clean;fi; }
 
@@ -174,8 +175,8 @@ do
 	fi
 done
 
-[ -n "${_SIMPLE_INIT}" ]||_error "SimpleInit not found, please see README.md"
-[ -f "configs/${DEVICE}.conf" ]||_error "Device configuration not found"
+[ -n "${_SIMPLE_INIT}" ]||[ ${BUILD_GUI} == false ]_error "SimpleInit not found, please see README.md"
+[ -f "configs/${DEVICE}.conf" ]||[ "${DEVICE}" == "all" ]||_error "Device configuration not found"
 
 export CROSS_COMPILE="${CROSS_COMPILE:-aarch64-linux-gnu-}"
 export GCC5_AARCH64_PREFIX="${CROSS_COMPILE}"
@@ -210,8 +211,11 @@ then
 	for i in configs/*.conf
 	do
 		DEV="$(basename "$i" .conf)"
-		echo "Building ${DEV}"
-		_build "${DEV}"||E="$?"
+		if [ "${DEV}" != "RK3588" ]&&[ "${DEV}" != "RK3568" ]
+		then
+			echo "Building ${DEV}"
+			_build "${DEV}"||E="$?"
+		fi
 	done
 	exit "${E}"
 else
