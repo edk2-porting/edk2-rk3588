@@ -134,6 +134,9 @@
   # Add I2CLib
   I2CLib|Silicon/Rockchip/Library/I2CLib/I2CLib.inf
 
+  # Rockchip ATAGS library
+  RkAtagsLib|Silicon/Rockchip/Library/RkAtagsLib/RkAtagsLib.inf
+
 [LibraryClasses.common.SEC]
   ArmGicArchLib|ArmPkg/Library/ArmGicArchSecLib/ArmGicArchSecLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf

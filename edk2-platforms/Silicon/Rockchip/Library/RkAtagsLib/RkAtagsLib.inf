@@ -1,0 +1,28 @@
+#/** @file
+#
+#  Rockchip ATAGS library.
+#
+#  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = RkAtagsLib
+  FILE_GUID                      = EEA8B68F-1262-44D6-9D89-2AE700B969F3
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = RkAtagsLib
+
+[Sources]
+  RkAtagsLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  Silicon/Rockchip/RockchipPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
