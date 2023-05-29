@@ -111,12 +111,17 @@ DwEmmcBuildDevicePath (
   IN EFI_DEVICE_PATH_PROTOCOL   **DevicePath
   )
 {
-  EFI_DEVICE_PATH_PROTOCOL *NewDevicePathNode;
+  MEMMAP_DEVICE_PATH *MemMap;
 
-  NewDevicePathNode = CreateDeviceNode (HARDWARE_DEVICE_PATH, HW_VENDOR_DP, sizeof (VENDOR_DEVICE_PATH));
-  CopyGuid (& ((VENDOR_DEVICE_PATH*)NewDevicePathNode)->Guid, &mDwEmmcDevicePathGuid);
+  MemMap = (MEMMAP_DEVICE_PATH *) CreateDeviceNode (HARDWARE_DEVICE_PATH,
+                                                    HW_MEMMAP_DP,
+                                                    sizeof (MEMMAP_DEVICE_PATH));
+  MemMap->MemoryType = EfiMemoryMappedIO;
+  MemMap->StartingAddress = PcdGet32 (PcdDwEmmcDxeBaseAddress);
+  MemMap->EndingAddress = MemMap->StartingAddress + 0x4000 - 1;
 
-  *DevicePath = NewDevicePathNode;
+  *DevicePath = (EFI_DEVICE_PATH_PROTOCOL *) MemMap;
+
   return EFI_SUCCESS;
 }
 
