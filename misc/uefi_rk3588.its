@@ -81,6 +81,15 @@
 				algo = "sha256";
 			};
 		};
+		nvdata {
+			description = "UEFI Non-Volatile Data";
+			data-position = <0x006C0000>; /* 0x007C0000 - 0x100000 FIT offset */
+			data-size = <0x00030000>; /* NV_VARIABLE_STORE + NV_FTW_WORKING + NV_FTW_SPARE */
+			type = "standalone";
+			arch = "arm64";
+			compression = "none";
+			load = <0x007C0000>;
+		};
 	};
 
 	configurations {
@@ -89,7 +98,7 @@
 			description = "@DEVICE@";
 			rollback-index = <0x0>;
 			firmware = "atf-1";
-			loadables = "uboot", "atf-2", "atf-3", "optee";
+			loadables = "uboot", "atf-2", "atf-3", "optee", "nvdata";
 			fdt = "fdt";
 			signature {
 				algo = "sha256,rsa2048";
