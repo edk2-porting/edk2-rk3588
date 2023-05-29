@@ -28,3 +28,8 @@
   ArmSmcLib
   BaseLib
   DebugLib
+  UefiLib
+  UefiRuntimeLib
+
+[Guids]
+  gRockchipEventResetGuid

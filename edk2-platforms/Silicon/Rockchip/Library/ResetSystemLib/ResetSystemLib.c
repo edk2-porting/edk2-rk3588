@@ -16,8 +16,21 @@
 #include <Library/DebugLib.h>
 #include <Library/IoLib.h>
 #include <Library/ResetSystemLib.h>
+#include <Library/UefiLib.h>
+#include <Library/UefiRuntimeLib.h>
 
 #include <IndustryStandard/ArmStdSmc.h>
+
+STATIC
+VOID
+SignalResetEvent (
+  VOID
+  )
+{
+  if (!EfiAtRuntime ()) {
+    EfiEventGroupSignal (&gRockchipEventResetGuid);
+  }
+}
 
 /**
   This function causes a system-wide initialization (warm reset), in which all processors
@@ -31,6 +44,8 @@ ResetWarm (
   VOID
   )
 {
+  SignalResetEvent ();
+
   // First global software reset by programming CRU_GLB_SRST_FST as 0xfdb9
 #ifdef RK356X
   MmioWrite32 (0xFDD200D4, 0xfdb9);
@@ -55,6 +70,8 @@ ResetCold (
 {
   ARM_SMC_ARGS ArmSmcArgs;
 
+  SignalResetEvent ();
+
   // Send a PSCI 0.2 SYSTEM_RESET command
   ArmSmcArgs.Arg0 = ARM_SMC_ID_PSCI_SYSTEM_RESET;
   ArmCallSmc (&ArmSmcArgs);
@@ -73,6 +90,8 @@ ResetShutdown (
   )
 {
   ARM_SMC_ARGS ArmSmcArgs;
+
+  SignalResetEvent ();
 
   // Send a PSCI 0.2 SYSTEM_OFF command
   ArmSmcArgs.Arg0 = ARM_SMC_ID_PSCI_SYSTEM_OFF;
@@ -97,6 +116,8 @@ ResetPlatformSpecific (
   IN VOID   *ResetData
   )
 {
+  SignalResetEvent ();
+
 #ifdef RK356X
   MmioWrite32 (0xfdc20200, 0xEF08A53C);
 #else
