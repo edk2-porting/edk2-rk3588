@@ -329,6 +329,7 @@
   gRockchipTokenSpaceGuid.PcdNvStorageVariableBase|0|UINT32|0x21200005
   gRockchipTokenSpaceGuid.PcdNvStorageFtwWorkingBase|0|UINT32|0x21200006
   gRockchipTokenSpaceGuid.PcdNvStorageFtwSpareBase|0|UINT32|0x21200007
+  gRockchipTokenSpaceGuid.PcdNvStoragePreferSpiFlash|FALSE|BOOLEAN|0x21200009
 
   gRockchipTokenSpaceGuid.PcdLcdPixelFormat|0|UINT32|0x32000001
   gRockchipTokenSpaceGuid.PcdComboPhyMode|{ 0x0 }|VOID*|0x32000002

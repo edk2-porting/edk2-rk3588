@@ -1,11 +1,13 @@
-/** @file  RkFvbDxe.h
-
-  Copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.
-  Copyright (c) 2021-2022 Rockchip Electronics Co., Ltd.
-
-  SPDX-License-Identifier: BSD-3-Clause
-
-**/
+/** @file
+ *
+ *  Copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.
+ *  Copyright (c) 2017 Marvell International Ltd.
+ *  Copyright (c) 2021-2022 Rockchip Electronics Co., Ltd.
+ *  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+ *
+ *  SPDX-License-Identifier: BSD-2-Clause-Patent
+ *
+ **/
 
 #ifndef __FVB_FLASH_DXE_H__
 #define __FVB_FLASH_DXE_H__
@@ -39,13 +41,17 @@ typedef struct {
 } FVB_DEVICE_PATH;
 
 typedef struct {
-  UNI_NOR_FLASH_PROTOCOL          *SpiFlashProtocol;
+  UNI_NOR_FLASH_PROTOCOL              *SpiFlashProtocol;
+  BOOLEAN                             IsSpiFlashAvailable;
+
+  EFI_DEVICE_PATH_PROTOCOL            *DiskDevice;
+  UINT32                              DiskMediaId;
+  BOOLEAN                             DiskDataInvalidated;
 
   EFI_HANDLE                          Handle;
 
   UINT32                              Signature;
 
-  BOOLEAN                             IsMemoryMapped;
   UINTN                               DeviceBaseAddress;
   UINTN                               RegionBaseAddress;
   UINTN                               Size;
@@ -56,7 +62,7 @@ typedef struct {
   EFI_BLOCK_IO_MEDIA                  Media;
   EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL FvbProtocol;
 
-  FVB_DEVICE_PATH               DevicePath;
+  FVB_DEVICE_PATH                     DevicePath;
 } FVB_DEVICE;
 
 EFI_STATUS

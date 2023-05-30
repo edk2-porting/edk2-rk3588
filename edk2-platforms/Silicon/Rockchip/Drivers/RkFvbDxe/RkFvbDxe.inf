@@ -1,7 +1,16 @@
+#/** @file
 #
-#    Copyright (c) 2022, Rockchip Limited. All rights reserved.
-# SPDX-License-Identifier: BSD-2-Clause-Patent
+#  Firmware Volume Block driver for non-volatile data storage on
+#  SPI NOR (persistent at runtime) or SD/eMMC (persistent only at boot time).
 #
+#  Copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.
+#  Copyright (c) 2017 Marvell International Ltd.
+#  Copyright (c) 2021-2022 Rockchip Electronics Co., Ltd.
+#  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
 
 [Defines]
   INF_VERSION                    = 0x0001001A
@@ -20,6 +29,7 @@
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
   Silicon/Rockchip/RockchipPkg.dec
+  Silicon/Rockchip/Drivers/DwEmmcDxe/DwEmmcDxe.dec
 
 [LibraryClasses]
   IoLib
@@ -35,6 +45,7 @@
   DxeServicesTableLib
   MemoryAllocationLib
   UefiRuntimeServicesTableLib
+  RkAtagsLib
 
 [Guids]
   gEdkiiNvVarStoreFormattedGuid
@@ -42,12 +53,16 @@
   gEfiEventVirtualAddressChangeGuid
   gEfiSystemNvDataFvGuid
   gEfiVariableGuid
+  gEfiEventReadyToBootGuid
+  gRockchipEventResetGuid
 
 [Protocols]
   gEfiDevicePathProtocolGuid
   gEfiFirmwareVolumeBlockProtocolGuid
   gRockchipSpiFlashProtocolGuid
   gUniNorFlashProtocolGuid
+  gEfiDiskIoProtocolGuid
+  gEfiBlockIoProtocolGuid
 
 [FixedPcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
@@ -56,6 +71,9 @@
 #  gRockchipTokenSpaceGuid.PcdSpiMemoryBase
 #  gRockchipTokenSpaceGuid.PcdSpiMemoryMapped
   gRockchipTokenSpaceGuid.PcdNvStorageVariableBase
+  gRockchipTokenSpaceGuid.PcdNvStoragePreferSpiFlash
+  gRockchipTokenSpaceGuid.PcdSdhciDxeBaseAddress
+  gDesignWareTokenSpaceGuid.PcdDwEmmcDxeBaseAddress
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64

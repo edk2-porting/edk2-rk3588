@@ -21,10 +21,16 @@ UINT64 mSystemMemoryBase = FixedPcdGet64 (PcdSystemMemoryBase);
 STATIC UINT64 mSystemMemorySize = FixedPcdGet64 (PcdSystemMemorySize);
 
 // The total number of descriptors, including the final "end-of-table" descriptor.
-#define MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS 10
+#define MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS 11
 
 STATIC BOOLEAN                     VirtualMemoryInfoInitialized = FALSE;
 STATIC RK3588_MEMORY_REGION_INFO   VirtualMemoryInfo[MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS];
+
+#define VariablesBase FixedPcdGet64(PcdNvStorageVariableBase)
+
+#define VariablesSize (FixedPcdGet32(PcdFlashNvStorageVariableSize)   + \
+                       FixedPcdGet32(PcdFlashNvStorageFtwWorkingSize) + \
+                       FixedPcdGet32(PcdFlashNvStorageFtwSpareSize))
 
 /**
   Return the Virtual Memory Map of your platform
@@ -139,6 +145,14 @@ ArmPlatformGetVirtualMemoryMap (
   // VirtualMemoryTable[Index].Attributes      = ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK;
   // VirtualMemoryInfo[Index].Type             = RK3588_MEM_RESERVED_REGION;
   // VirtualMemoryInfo[Index++].Name           = L"FD";
+
+  // Variable Volume
+  VirtualMemoryTable[Index].PhysicalBase    = VariablesBase;
+  VirtualMemoryTable[Index].VirtualBase     = VirtualMemoryTable[Index].PhysicalBase;
+  VirtualMemoryTable[Index].Length          = VariablesSize;
+  VirtualMemoryTable[Index].Attributes      = ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK;
+  VirtualMemoryInfo[Index].Type             = RK3588_MEM_RUNTIME_REGION;
+  VirtualMemoryInfo[Index++].Name           = L"Variable Store";
 
   // End of Table
   VirtualMemoryTable[Index].PhysicalBase    = 0;
