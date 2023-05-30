@@ -45,6 +45,12 @@
 #define CP_SATA           0x10
 #define CP_USB3           0x20
 
+#define SATA_CAP            0x0000
+#define  SATA_CAP_SSS       BIT27
+#define SATA_PI             0x000C
+#define SATA_CMD            0x0118
+#define  SATA_CMD_FBSCP     BIT22
+
 extern UINT8 RK3588DxeHiiBin[];
 extern UINT8 RK3588DxeStrings[];
 
@@ -250,6 +256,9 @@ InitComPhyConfig(
     MmioWrite32(PhpBaseAddr + 0x4, 0xFFFF4000);
     MmioWrite32(PhpBaseAddr + 0x8, 0xFFFF80c1);
     MmioWrite32(PhpBaseAddr + 0xc, 0xFFFF0407);
+
+    /* Should we tune the rest of the parameters too? */
+
     break;
 
   case CP_USB3:
@@ -331,9 +340,19 @@ ComboPhyInit(void)
   for (Index = 0; Index < ComPhyDeviceTableSize; Index++) {
     InitComPhyConfig (ComPhyReg[Index][0], ComPhyReg[Index][1], ComPhyMode[Index]);
     if (ComPhyMode[Index] == CP_SATA) {
+
+    /* Set port implemented flag */
+    MmioWrite32 (AhciReg[Index] + SATA_PI, 0x1);
+
+    /* Supports staggered spin-up */
+    MmioOr32 (AhciReg[Index] + SATA_CAP, SATA_CAP_SSS);
+
+    /* Supports FIS-based switching */
+    MmioOr32 (AhciReg[Index] + SATA_CMD, SATA_CMD_FBSCP);
+
 		RegisterNonDiscoverableMmioDevice (
            NonDiscoverableDeviceTypeAhci,
-           NonDiscoverableDeviceDmaTypeCoherent,
+           NonDiscoverableDeviceDmaTypeNonCoherent,
            NULL,
            NULL,
            1,
