@@ -380,8 +380,6 @@
   #MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
   MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
   #MdeModulePkg/Bus/Pci/NvmExpressPei/NvmExpressPei.inf
-  MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
-  MdeModulePkg/Bus/Pci/SataControllerDxe/SataControllerDxe.inf
 
   MdeModulePkg/Bus/Pci/NonDiscoverablePciDeviceDxe/NonDiscoverablePciDeviceDxe.inf
   
@@ -462,8 +460,8 @@
   #
   # AHCI Support
   #
-  Silicon/Rockchip/Drivers/SataControllerDxe/SataControllerDxe.inf
-  Silicon/Rockchip/Drivers/AtaAtapiPassThru/AtaAtapiPassThru.inf
+  MdeModulePkg/Bus/Pci/SataControllerDxe/SataControllerDxe.inf
+  MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
   MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf
 
   #

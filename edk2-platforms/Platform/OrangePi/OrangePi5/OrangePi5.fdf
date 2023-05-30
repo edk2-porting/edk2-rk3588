@@ -248,8 +248,6 @@ READ_LOCK_STATUS   = TRUE
 
   #INF MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
   INF MdeModulePkg/Bus/Pci/NonDiscoverablePciDeviceDxe/NonDiscoverablePciDeviceDxe.inf
-  INF MdeModulePkg/Bus/Pci/SataControllerDxe/SataControllerDxe.inf
-  INF MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
 
   #
   # Android Boot applications
@@ -288,8 +286,8 @@ READ_LOCK_STATUS   = TRUE
   #
   # AHCI Support
   #
-  INF Silicon/Rockchip/Drivers/SataControllerDxe/SataControllerDxe.inf
-  INF Silicon/Rockchip/Drivers/AtaAtapiPassThru/AtaAtapiPassThru.inf
+  INF MdeModulePkg/Bus/Pci/SataControllerDxe/SataControllerDxe.inf
+  INF MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
   INF MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf
 
   #
