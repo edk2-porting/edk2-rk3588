@@ -297,8 +297,10 @@ READ_LOCK_STATUS   = TRUE
   #
   INF Silicon/Rockchip/Drivers/NorFlashDxe/NorFlashDxe.inf
 
-  # Variable services
-  INF Silicon/Rockchip/Drivers/NorFlashDxe/RkFvbDxe.inf
+  #
+  # Non-volatile FVB support
+  #
+  INF Silicon/Rockchip/Drivers/RkFvbDxe/RkFvbDxe.inf
   INF MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
   INF MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
 

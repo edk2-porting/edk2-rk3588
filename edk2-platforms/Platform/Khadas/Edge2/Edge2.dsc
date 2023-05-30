@@ -250,10 +250,6 @@
   gRK3588TokenSpaceGuid.PcdSdBootDevicePath|L"VenHw(0D51905B-B77E-452A-A2C0-ECA0CC8D514A,00E023F70000000000)/SD(0x0)"
   gRK3588TokenSpaceGuid.PcdKernelBootArg|L"earlycon=uart8250,mmio32,0xfeb50000 root=PARTUUID=614e0000-0000 rw rootwait"
   gEmbeddedTokenSpaceGuid.PcdAndroidBootDevicePath|L"VenHw(100C2CFA-B586-4198-9B4C-1683D195B1DA)/HD(3,GPT,7A3F0000-0000-446A-8000-702F00006273,0x8000,0x20000)"
-  #
-  # Make VariableRuntimeDxe work at emulated non-volatile variable mode.
-  #
-  #gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable|TRUE
 
   # ACPI Enable
   gRK3588TokenSpaceGuid.AcpiEnable|TRUE
@@ -389,7 +385,10 @@
 
   MdeModulePkg/Bus/Pci/NonDiscoverablePciDeviceDxe/NonDiscoverablePciDeviceDxe.inf
   
-
+  #
+  # Non-volatile FVB support
+  #
+  Silicon/Rockchip/Drivers/RkFvbDxe/RkFvbDxe.inf
   MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
 
@@ -458,7 +457,6 @@
   # NOR FLASH
   #
   Silicon/Rockchip/Drivers/NorFlashDxe/NorFlashDxe.inf
-  Silicon/Rockchip/Drivers/NorFlashDxe/RkFvbDxe.inf
   Silicon/Rockchip/Applications/SpiTool/SpiFlashCmd.inf
 
   #
