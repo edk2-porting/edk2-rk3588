@@ -395,7 +395,7 @@ SetupCpuPerfVariables (
                             &gRK3588DxeFormSetGuid,
                             NULL, &Size, &Var32);
   if (EFI_ERROR (Status)) {
-    Status = PcdSet32S (PcdCPULClusterClockPreset, PcdGet32 (PcdCPULClusterClockPreset));
+    Status = PcdSet32S (PcdCPULClusterClockPreset, PcdGet32 (PcdCPULClusterClockPresetDefault));
     ASSERT_EFI_ERROR (Status);
   }
 
@@ -413,7 +413,7 @@ SetupCpuPerfVariables (
                             &gRK3588DxeFormSetGuid,
                             NULL, &Size, &Var32);
   if (EFI_ERROR (Status)) {
-    Status = PcdSet32S (PcdCPUB01ClusterClockPreset, PcdGet32 (PcdCPUB01ClusterClockPreset));
+    Status = PcdSet32S (PcdCPUB01ClusterClockPreset, PcdGet32 (PcdCPUB01ClusterClockPresetDefault));
     ASSERT_EFI_ERROR (Status);
   }
 
@@ -431,7 +431,7 @@ SetupCpuPerfVariables (
                             &gRK3588DxeFormSetGuid,
                             NULL, &Size, &Var32);
   if (EFI_ERROR (Status)) {
-    Status = PcdSet32S (PcdCPUB23ClusterClockPreset, PcdGet32 (PcdCPUB23ClusterClockPreset));
+    Status = PcdSet32S (PcdCPUB23ClusterClockPreset, PcdGet32 (PcdCPUB23ClusterClockPresetDefault));
     ASSERT_EFI_ERROR (Status);
   }
 

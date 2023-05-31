@@ -68,6 +68,9 @@
   gRockchipTokenSpaceGuid.FspiBaseAddr
   gRK3588TokenSpaceGuid.PcdKernelBootArg
 
+  gRK3588TokenSpaceGuid.PcdCPULClusterClockPresetDefault
+  gRK3588TokenSpaceGuid.PcdCPUB01ClusterClockPresetDefault
+  gRK3588TokenSpaceGuid.PcdCPUB23ClusterClockPresetDefault
   gRK3588TokenSpaceGuid.PcdCPULClusterClockPreset
   gRK3588TokenSpaceGuid.PcdCPULClusterClockCustom
   gRK3588TokenSpaceGuid.PcdCPUB01ClusterClockPreset

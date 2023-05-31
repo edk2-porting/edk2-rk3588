@@ -33,9 +33,12 @@
   gRockchipI2cDemoProtocolGuid    = { 0x71954bda, 0x60d3, 0x4ef8, { 0x8e, 0x3c, 0x0e, 0x33, 0x9f, 0x3b, 0xc2, 0x2b }}
 
 [PcdsFixedAtBuild]
+  gRK3588TokenSpaceGuid.PcdCPULClusterClockPresetDefault|0|UINT32|0x00010001
+  gRK3588TokenSpaceGuid.PcdCPUB01ClusterClockPresetDefault|0|UINT32|0x00010002
+  gRK3588TokenSpaceGuid.PcdCPUB23ClusterClockPresetDefault|0|UINT32|0x00010003
   gRK3588TokenSpaceGuid.PcdComboPhy0Switchable|FALSE|BOOLEAN|0x00010101
-  gRK3588TokenSpaceGuid.PcdComboPhy1Switchable|FALSE|BOOLEAN|0x00010002
-  gRK3588TokenSpaceGuid.PcdComboPhy2Switchable|FALSE|BOOLEAN|0x00010003
+  gRK3588TokenSpaceGuid.PcdComboPhy1Switchable|FALSE|BOOLEAN|0x00010102
+  gRK3588TokenSpaceGuid.PcdComboPhy2Switchable|FALSE|BOOLEAN|0x00010103
   gRK3588TokenSpaceGuid.PcdComboPhy0ModeDefault|0|UINT32|0x00010104
   gRK3588TokenSpaceGuid.PcdComboPhy1ModeDefault|0|UINT32|0x00010105
   gRK3588TokenSpaceGuid.PcdComboPhy2ModeDefault|0|UINT32|0x00010106
