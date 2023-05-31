@@ -17,6 +17,11 @@
   #
   # Must match defines in Silicon/Rockchip/RK3588/Include/VarStoreData.h
   #
+  DEFINE CPU_PERF_CLUSTER_CLOCK_PRESET_BOOTDEFAULT  = 0
+  DEFINE CPU_PERF_CLUSTER_CLOCK_PRESET_MIN          = 1
+  DEFINE CPU_PERF_CLUSTER_CLOCK_PRESET_MAX          = 2
+  DEFINE CPU_PERF_CLUSTER_CLOCK_PRESET_CUSTOM       = 3
+
   DEFINE COMBO_PHY_MODE_UNCONNECTED   = 0
   DEFINE COMBO_PHY_MODE_PCIE          = 1
   DEFINE COMBO_PHY_MODE_SATA          = 2
@@ -256,6 +261,13 @@
   #gRockchipTokenSpaceGuid.PcdHdmiId|0x00000001 #hdmi1
 
   #
+  # CPU Performance default values
+  #
+  gRK3588TokenSpaceGuid.PcdCPULClusterClockPresetDefault|$(CPU_PERF_CLUSTER_CLOCK_PRESET_BOOTDEFAULT)
+  gRK3588TokenSpaceGuid.PcdCPUB01ClusterClockPresetDefault|$(CPU_PERF_CLUSTER_CLOCK_PRESET_BOOTDEFAULT)
+  gRK3588TokenSpaceGuid.PcdCPUB23ClusterClockPresetDefault|$(CPU_PERF_CLUSTER_CLOCK_PRESET_BOOTDEFAULT)
+
+  #
   # PCIe/SATA/USB Combo PIPE PHY support flags and default values
   #
   gRK3588TokenSpaceGuid.PcdComboPhy0Switchable|TRUE
@@ -311,11 +323,11 @@
   #
   # CPU Performance
   #
-  gRK3588TokenSpaceGuid.PcdCPULClusterClockPreset|L"CpuPerf_CPULClusterClockPreset"|gRK3588DxeFormSetGuid|0x0|2
+  gRK3588TokenSpaceGuid.PcdCPULClusterClockPreset|L"CpuPerf_CPULClusterClockPreset"|gRK3588DxeFormSetGuid|0x0|gRK3588TokenSpaceGuid.PcdCPULClusterClockPresetDefault
   gRK3588TokenSpaceGuid.PcdCPULClusterClockCustom|L"CpuPerf_CPULClusterClockCustom"|gRK3588DxeFormSetGuid|0x0|1800
-  gRK3588TokenSpaceGuid.PcdCPUB01ClusterClockPreset|L"CpuPerf_CPUB01ClusterClockPreset"|gRK3588DxeFormSetGuid|0x0|2
+  gRK3588TokenSpaceGuid.PcdCPUB01ClusterClockPreset|L"CpuPerf_CPUB01ClusterClockPreset"|gRK3588DxeFormSetGuid|0x0|gRK3588TokenSpaceGuid.PcdCPUB01ClusterClockPresetDefault
   gRK3588TokenSpaceGuid.PcdCPUB01ClusterClockCustom|L"CpuPerf_CPUB01ClusterClockCustom"|gRK3588DxeFormSetGuid|0x0|2400
-  gRK3588TokenSpaceGuid.PcdCPUB23ClusterClockPreset|L"CpuPerf_CPUB23ClusterClockPreset"|gRK3588DxeFormSetGuid|0x0|2
+  gRK3588TokenSpaceGuid.PcdCPUB23ClusterClockPreset|L"CpuPerf_CPUB23ClusterClockPreset"|gRK3588DxeFormSetGuid|0x0|gRK3588TokenSpaceGuid.PcdCPUB23ClusterClockPresetDefault
   gRK3588TokenSpaceGuid.PcdCPUB23ClusterClockCustom|L"CpuPerf_CPUB23ClusterClockCustom"|gRK3588DxeFormSetGuid|0x0|2400
   gRK3588TokenSpaceGuid.PcdCPULClusterVoltageMode|L"CpuPerf_CPULClusterVoltageMode"|gRK3588DxeFormSetGuid|0x0|0
   gRK3588TokenSpaceGuid.PcdCPULClusterVoltageCustom|L"CpuPerf_CPULClusterVoltageCustom"|gRK3588DxeFormSetGuid|0x0|950000
