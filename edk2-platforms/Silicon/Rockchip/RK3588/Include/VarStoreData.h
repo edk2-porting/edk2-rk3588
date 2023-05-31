@@ -24,11 +24,19 @@ typedef struct {
 #define CPU_PERF_CLUSTER_VOLTAGE_MODE_AUTO          0
 #define CPU_PERF_CLUSTER_VOLTAGE_MODE_CUSTOM        1
 typedef struct {
-    UINT32 Mode;
+  UINT32 Mode;
 } CPU_PERF_CLUSTER_VOLTAGE_MODE_VARSTORE_DATA;
 
 typedef struct {
-    UINT32 Microvolts;
+  UINT32 Microvolts;
 } CPU_PERF_CLUSTER_VOLTAGE_CUSTOM_VARSTORE_DATA;
+
+#define COMBO_PHY_MODE_UNCONNECTED                  0
+#define COMBO_PHY_MODE_PCIE                         1
+#define COMBO_PHY_MODE_SATA                         2
+#define COMBO_PHY_MODE_USB3                         3
+typedef struct {
+  UINT32 Mode;
+} COMBO_PHY_MODE_VARSTORE_DATA;
 
 #endif // __VARSTORE_DATA_H__

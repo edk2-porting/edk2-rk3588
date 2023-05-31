@@ -90,6 +90,21 @@ formset
       name  = CpuPerf_CPUB23ClusterVoltageCustom,
       guid  = RK3588DXE_FORMSET_GUID;
 
+    efivarstore COMBO_PHY_MODE_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = ComboPhy0Mode,
+      guid  = RK3588DXE_FORMSET_GUID;
+
+    efivarstore COMBO_PHY_MODE_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = ComboPhy1Mode,
+      guid  = RK3588DXE_FORMSET_GUID;
+
+    efivarstore COMBO_PHY_MODE_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = ComboPhy2Mode,
+      guid  = RK3588DXE_FORMSET_GUID;
+
     form formid = 1,
       title  = STRING_TOKEN(STR_FORM_SET_TITLE);
       subtitle text = STRING_TOKEN(STR_FORM_SET_TITLE_SUBTITLE);
@@ -99,6 +114,10 @@ formset
       goto 0x1000,
         prompt = STRING_TOKEN(STR_CPU_PERF_FORM_TITLE),
         help = STRING_TOKEN(STR_CPU_PERF_FORM_HELP);
+
+      goto 0x1001,
+        prompt = STRING_TOKEN(STR_COMBO_PHY_FORM_TITLE),
+        help = STRING_TOKEN(STR_COMBO_PHY_FORM_HELP);
     endform;
 
     form formid = 0x1000,
@@ -260,5 +279,73 @@ formset
 
         subtitle text = STRING_TOKEN(STR_NULL_STRING);
         subtitle text = STRING_TOKEN(STR_CPU_PERF_FORM_SUBTITLE);
+    endform;
+
+    form formid = 0x1001,
+        title  = STRING_TOKEN(STR_COMBO_PHY_FORM_TITLE);
+
+        grayoutif FixedPcdGetBool (PcdComboPhy0Switchable) == 0;
+          oneof varid = ComboPhy0Mode.Mode,
+            prompt      = STRING_TOKEN(STR_COMBO_PHY0_MODE_PROMPT),
+#if   FixedPcdGet32 (PcdComboPhy0ModeDefault) == COMBO_PHY_MODE_PCIE
+            help        = STRING_TOKEN(STR_COMBO_PHY_MODE_DEFAULT_PCIE_HELP),
+#elif FixedPcdGet32 (PcdComboPhy0ModeDefault) == COMBO_PHY_MODE_SATA
+            help        = STRING_TOKEN(STR_COMBO_PHY_MODE_DEFAULT_SATA_HELP),
+#elif FixedPcdGet32 (PcdComboPhy0ModeDefault) == COMBO_PHY_MODE_USB3
+            help        = STRING_TOKEN(STR_COMBO_PHY_MODE_DEFAULT_USB3_HELP),
+#else
+            help        = STRING_TOKEN(STR_COMBO_PHY_MODE_DEFAULT_UNCONNECTED_HELP),
+#endif
+            flags       = NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+            default     = FixedPcdGet32 (PcdComboPhy0ModeDefault),
+            option text = STRING_TOKEN(STR_COMBO_PHY_MODE_UNCONNECTED), value = COMBO_PHY_MODE_UNCONNECTED, flags = 0;
+            option text = STRING_TOKEN(STR_COMBO_PHY_MODE_PCIE), value = COMBO_PHY_MODE_PCIE, flags = 0;
+            option text = STRING_TOKEN(STR_COMBO_PHY_MODE_SATA), value = COMBO_PHY_MODE_SATA, flags = 0;
+          endoneof;
+        endif;
+
+        grayoutif FixedPcdGetBool (PcdComboPhy1Switchable) == 0;
+          oneof varid = ComboPhy1Mode.Mode,
+            prompt      = STRING_TOKEN(STR_COMBO_PHY1_MODE_PROMPT),
+#if   FixedPcdGet32 (PcdComboPhy1ModeDefault) == COMBO_PHY_MODE_PCIE
+            help        = STRING_TOKEN(STR_COMBO_PHY_MODE_DEFAULT_PCIE_HELP),
+#elif FixedPcdGet32 (PcdComboPhy1ModeDefault) == COMBO_PHY_MODE_SATA
+            help        = STRING_TOKEN(STR_COMBO_PHY_MODE_DEFAULT_SATA_HELP),
+#elif FixedPcdGet32 (PcdComboPhy1ModeDefault) == COMBO_PHY_MODE_USB3
+            help        = STRING_TOKEN(STR_COMBO_PHY_MODE_DEFAULT_USB3_HELP),
+#else
+            help        = STRING_TOKEN(STR_COMBO_PHY_MODE_DEFAULT_UNCONNECTED_HELP),
+#endif
+            flags       = NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+            default     = FixedPcdGet32 (PcdComboPhy1ModeDefault),
+            option text = STRING_TOKEN(STR_COMBO_PHY_MODE_UNCONNECTED), value = COMBO_PHY_MODE_UNCONNECTED, flags = 0;
+            option text = STRING_TOKEN(STR_COMBO_PHY_MODE_PCIE), value = COMBO_PHY_MODE_PCIE, flags = 0;
+            option text = STRING_TOKEN(STR_COMBO_PHY_MODE_SATA), value = COMBO_PHY_MODE_SATA, flags = 0;
+          endoneof;
+        endif;
+
+        grayoutif FixedPcdGetBool (PcdComboPhy2Switchable) == 0;
+          oneof varid = ComboPhy2Mode.Mode,
+            prompt      = STRING_TOKEN(STR_COMBO_PHY2_MODE_PROMPT),
+#if   FixedPcdGet32 (PcdComboPhy2ModeDefault) == COMBO_PHY_MODE_PCIE
+            help        = STRING_TOKEN(STR_COMBO_PHY_MODE_DEFAULT_PCIE_HELP),
+#elif FixedPcdGet32 (PcdComboPhy2ModeDefault) == COMBO_PHY_MODE_SATA
+            help        = STRING_TOKEN(STR_COMBO_PHY_MODE_DEFAULT_SATA_HELP),
+#elif FixedPcdGet32 (PcdComboPhy2ModeDefault) == COMBO_PHY_MODE_USB3
+            help        = STRING_TOKEN(STR_COMBO_PHY_MODE_DEFAULT_USB3_HELP),
+#else
+            help        = STRING_TOKEN(STR_COMBO_PHY_MODE_DEFAULT_UNCONNECTED_HELP),
+#endif
+            flags       = NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+            default     = FixedPcdGet32 (PcdComboPhy2ModeDefault),
+            option text = STRING_TOKEN(STR_COMBO_PHY_MODE_UNCONNECTED), value = COMBO_PHY_MODE_UNCONNECTED, flags = 0;
+            option text = STRING_TOKEN(STR_COMBO_PHY_MODE_PCIE), value = COMBO_PHY_MODE_PCIE, flags = 0;
+            option text = STRING_TOKEN(STR_COMBO_PHY_MODE_SATA), value = COMBO_PHY_MODE_SATA, flags = 0;
+            option text = STRING_TOKEN(STR_COMBO_PHY_MODE_USB3), value = COMBO_PHY_MODE_USB3, flags = 0;
+          endoneof;
+        endif;
+
+        subtitle text = STRING_TOKEN(STR_NULL_STRING);
+        subtitle text = STRING_TOKEN(STR_COMBO_PHY_FORM_SUBTITLE);
     endform;
 endformset;

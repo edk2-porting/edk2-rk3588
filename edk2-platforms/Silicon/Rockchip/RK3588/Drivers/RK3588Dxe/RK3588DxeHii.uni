@@ -75,3 +75,24 @@
 
 #string STR_CPU_PERF_CLUSTER_VOLTAGE_MODE_AUTO             #language en-US "Automatic"
 #string STR_CPU_PERF_CLUSTER_VOLTAGE_MODE_CUSTOM           #language en-US "Custom"
+
+/*
+ * PCIe/SATA/USB Combo PIPE PHY configuration
+ */
+#string STR_COMBO_PHY_FORM_TITLE                           #language en-US "PCIe/SATA/USB Combo PIPE PHY"
+#string STR_COMBO_PHY_FORM_HELP                            #language en-US "Configure the Combo PIPE PHY operation modes."
+#string STR_COMBO_PHY_FORM_SUBTITLE                        #language en-US "Note: the selected mode must match the interface of the connected device."
+
+#string STR_COMBO_PHY0_MODE_PROMPT                         #language en-US "PHY #0 Mode"
+#string STR_COMBO_PHY1_MODE_PROMPT                         #language en-US "PHY #1 Mode"
+#string STR_COMBO_PHY2_MODE_PROMPT                         #language en-US "PHY #2 Mode"
+
+#string STR_COMBO_PHY_MODE_UNCONNECTED                     #language en-US "Unconnected"
+#string STR_COMBO_PHY_MODE_PCIE                            #language en-US "PCIe 2.1 x1"
+#string STR_COMBO_PHY_MODE_SATA                            #language en-US "SATA 3.1"
+#string STR_COMBO_PHY_MODE_USB3                            #language en-US "USB 3.1 Gen 1"
+
+#string STR_COMBO_PHY_MODE_DEFAULT_UNCONNECTED_HELP        #language en-US "This PHY may not be wired to any slot or device."
+#string STR_COMBO_PHY_MODE_DEFAULT_PCIE_HELP               #language en-US "This PHY may be wired to an M.2, Mini PCIe slot or a permanent device (such as Wi-Fi or Ethernet controller).\n\nConsult your platform's documentation for details on potential alternate modes, such as SATA or USB."
+#string STR_COMBO_PHY_MODE_DEFAULT_SATA_HELP               #language en-US "This PHY may be wired to an M.2 or SATA slot.\n\nConsult your platform's documentation for details on potential alternate modes, such as PCIe or USB."
+#string STR_COMBO_PHY_MODE_DEFAULT_USB3_HELP               #language en-US "This PHY is wired to an USB 3.1 Gen 1 Type-A port.\n\nConsult your platform's documentation for details on potential alternate modes, such as PCIe or SATA (via non-standard adapters)."

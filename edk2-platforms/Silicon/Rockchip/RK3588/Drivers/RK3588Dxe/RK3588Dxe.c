@@ -39,17 +39,7 @@
 #include "RK3588Dxe.h"
 #include "RK3588DxeFormSetGuid.h"
 #include "CpuPerformance.h"
-
-#define CP_UNCONNECTED    0x0
-#define CP_PCIE           0x01
-#define CP_SATA           0x10
-#define CP_USB3           0x20
-
-#define SATA_CAP            0x0000
-#define  SATA_CAP_SSS       BIT27
-#define SATA_PI             0x000C
-#define SATA_CMD            0x0118
-#define  SATA_CMD_FBSCP     BIT22
+#include "ComboPhy.h"
 
 extern UINT8 RK3588DxeHiiBin[];
 extern UINT8 RK3588DxeStrings[];
@@ -80,6 +70,50 @@ STATIC HII_VENDOR_DEVICE_PATH mVendorDevicePath = {
     }
   }
 };
+
+#define SATA_CAP            0x0000
+#define  SATA_CAP_SSS       BIT27
+#define SATA_PI             0x000C
+#define SATA_CMD            0x0118
+#define  SATA_CMD_FBSCP     BIT22
+
+static UINTN AhciReg[3] = {
+  0xFE210000,
+  0xFE220000,
+  0xFE230000,
+};
+
+STATIC
+VOID
+InstallSataDevices (
+  VOID
+  )
+{
+  UINT32 Index;
+  UINT32 ComPhyMode[] = { PcdGet32 (PcdComboPhy0Mode),
+                          PcdGet32 (PcdComboPhy1Mode),
+                          PcdGet32 (PcdComboPhy2Mode) };
+
+  for (Index = 0; Index < ARRAY_SIZE (ComPhyMode); Index++) {
+    if (ComPhyMode[Index] == COMBO_PHY_MODE_SATA) {
+      /* Set port implemented flag */
+      MmioWrite32 (AhciReg[Index] + SATA_PI, 0x1);
+
+      /* Supports staggered spin-up */
+      MmioOr32 (AhciReg[Index] + SATA_CAP, SATA_CAP_SSS);
+
+      /* Supports FIS-based switching */
+      MmioOr32 (AhciReg[Index] + SATA_CMD, SATA_CMD_FBSCP);
+
+      RegisterNonDiscoverableMmioDevice (NonDiscoverableDeviceTypeAhci,
+                                         NonDiscoverableDeviceDmaTypeNonCoherent,
+                                         NULL,
+                                         NULL,
+                                         1,
+                                         AhciReg[Index], SIZE_4KB);
+    }
+  }
+}
 
 STATIC
 EFI_STATUS
@@ -124,9 +158,20 @@ SetupVariables (
   VOID
   )
 {
-  SetupCpuPerfVariables();
+  SetupCpuPerfVariables ();
+  SetupComboPhyVariables ();
 
   return EFI_SUCCESS; 
+}
+
+STATIC
+VOID
+EFIAPI
+AfterApplyVariablesInit (
+  VOID
+  )
+{
+  InstallSataDevices ();
 }
 
 STATIC
@@ -136,7 +181,10 @@ ApplyVariables (
   VOID
   )
 {
-  ApplyCpuClockVariables();
+  ApplyCpuClockVariables ();
+  ApplyComboPhyVariables ();
+
+  AfterApplyVariablesInit ();
 }
 
 STATIC
@@ -197,193 +245,7 @@ GmacIomuxInit (
   GmacIomux(0);
 }
 
-static UINTN ComPhyReg[3][2] = {
-  {0xFEE00000, 0xFD5BC000},
-  {0xFEE10000, 0xFD5C0000},
-  {0xFEE20000, 0xFD5C4000},
-};
 
-static UINTN AhciReg[3] = {
-  0xFE210000,
-  0xFE220000,
-  0xFE230000,
-};
-
-UINTN
-EFIAPI
-InitComPhyConfig(
-  UINTN PhyBaseAddr,
-  UINTN PhpBaseAddr,
-  UINT8 PhyMode
-)
-{
-  UINT32 val;
-  DEBUG ((DEBUG_ERROR, "%a reg=%x %x mode = %d\n", __func__, PhyBaseAddr, PhpBaseAddr, PhyMode));
-
-  switch (PhyMode) {
-  case CP_PCIE:
-    MmioWrite32(PhpBaseAddr + 0x0, 0xFFFF1000);
-    MmioWrite32(PhpBaseAddr + 0x4, 0xFFFF4000);
-    MmioWrite32(PhpBaseAddr + 0x8, 0xFFFF0101);
-    MmioWrite32(PhpBaseAddr + 0xc, 0xFFFF0200);
-
-    /* gate_tx_pck_sel length select work for L1SS */
-    MmioWrite32(PhyBaseAddr + 0x74, 0xc0);
-
-    /* PLL KVCO tuning fine */
-    val = MmioRead32(PhyBaseAddr + (0x20 << 2));
-    val &= ~(0x7 << 2);
-    val |= 0x4 << 2;
-    MmioWrite32(PhyBaseAddr + (0x20 << 2), val);
-
-    /* Set up rx_trim: PLL LPF C1 85pf R1 1.25kohm */
-    MmioWrite32(PhyBaseAddr + (0x1b << 2), 0x4c);
-
-    /* Set up su_trim: T3 */
-    MmioWrite32(PhyBaseAddr + (0xa << 2), 0xb0);
-    MmioWrite32(PhyBaseAddr + (0xb << 2), 0x47);
-    MmioWrite32(PhyBaseAddr + (0xd << 2), 0x57);
-
-    break;
-
-  case CP_SATA:
-    MmioWrite32(PhyBaseAddr + 0x38, 0x41);
-    MmioWrite32(PhyBaseAddr + 0x18, 0x8F);
-    MmioWrite32(PhyBaseAddr + 0x7C, 0x50);
-    MmioWrite32(PhyBaseAddr + 0x24, 0x07);
-
-    MmioWrite32(PhpBaseAddr + 0x0, 0xFFFF0129);
-    MmioWrite32(PhpBaseAddr + 0x4, 0xFFFF4000);
-    MmioWrite32(PhpBaseAddr + 0x8, 0xFFFF80c1);
-    MmioWrite32(PhpBaseAddr + 0xc, 0xFFFF0407);
-
-    /* Should we tune the rest of the parameters too? */
-
-    break;
-
-  case CP_USB3:
-    /* Set SSC downward spread spectrum */
-    val = MmioRead32(PhyBaseAddr + (0x1f << 2));
-    val &= ~(0x3 << 4);
-    val |= 0x01 << 4;
-    MmioWrite32(PhyBaseAddr + 0x7c, val);
-
-    /* Enable adaptive CTLE for USB3.0 Rx */
-    val = MmioRead32(PhyBaseAddr + (0x0e << 2));
-    val &= ~(0x1 << 0);
-    val |= 0x01;
-    MmioWrite32(PhyBaseAddr + (0x0e << 2), val);
-
-    /* Set PLL KVCO fine tuning signals */
-    val = MmioRead32(PhyBaseAddr + (0x20 << 2));
-    val &= ~(0x7 << 2);
-    val |= 0x2 << 2;
-    MmioWrite32(PhyBaseAddr + (0x20 << 2), val);
-
-    /* Set PLL LPF R1 to su_trim[10:7]=1001 */
-    MmioWrite32(PhyBaseAddr + (0xb << 2), 0x4);
-
-    /* Set PLL input clock divider 1/2 */
-    val = MmioRead32(PhyBaseAddr + (0x5 << 2));
-    val &= ~(0x3 << 6);
-    val |= 0x1 << 6;
-    MmioWrite32(PhyBaseAddr + (0x5 << 2), val);
-
-    /* Set PLL loop divider */
-    MmioWrite32(PhyBaseAddr + (0x11 << 2), 0x32);
-
-    /* Set PLL KVCO to min and set PLL charge pump current to max */
-    MmioWrite32(PhyBaseAddr + (0xa << 2), 0xf0);
-
-    /* Set Rx squelch input filler bandwidth */
-    MmioWrite32(PhyBaseAddr + (0x14 << 2), 0x0d);
-
-    /* Set txcomp_sel[15] to 1b'0 */
-    MmioWrite32(PhpBaseAddr + 0x8, 0x80000000);
-    /* Set txelec_sel[12] to 1b'0 */
-    MmioWrite32(PhpBaseAddr + 0x8, 0x10000000);
-    /* Set usb_mode_set[5:0]=6b'000100 */
-    MmioWrite32(PhpBaseAddr + 0x0, 0x003F0004);
-
-    /* phy_clk_sel to 100MHz */
-    MmioWrite32(PhpBaseAddr + 0x4, 0x60004000);
-    break;
-
-  default:
-    break;
-  }
-
-  return RETURN_SUCCESS;
-}
-
-UINTN
-EFIAPI
-ComboPhyInit(void)
-{
-  UINT32 data;
-  UINT8 *ComPhyMode;
-  UINTN ComPhyDeviceTableSize, Index;
-
-  ComPhyMode = PcdGetPtr (PcdComboPhyMode);
-  if (ComPhyMode == NULL)
-    return RETURN_NOT_FOUND;
-
-  ComPhyDeviceTableSize = PcdGetSize (PcdComboPhyMode);
-
-  /* config phy clock to 100Mhz */
-  HAL_CRU_ClkSetFreq(PLL_PPLL, 100 * 1000000);
-  HAL_CRU_ClkSetFreq(CLK_REF_PIPE_PHY0, 100 * 1000000);
-  HAL_CRU_ClkSetFreq(CLK_REF_PIPE_PHY1, 100 * 1000000);
-  HAL_CRU_ClkSetFreq(CLK_REF_PIPE_PHY2, 100 * 1000000);
-
-  /* Initialize echo combo phy */
-  for (Index = 0; Index < ComPhyDeviceTableSize; Index++) {
-    InitComPhyConfig (ComPhyReg[Index][0], ComPhyReg[Index][1], ComPhyMode[Index]);
-    if (ComPhyMode[Index] == CP_SATA) {
-
-    /* Set port implemented flag */
-    MmioWrite32 (AhciReg[Index] + SATA_PI, 0x1);
-
-    /* Supports staggered spin-up */
-    MmioOr32 (AhciReg[Index] + SATA_CAP, SATA_CAP_SSS);
-
-    /* Supports FIS-based switching */
-    MmioOr32 (AhciReg[Index] + SATA_CMD, SATA_CMD_FBSCP);
-
-		RegisterNonDiscoverableMmioDevice (
-           NonDiscoverableDeviceTypeAhci,
-           NonDiscoverableDeviceDmaTypeNonCoherent,
-           NULL,
-           NULL,
-           1,
-           AhciReg[Index], SIZE_4KB);
-    }
-  }
-  /* Initialize SATA */
-  data = MmioRead32(0xfe210000 + 0x118);
-  MmioWrite32(0xfe210000 + 0x118, data | 1 << 22); /* FBSCP */
-  MmioWrite32(0xfe210000 + 0xc, 1); /* HOST_PORTS_IMPL */
-
-  data = MmioRead32(0xfe220000 + 0x118);
-  MmioWrite32(0xfe220000 + 0x118, data | 1 << 22); /* FBSCP */
-  MmioWrite32(0xfe220000 + 0xc, 1); /* HOST_PORTS_IMPL */
-
-  data = MmioRead32(0xfe230000 + 0x118);
-  MmioWrite32(0xfe230000 + 0x118, data | 1 << 22); /* FBSCP */
-  MmioWrite32(0xfe230000 + 0xc, 1); /* HOST_PORTS_IMPL */
-
-  MmioWrite32(0xfd5b0000 + 0x0, 0x07E00440);
-  MmioWrite32(0xfd5b0000 + 0x4, 0x00070002);
-
-  /* reset deassert */
-  MmioWrite32(0xfd7c0000 + 0x0b34, 0x01c00000);
-
-  for (Index = 0; Index < ComPhyDeviceTableSize; Index++)
-    if (ComPhyMode[Index] == CP_USB3)
-      gBS->Stall(2000);
-
-  return RETURN_SUCCESS;
-}
 
 EFI_STATUS
 RK3588InitPeripherals (
@@ -413,8 +275,6 @@ RK3588InitPeripherals (
   //MmioWrite32 (IOMG_080_REG, 0);        /* configure GPIO24 as GPIO */
 
   Rk806Configure();
-
-  ComboPhyInit();
 
   GmacIomuxInit();
   
