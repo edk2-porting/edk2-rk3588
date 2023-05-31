@@ -20,7 +20,7 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 2, "RPIFDN", "RPI", 2)
     include ("Cpu.asl")
 
     // include ("Pcie.asl")
-    // include ("Sata.asl")
+    include ("Sata2.asl")
     include ("Emmc.asl")
     include ("Sdhc.asl")
     // include ("Gmac.asl")
