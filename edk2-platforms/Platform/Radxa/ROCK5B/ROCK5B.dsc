@@ -23,10 +23,13 @@
 
   DEFINE CONFIG_NO_DEBUGLIB      = TRUE
 
-  DEFINE CP_UNCONNECTED    = 0x0
-  DEFINE CP_PCIE           = 0x01
-  DEFINE CP_SATA           = 0x10
-  DEFINE CP_USB3           = 0x20
+  #
+  # Must match defines in Silicon/Rockchip/RK3588/Include/VarStoreData.h
+  #
+  DEFINE COMBO_PHY_MODE_UNCONNECTED   = 0
+  DEFINE COMBO_PHY_MODE_PCIE          = 1
+  DEFINE COMBO_PHY_MODE_SATA          = 2
+  DEFINE COMBO_PHY_MODE_USB3          = 3
 
   #
   # Network definition
@@ -267,9 +270,14 @@
   #gRockchipTokenSpaceGuid.PcdHdmiId|0x00000001 #hdmi1
 
   #
-  # ComboPhy
+  # PCIe/SATA/USB Combo PIPE PHY support flags and default values
   #
-  gRockchipTokenSpaceGuid.PcdComboPhyMode|{ $(CP_PCIE), $(CP_PCIE), $(CP_USB3) }
+  gRK3588TokenSpaceGuid.PcdComboPhy0Switchable|TRUE
+  gRK3588TokenSpaceGuid.PcdComboPhy1Switchable|TRUE
+  gRK3588TokenSpaceGuid.PcdComboPhy2Switchable|TRUE
+  gRK3588TokenSpaceGuid.PcdComboPhy0ModeDefault|$(COMBO_PHY_MODE_PCIE)
+  gRK3588TokenSpaceGuid.PcdComboPhy1ModeDefault|$(COMBO_PHY_MODE_PCIE)
+  gRK3588TokenSpaceGuid.PcdComboPhy2ModeDefault|$(COMBO_PHY_MODE_USB3)
 
   #  BIT0  - Initialization message.<BR>
   #  BIT1  - Warning message.<BR>
@@ -330,6 +338,13 @@
   gRK3588TokenSpaceGuid.PcdCPUB23ClusterVoltageMode|L"CpuPerf_CPUB23ClusterVoltageMode"|gRK3588DxeFormSetGuid|0x0|0
   gRK3588TokenSpaceGuid.PcdCPUB23ClusterVoltageCustom|L"CpuPerf_CPUB23ClusterVoltageCustom"|gRK3588DxeFormSetGuid|0x0|1000000
 
+  #
+  # PCIe/SATA/USB Combo PIPE PHY
+  #
+  gRK3588TokenSpaceGuid.PcdComboPhy0Mode|L"ComboPhy0Mode"|gRK3588DxeFormSetGuid|0x0|gRK3588TokenSpaceGuid.PcdComboPhy0ModeDefault
+  gRK3588TokenSpaceGuid.PcdComboPhy1Mode|L"ComboPhy1Mode"|gRK3588DxeFormSetGuid|0x0|gRK3588TokenSpaceGuid.PcdComboPhy1ModeDefault
+  gRK3588TokenSpaceGuid.PcdComboPhy2Mode|L"ComboPhy2Mode"|gRK3588DxeFormSetGuid|0x0|gRK3588TokenSpaceGuid.PcdComboPhy2ModeDefault
+  
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform
