@@ -100,7 +100,8 @@ InstallSataDevices (
       MmioWrite32 (AhciReg[Index] + SATA_PI, 0x1);
 
       /* Supports staggered spin-up */
-      MmioOr32 (AhciReg[Index] + SATA_CAP, SATA_CAP_SSS);
+      /* Disable for now, otherwise NetBSD seems to not pick up any drive? */
+      MmioAndThenOr32 (AhciReg[Index] + SATA_CAP, ~SATA_CAP_SSS, 0);
 
       /* Supports FIS-based switching */
       MmioOr32 (AhciReg[Index] + SATA_CMD, SATA_CMD_FBSCP);
