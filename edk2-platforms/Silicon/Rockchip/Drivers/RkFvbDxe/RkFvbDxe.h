@@ -43,6 +43,7 @@ typedef struct {
 typedef struct {
   UNI_NOR_FLASH_PROTOCOL              *SpiFlashProtocol;
   BOOLEAN                             IsSpiFlashAvailable;
+  BOOLEAN                             IsFvbHeaderValid;
 
   EFI_DEVICE_PATH_PROTOCOL            *DiskDevice;
   UINT32                              DiskMediaId;

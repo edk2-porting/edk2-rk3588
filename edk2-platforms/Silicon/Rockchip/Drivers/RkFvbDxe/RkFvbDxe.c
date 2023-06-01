@@ -42,6 +42,7 @@ STATIC FVB_DEVICE    *mFvbDevice;
 STATIC CONST FVB_DEVICE mRkFvbFlashInstanceTemplate = {
   NULL, // SpiFlashProtocol ... NEED TO BE FILLED
   FALSE, // IsSpiFlashAvailable ... NEED TO BE FILLED
+  FALSE, // IsFvbHeaderValid ... NEED TO BE FILLED
 
   NULL, // DiskDevice ... NEED TO BE FILLED
   0, // DiskMediaId ... NEED TO BE FILLED
@@ -792,13 +793,16 @@ FvbEraseBlocks (
   FlashInstance = INSTANCE_FROM_FVB_THIS (This);
 
   Status = EFI_SUCCESS;
-  // Detect WriteDisabled state
-  FvbGetAttributes (This, &FlashFvbAttributes);
-  if ((FlashFvbAttributes & EFI_FVB2_WRITE_STATUS) == 0) {
-    DEBUG ((DEBUG_ERROR,
-      "%a: Device is in WriteDisabled state.\n",
-      __FUNCTION__));
-    return EFI_ACCESS_DENIED;
+
+  if(FlashInstance->IsFvbHeaderValid == TRUE) {
+    // Detect WriteDisabled state
+    FvbGetAttributes (This, &FlashFvbAttributes);
+    if ((FlashFvbAttributes & EFI_FVB2_WRITE_STATUS) == 0) {
+      DEBUG ((DEBUG_ERROR,
+        "%a: Device is in WriteDisabled state.\n",
+        __FUNCTION__));
+      return EFI_ACCESS_DENIED;
+    }
   }
 
   //
@@ -951,6 +955,8 @@ FvbPrepareFvHeader (
       "%a: Installing a correct one for this volume.\n",
       __FUNCTION__));
 
+    FlashInstance->IsFvbHeaderValid = FALSE;
+
     // Erase entire region that is reserved for variable storage
     Status = FvbEraseBlocks (&FlashInstance->FvbProtocol,
                              (EFI_LBA) 0,
@@ -965,6 +971,8 @@ FvbPrepareFvHeader (
     if (EFI_ERROR (Status)) {
       return Status;
     }
+  } else {
+    FlashInstance->IsFvbHeaderValid = TRUE;
   }
 
   return EFI_SUCCESS;
@@ -1340,6 +1348,7 @@ RkFvbEntryPoint (
   BootDevice = RkAtagsGetBootDev ();
   if (BootDevice != NULL) {
     mBootDeviceType = BootDevice->DevType;
+    DEBUG ((DEBUG_ERROR, "%a: BootDevice->DevType = 0x%x\n", __FUNCTION__, mBootDeviceType));
   } else {
     DEBUG ((DEBUG_ERROR, "%a: Couldn't identify boot device.\n", __FUNCTION__));
     mBootDeviceType = RkAtagBootDevTypeUnknown;
