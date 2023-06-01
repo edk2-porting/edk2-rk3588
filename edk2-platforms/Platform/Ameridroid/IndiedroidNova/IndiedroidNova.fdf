@@ -43,7 +43,7 @@ NumBlocks     = 0x800
 # RegionType <FV, DATA, or FILE>
 #
 ################################################################################
-0x00200000|0x00100000
+0x00200000|0x00500000
 gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvSize
 FV = BL33_AP_UEFI
 
