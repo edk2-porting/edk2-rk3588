@@ -59,8 +59,6 @@ function _pack(){
 	echo " => Building 8MB NOR FLASH IMAGE"
 	cp ${WORKSPACE}/Build/${PLATFORM_NAME}/${_MODE}_${TOOLCHAIN}/FV/NOR_FLASH_IMAGE.fd ${WORKSPACE}/RK3588_NOR_FLASH.img
 
-	# backup NV_DATA at 0x007C0000
-	dd if=${WORKSPACE}/RK3588_NOR_FLASH.img of=${WORKSPACE}/NV_DATA.img bs=1K skip=7936
 	# might be GPT table? size:0x4400
 	dd if=${ROOTDIR}/misc/rk3588_spi_nor_gpt.img of=${WORKSPACE}/RK3588_NOR_FLASH.img
 	# idblock at 0x8000 and 0x88000
@@ -68,8 +66,6 @@ function _pack(){
 	dd if=${WORKSPACE}/idblock.bin of=${WORKSPACE}/RK3588_NOR_FLASH.img bs=1K seek=544
 	# FIT Image at 0x100000
 	dd if=${WORKSPACE}/${DEVICE}_EFI.itb of=${WORKSPACE}/RK3588_NOR_FLASH.img bs=1K seek=1024
-	# restore NV_DATA at 0x007C0000
-	dd if=${WORKSPACE}/NV_DATA.img of=${WORKSPACE}/RK3588_NOR_FLASH.img bs=1K seek=7936
 	cp ${WORKSPACE}/RK3588_NOR_FLASH.img ${ROOTDIR}/
 }
 
