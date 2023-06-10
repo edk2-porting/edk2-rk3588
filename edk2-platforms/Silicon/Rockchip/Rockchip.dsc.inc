@@ -458,8 +458,6 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
     <LibraryClasses>
       PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
   }
-  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
-  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
 
   #
   # Non-volatile FVB support
@@ -468,6 +466,8 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
   Silicon/Rockchip/Drivers/NorFlashDxe/NorFlashDxe.inf
 !endif
   Silicon/Rockchip/Drivers/RkFvbDxe/RkFvbDxe.inf
+  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
 
   #
   # Multiple Console IO support
