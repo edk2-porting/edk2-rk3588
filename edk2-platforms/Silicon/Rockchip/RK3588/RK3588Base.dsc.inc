@@ -43,19 +43,22 @@
   # Default peripheral support flags
   #
 !ifndef RK_NOR_FLASH_ENABLE
-  DEFINE RK_NOR_FLASH_ENABLE  = TRUE
+  DEFINE RK_NOR_FLASH_ENABLE        = TRUE
+!endif
+!ifndef RK_860X_REGULATOR_ENABLE
+  DEFINE RK_860X_REGULATOR_ENABLE   = TRUE
 !endif
 !ifndef RK_PCIE_ENABLE
-  DEFINE RK_PCIE_ENABLE       = TRUE
+  DEFINE RK_PCIE_ENABLE             = TRUE
 !endif
 !ifndef RK_SD_ENABLE
-  DEFINE RK_SD_ENABLE         = TRUE
+  DEFINE RK_SD_ENABLE               = TRUE
 !endif
 !ifndef RK_EMMC_ENABLE
-  DEFINE RK_EMMC_ENABLE       = TRUE
+  DEFINE RK_EMMC_ENABLE             = TRUE
 !endif
 !ifndef RK_AHCI_ENABLE
-  DEFINE RK_AHCI_ENABLE       = TRUE
+  DEFINE RK_AHCI_ENABLE             = TRUE
 !endif
 
   #
