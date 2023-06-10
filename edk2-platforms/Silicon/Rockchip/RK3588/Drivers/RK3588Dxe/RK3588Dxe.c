@@ -1,37 +1,29 @@
 /** @file
 *
 *  Copyright (c) 2021, Rockchip Limited. All rights reserved.
+*  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
 *
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
 **/
+
 #include <Uefi.h>
 #include <Library/ArmLib.h>
-#include <Protocol/Cpu.h>
 #include <Library/CacheMaintenanceLib.h>
 #include <Library/DebugLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/IoLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
-#include <Library/UefiBootManagerLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/HiiLib.h>
 #include <Library/UefiLib.h>
-#include <Library/RK806.h>
 #include <Library/AcpiLib.h>
-#include <Protocol/DevicePath.h>
-#include <Protocol/DevicePathFromText.h>
-#include <Protocol/EmbeddedGpio.h>
-#include <Protocol/LoadedImage.h>
-#include <Protocol/PlatformBootManager.h>
-#include <Protocol/PlatformVirtualKeyboard.h>
-#include <Protocol/AndroidBootImg.h>
 #include <Library/DxeServicesTableLib.h>
 #include <Library/NonDiscoverableDeviceRegistrationLib.h>
 #include <Library/CruLib.h>
-#include <Protocol/NonDiscoverableDevice.h>
+#include <Library/RK806.h>
 #include <VarStoreData.h>
 #include <Soc.h>
 #include <RK3588RegsPeri.h>
@@ -152,7 +144,7 @@ InstallHiiPages (
   return EFI_SUCCESS;
 }
 
-STATIC 
+STATIC
 EFI_STATUS
 EFIAPI
 SetupVariables (
@@ -162,7 +154,7 @@ SetupVariables (
   SetupCpuPerfVariables ();
   SetupComboPhyVariables ();
 
-  return EFI_SUCCESS; 
+  return EFI_SUCCESS;
 }
 
 STATIC
@@ -218,8 +210,6 @@ UartInit (
   //MmioWrite32 (PMUSSI_ONOFF8_REG, Val);
 }
 
-STATIC EMBEDDED_GPIO        *mGpio;
-
 STATIC
 VOID
 MtcmosInit (
@@ -246,8 +236,6 @@ GmacIomuxInit (
   GmacIomux(0);
 }
 
-
-
 EFI_STATUS
 RK3588InitPeripherals (
   IN VOID
@@ -271,276 +259,12 @@ RK3588InitPeripherals (
   /* MTCMOS -- Multi-threshold CMOS */
   // MtcmosInit ();
 
-  /* Set DETECT_J15_FASTBOOT (GPIO24) pin as GPIO function */
-  //MmioWrite32 (IOCG_084_REG, 0);        /* configure GPIO24 as nopull */
-  //MmioWrite32 (IOMG_080_REG, 0);        /* configure GPIO24 as GPIO */
-
   Rk806Configure();
 
   GmacIomuxInit();
-  
-  return EFI_SUCCESS;
-}
-
-STATIC
-EFI_STATUS
-CreatePlatformBootOptionFromPath (
-  IN     CHAR16                          *PathStr,
-  IN     CHAR16                          *Description,
-  IN OUT EFI_BOOT_MANAGER_LOAD_OPTION    *BootOption
-  )
-{
-  EFI_STATUS                   Status;
-  EFI_DEVICE_PATH              *DevicePath;
-
-  DevicePath = (EFI_DEVICE_PATH *)ConvertTextToDevicePath (PathStr);
-  ASSERT (DevicePath != NULL);
-  Status = EfiBootManagerInitializeLoadOption (
-             BootOption,
-             LoadOptionNumberUnassigned,
-             LoadOptionTypeBoot,
-             LOAD_OPTION_ACTIVE,
-             Description,
-             DevicePath,
-             NULL,
-             0
-             );
-  FreePool (DevicePath);
-  return Status;
-}
-
-STATIC
-EFI_STATUS
-CreatePlatformBootOptionFromGuid (
-  IN     EFI_GUID                        *FileGuid,
-  IN     CHAR16                          *Description,
-  IN OUT EFI_BOOT_MANAGER_LOAD_OPTION    *BootOption
-  )
-{
-  EFI_STATUS                             Status;
-  EFI_DEVICE_PATH                        *DevicePath;
-  EFI_DEVICE_PATH                        *TempDevicePath;
-  EFI_LOADED_IMAGE_PROTOCOL              *LoadedImage;
-  MEDIA_FW_VOL_FILEPATH_DEVICE_PATH      FileNode;
-
-  Status = gBS->HandleProtocol (
-                  gImageHandle,
-                  &gEfiLoadedImageProtocolGuid,
-                  (VOID **) &LoadedImage
-                  );
-  ASSERT_EFI_ERROR (Status);
-  EfiInitializeFwVolDevicepathNode (&FileNode, FileGuid);
-  TempDevicePath = DevicePathFromHandle (LoadedImage->DeviceHandle);
-  ASSERT (TempDevicePath != NULL);
-  DevicePath = AppendDevicePathNode (
-                 TempDevicePath,
-                 (EFI_DEVICE_PATH_PROTOCOL *) &FileNode
-                 );
-  ASSERT (DevicePath != NULL);
-  Status = EfiBootManagerInitializeLoadOption (
-             BootOption,
-             LoadOptionNumberUnassigned,
-             LoadOptionTypeBoot,
-             LOAD_OPTION_ACTIVE,
-             Description,
-             DevicePath,
-             NULL,
-             0
-             );
-  FreePool (DevicePath);
-  return Status;
-}
-
-STATIC
-EFI_STATUS
-GetPlatformBootOptionsAndKeys (
-  OUT UINTN                              *BootCount,
-  OUT EFI_BOOT_MANAGER_LOAD_OPTION       **BootOptions,
-  OUT EFI_INPUT_KEY                      **BootKeys
-  )
-{
-  EFI_GUID                               *FileGuid;
-  CHAR16                                 *PathStr;
-  EFI_STATUS                             Status;
-  UINTN                                  Size;
-
-  *BootCount = 4;
-
-  Size = sizeof (EFI_BOOT_MANAGER_LOAD_OPTION) * *BootCount;
-  *BootOptions = (EFI_BOOT_MANAGER_LOAD_OPTION *)AllocateZeroPool (Size);
-  if (*BootOptions == NULL) {
-    DEBUG ((DEBUG_ERROR, "Failed to allocate memory for BootOptions\n"));
-    return EFI_OUT_OF_RESOURCES;
-  }
-  Size = sizeof (EFI_INPUT_KEY) * *BootCount;
-  *BootKeys = (EFI_INPUT_KEY *)AllocateZeroPool (Size);
-  if (*BootKeys == NULL) {
-    DEBUG ((DEBUG_ERROR, "Failed to allocate memory for BootKeys\n"));
-    Status = EFI_OUT_OF_RESOURCES;
-    goto Error;
-  }
-
-  PathStr = (CHAR16 *)PcdGetPtr (PcdSdBootDevicePath);
-  ASSERT (PathStr != NULL);
-  Status = CreatePlatformBootOptionFromPath (
-             PathStr,
-             L"Boot from SD",
-             &(*BootOptions)[0]
-             );
-  ASSERT_EFI_ERROR (Status);
-
-  PathStr = (CHAR16 *)PcdGetPtr (PcdAndroidBootDevicePath);
-  ASSERT (PathStr != NULL);
-  Status = CreatePlatformBootOptionFromPath (
-             PathStr,
-             L"Grub",
-             &(*BootOptions)[1]
-             );
-  ASSERT_EFI_ERROR (Status);
-
-  FileGuid = PcdGetPtr (PcdAndroidBootFile);
-  ASSERT (FileGuid != NULL);
-  Status = CreatePlatformBootOptionFromGuid (
-             FileGuid,
-             L"Android Boot",
-             &(*BootOptions)[2]
-             );
-  ASSERT_EFI_ERROR (Status);
-
-  FileGuid = PcdGetPtr (PcdAndroidFastbootFile);
-  ASSERT (FileGuid != NULL);
-  Status = CreatePlatformBootOptionFromGuid (
-             FileGuid,
-             L"Android Fastboot",
-             &(*BootOptions)[3]
-             );
-  ASSERT_EFI_ERROR (Status);
-  (*BootKeys)[3].ScanCode = SCAN_NULL;
-  (*BootKeys)[3].UnicodeChar = 'f';
 
   return EFI_SUCCESS;
-Error:
-  FreePool (*BootOptions);
-  return Status;
 }
-
-PLATFORM_BOOT_MANAGER_PROTOCOL mPlatformBootManager = {
-  GetPlatformBootOptionsAndKeys
-};
-
-EFI_STATUS
-EFIAPI
-VirtualKeyboardRegister (
-  IN VOID
-  )
-{
-  EFI_STATUS           Status;
-
-  Status = gBS->LocateProtocol (
-                  &gEmbeddedGpioProtocolGuid,
-                  NULL,
-                  (VOID **) &mGpio
-                  );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-  return EFI_SUCCESS;
-}
-
-EFI_STATUS
-EFIAPI
-VirtualKeyboardReset (
-  IN VOID
-  )
-{
-  EFI_STATUS           Status;
-
-  if (mGpio == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-  Status = mGpio->Set (mGpio, DETECT_J15_FASTBOOT, GPIO_MODE_INPUT);
-  return Status;
-}
-
-BOOLEAN
-EFIAPI
-VirtualKeyboardQuery (
-  IN VIRTUAL_KBD_KEY             *VirtualKey
-  )
-{
-  EFI_STATUS           Status;
-  UINTN                Value = 0;
-
-  if ((VirtualKey == NULL) || (mGpio == NULL)) {
-    return FALSE;
-  }
-  if (MmioRead32 (ADB_REBOOT_ADDRESS) == ADB_REBOOT_BOOTLOADER) {
-    goto Done;
-  } else {
-    Status = mGpio->Get (mGpio, DETECT_J15_FASTBOOT, &Value);
-    if (EFI_ERROR (Status) || (Value != 0)) {
-      return FALSE;
-    }
-  }
-Done:
-  VirtualKey->Signature = VIRTUAL_KEYBOARD_KEY_SIGNATURE;
-  VirtualKey->Key.ScanCode = SCAN_NULL;
-  VirtualKey->Key.UnicodeChar = L'f';
-  return TRUE;
-}
-
-EFI_STATUS
-EFIAPI
-VirtualKeyboardClear (
-  IN VIRTUAL_KBD_KEY            *VirtualKey
-  )
-{
-  if (VirtualKey == NULL) {
-    return EFI_INVALID_PARAMETER;
-  }
-  if (MmioRead32 (ADB_REBOOT_ADDRESS) == ADB_REBOOT_BOOTLOADER) {
-    MmioWrite32 (ADB_REBOOT_ADDRESS, ADB_REBOOT_NONE);
-    WriteBackInvalidateDataCacheRange ((VOID *)ADB_REBOOT_ADDRESS, 4);
-  }
-  return EFI_SUCCESS;
-}
-
-PLATFORM_VIRTUAL_KBD_PROTOCOL mVirtualKeyboard = {
-  VirtualKeyboardRegister,
-  VirtualKeyboardReset,
-  VirtualKeyboardQuery,
-  VirtualKeyboardClear
-};
-
-STATIC  EFI_STATUS EFIAPI AppendArgs (
-  IN CHAR16            *Args,
-  IN UINTN              Size
-  )
-{
-	CHAR16 *newArgs =   (CHAR16 *)PcdGetPtr (PcdKernelBootArg);
-    UINTN srcSize, i, bootArgSize;
-
-    for (srcSize = 0; srcSize < Size / 2; srcSize++) {
-        if (!Args[srcSize])
-			break;
-    }
-
-    for (bootArgSize = 0; bootArgSize < Size / 2; bootArgSize++) {
-        if (!newArgs[bootArgSize])
-			break;
-    }
-
-	if (bootArgSize * 2 + srcSize * 2 < Size)
-	    for (i = 0; i < bootArgSize; i++)
-            Args[i] = newArgs[i];
-
-    return 0;
-}
-
-ANDROID_BOOTIMG_PROTOCOL mAndroidBootImageManager = {
-	  AppendArgs,
-	  NULL
-};
 
 STATIC CONST EFI_GUID mAcpiTableFile = {
   0x7E374E25, 0x8E01, 0x4FEE, { 0x87, 0xf2, 0x39, 0x0C, 0x23, 0xC6, 0x06, 0xCD }
@@ -602,7 +326,6 @@ STATIC VOID SetFlashAttributeToUncache(VOID)
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: Failed to set memory attributes Status = %x\n",__FUNCTION__, Status));
   }
-
 }
 
 STATIC
@@ -626,7 +349,7 @@ OnEfiVariableWriteArchRegistrationEvent (
     if (Status != EFI_NOT_FOUND) {
         DEBUG((DEBUG_WARN, "Couldn't locate gEfiVariableWriteArchProtocolGuid. Status=%r\n", Status));
     }
-    return; // false alert
+    return;
   }
 
   gBS->CloseEvent (Event);
@@ -704,37 +427,8 @@ RK3588EntryPoint (
 
   SetFlashAttributeToUncache();
 
-  if(PcdGetBool (AcpiEnable)) {
-    LocateAndInstallAcpiFromFvConditional (&mAcpiTableFile, NULL);
-  }
-
-  Status = gBS->InstallProtocolInterface (
-                  &ImageHandle,
-                  &gPlatformVirtualKeyboardProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  &mVirtualKeyboard
-                  );
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Status = gBS->InstallProtocolInterface (
-                  &ImageHandle,
-                  &gPlatformBootManagerProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  &mPlatformBootManager
-                  );
-
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
-  Status = gBS->InstallProtocolInterface (
-                  &ImageHandle,
-                  &gAndroidBootImgProtocolGuid,
-                  EFI_NATIVE_INTERFACE,
-                  &mAndroidBootImageManager
-                  );
+  // TO-DO: Add a HII variable to let the user decide if they want ACPI (and/or DT).
+  LocateAndInstallAcpiFromFvConditional (&mAcpiTableFile, NULL);
 
   return Status;
 }

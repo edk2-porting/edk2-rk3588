@@ -108,7 +108,7 @@ formset
     form formid = 1,
       title  = STRING_TOKEN(STR_FORM_SET_TITLE);
       subtitle text = STRING_TOKEN(STR_FORM_SET_TITLE_SUBTITLE);
-      
+
       subtitle text = STRING_TOKEN(STR_NULL_STRING);
 
       goto 0x1000,

@@ -20,8 +20,8 @@
 #include "CpuPerformance.h"
 
 #define SCMI_CLK_CPUL       0
-#define SCMI_CLK_CPUB01			2
-#define SCMI_CLK_CPUB23			3
+#define SCMI_CLK_CPUB01     2
+#define SCMI_CLK_CPUB23     3
 
 #define FREQ_1_MHZ          1000000
 
@@ -205,9 +205,7 @@ SetRk860xRegulatorByTag (
                                     &NumRegulators,
                                     &HandleBuffer);
   if (EFI_ERROR(Status)) {
-    if (Status != EFI_NOT_FOUND) {
-        DEBUG((DEBUG_WARN, "Couldn't locate gRk860xRegulatorProtocolGuid. Status=%r\n", Status));
-    }
+    DEBUG((DEBUG_WARN, "Couldn't locate gRk860xRegulatorProtocolGuid. Status=%r\n", Status));
     return;
   }
 
@@ -230,8 +228,8 @@ SetRk860xRegulatorByTag (
     }
 
     FoundReg = TRUE;
-    DEBUG((EFI_D_WARN,"Found 0x%x on I2C bus %d for tag %u\n", 
-            I2C_DEVICE_ADDRESS(Rk860xRegulator->Identifier), 
+    DEBUG((EFI_D_WARN,"Found 0x%x on I2C bus %d for tag %u\n",
+            I2C_DEVICE_ADDRESS(Rk860xRegulator->Identifier),
             I2C_DEVICE_BUS(Rk860xRegulator->Identifier),
             Tag));
 
@@ -306,7 +304,7 @@ ApplyCpuClockVariables (
                                      PcdGet32 (PcdCPUB01ClusterClockPreset),
                                      PcdGet32 (PcdCPUB23ClusterClockPreset) };
   UINT32 CPUClusterClockCustom[] = { PcdGet32 (PcdCPULClusterClockCustom),
-                                     PcdGet32 (PcdCPUB01ClusterClockCustom), 
+                                     PcdGet32 (PcdCPUB01ClusterClockCustom),
                                      PcdGet32 (PcdCPUB23ClusterClockCustom) };
 
   for (Index = 0; Index < ARRAY_SIZE(CPUClusterClockPreset); Index++) {
@@ -353,7 +351,7 @@ ApplyCpuVoltageVariables (
 
   for (Index = 0; Index < ARRAY_SIZE (CPUClusterVoltageMode); Index++) {
     ScmiOppTable = mScmiOppTable[Index];
-    
+
     switch (CPUClusterVoltageMode[Index]) {
       case CPU_PERF_CLUSTER_VOLTAGE_MODE_AUTO:
         Status = ScmiGetClockRate (ScmiOppTable.ClockId, &ClockRate);
@@ -362,7 +360,7 @@ ApplyCpuVoltageVariables (
           continue;
         }
 
-        Status = GetOppVoltage (ScmiOppTable.Opp, ScmiOppTable.OppCount, 
+        Status = GetOppVoltage (ScmiOppTable.Opp, ScmiOppTable.OppCount,
                       ClockRate, &Microvolts);
         if (EFI_ERROR(Status)) {
           DEBUG ((DEBUG_ERROR, "%a: GetOppVoltage failed. Status=%r\n", __FUNCTION__, Status));
