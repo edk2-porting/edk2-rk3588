@@ -1,9 +1,0 @@
-*.swp
-*~$
-tags
-cscope.*
-.ycm_extra_conf.pyc
-compile_commands.json
-/.clangd
-/build
-/obj*

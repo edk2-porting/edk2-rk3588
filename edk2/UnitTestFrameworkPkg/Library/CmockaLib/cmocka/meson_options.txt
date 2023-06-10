@@ -1,1 +1,0 @@
-option('unit_testing', type: 'boolean', value: false)
