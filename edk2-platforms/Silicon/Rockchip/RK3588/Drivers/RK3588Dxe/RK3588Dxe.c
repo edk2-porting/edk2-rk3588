@@ -241,7 +241,6 @@ RK3588InitPeripherals (
   IN VOID
   )
 {
-  INT32 i;
   //UINT32     Data, Bits;
 
   DEBUG((EFI_D_WARN, "RK3588InitPeripherals: Entry\n"));
@@ -397,7 +396,6 @@ RK3588EntryPoint (
   )
 {
   EFI_STATUS            Status;
-  VOID                  *Rk860xRegulatorRegistration;
   VOID                  *EfiVariableArchRegistrationEvent;
   EFI_EVENT             ReadyToBootEvent;
 
