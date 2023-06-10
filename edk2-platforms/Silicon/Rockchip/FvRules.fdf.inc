@@ -1,11 +1,11 @@
 #/** @file
 #
 #    Copyright (c) 2021, Rockchip Limited. All rights reserved.
+#    Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
 #
 #**/
-
 
 ################################################################################
 #
@@ -15,7 +15,6 @@
 # content of the FFS file.
 #
 ################################################################################
-
 
 ############################################################################
 # Example of a DXE_DRIVER FFS file with a Checksum encapsulation section   #
@@ -124,9 +123,17 @@
     VERSION   STRING="$(INF_VERSION)" Optional BUILD_NUM=$(BUILD_NUMBER)
   }
 
+[Rule.Common.DXE_DRIVER]
+  FILE DRIVER = $(NAMED_GUID) {
+    DXE_DEPEX	 DXE_DEPEX		Optional $(INF_OUTPUT)/$(MODULE_NAME).depex
+    PE32	 PE32			$(INF_OUTPUT)/$(MODULE_NAME).efi
+    UI		 STRING="$(MODULE_NAME)" Optional
+    RAW 	 ACPI  Optional 	      |.acpi
+    RAW 	 ASL   Optional 	      |.aml
+  }
+
 [Rule.Common.USER_DEFINED.ACPITABLE]
   FILE FREEFORM = $(NAMED_GUID) {
     RAW ACPI               |.acpi
     RAW ASL                |.aml
   }
-

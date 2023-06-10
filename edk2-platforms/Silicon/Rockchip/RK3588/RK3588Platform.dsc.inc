@@ -1,0 +1,21 @@
+## @file
+#
+#  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+!include Silicon/Rockchip/RK3588/RK3588Base.dsc.inc
+
+################################################################################
+#
+# Pcd Section - list of all common EDK II PCD Entries used by RK3588 platforms.
+#
+################################################################################
+
+[PcdsFixedAtBuild.common]
+  #
+  # DWC3 controller
+  #
+  gRockchipTokenSpaceGuid.PcdDwc3BaseAddresses|{ UINT32(0xfc000000), UINT32(0xfc400000), UINT32(0xfcd00000) }

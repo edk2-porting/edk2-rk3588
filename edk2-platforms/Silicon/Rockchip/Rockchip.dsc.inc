@@ -1,10 +1,18 @@
+## @file
 #
 #  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 #  Copyright (c) 2021-2022, Rockchip Limited. All rights reserved.
+#  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
+##
+
+################################################################################
 #
+# Library Class section - list of all common Library Classes needed by Rockchip platforms.
+#
+################################################################################
 
 [LibraryClasses.common]
 !if $(TARGET) == RELEASE
@@ -15,6 +23,7 @@
   DebugPrintErrorLevelLib|MdePkg/Library/BaseDebugPrintErrorLevelLib/BaseDebugPrintErrorLevelLib.inf
 
   BaseLib|MdePkg/Library/BaseLib/BaseLib.inf
+  BaseMemoryLib|MdePkg/Library/BaseMemoryLibOptDxe/BaseMemoryLibOptDxe.inf
   BmpSupportLib|MdeModulePkg/Library/BaseBmpSupportLib/BaseBmpSupportLib.inf
   SafeIntLib|MdePkg/Library/BaseSafeIntLib/BaseSafeIntLib.inf
   SynchronizationLib|MdePkg/Library/BaseSynchronizationLib/BaseSynchronizationLib.inf
@@ -36,15 +45,46 @@
   UefiApplicationEntryPoint|MdePkg/Library/UefiApplicationEntryPoint/UefiApplicationEntryPoint.inf
   HiiLib|MdeModulePkg/Library/UefiHiiLib/UefiHiiLib.inf
   UefiHiiServicesLib|MdeModulePkg/Library/UefiHiiServicesLib/UefiHiiServicesLib.inf
-
   UefiRuntimeLib|MdePkg/Library/UefiRuntimeLib/UefiRuntimeLib.inf
+  UefiScsiLib|MdePkg/Library/UefiScsiLib/UefiScsiLib.inf
+
   OemHookStatusCodeLib|MdeModulePkg/Library/OemHookStatusCodeLibNull/OemHookStatusCodeLibNull.inf
+
+  # UiApp dependencies
+  ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
+  FileExplorerLib|MdeModulePkg/Library/FileExplorerLib/FileExplorerLib.inf
+  DxeServicesLib|MdePkg/Library/DxeServicesLib/DxeServicesLib.inf
+
+  # BDS dependencies
+  UefiBootManagerLib|MdeModulePkg/Library/UefiBootManagerLib/UefiBootManagerLib.inf
+  BootLogoLib|MdeModulePkg/Library/BootLogoLib/BootLogoLib.inf
+  PlatformBootManagerLib|Silicon/Rockchip/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
+  CustomizedDisplayLib|MdeModulePkg/Library/CustomizedDisplayLib/CustomizedDisplayLib.inf
+
+  # AndroidBootApp dependencies
+  AndroidBootImgLib|EmbeddedPkg/Library/AndroidBootImgLib/AndroidBootImgLib.inf
+
+  # USB Requirements
+  UefiUsbLib|MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
+
+  # SCMI Mailbox Transport Layer
+  ArmMtlLib|Silicon/Rockchip/Library/RkMtlLib/RkMtlLib.inf
+
+  # VariableRuntimeDxe Requirements
+  SynchronizationLib|MdePkg/Library/BaseSynchronizationLib/BaseSynchronizationLib.inf
+  AuthVariableLib|MdeModulePkg/Library/AuthVariableLibNull/AuthVariableLibNull.inf
+  TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
+  VarCheckLib|MdeModulePkg/Library/VarCheckLib/VarCheckLib.inf
+
+  # RTC dependencies
+  TimeBaseLib|EmbeddedPkg/Library/TimeBaseLib/TimeBaseLib.inf
+
+  DmaLib|EmbeddedPkg/Library/NonCoherentDmaLib/NonCoherentDmaLib.inf
+
   #
   # Allow dynamic PCDs
   #
   PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
-
-  BaseMemoryLib|MdePkg/Library/BaseMemoryLibOptDxe/BaseMemoryLibOptDxe.inf
 
   # ARM Architectural Libraries
   CacheMaintenanceLib|ArmPkg/Library/ArmCacheMaintenanceLib/ArmCacheMaintenanceLib.inf
@@ -56,27 +96,18 @@
   ArmPlatformStackLib|ArmPlatformPkg/Library/ArmPlatformStackLib/ArmPlatformStackLib.inf
   ArmSmcLib|ArmPkg/Library/ArmSmcLib/ArmSmcLib.inf
   ArmMmuLib|ArmPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
-
-  # ResetSystemLib|ArmPkg/Library/ArmSmcPsciResetSystemLib/ArmSmcPsciResetSystemLib.inf # Modified
-
-  # SDRAM detection Library
-  SdramLib|Silicon/Rockchip/Library/SdramLib/SdramLib.inf
-
-  # SPI Driver
-  SpiLib|Silicon/Rockchip/Library/SpiLib/SpiLib.inf
-  RK806|Silicon/Rockchip/Library/SpiLib/RK806.inf
-  
-  # ARM PL011 UART Driver
-  #PL011UartClockLib|ArmPlatformPkg/Library/PL011UartClockLib/PL011UartClockLib.inf
-  #PL011UartLib|ArmPlatformPkg/Library/PL011UartLib/PL011UartLib.inf
-  PWMLib|Silicon/Rockchip/Library/PWMLib/PWMLib.inf
-  # SerialPortLib|Silicon/Rockchip/Library/SerialPortLib/SerialPortLib.inf # Modified
-  # UartLib|Silicon/Rockchip/Library/SerialPortLib/UartLib.inf
+  ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
   TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
   #RealTimeClockLib|Silicon/Rockchip/Library/Rk808RealTimeClockLib/Rk808RealTimeClockLib.inf
   #RealTimeClockLib|Silicon/Rockchip/Library/VirtualRealTimeClockLib/RealTimeClockLib.inf
- 
-  UefiDevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
+
+  # UART libraries
+  # SerialPortLib|Silicon/Rockchip/Library/SerialPortLib/SerialPortLib.inf # Modified
+  # UartLib|Silicon/Rockchip/Library/SerialPortLib/UartLib.inf
+
+  # Runtime reset helper
+  ResetSystemLib|Silicon/Rockchip/Library/ResetSystemLib/ResetSystemLib.inf
+
   #
   # Uncomment (and comment out the next line) For RealView Debugger. The Standard IO window
   # in the debugger will show load and unload commands for symbols. You can cut and paste this
@@ -95,9 +126,8 @@
   TpmMeasurementLib|MdeModulePkg/Library/TpmMeasurementLibNull/TpmMeasurementLibNull.inf
   AuthVariableLib|MdeModulePkg/Library/AuthVariableLibNull/AuthVariableLibNull.inf
 
-  # BDS Libraries
+  # Flattened Device Tree (FDT) access library
   FdtLib|EmbeddedPkg/Library/FdtLib/FdtLib.inf
-  UefiDevicePathLib|MdePkg/Library/UefiDevicePathLib/UefiDevicePathLib.inf
 
   VarCheckLib|MdeModulePkg/Library/VarCheckLib/VarCheckLib.inf
   VariablePolicyHelperLib|MdeModulePkg/Library/VariablePolicyHelperLib/VariablePolicyHelperLib.inf
@@ -107,11 +137,12 @@
 
   NonDiscoverableDeviceRegistrationLib|MdeModulePkg/Library/NonDiscoverableDeviceRegistrationLib/NonDiscoverableDeviceRegistrationLib.inf
 
+  # UEFI Shell dependencies
   FileHandleLib|MdePkg/Library/UefiFileHandleLib/UefiFileHandleLib.inf
   ShellLib|ShellPkg/Library/UefiShellLib/UefiShellLib.inf
   SortLib|MdeModulePkg/Library/UefiSortLib/UefiSortLib.inf
 
-  CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibFmp/DxeCapsuleLib.inf
+  CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
   RngLib|MdePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
@@ -131,16 +162,35 @@
   # Add support for GCC stack protector
   NULL|MdePkg/Library/BaseStackCheckLib/BaseStackCheckLib.inf
 
-  # Add I2CLib
-  I2CLib|Silicon/Rockchip/Library/I2CLib/I2CLib.inf
+  # PCI Support
+!if $(RK_PCIE_ENABLE) == TRUE
+  PciSegmentLib|MdePkg/Library/BasePciSegmentLibPci/BasePciSegmentLibPci.inf
+  PciHostBridgeLib|Silicon/Rockchip/Library/PciHostBridgeLib/PciHostBridgeLib.inf
+  PciExpressLib|Silicon/Rockchip/Library/PciExpressLib/PciExpressLib.inf
+  PciLib|MdePkg/Library/BasePciLibPciExpress/BasePciLibPciExpress.inf
+!endif
 
-  # Rockchip ATAGS library
+  #
+  # Rockchip libraries
+  #
   RkAtagsLib|Silicon/Rockchip/Library/RkAtagsLib/RkAtagsLib.inf
+  SdramLib|Silicon/Rockchip/Library/SdramLib/SdramLib.inf
+  CruLib|Silicon/Rockchip/Library/CruLib/CruLib.inf
+  SpiLib|Silicon/Rockchip/Library/SpiLib/SpiLib.inf
+  RK806|Silicon/Rockchip/Library/SpiLib/RK806.inf
+  PWMLib|Silicon/Rockchip/Library/PWMLib/PWMLib.inf
+  RockchipDisplayLib|Silicon/Rockchip/Library/DisplayLib/RockchipDisplayLib.inf
 
 [LibraryClasses.common.SEC]
   ArmGicArchLib|ArmPkg/Library/ArmGicArchSecLib/ArmGicArchSecLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
   BaseMemoryLib|MdePkg/Library/BaseMemoryLib/BaseMemoryLib.inf
+  PrePiLib|EmbeddedPkg/Library/PrePiLib/PrePiLib.inf
+  ExtractGuidedSectionLib|EmbeddedPkg/Library/PrePiExtractGuidedSectionLib/PrePiExtractGuidedSectionLib.inf
+  HobLib|EmbeddedPkg/Library/PrePiHobLib/PrePiHobLib.inf
+  MemoryAllocationLib|EmbeddedPkg/Library/PrePiMemoryAllocationLib/PrePiMemoryAllocationLib.inf
+  PlatformPeiLib|ArmPlatformPkg/PlatformPei/PlatformPeiLib.inf
+  PrePiHobListPointerLib|ArmPlatformPkg/Library/PrePiHobListPointerLib/PrePiHobListPointerLib.inf
 
 [LibraryClasses.common.PEI_CORE]
   HobLib|MdePkg/Library/PeiHobLib/PeiHobLib.inf
@@ -215,7 +265,7 @@
   HobLib|MdePkg/Library/DxeHobLib/DxeHobLib.inf
   MemoryAllocationLib|MdePkg/Library/UefiMemoryAllocationLib/UefiMemoryAllocationLib.inf
   ReportStatusCodeLib|MdeModulePkg/Library/RuntimeDxeReportStatusCodeLib/RuntimeDxeReportStatusCodeLib.inf
-  CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibFmp/DxeRuntimeCapsuleLib.inf
+  CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
 !ifndef CONFIG_NO_DEBUGLIB
   DebugLib|MdeModulePkg/Library/PeiDxeDebugLibReportStatusCode/PeiDxeDebugLibReportStatusCode.inf
 !endif
@@ -228,6 +278,12 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
 [LibraryClasses.AARCH64]
   ArmGenericTimerCounterLib|ArmPkg/Library/ArmGenericTimerPhyCounterLib/ArmGenericTimerPhyCounterLib.inf
 
+###################################################################################################
+# BuildOptions Section - Define the module specific tool chain flags that should be used as
+#                        the default flags for a module. These flags are appended to any
+#                        standard flags that are defined by the build process.
+###################################################################################################
+
 [BuildOptions]
 #  RVCT:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG
   *_*_*_CC_FLAGS = -DDEFAULT_DARK
@@ -239,7 +295,7 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
 
 ################################################################################
 #
-# Pcd Section - list of all EDK II PCD Entries defined by this Platform
+# Pcd Section - list of all common EDK II PCD Entries used by Rockchip platforms.
 #
 ################################################################################
 
@@ -260,7 +316,13 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
 
   gArmTokenSpaceGuid.PcdArmGicV3WithV2Legacy|FALSE
 
+  #  If TRUE, Graphics Output Protocol will be installed on virtual handle created by ConsplitterDxe.
+  #  It could be set FALSE to save size.
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutGopSupport|TRUE
+
 [PcdsFixedAtBuild.common]
+  gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString|L"$(FIRMWARE_VER)"
+
   #
   # IO is mapped to memory space, so we use the same size of
   # PcdPrePiCpuMemorySize
@@ -292,20 +354,29 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
   #  DEBUG_WARN      0x00000002  // Warnings
   #  DEBUG_LOAD      0x00000004  // Load events
   #  DEBUG_FS        0x00000008  // EFI File system
-  #  DEBUG_POOL      0x00000010  // Alloc & Free's
-  #  DEBUG_PAGE      0x00000020  // Alloc & Free's
-  #  DEBUG_INFO      0x00000040  // Verbose
-  #  DEBUG_DISPATCH  0x00000080  // PEI/DXE Dispatchers
+  #  DEBUG_POOL      0x00000010  // Alloc & Free (pool)
+  #  DEBUG_PAGE      0x00000020  // Alloc & Free (page)
+  #  DEBUG_INFO      0x00000040  // Informational debug messages
+  #  DEBUG_DISPATCH  0x00000080  // PEI/DXE/SMM Dispatchers
   #  DEBUG_VARIABLE  0x00000100  // Variable
   #  DEBUG_BM        0x00000400  // Boot Manager
   #  DEBUG_BLKIO     0x00001000  // BlkIo Driver
-  #  DEBUG_NET       0x00004000  // SNI Driver
+  #  DEBUG_NET       0x00004000  // SNP Driver
   #  DEBUG_UNDI      0x00010000  // UNDI Driver
-  #  DEBUG_LOADFILE  0x00020000  // UNDI Driver
+  #  DEBUG_LOADFILE  0x00020000  // LoadFile
   #  DEBUG_EVENT     0x00080000  // Event messages
+  #  DEBUG_GCD       0x00100000  // Global Coherency Database changes
+  #  DEBUG_CACHE     0x00200000  // Memory range cachability changes
+  #  DEBUG_VERBOSE   0x00400000  // Detailed debug messages that may
+  #                              // significantly impact boot performance
   #  DEBUG_ERROR     0x80000000  // Error
 
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x8000008F
+!if $(TARGET) == RELEASE
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
+!else
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x800B0507
+!endif
+
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x06
 
   #
@@ -347,3 +418,256 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
 [PcdsDynamicHii.common.DEFAULT]
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|L"Timeout"|gEfiGlobalVariableGuid|0x0|10 # Variable: L"Timeout"
 
+################################################################################
+#
+# Components Section - list of all common EDK II Modules needed by Rockchip platforms.
+#
+# Should match the components declared in FvCompactModules and FvMainModules.
+#
+################################################################################
+[Components.common]
+  #
+  # PEI Phase modules
+  #
+  ArmPlatformPkg/PrePi/PeiUniCore.inf
+
+  #
+  # DXE
+  #
+  MdeModulePkg/Core/Dxe/DxeMain.inf {
+    <LibraryClasses>
+      NULL|MdeModulePkg/Library/DxeCrc32GuidedSectionExtractLib/DxeCrc32GuidedSectionExtractLib.inf
+  }
+  MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
+
+  #
+  # Architectural Protocols
+  #
+  ArmPkg/Drivers/CpuDxe/CpuDxe.inf
+  MdeModulePkg/Core/RuntimeDxe/RuntimeDxe.inf
+  MdeModulePkg/Universal/SecurityStubDxe/SecurityStubDxe.inf
+  MdeModulePkg/Universal/CapsuleRuntimeDxe/CapsuleRuntimeDxe.inf
+  EmbeddedPkg/EmbeddedMonotonicCounter/EmbeddedMonotonicCounter.inf
+  MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
+  EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf {
+  <LibraryClasses>
+    RealTimeClockLib|EmbeddedPkg/Library/VirtualRealTimeClockLib/VirtualRealTimeClockLib.inf
+  }
+  EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
+  MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf {
+    <LibraryClasses>
+      PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
+  }
+  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+  MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
+
+  #
+  # Non-volatile FVB support
+  #
+!if $(RK_NOR_FLASH_ENABLE) == TRUE
+  Silicon/Rockchip/Drivers/NorFlashDxe/NorFlashDxe.inf
+!endif
+  Silicon/Rockchip/Drivers/RkFvbDxe/RkFvbDxe.inf
+
+  #
+  # Multiple Console IO support
+  #
+  MdeModulePkg/Universal/Console/ConPlatformDxe/ConPlatformDxe.inf
+  MdeModulePkg/Universal/Console/ConSplitterDxe/ConSplitterDxe.inf
+  MdeModulePkg/Universal/Console/GraphicsConsoleDxe/GraphicsConsoleDxe.inf
+  MdeModulePkg/Universal/Console/TerminalDxe/TerminalDxe.inf
+  MdeModulePkg/Universal/SerialDxe/SerialDxe.inf
+
+  #
+  # Arm GIC
+  #
+  ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
+
+  #
+  # Timer
+  #
+  ArmPkg/Drivers/TimerDxe/TimerDxe.inf
+  MdeModulePkg/Universal/WatchdogTimerDxe/WatchdogTimer.inf
+
+  #
+  # SCMI Support
+  #
+  ArmPkg/Drivers/ArmScmiDxe/ArmScmiDxe.inf
+
+  #
+  # ACPI Support
+  #
+  MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
+  MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
+
+  #
+  # DeviceTree Support
+  #
+  EmbeddedPkg/Drivers/DtPlatformDxe/DtPlatformDxe.inf {
+  <LibraryClasses>
+    DtPlatformDtbLoaderLib|EmbeddedPkg/Library/DxeDtPlatformDtbLoaderLibDefault/DxeDtPlatformDtbLoaderLibDefault.inf
+  }
+
+  #
+  # SMBIOS Support
+  #
+  MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf
+  Silicon/Rockchip/Drivers/PlatformSmbiosDxe/PlatformSmbiosDxe.inf
+
+  #
+  # I2C Bus & Devices
+  #
+  MdeModulePkg/Bus/I2c/I2cDxe/I2cDxe.inf
+  Silicon/Rockchip/Drivers/I2c/I2cDxe/I2cDxe.inf
+!if $(RK_860X_REGULATOR_ENABLE) == TRUE
+  Silicon/Rockchip/Drivers/I2c/Rk860xRegulatorDxe/Rk860xRegulatorDxe.inf
+!endif
+  # Silicon/Rockchip/Drivers/I2c/I2cDemoDxe/I2cDemoDxe.inf
+
+  #
+  # Display Support
+  #
+  Silicon/Rockchip/Drivers/Vop2Dxe/Vop2Dxe.inf
+  # Silicon/Rockchip/Library/DisplayLib/AnalogixDpLib.inf
+  Silicon/Rockchip/Library/DisplayLib/DwHdmiQpLib.inf
+  Silicon/Rockchip/Drivers/LcdGraphicsOutputDxe/LcdGraphicsOutputDxe.inf
+
+  #
+  # USB Support
+  #
+  MdeModulePkg/Bus/Pci/EhciDxe/EhciDxe.inf
+  MdeModulePkg/Bus/Pci/XhciDxe/XhciDxe.inf
+  Silicon/Rockchip/Drivers/OhciDxe/OhciDxe.inf
+
+  # USB controllers installer
+  Silicon/Rockchip/Drivers/UsbHcdInitDxe/UsbHcd.inf
+
+  MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
+  MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
+  MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
+  MdeModulePkg/Bus/Usb/UsbMouseDxe/UsbMouseDxe.inf
+  MdeModulePkg/Bus/Usb/UsbMouseAbsolutePointerDxe/UsbMouseAbsolutePointerDxe.inf
+
+  EmbeddedPkg/Drivers/AndroidFastbootTransportUsbDxe/FastbootTransportUsbDxe.inf
+
+  #
+  # PCI Support
+  #
+!if $(RK_PCIE_ENABLE) == TRUE
+  ArmPkg/Drivers/ArmPciCpuIo2Dxe/ArmPciCpuIo2Dxe.inf
+  MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
+  MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
+  MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
+  Silicon/Rockchip/Drivers/PciPlatform/PcieInitDxe.inf
+!endif
+  MdeModulePkg/Bus/Pci/NonDiscoverablePciDeviceDxe/NonDiscoverablePciDeviceDxe.inf
+
+  #
+  # MMC Block I/O Driver
+  #
+!if $(RK_SD_ENABLE) == TRUE || $(RK_EMMC_ENABLE) == TRUE
+  Silicon/Rockchip/Drivers/MmcDxe/MmcDxe.inf
+!endif
+
+  #
+  # SD Support
+  #
+!if $(RK_SD_ENABLE) == TRUE
+  Silicon/Rockchip/Drivers/DwEmmcDxe/DwEmmcDxe.inf
+!endif
+
+  #
+  # eMMC Support
+  #
+!if $(RK_EMMC_ENABLE) == TRUE
+  Silicon/Rockchip/Drivers/SdhciHostDxe/SdhciHostDxe.inf
+!endif
+
+  #
+  # AHCI Support
+  #
+!if $(RK_AHCI_ENABLE) == TRUE
+  MdeModulePkg/Bus/Pci/SataControllerDxe/SataControllerDxe.inf
+  MdeModulePkg/Bus/Ata/AtaAtapiPassThru/AtaAtapiPassThru.inf
+  MdeModulePkg/Bus/Ata/AtaBusDxe/AtaBusDxe.inf
+!endif
+
+  #
+  # FAT filesystem + GPT/MBR partitioning
+  #
+  MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
+  MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
+  FatPkg/EnhancedFatDxe/Fat.inf
+  MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
+
+  #
+  # UEFI Network Stack
+  #
+!include NetworkPkg/Network.dsc.inc
+
+  #
+  # AX88772 Ethernet Driver for Apple Ethernet Adapter
+  #
+  Drivers/ASIX/Bus/Usb/UsbNetworking/Ax88772c/Ax88772c.inf
+
+  #
+  # Virtual Keyboard Support
+  #
+  EmbeddedPkg/Drivers/VirtualKeyboardDxe/VirtualKeyboardDxe.inf
+
+  #
+  # Bds
+  #
+  MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
+  MdeModulePkg/Universal/SetupBrowserDxe/SetupBrowserDxe.inf
+  MdeModulePkg/Universal/DisplayEngineDxe/DisplayEngineDxe.inf
+  MdeModulePkg/Universal/BdsDxe/BdsDxe.inf
+  MdeModulePkg/Application/UiApp/UiApp.inf {
+    <LibraryClasses>
+      NULL|MdeModulePkg/Library/DeviceManagerUiLib/DeviceManagerUiLib.inf
+      NULL|MdeModulePkg/Library/BootManagerUiLib/BootManagerUiLib.inf
+      NULL|MdeModulePkg/Library/BootMaintenanceManagerUiLib/BootMaintenanceManagerUiLib.inf
+      PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
+  }
+
+  #
+  # UEFI applications
+  #
+  ShellPkg/Application/Shell/Shell.inf {
+    <LibraryClasses>
+      ShellCommandLib|ShellPkg/Library/UefiShellCommandLib/UefiShellCommandLib.inf
+      NULL|ShellPkg/Library/UefiShellLevel2CommandsLib/UefiShellLevel2CommandsLib.inf
+      NULL|ShellPkg/Library/UefiShellLevel1CommandsLib/UefiShellLevel1CommandsLib.inf
+      NULL|ShellPkg/Library/UefiShellLevel3CommandsLib/UefiShellLevel3CommandsLib.inf
+      NULL|ShellPkg/Library/UefiShellDriver1CommandsLib/UefiShellDriver1CommandsLib.inf
+      NULL|ShellPkg/Library/UefiShellDebug1CommandsLib/UefiShellDebug1CommandsLib.inf
+      NULL|ShellPkg/Library/UefiShellInstall1CommandsLib/UefiShellInstall1CommandsLib.inf
+      NULL|Silicon/Rockchip/Applications/I2cDemoTest/I2cDemoTest.inf
+      NULL|Silicon/Rockchip/Applications/SpiTool/SpiFlashCmd.inf
+      NULL|ShellPkg/Library/UefiShellNetwork1CommandsLib/UefiShellNetwork1CommandsLib.inf
+      NULL|ShellPkg/Library/UefiShellAcpiViewCommandLib/UefiShellAcpiViewCommandLib.inf
+      HandleParsingLib|ShellPkg/Library/UefiHandleParsingLib/UefiHandleParsingLib.inf
+      OrderedCollectionLib|MdePkg/Library/BaseOrderedCollectionRedBlackTreeLib/BaseOrderedCollectionRedBlackTreeLib.inf
+      PrintLib|MdePkg/Library/BasePrintLib/BasePrintLib.inf
+      BcfgCommandLib|ShellPkg/Library/UefiShellBcfgCommandLib/UefiShellBcfgCommandLib.inf
+    <PcdsFixedAtBuild>
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0xFF
+      gEfiShellPkgTokenSpaceGuid.PcdShellLibAutoInitialize|FALSE
+      gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|8000
+  }
+!ifdef $(INCLUDE_TFTP_COMMAND)
+  ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf
+!endif #$(INCLUDE_TFTP_COMMAND)
+
+  # I2C Demo application
+  # Silicon/Rockchip/Applications/I2cDemoTest/I2cDemoTest.inf
+
+  # SPI Flash Cmd application
+  # Silicon/Rockchip/Applications/SpiTool/SpiFlashCmd.inf
+
+  # Android Boot applications
+  EmbeddedPkg/Application/AndroidBoot/AndroidBootApp.inf
+  EmbeddedPkg/Application/AndroidFastboot/AndroidFastbootApp.inf
+
+  # Maskrom reset application
+  Silicon/Rockchip/Applications/MaskromReset/maskrom.inf
