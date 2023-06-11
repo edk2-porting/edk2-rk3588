@@ -115,6 +115,7 @@
   gArmPlatformTokenSpaceGuid.PcdClusterCount|1
 
   # SMBIOS platform config
+  gRockchipTokenSpaceGuid.PcdProcessorName|"Rockchip RK3588 variant"
   gRockchipTokenSpaceGuid.PcdPlatformName|"Generic RK3588 platform"
   gRockchipTokenSpaceGuid.PcdMemoryVendorName|"TBD"
 

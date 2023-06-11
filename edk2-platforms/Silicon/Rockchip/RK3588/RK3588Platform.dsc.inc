@@ -15,6 +15,9 @@
 ################################################################################
 
 [PcdsFixedAtBuild.common]
+  # SMBIOS platform config
+  gRockchipTokenSpaceGuid.PcdProcessorName|"Rockchip RK3588"
+
   #
   # DWC3 controller
   #

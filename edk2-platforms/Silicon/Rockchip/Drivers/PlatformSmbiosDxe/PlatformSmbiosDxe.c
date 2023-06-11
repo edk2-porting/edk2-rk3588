@@ -986,8 +986,6 @@ ProcessorInfoUpdateSmbiosType4 (
 {
   UINT32 Rate;
   UINT64 *ProcessorId;
-  UINT16 CpuCode;
-  UINT8 CpuVersion;
 
   mProcessorInfoType4.CoreCount = (UINT8)MaxCpus;
   mProcessorInfoType4.CoreCount2 = (UINT8)MaxCpus;
@@ -1000,19 +998,7 @@ ProcessorInfoUpdateSmbiosType4 (
   mProcessorInfoType4.MaxSpeed = Rate / 1000000;
   mProcessorInfoType4.CurrentSpeed = Rate / 1000000;
 
-  OtpReadCpuCode(&CpuCode);
-  OtpReadCpuVersion(&CpuVersion);
-  CpuCode = (CpuCode >> 8) | (CpuCode << 8);
-  
-  AsciiSPrint(mCpuName, sizeof(mCpuName), "Rockchip RK%04X", CpuCode);
-
-  if (CpuVersion & BIT3) {
-    switch (CpuCode) {
-      case 0x3588:
-        AsciiStrCatS(mCpuName, sizeof(mCpuName), "S");
-        break;
-    }
-  }
+  AsciiStrCpyS (mCpuName, sizeof(mCpuName), (CHAR8 *) PcdGetPtr (PcdProcessorName));
 
   ProcessorId = (UINT64 *)&(mProcessorInfoType4.ProcessorId);
   *ProcessorId = ArmReadMidr();

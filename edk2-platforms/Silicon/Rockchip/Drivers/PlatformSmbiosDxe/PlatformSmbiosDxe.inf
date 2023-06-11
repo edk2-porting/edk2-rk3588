@@ -60,6 +60,7 @@
   gArmTokenSpaceGuid.PcdFdSize
   gArmTokenSpaceGuid.PcdSystemMemoryBase
   gArmTokenSpaceGuid.PcdSystemMemorySize
+  gRockchipTokenSpaceGuid.PcdProcessorName
   gRockchipTokenSpaceGuid.PcdPlatformName
   gRockchipTokenSpaceGuid.PcdPlatformVendorName
   gRockchipTokenSpaceGuid.PcdBoardName

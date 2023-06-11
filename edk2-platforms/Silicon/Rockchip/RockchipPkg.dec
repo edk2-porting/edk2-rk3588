@@ -33,13 +33,14 @@
   gRockchipEventResetGuid = { 0x4ecbd617, 0xc2a6, 0x4d4c, { 0x80, 0x4e, 0x53, 0x38, 0x3b, 0x98, 0x7d, 0x75 } }
 
 [PcdsFixedAtBuild]
-  gRockchipTokenSpaceGuid.PcdPlatformName|"Unknown"|VOID*|0x00000001
-  gRockchipTokenSpaceGuid.PcdPlatformVendorName|"Unknown"|VOID*|0x00000002
-  gRockchipTokenSpaceGuid.PcdBoardName|"Unknown"|VOID*|0x00000003
-  gRockchipTokenSpaceGuid.PcdBoardVendorName|"Unknown"|VOID*|0x00000004
-  gRockchipTokenSpaceGuid.PcdProductUrl|"Unknown"|VOID*|0x00000005
-  gRockchipTokenSpaceGuid.PcdMemoryVendorName|"Unknown"|VOID*|0x00000006
-  gRockchipTokenSpaceGuid.PcdFamilyName|"Unknown"|VOID*|0x00000007
+  gRockchipTokenSpaceGuid.PcdProcessorName|"Unknown"|VOID*|0x00000001
+  gRockchipTokenSpaceGuid.PcdPlatformName|"Unknown"|VOID*|0x00000002
+  gRockchipTokenSpaceGuid.PcdPlatformVendorName|"Unknown"|VOID*|0x00000003
+  gRockchipTokenSpaceGuid.PcdBoardName|"Unknown"|VOID*|0x00000004
+  gRockchipTokenSpaceGuid.PcdBoardVendorName|"Unknown"|VOID*|0x00000005
+  gRockchipTokenSpaceGuid.PcdProductUrl|"Unknown"|VOID*|0x00000006
+  gRockchipTokenSpaceGuid.PcdMemoryVendorName|"Unknown"|VOID*|0x00000007
+  gRockchipTokenSpaceGuid.PcdFamilyName|"Unknown"|VOID*|0x00000008
 
   gRockchipTokenSpaceGuid.PcdPcieRootPort3x4ApbBaseAddress|0|UINT64|0x10000050
   gRockchipTokenSpaceGuid.PcdPcieRootPort3x4DbiBaseAddress|0|UINT64|0x10000051
