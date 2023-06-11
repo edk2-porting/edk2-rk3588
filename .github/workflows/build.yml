@@ -29,9 +29,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Submodule init
-        shell: bash
-        run: git submodule update --init --recursive
+        with:
+          submodules: recursive
         
       - name: Install dependencies
         shell: bash
