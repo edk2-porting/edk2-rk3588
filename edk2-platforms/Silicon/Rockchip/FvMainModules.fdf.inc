@@ -208,4 +208,4 @@
   INF EmbeddedPkg/Application/AndroidFastboot/AndroidFastbootApp.inf
 
   # Maskrom reset application
-  INF Silicon/Rockchip/Applications/MaskromReset/maskrom.inf
+  # INF Silicon/Rockchip/Applications/MaskromReset/maskrom.inf

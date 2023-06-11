@@ -670,4 +670,4 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
   EmbeddedPkg/Application/AndroidFastboot/AndroidFastbootApp.inf
 
   # Maskrom reset application
-  Silicon/Rockchip/Applications/MaskromReset/maskrom.inf
+  # Silicon/Rockchip/Applications/MaskromReset/maskrom.inf
