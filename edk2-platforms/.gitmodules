@@ -1,3 +1,0 @@
-[submodule "Silicon/RISC-V/ProcessorPkg/Library/RiscVOpensbiLib/opensbi"]
-  path = Silicon/RISC-V/ProcessorPkg/Library/RiscVOpensbiLib/opensbi
-  url = https://github.com/riscv/opensbi
