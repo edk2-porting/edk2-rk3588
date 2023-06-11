@@ -1,0 +1,24 @@
+Some code is reused from GpioLib at https://github.com/jaredmcneill/quartz64_uefi 
+for rk356x, and is modified to work on rk3588.
+The modified part has the following license:
+/** @file
+ *
+ *  RK3588 GPIO Library.
+ * 
+ *  Copyright (c) 2023, Molly Sophia <mollysophia379@gmail.com>
+ *
+ *  SPDX-License-Identifier: BSD-2-Clause-Patent
+ *
+ **/
+
+
+Here's the original one:
+/** @file
+ *
+ *  RK3566/RK3568 GPIO Library.
+ * 
+ *  Copyright (c) 2021, Jared McNeill <jmcneill@invisible.ca>
+ *
+ *  SPDX-License-Identifier: BSD-2-Clause-Patent
+ *
+ **/

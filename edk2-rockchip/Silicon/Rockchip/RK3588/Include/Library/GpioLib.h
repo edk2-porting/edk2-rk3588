@@ -100,38 +100,38 @@ GpioPinRead (
   IN UINT8 Pin
   );
 
-// VOID
-// GpioPinSetFunction (
-//   IN UINT8 Group,
-//   IN UINT8 Pin,
-//   IN UINT8 Function
-//   );
+VOID
+GpioPinSetFunction (
+  IN UINT8 Group,
+  IN UINT8 Pin,
+  IN UINT8 Function
+  );
 
-// VOID
-// GpioPinSetPull (
-//   IN UINT8 Group,
-//   IN UINT8 Pin,
-//   IN GPIO_PIN_PULL Pull
-//   );
+VOID
+GpioPinSetPull (
+  IN UINT8 Group,
+  IN UINT8 Pin,
+  IN GPIO_PIN_PULL Pull
+  );
 
-// VOID
-// GpioPinSetDrive (
-//   IN UINT8 Group,
-//   IN UINT8 Pin,
-//   IN GPIO_PIN_DRIVE Drive
-//   );
+VOID
+GpioPinSetDrive (
+  IN UINT8 Group,
+  IN UINT8 Pin,
+  IN GPIO_PIN_DRIVE Drive
+  );
 
-// VOID
-// GpioPinSetInput (
-//   IN UINT8 Group,
-//   IN UINT8 Pin,
-//   IN GPIO_PIN_INPUT_ENABLE InputEnable
-//   );
+VOID
+GpioPinSetInput (
+  IN UINT8 Group,
+  IN UINT8 Pin,
+  IN GPIO_PIN_INPUT_ENABLE InputEnable
+  );
 
-// VOID
-// GpioSetIomuxConfig (
-//   IN CONST GPIO_IOMUX_CONFIG *Configs,
-//   IN UINT32 NumConfigs
-//   );
+VOID
+GpioSetIomuxConfig (
+  IN CONST GPIO_IOMUX_CONFIG *Configs,
+  IN UINT32 NumConfigs
+  );
 
 #endif /* GPIOLIB_H__ */
