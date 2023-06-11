@@ -155,7 +155,7 @@ if "${DISTCLEAN}";then _distclean;exit "$?";fi
 if "${CLEAN}";then _clean;exit "$?";fi
 [ -z "${DEVICE}" ]&&_help 1
 
-if ! [ -f Common/edk2/edksetup.sh ] && ! [ -f ../edk2/edksetup.sh ]
+if ! [ -f edk2/edksetup.sh ] && ! [ -f ../edk2/edksetup.sh ]
 then
 	set -e
 	echo "SKIP Updating submodules"
@@ -178,7 +178,7 @@ export CROSS_COMPILE="${CROSS_COMPILE:-aarch64-linux-gnu-}"
 export GCC5_AARCH64_PREFIX="${CROSS_COMPILE}"
 export CLANG38_AARCH64_PREFIX="${CROSS_COMPILE}"
 # export PACKAGES_PATH="$_EDK2:$_EDK2_PLATFORMS:$_SIMPLE_INIT:$PWD"
-export PACKAGES_PATH="${ROOTDIR}/edk2:${ROOTDIR}/edk2-platforms:${ROOTDIR}/edk2-non-osi:${ROOTDIR}:${_SIMPLE_INIT}"
+export PACKAGES_PATH="${ROOTDIR}/edk2:${ROOTDIR}/edk2-platforms:${ROOTDIR}/edk2-rockchip:${ROOTDIR}/edk2-non-osi:${ROOTDIR}:${_SIMPLE_INIT}"
 export WORKSPACE="${OUTDIR}/workspace"
 GITCOMMIT="$(git describe --tags --always)"||GITCOMMIT="unknown"
 export GITCOMMIT
