@@ -29,7 +29,6 @@
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
   Silicon/Rockchip/RockchipPkg.dec
-  Silicon/Rockchip/Drivers/DwEmmcDxe/DwEmmcDxe.dec
 
 [LibraryClasses]
   IoLib
@@ -73,7 +72,7 @@
   gRockchipTokenSpaceGuid.PcdNvStorageVariableBase
   gRockchipTokenSpaceGuid.PcdNvStoragePreferSpiFlash
   gRockchipTokenSpaceGuid.PcdSdhciDxeBaseAddress
-  gDesignWareTokenSpaceGuid.PcdDwEmmcDxeBaseAddress
+  gRockchipTokenSpaceGuid.PcdDwEmmcDxeBaseAddress
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64

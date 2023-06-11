@@ -141,14 +141,10 @@
   gHisiTokenSpaceGuid.PcdUartClkInHz|24000000
 
   # SPI - SPI2 for test
-  gRockchipTokenSpaceGuid.SpiTestBaseAddr|0xFEB20000
   gRockchipTokenSpaceGuid.SpiRK806BaseAddr|0xFEB20000
-  ## PL031 RealTimeClock
-  #gArmPlatformTokenSpaceGuid.PcdPL031RtcBase|0xF8003000
 
   # NOR FLASH
   gRockchipTokenSpaceGuid.FspiBaseAddr|0xFE2B0000
-  #gRockchipTokenSpaceGuid.PcdSpiVariableOffset|0x3C0000
 
   # CRU
   gRockchipTokenSpaceGuid.CruBaseAddr|0xFD7C0000
@@ -170,10 +166,9 @@
   #
   # DesignWare SD Controller (MSHC)
   #
-  gDesignWareTokenSpaceGuid.PcdDwEmmcDxeBaseAddress|0xfe2c0000
-  gDesignWareTokenSpaceGuid.PcdDwEmmcDxeClockFrequencyInHz|100000000
-  gDesignWareTokenSpaceGuid.PcdDwPermitObsoleteDrivers|TRUE
-  gDesignWareTokenSpaceGuid.PcdDwEmmcDxeFifoDepth|256
+  gRockchipTokenSpaceGuid.PcdDwEmmcDxeBaseAddress|0xfe2c0000
+  gRockchipTokenSpaceGuid.PcdDwEmmcDxeClockFrequencyInHz|100000000
+  gRockchipTokenSpaceGuid.PcdDwEmmcDxeFifoDepth|256
 
   #
   # DesignWare SD/eMMC Controller (SDHCI)
@@ -195,12 +190,6 @@
   gRockchipTokenSpaceGuid.PcdPcieRootPort3x4MemSize64|0x3f000000
 
   #
-  # Fastboot
-  #
-  gEmbeddedTokenSpaceGuid.PcdAndroidFastbootUsbVendorId|0x2207
-  gEmbeddedTokenSpaceGuid.PcdAndroidFastbootUsbProductId|0x0001
-
-  #
   # USB2 EHCI + OHCI companion controllers
   #
   gRockchipTokenSpaceGuid.PcdEhciBaseAddress|0xfc800000
@@ -212,17 +201,6 @@
   # DWC3 controller
   #
   gRockchipTokenSpaceGuid.PcdDwc3Size|0x400000
-
-  #
-  # Android Loader
-  #
-  gRK3588TokenSpaceGuid.PcdAndroidBootDevicePath|L"\\EFI\\BOOT\\GRUBAA64.EFI"
-  gRK3588TokenSpaceGuid.PcdSdBootDevicePath|L"VenHw(0D51905B-B77E-452A-A2C0-ECA0CC8D514A,00E023F70000000000)/SD(0x0)"
-  gRK3588TokenSpaceGuid.PcdKernelBootArg|L"earlycon=uart8250,mmio32,0xfeb50000 root=PARTUUID=614e0000-0000 rw rootwait"
-  gEmbeddedTokenSpaceGuid.PcdAndroidBootDevicePath|L"VenHw(100C2CFA-B586-4198-9B4C-1683D195B1DA)/HD(3,GPT,7A3F0000-0000-446A-8000-702F00006273,0x8000,0x20000)"
-
-  # ACPI Enable
-  gRK3588TokenSpaceGuid.AcpiEnable|TRUE
 
   #
   # Display

@@ -10,7 +10,6 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/TimerLib.h>
 #include <Library/RockchipPlatformLib.h>
-#include "DwEmmc.h"
 #include "Mmc.h"
 
 #define CONFIG_MMC_HS400ES

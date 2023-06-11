@@ -113,8 +113,6 @@
   INF MdeModulePkg/Bus/Usb/UsbMouseDxe/UsbMouseDxe.inf
   INF MdeModulePkg/Bus/Usb/UsbMouseAbsolutePointerDxe/UsbMouseAbsolutePointerDxe.inf
 
-  INF EmbeddedPkg/Drivers/AndroidFastbootTransportUsbDxe/FastbootTransportUsbDxe.inf
-
   #
   # PCI Support
   #
@@ -176,11 +174,6 @@
   INF Drivers/ASIX/Bus/Usb/UsbNetworking/Ax88772c/Ax88772c.inf
 
   #
-  # Virtual Keyboard Support
-  #
-  INF EmbeddedPkg/Drivers/VirtualKeyboardDxe/VirtualKeyboardDxe.inf
-
-  #
   # Bds
   #
   INF MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
@@ -202,10 +195,6 @@
 
   # SPI Flash Cmd application
   # INF Silicon/Rockchip/Applications/SpiTool/SpiFlashCmd.inf
-
-  # Android Boot applications
-  INF EmbeddedPkg/Application/AndroidBoot/AndroidBootApp.inf
-  INF EmbeddedPkg/Application/AndroidFastboot/AndroidFastbootApp.inf
 
   # Maskrom reset application
   # INF Silicon/Rockchip/Applications/MaskromReset/maskrom.inf

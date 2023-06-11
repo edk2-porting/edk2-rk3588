@@ -29,7 +29,6 @@
   ArmPlatformPkg/ArmPlatformPkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
-  Silicon/Rockchip/Drivers/DwEmmcDxe/DwEmmcDxe.dec
   Silicon/Rockchip/RockchipPkg.dec
 
 [LibraryClasses]
@@ -51,11 +50,10 @@
   gEmbeddedMmcHostProtocolGuid
 
 [Pcd]
-  gDesignWareTokenSpaceGuid.PcdDwEmmcDxeBaseAddress
-  gDesignWareTokenSpaceGuid.PcdDwEmmcDxeClockFrequencyInHz
-  gDesignWareTokenSpaceGuid.PcdDwEmmcDxeMaxClockFreqInHz
-  gDesignWareTokenSpaceGuid.PcdDwEmmcDxeFifoDepth
-  gDesignWareTokenSpaceGuid.PcdDwPermitObsoleteDrivers
+  gRockchipTokenSpaceGuid.PcdDwEmmcDxeBaseAddress
+  gRockchipTokenSpaceGuid.PcdDwEmmcDxeClockFrequencyInHz
+  gRockchipTokenSpaceGuid.PcdDwEmmcDxeMaxClockFreqInHz
+  gRockchipTokenSpaceGuid.PcdDwEmmcDxeFifoDepth
 
 [Depex]
   TRUE

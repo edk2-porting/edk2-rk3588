@@ -61,9 +61,6 @@
   PlatformBootManagerLib|Silicon/Rockchip/Library/PlatformBootManagerLib/PlatformBootManagerLib.inf
   CustomizedDisplayLib|MdeModulePkg/Library/CustomizedDisplayLib/CustomizedDisplayLib.inf
 
-  # AndroidBootApp dependencies
-  AndroidBootImgLib|EmbeddedPkg/Library/AndroidBootImgLib/AndroidBootImgLib.inf
-
   # USB Requirements
   UefiUsbLib|MdePkg/Library/UefiUsbLib/UefiUsbLib.inf
 
@@ -548,8 +545,6 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
   MdeModulePkg/Bus/Usb/UsbMouseDxe/UsbMouseDxe.inf
   MdeModulePkg/Bus/Usb/UsbMouseAbsolutePointerDxe/UsbMouseAbsolutePointerDxe.inf
 
-  EmbeddedPkg/Drivers/AndroidFastbootTransportUsbDxe/FastbootTransportUsbDxe.inf
-
   #
   # PCI Support
   #
@@ -611,11 +606,6 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
   Drivers/ASIX/Bus/Usb/UsbNetworking/Ax88772c/Ax88772c.inf
 
   #
-  # Virtual Keyboard Support
-  #
-  EmbeddedPkg/Drivers/VirtualKeyboardDxe/VirtualKeyboardDxe.inf
-
-  #
   # Bds
   #
   MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf
@@ -664,10 +654,6 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
 
   # SPI Flash Cmd application
   # Silicon/Rockchip/Applications/SpiTool/SpiFlashCmd.inf
-
-  # Android Boot applications
-  EmbeddedPkg/Application/AndroidBoot/AndroidBootApp.inf
-  EmbeddedPkg/Application/AndroidFastboot/AndroidFastbootApp.inf
 
   # Maskrom reset application
   # Silicon/Rockchip/Applications/MaskromReset/maskrom.inf

@@ -751,11 +751,6 @@ DwEmmcDxeInitialize (
   EFI_STATUS    Status;
   EFI_HANDLE    Handle;
 
-  if (!FixedPcdGetBool (PcdDwPermitObsoleteDrivers)) {
-    ASSERT (FALSE);
-    return EFI_UNSUPPORTED;
-  }
-
   Handle = NULL;
   DwEmmcDxeIoMux ();
   gpIdmacDesc = (DWEMMC_IDMAC_DESCRIPTOR *)AllocatePages (DWEMMC_MAX_DESC_PAGES);
