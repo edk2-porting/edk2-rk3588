@@ -254,8 +254,8 @@ UsbDpPhyEnable (
 
 VOID
 EFIAPI
-Pcie30IoInit (
-  VOID
+PcieIoInit (
+  UINT32 Segment
   )
 {
   /* not applicable */
@@ -263,8 +263,9 @@ Pcie30IoInit (
 
 VOID
 EFIAPI
-Pcie30PowerEn (
-  VOID
+PciePowerEn (
+  UINT32 Segment,
+  BOOLEAN Enable
   )
 {
   /* not applicable */
@@ -272,8 +273,9 @@ Pcie30PowerEn (
 
 VOID
 EFIAPI
-Pcie30PeReset (
-  BOOLEAN enable
+PciePeReset (
+  UINT32 Segment,
+  BOOLEAN Enable
   )
 {
   /* not applicable */

@@ -103,20 +103,22 @@ Usb2PhyResume (
 
 VOID
 EFIAPI
-Pcie30IoInit (
-  VOID
+PcieIoInit (
+  UINT32 Segment
   );
 
 VOID
 EFIAPI
-Pcie30PowerEn (
-  VOID
+PciePowerEn (
+  UINT32 Segment,
+  BOOLEAN Enable
   );
 
 VOID
 EFIAPI
-Pcie30PeReset (
-  BOOLEAN enable
+PciePeReset (
+  UINT32 Segment,
+  BOOLEAN Enable
   );
 
 VOID

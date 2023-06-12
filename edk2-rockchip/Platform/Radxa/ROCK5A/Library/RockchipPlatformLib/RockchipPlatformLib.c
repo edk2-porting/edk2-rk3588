@@ -10,6 +10,7 @@
 #include <Library/IoLib.h>
 #include <Library/GpioLib.h>
 #include <Library/RK806.h>
+#include <Library/Rk3588Pcie.h>
 #include <Soc.h>
 
 static struct regulator_init_data rk806_init_data[] = {
@@ -228,34 +229,43 @@ UsbDpPhyEnable (
   MmioWrite32 (0xfd5cc00c, 0x00030001);
 }
 
-/* ROCK5A does not have PCIe3.0, wait for PCIe2 support and re-add it.
 VOID
 EFIAPI
-Pcie30IoInit(VOID)
+PcieIoInit (
+  UINT32 Segment
+  )
 {
-  // Set reset and power IO to gpio output mode
-  GpioPinSetDirection (4, GPIO_PIN_PB6, GPIO_PIN_OUTPUT);
-  GpioPinSetDirection (1, GPIO_PIN_PA4, GPIO_PIN_OUTPUT);
+  if(Segment == PCIE_SEGMENT_PCIE20L2) {
+    // Set reset and power IO to gpio output mode
+    GpioPinSetDirection (0, GPIO_PIN_PC5, GPIO_PIN_OUTPUT);
+    GpioPinSetDirection (3, GPIO_PIN_PD1, GPIO_PIN_OUTPUT);
+  }
 }
 
 VOID
 EFIAPI
-Pcie30PowerEn(VOID)
+PciePowerEn (
+  UINT32 Segment,
+  BOOLEAN Enable
+  )
 {
-  // output high to enable power
-  GpioPinWrite (1, GPIO_PIN_PA4, TRUE);
+  if(Segment == PCIE_SEGMENT_PCIE20L2) {
+    /* output high to enable power */
+    GpioPinWrite (0, GPIO_PIN_PC5, Enable);
+  }
 }
 
 VOID
 EFIAPI
-Pcie30PeReset(BOOLEAN enable)
+PciePeReset (
+  UINT32 Segment,
+  BOOLEAN Enable
+  )
 {
-  if(enable)
-    GpioPinWrite (4, GPIO_PIN_PB6, FALSE); // output low
-  else
-    GpioPinWrite (4, GPIO_PIN_PB6, TRUE); // output high
+  if(Segment == PCIE_SEGMENT_PCIE20L2) {
+    GpioPinWrite (3, GPIO_PIN_PD1, !Enable);
+  }
 }
-*/
 
 VOID
 EFIAPI

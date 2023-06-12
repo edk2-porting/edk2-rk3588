@@ -253,8 +253,8 @@ UsbDpPhyEnable (
 
 VOID
 EFIAPI
-Pcie30IoInit (
-  VOID
+PcieIoInit (
+  UINT32 Segment
   )
 {
   /* Set reset and power IO to gpio output mode */
@@ -264,8 +264,9 @@ Pcie30IoInit (
 
 VOID
 EFIAPI
-Pcie30PowerEn (
-  VOID
+PciePowerEn (
+  UINT32 Segment,
+  BOOLEAN Enable
   )
 {
   /* output high to enable power */
@@ -274,8 +275,9 @@ Pcie30PowerEn (
 
 VOID
 EFIAPI
-Pcie30PeReset (
-  BOOLEAN enable
+PciePeReset (
+  UINT32 Segment,
+  BOOLEAN Enable
   )
 {
   if(enable)

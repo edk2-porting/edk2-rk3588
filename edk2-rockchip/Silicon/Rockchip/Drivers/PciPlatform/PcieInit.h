@@ -43,7 +43,7 @@ struct rk_pcie {
 	UINTN dbi_base;
 	UINTN apb_base;
 	UINTN cfg_base;
-	UINT32 first_busno;
+	UINT32 pcie_segment;
 	UINT32	gen;
 	UINT32	lane;
 };

@@ -162,10 +162,11 @@
 
   # PCI Support
 !if $(RK_PCIE_ENABLE) == TRUE
-  PciSegmentLib|MdePkg/Library/BasePciSegmentLibPci/BasePciSegmentLibPci.inf
-  PciHostBridgeLib|Silicon/Rockchip/Library/PciHostBridgeLib/PciHostBridgeLib.inf
-  PciExpressLib|Silicon/Rockchip/Library/PciExpressLib/PciExpressLib.inf
+  PciSegmentLib|Silicon/Rockchip/RK3588/Library/Rk3588PciSegmentLib/Rk3588PciSegmentLib.inf
+  PciHostBridgeLib|Silicon/Rockchip/RK3588/Library/Rk3588PciHostBridgeLib/Rk3588PciHostBridgeLib.inf
+  PciExpressLib|MdePkg/Library/BasePciExpressLib/BasePciExpressLib.inf
   PciLib|MdePkg/Library/BasePciLibPciExpress/BasePciLibPciExpress.inf
+  Pcie30PhyLib|Silicon/Rockchip/RK3588/Library/Pcie30PhyLib/Pcie30PhyLib.inf
 !endif
 
   # DwEmmcDxe dependencies
@@ -556,8 +557,8 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
   ArmPkg/Drivers/ArmPciCpuIo2Dxe/ArmPciCpuIo2Dxe.inf
   MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
   MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
+  EmbeddedPkg/Drivers/NonCoherentIoMmuDxe/NonCoherentIoMmuDxe.inf
   MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
-  Silicon/Rockchip/Drivers/PciPlatform/PcieInitDxe.inf
 !endif
   MdeModulePkg/Bus/Pci/NonDiscoverablePciDeviceDxe/NonDiscoverablePciDeviceDxe.inf
 

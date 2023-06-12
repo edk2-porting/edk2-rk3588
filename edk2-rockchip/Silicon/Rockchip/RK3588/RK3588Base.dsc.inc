@@ -14,7 +14,7 @@
 #
 ################################################################################
 [Defines]
-  DEFINE CONFIG_NO_DEBUGLIB      = TRUE
+  DEFINE CONFIG_NO_DEBUGLIB      = FALSE
 
   #
   # Must match defines in Silicon/Rockchip/RK3588/Include/VarStoreData.h

@@ -233,7 +233,7 @@ READ_LOCK_STATUS   = TRUE
 !ifdef $(ROCKCHIP_PCIE30)
 
   #PCIe
-  INF Silicon/Rockchip/Drivers/PciPlatform/PcieInitDxe.inf
+  # INF Silicon/Rockchip/Drivers/PciPlatform/PcieInitDxe.inf
 
   # Required by PCI
   INF ArmPkg/Drivers/ArmPciCpuIo2Dxe/ArmPciCpuIo2Dxe.inf
@@ -241,6 +241,7 @@ READ_LOCK_STATUS   = TRUE
   # PCI Support
   INF MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
   INF MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
+  INF EmbeddedPkg/Drivers/NonCoherentIoMmuDxe/NonCoherentIoMmuDxe.inf
   INF MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
   #INF MdeModulePkg/Bus/Pci/NvmExpressPei/NvmExpressPei.inf
 

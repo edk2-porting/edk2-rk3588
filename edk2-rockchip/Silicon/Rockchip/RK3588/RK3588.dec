@@ -39,6 +39,7 @@
   gRK3588TokenSpaceGuid.PcdComboPhy0ModeDefault|0|UINT32|0x00010104
   gRK3588TokenSpaceGuid.PcdComboPhy1ModeDefault|0|UINT32|0x00010105
   gRK3588TokenSpaceGuid.PcdComboPhy2ModeDefault|0|UINT32|0x00010106
+  gRK3588TokenSpaceGuid.PcdSocIs3588S|FALSE|BOOLEAN|0x00010107
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   gRK3588TokenSpaceGuid.PcdCPULClusterClockPreset|0|UINT32|0x00000001

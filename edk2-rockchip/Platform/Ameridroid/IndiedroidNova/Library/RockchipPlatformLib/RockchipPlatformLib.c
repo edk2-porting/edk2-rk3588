@@ -10,6 +10,7 @@
 #include <Library/IoLib.h>
 #include <Library/GpioLib.h>
 #include <Library/RK806.h>
+#include <Library/Rk3588Pcie.h>
 #include <Soc.h>
 
 static struct regulator_init_data rk806_init_data[] = {
@@ -226,19 +227,29 @@ UsbDpPhyEnable (
 
 VOID
 EFIAPI
-Pcie30IoInit (
-  VOID
+PcieIoInit (
+  UINT32 Segment
   )
 {
   /* Set reset and power IO to gpio output mode */
-  GpioPinSetDirection (4, GPIO_PIN_PB6, GPIO_PIN_OUTPUT);
-  GpioPinSetDirection (1, GPIO_PIN_PA4, GPIO_PIN_OUTPUT);
+  switch(Segment) {
+    case PCIE_SEGMENT_PCIE30X4:
+    case PCIE_SEGMENT_PCIE30X2:
+      GpioPinSetDirection (4, GPIO_PIN_PB6, GPIO_PIN_OUTPUT);
+      GpioPinSetDirection (1, GPIO_PIN_PA4, GPIO_PIN_OUTPUT);
+      break;
+    
+    default:
+      break;
+  }
+  
 }
 
 VOID
 EFIAPI
-Pcie30PowerEn (
-  VOID
+PciePowerEn (
+  UINT32 Segment,
+  BOOLEAN Enable
   )
 {
   /* output high to enable power */
@@ -247,8 +258,9 @@ Pcie30PowerEn (
 
 VOID
 EFIAPI
-Pcie30PeReset (
-  BOOLEAN enable
+PciePeReset (
+  UINT32 Segment,
+  BOOLEAN Enable
   )
 {
   if(enable)

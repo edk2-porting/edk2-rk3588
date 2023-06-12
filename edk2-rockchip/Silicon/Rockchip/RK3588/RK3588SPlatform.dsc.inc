@@ -15,7 +15,7 @@
   #
   # The current drivers only support PCIe 3 x4, which is not present on RK3588S.
   #
-  DEFINE RK_PCIE_ENABLE = FALSE
+  # DEFINE RK_PCIE_ENABLE = FALSE
 
 !include Silicon/Rockchip/RK3588/RK3588Base.dsc.inc
 
@@ -28,6 +28,7 @@
 [PcdsFixedAtBuild.common]
   # SMBIOS platform config
   gRockchipTokenSpaceGuid.PcdProcessorName|"Rockchip RK3588S"
+  gRK3588TokenSpaceGuid.PcdSocIs3588S|TRUE
 
   #
   # DWC3 controller

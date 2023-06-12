@@ -1,3 +1,13 @@
+/** @file
+ *
+ *  RK3588 GPIO Library.
+ * 
+ *  Copyright (c) 2021, Jared McNeill <jmcneill@invisible.ca>
+ *  Copyright (c) 2023, Molly Sophia <mollysophia379@gmail.com>
+ *
+ *  SPDX-License-Identifier: BSD-2-Clause-Patent
+ *
+ **/
 #include <Uefi.h>
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>

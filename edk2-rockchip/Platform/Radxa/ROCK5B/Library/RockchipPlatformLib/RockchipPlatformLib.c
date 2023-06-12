@@ -10,6 +10,7 @@
 #include <Library/IoLib.h>
 #include <Library/GpioLib.h>
 #include <Library/RK806.h>
+#include <Library/Rk3588Pcie.h>
 #include <Soc.h>
 
 static struct regulator_init_data rk806_init_data[] = {
@@ -252,35 +253,80 @@ UsbDpPhyEnable (
 
 VOID
 EFIAPI
-Pcie30IoInit (
-  VOID
+PcieIoInit (
+  UINT32 Segment
   )
 {
   /* Set reset and power IO to gpio output mode */
-  GpioPinSetDirection (4, GPIO_PIN_PB6, GPIO_PIN_OUTPUT);
-  GpioPinSetDirection (1, GPIO_PIN_PA4, GPIO_PIN_OUTPUT);
+  switch(Segment) {
+    case PCIE_SEGMENT_PCIE30X4:
+      GpioPinSetDirection (4, GPIO_PIN_PB6, GPIO_PIN_OUTPUT);
+      GpioPinSetDirection (1, GPIO_PIN_PA4, GPIO_PIN_OUTPUT);
+      // PciePinmuxInit(Segment, 1);
+      break;
+    case PCIE_SEGMENT_PCIE20L0:
+      GpioPinSetDirection (4, GPIO_PIN_PA5, GPIO_PIN_OUTPUT);
+      GpioPinSetDirection (1, GPIO_PIN_PD2, GPIO_PIN_OUTPUT);
+      // PciePinmuxInit(Segment, 1); // PCIE30x1_0_{CLKREQN,WAKEN,PERSTN}_M1
+      break;
+    case PCIE_SEGMENT_PCIE20L1:
+      break;
+    case PCIE_SEGMENT_PCIE20L2:
+      GpioPinSetDirection (3, GPIO_PIN_PB0, GPIO_PIN_OUTPUT);
+      // PciePinmuxInit(Segment, 0); // PCIE20x1_2_{CLKREQN,WAKEN,PERSTN}_M0
+      break;
+    default:
+      break;
+  }
 }
 
 VOID
 EFIAPI
-Pcie30PowerEn (
-  VOID
+PciePowerEn (
+  UINT32 Segment,
+  BOOLEAN Enable
   )
 {
   /* output high to enable power */
-  GpioPinWrite (1, GPIO_PIN_PA4, TRUE);
+  
+  switch(Segment) {
+    case PCIE_SEGMENT_PCIE30X4:
+      GpioPinWrite (1, GPIO_PIN_PA4, Enable);
+      break;
+    case PCIE_SEGMENT_PCIE20L0:
+      GpioPinWrite (1, GPIO_PIN_PD2, Enable);
+      break;
+    case PCIE_SEGMENT_PCIE20L1:
+      break;
+    case PCIE_SEGMENT_PCIE20L2:
+      break;
+    default:
+      break;
+  }
 }
 
 VOID
 EFIAPI
-Pcie30PeReset (
-  BOOLEAN enable
+PciePeReset (
+  UINT32 Segment,
+  BOOLEAN Enable
   )
 {
-  if(enable)
-    GpioPinWrite (4, GPIO_PIN_PB6, FALSE); /* output low */
-  else
-    GpioPinWrite (4, GPIO_PIN_PB6, TRUE); /* output high */
+  switch(Segment) {
+    case PCIE_SEGMENT_PCIE30X4:
+      GpioPinWrite (4, GPIO_PIN_PB6, !Enable);
+      break;
+    case PCIE_SEGMENT_PCIE20L0: // m.2 a+e key
+      GpioPinWrite (4, GPIO_PIN_PA5, !Enable);
+      break;
+    case PCIE_SEGMENT_PCIE20L1:
+      break;
+    case PCIE_SEGMENT_PCIE20L2: // rtl8125b
+      GpioPinWrite (3, GPIO_PIN_PB0, !Enable);
+      break;
+    default:
+      break;
+  }
 }
 
 VOID

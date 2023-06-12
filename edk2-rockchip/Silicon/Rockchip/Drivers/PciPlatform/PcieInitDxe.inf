@@ -36,6 +36,7 @@
   PcdLib
   IoLib
   RockchipPlatformLib
+  PciHostBridgeLib
 
 [Protocols]
   #gEfiPcieRootBridgeProtocolGuid
@@ -53,5 +54,4 @@
 
 [depex]
   TRUE
-
 

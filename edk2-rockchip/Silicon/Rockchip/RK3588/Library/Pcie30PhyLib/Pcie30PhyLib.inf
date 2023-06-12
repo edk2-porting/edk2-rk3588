@@ -1,0 +1,38 @@
+#/** @file
+#
+#  RK3588 PCIe 3.0 PHY Library.
+#
+#  Copyright (c) 2023, Jared McNeill <jmcneill@invisible.ca>
+#  Copyright (c) 2023, Molly Sophia <mollysophia379@gmail.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = Pcie30PhyLib
+  FILE_GUID                      = FF2358C0-1F45-4A8F-971F-891FFDE25C81
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = Pcie30PhyLib
+
+[Sources]
+  Pcie30PhyLib.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  Silicon/Rockchip/RK3588/RK3588.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  IoLib
+  TimerLib
+  CruLib
+
+[FixedPcd]
+
+[Guids]
