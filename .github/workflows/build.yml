@@ -15,7 +15,9 @@ jobs:
       matrix:
         PLATFORM:
           - rock-5b
+          - rock-5a
           - orangepi-5
+          - orangepi-5plus
           - indiedroid-nova
           - roc-rk3588s-pc
           - station-m3
@@ -23,7 +25,6 @@ jobs:
           - r58-mini
           - edge2
           - nanopc-t6
-          - rock-5a
           # - rk3588-evb is currently failing
         CONFIGURATION: [Debug, Release]
     steps:
