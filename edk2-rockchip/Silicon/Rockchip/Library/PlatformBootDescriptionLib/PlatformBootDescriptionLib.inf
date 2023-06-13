@@ -1,0 +1,41 @@
+#/** @file
+#
+#  Boot Manager device description handler.
+#
+#  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = PlatformBootDescriptionLib
+  FILE_GUID                      = 8d63c2d3-b621-41f1-80fe-037c46d23790
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NULL|DXE_DRIVER UEFI_APPLICATION
+  CONSTRUCTOR                    = PlatformBootDescriptionLibConstructor
+
+[Sources]
+  PlatformBootDescriptionLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Silicon/Rockchip/RockchipPkg.dec
+
+[LibraryClasses]
+  UefiLib
+  UefiBootServicesTableLib
+  UefiBootManagerLib
+  MemoryAllocationLib
+  DevicePathLib
+  RkAtagsLib
+
+[Protocols]
+  gEfiBlockIoProtocolGuid       ## SOMETIMES_CONSUMES
+
+[Pcd]
+  gRockchipTokenSpaceGuid.PcdSdhciDxeBaseAddress
+  gRockchipTokenSpaceGuid.PcdDwEmmcDxeBaseAddress

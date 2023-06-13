@@ -621,6 +621,7 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
       NULL|MdeModulePkg/Library/DeviceManagerUiLib/DeviceManagerUiLib.inf
       NULL|MdeModulePkg/Library/BootManagerUiLib/BootManagerUiLib.inf
       NULL|MdeModulePkg/Library/BootMaintenanceManagerUiLib/BootMaintenanceManagerUiLib.inf
+      NULL|Silicon/Rockchip/Library/PlatformBootDescriptionLib/PlatformBootDescriptionLib.inf
       PcdLib|MdePkg/Library/DxePcdLib/DxePcdLib.inf
   }
 
