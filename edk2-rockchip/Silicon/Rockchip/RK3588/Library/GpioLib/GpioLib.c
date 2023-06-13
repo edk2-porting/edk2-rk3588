@@ -26,6 +26,8 @@
 #define GPIO_WRITE_MASK(Pin)            (1U << (((Pin) % 16) + 16))
 #define GPIO_VALUE_MASK(Pin, Value)     ((UINT32)Value << ((Pin) % 16))
 
+#define GPIO_EXT_PORT                   0x0070
+
 #define GPIO_NGROUPS                    5
 
 #define PMU1_IOC_BASE     (0xFD5F0000U)
@@ -172,6 +174,16 @@ GpioPinRead (
 {
     CONST UINT32 Value = MmioRead32 (GPIO_BASE (Group) + GPIO_SWPORT_DR (Pin));
     return (Value & GPIO_VALUE_MASK (Pin, 1)) != 0;
+}
+
+BOOLEAN
+GpioPinReadActual (
+  IN UINT8 Group,
+  IN UINT8 Pin
+  )
+{
+    CONST UINT32 Value = MmioRead32 (GPIO_BASE (Group) + GPIO_EXT_PORT);
+    return (Value & (1 << Pin)) != 0;
 }
 
 VOID

@@ -100,6 +100,12 @@ GpioPinRead (
   IN UINT8 Pin
   );
 
+BOOLEAN
+GpioPinReadActual (
+  IN UINT8 Group,
+  IN UINT8 Pin
+  );
+
 VOID
 GpioPinSetFunction (
   IN UINT8 Group,
