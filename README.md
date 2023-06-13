@@ -5,6 +5,7 @@ This repository contains an UEFI firmware implementation based on EDK2 for vario
 - [Radxa ROCK 5B](https://wiki.radxa.com/Rock5/hardware/5b)
 - [Radxa ROCK 5A](https://wiki.radxa.com/Rock5/hardware/5a)
 - [Orange Pi 5](http://www.orangepi.org/html/hardWare/computerAndMicrocontrollers/details/Orange-Pi-5.html)
+- [Orange Pi 5 Plus](http://www.orangepi.org/html/hardWare/computerAndMicrocontrollers/details/Orange-Pi-5-plus.html)
 - [ameriDroid Indiedroid Nova](https://indiedroid.us)
 - [Firefly ROC-RK3588S-PC](https://en.t-firefly.com/product/industry/rocrk3588spc)
 - [StationPC Station M3](https://www.stationpc.com/product/stationm3)
