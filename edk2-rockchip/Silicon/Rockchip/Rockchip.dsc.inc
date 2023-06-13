@@ -168,6 +168,9 @@
   PciLib|MdePkg/Library/BasePciLibPciExpress/BasePciLibPciExpress.inf
 !endif
 
+  # DwEmmcDxe dependencies
+  DwEmmcPlatformLib|Silicon/Rockchip/Library/DwEmmcPlatformLibNull/DwEmmcPlatformLibNull.inf
+
   #
   # Rockchip libraries
   #

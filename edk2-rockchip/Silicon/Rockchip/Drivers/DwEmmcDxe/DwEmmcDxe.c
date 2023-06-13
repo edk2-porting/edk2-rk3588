@@ -22,18 +22,10 @@
 #include <Library/TimerLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
-
+#include <Library/DwEmmcPlatformLib.h>
 #include <Protocol/MmcHost.h>
-#include <Library/RockchipPlatformLib.h>
-#include "Include/Library/CruLib.h"
-#include "Soc.h"
-#include "DwEmmc.h"
 
-#if (CONFIG_SOC == RK3588)
-#include <Protocol/ArmScmi.h>
-#include <Protocol/ArmScmiClockProtocol.h>
-#define SCMI_CCLK_SD			9
-#endif
+#include "DwEmmc.h"
 
 #define DW_DBG		DEBUG_BLKIO
 
@@ -157,10 +149,6 @@ DwEmmcSetClock (
 {
   UINT32 Data;
   EFI_STATUS Status;
-#if (CONFIG_SOC == RK3588)
-  SCMI_CLOCK_PROTOCOL    *ClockProtocol;
-  EFI_GUID               ClockProtocolGuid = ARM_SCMI_CLOCK_PROTOCOL_GUID;
-#endif
 
   // Wait until MMC is idle
   do {
@@ -171,28 +159,15 @@ DwEmmcSetClock (
   MmioWrite32 (DWEMMC_CLKENA, 0);
   Status = DwEmmcUpdateClock ();
   ASSERT (!EFI_ERROR (Status));
-#if (CONFIG_SOC == RK3588)
-  Status = gBS->LocateProtocol (
-                  &ClockProtocolGuid,
-                  NULL,
-                  (VOID**)&ClockProtocol
-                  );
-  ASSERT (!EFI_ERROR (Status));
-#else
-  HAL_CRU_ClkSetFreq(CLK_SDMMC0, ClockFreq);
-  DEBUG ((DW_DBG, "%a():HAL_CRU_ClkGetFreq:%d\n", __func__, HAL_CRU_ClkGetFreq(CLK_SDMMC0)));
-#endif
+
+  Status = DwEmmcSetClockRate (ClockFreq);
+  /* Unsupported might be okay, but any other error isn't. */
+  ASSERT (Status == EFI_UNSUPPORTED || !EFI_ERROR (Status));
+
   MmioWrite32 (DWEMMC_CLKDIV, 1);
   Status = DwEmmcUpdateClock ();
   ASSERT (!EFI_ERROR (Status));
-#if (CONFIG_SOC == RK3588)
-  Status = ClockProtocol->RateSet (
-                            ClockProtocol,
-                            SCMI_CCLK_SD,
-                            ClockFreq
-                            );
-  ASSERT (!EFI_ERROR (Status));
-#endif
+
   // Enable MMC clock
   MmioWrite32 (DWEMMC_CLKENA, 1);
   MmioWrite32 (DWEMMC_CLKSRC, 0);
@@ -752,7 +727,7 @@ DwEmmcDxeInitialize (
   EFI_HANDLE    Handle;
 
   Handle = NULL;
-  DwEmmcDxeIoMux ();
+  DwEmmcSetIoMux ();
   gpIdmacDesc = (DWEMMC_IDMAC_DESCRIPTOR *)AllocatePages (DWEMMC_MAX_DESC_PAGES);
   if (gpIdmacDesc == NULL) {
     return EFI_BUFFER_TOO_SMALL;
