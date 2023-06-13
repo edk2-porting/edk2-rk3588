@@ -12,6 +12,7 @@
 #include <Library/DwEmmcPlatformLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/GpioLib.h>
 #include <Protocol/ArmScmiClockProtocol.h>
 
 #define SCMI_CCLK_SD			9
@@ -43,5 +44,15 @@ DwEmmcSetIoMux (
   VOID
   )
 {
-  return;
+  GpioPinSetDirection (0, GPIO_PIN_PA4, GPIO_PIN_INPUT);
+}
+
+DWEMMC_CARD_PRESENCE_STATE
+EFIAPI
+DwEmmcGetCardPresenceState (
+  VOID
+  )
+{
+  return GpioPinReadActual (0, GPIO_PIN_PA4) ? DwEmmcCardNotPresent
+                                             : DwEmmcCardPresent;
 }

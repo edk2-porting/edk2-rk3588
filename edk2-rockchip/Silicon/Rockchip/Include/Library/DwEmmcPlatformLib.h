@@ -8,6 +8,12 @@
  *
  **/
 
+typedef enum {
+  DwEmmcCardPresenceUnsupported = 0,
+  DwEmmcCardPresent,
+  DwEmmcCardNotPresent
+} DWEMMC_CARD_PRESENCE_STATE;
+
 EFI_STATUS
 EFIAPI
 DwEmmcSetClockRate (
@@ -17,5 +23,11 @@ DwEmmcSetClockRate (
 VOID
 EFIAPI
 DwEmmcSetIoMux (
+  VOID
+  );
+
+DWEMMC_CARD_PRESENCE_STATE
+EFIAPI
+DwEmmcGetCardPresenceState (
   VOID
   );

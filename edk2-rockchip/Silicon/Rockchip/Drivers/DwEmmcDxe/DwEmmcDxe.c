@@ -47,6 +47,17 @@ EFI_GUID mDwEmmcDevicePathGuid = EFI_CALLER_ID_GUID;
 STATIC UINT32 mDwEmmcCommand;
 STATIC UINT32 mDwEmmcArgument;
 
+typedef enum _CARD_DETECT_STATE {
+  CardDetectRequired = 0,
+  CardDetectInProgress,
+  CardDetectCompleted
+} CARD_DETECT_STATE;
+
+STATIC BOOLEAN mCardIsPresent = FALSE;
+STATIC CARD_DETECT_STATE mCardDetectState = CardDetectRequired;
+
+#define CMD8_SD_ARG       (0x0UL << 12 | BIT8 | 0xCEUL << 0)
+
 EFI_STATUS
 DwEmmcReadBlockData (
   IN EFI_MMC_HOST_PROTOCOL     *This,
@@ -70,15 +81,6 @@ DwEmmcInitialize (
 {
     DEBUG ((DEBUG_BLKIO, "DwEmmcInitialize()"));
     return EFI_SUCCESS;
-}
-
-BOOLEAN
-DwEmmcIsCardPresent (
-  IN EFI_MMC_HOST_PROTOCOL     *This
-  )
-{
-  /* check card present */
-  return TRUE;
 }
 
 BOOLEAN
@@ -184,6 +186,11 @@ DwEmmcNotifyState (
 {
   UINT32      Data;
   EFI_STATUS  Status;
+
+  // Stall all operations except init until card detection has occurred.
+  if (State != MmcHwInitializationState && mCardDetectState != CardDetectCompleted) {
+    return EFI_NOT_READY;
+  }
 
   switch (State) {
   case MmcInvalidState:
@@ -701,6 +708,79 @@ DwEmmcIsMultiBlock (
   )
 {
   return TRUE;
+}
+
+BOOLEAN
+DwEmmcIsCardPresent (
+  IN EFI_MMC_HOST_PROTOCOL     *This
+  )
+{
+  EFI_STATUS Status;
+  DWEMMC_CARD_PRESENCE_STATE CardPresenceState;
+
+  CardPresenceState = DwEmmcGetCardPresenceState ();
+
+  if (CardPresenceState != DwEmmcCardPresenceUnsupported) {
+    mCardDetectState = CardDetectCompleted;
+    return CardPresenceState == DwEmmcCardPresent;
+  }
+
+  //
+  // Fall back to software detection if physical presence is not supported.
+  //
+  // If we are already in progress (we may get concurrent calls)
+  // or completed the detection, just return the current value.
+  //
+  if (mCardDetectState != CardDetectRequired) {
+    return mCardIsPresent;
+  }
+
+  mCardDetectState = CardDetectInProgress;
+  mCardIsPresent = FALSE;
+
+  //
+  // The two following commands should succeed even if no card is present.
+  //
+  Status = DwEmmcNotifyState (This, MmcHwInitializationState);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: Error MmcHwInitializationState, Status=%r.\n",
+            __FUNCTION__, Status));
+    // If we failed init, go back to requiring card detection
+    mCardDetectState = CardDetectRequired;
+    return FALSE;
+  }
+
+  Status = DwEmmcSendCommand (This, MMC_CMD0, 0);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: CMD0 Error, Status=%r.\n", __FUNCTION__, Status));
+    goto out;
+  }
+
+  //
+  // CMD8 should tell us if an SD card is present.
+  //
+  Status = DwEmmcSendCommand (This, MMC_CMD8, CMD8_SD_ARG);
+  if (!EFI_ERROR (Status)) {
+     DEBUG ((DEBUG_INFO, "%a: Maybe SD card detected.\n", __FUNCTION__));
+     mCardIsPresent = TRUE;
+     goto out;
+  }
+
+  //
+  // MMC/eMMC won't accept CMD8, but we can try CMD1.
+  //
+  Status = DwEmmcSendCommand (This, MMC_CMD1, EMMC_CMD1_CAPACITY_GREATER_THAN_2GB);
+  if (!EFI_ERROR (Status)) {
+     DEBUG ((DEBUG_INFO, "%a Maybe MMC card detected.\n", __FUNCTION__));
+     mCardIsPresent = TRUE;
+     goto out;
+  }
+
+  DEBUG ((DEBUG_WARN, "%a: Not detected, Status=%r.\n", __FUNCTION__, Status));
+
+out:
+  mCardDetectState = CardDetectCompleted;
+  return mCardIsPresent;
 }
 
 EFI_MMC_HOST_PROTOCOL gMciHost = {

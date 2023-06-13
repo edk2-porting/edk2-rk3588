@@ -23,8 +23,17 @@ DwEmmcSetClockRate (
 VOID
 EFIAPI
 DwEmmcSetIoMux (
-  VOID 
+  VOID
   )
 {
   return;
+}
+
+DWEMMC_CARD_PRESENCE_STATE
+EFIAPI
+DwEmmcGetCardPresenceState (
+  VOID
+  )
+{
+  return DwEmmcCardPresenceUnsupported;
 }
