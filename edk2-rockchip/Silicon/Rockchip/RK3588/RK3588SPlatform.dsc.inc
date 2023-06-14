@@ -6,17 +6,6 @@
 #
 ##
 
-################################################################################
-#
-# Defines Section - statements that will be processed to create a Makefile.
-#
-################################################################################
-[Defines]
-  #
-  # The current drivers only support PCIe 3 x4, which is not present on RK3588S.
-  #
-  # DEFINE RK_PCIE_ENABLE = FALSE
-
 !include Silicon/Rockchip/RK3588/RK3588Base.dsc.inc
 
 ################################################################################

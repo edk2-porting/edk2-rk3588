@@ -48,9 +48,6 @@
 !ifndef RK_860X_REGULATOR_ENABLE
   DEFINE RK_860X_REGULATOR_ENABLE   = TRUE
 !endif
-!ifndef RK_PCIE_ENABLE
-  DEFINE RK_PCIE_ENABLE             = TRUE
-!endif
 !ifndef RK_SD_ENABLE
   DEFINE RK_SD_ENABLE               = TRUE
 !endif
@@ -59,6 +56,13 @@
 !endif
 !ifndef RK_AHCI_ENABLE
   DEFINE RK_AHCI_ENABLE             = TRUE
+!endif
+
+  #
+  # RK3588-specific flags
+  #
+!ifndef RK3588_PCIE_ENABLE
+  DEFINE RK3588_PCIE_ENABLE         = TRUE
 !endif
 
   #
@@ -82,6 +86,15 @@
 
   # SoC and memory descriptors
   ArmPlatformLib|Silicon/Rockchip/RK3588/Library/PlatformLib/PlatformLib.inf
+
+  # PCI Support
+!if $(RK3588_PCIE_ENABLE) == TRUE
+  PciExpressLib|MdePkg/Library/BasePciExpressLib/BasePciExpressLib.inf
+  PciLib|MdePkg/Library/BasePciLibPciExpress/BasePciLibPciExpress.inf
+  PciSegmentLib|Silicon/Rockchip/RK3588/Library/Rk3588PciSegmentLib/Rk3588PciSegmentLib.inf
+  PciHostBridgeLib|Silicon/Rockchip/RK3588/Library/Rk3588PciHostBridgeLib/Rk3588PciHostBridgeLib.inf
+  Pcie30PhyLib|Silicon/Rockchip/RK3588/Library/Pcie30PhyLib/Pcie30PhyLib.inf
+!endif
 
   # DwEmmcDxe dependencies
   DwEmmcPlatformLib|Silicon/Rockchip/RK3588/Library/DwEmmcPlatformLib/DwEmmcPlatformLib.inf
@@ -277,3 +290,14 @@
 [Components.common]
   # General platform manager
   Silicon/Rockchip/RK3588/Drivers/RK3588Dxe/RK3588Dxe.inf
+
+  #
+  # PCI Support
+  #
+!if $(RK3588_PCIE_ENABLE) == TRUE
+  ArmPkg/Drivers/ArmPciCpuIo2Dxe/ArmPciCpuIo2Dxe.inf
+  MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
+  MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
+  EmbeddedPkg/Drivers/NonCoherentIoMmuDxe/NonCoherentIoMmuDxe.inf
+  MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
+!endif

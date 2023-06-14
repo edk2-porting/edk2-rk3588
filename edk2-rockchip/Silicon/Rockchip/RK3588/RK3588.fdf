@@ -111,6 +111,17 @@ READ_LOCK_STATUS   = TRUE
   INF Silicon/Rockchip/RK3588/Drivers/RK3588Dxe/RK3588Dxe.inf
 
   #
+  # PCI Support
+  #
+!if $(RK3588_PCIE_ENABLE) == TRUE
+  INF ArmPkg/Drivers/ArmPciCpuIo2Dxe/ArmPciCpuIo2Dxe.inf
+  INF MdeModulePkg/Bus/Pci/PciBusDxe/PciBusDxe.inf
+  INF MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf
+  INF MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
+  INF EmbeddedPkg/Drivers/NonCoherentIoMmuDxe/NonCoherentIoMmuDxe.inf
+!endif
+
+  #
   # Custom platform components
   #
 !include $(RK_PLATFORM_FVMAIN_MODULES)
