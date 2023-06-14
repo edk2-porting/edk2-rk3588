@@ -17,9 +17,13 @@
 [PcdsFixedAtBuild.common]
   # SMBIOS platform config
   gRockchipTokenSpaceGuid.PcdProcessorName|"Rockchip RK3588S"
-  gRK3588TokenSpaceGuid.PcdSocIs3588S|TRUE
 
   #
   # DWC3 controller
   #
   gRockchipTokenSpaceGuid.PcdDwc3BaseAddresses|{ UINT32(0xfc000000), UINT32(0xfcd00000) }
+
+  #
+  # PCI Express 3.0 support flags and default values
+  #
+  gRK3588TokenSpaceGuid.PcdPcie30Supported|FALSE

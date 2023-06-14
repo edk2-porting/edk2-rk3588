@@ -245,6 +245,11 @@
   gRK3588TokenSpaceGuid.PcdComboPhy1ModeDefault|$(COMBO_PHY_MODE_UNCONNECTED)
   gRK3588TokenSpaceGuid.PcdComboPhy2ModeDefault|$(COMBO_PHY_MODE_UNCONNECTED)
 
+  #
+  # PCI Express 3.0 support flags and default values
+  #
+  gRK3588TokenSpaceGuid.PcdPcie30Supported|FALSE
+
 [PcdsDynamicDefault.common]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64|0x007C0000
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64|0x007CF000
@@ -281,6 +286,11 @@
   gRK3588TokenSpaceGuid.PcdComboPhy0Mode|L"ComboPhy0Mode"|gRK3588DxeFormSetGuid|0x0|gRK3588TokenSpaceGuid.PcdComboPhy0ModeDefault
   gRK3588TokenSpaceGuid.PcdComboPhy1Mode|L"ComboPhy1Mode"|gRK3588DxeFormSetGuid|0x0|gRK3588TokenSpaceGuid.PcdComboPhy1ModeDefault
   gRK3588TokenSpaceGuid.PcdComboPhy2Mode|L"ComboPhy2Mode"|gRK3588DxeFormSetGuid|0x0|gRK3588TokenSpaceGuid.PcdComboPhy2ModeDefault
+
+  #
+  # PCI Express 3.0
+  #
+  gRK3588TokenSpaceGuid.PcdPcie30State|L"Pcie30State"|gRK3588DxeFormSetGuid|0x0|gRK3588TokenSpaceGuid.PcdPcie30Supported
 
 ################################################################################
 #

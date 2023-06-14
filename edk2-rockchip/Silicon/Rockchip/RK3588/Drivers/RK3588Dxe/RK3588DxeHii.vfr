@@ -105,6 +105,11 @@ formset
       name  = ComboPhy2Mode,
       guid  = RK3588DXE_FORMSET_GUID;
 
+    efivarstore PCIE30_STATE_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = Pcie30State,
+      guid  = RK3588DXE_FORMSET_GUID;
+
     form formid = 1,
       title  = STRING_TOKEN(STR_FORM_SET_TITLE);
       subtitle text = STRING_TOKEN(STR_FORM_SET_TITLE_SUBTITLE);
@@ -118,6 +123,12 @@ formset
       goto 0x1001,
         prompt = STRING_TOKEN(STR_COMBO_PHY_FORM_TITLE),
         help = STRING_TOKEN(STR_COMBO_PHY_FORM_HELP);
+
+#if FixedPcdGetBool (PcdPcie30Supported)
+      goto 0x1002,
+        prompt = STRING_TOKEN(STR_PCIE30_FORM_TITLE),
+        help = STRING_TOKEN(STR_PCIE30_FORM_HELP);
+#endif
     endform;
 
     form formid = 0x1000,
@@ -351,4 +362,19 @@ formset
         subtitle text = STRING_TOKEN(STR_NULL_STRING);
         subtitle text = STRING_TOKEN(STR_COMBO_PHY_FORM_SUBTITLE);
     endform;
+
+#if FixedPcdGetBool (PcdPcie30Supported)
+    form formid = 0x1002,
+        title  = STRING_TOKEN(STR_PCIE30_FORM_TITLE);
+
+        oneof varid = Pcie30State.State,
+          prompt      = STRING_TOKEN(STR_PCIE30_STATE_PROMPT),
+          help        = STRING_TOKEN(STR_PCIE30_STATE_HELP),
+          flags       = NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+          default     = PCIE30_STATE_ENABLED,
+          option text = STRING_TOKEN(STR_PCIE30_STATE_DISABLED), value = PCIE30_STATE_DISABLED, flags = 0;
+          option text = STRING_TOKEN(STR_PCIE30_STATE_ENABLED), value = PCIE30_STATE_ENABLED, flags = 0;
+        endoneof;
+    endform;
+#endif
 endformset;

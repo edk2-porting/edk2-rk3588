@@ -21,6 +21,8 @@
 #include <Library/Pcie30PhyLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <IndustryStandard/Pci.h>
+#include <VarStoreData.h>
+
 #include "PciHostBridgeInit.h"
 
 /* APB Registers */
@@ -99,7 +101,7 @@ IsPcieNumEnabled(
   {
 	/* No bifurcation config yet */
 	case PCIE_SEGMENT_PCIE30X4:
-		Enabled = TRUE;
+		Enabled = (FixedPcdGetBool (PcdPcie30Supported) && PcdGet32 (PcdPcie30State) == PCIE30_STATE_ENABLED);
 		break;
 
 	case PCIE_SEGMENT_PCIE30X2:
@@ -107,23 +109,21 @@ IsPcieNumEnabled(
 		break;
 
 	case PCIE_SEGMENT_PCIE20L0:
-		Enabled = (PcdGet32(PcdComboPhy1Mode) == 1); // COMBO_PHY_MODE_PCIE
+		Enabled = (PcdGet32(PcdComboPhy1Mode) == COMBO_PHY_MODE_PCIE);
 		break;
 
 	case PCIE_SEGMENT_PCIE20L1:
-		Enabled = (PcdGet32(PcdComboPhy2Mode) == 1); // COMBO_PHY_MODE_PCIE
+		Enabled = (PcdGet32(PcdComboPhy2Mode) == COMBO_PHY_MODE_PCIE);
 		break;
 
 	case PCIE_SEGMENT_PCIE20L2:
-		Enabled = (PcdGet32(PcdComboPhy0Mode) == 1); // COMBO_PHY_MODE_PCIE
+		Enabled = (PcdGet32(PcdComboPhy0Mode) == COMBO_PHY_MODE_PCIE);
 		break;
 
 	default:
 	  break;
   }
 
-  if(FixedPcdGetBool(PcdSocIs3588S) == TRUE && (PcieNum == PCIE_SEGMENT_PCIE30X4 || PcieNum == PCIE_SEGMENT_PCIE30X2))
-    Enabled = FALSE;
   return Enabled;
 }
 

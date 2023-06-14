@@ -32,6 +32,7 @@
 #include "RK3588DxeFormSetGuid.h"
 #include "CpuPerformance.h"
 #include "ComboPhy.h"
+#include "PciExpress30.h"
 
 extern UINT8 RK3588DxeHiiBin[];
 extern UINT8 RK3588DxeStrings[];
@@ -153,6 +154,7 @@ SetupVariables (
 {
   SetupCpuPerfVariables ();
   SetupComboPhyVariables ();
+  SetupPcie30Variables ();
 
   return EFI_SUCCESS;
 }
@@ -176,6 +178,7 @@ ApplyVariables (
 {
   ApplyCpuClockVariables ();
   ApplyComboPhyVariables ();
+  ApplyPcie30Variables ();
 
   AfterApplyVariablesInit ();
 }

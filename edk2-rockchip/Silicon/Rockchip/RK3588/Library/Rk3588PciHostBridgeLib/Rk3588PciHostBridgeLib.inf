@@ -43,7 +43,6 @@
   Pcie30PhyLib
 
 [FixedPcd]
-  gRK3588TokenSpaceGuid.PcdSocIs3588S
   gRockchipTokenSpaceGuid.PcdPcieRootPort3x4ApbBaseAddress
   gRockchipTokenSpaceGuid.PcdPcieRootPort3x4DbiBaseAddress
   gRockchipTokenSpaceGuid.PcdPcieRootPort3x4CfgBaseAddress
@@ -54,8 +53,11 @@
   gRockchipTokenSpaceGuid.PcdPcieRootPort3x4MemSize
   gRockchipTokenSpaceGuid.PcdPcieRootPort3x4MemBaseAddress64
   gRockchipTokenSpaceGuid.PcdPcieRootPort3x4MemSize64
+  gRK3588TokenSpaceGuid.PcdPcie30Supported
 
 [Pcd]
   gRK3588TokenSpaceGuid.PcdComboPhy0Mode
   gRK3588TokenSpaceGuid.PcdComboPhy1Mode
   gRK3588TokenSpaceGuid.PcdComboPhy2Mode
+
+  gRK3588TokenSpaceGuid.PcdPcie30State

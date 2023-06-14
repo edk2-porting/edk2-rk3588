@@ -1,7 +1,7 @@
 /** @file
  *
  *  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
- *           
+ *
  *  SPDX-License-Identifier: BSD-2-Clause-Patent
  *
  **/
@@ -38,5 +38,11 @@ typedef struct {
 typedef struct {
   UINT32 Mode;
 } COMBO_PHY_MODE_VARSTORE_DATA;
+
+#define PCIE30_STATE_DISABLED                       0
+#define PCIE30_STATE_ENABLED                        1
+typedef struct {
+  UINT32 State;
+} PCIE30_STATE_VARSTORE_DATA;
 
 #endif // __VARSTORE_DATA_H__

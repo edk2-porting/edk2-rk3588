@@ -22,3 +22,8 @@
   # DWC3 controller
   #
   gRockchipTokenSpaceGuid.PcdDwc3BaseAddresses|{ UINT32(0xfc000000), UINT32(0xfc400000), UINT32(0xfcd00000) }
+
+  #
+  # PCI Express 3.0 support flags and default values
+  #
+  gRK3588TokenSpaceGuid.PcdPcie30Supported|TRUE

@@ -96,3 +96,15 @@
 #string STR_COMBO_PHY_MODE_DEFAULT_PCIE_HELP               #language en-US "This PHY may be wired to an M.2, Mini PCIe slot or a permanent device (such as Wi-Fi or Ethernet controller).\n\nConsult your platform's documentation for details on potential alternate modes, such as SATA or USB."
 #string STR_COMBO_PHY_MODE_DEFAULT_SATA_HELP               #language en-US "This PHY may be wired to an M.2 or SATA slot.\n\nConsult your platform's documentation for details on potential alternate modes, such as PCIe or USB."
 #string STR_COMBO_PHY_MODE_DEFAULT_USB3_HELP               #language en-US "This PHY is wired to an USB 3.1 Gen 1 Type-A port.\n\nConsult your platform's documentation for details on potential alternate modes, such as PCIe or SATA (via non-standard adapters)."
+
+/*
+ * PCI Express 3.0 configuration
+ */
+#string STR_PCIE30_FORM_TITLE                              #language en-US "PCI Express 3.0"
+#string STR_PCIE30_FORM_HELP                               #language en-US "Configure the PCIe 3.0 operation modes."
+
+#string STR_PCIE30_STATE_PROMPT                            #language en-US "Support State"
+#string STR_PCIE30_STATE_DISABLED                          #language en-US "Disabled"
+#string STR_PCIE30_STATE_ENABLED                           #language en-US "Enabled"
+
+#string STR_PCIE30_STATE_HELP                              #language en-US "Enable or disable PCIe 3.0 support."
