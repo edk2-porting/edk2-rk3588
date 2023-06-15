@@ -88,9 +88,6 @@
 #define IATU_LWR_TARGET_ADDR_OFF        0x014
 #define IATU_UPPER_TARGET_ADDR_OFF      0x018
 
-#define PHP_GRF_BASE 0xFD5B0000
-#define PHP_GRF_PCIESEL_CON 0x100
-
 BOOLEAN
 IsPcieNumEnabled(
   UINTN PcieNum
@@ -506,15 +503,7 @@ InitializePciHost (
     Pcie30PhyInit ();
   }
 
-  if (Segment == PCIE_SEGMENT_PCIE20L0) {
-    // route pcie1l0 to combphy
-    MmioWrite32 (PHP_GRF_BASE + PHP_GRF_PCIESEL_CON, BIT0 << 16);
-  }
-
-  if (Segment == PCIE_SEGMENT_PCIE20L1) {
-    // route pcie1l1 to combphy
-    MmioWrite32 (PHP_GRF_BASE + PHP_GRF_PCIESEL_CON, BIT1 << 16);
-  }
+  /* Combo PHY for PCIe 2.0 is configured earlier by RK3588Dxe */
 
   DEBUG ((DEBUG_ERROR, "PCIe: Setup clocks\n"));
   PciSetupClocks (Segment);

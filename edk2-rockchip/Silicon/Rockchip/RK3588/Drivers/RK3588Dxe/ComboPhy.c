@@ -16,10 +16,21 @@
 #include "RK3588DxeFormSetGuid.h"
 #include "ComboPhy.h"
 
+#define COMBO_PIPE_PHY0         0xFEE00000
+#define COMBO_PIPE_PHY1         0xFEE10000
+#define COMBO_PIPE_PHY2         0xFEE20000
+
+#define PHP_GRF_BASE            0xFD5B0000
+#define PHP_GRF_PCIESEL_CON     0x100
+
+#define PIPE_PHY0_GRF           0xFD5BC000
+#define PIPE_PHY1_GRF           0xFD5C0000
+#define PIPE_PHY2_GRF           0xFD5C4000
+
 static UINTN ComPhyReg[3][2] = {
-  {0xFEE00000, 0xFD5BC000},
-  {0xFEE10000, 0xFD5C0000},
-  {0xFEE20000, 0xFD5C4000},
+  { COMBO_PIPE_PHY0, PIPE_PHY0_GRF },
+  { COMBO_PIPE_PHY1, PIPE_PHY1_GRF },
+  { COMBO_PIPE_PHY2, PIPE_PHY2_GRF },
 };
 
 STATIC
@@ -58,6 +69,13 @@ InitComPhyConfig (
       MmioWrite32 (PhyBaseAddr + (0xb << 2), 0x47);
       MmioWrite32 (PhyBaseAddr + (0xd << 2), 0x57);
 
+      if (PhyBaseAddr == COMBO_PIPE_PHY0) {
+        MmioWrite32 (PHP_GRF_BASE + PHP_GRF_PCIESEL_CON, BIT0 << 16);
+      }
+
+      if (PhyBaseAddr == COMBO_PIPE_PHY1) {
+        MmioWrite32 (PHP_GRF_BASE + PHP_GRF_PCIESEL_CON, BIT1 << 16);
+      }
       break;
 
     case COMBO_PHY_MODE_SATA:
@@ -151,8 +169,8 @@ ApplyComboPhyVariables (
     InitComPhyConfig (ComPhyReg[Index][0], ComPhyReg[Index][1], ComPhyMode[Index]);
   }
 
-  MmioWrite32 (0xfd5b0000 + 0x0, 0x07E00440);
-  MmioWrite32 (0xfd5b0000 + 0x4, 0x00070002);
+  MmioWrite32 (PHP_GRF_BASE + 0x0, 0x07E00440);
+  MmioWrite32 (PHP_GRF_BASE + 0x4, 0x00070002);
 
   /* reset deassert */
   MmioWrite32 (0xfd7c0000 + 0x0b34, 0x01c00000);
