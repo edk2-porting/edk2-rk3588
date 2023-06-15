@@ -30,16 +30,6 @@
   DEFINE COMBO_PHY_MODE_USB3          = 3
 
   #
-  # Network definition
-  #
-  DEFINE NETWORK_SNP_ENABLE             = FALSE
-  DEFINE NETWORK_IP6_ENABLE             = FALSE
-  DEFINE NETWORK_TLS_ENABLE             = FALSE
-  DEFINE NETWORK_HTTP_BOOT_ENABLE       = FALSE
-  DEFINE NETWORK_ISCSI_ENABLE           = FALSE
-  DEFINE NETWORK_VLAN_ENABLE            = FALSE
-
-  #
   # Default peripheral support flags
   #
 !ifndef RK_NOR_FLASH_ENABLE

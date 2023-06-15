@@ -148,6 +148,7 @@
   FmpAuthenticationLib|SecurityPkg/Library/FmpAuthenticationLibPkcs7/FmpAuthenticationLibPkcs7.inf
   EdkiiSystemCapsuleLib|SignedCapsulePkg/Library/EdkiiSystemCapsuleLib/EdkiiSystemCapsuleLib.inf
   IniParsingLib|SignedCapsulePkg/Library/IniParsingLib/IniParsingLib.inf
+  TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
   #PlatformFlashAccessLib|Silicon/Rockchip/Library/PlatformFlashAccessLib/PlatformFlashAccessLibDxe.inf
 
   #
@@ -589,10 +590,22 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
   #
 !include NetworkPkg/Network.dsc.inc
 
+!if $(NETWORK_ENABLE) == TRUE
+  #
+  # Realtek PCIe UNDI Driver
+  #
+  Drivers/Realtek/Bus/Pcie/PcieNetworking/RtkUndiDxe.inf
+
+  #
+  # Realtek USB UNDI Driver
+  #
+  Drivers/Realtek/Bus/Usb/UsbNetworking/RtkUsbUndiDxe.inf
+
   #
   # AX88772 Ethernet Driver for Apple Ethernet Adapter
   #
   Drivers/ASIX/Bus/Usb/UsbNetworking/Ax88772c/Ax88772c.inf
+!endif
 
   #
   # Bds

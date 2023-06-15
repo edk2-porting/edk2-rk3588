@@ -161,10 +161,22 @@
   #
 !include NetworkPkg/Network.fdf.inc
 
+!if $(NETWORK_ENABLE) == TRUE
+  #
+  # Realtek PCIe UNDI Driver
+  #
+  INF Drivers/Realtek/Bus/Pcie/PcieNetworking/RtkUndiDxe.inf
+
+  #
+  # Realtek USB UNDI Driver
+  #
+  INF Drivers/Realtek/Bus/Usb/UsbNetworking/RtkUsbUndiDxe.inf
+
   #
   # AX88772 Ethernet Driver for Apple Ethernet Adapter
   #
   INF Drivers/ASIX/Bus/Usb/UsbNetworking/Ax88772c/Ax88772c.inf
+!endif
 
   #
   # Bds
