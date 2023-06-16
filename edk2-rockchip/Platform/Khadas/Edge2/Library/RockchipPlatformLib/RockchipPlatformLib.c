@@ -10,6 +10,7 @@
 #include <Library/IoLib.h>
 #include <Library/GpioLib.h>
 #include <Library/RK806.h>
+#include <Library/Rk3588Pcie.h>
 #include <Soc.h>
 
 static struct regulator_init_data rk806_init_data[] = {
@@ -138,22 +139,7 @@ GmacIomux (
    UINT32 id
   )
 {
-  switch (id) {
-  case 0:
-    /* gmac0 iomux */
-    BUS_IOC->GPIO2A_IOMUX_SEL_H = (0xFF00UL << 16) | 0x1100;
-    BUS_IOC->GPIO2B_IOMUX_SEL_L = (0xFFFFUL << 16) | 0x1111;
-    BUS_IOC->GPIO2B_IOMUX_SEL_H = (0xFF00UL << 16) | 0x1100;
-    BUS_IOC->GPIO2C_IOMUX_SEL_L = (0xFFFFUL << 16) | 0x1111;
-    BUS_IOC->GPIO4C_IOMUX_SEL_L = (0x0F00UL << 16) | 0x0100;
-    BUS_IOC->GPIO4C_IOMUX_SEL_H = (0x00FFUL << 16) | 0x0011;
-    break;
-  case 1:
-    /* gmac1 iomux */
-    break;
-  default:
-    break;
-  }
+  /* No GMAC here */
 }
 
 VOID
@@ -246,7 +232,7 @@ UsbDpPhyEnable (
   /* enable rx_lfps_en & usbdp_low_pwrn */
   MmioWrite32(0xfd5c8004, 0x60006000);
   MmioWrite32(0xfd5cc004, 0x60006000);
-  
+
   /* remove rx-termination, we don't support SS yet */
   MmioWrite32 (0xfd5c800c, 0x00030001);
   MmioWrite32 (0xfd5cc00c, 0x00030001);
@@ -258,7 +244,13 @@ PcieIoInit (
   UINT32 Segment
   )
 {
-  /* not applicable */
+  /* Set reset to gpio output mode */
+  if(Segment == PCIE_SEGMENT_PCIE20L2) { // AP6275P Wi-Fi
+    GpioPinSetDirection (3, GPIO_PIN_PD1, GPIO_PIN_OUTPUT);
+
+    /* wifi_poweren_gpio */
+    GpioPinSetDirection (0, GPIO_PIN_PC4, GPIO_PIN_OUTPUT);
+  }
 }
 
 VOID
@@ -268,7 +260,10 @@ PciePowerEn (
   BOOLEAN Enable
   )
 {
-  /* not applicable */
+  if(Segment == PCIE_SEGMENT_PCIE20L2) {
+    /* wifi_poweren_gpio */
+    GpioPinWrite (0, GPIO_PIN_PC4, Enable);
+  }
 }
 
 VOID
@@ -278,7 +273,9 @@ PciePeReset (
   BOOLEAN Enable
   )
 {
-  /* not applicable */
+  if(Segment == PCIE_SEGMENT_PCIE20L2) {
+    GpioPinWrite (3, GPIO_PIN_PD1, !Enable);
+  }
 }
 
 VOID

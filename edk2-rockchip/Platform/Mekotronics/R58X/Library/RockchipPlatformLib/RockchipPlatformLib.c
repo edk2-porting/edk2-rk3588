@@ -10,6 +10,7 @@
 #include <Library/IoLib.h>
 #include <Library/GpioLib.h>
 #include <Library/RK806.h>
+#include <Library/Rk3588Pcie.h>
 #include <Soc.h>
 
 static struct regulator_init_data rk806_init_data[] = {
@@ -245,7 +246,7 @@ UsbDpPhyEnable (
   /* enable rx_lfps_en & usbdp_low_pwrn */
   MmioWrite32(0xfd5c8004, 0x60006000);
   MmioWrite32(0xfd5cc004, 0x60006000);
-  
+
   /* remove rx-termination, we don't support SS yet */
   MmioWrite32 (0xfd5c800c, 0x00030001);
   MmioWrite32 (0xfd5cc00c, 0x00030001);
@@ -258,8 +259,23 @@ PcieIoInit (
   )
 {
   /* Set reset and power IO to gpio output mode */
-  GpioPinSetDirection (4, GPIO_PIN_PB6, GPIO_PIN_OUTPUT);
-  GpioPinSetDirection (1, GPIO_PIN_PC4, GPIO_PIN_OUTPUT);
+  switch(Segment) {
+    case PCIE_SEGMENT_PCIE30X4: // M.2 M Key
+      /* reset */
+      GpioPinSetDirection (4, GPIO_PIN_PB6, GPIO_PIN_OUTPUT);
+      /* vcc3v3_pcie30 */
+      GpioPinSetDirection (1, GPIO_PIN_PC4, GPIO_PIN_OUTPUT);
+      break;
+    case PCIE_SEGMENT_PCIE20L0: // AP6275P Wi-Fi
+      /* reset */
+      GpioPinSetDirection (1, GPIO_PIN_PB4, GPIO_PIN_OUTPUT);
+
+      /* wifi_poweren_gpio */
+      GpioPinSetDirection (1, GPIO_PIN_PB1, GPIO_PIN_OUTPUT);
+      break;
+    default:
+      break;
+  }
 }
 
 VOID
@@ -269,8 +285,18 @@ PciePowerEn (
   BOOLEAN Enable
   )
 {
-  /* output high to enable power */
-  GpioPinWrite (1, GPIO_PIN_PC4, TRUE);
+  switch(Segment) {
+    case PCIE_SEGMENT_PCIE30X4:
+      /* vcc3v3_pcie30 */
+      GpioPinWrite (1, GPIO_PIN_PC4, Enable);
+      break;
+    case PCIE_SEGMENT_PCIE20L0:
+      /* wifi_poweren_gpio */
+      GpioPinWrite (1, GPIO_PIN_PB1, Enable);
+      break;
+    default:
+      break;
+  }
 }
 
 VOID
@@ -280,10 +306,16 @@ PciePeReset (
   BOOLEAN Enable
   )
 {
-  if(enable)
-    GpioPinWrite (4, GPIO_PIN_PB6, FALSE); /* output low */
-  else
-    GpioPinWrite (4, GPIO_PIN_PB6, TRUE); /* output high */
+  switch(Segment) {
+    case PCIE_SEGMENT_PCIE30X4:
+      GpioPinWrite (4, GPIO_PIN_PB6, !Enable);
+      break;
+    case PCIE_SEGMENT_PCIE20L0:
+      GpioPinWrite (1, GPIO_PIN_PB4, !Enable);
+      break;
+    default:
+      break;
+  }
 }
 
 VOID

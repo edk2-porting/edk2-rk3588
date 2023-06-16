@@ -10,6 +10,7 @@
 #include <Library/IoLib.h>
 #include <Library/GpioLib.h>
 #include <Library/RK806.h>
+#include <Library/Rk3588Pcie.h>
 #include <Soc.h>
 #include <Library/UefiBootServicesTableLib.h>
 
@@ -248,7 +249,7 @@ UsbDpPhyEnable (
   /* enable rx_lfps_en & usbdp_low_pwrn */
   MmioWrite32(0xfd5c8004, 0x60006000);
   MmioWrite32(0xfd5cc004, 0x60006000);
-  
+
   /* remove rx-termination, we don't support SS yet */
   MmioWrite32 (0xfd5c800c, 0x00030001);
   MmioWrite32 (0xfd5cc00c, 0x00030001);
@@ -261,8 +262,12 @@ PcieIoInit (
   )
 {
   /* Set reset and power IO to gpio output mode */
-  GpioPinSetDirection (4, GPIO_PIN_PB6, GPIO_PIN_OUTPUT);
-  GpioPinSetDirection (1, GPIO_PIN_PA4, GPIO_PIN_OUTPUT);
+  if(Segment == PCIE_SEGMENT_PCIE20L2) { // M.2 M Key
+    /* reset */
+    GpioPinSetDirection (3, GPIO_PIN_PD1, GPIO_PIN_OUTPUT);
+    /* vcc3v3_pcie20 */
+    GpioPinSetDirection (1, GPIO_PIN_PD7, GPIO_PIN_OUTPUT);
+  }
 }
 
 VOID
@@ -272,8 +277,10 @@ PciePowerEn (
   BOOLEAN Enable
   )
 {
-  /* output high to enable power */
-  GpioPinWrite (1, GPIO_PIN_PA4, TRUE);
+  if(Segment == PCIE_SEGMENT_PCIE20L2) {
+    /* vcc3v3_pcie20 */
+    GpioPinWrite (1, GPIO_PIN_PD7, Enable);
+  }
 }
 
 VOID
@@ -283,10 +290,9 @@ PciePeReset (
   BOOLEAN Enable
   )
 {
-  if(enable)
-    GpioPinWrite (4, GPIO_PIN_PB6, FALSE); /* output low */
-  else
-    GpioPinWrite (4, GPIO_PIN_PB6, TRUE); /* output high */
+  if(Segment == PCIE_SEGMENT_PCIE20L2) {
+    GpioPinWrite (3, GPIO_PIN_PD1, !Enable);
+  }
 }
 
 VOID

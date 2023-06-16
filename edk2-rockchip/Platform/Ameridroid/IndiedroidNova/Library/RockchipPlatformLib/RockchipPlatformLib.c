@@ -119,22 +119,7 @@ GmacIomux (
    UINT32 id
   )
 {
-  switch (id) {
-  case 0:
-    /* gmac0 iomux */
-    BUS_IOC->GPIO2A_IOMUX_SEL_H = (0xFF00UL << 16) | 0x1100;
-    BUS_IOC->GPIO2B_IOMUX_SEL_L = (0xFFFFUL << 16) | 0x1111;
-    BUS_IOC->GPIO2B_IOMUX_SEL_H = (0xFF00UL << 16) | 0x1100;
-    BUS_IOC->GPIO2C_IOMUX_SEL_L = (0xFFFFUL << 16) | 0x1111;
-    BUS_IOC->GPIO4C_IOMUX_SEL_L = (0x0F00UL << 16) | 0x0100;
-    BUS_IOC->GPIO4C_IOMUX_SEL_H = (0x00FFUL << 16) | 0x0011;
-    break;
-  case 1:
-    /* gmac1 iomux */
-    break;
-  default:
-    break;
-  }
+  /* No GMAC here */
 }
 
 VOID
@@ -219,7 +204,7 @@ UsbDpPhyEnable (
   /* enable rx_lfps_en & usbdp_low_pwrn */
   MmioWrite32(0xfd5c8004, 0x60006000);
   MmioWrite32(0xfd5cc004, 0x60006000);
-  
+
   /* remove rx-termination, we don't support SS yet */
   MmioWrite32 (0xfd5c800c, 0x00030001);
   MmioWrite32 (0xfd5cc00c, 0x00030001);
@@ -231,18 +216,10 @@ PcieIoInit (
   UINT32 Segment
   )
 {
-  /* Set reset and power IO to gpio output mode */
-  switch(Segment) {
-    case PCIE_SEGMENT_PCIE30X4:
-    case PCIE_SEGMENT_PCIE30X2:
-      GpioPinSetDirection (4, GPIO_PIN_PB6, GPIO_PIN_OUTPUT);
-      GpioPinSetDirection (1, GPIO_PIN_PA4, GPIO_PIN_OUTPUT);
-      break;
-    
-    default:
-      break;
+  /* Set reset to gpio output mode */
+  if(Segment == PCIE_SEGMENT_PCIE20L2) { // RTL8111
+    GpioPinSetDirection (3, GPIO_PIN_PD1, GPIO_PIN_OUTPUT);
   }
-  
 }
 
 VOID
@@ -252,8 +229,7 @@ PciePowerEn (
   BOOLEAN Enable
   )
 {
-  /* output high to enable power */
-  GpioPinWrite (1, GPIO_PIN_PA4, TRUE);
+  /* nothing to power on */
 }
 
 VOID
@@ -263,10 +239,9 @@ PciePeReset (
   BOOLEAN Enable
   )
 {
-  if(enable)
-    GpioPinWrite (4, GPIO_PIN_PB6, FALSE); /* output low */
-  else
-    GpioPinWrite (4, GPIO_PIN_PB6, TRUE); /* output high */
+  if(Segment == PCIE_SEGMENT_PCIE20L2) {
+    GpioPinWrite (3, GPIO_PIN_PD1, !Enable);
+  }
 }
 
 VOID

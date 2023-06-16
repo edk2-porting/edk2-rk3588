@@ -10,6 +10,7 @@
 #include <Library/IoLib.h>
 #include <Library/GpioLib.h>
 #include <Library/RK806.h>
+#include <Library/Rk3588Pcie.h>
 #include <Soc.h>
 
 static struct regulator_init_data rk806_init_data[] = {
@@ -242,40 +243,45 @@ UsbDpPhyEnable (
   /* enable rx_lfps_en & usbdp_low_pwrn */
   MmioWrite32(0xfd5c8004, 0x60006000);
   MmioWrite32(0xfd5cc004, 0x60006000);
-  
+
   /* remove rx-termination, we don't support SS yet */
   MmioWrite32 (0xfd5c800c, 0x00030001);
   MmioWrite32 (0xfd5cc00c, 0x00030001);
 }
 
-/* Orange Pi5 does not have PCIe3.0, wait for PCIe2 support and re-add it.
 VOID
 EFIAPI
-Pcie30IoInit(VOID)
+PcieIoInit (
+  UINT32 Segment
+  )
 {
-  // Set reset and power IO to gpio output mode
-  GpioPinSetDirection (4, GPIO_PIN_PB6, GPIO_PIN_OUTPUT);
-  GpioPinSetDirection (1, GPIO_PIN_PA4, GPIO_PIN_OUTPUT);
+  /* Set reset to gpio output mode */
+  if(Segment == PCIE_SEGMENT_PCIE20L2) { // M.2 M Key
+    GpioPinSetDirection (3, GPIO_PIN_PD1, GPIO_PIN_OUTPUT);
+  }
 }
 
 VOID
 EFIAPI
-Pcie30PowerEn(VOID)
+PciePowerEn (
+  UINT32 Segment,
+  BOOLEAN Enable
+  )
 {
-  // output high to enable power
-  GpioPinWrite (1, GPIO_PIN_PA4, TRUE);
+  /* nothing to power on */
 }
 
 VOID
 EFIAPI
-Pcie30PeReset(BOOLEAN enable)
+PciePeReset (
+  UINT32 Segment,
+  BOOLEAN Enable
+  )
 {
-  if(enable)
-    GpioPinWrite (4, GPIO_PIN_PB6, FALSE); // output low
-  else
-    GpioPinWrite (4, GPIO_PIN_PB6, TRUE); // output high
+  if(Segment == PCIE_SEGMENT_PCIE20L2) {
+    GpioPinWrite (3, GPIO_PIN_PD1, !Enable);
+  }
 }
-*/
 
 VOID
 EFIAPI

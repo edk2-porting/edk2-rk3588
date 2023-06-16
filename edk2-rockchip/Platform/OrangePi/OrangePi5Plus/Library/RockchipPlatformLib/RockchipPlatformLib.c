@@ -10,6 +10,7 @@
 #include <Library/IoLib.h>
 #include <Library/GpioLib.h>
 #include <Library/RK806.h>
+#include <Library/Rk3588Pcie.h>
 #include <Soc.h>
 
 static struct regulator_init_data rk806_init_data[] = {
@@ -138,22 +139,7 @@ GmacIomux (
    UINT32 id
   )
 {
-  switch (id) {
-  case 0:
-    /* gmac0 iomux */
-    BUS_IOC->GPIO2A_IOMUX_SEL_H = (0xFF00UL << 16) | 0x1100;
-    BUS_IOC->GPIO2B_IOMUX_SEL_L = (0xFFFFUL << 16) | 0x1111;
-    BUS_IOC->GPIO2B_IOMUX_SEL_H = (0xFF00UL << 16) | 0x1100;
-    BUS_IOC->GPIO2C_IOMUX_SEL_L = (0xFFFFUL << 16) | 0x1111;
-    BUS_IOC->GPIO4C_IOMUX_SEL_L = (0x0F00UL << 16) | 0x0100;
-    BUS_IOC->GPIO4C_IOMUX_SEL_H = (0x00FFUL << 16) | 0x0011;
-    break;
-  case 1:
-    /* gmac1 iomux */
-    break;
-  default:
-    break;
-  }
+  /* No GMAC here */
 }
 
 VOID
@@ -250,29 +236,88 @@ UsbDpPhyEnable (
 
 VOID
 EFIAPI
-Pcie30IoInit(VOID)
+PcieIoInit (
+  UINT32 Segment
+  )
 {
-  // Set reset and power IO to gpio output mode
-  GpioPinSetDirection (4, GPIO_PIN_PB6, GPIO_PIN_OUTPUT);
-  GpioPinSetDirection (2, GPIO_PIN_PB6, GPIO_PIN_OUTPUT);
+  /* Set reset and power IO to gpio output mode */
+  switch(Segment) {
+    case PCIE_SEGMENT_PCIE30X4: // M.2 M Key
+      /* reset */
+      GpioPinSetDirection (4, GPIO_PIN_PB6, GPIO_PIN_OUTPUT);
+      /* vcc3v3_pcie30 */
+      GpioPinSetDirection (2, GPIO_PIN_PB6, GPIO_PIN_OUTPUT);
+      break;
+    case PCIE_SEGMENT_PCIE20L0: // M.2 A+E Key
+      /* reset */
+      GpioPinSetDirection (4, GPIO_PIN_PA5, GPIO_PIN_OUTPUT);
+      /* vcc3v3_pcie2x1l0 */
+      GpioPinSetDirection (2, GPIO_PIN_PC5, GPIO_PIN_OUTPUT);
+      break;
+    case PCIE_SEGMENT_PCIE20L1: // RTL8125B
+      /* reset */
+      GpioPinSetDirection (3, GPIO_PIN_PB3, GPIO_PIN_OUTPUT);
+      break;
+    case PCIE_SEGMENT_PCIE20L2: // RTL8125B
+      /* reset */
+      GpioPinSetDirection (4, GPIO_PIN_PA2, GPIO_PIN_OUTPUT);
+      break;
+    default:
+      break;
+  }
+  if (Segment == PCIE_SEGMENT_PCIE20L1 || Segment == PCIE_SEGMENT_PCIE20L2) {
+    /* vcc3v3_pcie_eth */
+    GpioPinSetDirection (3, GPIO_PIN_PB4, GPIO_PIN_OUTPUT);
+  }
 }
 
 VOID
 EFIAPI
-Pcie30PowerEn(VOID)
+PciePowerEn (
+  UINT32 Segment,
+  BOOLEAN Enable
+  )
 {
-  // output high to enable power
-  GpioPinWrite (2, GPIO_PIN_PB6, TRUE);
+  switch(Segment) {
+    case PCIE_SEGMENT_PCIE30X4:
+      GpioPinWrite (2, GPIO_PIN_PB6, Enable);
+      break;
+    case PCIE_SEGMENT_PCIE20L0:
+      GpioPinWrite (2, GPIO_PIN_PC5, Enable);
+      break;
+    case PCIE_SEGMENT_PCIE20L1:
+    case PCIE_SEGMENT_PCIE20L2:
+      /* Yes, disabling one would disable the other as well. */
+      GpioPinWrite (3, GPIO_PIN_PB4, !Enable);
+      break;
+    default:
+      break;
+  }
 }
 
 VOID
 EFIAPI
-Pcie30PeReset(BOOLEAN enable)
+PciePeReset (
+  UINT32 Segment,
+  BOOLEAN Enable
+  )
 {
-  if(enable)
-    GpioPinWrite (4, GPIO_PIN_PB6, FALSE); // output low
-  else
-    GpioPinWrite (4, GPIO_PIN_PB6, TRUE); // output high
+  switch(Segment) {
+    case PCIE_SEGMENT_PCIE30X4:
+      GpioPinWrite (4, GPIO_PIN_PB6, !Enable);
+      break;
+    case PCIE_SEGMENT_PCIE20L0:
+      GpioPinWrite (4, GPIO_PIN_PA5, !Enable);
+      break;
+    case PCIE_SEGMENT_PCIE20L1:
+      GpioPinWrite (3, GPIO_PIN_PB3, !Enable);
+      break;
+    case PCIE_SEGMENT_PCIE20L2:
+      GpioPinWrite (4, GPIO_PIN_PA2, !Enable);
+      break;
+    default:
+      break;
+  }
 }
 
 VOID
