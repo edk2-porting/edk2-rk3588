@@ -183,20 +183,6 @@
   gRockchipTokenSpaceGuid.PcdSdhciDxeBaseAddress|0xfe2e0000
 
   #
-  # PCIe controller
-  #
-  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4ApbBaseAddress|0xfe150000
-  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4DbiBaseAddress|0xf5000000
-  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4CfgBaseAddress|0xf0000000
-  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4CfgSize|0x100000
-  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4IoBaseAddress|0xf0100000
-  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4IoSize|0x10000
-  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4MemBaseAddress|0xf0200000
-  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4MemSize|0xe00000
-  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4MemBaseAddress64|0x901000000 #deduct 0x1000000 ECAM space
-  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4MemSize64|0x3f000000
-
-  #
   # USB2 EHCI + OHCI companion controllers
   #
   gRockchipTokenSpaceGuid.PcdEhciBaseAddress|0xfc800000

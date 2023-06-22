@@ -191,26 +191,25 @@ PciHostBridgeGetRootBridges (
     mPciRootBridges[Loop].AllocationAttributes  = EFI_PCI_HOST_BRIDGE_COMBINE_MEM_PMEM |
                                       EFI_PCI_HOST_BRIDGE_MEM64_DECODE;
 
-    mPciRootBridges[Loop].Bus.Base              = 0x0;
-    mPciRootBridges[Loop].Bus.Limit             = 0xf;
+    mPciRootBridges[Loop].Bus.Base              = 0;
+    mPciRootBridges[Loop].Bus.Limit             = 1;
 
-    mPciRootBridges[Loop].Io.Base               = 0x0;
-    mPciRootBridges[Loop].Io.Limit              = 0x10000 - 1;
-    mPciRootBridges[Loop].Io.Translation        = MAX_UINT64 -
-                                                  (PCIE_SEG0_MEM64_BASE + (Idx+1)*PCIE_MEM64_SIZE - 0x10000) + 1;
+    mPciRootBridges[Loop].Io.Base               = PCIE_IO_BASE;
+    mPciRootBridges[Loop].Io.Limit              = mPciRootBridges[Loop].Io.Base + PCIE_IO_SIZE - 1;
+    mPciRootBridges[Loop].Io.Translation        = MAX_UINT64 - PCIE_IO_XLATE(Idx) + 1;
 
-    mPciRootBridges[Loop].Mem.Base              = PCIE_SEG0_CFG_BASE + Idx*PCIE_CFG_BASE_DIFF + PCIE_MEM_OFFSET;
+    mPciRootBridges[Loop].Mem.Base              = PCIE_MEM_BASE(Idx);
     mPciRootBridges[Loop].Mem.Limit             = mPciRootBridges[Loop].Mem.Base + PCIE_MEM_SIZE - 1;
 
-    mPciRootBridges[Loop].MemAbove4G.Base       = PCIE_SEG0_MEM64_BASE + Idx*PCIE_MEM64_SIZE + 0x1000000;
-    mPciRootBridges[Loop].MemAbove4G.Limit      = mPciRootBridges[Loop].MemAbove4G.Base + PCIE_MEM64_SIZE - 0x1000001;
+    mPciRootBridges[Loop].MemAbove4G.Base       = PCIE_MEM64_BASE(Idx);
+    mPciRootBridges[Loop].MemAbove4G.Limit      = mPciRootBridges[Loop].MemAbove4G.Base + PCIE_MEM64_SIZE - 1;
 
     mPciRootBridges[Loop].PMem.Base             = MAX_UINT64;
     mPciRootBridges[Loop].PMem.Limit            = 0;
     mPciRootBridges[Loop].PMemAbove4G.Base      = MAX_UINT64;
     mPciRootBridges[Loop].PMemAbove4G.Limit     = 0;
     mPciRootBridges[Loop].DevicePath            = (EFI_DEVICE_PATH_PROTOCOL *)&mEfiPciRootBridgeDevicePath[Idx];
-    
+
     DEBUG((DEBUG_ERROR, "0x%llx 0x%llx 0x%llx\n", mPciRootBridges[Loop].Mem.Base, mPciRootBridges[Loop].MemAbove4G.Base,mPciRootBridges[Loop].Io.Translation));
     Loop++;
   }

@@ -36,27 +36,47 @@ typedef enum {
 #define ASSERT_INVALID_PCI_SEGMENT_ADDRESS(A,M) \
   ASSERT (((A) & (0xffff0000f0000000ULL | (M))) == 0)
 
+#define GET_SEG_NUM(Address)    ((Address >> 32) & 0xFFFF)
+#define GET_BUS_NUM(Address)    ((Address >> 20) & 0xFF)
+#define GET_DEV_NUM(Address)    ((Address >> 15) & 0x1F)
+#define GET_FUNC_NUM(Address)   ((Address >> 12) & 0x07)
+#define GET_REG_NUM(Address)    ((Address) & 0xFFF)
+
 STATIC
 UINT64
 PciSegmentLibGetConfigBase (
   IN  UINT64      Address
   )
 {
-  UINT32 Bus = (Address & 0xff00000) >> 20;
-  UINT16 Segment = (UINT16)(Address >> 32);
+  UINT16   Segment;
+  UINT8    Bus;
+  UINT16   Device;
+
+  Segment = GET_SEG_NUM (Address);
+  Bus = GET_BUS_NUM (Address);
+  Device = GET_DEV_NUM (Address);
 
   ASSERT (Segment < NUM_PCIE_CONTROLLER);
 
   // DEBUG ((DEBUG_ERROR, "PciSegmentLibGetConfigBase: Address=0x%lX, Bus=%d, Segment=%d\n",
   //         Address, Bus, Segment));
 
-  if ((Address & 0xff00000) == 0 && (Address & 0xf8000) != 0) {
+  //
+  // Ignore more than one device on:
+  //   - bus 0 as there can only be the root port.
+  //   - bus 1 because there may appear a ghost device at 0x1F.
+  //
+  if (Device > 0 && (Bus == 0 || Bus == 1)) {
     return 0xffffffff;
   }
 
-  if(Bus == 0)
-    return PCIE_SEG0_DBI_BASE + (Segment * PCIE_DBI_SIZE);
-  else return PCIE_SEG0_CFG_BASE + (Segment * PCIE_CFG_BASE_DIFF) + 0x8000;
+  // The root port is not part of the config space.
+  if(Bus == 0) {
+    return PCIE_DBI_BASE (Segment);
+  }
+
+  // Here starts the not-quite-compliant ECAM space.
+  return PCIE_CFG_BASE (Segment) + 0x8000;
 }
 
 /**
@@ -92,8 +112,8 @@ PciSegmentLibReadWorker (
   case PciCfgWidthUint16:
     return MmioRead16 (Base + (UINT32)Address);
   case PciCfgWidthUint32:
-    if ((Address & 0xFF00000) == 0) {
-      if ((Address & 0xFFF) == 0x10 || (Address & 0xFFF) == 0x14) {
+    if (GET_BUS_NUM (Address) == 0) {
+      if (GET_REG_NUM (Address) == 0x10 || GET_REG_NUM (Address) == 0x14) {
         // Hide BAR0 + BAR1 of root port
         return 0;
       }

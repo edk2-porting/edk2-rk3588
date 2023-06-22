@@ -453,9 +453,9 @@ InitializePciHost (
   UINT32 Segment
   )
 {
-  EFI_PHYSICAL_ADDRESS     ApbBase = PCIE_SEG0_APB_BASE + (Segment * PCIE_APB_SIZE);
-  EFI_PHYSICAL_ADDRESS     DbiBase = PCIE_SEG0_DBI_BASE + (Segment * PCIE_DBI_SIZE);
-  EFI_PHYSICAL_ADDRESS     PcieBase = PCIE_SEG0_CFG_BASE + (Segment * PCIE_CFG_BASE_DIFF);
+  EFI_PHYSICAL_ADDRESS     ApbBase = PCIE_APB_BASE (Segment);
+  EFI_PHYSICAL_ADDRESS     DbiBase = PCIE_DBI_BASE (Segment);
+  EFI_PHYSICAL_ADDRESS     PcieBase = PCIE_CFG_BASE (Segment);
   UINTN                    Retry;
   UINT32                   LinkSpeed;
   UINT32                   LinkWidth;

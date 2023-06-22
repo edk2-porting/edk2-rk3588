@@ -26,7 +26,7 @@ typedef struct {
   EFI_ACPI_6_0_GIC_STRUCTURE                            GicInterfaces[8];
   EFI_ACPI_6_0_GIC_DISTRIBUTOR_STRUCTURE                GicDistributor;
   EFI_ACPI_6_0_GICR_STRUCTURE                           GicRedistributors;
-  EFI_ACPI_6_0_GIC_MSI_FRAME_STRUCTURE                  GicMsiFrame;
+  // EFI_ACPI_6_0_GIC_MSI_FRAME_STRUCTURE                  GicMsiFrame;
   // EFI_ACPI_6_0_GIC_ITS_STRUCTURE                        GicIts[2];
 } EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE;
 
@@ -91,18 +91,25 @@ EFI_ACPI_6_0_MULTIPLE_APIC_DESCRIPTION_TABLE Madt = {
   EFI_ACPI_6_0_GIC_REDISTRIBUTOR_INIT (FixedPcdGet64 (PcdGicRedistributorsBase), 
                                        0x100000),
   // GIC MSI Frame
-  {
-    EFI_ACPI_6_0_GIC_MSI_FRAME,
-    sizeof (EFI_ACPI_6_0_GIC_MSI_FRAME_STRUCTURE),
-    EFI_ACPI_RESERVED_WORD,
-    0,
-    FixedPcdGet64 (PcdGicDistributorBase) + 0x10000,
-    EFI_ACPI_6_0_SPI_COUNT_BASE_SELECT,
-    56,
-    424
-  },
+  //
+  // Disable for now, will need to put it behind a config option
+  // as some OSes are not happy about it (like Windows).
+  //
+  // {
+  //   EFI_ACPI_6_0_GIC_MSI_FRAME,
+  //   sizeof (EFI_ACPI_6_0_GIC_MSI_FRAME_STRUCTURE),
+  //   EFI_ACPI_RESERVED_WORD,
+  //   0,
+  //   FixedPcdGet64 (PcdGicDistributorBase) + 0x10000,
+  //   EFI_ACPI_6_0_SPI_COUNT_BASE_SELECT,
+  //   56,
+  //   424
+  // },
 
   /* ITS is broken on RK35xx!*/
+  // Linux has a workaround for the erratum, but no way to describe
+  // this in ACPI yet.
+  //
   // {
   //   EFI_ACPI_6_0_GIC_ITS_FRAME_INIT(0, 0xfe640000),
   //   EFI_ACPI_6_0_GIC_ITS_FRAME_INIT(1, 0xfe660000)
