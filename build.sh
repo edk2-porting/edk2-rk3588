@@ -29,7 +29,7 @@ function _build_idblock(){
 	rm -f rk35*_spl_loader_*.bin idblock.bin rk35*_ddr_*.bin rk35*_usbplug*.bin UsbHead.bin ${FLASHFILES}
 
 	# Create idblock.bin
-	${ROOTDIR}/misc/rkbin/tools/mkimage -n rk3588 -T rksd -d ${ROOTDIR}/misc/rkbin/bin/rk35/rk3588_ddr_lp4_2112MHz_lp5_2736MHz_v1.11.bin:${ROOTDIR}/misc/rkbin/bin/rk35/rk3588_spl_v1.12.bin idblock.bin
+	${ROOTDIR}/misc/tools/mkimage -n rk3588 -T rksd -d ${ROOTDIR}/misc/rkbin/bin/rk35/rk3588_ddr_lp4_2112MHz_lp5_2736MHz_v1.11.bin:${ROOTDIR}/misc/rkbin/bin/rk35/rk3588_spl_v1.12.bin idblock.bin
 	popd
 	echo " => idblock.bin build done"
 }
@@ -46,7 +46,7 @@ function _build_fit(){
 	cp ${ROOTDIR}/misc/${SOC_L}_spl.dtb ${WORKSPACE}/${DEVICE}.dtb
 	cp ${WORKSPACE}/Build/${PLATFORM_NAME}/${_MODE}_${TOOLCHAIN}/FV/BL33_AP_UEFI.Fv ${WORKSPACE}/
 	cat ${ROOTDIR}/misc/uefi_${SOC_L}.its | sed "s,@DEVICE@,${DEVICE},g" > ${SOC_L}_${DEVICE}_EFI.its
-	${ROOTDIR}/misc/rkbin/tools/mkimage -f ${SOC_L}_${DEVICE}_EFI.its -E ${DEVICE}_EFI.itb
+	${ROOTDIR}/misc/tools/mkimage -f ${SOC_L}_${DEVICE}_EFI.its -E ${DEVICE}_EFI.itb
 
 	popd
 	echo " => FIT build done"
