@@ -35,6 +35,7 @@
   DebugLib
   AcpiLib
   IoLib
+  BaseMemoryLib
   UefiBootServicesTableLib
   UefiRuntimeServicesTableLib
   UefiLib
