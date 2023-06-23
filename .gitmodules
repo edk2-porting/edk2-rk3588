@@ -12,3 +12,6 @@
 [submodule "edk2-platforms"]
 	path = edk2-platforms
 	url = https://github.com/tianocore/edk2-platforms.git
+[submodule "misc/rkbin"]
+	path = misc/rkbin
+	url = https://github.com/rockchip-linux/rkbin.git
