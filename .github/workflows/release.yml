@@ -1,13 +1,15 @@
 name: Release
-on:  
+on:
   push:
     tags:
       - '*'
-      
+
 jobs:
   build_for_release:
     uses: ./.github/workflows/build.yml
-  
+    with:
+      build-configs: '"Debug", "Release"'
+
   release:
     runs-on: ubuntu-latest
     needs: build_for_release
@@ -16,7 +18,7 @@ jobs:
     steps:
       - name: Download all workflow run artifacts
         uses: actions/download-artifact@v3
-          
+
       - name: Create release
         uses: softprops/action-gh-release@v1
         with:

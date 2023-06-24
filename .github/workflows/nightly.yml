@@ -1,0 +1,41 @@
+name: Nightly
+run-name: Nightly build
+on:
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: Delete previous cancelled runs
+        uses: Mattraks/delete-workflow-runs@v2
+        with:
+          retain_days: 0
+          keep_minimum_runs: 0
+          delete_workflow_pattern: ${{ github.workflow }}
+          delete_run_by_conclusion_pattern: cancelled
+
+      - name: Check for new commits
+        id: check-new-commits
+        uses: adriangl/check-new-commits-action@v1
+        with:
+          seconds: 86400 # One day in seconds
+          branch: 'master'
+
+      - name: Cancel action if no new commits
+        if: ${{ steps.check-new-commits.outputs.has-new-commits != 'true' }}
+        uses: andymckay/cancel-action@0.3
+
+      - name: Wait for cancellation
+        if: ${{ steps.check-new-commits.outputs.has-new-commits != 'true' }}
+        shell: bash
+        run: while true; do echo "Waiting for job to be cancelled"; sleep 5; done
+
+  build_for_nightly:
+    needs: prepare
+    uses: ./.github/workflows/build.yml
+    with:
+      build-configs: '"Debug", "Release"'

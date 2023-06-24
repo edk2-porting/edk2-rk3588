@@ -1,12 +1,21 @@
 name: Build
 on:
   push:
+    paths-ignore:
+      - '**.md'
     branches:
       - master
   pull_request:
+    paths-ignore:
+      - '**.md'
     branches:
       - master
   workflow_call:
+    inputs:
+      build-configs:
+        type: string
+        required: true
+  workflow_dispatch:
 
 jobs:
   build:
@@ -26,13 +35,13 @@ jobs:
           - edge2
           - nanopc-t6
           # - rk3588-evb is currently failing
-        CONFIGURATION: [Debug, Release]
+        CONFIGURATION: ${{ fromJSON(format('[{0}]', inputs.build-configs || '"Debug"')) }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
         with:
           submodules: recursive
-        
+
       - name: Install dependencies
         shell: bash
         run: |
@@ -48,18 +57,18 @@ jobs:
           libc6-dev-arm64-cross \
           python3 \
           python3-pyelftools
-          
+
       - name: Get version tag
         id: get_version_tag
         shell: bash
         run: echo "version=$(git describe --tags --always)" >> $GITHUB_OUTPUT
-        
+
       - name: Build platform
         shell: bash
-        run: |  
+        run: |
          ./build.sh --device ${{matrix.PLATFORM}} --release ${{matrix.CONFIGURATION}}
           mv RK3588_NOR_FLASH.img ${{matrix.PLATFORM}}_UEFI_${{matrix.CONFIGURATION}}_${{steps.get_version_tag.outputs.version}}.img
-        
+
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
