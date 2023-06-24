@@ -36,7 +36,6 @@ static struct regulator_init_data rk806_init_data[] = {
   RK8XX_VOLTAGE_INIT(MASTER_PLDO4, 3300000),
   RK8XX_VOLTAGE_INIT(MASTER_PLDO5, 3300000),
   RK8XX_VOLTAGE_INIT(MASTER_PLDO6, 1800000),
-
   /* No dual PMICs on this platform */
 };
 
@@ -59,9 +58,7 @@ SdhciEmmcDxeIoMux (
   )
 {
   /* sdhci0 iomux (eMMC socket) */
-  BUS_IOC->GPIO2A_IOMUX_SEL_L = (0xFFFFUL << 16) | (0x1111); //EMMC_CMD,EMMC_CLKOUT,EMMC_DATASTROBE,EMMC_RSTN
-  BUS_IOC->GPIO2D_IOMUX_SEL_L = (0xFFFFUL << 16) | (0x1111); //EMMC_D0,EMMC_D1,EMMC_D2,EMMC_D3
-  BUS_IOC->GPIO2D_IOMUX_SEL_H = (0xFFFFUL << 16) | (0x1111); //EMMC_D4,EMMC_D5,EMMC_D6,EMMC_D7
+  /* Do not override, set by earlier boot stages. */
 }
 
 #define NS_CRU_BASE         0xFD7C0000
@@ -115,25 +112,7 @@ NorFspiIomux (
   )
 {
   /* io mux */
-  MmioWrite32(NS_CRU_BASE + CRU_CLKSEL_CON78,
-             (((0x3 << 12) | (0x3f << 6)) << 16) | (0x0 << 12) | (0x3f << 6));
-#define FSPI_M1
-#if defined(FSPI_M0)
-   /*FSPI M0*/
-  BUS_IOC->GPIO2A_IOMUX_SEL_L = ((0xF << 0) << 16) | (2 << 0); //FSPI_CLK_M0
-  BUS_IOC->GPIO2D_IOMUX_SEL_L = (0xFFFFUL << 16) | (0x2222); //FSPI_D0_M0,FSPI_D1_M0,FSPI_D2_M0,FSPI_D3_M0
-  BUS_IOC->GPIO2D_IOMUX_SEL_H = ((0xF << 8) << 16) | (0x2 << 8); //FSPI_CS0N_M0
-#elif defined(FSPI_M1)
-  /*FSPI M1*/
-  BUS_IOC->GPIO2A_IOMUX_SEL_H = (0xFF00UL << 16) | (0x3300); //FSPI_D0_M1,FSPI_D1_M1
-  BUS_IOC->GPIO2B_IOMUX_SEL_L = (0xF0FFUL << 16) | (0x3033); //FSPI_D2_M1,FSPI_D3_M1,FSPI_CLK_M1
-  BUS_IOC->GPIO2B_IOMUX_SEL_H = (0xF << 16) | (0x3); //FSPI_CS0N_M1
-#else
-  /*FSPI M2*/
-  BUS_IOC->GPIO3A_IOMUX_SEL_L = (0xFFFFUL << 16) | (0x5555); //[FSPI_D0_M2-FSPI_D3_M2]
-  BUS_IOC->GPIO3A_IOMUX_SEL_H = (0xF0UL << 16) | (0x50); //FSPI_CLK_M2
-  BUS_IOC->GPIO3C_IOMUX_SEL_H = (0xF << 16) | (0x2); //FSPI_CS0_M2
-#endif
+  /* Do not override, set by earlier boot stages. */
 }
 
 VOID
@@ -142,7 +121,22 @@ GmacIomux (
    UINT32 id
   )
 {
-  /* No GMAC here */
+  switch (id) {
+  case 0:
+    /* gmac0 iomux */
+    BUS_IOC->GPIO2A_IOMUX_SEL_H = (0xFF00UL << 16) | 0x1100;
+    BUS_IOC->GPIO2B_IOMUX_SEL_L = (0xFFFFUL << 16) | 0x1111;
+    BUS_IOC->GPIO2B_IOMUX_SEL_H = (0xFF00UL << 16) | 0x1100;
+    BUS_IOC->GPIO2C_IOMUX_SEL_L = (0xFFFFUL << 16) | 0x1111;
+    BUS_IOC->GPIO4C_IOMUX_SEL_L = (0x0F00UL << 16) | 0x0100;
+    BUS_IOC->GPIO4C_IOMUX_SEL_H = (0x00FFUL << 16) | 0x0011;
+    break;
+  case 1:
+    /* gmac1 iomux */
+    break;
+  default:
+    break;
+  }
 }
 
 VOID
@@ -198,17 +192,14 @@ UsbPortPowerEnable (
   )
 {
   DEBUG((EFI_D_WARN, "UsbPortPowerEnable called\n"));
-  /* Set GPIO4 PB0 (USB_HOST_PWREN) output high to power USB ports */
-  GpioPinWrite (4, GPIO_PIN_PB0, TRUE);
-  GpioPinSetDirection (4, GPIO_PIN_PB0, GPIO_PIN_OUTPUT);
+  
+  /* Set GPIO4 PB5 (USB_HOST_PWREN) output high to power USB ports */
+  GpioPinSetDirection (4, GPIO_PIN_PB5, GPIO_PIN_OUTPUT);
+  GpioPinWrite (4, GPIO_PIN_PB5, TRUE);
 
   /* Set GPIO1 PD2 (TYPEC5V_PWREN) output high to power the type-c port */
-  GpioPinWrite (1, GPIO_PIN_PD2, TRUE);
   GpioPinSetDirection (1, GPIO_PIN_PD2, GPIO_PIN_OUTPUT);
-
-  // DEBUG((EFI_D_WARN, "Trying to enable on-board LED1\n"));
-  // GpioPinWrite (2, GPIO_PIN_PC0, TRUE);
-  // GpioPinSetDirection (2, GPIO_PIN_PC0, GPIO_PIN_OUTPUT);
+  GpioPinWrite (1, GPIO_PIN_PD2, TRUE);
 }
 
 VOID
@@ -234,7 +225,7 @@ UsbDpPhyEnable (
   /* enable rx_lfps_en & usbdp_low_pwrn */
   MmioWrite32(0xfd5c8004, 0x60006000);
   MmioWrite32(0xfd5cc004, 0x60006000);
-
+  
   /* remove rx-termination, we don't support SS yet */
   MmioWrite32 (0xfd5c800c, 0x00030001);
   MmioWrite32 (0xfd5cc00c, 0x00030001);
@@ -246,27 +237,15 @@ PcieIoInit (
   UINT32 Segment
   )
 {
-  /* Set reset and power IO to gpio output mode */
+  /* found info from nanopi r6s dtb */
   switch(Segment) {
-    case PCIE_SEGMENT_PCIE30X4:
-      // PCIE30X4_PERSTn_M1_L
-      GpioPinSetDirection (4, GPIO_PIN_PB6, GPIO_PIN_OUTPUT);
-      // PCIE_M2_0_PWREN
-      GpioPinSetDirection (2, GPIO_PIN_PC5, GPIO_PIN_OUTPUT);
+    case PCIE_SEGMENT_PCIE20L1: // rtl8152b
+      // PCIE20x1_1_PERSTn_M2
+      GpioPinSetDirection (1, GPIO_PIN_PA7, GPIO_PIN_OUTPUT);
       break;
-    case PCIE_SEGMENT_PCIE20L0: // rtl8152b
-      // PCIE_25GLAN_PERSTB_B
-      GpioPinSetDirection (4, GPIO_PIN_PB3, GPIO_PIN_OUTPUT);
-      break;
-    case PCIE_SEGMENT_PCIE20L1: // m.2 a+e key
-      // PCIE_M2_1_PWREN
-      GpioPinSetDirection (4, GPIO_PIN_PC2, GPIO_PIN_OUTPUT);
-      // PCIE_WIFI_PERSTn
-      GpioPinSetDirection (4, GPIO_PIN_PA2, GPIO_PIN_OUTPUT);
-      break;
-    case PCIE_SEGMENT_PCIE20L2: //rtl8152b
-      // PCIE_25GLAN_PERSTB
-      GpioPinSetDirection (4, GPIO_PIN_PA4, GPIO_PIN_OUTPUT);
+    case PCIE_SEGMENT_PCIE20L2: // rtl8152b
+      // PCIE20x1_2_PERSTn_M0
+      GpioPinSetDirection (3, GPIO_PIN_PD1, GPIO_PIN_OUTPUT);
       break;
     default:
       break;
@@ -280,18 +259,12 @@ PciePowerEn (
   BOOLEAN Enable
   )
 {
-  /* output high to enable power */
-
   switch(Segment) {
-    case PCIE_SEGMENT_PCIE30X4:
-      GpioPinWrite (2, GPIO_PIN_PC5, Enable);
+    case PCIE_SEGMENT_PCIE20L1: // rtl8152b
+      GpioPinWrite (1, GPIO_PIN_PA7, Enable);
       break;
-    case PCIE_SEGMENT_PCIE20L0:
-      break;
-    case PCIE_SEGMENT_PCIE20L1:
-      GpioPinWrite (4, GPIO_PIN_PC2, Enable);
-      break;
-    case PCIE_SEGMENT_PCIE20L2:
+    case PCIE_SEGMENT_PCIE20L2: // rtl8152b
+      GpioPinWrite (3, GPIO_PIN_PD1, Enable);
       break;
     default:
       break;
@@ -306,17 +279,11 @@ PciePeReset (
   )
 {
   switch(Segment) {
-    case PCIE_SEGMENT_PCIE30X4:
-      GpioPinWrite (4, GPIO_PIN_PB6, !Enable);
+    case PCIE_SEGMENT_PCIE20L1: // rtl8152b
+      GpioPinWrite (1, GPIO_PIN_PA7, !Enable);
       break;
-    case PCIE_SEGMENT_PCIE20L0:
-      GpioPinWrite (4, GPIO_PIN_PB3, !Enable);
-      break;
-    case PCIE_SEGMENT_PCIE20L1:
-      GpioPinWrite (4, GPIO_PIN_PA2, !Enable);
-      break;
-    case PCIE_SEGMENT_PCIE20L2:
-      GpioPinWrite (4, GPIO_PIN_PA4, !Enable);
+    case PCIE_SEGMENT_PCIE20L2: // rtl8152b
+      GpioPinWrite (3, GPIO_PIN_PD1, !Enable);
       break;
     default:
       break;
