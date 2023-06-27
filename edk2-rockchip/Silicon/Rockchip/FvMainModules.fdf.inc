@@ -119,16 +119,10 @@
   INF MdeModulePkg/Bus/Pci/NonDiscoverablePciDeviceDxe/NonDiscoverablePciDeviceDxe.inf
 
   #
-  # MMC Block I/O Driver
-  #
-!if $(RK_SD_ENABLE) == TRUE || $(RK_EMMC_ENABLE) == TRUE
-  INF Silicon/Rockchip/Drivers/MmcDxe/MmcDxe.inf
-!endif
-
-  #
   # SD Support
   #
 !if $(RK_SD_ENABLE) == TRUE
+  INF EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
   INF Silicon/Rockchip/Drivers/DwEmmcDxe/DwEmmcDxe.inf
 !endif
 
