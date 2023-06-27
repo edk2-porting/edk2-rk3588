@@ -184,21 +184,24 @@ GITCOMMIT="$(git describe --tags --always)"||GITCOMMIT="unknown"
 export GITCOMMIT
 set -e
 
-mkdir -p "${_SIMPLE_INIT}/build" "${_SIMPLE_INIT}/root/usr/share/locale"
-for i in "${_SIMPLE_INIT}/po/"*.po
-do
-	[ -f "${i}" ]||continue
-	_name="$(basename "$i" .po)"
-	_path="${_SIMPLE_INIT}/root/usr/share/locale/${_name}/LC_MESSAGES"
-	mkdir -p "${_path}"
-	msgfmt -o "${_path}/simple-init.mo" "${i}"
-done
-
-if "${GEN_ROOTFS}"
+if "${BUILD_GUI}"
 then
-	 bash "${_SIMPLE_INIT}/scripts/gen-rootfs-source.sh" \
-		"${_SIMPLE_INIT}" \
-		"${_SIMPLE_INIT}/build"
+	mkdir -p "${_SIMPLE_INIT}/build" "${_SIMPLE_INIT}/root/usr/share/locale"
+	for i in "${_SIMPLE_INIT}/po/"*.po
+	do
+		[ -f "${i}" ]||continue
+		_name="$(basename "$i" .po)"
+		_path="${_SIMPLE_INIT}/root/usr/share/locale/${_name}/LC_MESSAGES"
+		mkdir -p "${_path}"
+		msgfmt -o "${_path}/simple-init.mo" "${i}"
+	done
+
+	if "${GEN_ROOTFS}"
+	then
+		bash "${_SIMPLE_INIT}/scripts/gen-rootfs-source.sh" \
+			"${_SIMPLE_INIT}" \
+			"${_SIMPLE_INIT}/build"
+	fi
 fi
 
 if [ "${DEVICE}" == "all" ]
