@@ -171,7 +171,7 @@ do
 	fi
 done
 
-[ -n "${_SIMPLE_INIT}" ]||[ ${BUILD_GUI} == false ]_error "SimpleInit not found, please see README.md"
+[ -n "${_SIMPLE_INIT}" ]||[ ${BUILD_GUI} == false ]||error "SimpleInit not found, please see README.md"
 [ -f "configs/${DEVICE}.conf" ]||[ "${DEVICE}" == "all" ]||_error "Device configuration not found"
 
 export CROSS_COMPILE="${CROSS_COMPILE:-aarch64-linux-gnu-}"
