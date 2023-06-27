@@ -136,7 +136,9 @@
   # eMMC Support
   #
 !if $(RK_EMMC_ENABLE) == TRUE
-  INF Silicon/Rockchip/Drivers/SdhciHostDxe/SdhciHostDxe.inf
+  INF MdeModulePkg/Bus/Pci/SdMmcPciHcDxe/SdMmcPciHcDxe.inf
+  INF MdeModulePkg/Bus/Sd/EmmcDxe/EmmcDxe.inf
+  INF Silicon/Rockchip/Drivers/DwcSdhciDxe/DwcSdhciDxe.inf
 !endif
 
   #

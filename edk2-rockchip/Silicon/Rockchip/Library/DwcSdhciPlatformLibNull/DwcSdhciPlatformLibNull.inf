@@ -1,0 +1,24 @@
+#/** @file
+#
+#  DwcSdhciDxe platform helper library.
+#
+#  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = DwcSdhciPlatformLibNull
+  FILE_GUID                      = 98fc1cd7-aeca-4b8d-894f-5d2f9899a47d
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = DwcSdhciPlatformLib
+
+[Sources]
+  DwcSdhciPlatformLibNull.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  Silicon/Rockchip/RockchipPkg.dec

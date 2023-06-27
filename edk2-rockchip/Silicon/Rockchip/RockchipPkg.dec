@@ -73,6 +73,7 @@
   gRockchipTokenSpaceGuid.PcdDwEmmcDxeFifoDepth|0x0|UINT32|0x40000033
 
   gRockchipTokenSpaceGuid.PcdSdhciDxeBaseAddress|0x0|UINT32|0x40000035
+  gRockchipTokenSpaceGuid.PcdDwcSdhciForceHighSpeed|FALSE|BOOLEAN|0x40000036
 
   gRockchipTokenSpaceGuid.SpiRK806BaseAddr|0|UINT32|0x21200002
 

@@ -1,0 +1,49 @@
+#/** @file
+#
+#  Synopsys DesignWare Cores SDHCI eMMC driver
+#
+#  Copyright (c) 2014-2017, Linaro Limited. All rights reserved.
+#  Copyright (c) 2022, Patrick Wildt <patrick@blueri.se>
+#  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = DwcSdhciDxe
+  FILE_GUID                      = 4cd3a91b-990e-46a6-b609-9fa5d70d1f5f
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = DwcSdhciDxeInitialize
+
+[Sources.common]
+  DwcSdhciDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Silicon/Rockchip/RockchipPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  DebugLib
+  IoLib
+  NonDiscoverableDeviceRegistrationLib
+  UefiBootServicesTableLib
+  DwcSdhciPlatformLib
+
+[Protocols]
+  gEdkiiNonDiscoverableDeviceProtocolGuid         ## PRODUCES
+  gEdkiiSdMmcOverrideProtocolGuid                 ## PRODUCES
+  gEfiCpuArchProtocolGuid
+  gEfiDevicePathProtocolGuid
+
+[Pcd]
+  gRockchipTokenSpaceGuid.PcdSdhciDxeBaseAddress
+  gRockchipTokenSpaceGuid.PcdDwcSdhciForceHighSpeed
+
+[Depex]
+  TRUE

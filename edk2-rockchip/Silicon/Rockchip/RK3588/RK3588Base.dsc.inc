@@ -89,6 +89,9 @@
   # DwEmmcDxe dependencies
   DwEmmcPlatformLib|Silicon/Rockchip/RK3588/Library/DwEmmcPlatformLib/DwEmmcPlatformLib.inf
 
+  # DwcSdhciDxe dependencies
+  DwcSdhciPlatformLib|Silicon/Rockchip/RK3588/Library/DwcSdhciPlatformLib/DwcSdhciPlatformLib.inf
+
   # Other SoC-specific libraries
   OtpLib|Silicon/Rockchip/RK3588/Library/OtpLib/OtpLib.inf
   GpioLib|Silicon/Rockchip/RK3588/Library/GpioLib/GpioLib.inf

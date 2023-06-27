@@ -164,6 +164,9 @@
   # DwEmmcDxe dependencies
   DwEmmcPlatformLib|Silicon/Rockchip/Library/DwEmmcPlatformLibNull/DwEmmcPlatformLibNull.inf
 
+  # DwcSdhciDxe dependencies
+  DwcSdhciPlatformLib|Silicon/Rockchip/Library/DwcSdhciPlatformLibNull/DwcSdhciPlatformLibNull.inf
+
   #
   # Rockchip libraries
   #
@@ -565,7 +568,9 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
   # eMMC Support
   #
 !if $(RK_EMMC_ENABLE) == TRUE
-  Silicon/Rockchip/Drivers/SdhciHostDxe/SdhciHostDxe.inf
+  MdeModulePkg/Bus/Pci/SdMmcPciHcDxe/SdMmcPciHcDxe.inf
+  MdeModulePkg/Bus/Sd/EmmcDxe/EmmcDxe.inf
+  Silicon/Rockchip/Drivers/DwcSdhciDxe/DwcSdhciDxe.inf
 !endif
 
   #
