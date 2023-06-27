@@ -33,7 +33,6 @@
 [Sources.common]
   RockchipPlatformLib.c
   $(RKPLATLIB_COMMON_DIR)/RK3588CruLib.c
-  $(RKPLATLIB_COMMON_DIR)/RockchipSdhci.c
 
 [Sources.AARCH64]
 
