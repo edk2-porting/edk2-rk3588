@@ -1,0 +1,33 @@
+#/** @file
+# Framework Module Development Environment Industry Standards
+#
+# This Package provides headers and libraries that conform to EFI/PI Industry standards.
+# Copyright (c) 2007-2021, Intel Corporation. All rights reserved.
+# Copyright (c) 2012-2014, ARM Ltd. All rights reserved.
+# Copyright (c) 2018, Linaro. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#**/
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010019
+  PACKAGE_NAME                   = DwMmcHcDxePkg
+  PACKAGE_GUID                   = e73097ce-1fe2-41a6-a930-3136bc6d23ef
+  PACKAGE_VERSION                = 0.1
+
+
+################################################################################
+#
+# Include Section - list of Include Paths that are provided by this package.
+#                   Comments are used for Keywords and Module Types.
+#
+# Supported Module Types:
+#  BASE SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
+#
+################################################################################
+
+[Guids.common]
+  gDwMmcHcDxeTokenSpaceGuid     = { 0x576c132e, 0x7d51, 0x4abb, { 0xbc, 0x60, 0x13, 0x08, 0x04, 0x0e, 0x90, 0x92 }}
+
+[Protocols.common]
+  gPlatformDwMmcProtocolGuid    = { 0x1d6dfde5, 0x76a7, 0x4404, { 0x85, 0x74, 0x7a, 0xdf, 0x1a, 0x8a, 0xa2, 0x0d }}

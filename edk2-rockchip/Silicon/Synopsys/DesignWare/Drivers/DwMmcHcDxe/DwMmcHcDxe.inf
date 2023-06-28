@@ -1,0 +1,64 @@
+## @file
+#  DwSdMmcHcDxe driver is used to manage those host controllers which comply with
+#  Designware SD Host Controller.
+#
+#  It will produce EFI_SD_MMC_PASS_THRU_PROTOCOL to allow sending SD/MMC/eMMC cmds
+#  to specified devices from upper layer.
+#
+#  Copyright (c) 2015, Intel Corporation. All rights reserved.
+#  Copyright (C) 2016, Marvell International Ltd. All rights reserved.
+#  Copyright (c) 2018, Linaro Ltd. All rights reserved.
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = DwMmcHcDxe
+  MODULE_UNI_FILE                = DwMmcHcDxe.uni
+  FILE_GUID                      = 9be4d260-208c-4efe-a524-0b5d3bf77f9d
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = InitializeDwMmcHcDxe
+
+[Sources]
+  ComponentName.c
+  DwMmcHcDxe.c
+  DwMmcHcDxe.h
+  DwMmcHci.c
+  DwMmcHci.h
+  EmmcDevice.c
+  SdDevice.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  EmbeddedPkg/Drivers/DwMmcHcDxe/DwMmcHcDxe.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  MdePkg/MdePkg.dec
+
+[LibraryClasses]
+  ArmLib
+  BaseLib
+  BaseMemoryLib
+  CacheMaintenanceLib
+  DebugLib
+  DevicePathLib
+  DmaLib
+  MemoryAllocationLib
+  TimerLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+  UefiRuntimeServicesTableLib
+
+[Protocols]
+  gEdkiiNonDiscoverableDeviceProtocolGuid
+  gEfiDevicePathProtocolGuid                    ## TO_START
+  gEfiPciIoProtocolGuid                         ## TO_START
+  gEfiSdMmcPassThruProtocolGuid                 ## BY_START
+  gPlatformDwMmcProtocolGuid
+
+[UserExtensions.TianoCore."ExtraFiles"]
+  DwMmcHcDxeExtra.uni
