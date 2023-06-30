@@ -259,16 +259,7 @@ PciePowerEn (
   BOOLEAN Enable
   )
 {
-  switch(Segment) {
-    case PCIE_SEGMENT_PCIE20L1: // rtl8152b
-      GpioPinWrite (1, GPIO_PIN_PA7, Enable);
-      break;
-    case PCIE_SEGMENT_PCIE20L2: // rtl8152b
-      GpioPinWrite (3, GPIO_PIN_PD1, Enable);
-      break;
-    default:
-      break;
-  }
+  /* nothing to power on */
 }
 
 VOID
