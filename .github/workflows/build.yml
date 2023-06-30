@@ -33,6 +33,7 @@ jobs:
           - r58x
           - r58-mini
           - edge2
+          - nanopi-r6s
           - nanopc-t6
           # - rk3588-evb is currently failing
         CONFIGURATION: ${{ fromJSON(format('[{0}]', inputs.build-configs || '"Debug"')) }}
