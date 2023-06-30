@@ -249,23 +249,17 @@ PcieIoInit (
   /* Set reset and power IO to gpio output mode */
   switch(Segment) {
     case PCIE_SEGMENT_PCIE30X4:
-      // PCIE30X4_PERSTn_M1_L
       GpioPinSetDirection (4, GPIO_PIN_PB6, GPIO_PIN_OUTPUT);
-      // PCIE_M2_0_PWREN
       GpioPinSetDirection (2, GPIO_PIN_PC5, GPIO_PIN_OUTPUT);
       break;
     case PCIE_SEGMENT_PCIE20L0: // rtl8152b
-      // PCIE_25GLAN_PERSTB_B
       GpioPinSetDirection (4, GPIO_PIN_PB3, GPIO_PIN_OUTPUT);
       break;
     case PCIE_SEGMENT_PCIE20L1: // m.2 a+e key
-      // PCIE_M2_1_PWREN
       GpioPinSetDirection (4, GPIO_PIN_PC2, GPIO_PIN_OUTPUT);
-      // PCIE_WIFI_PERSTn
       GpioPinSetDirection (4, GPIO_PIN_PA2, GPIO_PIN_OUTPUT);
       break;
     case PCIE_SEGMENT_PCIE20L2: //rtl8152b
-      // PCIE_25GLAN_PERSTB
       GpioPinSetDirection (4, GPIO_PIN_PA4, GPIO_PIN_OUTPUT);
       break;
     default:
