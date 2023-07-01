@@ -246,6 +246,7 @@ DwMmcHcEnumerateDevice (
   DW_MMC_HC_PRIVATE_DATA              *Private;
   EFI_STATUS                          Status;
   BOOLEAN                             MediaPresent;
+  BOOLEAN                             MediaChanged;
   UINT32                              RoutineNum;
   DWMMC_CARD_TYPE_DETECT_ROUTINE      *Routine;
   UINTN                               Index;
@@ -264,7 +265,10 @@ DwMmcHcEnumerateDevice (
                0,
                &MediaPresent
                );
-    if ((Status == EFI_MEDIA_CHANGED) && !MediaPresent) {
+
+    MediaChanged = Private->Slot[0].MediaPresent != MediaPresent;
+
+    if (MediaChanged && !MediaPresent) {
       DEBUG ((
         DEBUG_INFO,
         "DwMmcHcEnumerateDevice: device disconnected at %p\n",
@@ -299,7 +303,7 @@ DwMmcHcEnumerateDevice (
             &Private->PassThru
             );
     }
-    if ((Status == EFI_MEDIA_CHANGED) && MediaPresent) {
+    if (MediaChanged && MediaPresent) {
       DEBUG ((
         DEBUG_INFO,
         "DwMmcHcEnumerateDevice: device connected at %p\n",
@@ -669,6 +673,7 @@ DwMmcHcDriverBindingStart (
     goto Done;
   }
 
+  Private->Slot[0].SlotType = Private->Capability[0].SlotType;
   Private->Slot[0].CardType = Private->Capability[0].CardType;
   Private->Slot[0].Enable = TRUE;
   Private->Slot[0].MediaPresent = TRUE;
