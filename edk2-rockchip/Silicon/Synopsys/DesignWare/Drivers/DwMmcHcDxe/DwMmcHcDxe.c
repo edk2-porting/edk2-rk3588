@@ -501,7 +501,7 @@ DwMmcHcDriverBindingSupported (
         );
 
   //
-  // Now test the EmbeddedNonDiscoverableIoProtocol.
+  // Now test the EdkiiNonDiscoverableDeviceProtocol.
   //
   Status = gBS->OpenProtocol (
                   Controller,
@@ -514,13 +514,20 @@ DwMmcHcDriverBindingSupported (
   if (EFI_ERROR (Status)) {
     return Status;
   }
+
+  if (CompareGuid (Dev->Type, &gDwMmcHcNonDiscoverableDeviceGuid)) {
+    Status = EFI_SUCCESS;
+  } else {
+    Status = EFI_UNSUPPORTED;
+  }
+
   gBS->CloseProtocol (
          Controller,
          &gEdkiiNonDiscoverableDeviceProtocolGuid,
          This->DriverBindingHandle,
          Controller
          );
-  return EFI_SUCCESS;
+  return Status;
 }
 
 /**
