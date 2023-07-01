@@ -119,11 +119,19 @@
   INF MdeModulePkg/Bus/Pci/NonDiscoverablePciDeviceDxe/NonDiscoverablePciDeviceDxe.inf
 
   #
+  # SD/eMMC upper layer drivers
+  #
+!if $(RK_SD_ENABLE) == TRUE || $(RK_EMMC_ENABLE) == TRUE
+  INF MdeModulePkg/Bus/Sd/SdDxe/SdDxe.inf
+  INF MdeModulePkg/Bus/Sd/EmmcDxe/EmmcDxe.inf
+!endif
+
+  #
   # SD Support
   #
 !if $(RK_SD_ENABLE) == TRUE
-  INF EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
-  INF Silicon/Rockchip/Drivers/DwEmmcDxe/DwEmmcDxe.inf
+  INF Silicon/Synopsys/DesignWare/Drivers/DwMmcHcDxe/DwMmcHcDxe.inf
+  INF Silicon/Rockchip/Drivers/RkSdmmcDxe/RkSdmmcDxe.inf
 !endif
 
   #
@@ -131,7 +139,6 @@
   #
 !if $(RK_EMMC_ENABLE) == TRUE
   INF MdeModulePkg/Bus/Pci/SdMmcPciHcDxe/SdMmcPciHcDxe.inf
-  INF MdeModulePkg/Bus/Sd/EmmcDxe/EmmcDxe.inf
   INF Silicon/Rockchip/Drivers/DwcSdhciDxe/DwcSdhciDxe.inf
 !endif
 

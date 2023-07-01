@@ -551,11 +551,19 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
   MdeModulePkg/Bus/Pci/NonDiscoverablePciDeviceDxe/NonDiscoverablePciDeviceDxe.inf
 
   #
+  # SD/eMMC upper layer drivers
+  #
+!if $(RK_SD_ENABLE) == TRUE || $(RK_EMMC_ENABLE) == TRUE
+  MdeModulePkg/Bus/Sd/SdDxe/SdDxe.inf
+  MdeModulePkg/Bus/Sd/EmmcDxe/EmmcDxe.inf
+!endif
+
+  #
   # SD Support
   #
 !if $(RK_SD_ENABLE) == TRUE
-  EmbeddedPkg/Universal/MmcDxe/MmcDxe.inf
-  Silicon/Rockchip/Drivers/DwEmmcDxe/DwEmmcDxe.inf
+  Silicon/Synopsys/DesignWare/Drivers/DwMmcHcDxe/DwMmcHcDxe.inf
+  Silicon/Rockchip/Drivers/RkSdmmcDxe/RkSdmmcDxe.inf
 !endif
 
   #
@@ -563,7 +571,6 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
   #
 !if $(RK_EMMC_ENABLE) == TRUE
   MdeModulePkg/Bus/Pci/SdMmcPciHcDxe/SdMmcPciHcDxe.inf
-  MdeModulePkg/Bus/Sd/EmmcDxe/EmmcDxe.inf
   Silicon/Rockchip/Drivers/DwcSdhciDxe/DwcSdhciDxe.inf
 !endif
 

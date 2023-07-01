@@ -1,0 +1,48 @@
+#/** @file
+#
+#  Synopsys DesignWare MSHC platform driver for Rockchip SDMMC
+#
+#  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = RkSdmmcDxe
+  FILE_GUID                      = b6c84293-d505-4e5c-84ba-c7ff183fa566
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+
+  ENTRY_POINT                    = RkSdmmcDxeInitialize
+
+[Sources.common]
+  RkSdmmcDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Silicon/Rockchip/RockchipPkg.dec
+  Silicon/Synopsys/DesignWare/DesignWarePkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  BaseMemoryLib
+  DebugLib
+  UefiBootServicesTableLib
+  DwEmmcPlatformLib
+
+[Protocols]
+  gEfiDevicePathProtocolGuid                      ## PRODUCES
+  gEdkiiNonDiscoverableDeviceProtocolGuid         ## PRODUCES
+  gPlatformDwMmcProtocolGuid                      ## PRODUCES
+
+[Guids]
+  gDwMmcHcNonDiscoverableDeviceGuid
+
+[Pcd]
+  gRockchipTokenSpaceGuid.PcdDwEmmcDxeBaseAddress
+
+[Depex]
+  TRUE
