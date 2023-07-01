@@ -33,7 +33,7 @@
 
 [Packages]
   ArmPkg/ArmPkg.dec
-  EmbeddedPkg/Drivers/DwMmcHcDxe/DwMmcHcDxe.dec
+  Silicon/Synopsys/DesignWare/DesignWarePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec

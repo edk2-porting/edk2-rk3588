@@ -11,20 +11,12 @@
 
 [Defines]
   DEC_SPECIFICATION              = 0x00010019
-  PACKAGE_NAME                   = DwMmcHcDxePkg
+  PACKAGE_NAME                   = DesignWarePkg
   PACKAGE_GUID                   = e73097ce-1fe2-41a6-a930-3136bc6d23ef
   PACKAGE_VERSION                = 0.1
 
-
-################################################################################
-#
-# Include Section - list of Include Paths that are provided by this package.
-#                   Comments are used for Keywords and Module Types.
-#
-# Supported Module Types:
-#  BASE SEC PEI_CORE PEIM DXE_CORE DXE_DRIVER DXE_RUNTIME_DRIVER DXE_SMM_DRIVER DXE_SAL_DRIVER UEFI_DRIVER UEFI_APPLICATION
-#
-################################################################################
+[Includes]
+  Include
 
 [Guids.common]
   gDwMmcHcDxeTokenSpaceGuid     = { 0x576c132e, 0x7d51, 0x4abb, { 0xbc, 0x60, 0x13, 0x08, 0x04, 0x0e, 0x90, 0x92 }}
