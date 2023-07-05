@@ -1385,48 +1385,49 @@ DwSdExecTrb (
   if (Packet->InTransferLength || Packet->OutTransferLength) {
     ErrMask |= DW_MMC_INT_DCRC;
   }
-  if (Trb->UseFifo == TRUE) {
-    Status = TransferFifo (Trb);
-    if (EFI_ERROR (Status)) {
-      return Status;
+
+  Timeout = 10000;
+  do {
+    if (--Timeout == 0) {
+      break;
     }
-  } else {
-    Timeout = 10000;
-    do {
-      if (--Timeout == 0) {
-        break;
-      }
-      IntStatus = MmioRead32 (DevBase + DW_MMC_RINTSTS);
-      if (IntStatus & ErrMask) {
-        return EFI_DEVICE_ERROR;
-      }
-      if (Trb->DataLen && ((IntStatus & DW_MMC_INT_DTO) == 0)) {
-        //
-        // Transfer not Done
-        //
-        MicroSecondDelay (10);
-        continue;
-      }
-      MicroSecondDelay (10);
-    } while (!(IntStatus & DW_MMC_INT_CMD_DONE));
-    if (Packet->InTransferLength) {
-      do {
-        Idsts = MmioRead32 (DevBase + DW_MMC_IDSTS);
-      } while ((Idsts & DW_MMC_IDSTS_RI) == 0);
-      Status = DwMmcHcStopDma (Private, Trb);
+    IntStatus = MmioRead32 (DevBase + DW_MMC_RINTSTS);
+    MicroSecondDelay (1);
+  } while (!(IntStatus & DW_MMC_INT_CMD_DONE));
+
+  if (IntStatus & ErrMask) {
+    DEBUG ((DEBUG_ERROR, "%a: Command error. CmdIndex=%d, IntStatus=%p\n",
+        __func__, Packet->SdMmcCmdBlk->CommandIndex, IntStatus));
+    return EFI_DEVICE_ERROR;
+  }
+
+  if (Trb->DataLen) {
+    if (Trb->UseFifo == TRUE) {
+      Status = TransferFifo (Trb);
       if (EFI_ERROR (Status)) {
         return Status;
       }
-    } else if (Packet->OutTransferLength) {
-      do {
-        Idsts = MmioRead32 (DevBase + DW_MMC_IDSTS);
-      } while ((Idsts & DW_MMC_IDSTS_TI) == 0);
-      Status = DwMmcHcStopDma (Private, Trb);
-      if (EFI_ERROR (Status)) {
-        return Status;
-      }
-    } /* Packet->InTransferLength */
-  } /* UseFifo */
+    } else {
+      if (Packet->InTransferLength) {
+        do {
+          Idsts = MmioRead32 (DevBase + DW_MMC_IDSTS);
+        } while ((Idsts & DW_MMC_IDSTS_RI) == 0);
+        Status = DwMmcHcStopDma (Private, Trb);
+        if (EFI_ERROR (Status)) {
+          return Status;
+        }
+      } else if (Packet->OutTransferLength) {
+        do {
+          Idsts = MmioRead32 (DevBase + DW_MMC_IDSTS);
+        } while ((Idsts & DW_MMC_IDSTS_TI) == 0);
+        Status = DwMmcHcStopDma (Private, Trb);
+        if (EFI_ERROR (Status)) {
+          return Status;
+        }
+      } /* Packet->InTransferLength */
+    } /* UseFifo */
+  } /* Trb->DataLen */
+
   switch (Packet->SdMmcCmdBlk->ResponseType) {
     case SdMmcResponseTypeR1:
     case SdMmcResponseTypeR1b:
