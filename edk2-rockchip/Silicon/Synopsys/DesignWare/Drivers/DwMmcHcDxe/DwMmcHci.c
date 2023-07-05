@@ -459,6 +459,30 @@ DwMmcHcInitClockFreq (
   return Status;
 }
 
+STATIC
+EFI_STATUS
+DwMmcHcWaitReset (
+  IN UINTN DevBase,
+  IN UINT32 ResetValue
+  )
+{
+  UINT32 Timeout;
+  UINT32 Data;
+
+  MmioWrite32 (DevBase + DW_MMC_CTRL, ResetValue);
+
+  Timeout = DW_MMC_HC_GENERIC_TIMEOUT;
+  while (Timeout--) {
+    Data = MmioRead32 (DevBase + DW_MMC_CTRL);
+    if ((Data & DW_MMC_CTRL_RESET_ALL) == 0) {
+      return EFI_SUCCESS;
+    }
+    gBS->Stall (1);
+  }
+
+  return EFI_TIMEOUT;
+}
+
 /**
   Supply SD/MMC card with maximum voltage at initialization.
 
@@ -475,36 +499,18 @@ DwMmcHcInitPowerVoltage (
   IN DW_MMC_HC_SLOT_CAP     Capability
   )
 {
-  UINT32                    Data;
-  UINT32                    Timeout;
+  EFI_STATUS                Status;
 
-  Data = 0x1;
-  MmioWrite32 (DevBase + DW_MMC_PWREN, Data);
+  MmioWrite32 (DevBase + DW_MMC_PWREN, 0x1);
 
-  Data = DW_MMC_CTRL_RESET_ALL;
-  MmioWrite32 (DevBase + DW_MMC_CTRL, Data);
-
-  Timeout = DW_MMC_HC_GENERIC_TIMEOUT;
-  while (Timeout > 0) {
-    Data = MmioRead32 (DevBase + DW_MMC_CTRL);
-
-    if ((Data & DW_MMC_CTRL_RESET_ALL) == 0) {
-      break;
-    }
-    gBS->Stall (1);
-
-    Timeout--;
-  }
-
-  if (Timeout <= 0) {
-    DEBUG ((DEBUG_INFO,
+  Status = DwMmcHcWaitReset (DevBase, DW_MMC_CTRL_RESET_ALL);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR,
       "DwMmcHcInitPowerVoltage: reset failed due to timeout"));
-
-    return EFI_TIMEOUT;
+    return Status;
   }
 
-  Data = DW_MMC_CTRL_INT_EN;
-  MmioWrite32 (DevBase + DW_MMC_CTRL, Data);
+  MmioWrite32 (DevBase + DW_MMC_CTRL, DW_MMC_CTRL_INT_EN);
 
   return EFI_SUCCESS;
 }
@@ -571,6 +577,7 @@ DwMmcHcStartDma (
   IN DW_MMC_HC_TRB                    *Trb
   )
 {
+  EFI_STATUS                          Status;
   UINTN                               DevBase;
   UINT32                              Ctrl;
   UINT32                              Bmod;
@@ -583,25 +590,10 @@ DwMmcHcStartDma (
   //
   // Reset DMA
   //
-  Ctrl = DW_MMC_CTRL_DMA_RESET;
-  MmioWrite32 (DevBase + DW_MMC_CTRL, Ctrl);
-
-  Timeout = DW_MMC_HC_GENERIC_TIMEOUT;
-  while (Timeout > 0) {
-    Data = MmioRead32 (DevBase + DW_MMC_CTRL);
-
-    if ((Data & DW_MMC_CTRL_DMA_RESET) == 0) {
-      break;
-    }
-    gBS->Stall (1);
-
-    Timeout--;
-  }
-
-  if (Timeout <= 0) {
+  Status = DwMmcHcWaitReset (DevBase, DW_MMC_CTRL_DMA_RESET);
+  if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Timed out waiting for CTRL_DMA_RESET"));
-
-    return EFI_TIMEOUT;
+    return Status;
   }
 
   Bmod = DW_MMC_IDMAC_SWRESET | MmioRead32 (DevBase + DW_MMC_BMOD);
@@ -1369,6 +1361,14 @@ DwSdExecTrb (
     }
 
     MmioWrite32 (DevBase + DW_MMC_BLKSIZ, BlkSize);
+
+    if (Trb->DataLen) {
+      Status = DwMmcHcWaitReset (DevBase, DW_MMC_CTRL_FIFO_RESET);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "%a: FIFO reset timed out. CmdIndex=%d\n",
+            __func__, Packet->SdMmcCmdBlk->CommandIndex));
+      }
+    }
   }
 
   Argument = Packet->SdMmcCmdBlk->CommandArgument;
