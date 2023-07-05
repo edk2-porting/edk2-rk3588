@@ -834,6 +834,7 @@ TransferFifo (
   UINT32                    Index;     /* count with bytes */
   UINT32                    Ascending;
   UINT32                    Descending;
+  UINT32                    Timeout;
 
   DevBase   = Trb->Private->DevBase;
   Received = 0;
@@ -841,10 +842,12 @@ TransferFifo (
   Index = 0;
   Ascending = 0;
   Descending = ((Trb->DataLen + 3) & ~3) - 4;
+  Timeout = DW_MMC_HC_GENERIC_TIMEOUT;
+
   do {
     Intsts = MmioRead32 (DevBase + DW_MMC_RINTSTS);
 
-    if (Trb->DataLen && (Intsts & DW_MMC_INT_TXDR) && !Trb->Read) {
+    if (!Trb->Read && (Intsts & DW_MMC_INT_TXDR)) {
       Sts = MmioRead32 (DevBase + DW_MMC_STATUS);
 
       while (!(DW_MMC_STS_FIFO_FULL(Sts))
@@ -867,19 +870,20 @@ TransferFifo (
 
         Intsts = MmioRead32 (DevBase + DW_MMC_RINTSTS);
         Sts = MmioRead32 (DevBase + DW_MMC_STATUS);
-        }
-      continue;
+      }
+      Timeout = DW_MMC_HC_GENERIC_TIMEOUT;
+      goto Verify;
     }
 
-    if (Trb->DataLen && ((Intsts & DW_MMC_INT_RXDR) ||
-       (Intsts & DW_MMC_INT_DTO)) && Trb->Read) {
+    if (Trb->Read && ((Intsts & DW_MMC_INT_RXDR) ||
+        (Intsts & DW_MMC_INT_DTO))) {
       Sts = MmioRead32 (DevBase + DW_MMC_STATUS);
       //
       // Convert to bytes
       //
       FifoCount = GET_STS_FIFO_COUNT (Sts) << 2;
       if ((FifoCount == 0) && (Received < Trb->DataLen)) {
-        continue;
+        goto Verify;
       }
       Index = 0;
       Count = (MIN (FifoCount, Trb->DataLen) + 3) & ~3;
@@ -896,13 +900,27 @@ TransferFifo (
         Index += 4;
         Received += 4;
       } /* while */
+      Timeout = DW_MMC_HC_GENERIC_TIMEOUT;
     } /* if */
-  } while (((Intsts & DW_MMC_INT_CMD_DONE) == 0) || (Received < Trb->DataLen));
-  //
-  // Clear RINTSTS
-  //
-  Intsts = ~0;
-  MmioWrite32 (DevBase + DW_MMC_RINTSTS, Intsts);
+
+Verify:
+    if (Intsts & DW_MMC_INT_DATA_ERR) {
+      DEBUG ((DEBUG_ERROR, "%a: Data error. CmdIndex=%d, IntStatus=%p\n",
+          __func__, Trb->Packet->SdMmcCmdBlk->CommandIndex, Intsts));
+      return EFI_DEVICE_ERROR;
+    }
+
+    if (Timeout < DW_MMC_HC_GENERIC_TIMEOUT) {
+      MicroSecondDelay(1);
+    }
+
+    if (--Timeout == 0) {
+      DEBUG ((DEBUG_ERROR, "%a: Timed out. CmdIndex=%d, IntStatus=%p\n",
+          __func__, Trb->Packet->SdMmcCmdBlk->CommandIndex, Intsts));
+      return EFI_TIMEOUT;
+    }
+  } while ((Received < Trb->DataLen));
+
   return EFI_SUCCESS;
 }
 

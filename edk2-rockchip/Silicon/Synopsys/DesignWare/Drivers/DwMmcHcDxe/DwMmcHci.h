@@ -115,6 +115,7 @@
 #define DW_MMC_INT_SBE                          (1 << 13)       /* Start-bit  Err */
 #define DW_MMC_INT_HLE                          (1 << 12)       /* Hardware-lock Err */
 #define DW_MMC_INT_FRUN                         (1 << 11)       /* FIFO UN/OV RUN */
+#define DW_MMC_INT_HTO                          (1 << 10)       /* Data starvation by host timeout */
 #define DW_MMC_INT_DRT                          (1 << 9)        /* Data timeout */
 #define DW_MMC_INT_RTO                          (1 << 8)        /* Response timeout */
 #define DW_MMC_INT_DCRC                         (1 << 7)        /* Data CRC err */
@@ -124,6 +125,14 @@
 #define DW_MMC_INT_DTO                          (1 << 3)        /* Data trans over */
 #define DW_MMC_INT_CMD_DONE                     (1 << 2)        /* Command done */
 #define DW_MMC_INT_RE                           (1 << 1)        /* Response error */
+
+#define DW_MMC_INT_DATA_ERR                     (DW_MMC_INT_EBE  |\
+                                                 DW_MMC_INT_SBE  |\
+                                                 DW_MMC_INT_HLE  |\
+                                                 DW_MMC_INT_FRUN |\
+                                                 DW_MMC_INT_DCRC |\
+                                                 DW_MMC_INT_HTO  |\
+                                                 DW_MMC_INT_DRT)
 
 #define DW_MMC_IDMAC_DES0_DIC                   (1 << 1)
 #define DW_MMC_IDMAC_DES0_LD                    (1 << 2)
