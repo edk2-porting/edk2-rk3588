@@ -112,6 +112,7 @@
 #define CMD_INDEX(x)                            ((x) & CMD_INDEX_MASK)
 
 #define DW_MMC_INT_EBE                          (1 << 15)       /* End-bit Err */
+#define DW_MMC_INT_ACD                          (1 << 14)       /* Auto command done */
 #define DW_MMC_INT_SBE                          (1 << 13)       /* Start-bit  Err */
 #define DW_MMC_INT_HLE                          (1 << 12)       /* Hardware-lock Err */
 #define DW_MMC_INT_FRUN                         (1 << 11)       /* FIFO UN/OV RUN */

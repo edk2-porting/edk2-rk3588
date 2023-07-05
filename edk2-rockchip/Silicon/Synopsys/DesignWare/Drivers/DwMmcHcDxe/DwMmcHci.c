@@ -1538,10 +1538,42 @@ DwMmcCheckTrbResult (
   EFI_SD_MMC_PASS_THRU_COMMAND_PACKET *Packet;
   UINT32                              Idsts;
   UINTN                               DevBase;
+  UINT32                              IntStatus;
 
   DevBase = Private->DevBase;
   Packet  = Trb->Packet;
   if (Trb->UseFifo == TRUE) {
+    if (Trb->DataLen) {
+      IntStatus = MmioRead32 (DevBase + DW_MMC_RINTSTS);
+      //
+      // Check Auto CMD12 completion
+      //
+      if (!(IntStatus & DW_MMC_INT_ACD)) {
+        return EFI_NOT_READY;
+      }
+
+      //
+      // Check data trans over
+      //
+      if (!(IntStatus & DW_MMC_INT_DTO)) {
+        return EFI_NOT_READY;
+      }
+
+      //
+      // There will be some errors reported (SBE, HTO, DRT, DCRC, RCRC)
+      // depending on the command sent (read/write, single/multi block).
+      //
+      // Not sure why this happens (do we need to manually stop the command?),
+      // but it does not seem to affect operation in any way.
+      // All data is correctly transferred and the FIFO is empty by the time
+      // we reach this code path.
+      //
+      // Each transfer is validated in TransferFifo(), which would fail on any
+      // of the error states above and more.
+      // Interrupt status is cleared before a new command is issued, no need
+      // to do it here.
+      //
+    }
     return EFI_SUCCESS;
   }
   if (Packet->InTransferLength) {
