@@ -115,11 +115,19 @@ RkSdmmcCardDetect (
   IN UINT8          Slot
   )
 {
+  RKSDMMC_CARD_PRESENCE_STATE PresenceState;
+
   if (Controller != mDwMmcCapability.Controller) {
     return FALSE;
   }
 
-  return RkSdmmcGetCardPresenceState () == RkSdmmcCardPresent;
+  PresenceState = RkSdmmcGetCardPresenceState ();
+
+  if (PresenceState == RkSdmmcCardPresenceUnsupported) {
+    return TRUE; // let the driver do software detection
+  }
+
+  return PresenceState == RkSdmmcCardPresent;
 }
 
 STATIC PLATFORM_DW_MMC_PROTOCOL mDwMmcDeviceProtocol = {
