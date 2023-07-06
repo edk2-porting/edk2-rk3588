@@ -62,6 +62,7 @@
   gUniNorFlashProtocolGuid
   gEfiDiskIoProtocolGuid
   gEfiBlockIoProtocolGuid
+  gEdkiiNonDiscoverableDeviceProtocolGuid
 
 [FixedPcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize

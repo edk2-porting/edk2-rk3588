@@ -28,6 +28,7 @@
 #include <Library/RkAtagsLib.h>
 #include <Protocol/DiskIo.h>
 #include <Protocol/LoadedImage.h>
+#include <Protocol/NonDiscoverableDevice.h>
 #include <Guid/NvVarStoreFormatted.h>
 #include <Guid/SystemNvDataGuid.h>
 #include <Guid/VariableFormat.h>
@@ -1126,7 +1127,7 @@ FvbDiskNvDumpEventHandler (
   Status = FvbDiskDumpNvData (mFvbDevice->DiskDevice, mFvbDevice->DiskMediaId);
   if (EFI_ERROR (Status)) {
     CHAR16* DevicePathText = ConvertDevicePathToText (mFvbDevice->DiskDevice, FALSE, FALSE);
-    DEBUG ((DEBUG_ERROR, "%a: Couldn't dump NV data to disk [%s]\n", 
+    DEBUG ((DEBUG_ERROR, "%a: Couldn't dump NV data to disk [%s]\n",
             __FUNCTION__, DevicePathText));
     if (DevicePathText != NULL) {
       gBS->FreePool (DevicePathText);
@@ -1176,20 +1177,46 @@ FvbCheckIsBootDevice (
   IN EFI_HANDLE Handle
   )
 {
-  EFI_DEV_PATH *Device;
+  EFI_STATUS                          Status;
+  EFI_DEVICE_PATH_PROTOCOL            *DevicePath;
+  EFI_HANDLE                          DeviceHandle;
+  NON_DISCOVERABLE_DEVICE             *Device;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR   *Descriptor;
 
-  Device = (EFI_DEV_PATH *) DevicePathFromHandle (Handle);
+  DevicePath = DevicePathFromHandle (Handle);
 
   DEBUG ((DEBUG_INFO, "%a: DevPath type 0x%x subtype 0x%x\n",
-          __FUNCTION__, Device->DevPath.Type, Device->DevPath.SubType));
+          __FUNCTION__, DevicePath->Type, DevicePath->SubType));
 
-  if (Device->DevPath.Type == HARDWARE_DEVICE_PATH && Device->DevPath.SubType == HW_MEMMAP_DP) {
-    if (mBootDeviceType == RkAtagBootDevTypeEmmc) {
-      return Device->MemMap.StartingAddress == PcdGet32 (PcdDwcSdhciBaseAddress);
-    }
-    if (mBootDeviceType == RkAtagBootDevTypeSd0) {
-      return Device->MemMap.StartingAddress == PcdGet32 (PcdRkSdmmcBaseAddress);
-    }
+  if (DevicePath->Type != HARDWARE_DEVICE_PATH
+      || DevicePath->SubType != HW_VENDOR_DP) {
+    return FALSE;
+  }
+
+  Status = gBS->LocateDevicePath (&gEdkiiNonDiscoverableDeviceProtocolGuid,
+                   &DevicePath, &DeviceHandle);
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  Status = gBS->HandleProtocol (DeviceHandle,
+                   &gEdkiiNonDiscoverableDeviceProtocolGuid, (VOID **) &Device);
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  Descriptor = &Device->Resources[0];
+
+  if (Descriptor->Desc != ACPI_ADDRESS_SPACE_DESCRIPTOR ||
+      Descriptor->ResType != ACPI_ADDRESS_SPACE_TYPE_MEM) {
+    return FALSE;
+  }
+
+  if (mBootDeviceType == RkAtagBootDevTypeEmmc) {
+    return Descriptor->AddrRangeMin == PcdGet32 (PcdDwcSdhciBaseAddress);
+  }
+  if (mBootDeviceType == RkAtagBootDevTypeSd0) {
+    return Descriptor->AddrRangeMin == PcdGet32 (PcdRkSdmmcBaseAddress);
   }
 
   return FALSE;
