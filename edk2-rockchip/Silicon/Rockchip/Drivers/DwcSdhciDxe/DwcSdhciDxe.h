@@ -12,7 +12,7 @@
 #ifndef __DWCSDHCIDXE_H__
 #define __DWCSDHCIDXE_H__
 
-#define DWC_SDHCI_BASE          PcdGet32 (PcdSdhciDxeBaseAddress)
+#define DWC_SDHCI_BASE          PcdGet32 (PcdDwcSdhciBaseAddress)
 
 #define SD_MMC_HC_CLOCK_CTRL    (DWC_SDHCI_BASE + 0x2C)
 #define SD_MMC_HC_HOST_CTRL2    (DWC_SDHCI_BASE + 0x3E)

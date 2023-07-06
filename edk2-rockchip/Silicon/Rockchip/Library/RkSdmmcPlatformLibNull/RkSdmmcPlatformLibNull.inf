@@ -1,6 +1,6 @@
 #/** @file
 #
-#  DwEmmcDxe platform helper library.
+#  RkSdmmcDxe platform helper library.
 #
 #  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
 #
@@ -10,22 +10,15 @@
 
 [Defines]
   INF_VERSION                    = 0x0001001A
-  BASE_NAME                      = DwEmmcPlatformLib
-  FILE_GUID                      = b9039d6e-6d84-4f32-bfc5-9c328ed3e660
+  BASE_NAME                      = RkSdmmcPlatformLibNull
+  FILE_GUID                      = 3e414bfa-0637-4e2a-a272-eb3767cc5061
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
-  LIBRARY_CLASS                  = DwEmmcPlatformLib
+  LIBRARY_CLASS                  = RkSdmmcPlatformLib
 
 [Sources]
-  DwEmmcPlatformLib.c
+  RkSdmmcPlatformLibNull.c
 
 [Packages]
-  ArmPkg/ArmPkg.dec
   MdePkg/MdePkg.dec
   Silicon/Rockchip/RockchipPkg.dec
-  Silicon/Rockchip/RK3588/RK3588.dec
-
-[LibraryClasses]
-  DebugLib
-  UefiBootServicesTableLib
-  GpioLib

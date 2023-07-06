@@ -1185,10 +1185,10 @@ FvbCheckIsBootDevice (
 
   if (Device->DevPath.Type == HARDWARE_DEVICE_PATH && Device->DevPath.SubType == HW_MEMMAP_DP) {
     if (mBootDeviceType == RkAtagBootDevTypeEmmc) {
-      return Device->MemMap.StartingAddress == PcdGet32 (PcdSdhciDxeBaseAddress);
+      return Device->MemMap.StartingAddress == PcdGet32 (PcdDwcSdhciBaseAddress);
     }
     if (mBootDeviceType == RkAtagBootDevTypeSd0) {
-      return Device->MemMap.StartingAddress == PcdGet32 (PcdDwEmmcDxeBaseAddress);
+      return Device->MemMap.StartingAddress == PcdGet32 (PcdRkSdmmcBaseAddress);
     }
   }
 

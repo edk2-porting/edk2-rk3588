@@ -37,6 +37,5 @@
 [Sources.AARCH64]
 
 [Pcd]
-  gRockchipTokenSpaceGuid.PcdSdhciDxeBaseAddress
   gRockchipTokenSpaceGuid.PcdI2cBusCount
 

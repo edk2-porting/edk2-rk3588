@@ -1,0 +1,31 @@
+#/** @file
+#
+#  RkSdmmcDxe platform helper library.
+#
+#  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = RkSdmmcPlatformLib
+  FILE_GUID                      = b9039d6e-6d84-4f32-bfc5-9c328ed3e660
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = RkSdmmcPlatformLib
+
+[Sources]
+  RkSdmmcPlatformLib.c
+
+[Packages]
+  ArmPkg/ArmPkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/Rockchip/RockchipPkg.dec
+  Silicon/Rockchip/RK3588/RK3588.dec
+
+[LibraryClasses]
+  DebugLib
+  UefiBootServicesTableLib
+  GpioLib

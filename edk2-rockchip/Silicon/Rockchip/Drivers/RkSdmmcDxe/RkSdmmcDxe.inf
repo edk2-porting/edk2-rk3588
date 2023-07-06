@@ -31,7 +31,7 @@
   BaseMemoryLib
   DebugLib
   UefiBootServicesTableLib
-  DwEmmcPlatformLib
+  RkSdmmcPlatformLib
 
 [Protocols]
   gEfiDevicePathProtocolGuid                      ## PRODUCES
@@ -42,7 +42,7 @@
   gDwMmcHcNonDiscoverableDeviceGuid
 
 [Pcd]
-  gRockchipTokenSpaceGuid.PcdDwEmmcDxeBaseAddress
+  gRockchipTokenSpaceGuid.PcdRkSdmmcBaseAddress
 
 [Depex]
   TRUE

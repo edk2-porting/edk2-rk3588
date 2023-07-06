@@ -11,12 +11,12 @@
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
-#include <Library/DwEmmcPlatformLib.h>
+#include <Library/RkSdmmcPlatformLib.h>
 
 #include <Protocol/NonDiscoverableDevice.h>
 #include <Protocol/PlatformDwMmc.h>
 
-#define DW_MMC_BASE  FixedPcdGet32(PcdDwEmmcDxeBaseAddress)
+#define DW_MMC_BASE  FixedPcdGet32(PcdRkSdmmcBaseAddress)
 #define DW_MMC_SIZE  SIZE_16KB
 
 #pragma pack (1)
@@ -119,7 +119,7 @@ RkSdmmcCardDetect (
     return FALSE;
   }
 
-  return DwEmmcGetCardPresenceState () == DwEmmcCardPresent;
+  return RkSdmmcGetCardPresenceState () == RkSdmmcCardPresent;
 }
 
 STATIC PLATFORM_DW_MMC_PROTOCOL mDwMmcDeviceProtocol = {
@@ -137,7 +137,7 @@ RkSdmmcDxeInitialize (
   EFI_STATUS        Status;
   EFI_HANDLE        Handle;
 
-  DwEmmcSetIoMux ();
+  RkSdmmcSetIoMux ();
 
   Status = gBS->InstallMultipleProtocolInterfaces(&mDwMmcCapability.Controller,
             &gEfiDevicePathProtocolGuid, &mDwMmcDevice.DevicePath,

@@ -46,10 +46,10 @@ PlatformBootDescriptionHandler (
   Description = NULL;
   IsBootDevice = FALSE;
 
-  if (Device->MemMap.StartingAddress == PcdGet32 (PcdSdhciDxeBaseAddress)) {
+  if (Device->MemMap.StartingAddress == PcdGet32 (PcdDwcSdhciBaseAddress)) {
     Description = L"UEFI eMMC Device";
     IsBootDevice = mBootDeviceType == RkAtagBootDevTypeEmmc;
-  } else if (Device->MemMap.StartingAddress == PcdGet32 (PcdDwEmmcDxeBaseAddress)) {
+  } else if (Device->MemMap.StartingAddress == PcdGet32 (PcdRkSdmmcBaseAddress)) {
     Description = L"UEFI SD Device";
     IsBootDevice = mBootDeviceType == RkAtagBootDevTypeSd0;
   } else {

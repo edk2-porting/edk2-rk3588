@@ -67,12 +67,9 @@
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorMinVoltages|{ 0x0 }|VOID*|0x0200000C
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorMaxVoltages|{ 0x0 }|VOID*|0x0200000D
 
-  gRockchipTokenSpaceGuid.PcdDwEmmcDxeBaseAddress|0x0|UINT32|0x40000030
-  gRockchipTokenSpaceGuid.PcdDwEmmcDxeClockFrequencyInHz|0x0|UINT32|0x40000031
-  gRockchipTokenSpaceGuid.PcdDwEmmcDxeMaxClockFreqInHz|0x0|UINT32|0x40000032
-  gRockchipTokenSpaceGuid.PcdDwEmmcDxeFifoDepth|0x0|UINT32|0x40000033
+  gRockchipTokenSpaceGuid.PcdRkSdmmcBaseAddress|0x0|UINT32|0x40000030
 
-  gRockchipTokenSpaceGuid.PcdSdhciDxeBaseAddress|0x0|UINT32|0x40000035
+  gRockchipTokenSpaceGuid.PcdDwcSdhciBaseAddress|0x0|UINT32|0x40000035
   gRockchipTokenSpaceGuid.PcdDwcSdhciForceHighSpeed|FALSE|BOOLEAN|0x40000036
 
   gRockchipTokenSpaceGuid.SpiRK806BaseAddr|0|UINT32|0x21200002

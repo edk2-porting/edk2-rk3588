@@ -161,8 +161,8 @@
   # Add support for GCC stack protector
   NULL|MdePkg/Library/BaseStackCheckLib/BaseStackCheckLib.inf
 
-  # DwEmmcDxe dependencies
-  DwEmmcPlatformLib|Silicon/Rockchip/Library/DwEmmcPlatformLibNull/DwEmmcPlatformLibNull.inf
+  # RkSdmmcDxe dependencies
+  RkSdmmcPlatformLib|Silicon/Rockchip/Library/RkSdmmcPlatformLibNull/RkSdmmcPlatformLibNull.inf
 
   # DwcSdhciDxe dependencies
   DwcSdhciPlatformLib|Silicon/Rockchip/Library/DwcSdhciPlatformLibNull/DwcSdhciPlatformLibNull.inf

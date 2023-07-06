@@ -71,8 +71,8 @@
 #  gRockchipTokenSpaceGuid.PcdSpiMemoryMapped
   gRockchipTokenSpaceGuid.PcdNvStorageVariableBase
   gRockchipTokenSpaceGuid.PcdNvStoragePreferSpiFlash
-  gRockchipTokenSpaceGuid.PcdSdhciDxeBaseAddress
-  gRockchipTokenSpaceGuid.PcdDwEmmcDxeBaseAddress
+  gRockchipTokenSpaceGuid.PcdDwcSdhciBaseAddress
+  gRockchipTokenSpaceGuid.PcdRkSdmmcBaseAddress
 
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64

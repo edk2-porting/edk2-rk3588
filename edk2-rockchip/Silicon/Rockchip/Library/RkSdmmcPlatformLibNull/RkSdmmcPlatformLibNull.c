@@ -1,6 +1,6 @@
 /** @file
  *
- *  DwEmmcDxe platform helper library.
+ *  RkSdmmcDxe platform helper library.
  *
  *  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
  *
@@ -9,11 +9,11 @@
  **/
 
 #include <Uefi.h>
-#include <Library/DwEmmcPlatformLib.h>
+#include <Library/RkSdmmcPlatformLib.h>
 
 EFI_STATUS
 EFIAPI
-DwEmmcSetClockRate (
+RkSdmmcSetClockRate (
   IN UINTN Frequency
   )
 {
@@ -22,18 +22,18 @@ DwEmmcSetClockRate (
 
 VOID
 EFIAPI
-DwEmmcSetIoMux (
+RkSdmmcSetIoMux (
   VOID
   )
 {
   return;
 }
 
-DWEMMC_CARD_PRESENCE_STATE
+RKSDMMC_CARD_PRESENCE_STATE
 EFIAPI
-DwEmmcGetCardPresenceState (
+RkSdmmcGetCardPresenceState (
   VOID
   )
 {
-  return DwEmmcCardPresenceUnsupported;
+  return RkSdmmcCardPresenceUnsupported;
 }

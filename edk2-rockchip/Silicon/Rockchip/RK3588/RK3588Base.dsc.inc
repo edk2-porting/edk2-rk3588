@@ -86,8 +86,8 @@
   Pcie30PhyLib|Silicon/Rockchip/RK3588/Library/Pcie30PhyLib/Pcie30PhyLib.inf
 !endif
 
-  # DwEmmcDxe dependencies
-  DwEmmcPlatformLib|Silicon/Rockchip/RK3588/Library/DwEmmcPlatformLib/DwEmmcPlatformLib.inf
+  # RkSdmmcDxe dependencies
+  RkSdmmcPlatformLib|Silicon/Rockchip/RK3588/Library/RkSdmmcPlatformLib/RkSdmmcPlatformLib.inf
 
   # DwcSdhciDxe dependencies
   DwcSdhciPlatformLib|Silicon/Rockchip/RK3588/Library/DwcSdhciPlatformLib/DwcSdhciPlatformLib.inf
@@ -176,14 +176,12 @@
   #
   # DesignWare SD Controller (MSHC)
   #
-  gRockchipTokenSpaceGuid.PcdDwEmmcDxeBaseAddress|0xfe2c0000
-  gRockchipTokenSpaceGuid.PcdDwEmmcDxeClockFrequencyInHz|100000000
-  gRockchipTokenSpaceGuid.PcdDwEmmcDxeFifoDepth|256
+  gRockchipTokenSpaceGuid.PcdRkSdmmcBaseAddress|0xfe2c0000
 
   #
   # DesignWare SD/eMMC Controller (SDHCI)
   #
-  gRockchipTokenSpaceGuid.PcdSdhciDxeBaseAddress|0xfe2e0000
+  gRockchipTokenSpaceGuid.PcdDwcSdhciBaseAddress|0xfe2e0000
 
   #
   # USB2 EHCI + OHCI companion controllers

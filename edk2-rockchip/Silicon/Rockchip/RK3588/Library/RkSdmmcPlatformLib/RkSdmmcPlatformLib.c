@@ -1,6 +1,6 @@
 /** @file
  *
- *  DwEmmcDxe platform helper library.
+ *  RkSdmmcDxe platform helper library.
  *
  *  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
  *
@@ -9,7 +9,7 @@
  **/
 
 #include <Uefi.h>
-#include <Library/DwEmmcPlatformLib.h>
+#include <Library/RkSdmmcPlatformLib.h>
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/GpioLib.h>
@@ -19,7 +19,7 @@
 
 EFI_STATUS
 EFIAPI
-DwEmmcSetClockRate (
+RkSdmmcSetClockRate (
   IN UINTN Frequency
   )
 {
@@ -40,19 +40,19 @@ DwEmmcSetClockRate (
 
 VOID
 EFIAPI
-DwEmmcSetIoMux (
+RkSdmmcSetIoMux (
   VOID
   )
 {
   GpioPinSetDirection (0, GPIO_PIN_PA4, GPIO_PIN_INPUT);
 }
 
-DWEMMC_CARD_PRESENCE_STATE
+RKSDMMC_CARD_PRESENCE_STATE
 EFIAPI
-DwEmmcGetCardPresenceState (
+RkSdmmcGetCardPresenceState (
   VOID
   )
 {
-  return GpioPinReadActual (0, GPIO_PIN_PA4) ? DwEmmcCardNotPresent
-                                             : DwEmmcCardPresent;
+  return GpioPinReadActual (0, GPIO_PIN_PA4) ? RkSdmmcCardNotPresent
+                                             : RkSdmmcCardPresent;
 }

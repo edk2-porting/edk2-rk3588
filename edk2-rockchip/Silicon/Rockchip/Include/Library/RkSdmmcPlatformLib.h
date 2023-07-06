@@ -1,6 +1,6 @@
 /** @file
  *
- *  DwEmmcDxe platform helper library.
+ *  RkSdmmcDxe platform helper library.
  *
  *  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
  *
@@ -9,25 +9,25 @@
  **/
 
 typedef enum {
-  DwEmmcCardPresenceUnsupported = 0,
-  DwEmmcCardPresent,
-  DwEmmcCardNotPresent
-} DWEMMC_CARD_PRESENCE_STATE;
+  RkSdmmcCardPresenceUnsupported = 0,
+  RkSdmmcCardPresent,
+  RkSdmmcCardNotPresent
+} RKSDMMC_CARD_PRESENCE_STATE;
 
 EFI_STATUS
 EFIAPI
-DwEmmcSetClockRate (
+RkSdmmcSetClockRate (
   IN UINTN Frequency
   );
 
 VOID
 EFIAPI
-DwEmmcSetIoMux (
+RkSdmmcSetIoMux (
   VOID
   );
 
-DWEMMC_CARD_PRESENCE_STATE
+RKSDMMC_CARD_PRESENCE_STATE
 EFIAPI
-DwEmmcGetCardPresenceState (
+RkSdmmcGetCardPresenceState (
   VOID
   );

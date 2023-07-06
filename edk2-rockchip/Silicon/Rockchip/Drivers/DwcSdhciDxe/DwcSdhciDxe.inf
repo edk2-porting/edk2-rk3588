@@ -42,7 +42,7 @@
   gEfiDevicePathProtocolGuid
 
 [Pcd]
-  gRockchipTokenSpaceGuid.PcdSdhciDxeBaseAddress
+  gRockchipTokenSpaceGuid.PcdDwcSdhciBaseAddress
   gRockchipTokenSpaceGuid.PcdDwcSdhciForceHighSpeed
 
 [Depex]

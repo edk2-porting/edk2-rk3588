@@ -37,5 +37,5 @@
   gEfiBlockIoProtocolGuid       ## SOMETIMES_CONSUMES
 
 [Pcd]
-  gRockchipTokenSpaceGuid.PcdSdhciDxeBaseAddress
-  gRockchipTokenSpaceGuid.PcdDwEmmcDxeBaseAddress
+  gRockchipTokenSpaceGuid.PcdDwcSdhciBaseAddress
+  gRockchipTokenSpaceGuid.PcdRkSdmmcBaseAddress
