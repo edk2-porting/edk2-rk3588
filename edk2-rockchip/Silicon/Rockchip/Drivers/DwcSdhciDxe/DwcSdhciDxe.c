@@ -100,6 +100,7 @@ EmmcSdMmcNotifyPhase (
   SD_MMC_BUS_MODE                 *Timing;
   UINTN                            MaxClockFreq;
   UINT32                           Value, i;
+  UINT32                           TxClkTapNum;
 
   DEBUG ((DEBUG_INFO, "%a\n", __FUNCTION__));
 
@@ -185,12 +186,26 @@ EmmcSdMmcNotifyPhase (
       gBS->Stall (1);
     }
 
-    MmioWrite32(EMMC_DLL_RXCLK, EMMC_DLL_DLYENA |
-      EMMC_DLL_RXCLK_NO_INVERTER);
+    TxClkTapNum = EMMC_DLL_TXCLK_TAPNUM_DEFAULT;
+
+    if (*Timing == SdMmcMmcHs400) {
+      TxClkTapNum = EMMC_DLL_TXCLK_TAPNUM_90_DEGREES;
+
+      MmioWrite32 (EMMC_DLL_CMDOUT, EMMC_DLL_CMDOUT_SRC_CLK_NEG |
+                                    EMMC_DLL_CMDOUT_EN_SRC_CLK_NEG |
+                                    EMMC_DLL_DLYENA |
+                                    EMMC_DLL_CMDOUT_TAPNUM_90_DEGREES |
+                                    EMMC_DLL_TAPNUM_FROM_SW);
+    }
+
+    MmioWrite32(EMMC_DLL_RXCLK, EMMC_DLL_DLYENA);
+
     MmioWrite32(EMMC_DLL_TXCLK, EMMC_DLL_DLYENA |
-      EMMC_DLL_TXCLK_TAPNUM_DEFAULT | EMMC_DLL_TXCLK_TAPNUM_FROM_SW);
+      TxClkTapNum | EMMC_DLL_TAPNUM_FROM_SW |
+      EMMC_DLL_NO_INVERTER);
+
     MmioWrite32(EMMC_DLL_STRBIN, EMMC_DLL_DLYENA |
-      EMMC_DLL_STRBIN_TAPNUM_DEFAULT);
+      EMMC_DLL_STRBIN_TAPNUM_DEFAULT | EMMC_DLL_TAPNUM_FROM_SW);
     break;
 
   default:
