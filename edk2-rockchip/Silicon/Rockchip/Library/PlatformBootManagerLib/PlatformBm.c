@@ -20,6 +20,7 @@
 #include <Library/UefiBootManagerLib.h>
 #include <Library/UefiLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
+#include <Library/RkAtagsLib.h>
 #include <Protocol/BootManagerPolicy.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/EsrtManagement.h>
@@ -303,6 +304,68 @@ IsUsbHost (
       CompareGuid (Device->Type, &gEdkiiNonDiscoverableXhciDeviceGuid))
   {
     return TRUE;
+  }
+
+  return FALSE;
+}
+
+/**
+  This FILTER_FUNCTION checks if the Block I/O protocol handle
+  corresponds to that of the boot SD/eMMC device.
+
+  This code is almost identical to FvbCheckIsBootDevice from RkFvbDxe.
+**/
+STATIC
+BOOLEAN
+EFIAPI
+IsSdBootBlockIo (
+  IN EFI_HANDLE    Handle,
+  IN CONST CHAR16  *ReportText
+  )
+{
+  EFI_STATUS                          Status;
+  EFI_DEVICE_PATH_PROTOCOL            *DevicePath;
+  EFI_HANDLE                          DeviceHandle;
+  NON_DISCOVERABLE_DEVICE             *Device;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR   *Descriptor;
+  RKATAG_BOOTDEV                      *BootDevice;
+
+  BootDevice = RkAtagsGetBootDev ();
+  if (BootDevice == NULL) {
+    return FALSE;
+  }
+
+  DevicePath = DevicePathFromHandle (Handle);
+
+  if (DevicePath->Type != HARDWARE_DEVICE_PATH
+      || DevicePath->SubType != HW_VENDOR_DP) {
+    return FALSE;
+  }
+
+  Status = gBS->LocateDevicePath (&gEdkiiNonDiscoverableDeviceProtocolGuid,
+                   &DevicePath, &DeviceHandle);
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  Status = gBS->HandleProtocol (DeviceHandle,
+                   &gEdkiiNonDiscoverableDeviceProtocolGuid, (VOID **) &Device);
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  Descriptor = &Device->Resources[0];
+
+  if (Descriptor->Desc != ACPI_ADDRESS_SPACE_DESCRIPTOR ||
+      Descriptor->ResType != ACPI_ADDRESS_SPACE_TYPE_MEM) {
+    return FALSE;
+  }
+
+  if (BootDevice->DevType == RkAtagBootDevTypeEmmc) {
+    return Descriptor->AddrRangeMin == PcdGet32 (PcdDwcSdhciBaseAddress);
+  }
+  if (BootDevice->DevType == RkAtagBootDevTypeSd0) {
+    return Descriptor->AddrRangeMin == PcdGet32 (PcdRkSdmmcBaseAddress);
   }
 
   return FALSE;
@@ -832,6 +895,19 @@ PlatformBootManagerBeforeConsole (
   // PCI driver attached first.
   //
   FilterAndProcess (&gEdkiiNonDiscoverableDeviceProtocolGuid, IsUsbHost, Connect);
+
+  //
+  // Connect USB OHCI controller(s)
+  //
+  FilterAndProcess (&gOhciDeviceProtocol, NULL, Connect);
+
+  //
+  // Connect the Block I/O device produced by the SD/eMMC device that
+  // booted UEFI. We don't want BDS to ignore this device as it would
+  // prevent RkFvbDxe from detecting it and dumping the NVRAM variables
+  // in time.
+  //
+  FilterAndProcess (&gEfiBlockIoProtocolGuid, IsSdBootBlockIo, Connect);
 
   //
   // Add the hardcoded short-form USB keyboard device path to ConIn.

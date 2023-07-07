@@ -52,6 +52,7 @@
   UefiBootServicesTableLib
   UefiLib
   UefiRuntimeServicesTableLib
+  RkAtagsLib
 
 [FeaturePcd]
   gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
@@ -68,6 +69,8 @@
 [Pcd]
   gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut
   gEfiMdeModulePkgTokenSpaceGuid.PcdBootDiscoveryPolicy
+  gRockchipTokenSpaceGuid.PcdDwcSdhciBaseAddress
+  gRockchipTokenSpaceGuid.PcdRkSdmmcBaseAddress
 
 [Guids]
   gBootDiscoveryPolicyMgrFormsetGuid
@@ -93,5 +96,7 @@
   gEfiLoadedImageProtocolGuid
   gEfiPciRootBridgeIoProtocolGuid
   gEfiSimpleFileSystemProtocolGuid
+  gEfiBlockIoProtocolGuid
   gEsrtManagementProtocolGuid
   gPlatformBootManagerProtocolGuid
+  gOhciDeviceProtocol
