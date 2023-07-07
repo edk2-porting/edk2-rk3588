@@ -265,7 +265,7 @@ RegisterOhciController (
     goto FreeOhciDevice;
   }
 
-  CopyGuid (&OhciDevicePath->Vendor.Guid, &gOhciDeviceProtocol);
+  CopyGuid (&OhciDevicePath->Vendor.Guid, &gOhciDeviceProtocolGuid);
 
   /* Device paths must be unique */
   OhciDevicePath->BaseAddress = OhciDevice->BaseAddress;
@@ -277,7 +277,7 @@ RegisterOhciController (
   Handle = NULL;
   Status = gBS->InstallMultipleProtocolInterfaces (&Handle,
                   &gEfiDevicePathProtocolGuid, OhciDevicePath,
-                  &gOhciDeviceProtocol, OhciDevice,
+                  &gOhciDeviceProtocolGuid, OhciDevice,
                   NULL);
   if (EFI_ERROR (Status)) {
     goto FreeOhciDevicePath;

@@ -99,4 +99,4 @@
   gEfiBlockIoProtocolGuid
   gEsrtManagementProtocolGuid
   gPlatformBootManagerProtocolGuid
-  gOhciDeviceProtocol
+  gOhciDeviceProtocolGuid

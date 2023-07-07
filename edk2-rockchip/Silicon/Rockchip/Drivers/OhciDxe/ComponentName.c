@@ -186,7 +186,7 @@ OhciComponentNameGetControllerName (
   Status = EfiTestManagedDevice (
              ControllerHandle,
              gOhciDriverBinding.DriverBindingHandle,
-             &gOhciDeviceProtocol
+             &gOhciDeviceProtocolGuid
              );
   if (EFI_ERROR (Status)) {
     return Status;

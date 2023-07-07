@@ -18,6 +18,6 @@ typedef struct {
   UINT32      BaseAddress;
 } OHCI_DEVICE_PROTOCOL;
 
-extern EFI_GUID gOhciDeviceProtocol;
+extern EFI_GUID gOhciDeviceProtocolGuid;
 
 #endif // _OHCI_DEVICE_PROTOCOL_H_

@@ -62,7 +62,7 @@
   gEfiEndOfDxeEventGroupGuid
 
 [Protocols]
-  gOhciDeviceProtocol                           ## TO_START
+  gOhciDeviceProtocolGuid                           ## TO_START
   gEfiUsbHcProtocolGuid                         ## BY_START
 
 [Depex]

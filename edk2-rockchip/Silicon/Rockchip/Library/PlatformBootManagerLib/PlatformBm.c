@@ -899,7 +899,7 @@ PlatformBootManagerBeforeConsole (
   //
   // Connect USB OHCI controller(s)
   //
-  FilterAndProcess (&gOhciDeviceProtocol, NULL, Connect);
+  FilterAndProcess (&gOhciDeviceProtocolGuid, NULL, Connect);
 
   //
   // Connect the Block I/O device produced by the SD/eMMC device that

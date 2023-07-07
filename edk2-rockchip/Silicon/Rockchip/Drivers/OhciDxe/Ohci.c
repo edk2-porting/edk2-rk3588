@@ -2135,7 +2135,7 @@ OHCIDriverBindingSupported (
   //  Connect to the non-discoverable device
   //
   Status = gBS->OpenProtocol (ControllerHandle,
-                              &gOhciDeviceProtocol,
+                              &gOhciDeviceProtocolGuid,
                               (VOID **)&Dev,
                               This->DriverBindingHandle,
                               ControllerHandle,
@@ -2148,7 +2148,7 @@ OHCIDriverBindingSupported (
   // Clean up.
   //
   gBS->CloseProtocol (ControllerHandle,
-                      &gOhciDeviceProtocol,
+                      &gOhciDeviceProtocolGuid,
                       This->DriverBindingHandle,
                       ControllerHandle);
 
@@ -2187,7 +2187,7 @@ OHCIDriverBindingStart (
   }
 
   Status = gBS->OpenProtocol (ControllerHandle,
-                              &gOhciDeviceProtocol,
+                              &gOhciDeviceProtocolGuid,
                               (VOID **)&Ohc->Protocol,
                               This->DriverBindingHandle,
                               ControllerHandle,
@@ -2328,7 +2328,7 @@ UNINSTALL_USBHC:
          NULL
          );
   gBS->CloseProtocol (ControllerHandle,
-        &gOhciDeviceProtocol,
+        &gOhciDeviceProtocolGuid,
         This->DriverBindingHandle,
         ControllerHandle); 
 FREE_MEM_PAGE:
@@ -2382,7 +2382,7 @@ OHCIDriverBindingStop (
 
   gBS->CloseProtocol (
          Controller,
-         &gOhciDeviceProtocol,
+         &gOhciDeviceProtocolGuid,
          This->DriverBindingHandle,
          Controller
          );

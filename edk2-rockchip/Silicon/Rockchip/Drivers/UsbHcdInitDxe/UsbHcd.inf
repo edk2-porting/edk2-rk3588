@@ -44,7 +44,7 @@
   gRockchipTokenSpaceGuid.PcdDwc3Size
 
 [Protocols]
-  gOhciDeviceProtocol           ## PRODUCES
+  gOhciDeviceProtocolGuid           ## PRODUCES
 
 [Guids]
   gEfiEndOfDxeEventGroupGuid
