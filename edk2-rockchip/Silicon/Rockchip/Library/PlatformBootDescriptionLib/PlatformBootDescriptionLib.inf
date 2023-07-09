@@ -34,7 +34,8 @@
   RkAtagsLib
 
 [Protocols]
-  gEfiBlockIoProtocolGuid       ## SOMETIMES_CONSUMES
+  gEdkiiNonDiscoverableDeviceProtocolGuid   ## SOMETIMES_CONSUMES
+  gEfiDiskInfoProtocolGuid                  ## SOMETIMES_CONSUMES
 
 [Pcd]
   gRockchipTokenSpaceGuid.PcdDwcSdhciBaseAddress
