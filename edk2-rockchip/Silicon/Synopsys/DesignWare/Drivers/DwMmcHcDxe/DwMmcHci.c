@@ -1465,9 +1465,10 @@ DwSdExecTrb (
   }
 
   //
-  // The workaround on SD_SEND_CSD is used to be compatible with SDHC.
+  // The workaround on SD_SEND_CSD/CID is used to be compatible with SDHC.
   //
-  if (Packet->SdMmcCmdBlk->CommandIndex == SD_SEND_CSD) {
+  if (Packet->SdMmcCmdBlk->CommandIndex == SD_SEND_CSD
+      || Packet->SdMmcCmdBlk->CommandIndex == SD_SEND_CID) {
     {
       UINT32   Buf[4];
       ZeroMem (Buf, sizeof (Buf));
