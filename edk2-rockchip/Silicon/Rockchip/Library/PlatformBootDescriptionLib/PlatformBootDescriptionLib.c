@@ -79,6 +79,7 @@ STATIC SDMMC_MANUFACTURER mMmcManufacturers[] = {
   { 0x15, L"Samsung"                   },
   { 0x37, L"KingMax"                   },
   { 0x44, L"ATP"                       },
+  { 0x45, L"SanDisk"                   },
   { 0x2c, L"Kingston"                  },
   { 0x70, L"Kingston"                  },
   { 0x88, L"Foresee"                   },
