@@ -35,6 +35,7 @@ jobs:
           - edge2
           - nanopi-r6s
           - nanopc-t6
+          - blade3
           # - rk3588-evb is currently failing
         CONFIGURATION: ${{ fromJSON(format('[{0}]', inputs.build-configs || '"Debug"')) }}
     steps:
