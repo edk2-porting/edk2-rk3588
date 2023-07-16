@@ -70,11 +70,11 @@ InitComPhyConfig (
       MmioWrite32 (PhyBaseAddr + (0xd << 2), 0x57);
 
       if (PhyBaseAddr == COMBO_PIPE_PHY0) {
-        MmioWrite32 (PHP_GRF_BASE + PHP_GRF_PCIESEL_CON, BIT0 << 16);
+        MmioWrite32 (PHP_GRF_BASE + PHP_GRF_PCIESEL_CON, BIT1 << 16);
       }
 
       if (PhyBaseAddr == COMBO_PIPE_PHY1) {
-        MmioWrite32 (PHP_GRF_BASE + PHP_GRF_PCIESEL_CON, BIT1 << 16);
+        MmioWrite32 (PHP_GRF_BASE + PHP_GRF_PCIESEL_CON, BIT0 << 16);
       }
       break;
 
