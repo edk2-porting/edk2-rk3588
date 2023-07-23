@@ -61,22 +61,18 @@ PciSegmentLibGetConfigBase (
   // DEBUG ((DEBUG_ERROR, "PciSegmentLibGetConfigBase: Address=0x%lX, Bus=%d, Segment=%d\n",
   //         Address, Bus, Segment));
 
-  //
-  // Ignore more than one device on:
-  //   - bus 0 as there can only be the root port.
-  //   - bus 1 because there may appear a ghost device at 0x1F.
-  //
+  // Ignore more than one device on bus 0 and 1 to hide duplicates/ghosts.
   if (Device > 0 && (Bus == 0 || Bus == 1)) {
     return 0xffffffff;
   }
 
-  // The root port is not part of the config space.
+  // The root port is not part of the main config space.
   if(Bus == 0) {
     return PCIE_DBI_BASE (Segment);
   }
 
   // Here starts the not-quite-compliant ECAM space.
-  return PCIE_CFG_BASE (Segment) + 0x8000;
+  return PCIE_CFG_BASE (Segment);
 }
 
 /**

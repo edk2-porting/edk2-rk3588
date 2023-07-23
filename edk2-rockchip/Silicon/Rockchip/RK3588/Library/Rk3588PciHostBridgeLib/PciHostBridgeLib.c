@@ -192,7 +192,7 @@ PciHostBridgeGetRootBridges (
                                       EFI_PCI_HOST_BRIDGE_MEM64_DECODE;
 
     mPciRootBridges[Loop].Bus.Base              = 0;
-    mPciRootBridges[Loop].Bus.Limit             = 1;
+    mPciRootBridges[Loop].Bus.Limit             = 252; // limited by CFG1 iATU window size
 
     mPciRootBridges[Loop].Io.Base               = PCIE_IO_BASE;
     mPciRootBridges[Loop].Io.Limit              = mPciRootBridges[Loop].Io.Base + PCIE_IO_SIZE - 1;
