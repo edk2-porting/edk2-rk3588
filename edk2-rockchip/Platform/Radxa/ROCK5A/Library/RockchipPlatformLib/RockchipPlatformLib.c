@@ -192,12 +192,14 @@ UsbPortPowerEnable (
   )
 {
   DEBUG((EFI_D_WARN, "UsbPortPowerEnable called\n"));
-  
+
+  /* vcc5v0_host */
   GpioPinSetDirection (4, GPIO_PIN_PB5, GPIO_PIN_OUTPUT);
   GpioPinWrite (4, GPIO_PIN_PB5, TRUE);
 
-  GpioPinSetDirection (0, GPIO_PIN_PD4, GPIO_PIN_OUTPUT);
-  GpioPinWrite (0, GPIO_PIN_PD4, TRUE);
+  /* vcc_5v0 */
+  GpioPinSetDirection (4, GPIO_PIN_PA3, GPIO_PIN_OUTPUT);
+  GpioPinWrite (4, GPIO_PIN_PA3, TRUE);
 }
 
 VOID
