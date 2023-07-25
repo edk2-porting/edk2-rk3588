@@ -33,6 +33,7 @@ jobs:
           - r58x
           - r58-mini
           - edge2
+          - nanopi-r6c
           - nanopi-r6s
           - nanopc-t6
           - blade3
