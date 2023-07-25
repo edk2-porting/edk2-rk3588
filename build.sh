@@ -25,9 +25,9 @@ function _error(){ echo "${@}" >&2;exit 1; }
 MACHINE_TYPE=`uname -m`
 
 # Fix-up possible differences in reported arch
-if [ ${MACHINE_TYPE} == 'arm64']; then
+if [ ${MACHINE_TYPE} == 'arm64' ]; then
 	MACHINE_TYPE='aarch64'
-elif [ ${MACHINE_TYPE} == 'amd64']; then
+elif [ ${MACHINE_TYPE} == 'amd64' ]; then
 	MACHINE_TYPE='x86_64'
 fi
 
