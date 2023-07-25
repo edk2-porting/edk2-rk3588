@@ -13,6 +13,8 @@ This repository contains an UEFI firmware implementation based on EDK2 for vario
 - [Mekotronics R58 Mini](https://www.mekotronics.com/h-pd-76.html)
 - [Khadas Edge2](https://www.khadas.com/edge2)
 - [FriendlyELEC NanoPC T6](https://wiki.friendlyelec.com/wiki/index.php/NanoPC-T6)
+- [FriendlyELEC NanoPi R6C](https://wiki.friendlyelec.com/wiki/index.php/NanoPi_R6C)
+- [FriendlyELEC NanoPi R6S](https://wiki.friendlyelec.com/wiki/index.php/NanoPi_R6S)
 
 ## Supported peripherals
 Applicable to all platforms unless otherwise noted.
