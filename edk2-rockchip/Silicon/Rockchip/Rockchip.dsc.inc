@@ -663,6 +663,3 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
 
   # SPI Flash Cmd application
   # Silicon/Rockchip/Applications/SpiTool/SpiFlashCmd.inf
-
-  # Maskrom reset application
-  # Silicon/Rockchip/Applications/MaskromReset/maskrom.inf

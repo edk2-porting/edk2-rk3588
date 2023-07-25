@@ -58,7 +58,6 @@
 [Protocols]
   gEfiDevicePathProtocolGuid
   gEfiFirmwareVolumeBlockProtocolGuid
-  gRockchipSpiFlashProtocolGuid
   gUniNorFlashProtocolGuid
   gEfiDiskIoProtocolGuid
   gEfiBlockIoProtocolGuid

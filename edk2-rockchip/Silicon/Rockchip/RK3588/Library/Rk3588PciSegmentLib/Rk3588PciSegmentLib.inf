@@ -39,13 +39,3 @@
   DebugLib
 
 [FixedPcd]
-  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4ApbBaseAddress|0xfe150000
-  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4DbiBaseAddress|0xf5000000
-  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4CfgBaseAddress
-  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4CfgSize
-  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4IoBaseAddress
-  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4IoSize
-  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4MemBaseAddress
-  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4MemSize
-  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4MemBaseAddress64
-  gRockchipTokenSpaceGuid.PcdPcieRootPort3x4MemSize64

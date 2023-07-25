@@ -32,4 +32,3 @@
   MdePkg/MdePkg.dec
   Silicon/Rockchip/RockchipPkg.dec
   Silicon/Rockchip/RK3588/RK3588.dec
-  Platform/Rockchip/RK3588/RK3588.dec

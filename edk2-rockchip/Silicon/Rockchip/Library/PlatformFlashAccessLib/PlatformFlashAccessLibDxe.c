@@ -164,7 +164,7 @@ PerformFlashAccessLibConstructor (
                   (VOID **)&mSpiProtocol);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR,
-            "LocateProtocol gRockchipSpiFlashProtocolGuid Status = %r \n",
+            "LocateProtocol gUniNorFlashProtocolGuid Status = %r \n",
             Status));
   }
 

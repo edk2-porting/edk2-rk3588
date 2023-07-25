@@ -1157,7 +1157,6 @@ PlatformBootManagerAfterConsole (
   UINTN                         PosX;
   UINTN                         PosY;
   EFI_INPUT_KEY                 Key;
-  // EFI_INPUT_KEY                 F4;
 
   FirmwareVerLength = StrLen (PcdGetPtr (PcdFirmwareVersionString));
 
@@ -1221,14 +1220,6 @@ PlatformBootManagerAfterConsole (
   Key.ScanCode    = SCAN_NULL;
   Key.UnicodeChar = L's';
   PlatformRegisterFvBootOption (&gUefiShellFileGuid, L"UEFI Shell", 0, &Key);
-
-  // Map F4 for rebooting to maskrom
-  // Disable for now, it's broken.
-  //
-  // F4.ScanCode     = SCAN_F4;
-  // F4.UnicodeChar  = CHAR_NULL;
-
-  // PlatformRegisterFvBootOption (&gMaskromFileGuid, L"Reboot to Maskrom", 0, &F4);
 
   RemoveStaleFvFileOptions ();
 }

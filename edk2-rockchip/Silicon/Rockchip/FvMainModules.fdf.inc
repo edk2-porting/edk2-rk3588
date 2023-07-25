@@ -203,6 +203,3 @@
 
   # SPI Flash Cmd application
   # INF Silicon/Rockchip/Applications/SpiTool/SpiFlashCmd.inf
-
-  # Maskrom reset application
-  # INF Silicon/Rockchip/Applications/MaskromReset/maskrom.inf

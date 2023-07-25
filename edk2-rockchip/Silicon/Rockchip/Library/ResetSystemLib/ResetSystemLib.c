@@ -46,12 +46,11 @@ ResetWarm (
 {
   SignalResetEvent ();
 
+  // RK3588-specific!
+  // Should be moved into a lib if SoC abstraction is needed.
+
   // First global software reset by programming CRU_GLB_SRST_FST as 0xfdb9
-#ifdef RK356X
-  MmioWrite32 (0xFDD200D4, 0xfdb9);
-#else
   MmioWrite32 (0xFD7C0C08, 0xfdb9);
-#endif
 }
 
 /**
@@ -118,12 +117,6 @@ ResetPlatformSpecific (
 {
   SignalResetEvent ();
 
-#ifdef RK356X
-  MmioWrite32 (0xfdc20200, 0xEF08A53C);
-#else
-  MmioWrite32 (0xfd588080, 0xEF08A53C);
-#endif
-  // Hard reset doesn't work somehow
   ResetCold();
 }
 

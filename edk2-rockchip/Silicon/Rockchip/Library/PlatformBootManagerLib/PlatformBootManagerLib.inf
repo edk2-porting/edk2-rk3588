@@ -86,7 +86,6 @@
   gEfiTtyTermGuid
   gUefiShellFileGuid
   gSimpleInitFileGuid
-  gMaskromFileGuid
 
 [Protocols]
   gEdkiiNonDiscoverableDeviceProtocolGuid
