@@ -12,6 +12,7 @@
 #include <Library/RK806.h>
 #include <Library/Rk3588Pcie.h>
 #include <Soc.h>
+#include <Library/TimerLib.h>
 
 static struct regulator_init_data rk806_init_data[] = {
   /* Master PMIC */
@@ -201,6 +202,11 @@ UsbPortPowerEnable (
   /* Set GPIO4 PB0 (USB_HOST_PWREN) output high to power USB ports */
   GpioPinSetDirection (4, GPIO_PIN_PB0, GPIO_PIN_OUTPUT);
   GpioPinWrite (4, GPIO_PIN_PB0, TRUE);
+  /* Set GPIO4 PB0 (USB_HUB_PWREN) output high to power USB ports */
+  GpioPinSetDirection (4, GPIO_PIN_PA6, GPIO_PIN_OUTPUT);
+  GpioPinWrite (4, GPIO_PIN_PA6, FALSE);
+  MicroSecondDelay (100);
+  GpioPinWrite (4, GPIO_PIN_PA6, TRUE);
 }
 
 VOID
