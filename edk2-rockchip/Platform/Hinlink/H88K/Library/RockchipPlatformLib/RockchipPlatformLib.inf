@@ -28,6 +28,7 @@
   SerialPortLib
   CruLib
   GpioLib
+  TimerLib
 
 [Sources.common]
   RockchipPlatformLib.c
