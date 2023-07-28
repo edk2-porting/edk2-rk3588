@@ -76,6 +76,14 @@ function _pack(){
 	# FIT Image at 0x100000
 	dd if=${WORKSPACE}/${DEVICE}_EFI.itb of=${WORKSPACE}/RK3588_NOR_FLASH.img bs=1K seek=1024
 	cp ${WORKSPACE}/RK3588_NOR_FLASH.img ${ROOTDIR}/
+
+	echo " => Building SDCard image with a 300MB EFI partition"
+	fallocate -l 331M RK3588_SDCARD_EFI.img
+	parted -s RK3588_SDCARD_EFI.img mklabel gpt
+	parted -s RK3588_SDCARD_EFI.img unit s mkpart loader 64 32767
+	parted -s RK3588_SDCARD_EFI.img unit s mkpart EFI 32768 331MB
+	dd if=${WORKSPACE}/idblock.bin of=RK3588_SDCARD_EFI.img seek=64 conv=notrunc
+	dd if=${WORKSPACE}/${DEVICE}_EFI.itb of=RK3588_SDCARD_EFI.img seek=20480 conv=notrunc
 }
 
 function _build(){
@@ -101,6 +109,7 @@ function _build(){
 
 	# based on the instructions from edk2-platform
 	rm -f "${OUTDIR}/RK35*_NOR_FLASH.img"
+	rm -f "${OUTDIR}/RK35*_SDCARD_EFI.img"
 
 	case "${MODE}" in
 		RELEASE) _MODE=RELEASE;;

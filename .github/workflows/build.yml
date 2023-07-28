@@ -68,12 +68,16 @@ jobs:
       - name: Build platform
         shell: bash
         run: |
-         ./build.sh --device ${{matrix.PLATFORM}} --release ${{matrix.CONFIGURATION}}
+          ./build.sh --device ${{matrix.PLATFORM}} --release ${{matrix.CONFIGURATION}}
           mv RK3588_NOR_FLASH.img ${{matrix.PLATFORM}}_UEFI_${{matrix.CONFIGURATION}}_${{steps.get_version_tag.outputs.version}}.img
+          mv RK3588_SDCARD_EFI.img ${{matrix.PLATFORM}}_SDCARD_EFI_${{matrix.CONFIGURATION}}_${{steps.get_version_tag.outputs.version}}.img
+          xz -T0 ${{matrix.PLATFORM}}_SDCARD_EFI_${{matrix.CONFIGURATION}}_${{steps.get_version_tag.outputs.version}}.img
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
           name: ${{matrix.PLATFORM}} UEFI ${{matrix.CONFIGURATION}} image
-          path: ./*.img
+          path: |
+            ./*.img
+            ./*.img.xz
           if-no-files-found: error
