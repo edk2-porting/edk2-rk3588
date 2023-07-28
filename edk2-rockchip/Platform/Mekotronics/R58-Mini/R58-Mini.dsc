@@ -72,7 +72,7 @@
   gRK3588TokenSpaceGuid.PcdComboPhy1Switchable|FALSE
   gRK3588TokenSpaceGuid.PcdComboPhy2Switchable|TRUE
   gRK3588TokenSpaceGuid.PcdComboPhy0ModeDefault|$(COMBO_PHY_MODE_SATA)
-  gRK3588TokenSpaceGuid.PcdComboPhy1ModeDefault|$(COMBO_PHY_MODE_UNCONNECTED) # Not working yet, need to look into iomux config.
+  gRK3588TokenSpaceGuid.PcdComboPhy1ModeDefault|$(COMBO_PHY_MODE_PCIE)
   gRK3588TokenSpaceGuid.PcdComboPhy2ModeDefault|$(COMBO_PHY_MODE_USB3)
 
   #
