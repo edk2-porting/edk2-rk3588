@@ -40,7 +40,9 @@
 #define RK3588_PERIPH_BASE      0xF0000000
 #define RK3588_PERIPH_SZ        0x10000000
 
-#define I2C_BASE(id)            ((id == 0) ? 0xFD880000 : (0xFEA90000 + ((id - 1) * 0x10000)))
+#define I2C_BASE(id)            ((id == 0) ? 0xFD880000 :                              \
+                                 (id <= 5) ? (0xFEA90000 + ((id - 1) * 0x10000)) :     \
+                                 (id <= 8) ? (0xFEC80000 + ((id - 6) * 0x10000)) : 0)
 #define I2C_COUNT               9
 
 /******************************************CRU*******************************************/
