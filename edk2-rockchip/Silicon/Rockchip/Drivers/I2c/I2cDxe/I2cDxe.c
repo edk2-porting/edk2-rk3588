@@ -278,19 +278,33 @@ I2cInitialise (
   EFI_PHYSICAL_ADDRESS BaseAddress;
   EFI_EVENT EndOfDxeEvent;
   UINT8 *DeviceBusPcd;
+  UINT32 DeviceBusCount;
   EFI_STATUS Status;
   UINTN Index;
+  BOOLEAN ConfiguredBuses[I2C_COUNT] = {0};
 
-  DEBUG ((EFI_D_VERBOSE, "I2cInitialise count: %d\n", PcdGet32 (PcdI2cBusCount)));
+  DeviceBusPcd = PcdGetPtr (PcdI2cSlaveBuses);
+  DeviceBusCount = PcdGetSize (PcdI2cSlaveBuses);
 
-   DeviceBusPcd = PcdGetPtr (PcdI2cSlaveBuses);
   /* Initialize enabled chips */
-  for (Index = 0; Index < PcdGet32 (PcdI2cBusCount); Index++) {
+  for (Index = 0; Index < DeviceBusCount; Index++) {
     if (DeviceBusPcd[Index] > I2C_COUNT - 1) {
       DEBUG ((EFI_D_WARN, "I2cInitialise: invalid bus %d for DeviceBusPcd index %d. Skipping.\n",
               DeviceBusPcd[Index], Index));
       continue;
     }
+
+    //
+    // PcdI2cSlaveBuses is used to map devices to their corresponding bus,
+    // which means we will be looping over duplicate entries when there's
+    // more than one device on a bus. Don't reinitialize in this case.
+    //
+    if (ConfiguredBuses[DeviceBusPcd[Index]]) {
+      DEBUG ((DEBUG_VERBOSE, "%a: Bus %d already configured. Skipping.\n",
+              __FUNCTION__, DeviceBusPcd[Index]));
+      continue;
+    }
+    ConfiguredBuses[DeviceBusPcd[Index]] = TRUE;
 
     BaseAddress = I2C_BASE (DeviceBusPcd[Index]);
 
