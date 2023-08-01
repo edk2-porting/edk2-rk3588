@@ -10,6 +10,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/I2cBusConfigurationManagement.h>
 #include <Protocol/DevicePath.h>
 #include <Protocol/I2c.h>
+#include <Protocol/RockchipI2cMasterProtocol.h>
 
 #include <Library/TimerLib.h>
 #include <Library/BaseLib.h>
@@ -179,6 +180,7 @@ I2cInitialiseController (
   I2cMasterContext->I2cMaster.StartRequest = I2cStartRequest;
   I2cMasterContext->I2cEnumerate.Enumerate = I2cEnumerate;
   I2cMasterContext->I2cBusConf.EnableI2cBusConfiguration = I2cEnableConf;
+  I2cMasterContext->RockchipI2cMaster.Bus = BusId;
   I2cMasterContext->TclkFrequency = PcdGet32 (PcdI2cClockFrequency);
   I2cMasterContext->BaseAddress = BaseAddress;
   I2cMasterContext->Bus = BusId;
@@ -204,6 +206,8 @@ I2cInitialiseController (
     &I2cMasterContext->I2cEnumerate,
     &gEfiI2cBusConfigurationManagementProtocolGuid,
     &I2cMasterContext->I2cBusConf,
+    &gRockchipI2cMasterProtocolGuid,
+    &I2cMasterContext->RockchipI2cMaster,
     &gEfiDevicePathProtocolGuid,
     (EFI_DEVICE_PATH_PROTOCOL *) DevicePath,
     NULL);

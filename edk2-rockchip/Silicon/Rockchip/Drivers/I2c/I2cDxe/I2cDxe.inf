@@ -37,7 +37,7 @@
   gEfiDevicePathProtocolGuid
   gEfiI2cEnumerateProtocolGuid
   gEfiI2cBusConfigurationManagementProtocolGuid
-#  gRockchipBoardDescProtocolGuid
+  gRockchipI2cMasterProtocolGuid
 
 [Pcd]
   gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses
