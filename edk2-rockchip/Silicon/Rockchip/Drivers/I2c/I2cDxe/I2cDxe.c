@@ -176,6 +176,7 @@ I2cInitialiseController (
     return EFI_OUT_OF_RESOURCES;
   }
   I2cMasterContext->Signature = I2C_MASTER_SIGNATURE;
+  I2cMasterContext->I2cMaster.SetBusFrequency = I2cSetBusFrequency;
   I2cMasterContext->I2cMaster.Reset = I2cReset;
   I2cMasterContext->I2cMaster.StartRequest = I2cStartRequest;
   I2cMasterContext->I2cEnumerate.Enumerate = I2cEnumerate;
@@ -421,6 +422,24 @@ I2cAdapterBaudRate (
   /* 1 for data hold/setup time is enough */
   I2cMasterContext->Config = I2C_CON_SDA_CFG(1) | I2C_CON_STA_CFG(StartSetup);
   I2cWrite(I2cMasterContext, I2C_CLKDIV, (HighDiv << I2C_CLK_DIV_HIGH_SHIFT) | LowDiv);
+
+  return EFI_SUCCESS;
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+I2cSetBusFrequency (
+  IN CONST EFI_I2C_MASTER_PROTOCOL   *This,
+  IN OUT UINTN                       *BusClockHertz
+ )
+{
+  //
+  // Bus frequency is already set in the entry point.
+  //
+  // Note that this function is only called by some RTC drivers,
+  // the I2C I/O upper layer doesn't make any use of it yet.
+  //
 
   return EFI_SUCCESS;
 }

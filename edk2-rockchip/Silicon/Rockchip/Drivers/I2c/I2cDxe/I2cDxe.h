@@ -224,6 +224,14 @@ I2cAdapterBaudRate (
   IN CONST UINT32 ClkRate
   );
 
+STATIC
+EFI_STATUS
+EFIAPI
+I2cSetBusFrequency (
+  IN CONST EFI_I2C_MASTER_PROTOCOL   *This,
+  IN OUT UINTN                       *BusClockHertz
+ );
+
 EFI_STATUS
 EFIAPI
 I2cReset (
