@@ -32,9 +32,3 @@
 [Sources.common]
   RockchipPlatformLib.c
   $(RKPLATLIB_COMMON_DIR)/RK3588CruLib.c
-
-[Sources.AARCH64]
-
-[Pcd]
-  gRockchipTokenSpaceGuid.PcdI2cBusCount
-

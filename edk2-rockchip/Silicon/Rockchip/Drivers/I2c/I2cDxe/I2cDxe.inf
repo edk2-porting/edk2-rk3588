@@ -42,10 +42,8 @@
 [Pcd]
   gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses
   gRockchipTokenSpaceGuid.PcdI2cSlaveBuses
-  gRockchipTokenSpaceGuid.PcdI2cControllersEnabled
   gRockchipTokenSpaceGuid.PcdI2cClockFrequency
   gRockchipTokenSpaceGuid.PcdI2cBaudRate
-  gRockchipTokenSpaceGuid.PcdI2cBusCount
 
 [Guids]
   gEfiEndOfDxeEventGroupGuid

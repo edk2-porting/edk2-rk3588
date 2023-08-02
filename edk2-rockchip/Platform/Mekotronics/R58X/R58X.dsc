@@ -55,6 +55,13 @@
   gRockchipTokenSpaceGuid.PcdProductUrl|"https://www.mekotronics.com/h-pd-75.html"
   gRockchipTokenSpaceGuid.PcdBoardName|"EDGE-RK3588-4D32-V1.2"
 
+  # I2C
+  gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x42, 0x43 }
+  gRockchipTokenSpaceGuid.PcdI2cSlaveBuses|{ 0x0, 0x0 }
+  gRockchipTokenSpaceGuid.PcdRk860xRegulatorAddresses|{ 0x42, 0x43 }
+  gRockchipTokenSpaceGuid.PcdRk860xRegulatorBuses|{ 0x0, 0x0 }
+  gRockchipTokenSpaceGuid.PcdRk860xRegulatorTags|{ SCMI_CLK_CPUB01, SCMI_CLK_CPUB23 }
+
   #
   # CPU Performance default values
   #
