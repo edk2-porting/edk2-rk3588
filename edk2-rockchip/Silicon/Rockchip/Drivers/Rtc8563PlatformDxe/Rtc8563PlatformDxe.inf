@@ -1,0 +1,42 @@
+#/** @file
+#
+#  Pcf8563RealTimeClockLib initializer for Rockchip platforms.
+#
+#  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = RtcPlatformDxe
+  FILE_GUID                      = b4d6e6b1-b2a0-4c79-8bf1-3af8c485ec3d
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = Rtc8563PlatformDxeInitialize
+
+[Sources.common]
+  Rtc8563PlatformDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  Silicon/Rockchip/RockchipPkg.dec
+  Silicon/NXP/Library/Pcf8563RealTimeClockLib/Pcf8563RealTimeClockLib.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  DebugLib
+
+[Protocols]
+  gRockchipI2cMasterProtocolGuid                  ## CONSUMES
+  gPcf8563RealTimeClockLibI2cMasterProtocolGuid   ## PRODUCES
+
+[Pcd]
+  gRockchipTokenSpaceGuid.PcdRtc8563Bus
+
+[Depex]
+  TRUE

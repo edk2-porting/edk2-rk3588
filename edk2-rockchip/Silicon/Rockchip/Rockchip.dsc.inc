@@ -96,8 +96,6 @@
   ArmMmuLib|ArmPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
   TimerLib|ArmPkg/Library/ArmArchTimerLib/ArmArchTimerLib.inf
-  #RealTimeClockLib|Silicon/Rockchip/Library/Rk808RealTimeClockLib/Rk808RealTimeClockLib.inf
-  #RealTimeClockLib|Silicon/Rockchip/Library/VirtualRealTimeClockLib/RealTimeClockLib.inf
 
   # UART libraries
   # SerialPortLib|Silicon/Rockchip/Library/SerialPortLib/SerialPortLib.inf # Modified
@@ -448,7 +446,11 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
   MdeModulePkg/Universal/ResetSystemRuntimeDxe/ResetSystemRuntimeDxe.inf
   EmbeddedPkg/RealTimeClockRuntimeDxe/RealTimeClockRuntimeDxe.inf {
   <LibraryClasses>
+!if $(RK_RTC8563_ENABLE) == TRUE
+    RealTimeClockLib|Silicon/NXP/Library/Pcf8563RealTimeClockLib/Pcf8563RealTimeClockLib.inf
+!else
     RealTimeClockLib|EmbeddedPkg/Library/VirtualRealTimeClockLib/VirtualRealTimeClockLib.inf
+!endif
   }
   EmbeddedPkg/MetronomeDxe/MetronomeDxe.inf
   MdeModulePkg/Universal/HiiDatabaseDxe/HiiDatabaseDxe.inf {
@@ -518,6 +520,9 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
   Silicon/Rockchip/Drivers/I2c/I2cDxe/I2cDxe.inf
 !if $(RK_860X_REGULATOR_ENABLE) == TRUE
   Silicon/Rockchip/Drivers/I2c/Rk860xRegulatorDxe/Rk860xRegulatorDxe.inf
+!endif
+!if $(RK_RTC8563_ENABLE) == TRUE
+  Silicon/Rockchip/Drivers/Rtc8563PlatformDxe/Rtc8563PlatformDxe.inf
 !endif
   # Silicon/Rockchip/Drivers/I2c/I2cDemoDxe/I2cDemoDxe.inf
 
