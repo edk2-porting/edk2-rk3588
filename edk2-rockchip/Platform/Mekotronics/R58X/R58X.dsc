@@ -70,6 +70,9 @@
   gPcf8563RealTimeClockLibTokenSpaceGuid.PcdI2cSlaveAddress|0x51
   gRockchipTokenSpaceGuid.PcdRtc8563Bus|0x6
 
+  # Disable HS400 for now, otherwise eMMC is unusable.
+  gRockchipTokenSpaceGuid.PcdDwcSdhciDisableHs400|TRUE
+
   #
   # CPU Performance default values
   #
