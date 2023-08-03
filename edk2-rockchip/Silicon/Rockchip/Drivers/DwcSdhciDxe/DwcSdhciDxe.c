@@ -22,6 +22,7 @@
 #include "DwcSdhciDxe.h"
 
 #define EMMC_FORCE_HIGH_SPEED   FixedPcdGetBool(PcdDwcSdhciForceHighSpeed)
+#define EMMC_DISABLE_HS400      FixedPcdGetBool(PcdDwcSdhciDisableHs400)
 
 STATIC EFI_HANDLE mSdMmcControllerHandle;
 
@@ -58,7 +59,7 @@ EmmcSdMmcCapability (
     return EFI_NOT_FOUND;
   }
 
-  Capability->Hs400 = 1;
+  Capability->Hs400 = !EMMC_DISABLE_HS400;
 
   if (EMMC_FORCE_HIGH_SPEED) {
     Capability->BaseClkFreq = 52;

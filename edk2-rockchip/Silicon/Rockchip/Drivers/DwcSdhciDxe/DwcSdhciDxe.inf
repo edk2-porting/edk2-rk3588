@@ -44,6 +44,7 @@
 [Pcd]
   gRockchipTokenSpaceGuid.PcdDwcSdhciBaseAddress
   gRockchipTokenSpaceGuid.PcdDwcSdhciForceHighSpeed
+  gRockchipTokenSpaceGuid.PcdDwcSdhciDisableHs400
 
 [Depex]
   TRUE
