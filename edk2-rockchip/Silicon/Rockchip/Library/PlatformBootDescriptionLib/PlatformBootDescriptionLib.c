@@ -83,7 +83,8 @@ STATIC SDMMC_MANUFACTURER mMmcManufacturers[] = {
   { 0x2c, L"Kingston"                  },
   { 0x70, L"Kingston"                  },
   { 0x88, L"Foresee"                   },
-  { 0x9B, L"YMTC"                      },
+  { 0x9b, L"YMTC"                      },
+  { 0xd6, L"Foresee"                   },
   { 0xfe, L"Micron"                    },
 };
 
