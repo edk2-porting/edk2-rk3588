@@ -28,6 +28,12 @@
   RK_PLATFORM_FVMAIN_MODULES     = $(PLATFORM_DIRECTORY)/$(PLATFORM_NAME).Modules.fdf.inc
 
   #
+  # HYM8563 RTC support
+  # I2C location configured by PCDs below.
+  #
+  DEFINE RK_RTC8563_ENABLE = TRUE
+
+  #
   # RK3588-based platform
   #
 !include Silicon/Rockchip/RK3588/RK3588Platform.dsc.inc
@@ -55,11 +61,13 @@
   gRockchipTokenSpaceGuid.PcdProductUrl|"http://www.orangepi.org/html/hardWare/computerAndMicrocontrollers/details/Orange-Pi-5-plus.html"
 
   # I2C
-  gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x42, 0x43 }
-  gRockchipTokenSpaceGuid.PcdI2cSlaveBuses|{ 0x0, 0x0 }
+  gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x42, 0x43, 0x51 }
+  gRockchipTokenSpaceGuid.PcdI2cSlaveBuses|{ 0x0, 0x0, 0x6 }
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorAddresses|{ 0x42, 0x43 }
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorBuses|{ 0x0, 0x0 }
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorTags|{ SCMI_CLK_CPUB01, SCMI_CLK_CPUB23 }
+  gPcf8563RealTimeClockLibTokenSpaceGuid.PcdI2cSlaveAddress|0x51
+  gRockchipTokenSpaceGuid.PcdRtc8563Bus|0x6
 
   #
   # CPU Performance default values

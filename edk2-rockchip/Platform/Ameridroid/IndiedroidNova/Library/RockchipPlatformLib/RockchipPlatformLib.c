@@ -163,6 +163,11 @@ I2cIomux (
     break;
   case 5:
     break;
+  case 6:
+    /* io mux M3 */
+    BUS_IOC->GPIO4B_IOMUX_SEL_L = (0x00F0UL << 16) | 0x0090;
+    BUS_IOC->GPIO4B_IOMUX_SEL_L = (0x000FUL << 16) | 0x0009;
+    break;
   default:
     break;
   }

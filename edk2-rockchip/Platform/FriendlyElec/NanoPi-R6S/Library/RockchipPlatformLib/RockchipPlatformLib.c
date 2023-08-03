@@ -180,6 +180,13 @@ I2cIomux (
     break;
   case 5:
     break;
+  case 6:
+    /* io mux M0 */
+    BUS_IOC->GPIO0C_IOMUX_SEL_H = (0xF000UL << 16) | 0x9000;
+    BUS_IOC->GPIO0D_IOMUX_SEL_L = (0x000FUL << 16) | 0x0009;
+    PMU2_IOC->GPIO0C_IOMUX_SEL_H = (0xF000UL << 16) | 0x8000;
+    PMU2_IOC->GPIO0D_IOMUX_SEL_L = (0x000FUL << 16) | 0x0008;
+    break;
   default:
     break;
   }
@@ -192,7 +199,7 @@ UsbPortPowerEnable (
   )
 {
   DEBUG((EFI_D_WARN, "UsbPortPowerEnable called\n"));
-  
+
   /* Set GPIO4 PB5 (USB_HOST_PWREN) output high to power USB ports */
   GpioPinSetDirection (4, GPIO_PIN_PB5, GPIO_PIN_OUTPUT);
   GpioPinWrite (4, GPIO_PIN_PB5, TRUE);
@@ -225,7 +232,7 @@ UsbDpPhyEnable (
   /* enable rx_lfps_en & usbdp_low_pwrn */
   MmioWrite32(0xfd5c8004, 0x60006000);
   MmioWrite32(0xfd5cc004, 0x60006000);
-  
+
   /* remove rx-termination, we don't support SS yet */
   MmioWrite32 (0xfd5c800c, 0x00030001);
   MmioWrite32 (0xfd5cc00c, 0x00030001);
