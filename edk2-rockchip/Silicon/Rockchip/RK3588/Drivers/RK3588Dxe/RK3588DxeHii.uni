@@ -15,6 +15,12 @@
 #string STR_FORM_SET_TITLE_SUBTITLE     #language en-US "Configuration Options"
 
 /*
+ * Common strings
+ */
+#string STR_DISABLED                                       #language en-US "Disabled"
+#string STR_ENABLED                                        #language en-US "Enabled"
+
+/*
  * CPU Performance configuration
  */
 #string STR_CPU_PERF_FORM_TITLE                            #language en-US "CPU Performance"
@@ -104,7 +110,13 @@
 #string STR_PCIE30_FORM_HELP                               #language en-US "Configure the PCIe 3.0 operation modes."
 
 #string STR_PCIE30_STATE_PROMPT                            #language en-US "Support State"
-#string STR_PCIE30_STATE_DISABLED                          #language en-US "Disabled"
-#string STR_PCIE30_STATE_ENABLED                           #language en-US "Enabled"
-
 #string STR_PCIE30_STATE_HELP                              #language en-US "Enable or disable PCIe 3.0 support."
+
+/*
+ * ACPI configuration
+ */
+#string STR_ACPI_FORM_TITLE                                #language en-US "ACPI"
+#string STR_ACPI_FORM_HELP                                 #language en-US "Configure the ACPI support."
+
+#string STR_ACPI_USB2_STATE_PROMPT                         #language en-US "USB 2.0 Support"
+#string STR_ACPI_USB2_STATE_HELP                           #language en-US "Enable or disable the USB 2.0 (EHCI) controllers.\n\nThis option is disabled by default due to compatibility issues with Windows, but it can be enabled for other OSes."

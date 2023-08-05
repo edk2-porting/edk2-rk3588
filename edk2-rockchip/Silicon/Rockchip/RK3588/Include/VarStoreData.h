@@ -45,4 +45,10 @@ typedef struct {
   UINT32 State;
 } PCIE30_STATE_VARSTORE_DATA;
 
+#define ACPI_USB2_STATE_DISABLED                    0
+#define ACPI_USB2_STATE_ENABLED                     1
+typedef struct {
+  UINT32 State;
+} ACPI_USB2_STATE_VARSTORE_DATA;
+
 #endif // __VARSTORE_DATA_H__

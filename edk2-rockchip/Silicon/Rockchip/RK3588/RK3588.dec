@@ -43,6 +43,8 @@
 
   gRK3588TokenSpaceGuid.PcdPcie30Supported|FALSE|BOOLEAN|0x00010201
 
+  gRK3588TokenSpaceGuid.PcdAcpiUsb2StateDefault|0|UINT32|0x00010301
+
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   gRK3588TokenSpaceGuid.PcdCPULClusterClockPreset|0|UINT32|0x00000001
   gRK3588TokenSpaceGuid.PcdCPULClusterClockCustom|0|UINT32|0x00000002
@@ -62,3 +64,5 @@
   gRK3588TokenSpaceGuid.PcdComboPhy2Mode|0|UINT32|0x00000103
 
   gRK3588TokenSpaceGuid.PcdPcie30State|0|UINT32|0x00000201
+
+  gRK3588TokenSpaceGuid.PcdAcpiUsb2State|0|UINT32|0x00000301

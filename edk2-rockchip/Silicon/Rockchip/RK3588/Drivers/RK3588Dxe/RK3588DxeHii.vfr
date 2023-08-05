@@ -110,6 +110,11 @@ formset
       name  = Pcie30State,
       guid  = RK3588DXE_FORMSET_GUID;
 
+    efivarstore ACPI_USB2_STATE_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = AcpiUsb2State,
+      guid  = RK3588DXE_FORMSET_GUID;
+
     form formid = 1,
       title  = STRING_TOKEN(STR_FORM_SET_TITLE);
       subtitle text = STRING_TOKEN(STR_FORM_SET_TITLE_SUBTITLE);
@@ -129,6 +134,10 @@ formset
         prompt = STRING_TOKEN(STR_PCIE30_FORM_TITLE),
         help = STRING_TOKEN(STR_PCIE30_FORM_HELP);
 #endif
+
+      goto 0x1003,
+        prompt = STRING_TOKEN(STR_ACPI_FORM_TITLE),
+        help = STRING_TOKEN(STR_ACPI_FORM_HELP);
     endform;
 
     form formid = 0x1000,
@@ -372,9 +381,22 @@ formset
           help        = STRING_TOKEN(STR_PCIE30_STATE_HELP),
           flags       = NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
           default     = PCIE30_STATE_ENABLED,
-          option text = STRING_TOKEN(STR_PCIE30_STATE_DISABLED), value = PCIE30_STATE_DISABLED, flags = 0;
-          option text = STRING_TOKEN(STR_PCIE30_STATE_ENABLED), value = PCIE30_STATE_ENABLED, flags = 0;
+          option text = STRING_TOKEN(STR_DISABLED), value = PCIE30_STATE_DISABLED, flags = 0;
+          option text = STRING_TOKEN(STR_ENABLED), value = PCIE30_STATE_ENABLED, flags = 0;
         endoneof;
     endform;
 #endif
+
+    form formid = 0x1003,
+        title  = STRING_TOKEN(STR_ACPI_FORM_TITLE);
+
+        oneof varid = AcpiUsb2State.State,
+          prompt      = STRING_TOKEN(STR_ACPI_USB2_STATE_PROMPT),
+          help        = STRING_TOKEN(STR_ACPI_USB2_STATE_HELP),
+          flags       = NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+          default     = FixedPcdGet32 (PcdAcpiUsb2StateDefault),
+          option text = STRING_TOKEN(STR_DISABLED), value = ACPI_USB2_STATE_DISABLED, flags = 0;
+          option text = STRING_TOKEN(STR_ENABLED), value = ACPI_USB2_STATE_ENABLED, flags = 0;
+        endoneof;
+    endform;
 endformset;

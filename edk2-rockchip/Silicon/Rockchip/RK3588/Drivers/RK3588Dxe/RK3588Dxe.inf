@@ -18,6 +18,7 @@
   CpuPerformance.c
   ComboPhy.c
   PciExpress30.c
+  Acpi.c
   RK3588DxeHii.uni
   RK3588DxeHii.vfr
 
@@ -85,6 +86,9 @@
 
   gRK3588TokenSpaceGuid.PcdPcie30Supported
   gRK3588TokenSpaceGuid.PcdPcie30State
+
+  gRK3588TokenSpaceGuid.PcdAcpiUsb2StateDefault
+  gRK3588TokenSpaceGuid.PcdAcpiUsb2State
 
 [Guids]
   gRK3588DxeFormSetGuid

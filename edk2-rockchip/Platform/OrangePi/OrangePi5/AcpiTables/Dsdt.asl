@@ -27,9 +27,7 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 2, "RPIFDN", "RPI", 2)
     include ("Uart.asl")
     // include ("Spi.asl")
 
-    // won't work on Windows, will trigger bugcheck by usbehci
-    // include ("Usb2.asl")
-
+    include ("Usb1Host.asl")
     include ("Usb3Host0.asl")
     include ("Usb3Host2.asl")
   }

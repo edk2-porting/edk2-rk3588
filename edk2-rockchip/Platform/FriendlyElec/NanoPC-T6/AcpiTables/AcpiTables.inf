@@ -39,6 +39,7 @@
   $(RK_COMMON_ACPI_DIR)/Sata0.asl
   $(RK_COMMON_ACPI_DIR)/Sata1.asl
   $(RK_COMMON_ACPI_DIR)/Sata2.asl
+  $(RK_COMMON_ACPI_DIR)/Usb2Host.asl
 
 [Packages]
   ArmPkg/ArmPkg.dec
