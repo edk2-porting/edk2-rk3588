@@ -43,6 +43,7 @@
 
   gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x0 }|VOID*|0x02000001
   gRockchipTokenSpaceGuid.PcdI2cSlaveBuses|{ 0x0 }|VOID*|0x02000002
+  gRockchipTokenSpaceGuid.PcdI2cSlaveBusesRuntimeSupport|{ 0x0 }|VOID*|0x02000003
   gRockchipTokenSpaceGuid.PcdI2cClockFrequency|0|UINT32|0x02000004
   gRockchipTokenSpaceGuid.PcdI2cBaudRate|0|UINT32|0x02000005
   gRockchipTokenSpaceGuid.PcdI2cDemoAddresses|{ 0x0 }|VOID*|0x02000007

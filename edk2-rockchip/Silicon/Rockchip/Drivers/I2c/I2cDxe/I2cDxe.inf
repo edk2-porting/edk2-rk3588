@@ -1,12 +1,17 @@
+#/** @file
 #
-# SPDX-License-Identifier: BSD-2-Clause-Patent
+#  Copyright (c) 2021 Rockchip Electronics Co., Ltd.
+#  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
 #
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
 
 [Defines]
   INF_VERSION                    = 0x00010005
   BASE_NAME                      = I2cDxe
   FILE_GUID                      = 9335a854-4b88-11ec-a8ee-f42a7dcb925d
-  MODULE_TYPE                    = DXE_DRIVER
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
   VERSION_STRING                 = 1.0
   ENTRY_POINT                    = I2cInitialise
 
@@ -26,9 +31,11 @@
   PcdLib
   BaseLib
   DebugLib
+  DxeServicesTableLib
   UefiLib
   UefiDriverEntryPoint
   UefiBootServicesTableLib
+  UefiRuntimeLib
   RockchipPlatformLib
   TimerLib
 
@@ -42,11 +49,13 @@
 [Pcd]
   gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses
   gRockchipTokenSpaceGuid.PcdI2cSlaveBuses
+  gRockchipTokenSpaceGuid.PcdI2cSlaveBusesRuntimeSupport
   gRockchipTokenSpaceGuid.PcdI2cClockFrequency
   gRockchipTokenSpaceGuid.PcdI2cBaudRate
 
 [Guids]
   gEfiEndOfDxeEventGroupGuid
+  gEfiEventVirtualAddressChangeGuid
 
 [Depex]
-  TRUE
+  gEfiCpuArchProtocolGuid

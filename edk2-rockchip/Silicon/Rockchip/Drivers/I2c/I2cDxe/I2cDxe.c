@@ -1,9 +1,11 @@
-/********************************************************************************
-Copyright (C) 2021 Rockchip Electronics Co., Ltd
-
-SPDX-License-Identifier: BSD-2-Clause-Patent
-
-*******************************************************************************/
+/** @file
+ *
+ *  Copyright (c) 2021 Rockchip Electronics Co., Ltd.
+ *  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+ *
+ *  SPDX-License-Identifier: BSD-2-Clause-Patent
+ *
+ **/
 
 #include <Protocol/I2cMaster.h>
 #include <Protocol/I2cEnumerate.h>
@@ -16,10 +18,12 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Library/BaseLib.h>
 #include <Library/IoLib.h>
 #include <Library/DebugLib.h>
+#include <Library/DxeServicesTableLib.h>
 #include <Library/PcdLib.h>
 #include <Library/UefiLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiRuntimeLib.h>
 #include <Library/RockchipPlatformLib.h>
 
 #include <Soc.h>
@@ -147,18 +151,36 @@ I2cGetVersion(
   return Version >>= I2C_CON_VERSION_SHIFT;
 }
 
+STATIC
+VOID
+EFIAPI
+I2cVirtualAddressChangeNotify (
+  IN EFI_EVENT   Event,
+  IN VOID        *Context
+  )
+{
+  I2C_MASTER_CONTEXT *I2cMasterContext = Context;
+
+  EfiConvertPointer (0x0, (VOID **) &I2cMasterContext->BaseAddress);
+  EfiConvertPointer (0x0, (VOID **) &I2cMasterContext->I2cMaster.SetBusFrequency);
+  EfiConvertPointer (0x0, (VOID **) &I2cMasterContext->I2cMaster.Reset);
+  EfiConvertPointer (0x0, (VOID **) &I2cMasterContext->I2cMaster.StartRequest);
+}
+
 EFI_STATUS
 EFIAPI
 I2cInitialiseController (
   IN EFI_HANDLE  ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable,
   IN EFI_PHYSICAL_ADDRESS BaseAddress,
-  IN UINT32 BusId
+  IN UINT32 BusId,
+  IN BOOLEAN RuntimeSupport
   )
 {
   EFI_STATUS Status;
   I2C_MASTER_CONTEXT *I2cMasterContext;
   I2C_DEVICE_PATH *DevicePath;
+  EFI_EVENT VirtualAddressChangeEvent = NULL;
 
   DEBUG ((EFI_D_VERBOSE, "I2cInitialiseController\n"));
   DevicePath = AllocateCopyPool (sizeof(I2cDevicePathProtocol),
@@ -169,8 +191,12 @@ I2cInitialiseController (
   }
   DevicePath->Instance = BusId;
 
-  /* if attachment succeeds, this gets freed at ExitBootServices */
-  I2cMasterContext = AllocateZeroPool (sizeof (I2C_MASTER_CONTEXT));
+  if (RuntimeSupport) {
+    I2cMasterContext = AllocateRuntimeZeroPool (sizeof (I2C_MASTER_CONTEXT));
+  } else {
+    I2cMasterContext = AllocateZeroPool (sizeof (I2C_MASTER_CONTEXT));
+  }
+
   if (I2cMasterContext == NULL) {
     DEBUG((DEBUG_ERROR, "I2cDxe: I2C master context allocation failed\n"));
     return EFI_OUT_OF_RESOURCES;
@@ -185,7 +211,43 @@ I2cInitialiseController (
   I2cMasterContext->TclkFrequency = PcdGet32 (PcdI2cClockFrequency);
   I2cMasterContext->BaseAddress = BaseAddress;
   I2cMasterContext->Bus = BusId;
-  EfiInitializeLock(&I2cMasterContext->Lock, TPL_NOTIFY);
+  I2cMasterContext->RuntimeSupport = RuntimeSupport;
+
+  if (RuntimeSupport) {
+    Status = gDS->AddMemorySpace (
+                    EfiGcdMemoryTypeMemoryMappedIo,
+                    BaseAddress,
+                    I2C_PERIPHERAL_SIZE,
+                    EFI_MEMORY_UC | EFI_MEMORY_RUNTIME);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a: AddMemorySpace failed. Status=%r\n",
+              __FUNCTION__, Status));
+      goto fail;
+    }
+
+    Status = gDS->SetMemorySpaceAttributes (
+                    BaseAddress,
+                    I2C_PERIPHERAL_SIZE,
+                    EFI_MEMORY_UC | EFI_MEMORY_RUNTIME);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a: SetMemorySpaceAttributes failed. Status=%r\n",
+              __FUNCTION__, Status));
+      goto fail;
+    }
+
+    Status = gBS->CreateEventEx (
+                    EVT_NOTIFY_SIGNAL,
+                    TPL_NOTIFY,
+                    I2cVirtualAddressChangeNotify,
+                    I2cMasterContext,
+                    &gEfiEventVirtualAddressChangeGuid,
+                    &VirtualAddressChangeEvent);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a: Failed to register for virtual address change. Status=%r\n",
+              __FUNCTION__, Status));
+      goto fail;
+    }
+  }
 
   if (I2cGetVersion(I2cMasterContext) >= RkI2cVersion1) {
     I2cAdapterBaudRate(I2cMasterContext,
@@ -222,6 +284,10 @@ I2cInitialiseController (
   return EFI_SUCCESS;
 
 fail:
+  if (VirtualAddressChangeEvent && RuntimeSupport) {
+    gBS->CloseEvent (VirtualAddressChangeEvent);
+  }
+
   FreePool(I2cMasterContext);
   return Status;
 }
@@ -280,12 +346,14 @@ I2cInitialise (
   EFI_EVENT EndOfDxeEvent;
   UINT8 *DeviceBusPcd;
   UINT32 DeviceBusCount;
+  UINT8 *BusRuntimeSupport;
   EFI_STATUS Status;
   UINTN Index;
   BOOLEAN ConfiguredBuses[I2C_COUNT] = {0};
 
   DeviceBusPcd = PcdGetPtr (PcdI2cSlaveBuses);
   DeviceBusCount = PcdGetSize (PcdI2cSlaveBuses);
+  BusRuntimeSupport = PcdGetPtr (PcdI2cSlaveBusesRuntimeSupport);
 
   /* Initialize enabled chips */
   for (Index = 0; Index < DeviceBusCount; Index++) {
@@ -315,9 +383,10 @@ I2cInitialise (
       ImageHandle,
       SystemTable,
       BaseAddress,
-      DeviceBusPcd[Index]
+      DeviceBusPcd[Index],
+      BusRuntimeSupport[Index]
       );
-      
+
     if (EFI_ERROR(Status))
       return Status;
   }
@@ -462,11 +531,9 @@ I2cDisable (
 {
   DEBUG ((EFI_D_VERBOSE, "I2c I2cDisable.\n"));
 
-  EfiAcquireLock (&I2cMasterContext->Lock);
   I2cWrite(I2cMasterContext, I2C_IEN, 0);
   I2cWrite(I2cMasterContext, I2C_IPD, I2C_IPD_ALL_CLEAN);
   I2cWrite(I2cMasterContext, I2C_CON, 0);
-  EfiReleaseLock (&I2cMasterContext->Lock);
 }
 
 /*
@@ -496,7 +563,6 @@ I2cStartEnable (
   if (Timeout <= 0) {
     DEBUG ((EFI_D_ERROR, "I2C Send Start Bit Timeout\n"));
     I2cShowRegs(I2cMasterContext);
-    EfiReleaseLock (&I2cMasterContext->Lock);
     return EFI_TIMEOUT;
   }
 
@@ -513,8 +579,6 @@ I2cStop (
 
   DEBUG ((EFI_D_VERBOSE, "I2c Send Stop bit.\n"));
 
-  EfiAcquireLock (&I2cMasterContext->Lock);
-
   I2cWrite(I2cMasterContext, I2C_IPD, I2C_IPD_ALL_CLEAN);
   I2cWrite(I2cMasterContext, I2C_CON, I2C_CON_EN | I2C_CON_STOP |I2cMasterContext->Config);
   I2cWrite(I2cMasterContext, I2C_IEN, I2C_CON_STOP);
@@ -530,11 +594,8 @@ I2cStop (
   if (TimeOut <= 0) {
     DEBUG ((EFI_D_ERROR, "I2C Send Stop Bit Timeout\n"));
     I2cShowRegs(I2cMasterContext);
-    EfiReleaseLock (&I2cMasterContext->Lock);
     return EFI_TIMEOUT;
   }
-
-  EfiReleaseLock (&I2cMasterContext->Lock);
 
   return EFI_SUCCESS;
 }
@@ -565,7 +626,6 @@ I2cReadOperation (
   DEBUG ((EFI_D_VERBOSE, "I2cRead: base_addr = 0x%x buf = %p, Length = %d\n",
   	         I2cMasterContext->BaseAddress, Buf, Length));
 
-  EfiAcquireLock (&I2cMasterContext->Lock);
   /* If the second message for TRX read, resetting internal state. */
   if (Snd) {
     I2cWrite(I2cMasterContext, I2C_CON, 0);
@@ -602,7 +662,7 @@ I2cReadOperation (
       goto out;
     }
 
-    I2cWrite(I2cMasterContext, I2C_IEN, I2C_MBRFIEN | I2C_NAKRCVIEN); 
+    I2cWrite(I2cMasterContext, I2C_IEN, I2C_MBRFIEN | I2C_NAKRCVIEN);
     I2cWrite(I2cMasterContext, I2C_MRXCNT, BytesTranferedLen);
 
     while (TimeOut--) {
@@ -645,7 +705,6 @@ I2cReadOperation (
   (*Read) = Length;
 
 out:
-  EfiReleaseLock (&I2cMasterContext->Lock);
   return (Status);
 }
 
@@ -673,7 +732,6 @@ I2cWriteOperation (
   DEBUG ((EFI_D_VERBOSE, "I2cWrite: base_addr = 0x%x buf = %p, Length = %d\n",
                  I2cMasterContext->BaseAddress, Buf, Length));
 
-  EfiAcquireLock (&I2cMasterContext->Lock);
   (*Sent) = 0;
 
   while (BytesRemainLen) {
@@ -744,7 +802,6 @@ I2cWriteOperation (
   (*Sent) = Length;
   Status = EFI_SUCCESS;
 out:
-  EfiReleaseLock (&I2cMasterContext->Lock);
   return (Status);
 }
 
@@ -770,11 +827,33 @@ I2cStartRequest (
   EFI_I2C_OPERATION *Operation;
   EFI_STATUS Status = EFI_SUCCESS;
   UINTN i;
+  BOOLEAN AtRuntime;
+  EFI_TPL Tpl;
 
   ASSERT (RequestPacket != NULL);
   ASSERT (I2cMasterContext != NULL);
 
+  AtRuntime = EfiAtRuntime ();
+
+  // Events do not fire at runtime, so we can't support asynchronous requests.
+  if (AtRuntime && Event != NULL) {
+    return EFI_UNSUPPORTED;
+  }
+
   DEBUG ((EFI_D_VERBOSE, "I2cStartRequest.\n"));
+
+  if (!AtRuntime) {
+    // Disable (timer) interrupts.
+    Tpl = gBS->RaiseTPL (TPL_HIGH_LEVEL);
+  } else if (I2cMasterContext->RuntimeSupport) {
+    //
+    // TO-DO:
+    // Implement some synchronization mechanism between this code path
+    // and the HLOS I2C driver, to prevent a race condition.
+    //
+    // See: https://github.com/edk2-porting/edk2-rk3588/issues/70
+    //
+  }
 
   if (Count > 2 || ((Count == 2) && (RequestPacket->Operation->Flags & I2C_FLAG_READ))) {
     DEBUG ((EFI_D_VERBOSE, "Not support more messages now, split them\n"));
@@ -814,6 +893,12 @@ I2cStartRequest (
 
   I2cStop (I2cMasterContext);
   I2cDisable (I2cMasterContext);
+
+  if (!AtRuntime) {
+    gBS->RestoreTPL (Tpl);
+  } else if (I2cMasterContext->RuntimeSupport) {
+    // TO-DO: See above.
+  }
 
   if (I2cStatus != NULL)
     *I2cStatus = EFI_SUCCESS;

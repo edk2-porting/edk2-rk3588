@@ -1,16 +1,18 @@
-/********************************************************************************
-Copyright (C) 2021 Rockchip Electronics Co., Ltd
-
-SPDX-License-Identifier: BSD-2-Clause-Patent
-
-*******************************************************************************/
+/** @file
+ *
+ *  Copyright (c) 2021 Rockchip Electronics Co., Ltd.
+ *  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+ *
+ *  SPDX-License-Identifier: BSD-2-Clause-Patent
+ *
+ **/
 
 #ifndef __RK_I2C_DXE_H__
 #define __RK_I2C_DXE_H__
 
 #include <Uefi.h>
 
-#define I2C_BASE_ADDRESS    0xf0511000
+#define I2C_PERIPHERAL_SIZE  0x1000
 
 #define I2C_SLAVE_ADDR    0x00
 #define I2C_EXT_SLAVE_ADDR  0x10
@@ -146,11 +148,11 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 typedef struct {
   UINT32 Signature;
   EFI_HANDLE Controller;
-  EFI_LOCK Lock;
   UINTN TclkFrequency;
   UINTN BaseAddress;
   INTN Bus;
   UINTN Config;
+  BOOLEAN RuntimeSupport;
   EFI_I2C_MASTER_PROTOCOL I2cMaster;
   EFI_I2C_ENUMERATE_PROTOCOL I2cEnumerate;
   EFI_I2C_BUS_CONFIGURATION_MANAGEMENT_PROTOCOL I2cBusConf;
