@@ -17,7 +17,13 @@
   DEFINE CONFIG_NO_DEBUGLIB      = FALSE
 
   #
-  # Must match defines in Silicon/Rockchip/RK3588/Include/VarStoreData.h
+  # Shared Defines
+  #   - must be kept in sync with their associated headers
+  #   - values must be hexadecimal if used in byte array PCDs
+  #
+
+  #
+  # Silicon/Rockchip/RK3588/Include/VarStoreData.h
   #
   DEFINE CPU_PERF_CLUSTER_CLOCK_PRESET_BOOTDEFAULT  = 0
   DEFINE CPU_PERF_CLUSTER_CLOCK_PRESET_MIN          = 1
@@ -32,9 +38,9 @@
   #
   # Silicon/Rockchip/RK3588/Drivers/RK3588Dxe/CpuPerformance.h
   #
-  DEFINE SCMI_CLK_CPUL                = 0
-  DEFINE SCMI_CLK_CPUB01              = 2
-  DEFINE SCMI_CLK_CPUB23              = 3
+  DEFINE SCMI_CLK_CPUL                = 0x0
+  DEFINE SCMI_CLK_CPUB01              = 0x2
+  DEFINE SCMI_CLK_CPUB23              = 0x3
 
   #
   # Default peripheral support flags
