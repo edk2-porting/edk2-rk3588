@@ -10,7 +10,6 @@
 #include <Library/DebugLib.h>
 #include <Library/IoLib.h>
 #include <Library/PWMLib.h>
-#include <stdlib.h>
 
 #define PWM_INT_EN(ch)                      (1 << (ch))
 #define PWM_PWR_INT_EN(ch)                  (1 << ((ch) + 4 ))
@@ -71,24 +70,20 @@ RkPwmSetConfig (
   IN PWM_DATA                   *Data
   )
 {
-  ldiv_t PeriodDiv, DutyDiv;
   UINTN Base = mPwmControllerBase[Data->ControllerID];
   UINT32 Ctrl;
-  UINT64 PeriodCycle, DutyCycle;
+  UINT32 PeriodCycle, DutyCycle;
   UINT64 ChannelOffset = Data->ChannelID * 0x10;
 
-  PeriodDiv = ldiv((UINT64)FREQUENCY_24M * Data->PeriodNs, 1000000000);
-  DutyDiv = ldiv((UINT64)FREQUENCY_24M * Data->DutyNs, 1000000000);
-
-  PeriodCycle = PeriodDiv.quot;
-  DutyCycle = DutyDiv.quot;
+  PeriodCycle = ((UINT64)FREQUENCY_24M * Data->PeriodNs / 1000000000);
+  DutyCycle = ((UINT64)FREQUENCY_24M * Data->DutyNs / 1000000000);
 
   Ctrl = MmioRead32(Base + ChannelOffset + PWM_CTRL_OFFSET);
   Ctrl |= PWM_LOCK;
   MmioWrite32(Base + ChannelOffset + PWM_CTRL_OFFSET, Ctrl);
 
-  MmioWrite32(Base + ChannelOffset + PWM_PERIOD_HPR_OFFSET, Ctrl);
-  MmioWrite32(Base + ChannelOffset + PWM_DUTY_LPR_OFFSET, Ctrl);
+  MmioWrite32(Base + ChannelOffset + PWM_PERIOD_HPR_OFFSET, PeriodCycle);
+  MmioWrite32(Base + ChannelOffset + PWM_DUTY_LPR_OFFSET, DutyCycle);
 
   Ctrl &= ~(PWM_DUTY_MASK | PWM_INACTIVE_MASK);
 
