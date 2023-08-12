@@ -22,8 +22,8 @@ Applicable to all platforms unless otherwise noted.
 | Device | Status | Notes |
 | --- | --- | --- |
 | USB 3 / 2.0 / 1.1                  | 🟢 Working     | Host-mode only |
-| PCIe 3.0 (RK3588)                  | 🟡 Partial     | |
-| PCIe 2.1                           | 🔴 Not working | |
+| PCIe 3.0 (RK3588)                  | 🟢 Working     | |
+| PCIe 2.1                           | 🟢 Working     | |
 | SATA                               | 🟢 Working     | |
 | SD/eMMC                            | 🟢 Working     | |
 | HDMI output                        | 🟢 Working     | Single display with mode limited at 1080p 60 Hz |
@@ -32,11 +32,11 @@ Applicable to all platforms unless otherwise noted.
 | DSI                                | 🔴 Not working | |
 | GMAC Ethernet                      | 🔴 Not working | |
 | UART                               | 🟢 Working     | |
-| GPIO                               | 🟡 Partial     | No pin function support |
+| GPIO                               | 🟡 Partial     | Pin function should be good, while pull up/down and drive strength functions are untested|
 | I2C                                | 🟢 Working     | |
 | SPI                                | 🟢 Working     | |
 | SARADC                             | 🔴 Not working | |
-| PWM                                | ⚪ Untested    | |
+| PWM                                | 🟢 Working     | |
 | SPI NOR Flash                      | 🟢 Working     | |
 | Voltage regulators (RK806, RK860)  | 🟢 Working     | |
 | FUSB302 USB-C PD negotiation       | 🔴 Not working | Only present on a few boards (ROCK 5B, Edge2) |
