@@ -235,7 +235,7 @@ GpioPinSetFunction (
       Reg = PMU1_IOC_BASE + GRF_GPIO_IOMUX_REG(Pin);
     }
   } else {
-    Reg = (BUS_IOC_BASE + 0x0020) + ((Group - 1) * 0x8) + GRF_GPIO_IOMUX_REG(Pin);
+    Reg = BUS_IOC_BASE + Group * 0x20 + GRF_GPIO_IOMUX_REG(Pin);
   }
 
   DEBUG ((DEBUG_VERBOSE, "Reg - Value: 0x%lX = 0x%08X\n", Reg, Value));
