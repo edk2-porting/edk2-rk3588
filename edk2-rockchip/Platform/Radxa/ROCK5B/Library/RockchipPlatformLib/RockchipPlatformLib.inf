@@ -28,6 +28,7 @@
   SerialPortLib
   CruLib
   GpioLib
+  PWMLib
 
 [Sources.common]
   RockchipPlatformLib.c
