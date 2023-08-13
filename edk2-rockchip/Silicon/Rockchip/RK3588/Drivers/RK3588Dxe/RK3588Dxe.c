@@ -34,6 +34,7 @@
 #include "ComboPhy.h"
 #include "PciExpress30.h"
 #include "Acpi.h"
+#include "FanControl.h"
 
 extern UINT8 RK3588DxeHiiBin[];
 extern UINT8 RK3588DxeStrings[];
@@ -157,6 +158,7 @@ SetupVariables (
   SetupComboPhyVariables ();
   SetupPcie30Variables ();
   SetupAcpiVariables ();
+  SetupCoolingFanVariables();
 
   return EFI_SUCCESS;
 }
@@ -182,6 +184,7 @@ ApplyVariables (
   ApplyComboPhyVariables ();
   ApplyPcie30Variables ();
   ApplyAcpiVariables ();
+  ApplyCoolingFanVariables();
 
   AfterApplyVariablesInit ();
 }

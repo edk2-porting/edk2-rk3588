@@ -19,6 +19,7 @@
   ComboPhy.c
   PciExpress30.c
   Acpi.c
+  FanControl.c
   RK3588DxeHii.uni
   RK3588DxeHii.vfr
 
@@ -49,6 +50,7 @@
   NonDiscoverableDeviceRegistrationLib
   HiiLib
   PcdLib
+  RockchipPlatformLib
 
 [Protocols]
   gRk860xRegulatorProtocolGuid
@@ -89,6 +91,10 @@
 
   gRK3588TokenSpaceGuid.PcdAcpiUsb2StateDefault
   gRK3588TokenSpaceGuid.PcdAcpiUsb2State
+
+  gRK3588TokenSpaceGuid.PcdHasOnBoardFanOutput
+  gRK3588TokenSpaceGuid.PcdCoolingFanState
+  gRK3588TokenSpaceGuid.PcdCoolingFanSpeed
 
 [Guids]
   gRK3588DxeFormSetGuid

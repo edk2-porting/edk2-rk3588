@@ -51,4 +51,14 @@ typedef struct {
   UINT32 State;
 } ACPI_USB2_STATE_VARSTORE_DATA;
 
+#define COOLING_FAN_STATE_DISABLED                    0
+#define COOLING_FAN_STATE_ENABLED                     1
+typedef struct {
+  UINT32 State;
+} COOLING_FAN_STATE_VARSTORE_DATA;
+
+typedef struct {
+  UINT32 Percentage;
+} COOLING_FAN_SPEED_VARSTORE_DATA;
+
 #endif // __VARSTORE_DATA_H__

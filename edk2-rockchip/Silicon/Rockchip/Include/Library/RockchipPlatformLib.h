@@ -123,6 +123,18 @@ PciePeReset (
 
 VOID
 EFIAPI
+PwmFanIoSetup(
+  VOID
+);
+
+VOID
+EFIAPI
+PwmFanSetSpeed(
+  UINT32 Percentage
+);
+
+VOID
+EFIAPI
 PlatformEarlyInit (
   VOID
   );

@@ -38,6 +38,9 @@
   DEFINE ACPI_USB2_STATE_DISABLED     = 0
   DEFINE ACPI_USB2_STATE_ENABLED      = 1
 
+  DEFINE COOLING_FAN_STATE_DISABLED   = 0
+  DEFINE COOLING_FAN_STATE_ENABLED    = 1
+
   #
   # Silicon/Rockchip/RK3588/Drivers/RK3588Dxe/CpuPerformance.h
   #
@@ -220,6 +223,11 @@
   gRK3588TokenSpaceGuid.PcdCPUB23ClusterClockPresetDefault|$(CPU_PERF_CLUSTER_CLOCK_PRESET_BOOTDEFAULT)
 
   #
+  # Cooling Fan definitions
+  #
+  gRK3588TokenSpaceGuid.PcdHasOnBoardFanOutput|FALSE
+
+  #
   # PCIe/SATA/USB Combo PIPE PHY support flags and default values
   #
   gRK3588TokenSpaceGuid.PcdComboPhy0Switchable|FALSE
@@ -287,6 +295,11 @@
   #
   gRK3588TokenSpaceGuid.PcdAcpiUsb2State|L"AcpiUsb2State"|gRK3588DxeFormSetGuid|0x0|gRK3588TokenSpaceGuid.PcdAcpiUsb2StateDefault
 
+  #
+  # Cooling Fan
+  #
+  gRK3588TokenSpaceGuid.PcdCoolingFanState|L"CoolingFanState"|gRK3588DxeFormSetGuid|0x0|1
+  gRK3588TokenSpaceGuid.PcdCoolingFanSpeed|L"CoolingFanSpeed"|gRK3588DxeFormSetGuid|0x0|100
 ################################################################################
 #
 # Components Section - list of all common EDK II Modules needed by RK3588 platforms.

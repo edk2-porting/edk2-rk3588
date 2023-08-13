@@ -270,6 +270,35 @@ PciePeReset (
   }
 }
 
+PWM_DATA pwm_data = {
+  .ControllerID = PWM_CONTROLLER0,
+  .ChannelID = PWM_CHANNEL3,
+  .PeriodNs = 4000000,
+  .DutyNs = 4000000,
+  .Polarity = FALSE,
+}; // PWM0_CH3
+
+VOID
+EFIAPI
+PwmFanIoSetup(
+  VOID
+)
+{
+  GpioPinSetFunction (3, GPIO_PIN_PB2, 0xB); // PWM3_IR_M1
+  RkPwmSetConfig(&pwm_data);
+  RkPwmEnable(&pwm_data);
+}
+
+VOID
+EFIAPI
+PwmFanSetSpeed(
+  UINT32 Percentage
+)
+{
+  pwm_data.DutyNs = pwm_data.PeriodNs * Percentage / 100;
+  RkPwmSetConfig(&pwm_data);
+}
+
 VOID
 EFIAPI
 PlatformEarlyInit (
@@ -277,17 +306,5 @@ PlatformEarlyInit (
   )
 {
   // Configure various things specific to this platform
-  DEBUG((EFI_D_WARN, "PlatformEarlyInit called\n"));
-  GpioPinSetFunction (3, GPIO_PIN_PB2, 0xB); // PWM3_IR_M1
   
-  PWM_DATA pwm_data = {
-    .ControllerID = PWM_CONTROLLER0,
-    .ChannelID = PWM_CHANNEL3,
-    .PeriodNs = 1000000,
-    .DutyNs = 500000,
-    .Polarity = FALSE,
-  }; // PWM0_CH3
-  
-  RkPwmSetConfig(&pwm_data);
-  RkPwmEnable(&pwm_data);
 }

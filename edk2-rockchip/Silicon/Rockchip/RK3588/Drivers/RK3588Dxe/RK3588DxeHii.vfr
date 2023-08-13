@@ -15,6 +15,7 @@
 
 #define VFR_FILE_INCLUDE
 #include "CpuPerformance.h"
+#include "FanControl.h"
 
 //
 // EFI Variable attributes
@@ -115,6 +116,16 @@ formset
       name  = AcpiUsb2State,
       guid  = RK3588DXE_FORMSET_GUID;
 
+    efivarstore COOLING_FAN_STATE_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = CoolingFanState,
+      guid  = RK3588DXE_FORMSET_GUID;
+
+    efivarstore COOLING_FAN_SPEED_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = CoolingFanSpeed,
+      guid  = RK3588DXE_FORMSET_GUID;
+
     form formid = 1,
       title  = STRING_TOKEN(STR_FORM_SET_TITLE);
       subtitle text = STRING_TOKEN(STR_FORM_SET_TITLE_SUBTITLE);
@@ -138,6 +149,13 @@ formset
       goto 0x1003,
         prompt = STRING_TOKEN(STR_ACPI_FORM_TITLE),
         help = STRING_TOKEN(STR_ACPI_FORM_HELP);
+
+#if FixedPcdGetBool (PcdHasOnBoardFanOutput)
+      goto 0x1004,
+        prompt = STRING_TOKEN(STR_COOLING_FAN_FORM_TITLE),
+        help = STRING_TOKEN(STR_COOLING_FAN_FORM_HELP); 
+#endif
+
     endform;
 
     form formid = 0x1000,
@@ -399,4 +417,33 @@ formset
           option text = STRING_TOKEN(STR_ENABLED), value = ACPI_USB2_STATE_ENABLED, flags = 0;
         endoneof;
     endform;
+
+#if FixedPcdGetBool (PcdHasOnBoardFanOutput)
+    form formid = 0x1004,
+        title  = STRING_TOKEN(STR_COOLING_FAN_FORM_TITLE);
+
+        oneof varid = CoolingFanState.State,
+          prompt      = STRING_TOKEN(STR_COOLING_FAN_STATE_PROMPT),
+          help        = STRING_TOKEN(STR_COOLING_FAN_STATE_PROMPT),
+          flags       = NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+          default     = COOLING_FAN_STATE_ENABLED,
+          option text = STRING_TOKEN(STR_DISABLED), value = COOLING_FAN_STATE_DISABLED, flags = 0;
+          option text = STRING_TOKEN(STR_ENABLED), value = COOLING_FAN_STATE_ENABLED, flags = 0;
+        endoneof;
+
+        grayoutif NOT ideqval CoolingFanState.State == COOLING_FAN_STATE_ENABLED;
+          numeric varid = CoolingFanSpeed.Percentage,
+            prompt  = STRING_TOKEN(STR_COOLING_FAN_SPEED_PROMPT),
+            help    = STRING_TOKEN(STR_COOLING_FAN_SPEED_PROMPT),
+            flags   = DISPLAY_UINT_DEC | NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+            minimum = FAN_PERCENTAGE_MIN,
+            maximum = FAN_PERCENTAGE_MAX,
+            step = FAN_PERCENTAGE_STEP,
+            default = FAN_PERCENTAGE_DEFAULT,
+          endnumeric;
+        endif;
+    endform;
+        
+#endif
+
 endformset;

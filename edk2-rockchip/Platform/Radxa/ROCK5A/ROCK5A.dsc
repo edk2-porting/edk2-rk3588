@@ -78,6 +78,11 @@
   gRK3588TokenSpaceGuid.PcdComboPhy0ModeDefault|$(COMBO_PHY_MODE_PCIE)
   gRK3588TokenSpaceGuid.PcdComboPhy2ModeDefault|$(COMBO_PHY_MODE_USB3)
 
+  #
+  # On-Board fan output
+  #
+  gRK3588TokenSpaceGuid.PcdHasOnBoardFanOutput|TRUE
+
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform.
