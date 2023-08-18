@@ -104,6 +104,16 @@
 #string STR_COMBO_PHY_MODE_DEFAULT_USB3_HELP               #language en-US "This PHY is wired to an USB 3.1 Gen 1 Type-A port.\n\nConsult your platform's documentation for details on potential alternate modes, such as PCIe or SATA (via non-standard adapters)."
 
 /*
+ * USB/DP Combo PHY configuration
+ */
+#string STR_USBDP_PHY_FORM_TITLE                           #language en-US "USB/DP Combo PHY"
+#string STR_USBDP_PHY_FORM_HELP                            #language en-US "Configure the USB/DP Combo PHY operation modes."
+
+#string STR_USBDP_PHY0_USB3_STATE_PROMPT                   #language en-US "PHY #0 USB 3 SuperSpeed State"
+#string STR_USBDP_PHY1_USB3_STATE_PROMPT                   #language en-US "PHY #1 USB 3 SuperSpeed State"
+#string STR_USBDP_PHY_USB3_STATE_PROMPT                    #language en-US "Enable or disable SuperSpeed signaling on the selected PHY.\n\nIf USB 3.0 devices connected to the associated Type-C or Type-A port malfunction, disabling this option may help."
+
+/*
  * PCI Express 3.0 configuration
  */
 #string STR_PCIE30_FORM_TITLE                              #language en-US "PCI Express 3.0"

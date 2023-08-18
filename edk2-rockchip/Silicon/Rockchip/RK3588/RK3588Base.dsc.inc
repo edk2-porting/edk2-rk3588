@@ -41,6 +41,9 @@
   DEFINE COOLING_FAN_STATE_DISABLED   = 0
   DEFINE COOLING_FAN_STATE_ENABLED    = 1
 
+  DEFINE USBDP_PHY_USB3_STATE_DISABLED  = 0
+  DEFINE USBDP_PHY_USB3_STATE_ENABLED   = 1
+
   #
   # Silicon/Rockchip/RK3588/Drivers/RK3588Dxe/CpuPerformance.h
   #
@@ -300,6 +303,13 @@
   #
   gRK3588TokenSpaceGuid.PcdCoolingFanState|L"CoolingFanState"|gRK3588DxeFormSetGuid|0x0|1
   gRK3588TokenSpaceGuid.PcdCoolingFanSpeed|L"CoolingFanSpeed"|gRK3588DxeFormSetGuid|0x0|100
+
+  #
+  # USB/DP PHY
+  #
+  gRK3588TokenSpaceGuid.PcdUsbDpPhy0Usb3State|L"UsbDpPhy0Usb3State"|gRK3588DxeFormSetGuid|0x0|$(USBDP_PHY_USB3_STATE_ENABLED)
+  gRK3588TokenSpaceGuid.PcdUsbDpPhy1Usb3State|L"UsbDpPhy1Usb3State"|gRK3588DxeFormSetGuid|0x0|$(USBDP_PHY_USB3_STATE_ENABLED)
+
 ################################################################################
 #
 # Components Section - list of all common EDK II Modules needed by RK3588 platforms.
@@ -319,3 +329,8 @@
   EmbeddedPkg/Drivers/NonCoherentIoMmuDxe/NonCoherentIoMmuDxe.inf
   MdeModulePkg/Bus/Pci/NvmExpressDxe/NvmExpressDxe.inf
 !endif
+
+  #
+  # USB/DP PHY Driver
+  #
+  Silicon/Rockchip/RK3588/Drivers/UsbDpPhyDxe/UsbDpPhyDxe.inf

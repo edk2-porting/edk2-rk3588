@@ -20,6 +20,7 @@
   PciExpress30.c
   Acpi.c
   FanControl.c
+  UsbDpPhy.c
   RK3588DxeHii.uni
   RK3588DxeHii.vfr
 
@@ -53,8 +54,9 @@
   RockchipPlatformLib
 
 [Protocols]
-  gRk860xRegulatorProtocolGuid
-  gEfiVariableWriteArchProtocolGuid
+  gRk860xRegulatorProtocolGuid                    ## CONSUMES
+  gEfiVariableWriteArchProtocolGuid               ## CONSUMES
+  gRockchipPlatformConfigAppliedProtocolGuid      ## PRODUCES
 
 [Pcd]
   gRockchipTokenSpaceGuid.CruBaseAddr
@@ -95,6 +97,11 @@
   gRK3588TokenSpaceGuid.PcdHasOnBoardFanOutput
   gRK3588TokenSpaceGuid.PcdCoolingFanState
   gRK3588TokenSpaceGuid.PcdCoolingFanSpeed
+
+  gRK3588TokenSpaceGuid.PcdUsbDpPhy0Supported
+  gRK3588TokenSpaceGuid.PcdUsbDpPhy1Supported
+  gRK3588TokenSpaceGuid.PcdUsbDpPhy0Usb3State
+  gRK3588TokenSpaceGuid.PcdUsbDpPhy1Usb3State
 
 [Guids]
   gRK3588DxeFormSetGuid

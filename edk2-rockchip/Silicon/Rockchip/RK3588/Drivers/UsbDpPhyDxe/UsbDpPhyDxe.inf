@@ -1,0 +1,46 @@
+#/** @file
+#
+#  Rockchip USB/DP Combo PHY Driver
+#
+#  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = UsbDpPhyDxe
+  FILE_GUID                      = 6fbd6b56-e302-4560-85f4-0e78fb731922
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = UsbDpPhyDxeInitialize
+
+[Sources.common]
+  UsbDpPhyDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Silicon/Rockchip/RockchipPkg.dec
+  Silicon/Rockchip/RK3588/RK3588.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  DebugLib
+  IoLib
+  TimerLib
+  RockchipPlatformLib
+
+[Protocols]
+
+[Pcd]
+  gRK3588TokenSpaceGuid.PcdUsbDpPhy0Supported
+  gRK3588TokenSpaceGuid.PcdUsbDpPhy1Supported
+  gRK3588TokenSpaceGuid.PcdDp0LaneMux
+  gRK3588TokenSpaceGuid.PcdDp1LaneMux
+  gRK3588TokenSpaceGuid.PcdUsbDpPhy0Usb3State
+  gRK3588TokenSpaceGuid.PcdUsbDpPhy1Usb3State
+
+[Depex]
+  gRockchipPlatformConfigAppliedProtocolGuid

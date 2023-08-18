@@ -122,6 +122,11 @@ READ_LOCK_STATUS   = TRUE
 !endif
 
   #
+  # USB/DP PHY Driver
+  #
+  INF Silicon/Rockchip/RK3588/Drivers/UsbDpPhyDxe/UsbDpPhyDxe.inf
+
+  #
   # Custom platform components
   #
 !include $(RK_PLATFORM_FVMAIN_MODULES)

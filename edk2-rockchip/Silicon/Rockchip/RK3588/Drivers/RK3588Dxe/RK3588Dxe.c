@@ -35,6 +35,7 @@
 #include "PciExpress30.h"
 #include "Acpi.h"
 #include "FanControl.h"
+#include "UsbDpPhy.h"
 
 extern UINT8 RK3588DxeHiiBin[];
 extern UINT8 RK3588DxeStrings[];
@@ -158,7 +159,8 @@ SetupVariables (
   SetupComboPhyVariables ();
   SetupPcie30Variables ();
   SetupAcpiVariables ();
-  SetupCoolingFanVariables();
+  SetupCoolingFanVariables ();
+  SetupUsbDpPhyVariables ();
 
   return EFI_SUCCESS;
 }
@@ -176,6 +178,24 @@ AfterApplyVariablesInit (
 STATIC
 VOID
 EFIAPI
+InstallConfigAppliedProtocol (
+  VOID
+  )
+{
+  EFI_HANDLE Handle;
+  EFI_STATUS Status;
+
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  &Handle,
+                  &gRockchipPlatformConfigAppliedProtocolGuid,
+                  NULL,
+                  NULL);
+  ASSERT_EFI_ERROR (Status);
+}
+
+STATIC
+VOID
+EFIAPI
 ApplyVariables (
   VOID
   )
@@ -184,7 +204,10 @@ ApplyVariables (
   ApplyComboPhyVariables ();
   ApplyPcie30Variables ();
   ApplyAcpiVariables ();
-  ApplyCoolingFanVariables();
+  ApplyCoolingFanVariables ();
+  ApplyUsbDpPhyVariables ();
+
+  InstallConfigAppliedProtocol ();
 
   AfterApplyVariablesInit ();
 }

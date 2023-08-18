@@ -61,4 +61,10 @@ typedef struct {
   UINT32 Percentage;
 } COOLING_FAN_SPEED_VARSTORE_DATA;
 
+#define USBDP_PHY_USB3_STATE_DISABLED               0
+#define USBDP_PHY_USB3_STATE_ENABLED                1
+typedef struct {
+  UINT32 State;
+} USBDP_PHY_USB3_STATE_VARSTORE_DATA;
+
 #endif // __VARSTORE_DATA_H__

@@ -47,6 +47,11 @@
 
   gRK3588TokenSpaceGuid.PcdHasOnBoardFanOutput|FALSE|BOOLEAN|0x10401
 
+  gRK3588TokenSpaceGuid.PcdUsbDpPhy0Supported|FALSE|BOOLEAN|0x00010501
+  gRK3588TokenSpaceGuid.PcdUsbDpPhy1Supported|FALSE|BOOLEAN|0x00010502
+  gRK3588TokenSpaceGuid.PcdDp0LaneMux|{ 0x0 }|VOID*|0x00010503
+  gRK3588TokenSpaceGuid.PcdDp1LaneMux|{ 0x0 }|VOID*|0x00010504
+
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   gRK3588TokenSpaceGuid.PcdCPULClusterClockPreset|0|UINT32|0x00000001
   gRK3588TokenSpaceGuid.PcdCPULClusterClockCustom|0|UINT32|0x00000002
@@ -71,3 +76,6 @@
 
   gRK3588TokenSpaceGuid.PcdCoolingFanState|0|UINT32|0x00000401
   gRK3588TokenSpaceGuid.PcdCoolingFanSpeed|0|UINT32|0x00000402
+
+  gRK3588TokenSpaceGuid.PcdUsbDpPhy0Usb3State|0|UINT32|0x00000501
+  gRK3588TokenSpaceGuid.PcdUsbDpPhy1Usb3State|0|UINT32|0x00000502
