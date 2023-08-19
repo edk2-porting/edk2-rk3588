@@ -10,6 +10,50 @@
 
 ################################################################################
 #
+# Defines Section - statements that will be processed to create a Makefile.
+#
+################################################################################
+[Defines]
+  #  DEBUG_INIT      0x00000001  // Initialization
+  #  DEBUG_WARN      0x00000002  // Warnings
+  #  DEBUG_LOAD      0x00000004  // Load events
+  #  DEBUG_FS        0x00000008  // EFI File system
+  #  DEBUG_POOL      0x00000010  // Alloc & Free (pool)
+  #  DEBUG_PAGE      0x00000020  // Alloc & Free (page)
+  #  DEBUG_INFO      0x00000040  // Informational debug messages
+  #  DEBUG_DISPATCH  0x00000080  // PEI/DXE/SMM Dispatchers
+  #  DEBUG_VARIABLE  0x00000100  // Variable
+  #  DEBUG_BM        0x00000400  // Boot Manager
+  #  DEBUG_BLKIO     0x00001000  // BlkIo Driver
+  #  DEBUG_NET       0x00004000  // SNP Driver
+  #  DEBUG_UNDI      0x00010000  // UNDI Driver
+  #  DEBUG_LOADFILE  0x00020000  // LoadFile
+  #  DEBUG_EVENT     0x00080000  // Event messages
+  #  DEBUG_GCD       0x00100000  // Global Coherency Database changes
+  #  DEBUG_CACHE     0x00200000  // Memory range cachability changes
+  #  DEBUG_VERBOSE   0x00400000  // Detailed debug messages that may
+  #                              // significantly impact boot performance
+  #  DEBUG_ERROR     0x80000000  // Error
+  #
+  DEFINE DEBUG_PRINT_ERROR_LEVEL = 0x80000047
+
+  #
+  # Modules that can get too noisy on the DEBUG_INFO channel
+  # are excluded from it in the DEBUG_PRINT_INFO_MODULE_EXCLUDE
+  # bitmask below.
+  #
+  DEFINE DEBUG_MODULE_DXEMAIN            = 0x00000010
+  DEFINE DEBUG_MODULE_USBBUSDXE          = 0x00000020
+  DEFINE DEBUG_MODULE_PARTITIONDXE       = 0x00000040
+  DEFINE DEBUG_MODULE_SNPDXE             = 0x00000100
+  DEFINE DEBUG_MODULE_MNPDXE             = 0x00000200
+
+  DEFINE DEBUG_PRINT_INFO_MODULE_EXCLUDE = 0x00000370
+
+  DEFINE DEBUG_PRINT_ERROR_LEVEL_NO_INFO = $(DEBUG_PRINT_ERROR_LEVEL) - 0x00000040
+
+################################################################################
+#
 # Library Class section - list of all common Library Classes needed by Rockchip platforms.
 #
 ################################################################################
@@ -340,37 +384,12 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
   # ASSERT_BREAKPOINT_ENABLED  0x10
   # ASSERT_DEADLOOP_ENABLED    0x20
 !if $(TARGET) == RELEASE
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0e
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x00
 !else
   gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0f
 !endif
 
-  #  DEBUG_INIT      0x00000001  // Initialization
-  #  DEBUG_WARN      0x00000002  // Warnings
-  #  DEBUG_LOAD      0x00000004  // Load events
-  #  DEBUG_FS        0x00000008  // EFI File system
-  #  DEBUG_POOL      0x00000010  // Alloc & Free (pool)
-  #  DEBUG_PAGE      0x00000020  // Alloc & Free (page)
-  #  DEBUG_INFO      0x00000040  // Informational debug messages
-  #  DEBUG_DISPATCH  0x00000080  // PEI/DXE/SMM Dispatchers
-  #  DEBUG_VARIABLE  0x00000100  // Variable
-  #  DEBUG_BM        0x00000400  // Boot Manager
-  #  DEBUG_BLKIO     0x00001000  // BlkIo Driver
-  #  DEBUG_NET       0x00004000  // SNP Driver
-  #  DEBUG_UNDI      0x00010000  // UNDI Driver
-  #  DEBUG_LOADFILE  0x00020000  // LoadFile
-  #  DEBUG_EVENT     0x00080000  // Event messages
-  #  DEBUG_GCD       0x00100000  // Global Coherency Database changes
-  #  DEBUG_CACHE     0x00200000  // Memory range cachability changes
-  #  DEBUG_VERBOSE   0x00400000  // Detailed debug messages that may
-  #                              // significantly impact boot performance
-  #  DEBUG_ERROR     0x80000000  // Error
-
-!if $(TARGET) == RELEASE
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x80000000
-!else
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|0x800B0507
-!endif
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|$(DEBUG_PRINT_ERROR_LEVEL)
 
   gEfiMdePkgTokenSpaceGuid.PcdReportStatusCodePropertyMask|0x06
 
@@ -432,6 +451,11 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
   MdeModulePkg/Core/Dxe/DxeMain.inf {
     <LibraryClasses>
       NULL|MdeModulePkg/Library/DxeCrc32GuidedSectionExtractLib/DxeCrc32GuidedSectionExtractLib.inf
+
+    <PcdsFixedAtBuild>
+!if $(DEBUG_PRINT_INFO_MODULE_EXCLUDE) & $(DEBUG_MODULE_DXEMAIN)
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|$(DEBUG_PRINT_ERROR_LEVEL_NO_INFO)
+!endif
   }
   MdeModulePkg/Universal/PCD/Dxe/Pcd.inf
 
@@ -544,7 +568,12 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
   # USB controllers installer
   Silicon/Rockchip/Drivers/UsbHcdInitDxe/UsbHcd.inf
 
-  MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf
+  MdeModulePkg/Bus/Usb/UsbBusDxe/UsbBusDxe.inf {
+    <PcdsFixedAtBuild>
+!if $(DEBUG_PRINT_INFO_MODULE_EXCLUDE) & $(DEBUG_MODULE_USBBUSDXE)
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|$(DEBUG_PRINT_ERROR_LEVEL_NO_INFO)
+!endif
+  }
   MdeModulePkg/Bus/Usb/UsbMassStorageDxe/UsbMassStorageDxe.inf
   MdeModulePkg/Bus/Usb/UsbKbDxe/UsbKbDxe.inf
   MdeModulePkg/Bus/Usb/UsbMouseDxe/UsbMouseDxe.inf
@@ -592,7 +621,12 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
   # FAT filesystem + GPT/MBR partitioning
   #
   MdeModulePkg/Universal/Disk/DiskIoDxe/DiskIoDxe.inf
-  MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf
+  MdeModulePkg/Universal/Disk/PartitionDxe/PartitionDxe.inf {
+    <PcdsFixedAtBuild>
+!if $(DEBUG_PRINT_INFO_MODULE_EXCLUDE) & $(DEBUG_MODULE_PARTITIONDXE)
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|$(DEBUG_PRINT_ERROR_LEVEL_NO_INFO)
+!endif
+  }
   FatPkg/EnhancedFatDxe/Fat.inf
   MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 
@@ -602,6 +636,23 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
 !include NetworkPkg/Network.dsc.inc
 
 !if $(NETWORK_ENABLE) == TRUE
+
+!if $(NETWORK_SNP_ENABLE) == TRUE
+  NetworkPkg/SnpDxe/SnpDxe.inf {
+    <PcdsFixedAtBuild>
+!if $(DEBUG_PRINT_INFO_MODULE_EXCLUDE) & $(DEBUG_MODULE_SNPDXE)
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|$(DEBUG_PRINT_ERROR_LEVEL_NO_INFO)
+!endif
+  }
+!endif
+
+  NetworkPkg/MnpDxe/MnpDxe.inf {
+    <PcdsFixedAtBuild>
+!if $(DEBUG_PRINT_INFO_MODULE_EXCLUDE) & $(DEBUG_MODULE_MNPDXE)
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|$(DEBUG_PRINT_ERROR_LEVEL_NO_INFO)
+!endif
+  }
+
   #
   # Realtek PCIe UNDI Driver
   #
