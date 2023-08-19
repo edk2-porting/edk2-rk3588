@@ -649,13 +649,7 @@ DwMmcHcDriverBindingStart (
 
   DumpCapabilityReg (0, &Private->Capability[0]);
 
-  MediaPresent = FALSE;
-
-  Status = Private->PlatformDwMmc->CardDetect (Controller, 0);
-  Status = DwMmcHcCardDetect (Private->DevBase, Controller, 0, &MediaPresent);
-  if (MediaPresent == FALSE) {
-    goto Done;
-  }
+  Status = DwMmcHcCardDetect (Private->DevBase, Controller, 0, &Private->Slot[0].MediaPresent);
 
   //
   // Initialize slot and start identification process for the new attached device
@@ -676,7 +670,6 @@ DwMmcHcDriverBindingStart (
   Private->Slot[0].SlotType = Private->Capability[0].SlotType;
   Private->Slot[0].CardType = Private->Capability[0].CardType;
   Private->Slot[0].Enable = TRUE;
-  Private->Slot[0].MediaPresent = TRUE;
 
   RoutineNum = sizeof (mCardTypeDetectRoutineTable) / sizeof (DWMMC_CARD_TYPE_DETECT_ROUTINE);
   for (Index = 0; Index < RoutineNum; Index++) {
