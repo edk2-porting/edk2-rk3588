@@ -59,5 +59,5 @@ DwcSdhciSetIoMux (
   VOID
   )
 {
-  SdhciEmmcDxeIoMux ();
+  SdhciEmmcIoMux ();
 }

@@ -42,7 +42,7 @@ static struct regulator_init_data rk806_init_data[] = {
 
 VOID
 EFIAPI
-DwEmmcDxeIoMux (
+SdmmcIoMux (
   VOID
   )
 {
@@ -51,7 +51,7 @@ DwEmmcDxeIoMux (
 
 VOID
 EFIAPI
-SdhciEmmcDxeIoMux (
+SdhciEmmcIoMux (
   VOID
   )
 {

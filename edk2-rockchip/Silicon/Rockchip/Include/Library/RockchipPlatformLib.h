@@ -19,13 +19,13 @@
 
 VOID
 EFIAPI
-DwEmmcDxeIoMux (
+SdmmcIoMux (
   VOID
   );
 
 VOID
 EFIAPI
-SdhciEmmcDxeIoMux (
+SdhciEmmcIoMux (
   VOID
   );
 
