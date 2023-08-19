@@ -47,7 +47,10 @@ SdmmcIoMux (
   VOID
   )
 {
-  /* sdmmc0 iomux */
+  /* sdmmc0 iomux (microSD socket) */
+  BUS_IOC->GPIO4D_IOMUX_SEL_L = (0xFFFFUL << 16) | (0x1111); //SDMMC_D0,SDMMC_D1,SDMMC_D2,SDMMC_D3
+  BUS_IOC->GPIO4D_IOMUX_SEL_H = (0x00FFUL << 16) | (0x0011); //SDMMC_CLK,SDMMC_CMD
+  PMU1_IOC->GPIO0A_IOMUX_SEL_H = (0x000FUL << 16) | (0x0001); //SDMMC_DET
 }
 
 VOID

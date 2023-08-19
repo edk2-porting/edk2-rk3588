@@ -13,6 +13,7 @@
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/GpioLib.h>
+#include <Library/RockchipPlatformLib.h>
 #include <Protocol/ArmScmiClockProtocol.h>
 
 #define SCMI_CCLK_SD			9
@@ -45,6 +46,7 @@ RkSdmmcSetIoMux (
   )
 {
   GpioPinSetDirection (0, GPIO_PIN_PA4, GPIO_PIN_INPUT);
+  SdmmcIoMux ();
 }
 
 RKSDMMC_CARD_PRESENCE_STATE
