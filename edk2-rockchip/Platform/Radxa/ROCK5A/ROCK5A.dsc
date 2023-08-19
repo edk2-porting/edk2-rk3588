@@ -79,6 +79,12 @@
   gRK3588TokenSpaceGuid.PcdComboPhy2ModeDefault|$(COMBO_PHY_MODE_USB3)
 
   #
+  # USB/DP Combo PHY support flags and default values
+  #
+  gRK3588TokenSpaceGuid.PcdUsbDpPhy0Supported|TRUE
+  gRK3588TokenSpaceGuid.PcdDp0LaneMux|{ 0x2, 0x3 }
+
+  #
   # On-Board fan output
   #
   gRK3588TokenSpaceGuid.PcdHasOnBoardFanOutput|TRUE

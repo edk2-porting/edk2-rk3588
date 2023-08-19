@@ -228,21 +228,6 @@ Usb2PhyResume (
 
 VOID
 EFIAPI
-UsbDpPhyEnable (
-  VOID
-  )
-{
-  /* enable rx_lfps_en & usbdp_low_pwrn */
-  MmioWrite32(0xfd5c8004, 0x60006000);
-  MmioWrite32(0xfd5cc004, 0x60006000);
-
-  /* remove rx-termination, we don't support SS yet */
-  MmioWrite32 (0xfd5c800c, 0x00030001);
-  MmioWrite32 (0xfd5cc00c, 0x00030001);
-}
-
-VOID
-EFIAPI
 PcieIoInit (
   UINT32 Segment
   )

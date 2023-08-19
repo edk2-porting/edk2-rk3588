@@ -86,6 +86,12 @@
   gRK3588TokenSpaceGuid.PcdComboPhy0ModeDefault|$(COMBO_PHY_MODE_PCIE)
   gRK3588TokenSpaceGuid.PcdComboPhy2ModeDefault|$(COMBO_PHY_MODE_PCIE)
 
+  #
+  # USB/DP Combo PHY support flags and default values
+  #
+  gRK3588TokenSpaceGuid.PcdUsbDpPhy0Supported|TRUE
+  gRK3588TokenSpaceGuid.PcdDp0LaneMux|{ 0x2, 0x3 }
+
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform.

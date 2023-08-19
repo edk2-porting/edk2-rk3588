@@ -85,12 +85,6 @@ I2cIomux (
 
 VOID
 EFIAPI
-UsbDpPhyEnable (
-  VOID
-  );
-
-VOID
-EFIAPI
 UsbPortPowerEnable (
   VOID
   );

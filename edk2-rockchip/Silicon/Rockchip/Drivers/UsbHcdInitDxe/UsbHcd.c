@@ -330,7 +330,6 @@ UsbEndOfDxeCallback (
 
   /* Enable USB PHYs */
   Usb2PhyResume (); 
-  UsbDpPhyEnable ();
   
   UsbPortPowerEnable ();
 
