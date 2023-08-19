@@ -194,10 +194,10 @@ STATIC RK3588_PPTT Pptt = {
       {                                           /* Reserved[2] */
         EFI_ACPI_RESERVED_BYTE,
         EFI_ACPI_RESERVED_BYTE
-        },
+      },
       {                                           /* Flags */
         EFI_ACPI_6_2_PPTT_PACKAGE_PHYSICAL,
-        EFI_ACPI_6_2_PPTT_PROCESSOR_ID_INVALID
+        EFI_ACPI_6_2_PPTT_PROCESSOR_ID_VALID
       },
       0,                                          /* Parent */
       8,                                          /* AcpiProcessorId */
