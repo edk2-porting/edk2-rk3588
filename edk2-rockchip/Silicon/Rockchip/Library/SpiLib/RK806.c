@@ -324,7 +324,7 @@ static RETURN_STATUS pmic_reg_read(INT32 cs_id,
 
   ret = _spi_read(cs_id, reg, buffer, len);
   if (ret)
-    DEBUG ((RK806_DBG, "cs_id %d rk806 read reg(0x%x) error: %d buffer = %x\n",
+    DEBUG ((DEBUG_ERROR, "cs_id %d rk806 read reg(0x%x) error: %d buffer = %x\n",
            cs_id, reg, ret, buffer[0]));
 
   return ret;
@@ -339,7 +339,7 @@ static INT32 pmic_reg_write(INT32 cs_id,
 
   ret = _spi_write(cs_id, reg, buffer, len);
   if (ret)
-    DEBUG ((RK806_DBG, "cs_id %d rk806 write reg(0x%x) error: %d %x\n",
+    DEBUG ((DEBUG_ERROR, "cs_id %d rk806 write reg(0x%x) error: %d %x\n",
            cs_id, reg, ret, buffer[0]));
 
   return ret;
@@ -401,7 +401,7 @@ static RETURN_STATUS buck_set_voltage(INT32 reg_id, INT32 uvolt)
 	else
 		val = ((uvolt - info->min_uv) / info->step_uv) + info->min_sel;
 
-	DEBUG ((RK806_DBG, "%a: volt=%d, buck=%d, reg=0x%x, mask=0x%x, val=0x%x\n",
+	DEBUG ((DEBUG_INFO, "%a: volt=%d, buck=%d, reg=0x%x, mask=0x%x, val=0x%x\n",
 	      __func__, uvolt, buck + 1, info->vsel_reg, mask, val));
 
 	return pmic_clrsetbits(cs_id, info->vsel_reg, mask, val);
@@ -423,7 +423,7 @@ static RETURN_STATUS nldo_set_voltage(INT32 reg_id, INT32 uvolt)
 	else
 		val = ((uvolt - info->min_uv) / info->step_uv) + info->min_sel;
 
-	DEBUG ((RK806_DBG, "%a: volt=%d, ldo=%d, reg=0x%x, mask=0x%x, val=0x%x\n",
+	DEBUG ((DEBUG_INFO, "%a: volt=%d, ldo=%d, reg=0x%x, mask=0x%x, val=0x%x\n",
 	      __func__, uvolt, ldo + 1, info->vsel_reg, mask, val));
 
 	return pmic_clrsetbits(cs_id, info->vsel_reg, mask, val);
@@ -445,7 +445,7 @@ static RETURN_STATUS pldo_set_voltage(INT32 reg_id, INT32 uvolt)
 	else
 		val = ((uvolt - info->min_uv) / info->step_uv) + info->min_sel;
 
-	DEBUG ((RK806_DBG, "%s: volt=%d, ldo=%d, reg=0x%x, mask=0x%x, val=0x%x\n",
+	DEBUG ((DEBUG_INFO, "%s: volt=%d, ldo=%d, reg=0x%x, mask=0x%x, val=0x%x\n",
 	      __func__, uvolt, ldo + 1, info->vsel_reg, mask, val));
 
 	return pmic_clrsetbits(cs_id, info->vsel_reg, mask, val);
@@ -562,7 +562,7 @@ RETURN_STATUS
 SpiCongig(struct SPI_HANDLE *pSPI)
 {
   struct SPI_CONFIG *pSPIConfig = &pSPI->config;
-  DEBUG ((DEBUG_ERROR, "%a(%u): 0: %x\n", "SpiCongig", __LINE__, 0));
+  DEBUG ((DEBUG_INFO, "%a(%u): 0: %x\n", "SpiCongig", __LINE__, 0));
 
   /* Data width */
   pSPIConfig->nBytes = CR0_DATA_FRAME_SIZE_8BIT;
@@ -602,7 +602,7 @@ RETURN_STATUS RK806Init(void)
 
   Rk806SpiIomux();
 
-  DEBUG ((DEBUG_ERROR, "%a(%u): base: %x\n", "RK806Init", __LINE__, base));
+  DEBUG ((DEBUG_INIT, "%a(%u): base: %x\n", "RK806Init", __LINE__, base));
 
   SPI_Init(&gSPI, base);
   SpiCongig(&gSPI);

@@ -885,7 +885,7 @@ SysInfoUpdateSmbiosType1 (
   I64ToHexString (mSysInfoSKU, sizeof (mSysInfoSKU), BoardRevision);
   I64ToHexString (mSysInfoSerial, sizeof (mSysInfoSerial), BoardSerial);
 
-  DEBUG ((DEBUG_ERROR, "Board Serial Number: %a\n", mSysInfoSerial));
+  DEBUG ((DEBUG_INFO, "Board Serial Number: %a\n", mSysInfoSerial));
 
   mSysInfoType1.Uuid.Data1 = BoardRevision;
   mSysInfoType1.Uuid.Data2 = 0x0;

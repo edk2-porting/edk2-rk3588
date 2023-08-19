@@ -37,7 +37,7 @@
 #define  APP_CLK_REQ_N                  BIT0
 #define  CLK_REQ_N_BYPASS               BIT12
 #define  CLK_REQ_N_CON                  BIT13
-#define PCIE_CLIENT_GENERAL_DEBUG_ERROR 0x0104
+#define PCIE_CLIENT_GENERAL_DEBUG_INIT 0x0104
 #define PCIE_CLIENT_HOT_RESET_CTRL      0x0180
 #define  APP_LSSTM_ENABLE_ENHANCE       BIT4
 #define PCIE_CLIENT_LTSSM_STATUS        0x0300
@@ -295,7 +295,7 @@ PciDirectSpeedChange (
   IN EFI_PHYSICAL_ADDRESS DbiBase
   )
 {
-  DEBUG ((DEBUG_ERROR, "PCIe: SetupBars: Speed change\n"));
+  DEBUG ((DEBUG_INIT, "PCIe: SetupBars: Speed change\n"));
   /* Initiate a speed change to Gen2 or Gen3 after the link is initialized as Gen1 speed. */
   MmioOr32 (DbiBase + PL_GEN2_CTRL_OFF, DIRECT_SPEED_CHANGE);
 }
@@ -367,7 +367,7 @@ PciPrintLinkSpeedWidth (
                    (Speed * 25) / 10, (Speed * 25) % 10);
     break;
   }
-  DEBUG ((DEBUG_ERROR, "PCIe: Link up (x%u, %a GT/s)\n", Width, LinkSpeedBuf));
+  DEBUG ((DEBUG_INIT, "PCIe: Link up (x%u, %a GT/s)\n", Width, LinkSpeedBuf));
 }
 
 STATIC
@@ -399,7 +399,7 @@ PciIsLinkUp (
 
   Val = MmioRead32 (ApbBase + PCIE_CLIENT_LTSSM_STATUS);
   if (Val != LastVal) {
-    DEBUG ((DEBUG_ERROR, "PCIe: PciIsLinkUp(): LTSSM_STATUS=0x%08X\n", Val));
+    DEBUG ((DEBUG_INIT, "PCIe: PciIsLinkUp(): LTSSM_STATUS=0x%08X\n", Val));
     LastVal = Val;
   }
 
@@ -487,12 +487,12 @@ InitializePciHost (
   }
 
   /* Log settings */
-  DEBUG ((DEBUG_ERROR, "\nPCIe: Segment %u\n", Segment));
-  DEBUG ((DEBUG_ERROR, "PCIe: PciExpressBaseAddress 0x%lx\n", PcieBase));
-  DEBUG ((DEBUG_ERROR, "PCIe: ApbBase 0x%lx\n", ApbBase));
-  DEBUG ((DEBUG_ERROR, "PCIe: DbiBase 0x%lx\n", DbiBase));
-  DEBUG ((DEBUG_ERROR, "PCIe: NumLanes %u\n", LinkWidth));
-  DEBUG ((DEBUG_ERROR, "PCIe: LinkSpeed %u\n", LinkSpeed));
+  DEBUG ((DEBUG_INIT, "\nPCIe: Segment %u\n", Segment));
+  DEBUG ((DEBUG_INIT, "PCIe: PciExpressBaseAddress 0x%lx\n", PcieBase));
+  DEBUG ((DEBUG_INIT, "PCIe: ApbBase 0x%lx\n", ApbBase));
+  DEBUG ((DEBUG_INIT, "PCIe: DbiBase 0x%lx\n", DbiBase));
+  DEBUG ((DEBUG_INIT, "PCIe: NumLanes %u\n", LinkWidth));
+  DEBUG ((DEBUG_INIT, "PCIe: LinkSpeed %u\n", LinkSpeed));
 
   PcieIoInit(Segment);
   PciePowerEn(Segment, TRUE);
@@ -505,20 +505,20 @@ InitializePciHost (
 
   /* Combo PHY for PCIe 2.0 is configured earlier by RK3588Dxe */
 
-  DEBUG ((DEBUG_ERROR, "PCIe: Setup clocks\n"));
+  DEBUG ((DEBUG_INIT, "PCIe: Setup clocks\n"));
   PciSetupClocks (Segment);
 
-  DEBUG ((DEBUG_ERROR, "PCIe: Switching to RC mode\n"));
+  DEBUG ((DEBUG_INIT, "PCIe: Switching to RC mode\n"));
   PciSetRcMode (Segment, ApbBase);
 
   /* Allow writing RO registers through the DBI */
-  DEBUG ((DEBUG_ERROR, "PCIe: Enabling DBI access\n"));
+  DEBUG ((DEBUG_INIT, "PCIe: Enabling DBI access\n"));
   MmioOr32 (DbiBase + PL_MISC_CONTROL_1_OFF, DBI_RO_WR_EN);
 
-  DEBUG ((DEBUG_ERROR, "PCIe: Setup BARs\n"));
+  DEBUG ((DEBUG_INIT, "PCIe: Setup BARs\n"));
   PciSetupBars (DbiBase);
 
-  DEBUG ((DEBUG_ERROR, "PCIe: Setup iATU\n"));
+  DEBUG ((DEBUG_INIT, "PCIe: Setup iATU\n"));
   Cfg0Base = SIZE_1MB;
   Cfg0Size = SIZE_64KB;
   Cfg1Base = SIZE_2MB;
@@ -530,26 +530,26 @@ InitializePciHost (
   PciSetupAtu (DbiBase, 1, IATU_TYPE_CFG1, PcieBase + Cfg1Base, Cfg1Base, Cfg1Size);
   PciSetupAtu (DbiBase, 2, IATU_TYPE_IO,   PcieBase + PciIoBase, 0, PciIoSize);
 
-  DEBUG ((DEBUG_ERROR, "PCIe: Set link speed\n"));
+  DEBUG ((DEBUG_INIT, "PCIe: Set link speed\n"));
   PciSetupLinkSpeed (DbiBase, LinkSpeed, LinkWidth);
   PciDirectSpeedChange (DbiBase);
 
   /* Disallow writing RO registers through the DBI */
   MmioAnd32 (DbiBase + PL_MISC_CONTROL_1_OFF, ~DBI_RO_WR_EN);
 
-  DEBUG ((DEBUG_ERROR, "PCIe: Assert reset\n"));
+  DEBUG ((DEBUG_INIT, "PCIe: Assert reset\n"));
   PciePeReset(Segment, TRUE);
 
-  DEBUG ((DEBUG_ERROR, "PCIe: Start LTSSM\n"));
+  DEBUG ((DEBUG_INIT, "PCIe: Start LTSSM\n"));
 
   PciEnableLtssm (ApbBase, TRUE);
 
   gBS->Stall (100000);
-  DEBUG ((DEBUG_ERROR, "PCIe: Deassert reset\n"));
+  DEBUG ((DEBUG_INIT, "PCIe: Deassert reset\n"));
   PciePeReset(Segment, FALSE);
 
   /* Wait for link up */
-  DEBUG ((DEBUG_ERROR, "PCIe: Waiting for link up...\n"));
+  DEBUG ((DEBUG_INIT, "PCIe: Waiting for link up...\n"));
   for (Retry = 20; Retry != 0; Retry--) {
     if (PciIsLinkUp (ApbBase)) {
       break;

@@ -869,7 +869,7 @@ LcdGraphicsBlt (
   HorizontalResolution = This->Mode->Info->HorizontalResolution;
   VerticalResolution   = This->Mode->Info->VerticalResolution;
 
-  DEBUG((DEBUG_INFO, "[BLT]LcdGraphicsBlt (BltOperation:%d,DestX:%d,DestY:%d,Width:%d,Height:%d) res(%d,%d)\n",
+  DEBUG((DEBUG_VERBOSE, "[BLT]LcdGraphicsBlt (BltOperation:%d,DestX:%d,DestY:%d,Width:%d,Height:%d) res(%d,%d)\n",
       BltOperation,DestinationX,DestinationY,Width,Height,HorizontalResolution,VerticalResolution));
 
   // Check we have reasonable parameters

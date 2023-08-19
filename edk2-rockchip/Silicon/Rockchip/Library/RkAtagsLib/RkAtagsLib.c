@@ -115,7 +115,7 @@ RkAtagsGetTagBuffer (
       TagHash = (UINT32 *)(TagBuffer + TagHashOffset);
 
       if (*TagHash == 0) {
-        DEBUG ((EFI_D_WARN, "%a: Tag hash missing! Type=%x. Ignoring.\n",
+        DEBUG ((DEBUG_WARN, "%a: Tag hash missing! Type=%x. Ignoring.\n",
                 __FUNCTION__, TagHeader->Type));
         return TagBuffer + sizeof (RKATAG_HEADER);
       }

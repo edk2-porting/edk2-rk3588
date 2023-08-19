@@ -210,7 +210,7 @@ InitializeXhciController (
   EFI_STATUS Status;
   EFI_PHYSICAL_ADDRESS UsbReg = This->Resources->AddrRangeMin;
 
-  DEBUG ((DEBUG_ERROR, "XHCI: Initialize DWC3 at 0x%lX\n", UsbReg));
+  DEBUG ((DEBUG_INFO, "XHCI: Initialize DWC3 at 0x%lX\n", UsbReg));
 
   Status = XhciCoreInit (UsbReg);
 

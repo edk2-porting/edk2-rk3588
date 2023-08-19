@@ -12,7 +12,6 @@
 /* Not used or exisit register and configure */
 #define NA			-1
 #define BIT(n)			(1 << (n))
-#define RK806_DBG		DEBUG_ERROR
 /* rk806 buck*/
 #define RK806_BUCK_ON_VSEL(n)		(0x1a + n - 1)
 #define RK806_BUCK_SLP_VSEL(n)		(0x24 + n - 1)

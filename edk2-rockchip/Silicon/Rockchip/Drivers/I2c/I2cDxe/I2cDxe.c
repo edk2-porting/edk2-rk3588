@@ -182,7 +182,7 @@ I2cInitialiseController (
   I2C_DEVICE_PATH *DevicePath;
   EFI_EVENT VirtualAddressChangeEvent = NULL;
 
-  DEBUG ((EFI_D_VERBOSE, "I2cInitialiseController\n"));
+  DEBUG ((DEBUG_VERBOSE, "I2cInitialiseController\n"));
   DevicePath = AllocateCopyPool (sizeof(I2cDevicePathProtocol),
                                  &I2cDevicePathProtocol);
   if (DevicePath == NULL) {
@@ -358,7 +358,7 @@ I2cInitialise (
   /* Initialize enabled chips */
   for (Index = 0; Index < DeviceBusCount; Index++) {
     if (DeviceBusPcd[Index] > I2C_COUNT - 1) {
-      DEBUG ((EFI_D_WARN, "I2cInitialise: invalid bus %d for DeviceBusPcd index %d. Skipping.\n",
+      DEBUG ((DEBUG_WARN, "I2cInitialise: invalid bus %d for DeviceBusPcd index %d. Skipping.\n",
               DeviceBusPcd[Index], Index));
       continue;
     }
@@ -449,7 +449,7 @@ I2cAdapterBaudRate (
   } else if (Target <= 1000000 && Target > 400000) {
     Speed = 1000;
   } else {
-    DEBUG ((EFI_D_ERROR, "invalid i2c speed : %d\n", Target));
+    DEBUG ((DEBUG_ERROR, "invalid i2c speed : %d\n", Target));
     return EFI_INVALID_PARAMETER;
   }
 
@@ -519,7 +519,7 @@ I2cReset (
   IN CONST EFI_I2C_MASTER_PROTOCOL *This
   )
 {
-  DEBUG((EFI_D_VERBOSE, "I2cReset\n"));
+  DEBUG((DEBUG_VERBOSE, "I2cReset\n"));
   return EFI_SUCCESS;
 }
 
@@ -529,7 +529,7 @@ I2cDisable (
   IN I2C_MASTER_CONTEXT *I2cMasterContext
   )
 {
-  DEBUG ((EFI_D_VERBOSE, "I2c I2cDisable.\n"));
+  DEBUG ((DEBUG_VERBOSE, "I2c I2cDisable.\n"));
 
   I2cWrite(I2cMasterContext, I2C_IEN, 0);
   I2cWrite(I2cMasterContext, I2C_IPD, I2C_IPD_ALL_CLEAN);
@@ -547,7 +547,7 @@ I2cStartEnable (
   IN UINTN Timeout
   )
 {
-  DEBUG ((EFI_D_VERBOSE, "I2cStartEnable\n"));
+  DEBUG ((DEBUG_VERBOSE, "I2cStartEnable\n"));
 
   I2cWrite(I2cMasterContext, I2C_IPD, I2C_IPD_ALL_CLEAN);
   I2cWrite(I2cMasterContext, I2C_IEN, I2C_STARTIEN);
@@ -561,7 +561,7 @@ I2cStartEnable (
     MicroSecondDelay(1);
   }
   if (Timeout <= 0) {
-    DEBUG ((EFI_D_ERROR, "I2C Send Start Bit Timeout\n"));
+    DEBUG ((DEBUG_ERROR, "I2C Send Start Bit Timeout\n"));
     I2cShowRegs(I2cMasterContext);
     return EFI_TIMEOUT;
   }
@@ -577,7 +577,7 @@ I2cStop (
 {
   int TimeOut = I2C_READY_TIMEOUT;
 
-  DEBUG ((EFI_D_VERBOSE, "I2c Send Stop bit.\n"));
+  DEBUG ((DEBUG_VERBOSE, "I2c Send Stop bit.\n"));
 
   I2cWrite(I2cMasterContext, I2C_IPD, I2C_IPD_ALL_CLEAN);
   I2cWrite(I2cMasterContext, I2C_CON, I2C_CON_EN | I2C_CON_STOP |I2cMasterContext->Config);
@@ -592,7 +592,7 @@ I2cStop (
   }
 
   if (TimeOut <= 0) {
-    DEBUG ((EFI_D_ERROR, "I2C Send Stop Bit Timeout\n"));
+    DEBUG ((DEBUG_ERROR, "I2C Send Stop Bit Timeout\n"));
     I2cShowRegs(I2cMasterContext);
     return EFI_TIMEOUT;
   }
@@ -623,7 +623,7 @@ I2cReadOperation (
   UINT32 i, j;
   UINTN SndChunk = 0;
 
-  DEBUG ((EFI_D_VERBOSE, "I2cRead: base_addr = 0x%x buf = %p, Length = %d\n",
+  DEBUG ((DEBUG_VERBOSE, "I2cRead: base_addr = 0x%x buf = %p, Length = %d\n",
   	         I2cMasterContext->BaseAddress, Buf, Length));
 
   /* If the second message for TRX read, resetting internal state. */
@@ -680,7 +680,7 @@ I2cReadOperation (
     }
 
     if (TimeOut <= 0) {
-      DEBUG ((EFI_D_ERROR, "I2C Read Data Timeout\n"));
+      DEBUG ((DEBUG_ERROR, "I2C Read Data Timeout\n"));
       I2cShowRegs(I2cMasterContext);
       Status = EFI_TIMEOUT;
       goto out;
@@ -688,7 +688,7 @@ I2cReadOperation (
 
     for (i = 0; i < WordsTranferedLen; i++) {
       RxData = I2cRead(I2cMasterContext, I2C_RXDATA_BASE + i * 4);
-      DEBUG ((EFI_D_VERBOSE, "I2c Read RXDATA[%d] = 0x%x\n", i, RxData));
+      DEBUG ((DEBUG_VERBOSE, "I2c Read RXDATA[%d] = 0x%x\n", i, RxData));
       for (j = 0; j < 4; j++) {
         if ((i * 4 + j) == BytesTranferedLen) {
         break;
@@ -729,7 +729,7 @@ I2cWriteOperation (
   UINT32 i, j;
   UINTN Next = 0;
 
-  DEBUG ((EFI_D_VERBOSE, "I2cWrite: base_addr = 0x%x buf = %p, Length = %d\n",
+  DEBUG ((DEBUG_VERBOSE, "I2cWrite: base_addr = 0x%x buf = %p, Length = %d\n",
                  I2cMasterContext->BaseAddress, Buf, Length));
 
   (*Sent) = 0;
@@ -756,7 +756,7 @@ I2cWriteOperation (
         }
       }
       I2cWrite(I2cMasterContext, I2C_TXDATA_BASE + i * 4, TxData);
-      DEBUG ((EFI_D_VERBOSE, "I2c Write TXDATA[%d] = 0x%x\n", i, TxData));
+      DEBUG ((DEBUG_VERBOSE, "I2c Write TXDATA[%d] = 0x%x\n", i, TxData));
     }
 
     /* If the write is the first, need to send start bit */
@@ -789,7 +789,7 @@ I2cWriteOperation (
     }
 
     if (TimeOut <= 0) {
-      DEBUG ((EFI_D_ERROR, "I2C Write Data Timeout\n"));
+      DEBUG ((DEBUG_ERROR, "I2C Write Data Timeout\n"));
       I2cShowRegs(I2cMasterContext);
       Status = EFI_TIMEOUT;
       goto out;
@@ -840,7 +840,7 @@ I2cStartRequest (
     return EFI_UNSUPPORTED;
   }
 
-  DEBUG ((EFI_D_VERBOSE, "I2cStartRequest.\n"));
+  DEBUG ((DEBUG_VERBOSE, "I2cStartRequest.\n"));
 
   if (!AtRuntime) {
     // Disable (timer) interrupts.
@@ -856,7 +856,7 @@ I2cStartRequest (
   }
 
   if (Count > 2 || ((Count == 2) && (RequestPacket->Operation->Flags & I2C_FLAG_READ))) {
-    DEBUG ((EFI_D_VERBOSE, "Not support more messages now, split them\n"));
+    DEBUG ((DEBUG_VERBOSE, "Not support more messages now, split them\n"));
     return EFI_INVALID_PARAMETER;
   }
 
@@ -886,7 +886,7 @@ I2cStartRequest (
 
     /* I2C transaction was aborted, so stop further transactions */
     if (EFI_ERROR (Status)) {
-      DEBUG ((EFI_D_VERBOSE, "I2cStartRequest: Failed at Count = %d\n", Count));
+      DEBUG ((DEBUG_VERBOSE, "I2cStartRequest: Failed at Count = %d\n", Count));
       break;
     }
   }

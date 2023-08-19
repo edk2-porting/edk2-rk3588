@@ -112,11 +112,11 @@ ScmiSetClockRate (
     return Status;
   }
 
-  DEBUG ((EFI_D_WARN, "SCMI: %a: Current rate is %uHz\n", ClockName, ClockRate));
+  DEBUG ((DEBUG_INFO, "SCMI: %a: Current rate is %uHz\n", ClockName, ClockRate));
 
   ClockRate = Hz;
 
-  DEBUG ((EFI_D_WARN, "SCMI: %a: New rate is %uHz\n", ClockName, ClockRate));
+  DEBUG ((DEBUG_INFO, "SCMI: %a: New rate is %uHz\n", ClockName, ClockRate));
 
   Status = ClockProtocol->RateSet (
                             ClockProtocol,
@@ -134,7 +134,7 @@ ScmiSetClockRate (
     return Status;
   }
 
-  DEBUG ((EFI_D_WARN, "SCMI: %a: Current rate is %uHz\n", ClockName, ClockRate));
+  DEBUG ((DEBUG_INFO, "SCMI: %a: Current rate is %uHz\n", ClockName, ClockRate));
 
   return EFI_SUCCESS;
 }
@@ -228,7 +228,7 @@ SetRk860xRegulatorByTag (
     }
 
     FoundReg = TRUE;
-    DEBUG((EFI_D_WARN,"Found 0x%x on I2C bus %d for tag %u\n",
+    DEBUG((DEBUG_INFO, "Found 0x%x on I2C bus %d for tag %u\n",
             I2C_DEVICE_ADDRESS(Rk860xRegulator->Identifier),
             I2C_DEVICE_BUS(Rk860xRegulator->Identifier),
             Tag));
@@ -238,11 +238,11 @@ SetRk860xRegulatorByTag (
       DEBUG((DEBUG_ERROR, "Failed to get voltage. Status=%r\n", Status));
       goto CloseProtocol;
     }
-    DEBUG((EFI_D_WARN,"Current voltage: %d uV\n", Voltage));
+    DEBUG((DEBUG_INFO, "Current voltage: %d uV\n", Voltage));
 
     Voltage = Microvolts;
 
-    DEBUG((EFI_D_WARN,"Setting voltage to: %d uV\n", Voltage));
+    DEBUG((DEBUG_INFO, "Setting voltage to: %d uV\n", Voltage));
     Status = Rk860xRegulator->SetVoltage (Rk860xRegulator, Voltage, FALSE);
     if (EFI_ERROR(Status)) {
       DEBUG((DEBUG_ERROR, "Failed to set voltage. Status=%r\n", Status));
@@ -254,7 +254,7 @@ SetRk860xRegulatorByTag (
       DEBUG((DEBUG_ERROR, "Failed to get voltage. Status=%r\n", Status));
       goto CloseProtocol;
     }
-    DEBUG((EFI_D_WARN,"Current voltage: %d uV\n", Voltage));
+    DEBUG((DEBUG_INFO, "Current voltage: %d uV\n", Voltage));
 
 CloseProtocol:
     gBS->CloseProtocol (HandleBuffer[Index],
@@ -326,7 +326,7 @@ ApplyCpuClockVariables (
 
     Status = ScmiSetClockRate (ScmiOppTable.ClockId, ClockRate);
     if (EFI_ERROR(Status)) {
-       DEBUG ((EFI_D_WARN, "%a: ScmiSetClockRate failed. Status=%r\n", __FUNCTION__, Status));
+       DEBUG ((DEBUG_WARN, "%a: ScmiSetClockRate failed. Status=%r\n", __FUNCTION__, Status));
     }
   }
 }

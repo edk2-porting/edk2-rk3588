@@ -198,12 +198,12 @@ UsbPortPowerEnable (
   VOID
   )
 {
-  DEBUG((EFI_D_WARN, "UsbPortPowerEnable called\n"));
+  DEBUG((DEBUG_INFO, "UsbPortPowerEnable called\n"));
   /* Set GPIO3 PC0 (TYPEC_EN) output high to power Type-C/USB2.0 ports */
   GpioPinWrite (3, GPIO_PIN_PC0, TRUE);
   GpioPinSetDirection (3, GPIO_PIN_PC0, GPIO_PIN_OUTPUT);
 
-  // DEBUG((EFI_D_WARN, "Trying to enable green led\n"));
+  // DEBUG((DEBUG_INFO, "Trying to enable green led\n"));
   // GpioPinWrite (1, GPIO_PIN_PA2, TRUE);
   // GpioPinSetDirection (1, GPIO_PIN_PA2, GPIO_PIN_OUTPUT);
 }

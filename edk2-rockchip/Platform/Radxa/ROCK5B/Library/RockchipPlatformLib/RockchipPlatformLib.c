@@ -205,12 +205,12 @@ UsbPortPowerEnable (
   VOID
   )
 {
-  DEBUG((EFI_D_WARN, "UsbPortPowerEnable called\n"));
+  DEBUG((DEBUG_INFO, "UsbPortPowerEnable called\n"));
   /* Set GPIO4 PB0 (USB_HOST_PWREN) output high to power USB ports */
   GpioPinWrite (4, GPIO_PIN_PB0, TRUE);
   GpioPinSetDirection (4, GPIO_PIN_PB0, GPIO_PIN_OUTPUT);
 
-  // DEBUG((EFI_D_WARN, "Trying to enable blue led\n"));
+  // DEBUG((DEBUG_INFO, "Trying to enable blue led\n"));
   // GpioPinWrite (0, GPIO_PIN_PB7, TRUE);
   // GpioPinSetDirection (0, GPIO_PIN_PB7, GPIO_PIN_OUTPUT);
 }
@@ -338,7 +338,7 @@ PlatformEarlyInit (
   )
 {
   // Configure various things specific to this platform
-  DEBUG((EFI_D_WARN, "PlatformEarlyInit called\n"));
+  DEBUG((DEBUG_INFO, "PlatformEarlyInit called\n"));
   GpioPinSetFunction (0, GPIO_PIN_PC0, 0x3); // PWM1_M0
 
   

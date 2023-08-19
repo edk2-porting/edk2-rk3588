@@ -220,7 +220,7 @@ UartInit (
 {
   //UINT32     Val;
 
-  DEBUG((EFI_D_WARN, "RK3588InitPeripherals: UartInit()\n"));
+  DEBUG((DEBUG_INIT, "RK3588InitPeripherals: UartInit()\n"));
   /* make UART1 out of reset */
   //MmioWrite32 (CRU_BASE + SC_PERIPH_RSTDIS3, PERIPH_RST3_UART1);
   //MmioWrite32 (CRU_BASE + SC_PERIPH_CLKEN3, PERIPH_RST3_UART1);
@@ -250,7 +250,7 @@ MtcmosInit (
 {
   //UINT32     Data;
 
-  DEBUG((EFI_D_WARN, "RK3588InitPeripherals: MtcmosInit()\n"));
+  DEBUG((DEBUG_INIT, "RK3588InitPeripherals: MtcmosInit()\n"));
   /* enable MTCMOS for GPU */
   //MmioWrite32 (AO_CTRL_BASE + SC_PW_MTCMOS_EN0, PW_EN0_G3D);
   //do {
@@ -264,7 +264,7 @@ GmacIomuxInit (
   IN VOID
   )
 {
-  DEBUG((EFI_D_WARN, "RK3588InitPeripherals: GmacIomuxInit()\n"));
+  DEBUG((DEBUG_INIT, "RK3588InitPeripherals: GmacIomuxInit()\n"));
   GmacIomux(0);
 }
 
@@ -275,7 +275,7 @@ RK3588InitPeripherals (
 {
   //UINT32     Data, Bits;
 
-  DEBUG((EFI_D_WARN, "RK3588InitPeripherals: Entry\n"));
+  DEBUG((DEBUG_INIT, "RK3588InitPeripherals: Entry\n"));
 
   /* make I2C0/I2C1/I2C2/SPI0 out of reset */
   //Bits = PERIPH_RST3_I2C0 | PERIPH_RST3_I2C1 | PERIPH_RST3_I2C2 | PERIPH_RST3_SSP;
@@ -314,8 +314,8 @@ STATIC VOID SetFlashAttributeToUncache(VOID)
   }
 
   Status = gDS->GetMemorySpaceDescriptor(PcdGet64(FspiBaseAddr),&desp);
-  DEBUG ((DEBUG_ERROR, "%a: GetMemorySpaceDescriptor status = %x\n", __FUNCTION__, Status));
   if(EFI_ERROR(Status)){
+    DEBUG ((DEBUG_ERROR, "%a: GetMemorySpaceDescriptor failed = %x\n", __FUNCTION__, Status));
     return;
   }
 
@@ -340,8 +340,8 @@ STATIC VOID SetFlashAttributeToUncache(VOID)
   }
 
   Status = gDS->GetMemorySpaceDescriptor(PcdGet64(CruBaseAddr),&desp);
-    DEBUG ((DEBUG_ERROR, "%a: GetMemorySpaceDescriptor status = %x\n", __FUNCTION__, Status));
   if(EFI_ERROR(Status)){
+    DEBUG ((DEBUG_ERROR, "%a: GetMemorySpaceDescriptor failed = %x\n", __FUNCTION__, Status));
     return;
   }
 
@@ -409,7 +409,7 @@ RK3588NotifyReadyToBoot (
   // really no need to set them early.
   //
 
-  DEBUG ((DEBUG_ERROR, "%a: called. Configure CPU voltages once.\n", __FUNCTION__));
+  DEBUG ((DEBUG_INFO, "%a: called. Configure CPU voltages once.\n", __FUNCTION__));
 
   ApplyCpuVoltageVariables ();
 

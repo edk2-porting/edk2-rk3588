@@ -213,7 +213,7 @@ UsbPortPowerEnable (
   VOID
   )
 {
-  DEBUG((EFI_D_WARN, "UsbPortPowerEnable called\n"));
+  DEBUG((DEBUG_INFO, "UsbPortPowerEnable called\n"));
 
   /* Enable USB-C VBUS */
   GpioPinWrite (1, GPIO_PIN_PB1, TRUE);

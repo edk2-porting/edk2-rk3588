@@ -197,7 +197,7 @@ UsbPortPowerEnable (
   VOID
   )
 {
-  DEBUG((EFI_D_WARN, "UsbPortPowerEnable called\n"));
+  DEBUG((DEBUG_INFO, "UsbPortPowerEnable called\n"));
 
   /* vbus5v0_typec0 (data-only port) */
   GpioPinWrite (4, GPIO_PIN_PB0, TRUE);

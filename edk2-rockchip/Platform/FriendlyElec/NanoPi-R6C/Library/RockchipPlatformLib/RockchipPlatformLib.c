@@ -202,7 +202,7 @@ UsbPortPowerEnable (
   VOID
   )
 {
-  DEBUG((EFI_D_WARN, "UsbPortPowerEnable called\n"));
+  DEBUG((DEBUG_INFO, "UsbPortPowerEnable called\n"));
   /* Set GPIO4 PB5 (USB_HOST_PWREN) output high to power USB ports */
   GpioPinWrite (4, GPIO_PIN_PB5, TRUE);
   GpioPinSetDirection (4, GPIO_PIN_PB5, GPIO_PIN_OUTPUT);
@@ -211,15 +211,15 @@ UsbPortPowerEnable (
   GpioPinWrite (1, GPIO_PIN_PD2, TRUE);
   GpioPinSetDirection (1, GPIO_PIN_PD2, GPIO_PIN_OUTPUT);
 
-  // DEBUG((EFI_D_WARN, "Trying to enable on-board LED WAN\n"));
+  // DEBUG((DEBUG_INFO, "Trying to enable on-board LED WAN\n"));
   // GpioPinWrite (1, GPIO_PIN_PC2, TRUE);
   // GpioPinSetDirection (1, GPIO_PIN_PC2, GPIO_PIN_OUTPUT);
 
-  // DEBUG((EFI_D_WARN, "Trying to enable on-board LED LAN\n"));
+  // DEBUG((DEBUG_INFO, "Trying to enable on-board LED LAN\n"));
   // GpioPinWrite (1, GPIO_PIN_PC3, TRUE);
   // GpioPinSetDirection (1, GPIO_PIN_PC3, GPIO_PIN_OUTPUT);
 
-  // DEBUG((EFI_D_WARN, "Trying to enable on-board LED1\n"));
+  // DEBUG((DEBUG_INFO, "Trying to enable on-board LED1\n"));
   // GpioPinWrite (1, GPIO_PIN_PC4, TRUE);
   // GpioPinSetDirection (1, GPIO_PIN_PC4, GPIO_PIN_OUTPUT);
 }

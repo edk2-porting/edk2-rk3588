@@ -106,7 +106,7 @@ DrmDpLinkTrainClockRecoveryDelay (
     DP_TRAINING_AUX_RD_MASK;
 
   if (RdInterval > 4)
-    DEBUG ((EFI_D_WARN, "AUX interval %d, out of range (max 4)\n", RdInterval));
+    DEBUG ((DEBUG_WARN, "AUX interval %d, out of range (max 4)\n", RdInterval));
 
   if (RdInterval == 0 || Dpcd[DP_DPCD_REV] >= DP_DPCD_REV_14)
     NanoSecondDelay(100000);
@@ -124,7 +124,7 @@ DrmDpLinkTrainChannelEqDelay (
     DP_TRAINING_AUX_RD_MASK;
 
   if (RdInterval > 4)
-    DEBUG ((EFI_D_WARN, "AUX interval %d, out of range (max 4)\n", RdInterval));
+    DEBUG ((DEBUG_WARN, "AUX interval %d, out of range (max 4)\n", RdInterval));
 
   if (RdInterval == 0)
     NanoSecondDelay(400000);
@@ -140,7 +140,7 @@ DrmDpBwCodeToLinkRate (
 {
   switch(LinkBw) {
   default:
-    DEBUG ((EFI_D_WARN, "Unknown DP link BW code %x, using 162000\n", LinkBw));
+    DEBUG ((DEBUG_WARN, "Unknown DP link BW code %x, using 162000\n", LinkBw));
   case DP_LINK_BW_1_62:
     return 162000;
   case DP_LINK_BW_2_7:
@@ -335,13 +335,13 @@ AnalogixDpInitTraining (
   if ((Dp->LinkTrain.LinkRate != DP_LINK_BW_1_62) &&
       (Dp->LinkTrain.LinkRate != DP_LINK_BW_2_7) &&
       (Dp->LinkTrain.LinkRate != DP_LINK_BW_5_4) ) {
-    DEBUG ((EFI_D_WARN, "faiied to get Rx Max Link Rate  0x%2x \n",
+    DEBUG ((DEBUG_WARN, "faiied to get Rx Max Link Rate  0x%2x \n",
           Dp->LinkTrain.LinkRate));
     return -ENODEV;
   }
 
   if (Dp->LinkTrain.LaneCount == 0) {
-    DEBUG ((EFI_D_WARN, "faiied to get Rx Max Lane count\n"));
+    DEBUG ((DEBUG_WARN, "faiied to get Rx Max Lane count\n"));
     return -ENODEV;
   }
 
@@ -709,7 +709,7 @@ AnalogixDpProcessClockRecovery (
     if (Retval)
       return Retval;
 
-    DEBUG ((EFI_D_WARN, "Link Training Clock Recovery success\n"));
+    DEBUG ((DEBUG_WARN, "Link Training Clock Recovery success\n"));
     Dp->LinkTrain.LtState = EQUALIZER_TRAINING;
 
     return 0;
@@ -736,7 +736,7 @@ AnalogixDpProcessClockRecovery (
       if (Dp->LinkTrain.CrLoop[Lane] == MAX_CR_LOOP ||
           VoltageSwing == VOLTAGE_LEVEL_3 ||
           PreEmphasis == PRE_EMPHASIS_LEVEL_3) {
-        DEBUG ((EFI_D_ERROR, "CR Max reached (%d,%d)\n",
+        DEBUG ((DEBUG_ERROR, "CR Max reached (%d,%d)\n",
               Dp->LinkTrain.CrLoop[Lane],
               VoltageSwing, PreEmphasis));
         AnalogixDpReduceLinkRate(Dp);
@@ -802,7 +802,7 @@ AnalogixDpProcessEqualizerTraining (
     return Retval;
 
   if (AnalogixDpClockRecoveryOk(LinkStatus, LaneCount)) {
-    DEBUG ((EFI_D_WARN, "AnalogixDpReduceLinkRate \n"));
+    DEBUG ((DEBUG_WARN, "AnalogixDpReduceLinkRate \n"));
     AnalogixDpReduceLinkRate(Dp);
     //Todo
     //return -EIO;
@@ -822,14 +822,14 @@ AnalogixDpProcessEqualizerTraining (
   AnalogixDpTrainingPatternDis(Dp);
   if (!AnalogixDpChannelEqOk(LinkStatus, LinkAlign, LaneCount)) {
 
-    DEBUG ((EFI_D_WARN, "Link Training success\n"));
+    DEBUG ((DEBUG_WARN, "Link Training success\n"));
 
     AnalogixDpGetLinkBandwidth(Dp, &Reg);
     Dp->LinkTrain.LinkRate = Reg;
     AnalogixDpGetLaneCount(Dp, &Reg);
     Dp->LinkTrain.LaneCount = Reg;
 
-    DEBUG ((EFI_D_WARN, "Final link rate = 0x%.2x, Lane count = 0x%.2x\n",
+    DEBUG ((DEBUG_WARN, "Final link rate = 0x%.2x, Lane count = 0x%.2x\n",
           Dp->LinkTrain.LinkRate, Dp->LinkTrain.LaneCount));
 
     /* Set enhanced mode if available */
@@ -842,7 +842,7 @@ AnalogixDpProcessEqualizerTraining (
   /* not all locked */
   Dp->LinkTrain.EqLoop++;
   if (Dp->LinkTrain.EqLoop > MAX_EQ_LOOP) {
-    DEBUG ((EFI_D_WARN, "EQ Max loop\n"));
+    DEBUG ((DEBUG_WARN, "EQ Max loop\n"));
     AnalogixDpReduceLinkRate(Dp);
     return -EIO;
   }
@@ -876,16 +876,16 @@ AnalogixDpSwLinkTraining (
     case START:
       Retval = AnalogixDpLinkStart(Dp);
       if (Retval)
-        DEBUG ((EFI_D_WARN, "LT link start failed!\n"));
+        DEBUG ((DEBUG_WARN, "LT link start failed!\n"));
       break;
     case CLOCK_RECOVERY:
       Retval = AnalogixDpProcessClockRecovery(Dp);
       if (Retval)
-        DEBUG ((EFI_D_WARN, "LT CR failed!\n"));
+        DEBUG ((DEBUG_WARN, "LT CR failed!\n"));
     case EQUALIZER_TRAINING:
       Retval = AnalogixDpProcessEqualizerTraining(Dp);
       if (Retval)
-        DEBUG ((EFI_D_WARN, "LT EQ failed!\n"));
+        DEBUG ((DEBUG_WARN, "LT EQ failed!\n"));
     case FINISHED:
       TrainingFinished = 1;
       break;
@@ -909,7 +909,7 @@ AnalogixDpSetLinkTrain (
   for (i = 0; i < 5; i++) {
     Ret = AnalogixDpInitTraining(Dp, Count, BwType);
     if (Ret < 0) {
-      DEBUG ((EFI_D_WARN, "faiied to init training\n")); 
+      DEBUG ((DEBUG_WARN, "faiied to init training\n")); 
       return Ret;
     }
 
@@ -1033,9 +1033,9 @@ AnalogixDpConfigVideo (
 
   Reg = AnalogixDpGetPllLockStatus(Dp);
   if (Reg != PLL_LOCKED ) {
-    DEBUG ((EFI_D_WARN, "PLL is not locked yet. \n"));
+    DEBUG ((DEBUG_WARN, "PLL is not locked yet. \n"));
     Ret = AnalogixDpRegRead(Dp, ANALOGIX_DP_DEBUG_CTL);
-    DEBUG ((EFI_D_WARN, "PLL Dp debug ctl ret 0x%.8x\n", Ret));
+    DEBUG ((DEBUG_WARN, "PLL Dp debug ctl ret 0x%.8x\n", Ret));
   }
 
   for (;;) {
@@ -1043,7 +1043,7 @@ AnalogixDpConfigVideo (
     if (AnalogixDpIsSlaveVideoStreamClockOn(Dp) == 0)
       break;
     if (TimeoutLoop > DP_TIMEOUT_LOOP_COUNT) {
-      DEBUG ((EFI_D_WARN, "Timeout of video streamclk ok\n"));
+      DEBUG ((DEBUG_WARN, "Timeout of video streamclk ok\n"));
       return -ETIMEDOUT;
     }
 
@@ -1077,7 +1077,7 @@ AnalogixDpConfigVideo (
       DoneCount = 0;
 
     if (TimeoutLoop > DP_TIMEOUT_LOOP_COUNT) {
-      DEBUG ((EFI_D_ERROR, "Timeout of video streamclk ok\n"));
+      DEBUG ((DEBUG_ERROR, "Timeout of video streamclk ok\n"));
       return -ETIMEDOUT;
     }
 

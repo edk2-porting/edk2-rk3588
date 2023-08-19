@@ -31,7 +31,7 @@ OhciCreateTD (
 
   Td = UsbHcAllocateMem(Ohc->MemPool, sizeof(TD_DESCRIPTOR));
   if (Td == NULL) {
-    DEBUG ((EFI_D_INFO, "STV allocate TD fail !\r\n"));
+    DEBUG ((DEBUG_INFO, "STV allocate TD fail !\r\n"));
     return NULL;
   }
   Td->CurrBufferPointer = 0;
@@ -85,7 +85,7 @@ OhciCreateED (
   ED_DESCRIPTOR   *Ed;
   Ed = UsbHcAllocateMem(Ohc->MemPool, sizeof (ED_DESCRIPTOR));
   if (Ed == NULL) {
-    DEBUG ((EFI_D_INFO, "STV allocate ED fail !\r\n"));
+    DEBUG ((DEBUG_INFO, "STV allocate ED fail !\r\n"));
     return NULL;
   }
   Ed->Word0.Skip = 1;

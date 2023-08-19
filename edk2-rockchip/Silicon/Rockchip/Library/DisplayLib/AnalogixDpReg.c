@@ -643,7 +643,7 @@ AnalogixDpStartAuxTransaction (
   while (!(Reg & RPLY_RECEIV)) {
     TimeOutLoop++;
     if (DP_TIMEOUT_LOOP_COUNT < TimeOutLoop) {
-      DEBUG ((EFI_D_WARN, "AUX CH command reply failed!\n"));
+      DEBUG ((DEBUG_WARN, "AUX CH command reply failed!\n"));
       return -ETIMEDOUT;
     }
 
@@ -664,7 +664,7 @@ AnalogixDpStartAuxTransaction (
   /* Check AUX CH error access status */
   Reg = AnalogixDpRegRead(Dp, ANALOGIX_DP_AUX_CH_STA);
   if ((Reg & AUX_STATUS_MASK) != 0) {
-    DEBUG ((EFI_D_ERROR,"AUX CH error happens: %d \n",
+    DEBUG ((DEBUG_ERROR,"AUX CH error happens: %d \n",
           Reg & AUX_STATUS_MASK));
     return -EREMOTEIO;
   }
@@ -1131,79 +1131,79 @@ DumpHdptxPhyRegisters (
   else
     Shift = BASE = EDP1TX_PHY_BASE;
 
-  DEBUG ((EFI_D_WARN, "\nHDPTX_PHY_BASE\n%.8x ", BASE));
+  DEBUG ((DEBUG_WARN, "\nHDPTX_PHY_BASE\n%.8x ", BASE));
   for (i = 0; i < 168; i++) {
     Ret = MmioRead32(Shift);
     Shift = Shift + 0x04;
-    DEBUG ((EFI_D_WARN, "%.8x ", Ret));
+    DEBUG ((DEBUG_WARN, "%.8x ", Ret));
     if((i+1) % 4 == 0) {
-      DEBUG ((EFI_D_WARN, "\n%.8x ", Shift));
+      DEBUG ((DEBUG_WARN, "\n%.8x ", Shift));
     }
   }
 
   Shift = BASE+0x400;
-  DEBUG ((EFI_D_WARN, "\n%.8x ", Shift));
+  DEBUG ((DEBUG_WARN, "\n%.8x ", Shift));
   for (i = 0; i < 40; i++) {
     Ret = MmioRead32(Shift);
     Shift = Shift + 0x04;
-    DEBUG ((EFI_D_WARN, "%.8x ", Ret));
+    DEBUG ((DEBUG_WARN, "%.8x ", Ret));
     if( (i+1) % 4 == 0) {
-      DEBUG ((EFI_D_WARN, "\n%.8x ", Shift));
+      DEBUG ((DEBUG_WARN, "\n%.8x ", Shift));
     }
   }
 
   Shift = BASE + 0x800;
-  DEBUG ((EFI_D_WARN, "\n%.8x ", Shift));
+  DEBUG ((DEBUG_WARN, "\n%.8x ", Shift));
   for (i = 0; i < 40; i++) {
     Ret = MmioRead32(Shift);
     Shift = Shift + 0x04;
-    DEBUG ((EFI_D_WARN, "%.8x ", Ret));
+    DEBUG ((DEBUG_WARN, "%.8x ", Ret));
     if((i+1) % 4 == 0) {
-      DEBUG ((EFI_D_WARN, "\n%.8x ", Shift));
+      DEBUG ((DEBUG_WARN, "\n%.8x ", Shift));
     }
   }
 
   Shift = BASE + 0x0C00;
-  DEBUG ((EFI_D_WARN, "\n%.8x ", Shift));
+  DEBUG ((DEBUG_WARN, "\n%.8x ", Shift));
   for (i = 0; i < 40; i++) {
     Ret = MmioRead32(Shift);
     Shift = Shift + 0x04;
-    DEBUG ((EFI_D_WARN, "%.8x ", Ret));
+    DEBUG ((DEBUG_WARN, "%.8x ", Ret));
     if((i+1) % 4 == 0) {
-      DEBUG ((EFI_D_WARN, "\n%.8x ", Shift));
+      DEBUG ((DEBUG_WARN, "\n%.8x ", Shift));
     }
   }
 
   Shift = BASE + 0x1000;
-  DEBUG ((EFI_D_WARN, "\n%.8x ", Shift));
+  DEBUG ((DEBUG_WARN, "\n%.8x ", Shift));
   for ( i = 0; i < 40; i++) {
     Ret = MmioRead32(Shift);
     Shift = Shift + 0x04;
-    DEBUG ((EFI_D_WARN, "%.8x ", Ret));
+    DEBUG ((DEBUG_WARN, "%.8x ", Ret));
     if( (i+1) % 4 == 0) {
-      DEBUG ((EFI_D_WARN, "\n%.8x ", Shift));
+      DEBUG ((DEBUG_WARN, "\n%.8x ", Shift));
     }
   }
 
   Shift = BASE + 0x1400;
-  DEBUG ((EFI_D_WARN, "\n%.8x ", Shift));
+  DEBUG ((DEBUG_WARN, "\n%.8x ", Shift));
   for (i = 0; i < 40; i++) {
     Ret = MmioRead32(Shift);
     Shift = Shift + 0x04;
-    DEBUG ((EFI_D_WARN, "%.8x ", Ret));
+    DEBUG ((DEBUG_WARN, "%.8x ", Ret));
     if( (i+1) % 4 == 0) {
-      DEBUG ((EFI_D_WARN, "\n%.8x ", Shift));
+      DEBUG ((DEBUG_WARN, "\n%.8x ", Shift));
     }
   }
 
   Shift = BASE + 0x1800;
-  DEBUG ((EFI_D_WARN, "\n%.8x ", Shift));
+  DEBUG ((DEBUG_WARN, "\n%.8x ", Shift));
   for (i = 0; i < 40; i++) {
     Ret = MmioRead32(Shift);
     Shift = Shift + 0x04;
-    DEBUG ((EFI_D_WARN, "%.8x ", Ret));
+    DEBUG ((DEBUG_WARN, "%.8x ", Ret));
     if((i+1) % 4 == 0) {
-      DEBUG ((EFI_D_WARN, "\n%.8x ", Shift));
+      DEBUG ((DEBUG_WARN, "\n%.8x ", Shift));
     }
   }
 }
@@ -1222,12 +1222,12 @@ DumpDpRegisters (
   else
     Shift = ANALOGIX_DP1_REG_BASE;
 
-  DEBUG ((EFI_D_WARN, "\n%.8x ", Shift));
+  DEBUG ((DEBUG_WARN, "\n%.8x ", Shift));
   for (i = 0; i < 800; i++) {
     Ret = MmioRead32(Shift);
     Shift = Shift + 0x04;
-    DEBUG ((EFI_D_WARN, "%.8x ", Ret));
+    DEBUG ((DEBUG_WARN, "%.8x ", Ret));
     if( (i+1) % 4 == 0)
-      DEBUG ((EFI_D_WARN, "\n%.8x ", Shift)); 
+      DEBUG ((DEBUG_WARN, "\n%.8x ", Shift)); 
   }
 }

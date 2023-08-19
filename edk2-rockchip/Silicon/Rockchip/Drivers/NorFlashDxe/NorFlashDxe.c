@@ -945,7 +945,7 @@ EFI_STATUS  Write(
   if (EfiAtRuntime ())
     NorFspiEnableClock(g_nor->spi->CruBase);
 
-  //DEBUG ((EFI_D_ERROR, "[%a]:[%dL]: %x!......................\n", __FUNCTION__,__LINE__,Offset));
+  //DEBUG ((DEBUG_ERROR, "[%a]:[%dL]: %x!......................\n", __FUNCTION__,__LINE__,Offset));
   Status = HAL_SNOR_ProgData(g_nor, Offset, Buffer, ulLen);
   if (EFI_ERROR (Status)) {
     DEBUG((DEBUG_ERROR, "SpiFlash: Error while programming target address\n"));
@@ -965,7 +965,7 @@ EFI_STATUS Read(
   if (EfiAtRuntime ())
     NorFspiEnableClock(g_nor->spi->CruBase);
 
-  //DEBUG ((EFI_D_ERROR, "[%a]:[%dL]: %x!......................\n", __FUNCTION__,__LINE__,Offset));
+  //DEBUG ((DEBUG_ERROR, "[%a]:[%dL]: %x!......................\n", __FUNCTION__,__LINE__,Offset));
   Status = HAL_SNOR_ReadData(g_nor, Offset, Buffer, ulLen);
   return Status;
 }
@@ -1041,7 +1041,7 @@ EFI_STATUS  Update(
   EFI_STATUS Status = EFI_SUCCESS;
   UINT64 SectorSize, ToUpdate, Align, Scale = 1;
   UINT8 *TmpBuf, *End;
-  //DEBUG ((EFI_D_ERROR, "[%a]:%x %x!......................\n", __FUNCTION__, Offset, ulLength));
+  //DEBUG ((DEBUG_ERROR, "[%a]:%x %x!......................\n", __FUNCTION__, Offset, ulLength));
 
   SectorSize = g_nor->sectorSize;
   Align = Offset & (SectorSize -1);
@@ -1093,8 +1093,8 @@ static RETURN_STATUS SNOR_STRESS_RANDOM_TEST(UINT32 testEndLBA)
     UINT32 testCount, testLBA = 0;
     UINT32 testSecCount = 1;
 
-    DEBUG ((EFI_D_ERROR, "---------%a %lx---------\n", __func__, testEndLBA));
-    DEBUG ((EFI_D_ERROR, "---------%a---------\n", __func__));
+    DEBUG ((DEBUG_ERROR, "---------%a %lx---------\n", __func__, testEndLBA));
+    DEBUG ((DEBUG_ERROR, "---------%a---------\n", __func__));
     for (j = 0; j < testSecCount * (UINT32)g_nor->sectorSize / 4; j++)
       pwrite32[j] = j + (0xFFFF0000 - j);
 
@@ -1112,7 +1112,7 @@ static RETURN_STATUS SNOR_STRESS_RANDOM_TEST(UINT32 testEndLBA)
         }
         for (j = 0; j < testSecCount * (UINT32)g_nor->sectorSize / 4; j++) {
             if (pwrite32[j] != pread32[j]) {
-                DEBUG ((EFI_D_ERROR, 
+                DEBUG ((DEBUG_ERROR, 
                     "check not match:row=%lx, num=%lx, write=%lx, read=%lx %lx %lx %lx\n",
                     testLBA, j, pwrite32[j], pread32[j], pread32[j + 1], pread32[j + 2], pread32[j - 1]));
                 while (1) {
@@ -1120,10 +1120,10 @@ static RETURN_STATUS SNOR_STRESS_RANDOM_TEST(UINT32 testEndLBA)
                 }
             }
         }
-        DEBUG ((EFI_D_ERROR, "testCount= %lx testLBA= %lx\n", testCount, testLBA));
+        DEBUG ((DEBUG_ERROR, "testCount= %lx testLBA= %lx\n", testCount, testLBA));
         testCount += testSecCount;
     }
-    DEBUG ((EFI_D_ERROR, "---------%a SUCCESS---------\n", __func__));
+    DEBUG ((DEBUG_ERROR, "---------%a SUCCESS---------\n", __func__));
 
     return RETURN_SUCCESS;
 }
@@ -1187,7 +1187,7 @@ EFIAPI InitializeFlash (
                             &gUniNorFlash);
   if(EFI_SUCCESS != Status)
   {
-    DEBUG ((EFI_D_ERROR, "[%a]:[%dL]:Install Protocol Interface %r!\n", __FUNCTION__,__LINE__,Status));
+    DEBUG ((DEBUG_ERROR, "[%a]:[%dL]:Install Protocol Interface %r!\n", __FUNCTION__,__LINE__,Status));
   }
 
   Status = gBS->CreateEventEx (EVT_NOTIFY_SIGNAL,

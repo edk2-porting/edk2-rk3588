@@ -1375,7 +1375,7 @@ RkFvbEntryPoint (
   BootDevice = RkAtagsGetBootDev ();
   if (BootDevice != NULL) {
     mBootDeviceType = BootDevice->DevType;
-    DEBUG ((DEBUG_ERROR, "%a: BootDevice->DevType = 0x%x\n", __FUNCTION__, mBootDeviceType));
+    DEBUG ((DEBUG_INFO, "%a: BootDevice->DevType = 0x%x\n", __FUNCTION__, mBootDeviceType));
   } else {
     DEBUG ((DEBUG_ERROR, "%a: Couldn't identify boot device.\n", __FUNCTION__));
     mBootDeviceType = RkAtagBootDevTypeUnknown;

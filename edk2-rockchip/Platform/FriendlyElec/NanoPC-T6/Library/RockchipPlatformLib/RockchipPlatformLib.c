@@ -204,7 +204,7 @@ UsbPortPowerEnable (
   VOID
   )
 {
-  DEBUG((EFI_D_WARN, "UsbPortPowerEnable called\n"));
+  DEBUG((DEBUG_INFO, "UsbPortPowerEnable called\n"));
   /* Set GPIO4 PB0 (USB_HOST_PWREN) output high to power USB ports */
   GpioPinWrite (4, GPIO_PIN_PB0, TRUE);
   GpioPinSetDirection (4, GPIO_PIN_PB0, GPIO_PIN_OUTPUT);
@@ -213,7 +213,7 @@ UsbPortPowerEnable (
   GpioPinWrite (1, GPIO_PIN_PD2, TRUE);
   GpioPinSetDirection (1, GPIO_PIN_PD2, GPIO_PIN_OUTPUT);
 
-  // DEBUG((EFI_D_WARN, "Trying to enable on-board LED1\n"));
+  // DEBUG((DEBUG_INFO, "Trying to enable on-board LED1\n"));
   // GpioPinWrite (2, GPIO_PIN_PC0, TRUE);
   // GpioPinSetDirection (2, GPIO_PIN_PC0, GPIO_PIN_OUTPUT);
 }

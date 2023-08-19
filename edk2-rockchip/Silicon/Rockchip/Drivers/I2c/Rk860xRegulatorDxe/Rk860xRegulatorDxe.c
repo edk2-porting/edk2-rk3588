@@ -56,7 +56,6 @@ Rk860xRegulatorSupported (
       EFI_OPEN_PROTOCOL_BY_DRIVER
       );
   if (EFI_ERROR(Status)) {
-    DEBUG ((DEBUG_INFO, "Rk860xRegulatorSupported Error status: %d\n", Status));
     return EFI_UNSUPPORTED;
   }
 

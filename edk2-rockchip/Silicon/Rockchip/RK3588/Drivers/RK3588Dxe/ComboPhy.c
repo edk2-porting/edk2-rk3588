@@ -43,7 +43,7 @@ InitComPhyConfig (
   )
 {
   UINT32 Val;
-  DEBUG ((DEBUG_ERROR, "%a reg=%x %x mode = %d\n", __func__, PhyBaseAddr, PhpBaseAddr, PhyMode));
+  DEBUG ((DEBUG_INIT, "%a reg=%x %x mode = %d\n", __func__, PhyBaseAddr, PhpBaseAddr, PhyMode));
 
   switch (PhyMode) {
     case COMBO_PHY_MODE_PCIE:

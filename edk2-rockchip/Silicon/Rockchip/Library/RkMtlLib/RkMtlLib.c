@@ -147,7 +147,7 @@ MtlSendMessage (
 
   ArmDataSynchronizationBarrier ();
 
-  DEBUG ((DEBUG_WARN, "MtlSendMessage ringing doorbell 0x%08X with message header 0x%08X length 0x%08X\n",
+  DEBUG ((DEBUG_INFO, "MtlSendMessage ringing doorbell 0x%08X with message header 0x%08X length 0x%08X\n",
           FixedPcdGet32 (PcdRkMtlMailBoxSmcId), MailBox->MessageHeader, MailBox->Length));
 
   // Ring the doorbell.
