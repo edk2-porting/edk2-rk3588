@@ -167,7 +167,7 @@ formset
         help = STRING_TOKEN(STR_ACPI_FORM_HELP);
 
 #if FixedPcdGetBool (PcdHasOnBoardFanOutput)
-      goto 0x1004,
+      goto 0x1005,
         prompt = STRING_TOKEN(STR_COOLING_FAN_FORM_TITLE),
         help = STRING_TOKEN(STR_COOLING_FAN_FORM_HELP);
 #endif
@@ -461,7 +461,7 @@ formset
     endform;
 
 #if FixedPcdGetBool (PcdHasOnBoardFanOutput)
-    form formid = 0x1004,
+    form formid = 0x1005,
         title  = STRING_TOKEN(STR_COOLING_FAN_FORM_TITLE);
 
         oneof varid = CoolingFanState.State,
