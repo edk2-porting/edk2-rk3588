@@ -151,7 +151,7 @@ typedef struct {
 #define RK3588_PPTT_A76_CORE_NODE_INIT(ClusterIndex, CoreUid)                     \
   RK3588_PPTT_CORE_NODE_INIT (                                                    \
     ClusterIndex, CoreUid,                                                        \
-    A76L1DCache, A76L1ICache, A55L2Cache                                          \
+    A76L1DCache, A76L1ICache, A76L2Cache                                          \
   )
 
 #define RK3588_PPTT_CACHE_NODE_INIT(NextLevelOfCache, Size,                       \
