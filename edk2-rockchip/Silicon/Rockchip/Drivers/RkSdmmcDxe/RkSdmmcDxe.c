@@ -86,7 +86,7 @@ STATIC DW_MMC_HC_SLOT_CAP mDwMmcCapability = {
   .SlotType    = RemovableSlot,
   .CardType    = SdCardType,
   .Voltage30   = 1,
-  .BaseClkFreq = 3200
+  .BaseClkFreq = 52000
 };
 
 STATIC
@@ -146,6 +146,8 @@ RkSdmmcDxeInitialize (
   EFI_HANDLE        Handle;
 
   RkSdmmcSetIoMux ();
+
+  RkSdmmcSetClockRate (mDwMmcCapability.BaseClkFreq * 1000);
 
   Status = gBS->InstallMultipleProtocolInterfaces(&mDwMmcCapability.Controller,
             &gEfiDevicePathProtocolGuid, &mDwMmcDevice.DevicePath,
