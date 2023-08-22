@@ -46,6 +46,7 @@ RealtekPhyInit (
     case 0x001CC878:
       DEBUG ((DEBUG_INFO, "%a: Found Realtek RTL8211F-VD GbE PHY\n", __func__));
       RTL8211FPhyInit (GmacBase);
+      break;
     default:
       return EFI_UNSUPPORTED;
   }
