@@ -119,7 +119,7 @@ NorFspiIomux (
 VOID
 EFIAPI
 GmacIomux (
-   UINT32 id
+  IN UINT32 Id
   )
 {
   /* No GMAC here */

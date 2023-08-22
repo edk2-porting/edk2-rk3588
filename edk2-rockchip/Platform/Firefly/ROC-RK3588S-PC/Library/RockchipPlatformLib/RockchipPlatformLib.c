@@ -140,24 +140,40 @@ NorFspiIomux (
 VOID
 EFIAPI
 GmacIomux (
-   UINT32 id
+  IN UINT32 Id
   )
 {
-  switch (id) {
-  case 0:
-    /* gmac0 iomux */
-    BUS_IOC->GPIO2A_IOMUX_SEL_H = (0xFF00UL << 16) | 0x1100;
-    BUS_IOC->GPIO2B_IOMUX_SEL_L = (0xFFFFUL << 16) | 0x1111;
-    BUS_IOC->GPIO2B_IOMUX_SEL_H = (0xFF00UL << 16) | 0x1100;
-    BUS_IOC->GPIO2C_IOMUX_SEL_L = (0xFFFFUL << 16) | 0x1111;
-    BUS_IOC->GPIO4C_IOMUX_SEL_L = (0x0F00UL << 16) | 0x0100;
-    BUS_IOC->GPIO4C_IOMUX_SEL_H = (0x00FFUL << 16) | 0x0011;
-    break;
-  case 1:
-    /* gmac1 iomux */
-    break;
-  default:
-    break;
+  switch (Id) {
+    case 1:
+      /* gmac1 iomux */
+      BUS_IOC->GPIO3B_IOMUX_SEL_H = (0x0FFFUL << 16) | 0x0111;
+      BUS_IOC->GPIO3A_IOMUX_SEL_L = (0xFFFFUL << 16) | 0x1111;
+      BUS_IOC->GPIO3B_IOMUX_SEL_L = (0xF0FFUL << 16) | 0x1011;
+      BUS_IOC->GPIO3A_IOMUX_SEL_H = (0xF0FFUL << 16) | 0x1011;
+      BUS_IOC->GPIO3C_IOMUX_SEL_L = (0xFF00UL << 16) | 0x1100;
+
+      /* phy1 reset */
+      GpioPinSetDirection (0, GPIO_PIN_PD3, GPIO_PIN_OUTPUT);
+      break;
+    default:
+      break;
+  }
+}
+
+VOID
+EFIAPI
+GmacIoPhyReset (
+  UINT32   Id,
+  BOOLEAN  Enable
+  )
+{
+  switch (Id) {
+    case 1:
+      /* phy1 reset */
+      GpioPinWrite (0, GPIO_PIN_PD3, !Enable);
+      break;
+    default:
+      break;
   }
 }
 

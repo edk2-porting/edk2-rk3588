@@ -44,7 +44,14 @@ EnablePWM (
 VOID
 EFIAPI
 GmacIomux (
-  UINT32 id
+  IN UINT32 Id
+  );
+
+VOID
+EFIAPI
+GmacIoPhyReset (
+  IN UINT32   Id,
+  IN BOOLEAN  Enable
   );
 
 VOID

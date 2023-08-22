@@ -258,16 +258,6 @@ MtcmosInit (
   //} while ((Data & PW_EN0_G3D) == 0);
 }
 
-STATIC
-VOID
-GmacIomuxInit (
-  IN VOID
-  )
-{
-  DEBUG((DEBUG_INIT, "RK3588InitPeripherals: GmacIomuxInit()\n"));
-  GmacIomux(0);
-}
-
 EFI_STATUS
 RK3588InitPeripherals (
   IN VOID
@@ -291,8 +281,6 @@ RK3588InitPeripherals (
   // MtcmosInit ();
 
   Rk806Configure();
-
-  GmacIomuxInit();
 
   return EFI_SUCCESS;
 }

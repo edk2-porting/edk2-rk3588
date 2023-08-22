@@ -96,6 +96,12 @@
   gRK3588TokenSpaceGuid.PcdDp0LaneMux|{ 0x2, 0x3 }
   gRK3588TokenSpaceGuid.PcdDp1LaneMux|{ 0x0 }
 
+  #
+  # GMAC
+  #
+  gRK3588TokenSpaceGuid.PcdGmac0Supported|TRUE
+  gRK3588TokenSpaceGuid.PcdGmac0TxDelay|0x44
+
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform.

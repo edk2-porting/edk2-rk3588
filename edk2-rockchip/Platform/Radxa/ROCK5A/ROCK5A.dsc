@@ -85,6 +85,13 @@
   gRK3588TokenSpaceGuid.PcdDp0LaneMux|{ 0x2, 0x3 }
 
   #
+  # GMAC
+  #
+  gRK3588TokenSpaceGuid.PcdGmac1Supported|TRUE
+  gRK3588TokenSpaceGuid.PcdGmac1TxDelay|0x3a
+  gRK3588TokenSpaceGuid.PcdGmac1RxDelay|0x3e
+
+  #
   # On-Board fan output
   #
   gRK3588TokenSpaceGuid.PcdHasOnBoardFanOutput|TRUE

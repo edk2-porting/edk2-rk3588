@@ -334,3 +334,8 @@
   # USB/DP PHY Driver
   #
   Silicon/Rockchip/RK3588/Drivers/UsbDpPhyDxe/UsbDpPhyDxe.inf
+
+  #
+  # GMAC Init Driver
+  #
+  Silicon/Rockchip/RK3588/Drivers/GmacPlatformDxe/GmacPlatformDxe.inf

@@ -140,10 +140,42 @@ NorFspiIomux (
 VOID
 EFIAPI
 GmacIomux (
-   UINT32 id
+  IN UINT32 Id
   )
 {
-  /* No GMAC here */
+  switch (Id) {
+    case 0:
+      /* gmac0 iomux */
+      BUS_IOC->GPIO2A_IOMUX_SEL_H = (0xFF00UL << 16) | 0x1100;
+      BUS_IOC->GPIO2B_IOMUX_SEL_L = (0xFFFFUL << 16) | 0x1111;
+      BUS_IOC->GPIO2B_IOMUX_SEL_H = (0xFF00UL << 16) | 0x1100;
+      BUS_IOC->GPIO2C_IOMUX_SEL_L = (0x0FFFUL << 16) | 0x0111;
+      BUS_IOC->GPIO4C_IOMUX_SEL_L = (0xFF00UL << 16) | 0x1100;
+      BUS_IOC->GPIO4C_IOMUX_SEL_H = (0x00FFUL << 16) | 0x0011;
+
+      /* phy0 reset */
+      GpioPinSetDirection (4, GPIO_PIN_PB3, GPIO_PIN_OUTPUT);
+      break;
+    default:
+      break;
+  }
+}
+
+VOID
+EFIAPI
+GmacIoPhyReset (
+  UINT32   Id,
+  BOOLEAN  Enable
+  )
+{
+  switch (Id) {
+    case 0:
+      /* phy0 reset */
+      GpioPinWrite (4, GPIO_PIN_PB3, !Enable);
+      break;
+    default:
+      break;
+  }
 }
 
 VOID

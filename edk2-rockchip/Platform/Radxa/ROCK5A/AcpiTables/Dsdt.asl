@@ -21,7 +21,7 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 2, "RPIFDN", "RPI", 2)
 
     include ("Emmc.asl")
     include ("Sdhc.asl")
-    // include ("Gmac.asl")
+    include ("Gmac1.asl")
     // include ("Gpio.asl")
     // include ("I2c.asl")
     include ("Uart.asl")
