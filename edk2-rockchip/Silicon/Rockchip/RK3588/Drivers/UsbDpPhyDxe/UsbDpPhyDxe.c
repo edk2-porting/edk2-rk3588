@@ -420,8 +420,10 @@ static int udphy_parse_lane_mux_data(struct rockchip_udphy *udphy, UINT8 *prop, 
 	}
 
 	udphy->mode = UDPHY_MODE_DP;
-	if (num_lanes == 2)
+	if (num_lanes == 2) {
 		udphy->mode |= UDPHY_MODE_USB;
+		udphy->flip = udphy->lane_mux_sel[0] == PHY_LANE_MUX_DP ? true : false;
+	}
 
 	return 0;
 }
