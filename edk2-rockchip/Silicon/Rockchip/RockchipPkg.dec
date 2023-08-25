@@ -41,6 +41,7 @@
   gRockchipTokenSpaceGuid.PcdProductUrl|"Unknown"|VOID*|0x00000006
   gRockchipTokenSpaceGuid.PcdMemoryVendorName|"Unknown"|VOID*|0x00000007
   gRockchipTokenSpaceGuid.PcdFamilyName|"Unknown"|VOID*|0x00000008
+  gRockchipTokenSpaceGuid.PcdDeviceTreeName|"Unknown"|VOID*|0x00000009
 
   gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x0 }|VOID*|0x02000001
   gRockchipTokenSpaceGuid.PcdI2cSlaveBuses|{ 0x0 }|VOID*|0x02000002

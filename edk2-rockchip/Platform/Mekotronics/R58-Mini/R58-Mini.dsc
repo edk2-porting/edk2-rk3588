@@ -63,6 +63,7 @@
   gRockchipTokenSpaceGuid.PcdFamilyName|"R58"
   gRockchipTokenSpaceGuid.PcdProductUrl|"https://www.mekotronics.com/h-pd-76.html"
   gRockchipTokenSpaceGuid.PcdBoardName|"MINI-PC-RK3588-4D32-V1.0"
+  gRockchipTokenSpaceGuid.PcdDeviceTreeName|"rk3588-blueberry-minipc-linux.dtb"
 
   # I2C
   gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x42, 0x43, 0x51 }

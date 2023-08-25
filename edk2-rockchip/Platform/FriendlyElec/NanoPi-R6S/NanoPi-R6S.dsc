@@ -60,6 +60,7 @@
   gRockchipTokenSpaceGuid.PcdPlatformVendorName|"FriendlyElec"
   gRockchipTokenSpaceGuid.PcdFamilyName|"NanoPi 6"
   gRockchipTokenSpaceGuid.PcdProductUrl|"https://wiki.friendlyelec.com/wiki/index.php/NanoPi_R6S"
+  gRockchipTokenSpaceGuid.PcdDeviceTreeName|"rk3588s-nanopi-r6s.dtb"
 
   # I2C
   gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x42, 0x43, 0x51 }

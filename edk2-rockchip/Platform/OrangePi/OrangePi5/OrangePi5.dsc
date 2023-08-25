@@ -60,6 +60,7 @@
   gRockchipTokenSpaceGuid.PcdPlatformVendorName|"Orange Pi"
   gRockchipTokenSpaceGuid.PcdFamilyName|"Orange Pi 5"
   gRockchipTokenSpaceGuid.PcdProductUrl|"http://www.orangepi.org/html/hardWare/computerAndMicrocontrollers/details/Orange-Pi-5.html"
+  gRockchipTokenSpaceGuid.PcdDeviceTreeName|"rk3588s-orangepi-5.dtb"
 
   # I2C
   gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x42, 0x43, 0x51 }

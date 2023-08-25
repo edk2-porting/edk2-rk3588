@@ -66,6 +66,7 @@
   gRockchipTokenSpaceGuid.PcdBoardName
   gRockchipTokenSpaceGuid.PcdBoardVendorName
   gRockchipTokenSpaceGuid.PcdProductUrl
+  gRockchipTokenSpaceGuid.PcdDeviceTreeName
   gRockchipTokenSpaceGuid.PcdFamilyName
   gRockchipTokenSpaceGuid.PcdMemoryVendorName
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVendor
