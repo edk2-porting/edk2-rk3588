@@ -182,7 +182,7 @@ InstallConfigAppliedProtocol (
   VOID
   )
 {
-  EFI_HANDLE Handle;
+  EFI_HANDLE Handle = NULL;
   EFI_STATUS Status;
 
   Status = gBS->InstallMultipleProtocolInterfaces (
