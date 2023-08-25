@@ -504,13 +504,15 @@ CHAR8 *mSysSlotInfoType9Strings[] = {
 ************************************************************************/
 
 CHAR8 mOemInfoProductUrl[128];
+CHAR8 mOemInfoDeviceTreeName[128];
 
 SMBIOS_TABLE_TYPE11 mOemStringsType11 = {
   { EFI_SMBIOS_TYPE_OEM_STRINGS, sizeof (SMBIOS_TABLE_TYPE11), 0 },
-  1 // StringCount
+  2 // StringCount
 };
 CHAR8 *mOemStringsType11Strings[] = {
   mOemInfoProductUrl,
+  mOemInfoDeviceTreeName,
   NULL
 };
 
@@ -1047,6 +1049,7 @@ OemStringsUpdateSmbiosType11 (
   )
 {
   AsciiStrCpyS (mOemInfoProductUrl, sizeof (mOemInfoProductUrl), (CHAR8 *) PcdGetPtr(PcdProductUrl));
+  AsciiStrCpyS (mOemInfoDeviceTreeName, sizeof (mOemInfoDeviceTreeName), (CHAR8 *) PcdGetPtr(PcdDeviceTreeName));
 
   LogSmbiosData ((EFI_SMBIOS_TABLE_HEADER*)&mOemStringsType11, mOemStringsType11Strings, NULL);
 }

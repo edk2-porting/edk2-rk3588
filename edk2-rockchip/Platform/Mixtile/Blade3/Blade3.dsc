@@ -53,6 +53,7 @@
   gRockchipTokenSpaceGuid.PcdPlatformVendorName|"Mixtile"
   gRockchipTokenSpaceGuid.PcdFamilyName|"Blade"
   gRockchipTokenSpaceGuid.PcdProductUrl|"https://www.mixtile.com/blade-3/"
+  gRockchipTokenSpaceGuid.PcdDeviceTreeName|"rk3588-blade3-v101-linux.dtb"
 
   # I2C
   gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x42, 0x43 }
