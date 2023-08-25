@@ -70,9 +70,8 @@ function _pack(){
 
 	# might be GPT table? size:0x4400
 	dd if=${ROOTDIR}/misc/rk3588_spi_nor_gpt.img of=${WORKSPACE}/RK3588_NOR_FLASH.img
-	# idblock at 0x8000 and 0x88000
+	# idblock at 0x8000
 	dd if=${WORKSPACE}/idblock.bin of=${WORKSPACE}/RK3588_NOR_FLASH.img bs=1K seek=32
-	dd if=${WORKSPACE}/idblock.bin of=${WORKSPACE}/RK3588_NOR_FLASH.img bs=1K seek=544
 	# FIT Image at 0x100000
 	dd if=${WORKSPACE}/${DEVICE}_EFI.itb of=${WORKSPACE}/RK3588_NOR_FLASH.img bs=1K seek=1024
 	cp ${WORKSPACE}/RK3588_NOR_FLASH.img ${ROOTDIR}/

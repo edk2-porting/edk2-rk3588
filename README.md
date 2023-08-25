@@ -146,7 +146,6 @@ ACPI support is limited, with only boot critical devices being currently exposed
 | ---------- | ---------- | --------------------- | ---------------------- |
 | 0x00000000 | 0x00004400 | GPT Table             | rk3588_spi_nor_gpt.img |
 | 0x00008000 |            | IDBlock               | idblock.bin            |
-| 0x00088000 |            | IDBlock               | idblock.bin            |
 | 0x00100000 | 0x00500000 | BL33_AP_UEFI FV       | ${DEVICE}_EFI.itb      |
 
 ### Memory Map
