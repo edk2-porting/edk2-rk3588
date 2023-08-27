@@ -788,7 +788,6 @@ PlatformRegisterOptionsAndKeys (
   EFI_STATUS                    Status;
   EFI_INPUT_KEY                 Enter;
   EFI_INPUT_KEY                 F2;
-  EFI_INPUT_KEY                 F3;
   EFI_INPUT_KEY                 Esc;
   EFI_BOOT_MANAGER_LOAD_OPTION  BootOption;
 
@@ -827,13 +826,6 @@ PlatformRegisterOptionsAndKeys (
              NULL
              );
   ASSERT (Status == EFI_SUCCESS || Status == EFI_ALREADY_STARTED);
-
-  // Map F3 to SimpleInit GUI
-  F3.ScanCode     = SCAN_F3;
-  F3.UnicodeChar  = CHAR_NULL;
-#ifdef ENABLE_SIMPLE_INIT
-  PlatformRegisterFvBootOption (&gSimpleInitFileGuid, L"Simple Init", LOAD_OPTION_ACTIVE, &F3);
-#endif
 }
 
 //
@@ -1171,11 +1163,7 @@ PlatformBootManagerAfterConsole (
         PcdGetPtr (PcdFirmwareVersionString)
         );
     }
-#ifdef ENABLE_SIMPLE_INIT
-    Print (L"Press ESCAPE for boot options, or F3 for SimpleInit GUI");
-#else
     Print (L"Press ESCAPE for boot options");
-#endif
   } else if (FirmwareVerLength > 0) {
     Status = gBS->HandleProtocol (
                     gST->ConsoleOutHandle,
@@ -1249,11 +1237,7 @@ PlatformBootManagerWaitCallback (
   Status = BootLogoUpdateProgress (
              White.Pixel,
              Black.Pixel,
-#ifdef ENABLE_SIMPLE_INIT
-             L"Press ESCAPE for boot options, or F3 for SimpleInit GUI",
-#else
              L"Press ESCAPE for boot options",
-#endif
              White.Pixel,
              (Timeout - TimeoutRemain) * 100 / Timeout,
              0

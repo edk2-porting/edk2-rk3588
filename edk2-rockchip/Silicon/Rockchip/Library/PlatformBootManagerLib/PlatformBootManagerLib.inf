@@ -34,7 +34,6 @@
   MdePkg/MdePkg.dec
   ShellPkg/ShellPkg.dec
   Silicon/Rockchip/RockchipPkg.dec
-  SimpleInit.dec
 
 [LibraryClasses]
   BaseLib
@@ -85,7 +84,6 @@
   gEfiEndOfDxeEventGroupGuid
   gEfiTtyTermGuid
   gUefiShellFileGuid
-  gSimpleInitFileGuid
 
 [Protocols]
   gEdkiiNonDiscoverableDeviceProtocolGuid
