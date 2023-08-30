@@ -12,7 +12,7 @@
 // Gigabit Media Access Controller (GMAC0)
 Device (MAC0) {
   Name (_HID, "PRP0001")
-  Name (_UID, 0)
+  Name (_UID, 60)
   Name (_CCA, 0)
   Name (_STA, 0xF)
 
