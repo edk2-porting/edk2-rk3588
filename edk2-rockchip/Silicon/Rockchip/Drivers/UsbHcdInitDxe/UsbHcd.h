@@ -35,6 +35,7 @@
 
 /* Global UCTL1 Register */
 #define DWC3_GUCTL1_TX_IPGAP_LINECHECK_DIS     BIT28
+#define DWC3_GUCTL1_PARKMODE_DISABLE_SS        BIT17
 
 /* Global USB2 PHY Configuration Register */
 #define DWC3_GUSB2PHYCFG_PHYSOFTRST            BIT31

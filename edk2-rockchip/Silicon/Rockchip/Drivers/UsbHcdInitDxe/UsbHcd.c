@@ -194,6 +194,8 @@ XhciCoreInit (
   MmioAndThenOr32 ((UINTN)&Dwc3Reg->GUsb3PipeCtl[0], ~DWC3_GUSB3PIPECTL_DEPOCHANGE, 0);
   /* snps,dis-tx-ipgap-linecheck-quirk */
   MmioOr32 ((UINTN)&Dwc3Reg->GUctl1, DWC3_GUCTL1_TX_IPGAP_LINECHECK_DIS);
+  /* snps,parkmode-disable-ss-quirk */
+  MmioOr32 ((UINTN)&Dwc3Reg->GUctl1, DWC3_GUCTL1_PARKMODE_DISABLE_SS);
 
   /* Set max speed */
   MmioAndThenOr32 ((UINTN)&Dwc3Reg->DCfg, ~DCFG_SPEED_MASK, DCFG_SPEED_SS);
