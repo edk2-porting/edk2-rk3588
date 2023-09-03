@@ -3,6 +3,7 @@
 
   Copyright (c) 2011 - 2020, Arm Limited. All rights reserved.<BR>
   Copyright (c) 2022 Rockchip Electronics Co. Ltd.
+  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -84,8 +85,6 @@ STATIC DISPLAY_MODE mDisplayModes[] = {
     1
   },
 };
-
-BOOLEAN mDisplayInitialized = FALSE;
 
 STATIC CONST UINT32 mMaxMode = ARRAY_SIZE (mDisplayModes);
 
@@ -231,111 +230,6 @@ DisplayBppConvert (
   }
 
   return DisplayBpp;
-}
-
-EFI_STATUS
-InitializeDisplay (
-  IN LCD_INSTANCE* Instance
-  )
-{
-  EFI_STATUS                  Status;
-  EFI_PHYSICAL_ADDRESS        VramBaseAddress;
-  UINTN                       VramSize;
-  UINTN                       NumVramPages;
-  DISPLAY_STATE               *StateInterate;
-  CRTC_STATE                  *CrtcState;
-  CONNECTOR_STATE             *ConnectorState;
-  DRM_DISPLAY_MODE            *Mode;
-  ROCKCHIP_CRTC_PROTOCOL      *Crtc;
-  LCD_BPP                     LcdBpp;
-  ROCKCHIP_CONNECTOR_PROTOCOL *Connector;
-
-  VramSize = SIZE_128MB;
-  NumVramPages = EFI_SIZE_TO_PAGES (VramSize);
-
-  Status = gBS->AllocatePages (AllocateAnyPages, EfiRuntimeServicesData,
-                               NumVramPages, &VramBaseAddress);                      
-  if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "Failed to allocate %u pages for framebuffer: %r\n", NumVramPages, Status));
-      goto EXIT;
-  }
-
-  Status = mCpu->SetMemoryAttributes (mCpu, VramBaseAddress,
-                                      ALIGN_VALUE (VramSize, EFI_PAGE_SIZE),
-                                      EFI_MEMORY_WC);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "Couldn't set framebuffer attributes: %r\n", Status));
-    goto EXIT;
-  }
-
-  // Setup all the relevant mode information
-  Instance->Gop.Mode->SizeOfInfo      = sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
-  Instance->Gop.Mode->FrameBufferBase = VramBaseAddress;
-
-  LIST_FOR_EACH_ENTRY(StateInterate, &mDisplayStateList, ListHead) {
-    if (StateInterate->IsEnable) {
-      Crtc = (ROCKCHIP_CRTC_PROTOCOL *)StateInterate->CrtcState.Crtc;
-      Connector = (ROCKCHIP_CONNECTOR_PROTOCOL *)StateInterate->ConnectorState.Connector;
-      CrtcState = &StateInterate->CrtcState;
-      ConnectorState = &StateInterate->ConnectorState;
-      Mode = &StateInterate->ConnectorState.DisplayMode;
-
-      if (Connector && Connector->Init)
-        Status = Connector->Init(Connector, StateInterate);
-
-      /* move to panel protocol --- todo */
-      DisplayGetTiming (StateInterate);
-
-      DEBUG ((DEBUG_INIT, "[INIT]detailed mode clock %u kHz, flags[%x]\n"
-                          "          H: %04d %04d %04d %04d\n"
-                          "          V: %04d %04d %04d %04d\n"
-                          "      bus_format: %x\n",
-                          Mode->Clock, Mode->Flags,
-                          Mode->HDisplay, Mode->HSyncStart,
-                          Mode->HSyncEnd, Mode->HTotal,
-                          Mode->VDisplay, Mode->VSyncStart,
-                          Mode->VSyncEnd, Mode->VTotal,
-                          ConnectorState->BusFormat));
-
-      Status = DisplaySetCrtcInfo(Mode, CRTC_INTERLACE_HALVE_V);
-      if (EFI_ERROR (Status)) {
-        goto EXIT;
-      }
-
-      if (Crtc && Crtc->Init) {
-        Status = Crtc->Init (Crtc, StateInterate);
-        if (EFI_ERROR (Status)) {
-          goto EXIT;
-        }
-      }
-
-      /* adapt to uefi display architecture */
-      CrtcState->Format = ROCKCHIP_FMT_ARGB8888;
-      CrtcState->SrcW = ConnectorState->DisplayMode.HDisplay;
-      CrtcState->SrcH = ConnectorState->DisplayMode.VDisplay;
-      CrtcState->SrcX = 0;
-      CrtcState->SrcY = 0;
-      CrtcState->CrtcW = ConnectorState->DisplayMode.HDisplay;
-      CrtcState->CrtcH = ConnectorState->DisplayMode.VDisplay;
-      CrtcState->CrtcX = 0;
-      CrtcState->CrtcY = 0;
-      CrtcState->YMirror = 0;
-      CrtcState->RBSwap = 0;
-
-      LcdGraphicsGetBpp (StateInterate->ModeNumber, &LcdBpp);
-      CrtcState->XVirtual = ALIGN(CrtcState->SrcW * DisplayBppConvert (LcdBpp), 32) >> 5;
-      CrtcState->DMAAddress = (UINT32)VramBaseAddress;
-    }
-  }
-
-  // Set the flag before changing the mode, to avoid infinite loops
-  mDisplayInitialized = TRUE;
-
-  // All is ok, so don't deal with any errors
-  goto EXIT;
-
-EXIT:
-  return Status;
 }
 
 STATIC
@@ -604,14 +498,6 @@ LcdGraphicsQueryMode (
 
   Instance = LCD_INSTANCE_FROM_GOP_THIS (This);
 
-  // Setup the hardware if not already done
-  if (!mDisplayInitialized) {
-    Status = InitializeDisplay (Instance);
-    if (EFI_ERROR (Status)) {
-      goto EXIT;
-    }
-  }
-
   // Error checking
   if ((This == NULL) ||
       (Info == NULL) ||
@@ -656,25 +542,69 @@ LcdGraphicsSetMode (
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL   FillColour;
   LCD_INSTANCE*                   Instance;
   LCD_BPP                         Bpp;
+  EFI_PHYSICAL_ADDRESS            VramBaseAddress;
+  UINTN                           VramSize;
+  UINTN                           NumVramPages;
+  UINTN                           NumPreviousVramPages;
+  DISPLAY_MODE                    *Mode;
+  DRM_DISPLAY_MODE                *DrmMode;
   DISPLAY_STATE                   *StateInterate;
   ROCKCHIP_CRTC_PROTOCOL          *Crtc;
+  CRTC_STATE                      *CrtcState;
   ROCKCHIP_CONNECTOR_PROTOCOL     *Connector;
+  CONNECTOR_STATE                 *ConnectorState;
 
   Instance = LCD_INSTANCE_FROM_GOP_THIS (This);
 
-  // Setup the hardware if not already done
-  if (!mDisplayInitialized) {
-    Status = InitializeDisplay (Instance);
-    if (EFI_ERROR (Status)) {
-      goto EXIT;
-    }
-  }
-
   // Check if this mode is supported
   if (ModeNumber >= This->Mode->MaxMode) {
-    DEBUG ((DEBUG_ERROR, "LcdGraphicsSetMode: ERROR - Unsupported mode number %d .\n", ModeNumber));
+    DEBUG ((DEBUG_ERROR, "%a: ERROR - Unsupported mode number %d .\n",
+            __func__, ModeNumber));
     Status = EFI_UNSUPPORTED;
     goto EXIT;
+  }
+
+  Mode = &mDisplayModes[ModeNumber];
+
+  Status = LcdGraphicsGetBpp (ModeNumber, &Bpp);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: ERROR - Couldn't get bytes per pixel, status: %r\n",
+            __func__, Status));
+    goto EXIT;
+  }
+
+  VramBaseAddress = This->Mode->FrameBufferBase;
+
+  VramSize = Mode->Horizontal.Resolution
+             * Mode->Vertical.Resolution
+             * GetBytesPerPixel (Bpp);
+
+  NumVramPages = EFI_SIZE_TO_PAGES (VramSize);
+  NumPreviousVramPages = EFI_SIZE_TO_PAGES (This->Mode->FrameBufferSize);
+
+  if (NumPreviousVramPages < NumVramPages) {
+    if (NumPreviousVramPages != 0) {
+      gBS->FreePages (VramBaseAddress, NumPreviousVramPages);
+      This->Mode->FrameBufferSize = 0;
+    }
+
+    VramBaseAddress = SIZE_4GB - 1; // VOP2 only supports 32-bit addresses
+    Status = gBS->AllocatePages (AllocateMaxAddress, EfiRuntimeServicesData,
+                                NumVramPages, &VramBaseAddress);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a: Could not allocate %u pages for mode %u: %r\n",
+              __func__, NumVramPages, ModeNumber, Status));
+      return Status;
+    }
+
+    Status = mCpu->SetMemoryAttributes (mCpu, VramBaseAddress,
+                                        ALIGN_VALUE (VramSize, EFI_PAGE_SIZE),
+                                        EFI_MEMORY_WC);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "%a: Couldn't set framebuffer attributes: %r\n",
+              __func__, Status));
+      goto EXIT;
+    }
   }
 
   // Update the UEFI mode information
@@ -685,16 +615,10 @@ LcdGraphicsSetMode (
   Instance->ModeInfo.VerticalResolution = mDisplayModes[ModeNumber].Vertical.Resolution;
   Instance->ModeInfo.PixelsPerScanLine = mDisplayModes[ModeNumber].Horizontal.Resolution;
   Instance->ModeInfo.PixelFormat = FixedPcdGet32 (PcdLcdPixelFormat);
+  Instance->Mode.SizeOfInfo = sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
 
-  Status = LcdGraphicsGetBpp (ModeNumber, &Bpp);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "LcdGraphicsSetMode: ERROR - Couldn't get bytes per pixel, status: %r\n", Status));
-    goto EXIT;
-  }
-  This->Mode->FrameBufferSize =  Instance->ModeInfo.VerticalResolution
-                                 *Instance->ModeInfo.PixelsPerScanLine
-                                 *GetBytesPerPixel (Bpp);
-
+  This->Mode->FrameBufferBase = VramBaseAddress;
+  This->Mode->FrameBufferSize = VramSize;
 
   // The UEFI spec requires that we now clear the visible portions of the
   // output display to black.
@@ -720,6 +644,56 @@ LcdGraphicsSetMode (
     if (StateInterate->ModeNumber == ModeNumber && StateInterate->IsEnable) {
       Crtc = (ROCKCHIP_CRTC_PROTOCOL*)StateInterate->CrtcState.Crtc;
       Connector = (ROCKCHIP_CONNECTOR_PROTOCOL *)StateInterate->ConnectorState.Connector;
+      CrtcState = &StateInterate->CrtcState;
+      ConnectorState = &StateInterate->ConnectorState;
+      DrmMode = &StateInterate->ConnectorState.DisplayMode;
+
+      StateInterate->ModeNumber = ModeNumber;
+
+      if (Connector && Connector->Init)
+        Status = Connector->Init(Connector, StateInterate);
+
+      /* move to panel protocol --- todo */
+      DisplayGetTiming (StateInterate);
+
+      DEBUG ((DEBUG_INIT, "[INIT]detailed mode clock %u kHz, flags[%x]\n"
+                          "          H: %04d %04d %04d %04d\n"
+                          "          V: %04d %04d %04d %04d\n"
+                          "      bus_format: %x\n",
+                          DrmMode->Clock, DrmMode->Flags,
+                          DrmMode->HDisplay, DrmMode->HSyncStart,
+                          DrmMode->HSyncEnd, DrmMode->HTotal,
+                          DrmMode->VDisplay, DrmMode->VSyncStart,
+                          DrmMode->VSyncEnd, DrmMode->VTotal,
+                          ConnectorState->BusFormat));
+
+      Status = DisplaySetCrtcInfo(DrmMode, CRTC_INTERLACE_HALVE_V);
+      if (EFI_ERROR (Status)) {
+        goto EXIT;
+      }
+
+      if (Crtc && Crtc->Init) {
+        Status = Crtc->Init (Crtc, StateInterate);
+        if (EFI_ERROR (Status)) {
+          goto EXIT;
+        }
+      }
+
+      /* adapt to uefi display architecture */
+      CrtcState->Format = ROCKCHIP_FMT_ARGB8888;
+      CrtcState->SrcW = ConnectorState->DisplayMode.HDisplay;
+      CrtcState->SrcH = ConnectorState->DisplayMode.VDisplay;
+      CrtcState->SrcX = 0;
+      CrtcState->SrcY = 0;
+      CrtcState->CrtcW = ConnectorState->DisplayMode.HDisplay;
+      CrtcState->CrtcH = ConnectorState->DisplayMode.VDisplay;
+      CrtcState->CrtcX = 0;
+      CrtcState->CrtcY = 0;
+      CrtcState->YMirror = 0;
+      CrtcState->RBSwap = 0;
+
+      CrtcState->XVirtual = ALIGN(CrtcState->SrcW * DisplayBppConvert (Bpp), 32) >> 5;
+      CrtcState->DMAAddress = (UINT32)VramBaseAddress;
 
       if (Crtc && Crtc->SetPlane)
         Crtc->SetPlane (Crtc, StateInterate);

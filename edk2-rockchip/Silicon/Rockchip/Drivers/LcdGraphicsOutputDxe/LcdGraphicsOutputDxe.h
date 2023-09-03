@@ -119,9 +119,4 @@ GraphicsOutputDxeInitialize (
   IN EFI_SYSTEM_TABLE   *SystemTable
 );
 
-EFI_STATUS
-InitializeDisplay (
-  IN LCD_INSTANCE* Instance
-);
-
 #endif /* LCD_GRAPHICS_OUTPUT_DXE_H_ */

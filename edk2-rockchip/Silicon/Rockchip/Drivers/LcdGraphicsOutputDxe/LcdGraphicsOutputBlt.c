@@ -858,14 +858,6 @@ LcdGraphicsBlt (
 
   Instance = LCD_INSTANCE_FROM_GOP_THIS(This);
 
-  // Setup the hardware if not already done
-  if (!mDisplayInitialized) {
-    Status = InitializeDisplay (Instance);
-    if (EFI_ERROR(Status)) {
-      goto EXIT;
-    }
-  }
-
   HorizontalResolution = This->Mode->Info->HorizontalResolution;
   VerticalResolution   = This->Mode->Info->VerticalResolution;
 
