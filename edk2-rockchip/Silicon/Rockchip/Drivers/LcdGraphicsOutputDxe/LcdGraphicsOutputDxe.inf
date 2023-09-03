@@ -48,6 +48,9 @@
   gRockchipCrtcProtocolGuid
   gRockchipConnectorProtocolGuid
 
+[Guids]
+  gEfiEndOfDxeEventGroupGuid
+
 [Pcd]
   gRockchipTokenSpaceGuid.PcdLcdPixelFormat
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution

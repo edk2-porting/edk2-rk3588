@@ -73,19 +73,6 @@ typedef struct {
 
 STATIC DISPLAY_MODE mDisplayModes[] = {
   {
-    // eDP : 1536 x 2048
-    2,
-    200000000,
-    {1536, 16, 12, 48},
-    {2048, 4, 8, 8},
-    0,
-    0,
-    0,
-    0,
-    1
-  },
-  {
-    // eDP : 1920 x 1080
     2,
     148500000,
     {1920, 32, 200, 48},
@@ -387,40 +374,28 @@ EXIT:
   return Status;
 }
 
+STATIC
 EFI_STATUS
 EFIAPI
-LcdGraphicsOutputDxeInitialize (
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
+LcdGraphicsOutputInit (
+  VOID
   )
 {
-  EFI_STATUS  Status;
-  LCD_INSTANCE* Instance;
-  DISPLAY_STATE *DisplayState;
-  DISPLAY_MODE *Mode;
-  ROCKCHIP_CRTC_PROTOCOL *Crtc;
-  INT32 i = 0;
-  UINT32 HorizontalResolution  = PcdGet32 (PcdVideoHorizontalResolution);
-  UINT32 VerticalResolution    = PcdGet32 (PcdVideoVerticalResolution);
+  EFI_STATUS                  Status;
+  LCD_INSTANCE                *Instance;
+  DISPLAY_STATE               *DisplayState;
+  DISPLAY_MODE                *Mode;
+  UINTN                       ModeIndex;
+  ROCKCHIP_CRTC_PROTOCOL      *Crtc;
+  UINTN                       ConnectorCount;
+  EFI_HANDLE                  *ConnectorHandles;
+  UINTN                       Index;
+  UINT32                      HorizontalResolution;
+  UINT32                      VerticalResolution;
 
   Status = LcdInstanceContructor (&Instance);
   if (EFI_ERROR (Status)) {
-    goto EXIT;
-  }
-
-  // Install the Graphics Output Protocol and the Device Path
-  Status = gBS->InstallMultipleProtocolInterfaces (
-                  &Instance->Handle,
-                  &gEfiGraphicsOutputProtocolGuid,
-                  &Instance->Gop,
-                  &gEfiDevicePathProtocolGuid,
-                  &Instance->DevicePath,
-                  NULL
-                  );
-
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "LcdGraphicsOutputDxeInitialize: Can not install the protocol. Exit Status=%r\n", Status));
-    goto EXIT;
+    return Status;
   }
 
   Status = gBS->LocateProtocol (&gEfiCpuArchProtocolGuid, NULL,
@@ -430,31 +405,74 @@ LcdGraphicsOutputDxeInitialize (
     return Status;
   }
 
+  Status = gBS->LocateProtocol (&gRockchipCrtcProtocolGuid, NULL,
+                                (VOID **) &Crtc);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: Can not locate the RockchipCrtcProtocol. Status=%r\n",
+            __func__, Status));
+    return Status;
+  }
+
+  Status = gBS->LocateHandleBuffer (ByProtocol,
+                                    &gRockchipConnectorProtocolGuid,
+                                    NULL,
+                                    &ConnectorCount,
+                                    &ConnectorHandles);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: Can not locate gRockchipConnectorProtocolGuid. Status=%r\n",
+            __func__, Status));
+    return Status;
+  }
+
+  //
+  // TO-DO: When EDID is implemented.
+  // If native resolution is preferred (rather than custom, via PCDs),
+  // we should pick the maximum mode supported by all connected displays.
+  //
+  // Why? Because we provide a single GOP and framebuffer shared between
+  // all outputs.
+  //
+  // It is possible to install a GOP for each display, but then OSes would
+  // only draw on the primary (usually first) one. This needs additional
+  // logic to let users choose the primary display through a setup option.
+  //
+
+  HorizontalResolution = PcdGet32 (PcdVideoHorizontalResolution);
+  VerticalResolution = PcdGet32 (PcdVideoVerticalResolution);
+
+  for (ModeIndex = 0; ModeIndex < mMaxMode; ModeIndex++) {
+    Mode = &mDisplayModes[ModeIndex];
+    if (Mode->Horizontal.Resolution == HorizontalResolution && Mode->Vertical.Resolution == VerticalResolution) {
+      break;
+    }
+  }
+
+  if (ModeIndex >= mMaxMode) {
+    DEBUG ((DEBUG_ERROR, "%a: %dx%d mode not supported.\n",
+            __func__, HorizontalResolution, VerticalResolution));
+    return EFI_UNSUPPORTED;
+  }
+
   InitializeListHead (&mDisplayStateList);
 
-  for (i = 0; i < mMaxMode; i++) {
-    Mode = &mDisplayModes[i];
-
+  for (Index = 0; Index < ConnectorCount; Index++) {
     DisplayState = AllocateZeroPool (sizeof(DISPLAY_STATE));
     InitializeListHead (&DisplayState->ListHead);
 
     /* adapt to UEFI architecture */
-    DisplayState->ModeNumber = i;
+    DisplayState->ModeNumber = ModeIndex;
     DisplayState->VpsConfigModeID = Mode->VpsConfigModeID;
 
-    Status = gBS->LocateProtocol (&gRockchipCrtcProtocolGuid, NULL,
-                                  (VOID **) &DisplayState->CrtcState.Crtc);
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "Can not locate the RockchipCrtcProtocol. Exit Status=%r\n", Status));
-      return EFI_INVALID_PARAMETER;
-    }
+    DisplayState->CrtcState.Crtc = (VOID *) Crtc;
     DisplayState->CrtcState.CrtcID = Mode->CrtcId;
 
-    Status = gBS->LocateProtocol (&gRockchipConnectorProtocolGuid, NULL,
+    Status = gBS->HandleProtocol (ConnectorHandles[Index],
+                                  &gRockchipConnectorProtocolGuid,
                                   (VOID **) &DisplayState->ConnectorState.Connector);
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "Can not locate the RockchipConnectorProtocol. Exit Status=%r\n", Status));
-      return EFI_INVALID_PARAMETER;
+      DEBUG ((DEBUG_ERROR, "%a: HandleProtocol gRockchipConnectorProtocolGuid [%d] failed. Status=%r\n",
+              __func__, Index, Status));
+      return Status;
     }
 
     DisplayState->ConnectorState.OverScan.LeftMargin = mDefaultOverScanParas.LeftMargin;
@@ -469,21 +487,17 @@ LcdGraphicsOutputDxeInitialize (
     /* add BCSH data if needed --- todo */
     DisplayState->ConnectorState.DispInfo = NULL;
 
-    if (Mode->Horizontal.Resolution == HorizontalResolution && Mode->Vertical.Resolution == VerticalResolution) {
-      Crtc = (ROCKCHIP_CRTC_PROTOCOL*)DisplayState->CrtcState.Crtc;
-      Crtc->Vps[Mode->CrtcId].Enable = TRUE;
-      DisplayState->IsEnable = TRUE;
-    } else {
-      DisplayState->IsEnable = FALSE;
-    }
+    Crtc->Vps[Mode->CrtcId].Enable = TRUE;
+    DisplayState->IsEnable = TRUE;
 
     InsertTailList (&mDisplayStateList, &DisplayState->ListHead);
   }
 
   Status = DisplayPreInit (Instance);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "LcdGraphicsOutputDxeInitialize: DisplayPreInit fail. Exit Status=%r\n", Status));
-    goto EXIT_ERROR_UNINSTALL_PROTOCOL;
+    DEBUG ((DEBUG_ERROR, "%a: DisplayPreInit fail. Exit Status=%r\n",
+            __func__, Status));
+    return Status;
   }
 
   // Register for an ExitBootServicesEvent
@@ -497,30 +511,60 @@ LcdGraphicsOutputDxeInitialize (
                   NULL,
                   &Instance->ExitBootServicesEvent
                   );
-
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "LcdGraphicsOutputDxeInitialize: Can not install the ExitBootServicesEvent handler. Exit Status=%r\n", Status));
-    goto EXIT_ERROR_UNINSTALL_PROTOCOL;
+    DEBUG ((DEBUG_ERROR, "%a: Can not install the ExitBootServicesEvent handler. Exit Status=%r\n",
+            __func__, Status));
+    return Status;
   }
 
-  // To get here, everything must be fine, so just exit
-  goto EXIT;
+  // Install the Graphics Output Protocol and the Device Path
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  &Instance->Handle,
+                  &gEfiGraphicsOutputProtocolGuid,
+                  &Instance->Gop,
+                  &gEfiDevicePathProtocolGuid,
+                  &Instance->DevicePath,
+                  NULL
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: Can not install the protocol. Status=%r\n",
+            __func__, Status));
+    return Status;
+  }
 
-EXIT_ERROR_UNINSTALL_PROTOCOL:
-  // The following function could return an error message,
-  // however, to get here something must have gone wrong already,
-  // so preserve the original error, i.e. don't change
-  // the Status variable, even it fails to uninstall the protocol.
-  gBS->UninstallMultipleProtocolInterfaces (
-         Instance->Handle,
-         &gEfiGraphicsOutputProtocolGuid,
-         &Instance->Gop, // Uninstall Graphics Output protocol
-         &gEfiDevicePathProtocolGuid,
-         &Instance->DevicePath,     // Uninstall device path
-         NULL
-         );
+  return EFI_SUCCESS;
+}
 
-EXIT:
+VOID
+EFIAPI
+LcdGraphicsOutputEndOfDxeEventHandler (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  gBS->CloseEvent (Event);
+
+  LcdGraphicsOutputInit ();
+}
+
+EFI_STATUS
+EFIAPI
+LcdGraphicsOutputDxeInitialize (
+  IN EFI_HANDLE         ImageHandle,
+  IN EFI_SYSTEM_TABLE   *SystemTable
+  )
+{
+  EFI_STATUS               Status;
+  EFI_EVENT                EndOfDxeEvent;
+
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  LcdGraphicsOutputEndOfDxeEventHandler,
+                  NULL,
+                  &gEfiEndOfDxeEventGroupGuid,
+                  &EndOfDxeEvent
+                  );
   return Status;
 }
 
