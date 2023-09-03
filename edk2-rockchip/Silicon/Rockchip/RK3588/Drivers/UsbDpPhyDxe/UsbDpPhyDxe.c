@@ -2,8 +2,7 @@
  *
  *  Rockchip USBDP Combo PHY with Samsung IP block driver
  *
- *  This was ported from U-Boot upstream. It currently lacks:
- *    - proper DisplayPort PHY bring-up
+ *  This was ported from U-Boot upstream/downstream. It currently lacks:
  *    - lane orientation flip binding, exposed via a protocol to the TCPM driver.
  *
  *  After all features are merged in and tested, the code should ideally
@@ -21,6 +20,8 @@
  *
  **/
 
+#include <Protocol/DpPhy.h>
+#include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>
 #include <Library/IoLib.h>
 #include <Library/TimerLib.h>
@@ -33,6 +34,13 @@
 #include "UsbDpPhy.h"
 
 #define BIT_WRITEABLE_SHIFT	16
+
+enum {
+	DP_BW_RBR,
+	DP_BW_HBR,
+	DP_BW_HBR2,
+	DP_BW_HBR3,
+};
 
 enum {
 	UDPHY_MODE_NONE		= 0,
@@ -79,11 +87,25 @@ struct udphy_grf_cfg {
 	struct udphy_grf_reg	rx_lfps;
 };
 
+struct dp_tx_drv_ctrl {
+	u32 trsv_reg0204;
+	u32 trsv_reg0205;
+	u32 trsv_reg0206;
+	u32 trsv_reg0207;
+};
+
 struct rockchip_udphy;
 
 struct rockchip_udphy_cfg {
 	struct udphy_grf_cfg grfcfg;
+	const struct dp_tx_drv_ctrl (*dp_tx_ctrl_cfg[4])[4];
 	int (*combophy_init)(struct rockchip_udphy *udphy);
+	int (*dp_phy_set_rate)(struct rockchip_udphy *udphy,
+			       DP_PHY_CONFIGURATION *dp);
+	int (*dp_phy_set_voltages)(struct rockchip_udphy *udphy,
+				   DP_PHY_CONFIGURATION *dp);
+	int (*dplane_enable)(struct rockchip_udphy *udphy, int dp_lanes);
+	int (*dplane_select)(struct rockchip_udphy *udphy);
 };
 
 struct cru_reset_reg {
@@ -92,6 +114,10 @@ struct cru_reset_reg {
 };
 
 struct rockchip_udphy {
+	UINT32 Signature;
+	EFI_HANDLE Handle;
+	DP_PHY_PROTOCOL DpPhyProtocol;
+
 	UINTN pma_regmap;
 	UINTN u2phygrf;
 	UINTN udphygrf;
@@ -121,10 +147,100 @@ struct rockchip_udphy {
 	u32 dp_lane_sel[4];
 	u32 dp_aux_dout_sel;
 	u32 dp_aux_din_sel;
+	u32 max_link_rate;
+	u8 bw; /* dp bandwidth */
 	int id;
 
 	/* PHY const config */
 	const struct rockchip_udphy_cfg *cfgs;
+};
+
+#define UDPHY_SIGNATURE          SIGNATURE_32 ('U', 'D', 'P', 'Y')
+
+#define ROCKCHIP_UDPHY_FROM_DP_PHY_PROTOCOL(a) CR (a, struct rockchip_udphy, DpPhyProtocol, UDPHY_SIGNATURE)
+
+static const struct dp_tx_drv_ctrl rk3588_dp_tx_drv_ctrl_rbr_hbr[4][4] = {
+	/* voltage swing 0, pre-emphasis 0->3 */
+	{
+		{ 0x20, 0x10, 0x42, 0xe5 },
+		{ 0x26, 0x14, 0x42, 0xe5 },
+		{ 0x29, 0x18, 0x42, 0xe5 },
+		{ 0x2b, 0x1c, 0x43, 0xe7 },
+	},
+
+	/* voltage swing 1, pre-emphasis 0->2 */
+	{
+		{ 0x23, 0x10, 0x42, 0xe7 },
+		{ 0x2a, 0x17, 0x43, 0xe7 },
+		{ 0x2b, 0x1a, 0x43, 0xe7 },
+	},
+
+	/* voltage swing 2, pre-emphasis 0->1 */
+	{
+		{ 0x27, 0x10, 0x42, 0xe7 },
+		{ 0x2b, 0x17, 0x43, 0xe7 },
+	},
+
+	/* voltage swing 3, pre-emphasis 0 */
+	{
+		{ 0x29, 0x10, 0x43, 0xe7 },
+	},
+};
+
+static const struct dp_tx_drv_ctrl rk3588_dp_tx_drv_ctrl_hbr2[4][4] = {
+	/* voltage swing 0, pre-emphasis 0->3 */
+	{
+		{ 0x21, 0x10, 0x42, 0xe5 },
+		{ 0x26, 0x14, 0x42, 0xe5 },
+		{ 0x26, 0x16, 0x43, 0xe5 },
+		{ 0x2a, 0x19, 0x43, 0xe7 },
+	},
+
+	/* voltage swing 1, pre-emphasis 0->2 */
+	{
+		{ 0x24, 0x10, 0x42, 0xe7 },
+		{ 0x2a, 0x17, 0x43, 0xe7 },
+		{ 0x2b, 0x1a, 0x43, 0xe7 },
+	},
+
+	/* voltage swing 2, pre-emphasis 0->1 */
+	{
+		{ 0x28, 0x10, 0x42, 0xe7 },
+		{ 0x2b, 0x17, 0x43, 0xe7 },
+	},
+
+	/* voltage swing 3, pre-emphasis 0 */
+	{
+		{ 0x28, 0x10, 0x43, 0xe7 },
+	},
+};
+
+static const struct dp_tx_drv_ctrl rk3588_dp_tx_drv_ctrl_hbr3[4][4] = {
+	/* voltage swing 0, pre-emphasis 0->3 */
+	{
+		{ 0x21, 0x10, 0x42, 0xe5 },
+		{ 0x26, 0x14, 0x42, 0xe5 },
+		{ 0x26, 0x16, 0x43, 0xe5 },
+		{ 0x29, 0x18, 0x43, 0xe7 },
+	},
+
+	/* voltage swing 1, pre-emphasis 0->2 */
+	{
+		{ 0x24, 0x10, 0x42, 0xe7 },
+		{ 0x2a, 0x18, 0x43, 0xe7 },
+		{ 0x2b, 0x1b, 0x43, 0xe7 }
+	},
+
+	/* voltage swing 2, pre-emphasis 0->1 */
+	{
+		{ 0x27, 0x10, 0x42, 0xe7 },
+		{ 0x2b, 0x18, 0x43, 0xe7 }
+	},
+
+	/* voltage swing 3, pre-emphasis 0 */
+	{
+		{ 0x28, 0x10, 0x43, 0xe7 },
+	},
 };
 
 static const struct reg_sequence rk3588_udphy_24m_refclk_cfg[] = {
@@ -321,6 +437,47 @@ static void udphy_usb_bvalid_enable(struct rockchip_udphy *udphy, u8 enable)
  * <2 3>                  usbrx         usbtx       dpln0         dpln1
  * ---------------------------------------------------------------------------
  */
+static int udphy_dplane_select(struct rockchip_udphy *udphy)
+{
+	const struct rockchip_udphy_cfg *cfg = udphy->cfgs;
+
+	if (cfg->dplane_select)
+		return cfg->dplane_select(udphy);
+
+	return 0;
+}
+
+static int udphy_dplane_get(struct rockchip_udphy *udphy)
+{
+	int dp_lanes;
+
+	switch (udphy->mode) {
+	case UDPHY_MODE_DP:
+		dp_lanes = 4;
+		break;
+	case UDPHY_MODE_DP_USB:
+		dp_lanes = 2;
+		break;
+	case UDPHY_MODE_USB:
+		/* fallthrough; */
+	default:
+		dp_lanes = 0;
+		break;
+	}
+
+	return dp_lanes;
+}
+
+static int udphy_dplane_enable(struct rockchip_udphy *udphy, int dp_lanes)
+{
+	const struct rockchip_udphy_cfg *cfg = udphy->cfgs;
+	int ret = 0;
+
+	if (cfg->dplane_enable)
+		ret = cfg->dplane_enable(udphy, dp_lanes);
+
+	return ret;
+}
 
 __maybe_unused
 static int upphy_set_typec_default_mapping(struct rockchip_udphy *udphy)
@@ -487,6 +644,117 @@ static int udphy_power_off(struct rockchip_udphy *udphy, u8 mode)
 	return 0;
 }
 
+static int rockchip_dpphy_power_on(struct rockchip_udphy *udphy)
+{
+	int ret, dp_lanes;
+
+	dp_lanes = udphy_dplane_get(udphy);
+	udphy->DpPhyProtocol.Capabilities.BusWidth = dp_lanes;
+	udphy->DpPhyProtocol.Capabilities.MaximumLinkRate = udphy->max_link_rate;
+
+	ret = udphy_power_on(udphy, UDPHY_MODE_DP);
+	if (ret)
+		return ret;
+
+	ret = udphy_dplane_enable(udphy, dp_lanes);
+	if (ret)
+		return ret;
+
+	return udphy_dplane_select(udphy);
+}
+
+static int rockchip_dpphy_power_off(struct rockchip_udphy *udphy)
+{
+	int ret;
+
+	ret = udphy_dplane_enable(udphy, 0);
+	if (ret)
+		return ret;
+
+	return udphy_power_off(udphy, UDPHY_MODE_DP);
+}
+
+static int rockchip_dpphy_verify_config(struct rockchip_udphy *udphy,
+					DP_PHY_CONFIGURATION *dp)
+{
+	int i;
+
+	/* If changing link rate was required, verify it's supported. */
+	if (dp->SetLinkRateAndSpreadSpectrum) {
+		switch (dp->LinkRate) {
+		case 1620:
+		case 2700:
+		case 5400:
+		case 8100:
+			/* valid bit rate */
+			break;
+		default:
+			return -EINVAL;
+		}
+	}
+
+	/* Verify lane count. */
+	switch (dp->LaneCount) {
+	case 1:
+	case 2:
+	case 4:
+		/* valid lane count. */
+		break;
+	default:
+		return -EINVAL;
+	}
+
+	/*
+	 * If changing voltages is required, check swing and pre-emphasis
+	 * levels, per-lane.
+	 */
+	if (dp->SetVoltageSwingAndPreEmphasisLevels) {
+		/* Lane count verified previously. */
+		for (i = 0; i < dp->LaneCount; i++) {
+			if (dp->LaneVoltageSwingLevels[i] > 3 || dp->LanePreEmphasisLevels[i] > 3)
+				return -EINVAL;
+
+			/*
+			 * Sum of voltage swing and pre-emphasis levels cannot
+			 * exceed 3.
+			 */
+			if (dp->LaneVoltageSwingLevels[i] + dp->LanePreEmphasisLevels[i] > 3)
+				return -EINVAL;
+		}
+	}
+
+	return 0;
+}
+
+static int rockchip_dpphy_configure(struct rockchip_udphy *udphy,
+				    DP_PHY_CONFIGURATION *dp)
+{
+	const struct rockchip_udphy_cfg *cfg = udphy->cfgs;
+	int ret;
+
+	ret = rockchip_dpphy_verify_config(udphy, dp);
+	if (ret)
+		return ret;
+
+	if (dp->SetLinkRateAndSpreadSpectrum && cfg->dp_phy_set_rate) {
+		ret = cfg->dp_phy_set_rate(udphy, dp);
+		if (ret) {
+			dev_err(udphy->dev, "rockchip_hdptx_phy_set_rate failed\n");
+			return ret;
+		}
+	}
+
+	if (dp->SetVoltageSwingAndPreEmphasisLevels && cfg->dp_phy_set_voltages) {
+		ret = cfg->dp_phy_set_voltages(udphy, dp);
+		if (ret) {
+			dev_err(udphy->dev, "rockchip_dp_phy_set_voltages failed\n");
+			return ret;
+		}
+	}
+
+	return 0;
+}
+
 static int rockchip_u3phy_init(struct rockchip_udphy *udphy)
 {
 	/* DP only or high-speed, disable U3 port */
@@ -635,6 +903,201 @@ assert_apb:
 	return ret;
 }
 
+static int rk3588_udphy_dplane_enable(struct rockchip_udphy *udphy, int dp_lanes)
+{
+	int i;
+	u32 val = 0;
+
+	for (i = 0; i < dp_lanes; i++)
+		val |= BIT(udphy->dp_lane_sel[i]);
+
+	regmap_update_bits(udphy->pma_regmap, CMN_LANE_MUX_AND_EN_OFFSET, CMN_DP_LANE_EN_ALL,
+			   FIELD_PREP(CMN_DP_LANE_EN_ALL, val));
+
+	if (!dp_lanes)
+		regmap_update_bits(udphy->pma_regmap, CMN_DP_RSTN_OFFSET,
+				   CMN_DP_CMN_RSTN, FIELD_PREP(CMN_DP_CMN_RSTN, 0x0));
+
+	return 0;
+}
+
+static int rk3588_udphy_dplane_select(struct rockchip_udphy *udphy)
+{
+	u32 value = 0;
+
+	switch (udphy->mode) {
+	case UDPHY_MODE_DP:
+		value |= 2 << udphy->dp_lane_sel[2] * 2;
+		value |= 3 << udphy->dp_lane_sel[3] * 2;
+	case UDPHY_MODE_DP_USB:
+		value |= 0 << udphy->dp_lane_sel[0] * 2;
+		value |= 1 << udphy->dp_lane_sel[1] * 2;
+		break;
+	case UDPHY_MODE_USB:
+		break;
+	default:
+		break;
+	}
+
+	regmap_write(udphy->vogrf, udphy->id ? RK3588_GRF_VO0_CON2 : RK3588_GRF_VO0_CON0,
+		     ((DP_AUX_DIN_SEL | DP_AUX_DOUT_SEL | DP_LANE_SEL_ALL) << 16) |
+		     FIELD_PREP(DP_AUX_DIN_SEL, udphy->dp_aux_din_sel) |
+		     FIELD_PREP(DP_AUX_DOUT_SEL, udphy->dp_aux_dout_sel) | value);
+
+	return 0;
+}
+
+static int rk3588_dp_phy_set_rate(struct rockchip_udphy *udphy,
+				  DP_PHY_CONFIGURATION *dp)
+{
+	u32 val;
+	int ret;
+
+	regmap_update_bits(udphy->pma_regmap, CMN_DP_RSTN_OFFSET,
+			   CMN_DP_CMN_RSTN, FIELD_PREP(CMN_DP_CMN_RSTN, 0x0));
+
+	switch (dp->LinkRate) {
+	case 1620:
+		udphy->bw = DP_BW_RBR;
+		break;
+	case 2700:
+		udphy->bw = DP_BW_HBR;
+		break;
+	case 5400:
+		udphy->bw = DP_BW_HBR2;
+		break;
+	case 8100:
+		udphy->bw = DP_BW_HBR3;
+		break;
+	default:
+		return -EINVAL;
+	}
+
+	regmap_update_bits(udphy->pma_regmap, CMN_DP_LINK_OFFSET, CMN_DP_TX_LINK_BW,
+			   FIELD_PREP(CMN_DP_TX_LINK_BW, udphy->bw));
+	regmap_update_bits(udphy->pma_regmap, CMN_SSC_EN_OFFSET, CMN_ROPLL_SSC_EN,
+			   FIELD_PREP(CMN_ROPLL_SSC_EN, dp->EnableSpreadSpectrum));
+	regmap_update_bits(udphy->pma_regmap, CMN_DP_RSTN_OFFSET, CMN_DP_CMN_RSTN,
+			   FIELD_PREP(CMN_DP_CMN_RSTN, 0x1));
+
+	ret = regmap_read_poll_timeout(udphy->pma_regmap, CMN_ANA_ROPLL_DONE_OFFSET, val,
+				       FIELD_GET(CMN_ANA_ROPLL_LOCK_DONE, val) &&
+				       FIELD_GET(CMN_ANA_ROPLL_AFC_DONE, val),
+				       0, 1000);
+	if (ret) {
+		printf("ROPLL is not lock\n");
+		return ret;
+	}
+
+	return 0;
+}
+
+static void rk3588_dp_phy_set_voltage(struct rockchip_udphy *udphy, u8 bw,
+				      u32 voltage, u32 pre, u32 lane)
+{
+	u32 offset = 0x800 * lane;
+	u32 val;
+	const struct rockchip_udphy_cfg *cfg = udphy->cfgs;
+	const struct dp_tx_drv_ctrl (*dp_ctrl)[4];
+
+	dp_ctrl = cfg->dp_tx_ctrl_cfg[bw];
+	val = dp_ctrl[voltage][pre].trsv_reg0204;
+	regmap_write(udphy->pma_regmap, 0x0810 + offset, val);
+
+	val = dp_ctrl[voltage][pre].trsv_reg0205;
+	regmap_write(udphy->pma_regmap, 0x0814 + offset, val);
+
+	val = dp_ctrl[voltage][pre].trsv_reg0206;
+	regmap_write(udphy->pma_regmap, 0x0818 + offset, val);
+
+	val = dp_ctrl[voltage][pre].trsv_reg0207;
+	regmap_write(udphy->pma_regmap, 0x081c + offset, val);
+}
+
+static int rk3588_dp_phy_set_voltages(struct rockchip_udphy *udphy,
+				      DP_PHY_CONFIGURATION *dp)
+{
+	u32 i, lane;
+
+	for (i = 0; i < dp->LaneCount; i++) {
+		lane = udphy->dp_lane_sel[i];
+		switch (dp->LinkRate) {
+		case 1620:
+		case 2700:
+			regmap_update_bits(udphy->pma_regmap, TRSV_ANA_TX_CLK_OFFSET_N(lane),
+					   LN_ANA_TX_SER_TXCLK_INV,
+					   FIELD_PREP(LN_ANA_TX_SER_TXCLK_INV,
+						      udphy->lane_mux_sel[lane]));
+			break;
+		case 5400:
+		case 8100:
+			regmap_update_bits(udphy->pma_regmap, TRSV_ANA_TX_CLK_OFFSET_N(lane),
+					   LN_ANA_TX_SER_TXCLK_INV,
+					   FIELD_PREP(LN_ANA_TX_SER_TXCLK_INV, 0x0));
+			break;
+		}
+
+		rk3588_dp_phy_set_voltage(udphy, udphy->bw, dp->LaneVoltageSwingLevels[i], dp->LanePreEmphasisLevels[i], lane);
+	}
+
+	return 0;
+}
+
+EFI_STATUS
+EFIAPI
+DpPhyPowerOn (
+	IN DP_PHY_PROTOCOL		*This
+	)
+{
+	struct rockchip_udphy *udphy;
+	int ret;
+
+	udphy = ROCKCHIP_UDPHY_FROM_DP_PHY_PROTOCOL (This);
+
+	ret = rockchip_dpphy_power_on (udphy);
+	if (ret)
+		return EFI_DEVICE_ERROR;
+
+	return EFI_SUCCESS;
+}
+
+EFI_STATUS
+EFIAPI
+DpPhyPowerOff (
+	IN DP_PHY_PROTOCOL		*This
+	)
+{
+	struct rockchip_udphy *udphy;
+	int ret;
+
+	udphy = ROCKCHIP_UDPHY_FROM_DP_PHY_PROTOCOL (This);
+
+	ret = rockchip_dpphy_power_off (udphy);
+	if (ret)
+		return EFI_DEVICE_ERROR;
+
+	return EFI_SUCCESS;
+}
+
+EFI_STATUS
+EFIAPI
+DpPhyConfigure (
+	IN DP_PHY_PROTOCOL		*This,
+	IN DP_PHY_CONFIGURATION		*Configuration
+	)
+{
+	struct rockchip_udphy *udphy;
+	int ret;
+
+	udphy = ROCKCHIP_UDPHY_FROM_DP_PHY_PROTOCOL (This);
+
+	ret = rockchip_dpphy_configure (udphy, Configuration);
+	if (ret)
+		return EFI_DEVICE_ERROR;
+
+	return EFI_SUCCESS;
+}
+
 EFI_STATUS
 UsbDpPhySetup (
 	IN struct rockchip_udphy *UdPhy,
@@ -643,6 +1106,7 @@ UsbDpPhySetup (
 	IN UINT32 Usb3State
 	)
 {
+	EFI_STATUS Status;
 	int ret = 0;
 
 	// treat default byte array definition as NULL
@@ -673,6 +1137,24 @@ UsbDpPhySetup (
 		return EFI_DEVICE_ERROR;
 	}
 
+	if (UdPhy->mode & UDPHY_MODE_DP) {
+		UdPhy->Signature = UDPHY_SIGNATURE;
+		UdPhy->DpPhyProtocol.PowerOn = DpPhyPowerOn;
+		UdPhy->DpPhyProtocol.PowerOff = DpPhyPowerOff;
+		UdPhy->DpPhyProtocol.Configure = DpPhyConfigure;
+		UdPhy->DpPhyProtocol.Id = UdPhy->id;
+
+		Status = gBS->InstallMultipleProtocolInterfaces (&UdPhy->Handle,
+				&gDpPhyProtocolGuid, &UdPhy->DpPhyProtocol,
+				NULL);
+
+		if (EFI_ERROR (Status)) {
+			DEBUG ((DEBUG_ERROR, "%a: Failed to install DP PHY protocol. Status=%r\n",
+				__func__, Status));
+			return Status;
+		}
+	}
+
 	return EFI_SUCCESS;
 }
 
@@ -690,7 +1172,17 @@ static const struct rockchip_udphy_cfg rk3588_udphy_cfgs = {
 		.low_pwrn		= { 0x0004, 13, 13, 0, 1 },
 		.rx_lfps		= { 0x0004, 14, 14, 0, 1 },
 	},
+	.dp_tx_ctrl_cfg = {
+		rk3588_dp_tx_drv_ctrl_rbr_hbr,
+		rk3588_dp_tx_drv_ctrl_rbr_hbr,
+		rk3588_dp_tx_drv_ctrl_hbr2,
+		rk3588_dp_tx_drv_ctrl_hbr3,
+	},
 	.combophy_init = rk3588_udphy_init,
+	.dp_phy_set_rate = rk3588_dp_phy_set_rate,
+	.dp_phy_set_voltages = rk3588_dp_phy_set_voltages,
+	.dplane_enable = rk3588_udphy_dplane_enable,
+	.dplane_select = rk3588_udphy_dplane_select,
 };
 
 static struct rockchip_udphy usbdp_phy[] = {
@@ -706,6 +1198,8 @@ static struct rockchip_udphy usbdp_phy[] = {
 		.rst_lane 		= { 0xA08, 10 },
 		.rst_pcs_apb 		= { 0xA08, 11 },
 		.rst_pma_apb 		= { 0xB20, 2 },
+
+		.max_link_rate          = 8100,
 
 		.id			= 0,
 
@@ -723,6 +1217,8 @@ static struct rockchip_udphy usbdp_phy[] = {
 		.rst_lane 		= { 0xA0C, 1 },
 		.rst_pcs_apb 		= { 0xA0C, 2 },
 		.rst_pma_apb 		= { 0xB20, 4 },
+
+		.max_link_rate          = 8100,
 
 		.id			= 1,
 

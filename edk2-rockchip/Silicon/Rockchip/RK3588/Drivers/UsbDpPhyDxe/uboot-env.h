@@ -17,9 +17,10 @@ typedef BOOLEAN bool;
 
 #define udelay(x)	MicroSecondDelay (x)
 
-#define dev_err(dev, args...)  	DEBUG ((DEBUG_ERROR, args));
-#define dev_info(dev, args...)  DEBUG ((DEBUG_INFO, args));
-#define dev_dbg(dev, args...) 	DEBUG ((DEBUG_VERBOSE, args));
+#define dev_err(dev, args...)  	DEBUG ((DEBUG_ERROR, args))
+#define dev_info(dev, args...)  DEBUG ((DEBUG_INFO, args))
+#define dev_dbg(dev, args...) 	DEBUG ((DEBUG_INFO, args))
+#define printf(args...)		DEBUG ((DEBUG_INFO, args))
 
 #define BITS_PER_LONG 	(sizeof(UINTN) * 8)
 #define GENMASK(h, l) \
@@ -32,6 +33,11 @@ typedef BOOLEAN bool;
 #define FIELD_PREP(_mask, _val)						\
 	({								\
 		((typeof(_mask))(_val) << __bf_shf(_mask)) & (_mask);	\
+	})
+
+#define FIELD_GET(_mask, _reg)						\
+	({								\
+		(typeof(_mask))(((_reg) & (_mask)) >> __bf_shf(_mask));	\
 	})
 
 #define regmap_read_poll_timeout(map, addr, val, cond, sleep_us, \

@@ -27,12 +27,14 @@
 
 [LibraryClasses]
   UefiDriverEntryPoint
+  UefiBootServicesTableLib
   DebugLib
   IoLib
   TimerLib
   RockchipPlatformLib
 
 [Protocols]
+  gDpPhyProtocolGuid                ## PRODUCES
 
 [Pcd]
   gRK3588TokenSpaceGuid.PcdUsbDpPhy0Supported
