@@ -890,6 +890,7 @@ Vop2CalcCruConfig (
   UINT64 DclkRate = VPixclk;
   UINT64 IfDclkRate;
   UINT64 IfPixclkRate;
+  UINT64 DclkOutRate;
   INT32 OutputType = ConnectorState->Type;
   INT32 OutputMode = ConnectorState->OutputMode;
   UINT8 K = 1;
@@ -939,6 +940,19 @@ Vop2CalcCruConfig (
     *DclkCoreDiv = DclkRate / DclkCoreRate;
     *IfPixclkDiv = DclkRate / IfPixclkRate;
     *IfDclkDiv = *IfPixclkDiv;
+  } else if (OutputType == DRM_MODE_CONNECTOR_DisplayPort) {
+    DclkOutRate = VPixclk >> 2;
+    DclkOutRate = DclkOutRate / K;
+
+    DclkRate = Vop2CalcDclk(DclkOutRate,
+                  Vop2->Data->VpData->MaxDclk);
+    if (!DclkRate) {
+      DEBUG ((DEBUG_ERROR, "DP dclk_core out of range(max_dclk: %d KHZ, dclk_core: %ld KHZ)\n",
+              Vop2->Data->VpData->MaxDclk, DclkCoreRate));
+      return EFI_INVALID_PARAMETER;
+    }
+    *DclkOutDiv = DclkRate / DclkOutRate;
+    *DclkCoreDiv = DclkRate / DclkCoreRate;
   }
 
   *IfPixclkDiv = LogCalculate(*IfPixclkDiv);
@@ -1038,6 +1052,24 @@ Vop2IfConfig (
                   RK3588_GRF_HDMITX1_ENABLE_SHIFT, 1);
     Vop2GrfWrite (RK3588_VO1_GRF_BASE, RK3588_GRF_VO1_CON0, HDMI_SYNC_POL_MASK,
                   HDMI1_SYNC_POL_SHIFT, Val);
+  }
+
+  if (OutputIf & VOP_OUTPUT_IF_DP0) {
+    Vop2MaskWrite (Vop2->BaseAddress, RK3568_DSP_IF_EN, EN_MASK,
+                    RK3588_DP0_EN_SHIFT, 1, FALSE);
+    Vop2MaskWrite (Vop2->BaseAddress, RK3568_DSP_IF_EN, IF_MUX_MASK,
+                    RK3588_DP0_MUX_SHIFT, CrtcState->CrtcID, FALSE);
+    Vop2MaskWrite (Vop2->BaseAddress, RK3568_DSP_IF_POL, RK3588_IF_PIN_POL_MASK,
+                    RK3588_DP0_PIN_POL_SHIFT, Val, FALSE);
+  }
+
+  if (OutputIf & VOP_OUTPUT_IF_DP1) {
+    Vop2MaskWrite (Vop2->BaseAddress, RK3568_DSP_IF_EN, EN_MASK,
+                    RK3588_DP1_EN_SHIFT, 1, FALSE);
+    Vop2MaskWrite (Vop2->BaseAddress, RK3568_DSP_IF_EN, IF_MUX_MASK,
+                    RK3588_DP1_MUX_SHIFT, CrtcState->CrtcID, FALSE);
+    Vop2MaskWrite (Vop2->BaseAddress, RK3568_DSP_IF_POL, RK3588_IF_PIN_POL_MASK,
+                    RK3588_DP1_PIN_POL_SHIFT, Val, FALSE);
   }
 
   Vop2MaskWrite (Vop2->BaseAddress, RK3588_VP0_CLK_CTRL + VPOffset, 0x3,
