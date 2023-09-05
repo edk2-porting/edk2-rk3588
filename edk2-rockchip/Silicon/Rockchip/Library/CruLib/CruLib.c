@@ -73,6 +73,11 @@
 #define MIN_FOUT_FREQ    (24 * MHZ)
 #define MAX_FOUT_FREQ    (1600 * MHZ)
 
+#define RK3588_VCO_MIN_HZ   (2250UL * MHZ)
+#define RK3588_VCO_MAX_HZ   (4500UL * MHZ)
+#define RK3588_FOUT_MIN_HZ  (37UL * MHZ)
+#define RK3588_FOUT_MAX_HZ  (4500UL * MHZ)
+
 #define EXPONENT_OF_FRAC_PLL              24
 #define RK_PLL_MODE_SLOW                  0
 #define RK_PLL_MODE_NORMAL                1
@@ -270,6 +275,75 @@ static const struct PLL_CONFIG *CRU_PllGetSettings(struct PLL_SETUP *pSetup,
         return rateTable;
     }
 }
+
+static const struct PLL_CONFIG *CRU_PllV1SetByAuto(uint32_t fin_hz,
+                                                   uint32_t fout_hz)
+{
+    struct PLL_CONFIG *rate_table = &g_rockchipAutoTable;
+    uint32_t p, m, s;
+    uint64_t fvco, fref, fout, ffrac;
+
+    if (fin_hz == 0 || fout_hz == 0 || fout_hz == fin_hz)
+        return NULL;
+
+    if (fout_hz > RK3588_FOUT_MAX_HZ || fout_hz < RK3588_FOUT_MIN_HZ)
+        return NULL;
+
+    for (s = 0; s <= 6; s++) {
+        fvco = fout_hz << s;
+        if (fvco < RK3588_VCO_MIN_HZ ||
+            fvco > RK3588_VCO_MAX_HZ)
+            continue;
+        for (p = 1; p <= 4; p++) {
+            for (m = 64; m <= 1023; m++) {
+                if ((fvco >= m * fin_hz / p) && (fvco < (m + 1) * fin_hz / p)) {
+                    rate_table->p = p;
+                    rate_table->m = m;
+                    rate_table->s = s;
+                    fref = fin_hz / p;
+                    ffrac = fvco - (m * fref);
+                    fout = ffrac * 65536;
+                    rate_table->k = fout / fref;
+                    return rate_table;
+                }
+            }
+        }
+    }
+
+    DEBUG((DEBUG_ERROR, "%a: CANNOT FIND Fout by auto,fout = %lu\n", __func__, fout_hz));
+    return NULL;
+}
+
+/**
+ * @brief Get pll parameter by rateTable. (RK3588)
+ * @param  *pSetup: struct PLL_SETUP struct, Contains PLL register parameters
+ * @param  rate: pll target rate.
+ * @return struct PLL_CONFIG.
+ * How to calculate the PLL:
+ *     Look up the rateTable to get the PLL config parameter
+ */
+static const struct PLL_CONFIG *CRU_PllV1GetSettings(struct PLL_SETUP *pSetup,
+                                                     uint32_t rate)
+{
+    const struct PLL_CONFIG *rateTable = pSetup->rateTable;
+
+    if (rateTable == NULL) {
+        return CRU_PllV1SetByAuto(PLL_INPUT_OSC_RATE, rate);
+    }
+
+    while (rateTable->rate) {
+        if (rateTable->rate == rate) {
+            break;
+        }
+        rateTable++;
+    }
+    if (rateTable->rate != rate) {
+        return CRU_PllV1SetByAuto(PLL_INPUT_OSC_RATE, rate);
+    } else {
+        return rateTable;
+    }
+}
+
 /** @} */
 /********************* Public Function Definition ****************************/
 
@@ -484,13 +558,13 @@ HAL_Status HAL_CRU_SetPllV1Freq(struct PLL_SETUP *pSetup, uint32_t rate)
 
     if (rate == HAL_CRU_GetPllV1Freq(pSetup)) {
         return HAL_OK;
-    } else if (rate < MIN_FOUT_FREQ) {
+    } else if (rate < RK3588_FOUT_MIN_HZ) {
         return HAL_INVAL;
-    } else if (rate > MAX_FOUT_FREQ) {
+    } else if (rate > RK3588_FOUT_MAX_HZ) {
         return HAL_INVAL;
     }
 
-    pConfig = CRU_PllGetSettings(pSetup, rate);
+    pConfig = CRU_PllV1GetSettings(pSetup, rate);
     if (!pConfig) {
         return HAL_ERROR;
     }
