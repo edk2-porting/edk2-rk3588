@@ -1396,7 +1396,7 @@ Vop2SetClk (
 
   HAL_CRU_ClkSetFreq (DCLK_VOP2_SRC, Rate);
 
-  DEBUG ((DEBUG_ERROR, "%a: V0PLL=%lu, DCLK_VOP2_SRC=%lu\n",
+  DEBUG ((DEBUG_INFO, "%a: V0PLL=%lu, DCLK_VOP2_SRC=%lu\n",
           __func__, HAL_CRU_ClkGetFreq (PLL_V0PLL), HAL_CRU_ClkGetFreq (DCLK_VOP2_SRC)));
 
   return EFI_SUCCESS;
