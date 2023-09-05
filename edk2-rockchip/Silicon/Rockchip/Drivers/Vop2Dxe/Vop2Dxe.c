@@ -14,6 +14,7 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/RockchipDisplayLib.h>
+#include <Library/CruLib.h>
 
 #include <Library/MediaBusFormat.h>
 #include <Library/DrmModes.h>
@@ -1383,24 +1384,20 @@ Vop2PostConfig (
 STATIC
 EFI_STATUS
 Vop2SetClk (
+  IN UINT32                                CrtcId,
   IN UINT64                                Rate
 )
 {
-  if (Rate == 148500000) {
-    MmioWrite32(0xfD7C0160, 0xFFFF00C6);
-    MmioWrite32(0xfD7C0164, 0xFFFF0082);
-    MmioWrite32(0xfD7C0280, 0xFFFF0155);
-    MmioWrite32(0xfD7C04C0, 0xFFFF0043);
-    MmioWrite32(0xfD7C04C4, 0xFFFF0005);
-    } else if (Rate == 200000000) {
-    MmioWrite32(0xfD7C0160, 0xFFFF00C8);
-    MmioWrite32(0xfD7C0164, 0xFFFF0082);
-    MmioWrite32(0xfD7C0280, 0xFFFF0155);
-    MmioWrite32(0xfD7C04BC, 0xFFFF0201);
-    MmioWrite32(0xfD7C04C0, 0xFFFF0042);
-  } else {
-    return EFI_INVALID_PARAMETER;
-  }
+  /* only support VP2 for now */
+  ASSERT (CrtcId == 2);
+
+  /* CRU_MODE_CON00: set clock modes */
+  MmioWrite32(CRU_BASE + 0x0280, 0xFFFF0155);
+
+  HAL_CRU_ClkSetFreq (DCLK_VOP2_SRC, Rate);
+
+  DEBUG ((DEBUG_ERROR, "%a: V0PLL=%lu, DCLK_VOP2_SRC=%lu\n",
+          __func__, HAL_CRU_ClkGetFreq (PLL_V0PLL), HAL_CRU_ClkGetFreq (DCLK_VOP2_SRC)));
 
   return EFI_SUCCESS;
 }
@@ -1637,7 +1634,7 @@ Vop2Init (
   Vop2TVConfigUpdate (DisplayState, Vop2);
   Vop2PostConfig (DisplayState, Vop2);
 
-  Vop2SetClk (DclkRate * 1000);
+  Vop2SetClk (CrtcState->CrtcID, DclkRate * 1000);
 
   Vop2MaskWrite (Vop2->BaseAddress, RK3568_SYS_CTRL_LINE_FLAG0 + LineFlagOffset, LINE_FLAG_NUM_MASK,
                  RK3568_DSP_LINE_FLAG_NUM0_SHIFT, ActEnd, FALSE);

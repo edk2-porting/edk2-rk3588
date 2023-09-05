@@ -179,6 +179,10 @@ HAL_CRU_ClkGetFreq(eCLOCK_Name clockName)
         s_cpllFreq = HAL_CRU_GetPllV1Freq(&CPLL);
     }
 
+    if (!s_v0pllFreq) {
+        s_v0pllFreq = HAL_CRU_GetPllV1Freq(&V0PLL);
+    }
+
     switch (clockName) {
     case PLL_LPLL:
         freq = HAL_CRU_GetPllV1Freq(&LPLL);
@@ -251,6 +255,11 @@ HAL_CRU_ClkGetFreq(eCLOCK_Name clockName)
         } else if (HAL_CRU_ClkGetMux(clkMux) == 1) {
              return s_ppllFreq / HAL_CRU_ClkGetDiv(clkDiv) ;
         }
+
+    case DCLK_VOP2_SRC:
+        ASSERT (HAL_CRU_ClkGetMux(clkMux) == 2);
+        pRate = s_v0pllFreq;
+        break;
     default:
         break;
     }
@@ -267,6 +276,8 @@ HAL_CRU_ClkGetFreq(eCLOCK_Name clockName)
 
     return freq;
 }
+
+#define RK3588_VOP_PLL_LIMIT_FREQ 600000000
 
 /**
  * @brief Set clk freq.
@@ -286,6 +297,10 @@ HAL_CRU_ClkSetFreq(eCLOCK_Name clockName, uint32_t rate)
 
     if (!s_cpllFreq) {
         s_cpllFreq = HAL_CRU_GetPllV1Freq(&CPLL);
+    }
+
+    if (!s_v0pllFreq) {
+        s_v0pllFreq = HAL_CRU_GetPllV1Freq(&V0PLL);
     }
 
     switch (clockName) {
@@ -370,6 +385,18 @@ HAL_CRU_ClkSetFreq(eCLOCK_Name clockName, uint32_t rate)
         }
         return HAL_OK;
 
+    case DCLK_VOP2_SRC:
+        HAL_CRU_ClkSetMux(clkMux, 2);
+
+        if (s_v0pllFreq >= RK3588_VOP_PLL_LIMIT_FREQ && s_v0pllFreq % rate == 0) {
+            div = HAL_DIV_ROUND_UP(s_v0pllFreq, rate);
+            HAL_CRU_ClkSetDiv(clkDiv, div);
+        } else {
+            div = HAL_DIV_ROUND_UP(RK3588_VOP_PLL_LIMIT_FREQ, rate);
+            HAL_CRU_ClkSetDiv(clkDiv, div);
+            error = HAL_CRU_ClkSetFreq(PLL_V0PLL, div * rate);
+        }
+        return error;
     default:
         break;
     }

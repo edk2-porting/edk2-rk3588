@@ -24,6 +24,7 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   Silicon/Rockchip/RockchipPkg.dec
+  Silicon/Rockchip/RK3588/RK3588.dec
 
 [LibraryClasses]
   TimerLib
@@ -33,6 +34,7 @@
   MemoryAllocationLib
   RockchipDisplayLib
   UefiDriverEntryPoint
+  CruLib
 
 [Protocols]
   gRockchipCrtcProtocolGuid
