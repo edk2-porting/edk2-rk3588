@@ -159,7 +159,8 @@ GpioPinSetDirection (
   IN GPIO_PIN_DIRECTION Direction
   )
 {
-    DEBUG((DEBUG_INFO, "GpioPinSetDirection Group:%d Pin:%d\n", Group, Pin));
+    DEBUG((DEBUG_INFO, "GpioPinSetDirection Group:%d Pin:%d Direction:%d\n", 
+           Group, Pin, Direction));
     MmioWrite32 (GPIO_BASE (Group) + GPIO_SWPORT_DDR (Pin),
                  GPIO_WRITE_MASK (Pin) | GPIO_VALUE_MASK (Pin, Direction));
 }
@@ -171,7 +172,8 @@ GpioPinWrite (
   IN BOOLEAN Value
   )
 {
-    DEBUG((DEBUG_INFO, "GpioPinWrite Group:%d Pin:%d\n", Group, Pin));
+    DEBUG((DEBUG_VERBOSE, "GpioPinWrite Group:%d Pin:%d Value:%d\n", 
+           Group, Pin, Value));
     MmioWrite32 (GPIO_BASE (Group) + GPIO_SWPORT_DR (Pin),
                  GPIO_WRITE_MASK (Pin) | GPIO_VALUE_MASK (Pin, Value));
 }
