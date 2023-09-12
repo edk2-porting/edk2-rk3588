@@ -190,8 +190,9 @@ BlinkLedSync (
 
     gBS->Stall (MILLIS_TO_MICROS(PatternDelayMs));
 
-    if (RepeatIndex != REPEAT_INFINITE)
+    if (RepeatCount != REPEAT_INFINITE) {
       RepeatIndex++;
+    }
   }
 
   if (ContinueWithIdlePattern) {
