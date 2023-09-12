@@ -639,6 +639,11 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
   MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 
   #
+  # RAM Disk Support
+  #
+  MdeModulePkg/Universal/Disk/RamDiskDxe/RamDiskDxe.inf
+
+  #
   # UEFI Network Stack
   #
 !include NetworkPkg/Network.dsc.inc
