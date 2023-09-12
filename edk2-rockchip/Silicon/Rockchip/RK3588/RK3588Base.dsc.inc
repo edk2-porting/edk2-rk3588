@@ -54,6 +54,9 @@
   #
   # Default peripheral support flags
   #
+!ifndef RK_STATUS_LED_ENABLE
+  DEFINE RK_STATUS_LED_ENABLE       = TRUE
+!endif
 !ifndef RK_NOR_FLASH_ENABLE
   DEFINE RK_NOR_FLASH_ENABLE        = TRUE
 !endif

@@ -136,6 +136,18 @@ PwmFanSetSpeed(
 
 VOID
 EFIAPI
+PlatformInitLeds (
+  VOID
+  );
+
+VOID
+EFIAPI
+PlatformSetStatusLed (
+  IN BOOLEAN Enable
+  );
+
+VOID
+EFIAPI
 PlatformEarlyInit (
   VOID
   );

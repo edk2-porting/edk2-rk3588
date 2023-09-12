@@ -319,11 +319,29 @@ PwmFanSetSpeed(
 
 VOID
 EFIAPI
+PlatformInitLeds (
+  VOID
+  )
+{
+  /* Power button LED used as status indicator */
+  GpioPinWrite (3, GPIO_PIN_PB7, FALSE);
+  GpioPinSetDirection (3, GPIO_PIN_PB7, GPIO_PIN_OUTPUT);
+}
+
+VOID
+EFIAPI
+PlatformSetStatusLed (
+  IN BOOLEAN Enable
+  )
+{
+  GpioPinWrite (3, GPIO_PIN_PB7, Enable);
+}
+
+VOID
+EFIAPI
 PlatformEarlyInit (
   VOID
   )
 {
-  /* Enable power LED */
-  GpioPinWrite (3, GPIO_PIN_PB7, TRUE);
-  GpioPinSetDirection (3, GPIO_PIN_PB7, GPIO_PIN_OUTPUT);
+
 }

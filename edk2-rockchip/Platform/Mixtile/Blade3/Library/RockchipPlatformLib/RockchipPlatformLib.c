@@ -302,6 +302,24 @@ PwmFanSetSpeed(
 
 VOID
 EFIAPI
+PlatformInitLeds (
+  VOID
+  )
+{
+  // No controllable LEDs on this platform
+}
+
+VOID
+EFIAPI
+PlatformSetStatusLed (
+  IN BOOLEAN Enable
+  )
+{
+  // No controllable LEDs on this platform
+}
+
+VOID
+EFIAPI
 PlatformEarlyInit (
   VOID
   )

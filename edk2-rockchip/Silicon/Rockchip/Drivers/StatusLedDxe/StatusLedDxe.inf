@@ -1,0 +1,41 @@
+#/** @file
+#
+#  Platform Status LED controller
+#
+#  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = StatusLedDxe
+  FILE_GUID                      = b1f3fd14-9bd1-48cc-9258-e2807ecb1b84
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = StatusLedDxeInitialize
+
+[Sources.common]
+  StatusLedDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  Silicon/Rockchip/RockchipPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiLib
+  UefiBootServicesTableLib
+  RockchipPlatformLib
+
+[Pcd]
+
+[Protocols]
+
+[Guids]
+  gEfiEventExitBootServicesGuid
+  gRockchipEventPlatformBmAfterConsoleGuid
+
+[Depex]
+  TRUE

@@ -290,6 +290,26 @@ PwmFanSetSpeed(
 
 VOID
 EFIAPI
+PlatformInitLeds (
+  VOID
+  )
+{
+  /* Status indicator */
+  GpioPinWrite (1, GPIO_PIN_PA2, FALSE);
+  GpioPinSetDirection (1, GPIO_PIN_PA2, GPIO_PIN_OUTPUT);
+}
+
+VOID
+EFIAPI
+PlatformSetStatusLed (
+  IN BOOLEAN Enable
+  )
+{
+  GpioPinWrite (1, GPIO_PIN_PA2, Enable);
+}
+
+VOID
+EFIAPI
 PlatformEarlyInit (
   VOID
   )

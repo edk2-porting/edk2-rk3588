@@ -284,6 +284,30 @@ PwmFanSetSpeed(
 
 VOID
 EFIAPI
+PlatformInitLeds (
+  VOID
+  )
+{
+  /* Red off, Green for status, Blue for power */
+  GpioPinWrite (4, GPIO_PIN_PB4, FALSE);
+  GpioPinSetDirection (4, GPIO_PIN_PB4, GPIO_PIN_OUTPUT);
+  GpioPinWrite (4, GPIO_PIN_PB2, FALSE);
+  GpioPinSetDirection (4, GPIO_PIN_PB2, GPIO_PIN_OUTPUT);
+  GpioPinWrite (4, GPIO_PIN_PB3, TRUE);
+  GpioPinSetDirection (4, GPIO_PIN_PB3, GPIO_PIN_OUTPUT);
+}
+
+VOID
+EFIAPI
+PlatformSetStatusLed (
+  IN BOOLEAN Enable
+  )
+{
+  GpioPinWrite (4, GPIO_PIN_PB2, Enable);
+}
+
+VOID
+EFIAPI
 PlatformEarlyInit (
   VOID
   )

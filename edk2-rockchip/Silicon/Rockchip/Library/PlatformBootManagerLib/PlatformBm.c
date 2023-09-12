@@ -1150,6 +1150,8 @@ PlatformBootManagerAfterConsole (
   UINTN                         PosY;
   EFI_INPUT_KEY                 Key;
 
+  EfiEventGroupSignal (&gRockchipEventPlatformBmAfterConsoleGuid);
+
   FirmwareVerLength = StrLen (PcdGetPtr (PcdFirmwareVersionString));
 
   //

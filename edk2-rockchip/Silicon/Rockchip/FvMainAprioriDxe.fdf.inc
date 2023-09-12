@@ -6,4 +6,8 @@
 #
 ##
 
+!if $(RK_STATUS_LED_ENABLE) == TRUE
+  INF Silicon/Rockchip/Drivers/StatusLedDxe/StatusLedDxe.inf
+!endif
+
   INF MdeModulePkg/Universal/PCD/Dxe/Pcd.inf

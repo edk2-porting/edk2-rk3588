@@ -27,6 +27,9 @@
   FLASH_DEFINITION               = Silicon/Rockchip/RK3588/RK3588.fdf
   RK_PLATFORM_FVMAIN_MODULES     = $(PLATFORM_DIRECTORY)/$(PLATFORM_NAME).Modules.fdf.inc
 
+  # No status LED on this platform.
+  DEFINE RK_STATUS_LED_ENABLE = FALSE
+
   #
   # RK3588-based platform
   #

@@ -483,6 +483,13 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
   }
 
   #
+  # Status LED support
+  #
+!if $(RK_STATUS_LED_ENABLE) == TRUE
+  Silicon/Rockchip/Drivers/StatusLedDxe/StatusLedDxe.inf
+!endif
+
+  #
   # Non-volatile FVB support
   #
 !if $(RK_NOR_FLASH_ENABLE) == TRUE
