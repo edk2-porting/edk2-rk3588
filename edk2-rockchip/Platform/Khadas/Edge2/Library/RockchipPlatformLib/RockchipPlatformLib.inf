@@ -19,6 +19,7 @@
   MdeModulePkg/MdeModulePkg.dec
   Silicon/Rockchip/RK3588/RK3588.dec
   Silicon/Rockchip/RockchipPkg.dec
+  Platform/Khadas/KhadasPkg.dec
 
 [LibraryClasses]
   ArmLib
@@ -28,7 +29,12 @@
   SerialPortLib
   CruLib
   GpioLib
+  UefiLib
+  UefiBootServicesTableLib
 
 [Sources.common]
   RockchipPlatformLib.c
   $(RKPLATLIB_COMMON_DIR)/RK3588CruLib.c
+
+[Protocols]
+  gKhadasMcuProtocolGuid

@@ -11,3 +11,6 @@
 
   # Splash screen logo
   INF $(VENDOR_DIRECTORY)/Drivers/LogoDxe/LogoDxe.inf
+
+  # Khadas MCU Support
+  INF $(VENDOR_DIRECTORY)/Drivers/KhadasMcuDxe/KhadasMcuDxe.inf

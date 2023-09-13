@@ -1,17 +1,28 @@
 /** @file
 *
 *  Copyright (c) 2021, Rockchip Limited. All rights reserved.
+*  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
 *
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
 **/
+
 #include <Base.h>
+#include <Uefi.h>
+#include <Library/UefiLib.h>
+#include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>
 #include <Library/IoLib.h>
 #include <Library/GpioLib.h>
 #include <Library/RK806.h>
 #include <Library/Rk3588Pcie.h>
 #include <Soc.h>
+
+#include <Protocol/KhadasMcu.h>
+
+STATIC VOID                   *mKhadasMcuEventRegistration;
+STATIC KHADAS_MCU_PROTOCOL    *mKhadasMcu;
+STATIC UINT8                  mTargetFanSpeed;
 
 static struct regulator_init_data rk806_init_data[] = {
   /* Master PMIC */
@@ -266,20 +277,71 @@ PciePeReset (
   }
 }
 
+STATIC
 VOID
-EFIAPI
-PwmFanIoSetup(
-  VOID
-)
+KhadasMcuRegistrationEventHandler (
+  IN  EFI_EVENT       Event,
+  IN  VOID            *Context
+  )
 {
+  EFI_HANDLE     Handle;
+  UINTN          BufferSize;
+  EFI_STATUS     Status;
+
+  BufferSize = sizeof (EFI_HANDLE);
+  Status = gBS->LocateHandle (
+                    ByRegisterNotify,
+                    NULL,
+                    mKhadasMcuEventRegistration,
+                    &BufferSize,
+                    &Handle);
+  if (EFI_ERROR (Status)) {
+    if (Status != EFI_NOT_FOUND) {
+      DEBUG ((DEBUG_WARN, "%a: Failed to locate gKhadasMcuProtocol. Status=%r\n",
+              __func__, Status));
+    }
+    return;
+  }
+
+  Status = gBS->HandleProtocol (Handle,
+              &gKhadasMcuProtocolGuid, (VOID **) &mKhadasMcu);
+  ASSERT_EFI_ERROR (Status);
+
+  PwmFanSetSpeed (mTargetFanSpeed);
+
+  gBS->CloseEvent (Event);
 }
 
 VOID
 EFIAPI
-PwmFanSetSpeed(
-  UINT32 Percentage
-)
+PwmFanIoSetup (
+  VOID
+  )
 {
+  EfiCreateProtocolNotifyEvent (
+          &gKhadasMcuProtocolGuid,
+          TPL_CALLBACK,
+          KhadasMcuRegistrationEventHandler,
+          NULL,
+          &mKhadasMcuEventRegistration);
+}
+
+VOID
+EFIAPI
+PwmFanSetSpeed (
+  UINT32 Percentage
+  )
+{
+  mTargetFanSpeed = (UINT8) Percentage;
+
+  //
+  // If the protocol is installed, set the speed now.
+  // Otherwise it will be set by KhadasMcuRegistrationEventHandler
+  // when ready.
+  //
+  if (mKhadasMcu != NULL) {
+    mKhadasMcu->SetFanSpeedPercentage (mKhadasMcu, mTargetFanSpeed);
+  }
 }
 
 VOID

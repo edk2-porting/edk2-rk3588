@@ -1,0 +1,48 @@
+#/** @file
+#
+#  Khadas MCU platform driver
+#
+#  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = KhadasMcuDxe
+  FILE_GUID                      = a9d195e1-85a0-426f-b364-413e6d2350a7
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = KhadasMcuDxeInitialize
+
+[Sources.common]
+  KhadasMcuDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Platform/Khadas/KhadasPkg.dec
+  Silicon/Rockchip/RockchipPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  DebugLib
+  PcdLib
+  UefiLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiI2cIoProtocolGuid           ## CONSUMES
+  gEfiDriverBindingProtocolGuid   ## PRODUCES
+  gKhadasMcuProtocolGuid          ## PRODUCES
+
+[Pcd]
+  gKhadasTokenSpaceGuid.PcdKhadasMcuAddress
+  gKhadasTokenSpaceGuid.PcdKhadasMcuBus
+
+[Depex]
+  TRUE

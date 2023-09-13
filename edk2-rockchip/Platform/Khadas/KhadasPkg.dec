@@ -1,0 +1,26 @@
+## @file
+#
+#  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = KhadasPkg
+  PACKAGE_GUID                   = 7a5b60db-89a8-4749-b4e7-e093197595c2
+  PACKAGE_VERSION                = 0.1
+
+[Includes]
+  Include
+
+[Protocols]
+  gKhadasMcuProtocolGuid = { 0x162d2a6e, 0x33af, 0x4ca5, { 0xaa, 0x68, 0xbc, 0xd3, 0xb2, 0x4c, 0xca, 0xf5 } }
+
+[Guids]
+  gKhadasTokenSpaceGuid = { 0x2f92c2cf, 0x0e93, 0x45c9, { 0xae, 0x30, 0x38, 0x46, 0x4d, 0x3f, 0xde, 0x8a } }
+
+[PcdsFixedAtBuild]
+  gKhadasTokenSpaceGuid.PcdKhadasMcuAddress|0|UINT8|0x00000001
+  gKhadasTokenSpaceGuid.PcdKhadasMcuBus|0|UINT8|0x00000002
