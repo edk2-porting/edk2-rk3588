@@ -300,39 +300,35 @@ OnEndOfDxe (
   IN VOID       *Context
   )
 {
-  I2C_DEVICE_PATH        *DevicePath;
-  EFI_DEVICE_PATH_PROTOCOL  *DevicePathPointer;
-  EFI_HANDLE                DeviceHandle;
-  EFI_STATUS                Status;
+  EFI_STATUS    Status;
+  EFI_HANDLE    *Handles;
+  UINTN         HandleCount;
+  UINTN         Index;
 
   gBS->CloseEvent (Event);
 
-  DevicePath = AllocateCopyPool (sizeof (I2cDevicePathProtocol),
-                 &I2cDevicePathProtocol);
-  if (DevicePath == NULL) {
-    DEBUG ((DEBUG_ERROR, "I2cDxe: I2C device path allocation failed\n"));
+  Status = gBS->LocateHandleBuffer (
+                  ByProtocol,
+                  &gEfiI2cMasterProtocolGuid,
+                  NULL,
+                  &HandleCount,
+                  &Handles
+                  );
+  if (EFI_ERROR(Status)) {
+    DEBUG((DEBUG_WARN, "%a: Couldn't locate gEfiI2cMasterProtocolGuid. Status=%r\n",
+            __func__, Status));
     return;
   }
 
-  do {
-    DevicePathPointer = (EFI_DEVICE_PATH_PROTOCOL *)DevicePath;
-    Status = gBS->LocateDevicePath (&gEfiI2cMasterProtocolGuid,
-                                    &DevicePathPointer,
-                                    &DeviceHandle);
-    if (EFI_ERROR (Status)) {
-      break;
+  for (Index = 0; Index < HandleCount; Index++) {
+    Status = gBS->ConnectController (Handles[Index], NULL, NULL, TRUE);
+    if (EFI_ERROR(Status)) {
+      DEBUG ((DEBUG_ERROR, "%a: ConnectController () failed. Status=%r\n",
+              __func__, Status));
     }
+  }
 
-    Status = gBS->ConnectController (DeviceHandle, NULL, NULL, TRUE);
-    DEBUG ((DEBUG_INFO,
-      "%a: ConnectController () returned %r\n",
-      __FUNCTION__,
-      Status));
-
-    DevicePath->Instance++;
-  } while (TRUE);
-
-  gBS->FreePool (DevicePath);
+  gBS->FreePool (Handles);
 }
 
 EFI_STATUS
