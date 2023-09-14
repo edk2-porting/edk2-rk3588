@@ -1,7 +1,6 @@
 [submodule "edk2"]
 	path = edk2
 	url = https://github.com/tianocore/edk2.git
-	branch = edk2-stable202302
 [submodule "edk2-non-osi"]
 	path = edk2-non-osi
 	url = https://github.com/tianocore/edk2-non-osi.git
