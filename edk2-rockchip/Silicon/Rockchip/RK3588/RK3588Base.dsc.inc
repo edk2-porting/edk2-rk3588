@@ -305,7 +305,7 @@
   # Cooling Fan
   #
   gRK3588TokenSpaceGuid.PcdCoolingFanState|L"CoolingFanState"|gRK3588DxeFormSetGuid|0x0|1
-  gRK3588TokenSpaceGuid.PcdCoolingFanSpeed|L"CoolingFanSpeed"|gRK3588DxeFormSetGuid|0x0|100
+  gRK3588TokenSpaceGuid.PcdCoolingFanSpeed|L"CoolingFanSpeed"|gRK3588DxeFormSetGuid|0x0|50
 
   #
   # USB/DP PHY

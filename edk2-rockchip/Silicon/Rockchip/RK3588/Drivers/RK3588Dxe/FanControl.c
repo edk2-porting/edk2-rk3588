@@ -52,7 +52,7 @@ SetupCoolingFanVariables (
                             &gRK3588DxeFormSetGuid,
                             NULL, &Size, &Var32);
   if (EFI_ERROR (Status)) {
-    Status = PcdSet32S (PcdCoolingFanSpeed, 100);
+    Status = PcdSet32S (PcdCoolingFanSpeed, FAN_PERCENTAGE_DEFAULT);
     ASSERT_EFI_ERROR (Status);
   }
 }

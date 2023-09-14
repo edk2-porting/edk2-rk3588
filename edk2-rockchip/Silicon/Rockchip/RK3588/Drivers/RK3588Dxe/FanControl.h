@@ -12,7 +12,7 @@
 #define FAN_PERCENTAGE_MIN           0
 #define FAN_PERCENTAGE_MAX           100
 #define FAN_PERCENTAGE_STEP          1
-#define FAN_PERCENTAGE_DEFAULT       100
+#define FAN_PERCENTAGE_DEFAULT       50
 
 //
 // Don't declare these in the VFR file.
