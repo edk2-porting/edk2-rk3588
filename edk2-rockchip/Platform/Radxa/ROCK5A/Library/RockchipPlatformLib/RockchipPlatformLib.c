@@ -281,23 +281,23 @@ PWM_DATA pwm_data = {
 
 VOID
 EFIAPI
-PwmFanIoSetup(
+PwmFanIoSetup (
   VOID
-)
+  )
 {
   GpioPinSetFunction (3, GPIO_PIN_PB2, 0xB); // PWM3_IR_M1
-  RkPwmSetConfig(&pwm_data);
-  RkPwmEnable(&pwm_data);
+  RkPwmSetConfig (&pwm_data);
+  RkPwmEnable (&pwm_data);
 }
 
 VOID
 EFIAPI
-PwmFanSetSpeed(
-  UINT32 Percentage
-)
+PwmFanSetSpeed (
+  IN UINT32 Percentage
+  )
 {
   pwm_data.DutyNs = pwm_data.PeriodNs * Percentage / 100;
-  RkPwmSetConfig(&pwm_data);
+  RkPwmSetConfig (&pwm_data);
 }
 
 VOID

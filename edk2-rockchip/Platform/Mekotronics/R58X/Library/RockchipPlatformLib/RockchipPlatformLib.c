@@ -343,17 +343,17 @@ PciePeReset (
 
 VOID
 EFIAPI
-PwmFanIoSetup(
+PwmFanIoSetup (
   VOID
-)
+  )
 {
 }
 
 VOID
 EFIAPI
-PwmFanSetSpeed(
-  UINT32 Percentage
-)
+PwmFanSetSpeed (
+  IN UINT32 Percentage
+  )
 {
 }
 

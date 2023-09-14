@@ -11,6 +11,7 @@
 #include <Library/GpioLib.h>
 #include <Library/RK806.h>
 #include <Library/Rk3588Pcie.h>
+#include <Library/PWMLib.h>
 #include <Soc.h>
 
 static struct regulator_init_data rk806_init_data[] = {
@@ -237,20 +238,33 @@ PciePeReset (
   }
 }
 
+PWM_DATA pwm_data = {
+  .ControllerID = PWM_CONTROLLER2,
+  .ChannelID = PWM_CHANNEL3,
+  .PeriodNs = 4000000,
+  .DutyNs = 4000000,
+  .Polarity = FALSE,
+}; // PWM2_CH3
+
 VOID
 EFIAPI
-PwmFanIoSetup(
+PwmFanIoSetup (
   VOID
-)
+  )
 {
+  GpioPinSetFunction (4, GPIO_PIN_PB4, 0xB); // PWM11_IR_M1
+  RkPwmSetConfig (&pwm_data);
+  RkPwmEnable (&pwm_data);
 }
 
 VOID
 EFIAPI
-PwmFanSetSpeed(
-  UINT32 Percentage
-)
+PwmFanSetSpeed (
+  IN UINT32 Percentage
+  )
 {
+  pwm_data.DutyNs = pwm_data.PeriodNs * Percentage / 100;
+  RkPwmSetConfig (&pwm_data);
 }
 
 VOID

@@ -11,6 +11,7 @@
 #include <Library/GpioLib.h>
 #include <Library/RK806.h>
 #include <Library/Rk3588Pcie.h>
+#include <Library/PWMLib.h>
 #include <Soc.h>
 #include <Library/UefiBootServicesTableLib.h>
 
@@ -299,20 +300,33 @@ PciePeReset (
   }
 }
 
+PWM_DATA pwm_data = {
+  .ControllerID = PWM_CONTROLLER2,
+  .ChannelID = PWM_CHANNEL3,
+  .PeriodNs = 50000,
+  .DutyNs = 50000,
+  .Polarity = TRUE,
+}; // PWM2_CH3
+
 VOID
 EFIAPI
-PwmFanIoSetup(
+PwmFanIoSetup (
   VOID
-)
+  )
 {
+  GpioPinSetFunction (3, GPIO_PIN_PD5, 0xB); // PWM11_IR_M3
+  RkPwmSetConfig (&pwm_data);
+  RkPwmEnable (&pwm_data);
 }
 
 VOID
 EFIAPI
-PwmFanSetSpeed(
-  UINT32 Percentage
-)
+PwmFanSetSpeed (
+  IN UINT32 Percentage
+  )
 {
+  pwm_data.DutyNs = pwm_data.PeriodNs * Percentage / 100;
+  RkPwmSetConfig (&pwm_data);
 }
 
 VOID
