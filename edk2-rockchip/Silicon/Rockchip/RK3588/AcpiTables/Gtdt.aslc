@@ -12,6 +12,8 @@
 #include <Library/PcdLib.h>
 #include <IndustryStandard/Acpi.h>
 
+#include "AcpiTables.h"
+
 #define GTDT_GLOBAL_FLAGS_MAPPED      EFI_ACPI_5_0_GTDT_GLOBAL_FLAG_MEMORY_MAPPED_BLOCK_PRESENT
 #define GTDT_GLOBAL_FLAGS_NOT_MAPPED  0
 #define GTDT_GLOBAL_FLAGS_EDGE        EFI_ACPI_5_0_GTDT_GLOBAL_FLAG_INTERRUPT_MODE
@@ -32,24 +34,6 @@
 
 #define GTDT_GTIMER_FLAGS           (GTDT_TIMER_ACTIVE_LOW | GTDT_TIMER_LEVEL_TRIGGERED)
 
-#define EFI_ACPI_ARM_OEM_ID           'A','R','M','L','T','D'   // OEMID 6 bytes long
-#define EFI_ACPI_ARM_OEM_TABLE_ID     SIGNATURE_64('A','R','M','-','J','U','N','O') // OEM table id 8 bytes long
-#define EFI_ACPI_ARM_OEM_REVISION     0x20140727
-#define EFI_ACPI_ARM_CREATOR_ID       SIGNATURE_32('A','R','M',' ')
-#define EFI_ACPI_ARM_CREATOR_REVISION 0x00000099
-
-#define ARM_ACPI_HEADER(Signature, Type, Revision) {              \
-      Signature,		      /* UINT32  Signature */	    \
-      sizeof (Type),		      /* UINT32  Length */	    \
-      Revision, 		      /* UINT8	 Revision */	    \
-      0,			      /* UINT8	 Checksum */	    \
-      { EFI_ACPI_ARM_OEM_ID },	      /* UINT8	 OemId[6] */	    \
-      EFI_ACPI_ARM_OEM_TABLE_ID,      /* UINT64  OemTableId */	    \
-      EFI_ACPI_ARM_OEM_REVISION,      /* UINT32  OemRevision */     \
-      EFI_ACPI_ARM_CREATOR_ID,	      /* UINT32  CreatorId */	    \
-      EFI_ACPI_ARM_CREATOR_REVISION   /* UINT32  CreatorRevision */ \
-    }
-
 #pragma pack (1)
 
 typedef struct {
@@ -60,7 +44,7 @@ typedef struct {
 
 GENERIC_TIMER_DESCRIPTION_TABLE Gtdt = {
   {
-    ARM_ACPI_HEADER(
+    ACPI_HEADER(
       EFI_ACPI_5_1_GENERIC_TIMER_DESCRIPTION_TABLE_SIGNATURE,
       GENERIC_TIMER_DESCRIPTION_TABLE,
       EFI_ACPI_5_1_GENERIC_TIMER_DESCRIPTION_TABLE_REVISION

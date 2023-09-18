@@ -1,6 +1,6 @@
 /** @file
  *
- *  RPi defines for constructing ACPI tables
+ *  RK3588 defines for constructing ACPI tables
  *
  *  Copyright (c) 2020, Pete Batard <pete@akeo.ie>
  *  Copyright (c) 2019, ARM Ltd. All rights reserved.

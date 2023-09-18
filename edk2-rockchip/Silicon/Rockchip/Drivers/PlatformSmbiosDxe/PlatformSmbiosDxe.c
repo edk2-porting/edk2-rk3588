@@ -409,11 +409,7 @@ SMBIOS_TABLE_TYPE7 mCacheInfoType7_L1D = {
   0,                        // Cache Speed unknown
   CacheErrorSingleBit,      // Error Correction
   CacheTypeData,            // System Cache Type
-#if (RPI_MODEL == 4)
-  CacheAssociativity2Way    // Associativity
-#else
   CacheAssociativity4Way    // Associativity
-#endif
 };
 CHAR8  *mCacheInfoType7Strings_L1D[] = {
   "L1 Data",
