@@ -54,8 +54,9 @@
   RockchipPlatformLib
 
 [Protocols]
-  gRk860xRegulatorProtocolGuid                    ## CONSUMES
   gEfiVariableWriteArchProtocolGuid               ## CONSUMES
+  gEfiMemoryAttributeProtocolGuid                 ## CONSUMES
+  gRk860xRegulatorProtocolGuid                    ## CONSUMES
   gRockchipPlatformConfigAppliedProtocolGuid      ## PRODUCES
 
 [Pcd]

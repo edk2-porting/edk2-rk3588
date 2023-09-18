@@ -8,6 +8,7 @@
 **/
 
 #include <Uefi.h>
+#include <Protocol/MemoryAttribute.h>
 #include <Library/ArmLib.h>
 #include <Library/CacheMaintenanceLib.h>
 #include <Library/DebugLib.h>
@@ -404,6 +405,69 @@ RK3588NotifyReadyToBoot (
   gBS->CloseEvent (Event);
 }
 
+
+/**
+  This function uninstalls the recently added EFI_MEMORY_ATTRIBUTE_PROTOCOL
+  to workaround older versions of OS loaders/shims using it incorrectly and
+  throwing a Synchronous Exception.
+
+  See:
+    - https://github.com/microsoft/mu_silicon_arm_tiano/issues/124
+    - https://edk2.groups.io/g/devel/topic/99631663
+**/
+STATIC
+VOID
+EFIAPI
+UninstallMemoryAttributeProtocol (
+  VOID
+  )
+{
+  EFI_STATUS                      Status;
+  EFI_HANDLE                      *Handles;
+  UINTN                           HandleCount;
+  EFI_MEMORY_ATTRIBUTE_PROTOCOL   *MemoryAttributeProtocol;
+
+  Status = gBS->LocateHandleBuffer (
+                  ByProtocol,
+                  &gEfiMemoryAttributeProtocolGuid,
+                  NULL,
+                  &HandleCount,
+                  &Handles
+                  );
+  ASSERT_EFI_ERROR (Status);
+  ASSERT (HandleCount == 1);
+
+  Status = gBS->HandleProtocol (
+                  Handles[0],
+                  &gEfiMemoryAttributeProtocolGuid,
+                  (VOID **)&MemoryAttributeProtocol
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  Status = gBS->UninstallMultipleProtocolInterfaces (
+                  Handles[0],
+                  &gEfiMemoryAttributeProtocolGuid,
+                  MemoryAttributeProtocol,
+                  NULL
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  gBS->FreePool (Handles);
+}
+
+STATIC
+VOID
+EFIAPI
+RK3588NotifyEndOfDxe (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  gBS->CloseEvent (Event);
+
+  UninstallMemoryAttributeProtocol ();
+}
+
 EFI_STATUS
 EFIAPI
 RK3588EntryPoint (
@@ -413,7 +477,7 @@ RK3588EntryPoint (
 {
   EFI_STATUS            Status;
   VOID                  *EfiVariableArchRegistrationEvent;
-  EFI_EVENT             ReadyToBootEvent;
+  EFI_EVENT             Event;
 
   PlatformEarlyInit();
 
@@ -431,7 +495,15 @@ RK3588EntryPoint (
   Status = EfiCreateEventReadyToBootEx (TPL_CALLBACK,
                                         RK3588NotifyReadyToBoot,
                                         NULL,
-                                        &ReadyToBootEvent);
+                                        &Event);
+  ASSERT_EFI_ERROR (Status);
+
+  Status = gBS->CreateEventEx (EVT_NOTIFY_SIGNAL,
+                    TPL_CALLBACK,
+                    RK3588NotifyEndOfDxe,
+                    NULL,
+                    &gEfiEndOfDxeEventGroupGuid,
+                    &Event);
   ASSERT_EFI_ERROR (Status);
 
   Status = RK3588InitPeripherals ();
