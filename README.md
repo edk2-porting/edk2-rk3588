@@ -93,6 +93,8 @@ At this stage, you can press <kbd>Esc</kbd> to enter the firmware setup, <kbd>F1
 
 Check the [Supported peripherals](#supported-peripherals) and [Supported OSes](#supported-oses-with-acpi) sections to see what's currently possible with this firmware.
 
+Also check the configuration options described below, some of which may need to be changed depending on the OS used.
+
 If you experience any issues, please see the [Troubleshooting](#troubleshooting) section.
 
 ## Configuration settings
@@ -102,10 +104,12 @@ Configuration through the user interface is fairly straightforward and help info
 
 Configuration through the UEFI shell is more advanced and mostly useful for scripts. See [Setting configuration options via the shell](#setting-configuration-options-via-the-shell).
 
-#### Tips
-If you only wish to boot non-Windows OSes, go to the configuration menu -> `ACPI` and set `USB 2.0 Support` to `Enabled`, in order to get maximum speed from USB 2.0 ports.
+### Tips
+* If you only wish to boot non-Windows OSes, go to the configuration menu -> `ACPI` and set `USB 2.0 Support` to `Enabled`, in order to get maximum speed from USB 2.0 ports.
 
-Booting Windows with this option enabled will cause it to crash.
+  Booting Windows with this option enabled will cause it to crash.
+
+* CPU clocks are set to 816 MHz (boot default) on platforms without a cooling fan included. If you have adequate cooling, go to the configuration menu -> `CPU Performance` and set all Cluster Presets to `Maximum`.
 
 ## Updating the firmware
 If the storage is only used for UEFI and nothing else, simply download the latest image and flash it as described in the [Getting started](#getting-started) section.
