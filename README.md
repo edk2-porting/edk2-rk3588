@@ -145,25 +145,60 @@ If the LED:
 #### Nothing shows up on the screen
 Make sure you've flashed the firmware correctly and that it is the version designed for your device. In most cases this is the culprit.
 
-The display must support a resolution of at least 1080p at 60 Hz.
-
-If you're using HDMI and the system has two ports, only one will work. Try both.
-
-If you're using USB-C to DisplayPort, only one orientation of the USB-C connector will work. Check both.
+Assuming the firmware loads fine:
+* The display must support a resolution of at least 1080p at 60 Hz.
+* If you're using HDMI and the system has two ports, only one will work. Try both.
+* If you're using USB-C to DisplayPort, only one orientation of the USB-C connector will work. Check both.
 
 If you are not able to get any display output, the only way to interact with UEFI is via the [serial console](#advanced-troubleshooting).
 
 #### USB 3 devices do not work
-Try a different port.
-
-If you're using USB-C, 3.0 devices will only work in one orientation of the connector. Check both.
-
-This can also be a power issue.
+* Try a different port.
+* If you're using USB-C, 3.0 devices will only work in one orientation of the connector. Check both.
+* Make sure the power supply and cable are good
 
 #### Networking does not work
-Only Realtek PCIe and USB controllers are supported. Native Gigabit provided by RK3588 isn't.
+* Only Realtek PCIe and USB controllers are supported. Native Gigabit provided by RK3588 isn't.
 
-Some boards do not have a MAC address set at factory and will show-up as being all zeros in UEFI. There is no documented fix available yet. See [issue 42](https://github.com/edk2-porting/edk2-rk3588/issues/42) for more info.
+* Some boards with Realtek NICs do not have a MAC address set at factory and will show-up as being all zeros in UEFI, possibly preventing the adapter from obtaining an IP address.
+
+  You can easily fix this by writing the MAC address manually:
+
+  1. Boot into Linux and open up a terminal. The commands below apply to Armbian with legacy kernel.
+
+  2. Install the headers for your kernel version:
+      ```bash
+      sudo apt install -y linux-headers-legacy-rk35xx
+      ```
+
+  3. Clone Realtek PGTool and build the driver:
+      ```bash
+      git clone https://github.com/redchenjs/rtnicpg
+      cd rtnicpg
+      make
+      ```
+
+  4. Unload all Realtek modules and load the driver built above:
+      ```bash
+      sudo rmmod pgdrv
+      sudo ./pgload.sh
+      ```
+      Note: make sure there aren't any remaining Realtek modules loaded after this, except for the new `pgdrv`.<br> If you have `r8125` built-in, you might have to reboot with `initcall_blacklist=rtl8125_init_module` as a kernel parameter (in Grub).
+
+   5. Burn a MAC address into the eFuses:
+
+      For only one NIC:
+      ```bash
+      sudo ./rtnicpg-aarch64-linux-gnu /efuse /nodeid 00E04C001234
+      ```
+      For two or more:
+      ```bash
+      sudo ./rtnicpg-aarch64-linux-gnu /efuse /# 1 /nodeid 00E04C001234
+      sudo ./rtnicpg-aarch64-linux-gnu /efuse /# 2 /nodeid 00E04C001235
+      ```
+      `00E04C001234` is an example address. You can generate random and unique ones using: <https://www.macvendorlookup.com/mac-address-generator>
+
+  **Note:** the number of eFuses is limited, thus MAC addresses can only be changed a few times.
 
 ### Advanced troubleshooting
 The firmware will log detailed information to the serial console when using a debug version. See the [release notes](https://github.com/edk2-porting/edk2-rk3588/releases) for details on how to obtain this version.
