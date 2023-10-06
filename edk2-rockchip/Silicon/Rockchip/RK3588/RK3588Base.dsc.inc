@@ -350,6 +350,11 @@
   Silicon/Rockchip/RK3588/Drivers/GmacPlatformDxe/GmacPlatformDxe.inf
 
   #
+  # ACPI Support
+  #
+  Silicon/Rockchip/RK3588/Drivers/AcpiPlatformDxe/AcpiPlatformDxe.inf
+
+  #
   # Device Tree Support
   #
   Silicon/Rockchip/RK3588/Drivers/FdtPlatformDxe/FdtPlatformDxe.inf
