@@ -15,6 +15,7 @@ function _help(){
 	echo "	--clean, -C:             clean workspace and output."
 	echo "	--distclean, -D:         clean up all files that are not in repo."
 	echo "	--outputdir, -O:         output folder."
+	echo "	--build-flags:           flags appended to the EDK2 build process."
 	echo "	--help, -h:              show this help."
 	echo
 	exit "${1}"
@@ -119,6 +120,7 @@ function _build(){
 		-D FIRMWARE_VER="${GITCOMMIT}" \
 		-D ENABLE_SIMPLE_INIT="${BUILD_GUI}" \
 		-D CONFIG_SOC="${SOC}" \
+		${BUILD_FLAGS} \
 		||return "$?"
 
 	_pack
@@ -141,10 +143,11 @@ MODE=DEBUG
 CLEAN=false
 DISTCLEAN=false
 TOOLCHAIN=GCC
+BUILD_FLAGS=""
 export ROOTDIR OUTDIR
 export GEN_ROOTFS=true
 export BUILD_GUI=false
-OPTS="$(getopt -o t:d:haCDO:r -l toolchain:,device:,help,all,skip-rootfs-gen,gui,clean,distclean,outputdir:,release: -n 'build.sh' -- "$@")"||exit 1
+OPTS="$(getopt -o t:d:haCDO:r -l toolchain:,device:,help,all,skip-rootfs-gen,gui,clean,distclean,outputdir:,release:,build-flags: -n 'build.sh' -- "$@")"||exit 1
 eval set -- "${OPTS}"
 while true
 do	case "${1}" in
@@ -157,6 +160,7 @@ do	case "${1}" in
 		--gui) BUILD_GUI=true;shift;;
 		-r|--release) MODE="${2}";shift 2;;
 		-t|--toolchain) TOOLCHAIN="${2}";shift 2;;
+		--build-flags) BUILD_FLAGS="${2}";shift 2;;
 		-h|--help) _help 0;shift;;
 		--) shift;break;;
 		*) _help 1;;
