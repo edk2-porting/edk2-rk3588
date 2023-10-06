@@ -37,8 +37,11 @@ function _build_idblock(){
 	FLASHFILES="FlashHead.bin FlashData.bin FlashBoot.bin"
 	rm -f rk35*_spl_loader_*.bin idblock.bin rk35*_ddr_*.bin rk35*_usbplug*.bin UsbHead.bin ${FLASHFILES}
 
+	DDRBIN=$(grep '^FlashData' ${ROOTDIR}/misc/rkbin/RKBOOT/${MINIALL_INI} | cut -d = -f 2-)
+	SPL=$(grep '^FlashBoot' ${ROOTDIR}/misc/rkbin/RKBOOT/${MINIALL_INI} | cut -d = -f 2-)
+
 	# Create idblock.bin
-	${ROOTDIR}/misc/tools/${MACHINE_TYPE}/mkimage -n rk3588 -T rksd -d ${ROOTDIR}/misc/rkbin/bin/rk35/rk3588_ddr_lp4_2112MHz_lp5_2736MHz_v1.11.bin:${ROOTDIR}/misc/rkbin/bin/rk35/rk3588_spl_v1.12.bin idblock.bin
+	${ROOTDIR}/misc/tools/${MACHINE_TYPE}/mkimage -n rk3588 -T rksd -d ${ROOTDIR}/misc/rkbin/${DDRBIN}:${ROOTDIR}/misc/rkbin/${SPL} idblock.bin
 	popd
 	echo " => idblock.bin build done"
 }
