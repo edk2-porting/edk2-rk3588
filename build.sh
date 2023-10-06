@@ -10,7 +10,7 @@ function _help(){
 	echo "	--all, -a:               build all devices."
 	echo "	--gui:                   Enable simple-init GUI."
 	echo "	--release MODE, -r MODE: Release mode for building, default is 'DEBUG', 'RELEASE' alternatively."
-	echo "	--toolchain TOOLCHAIN:   Set toolchain, default is 'GCC5'."
+	echo "	--toolchain TOOLCHAIN:   Set toolchain, default is 'GCC'."
 	echo " 	--skip-rootfs-gen:       skip generating SimpleInit rootfs to speed up building."
 	echo "	--clean, -C:             clean workspace and output."
 	echo "	--distclean, -D:         clean up all files that are not in repo."
@@ -140,7 +140,7 @@ DEVICE=""
 MODE=DEBUG
 CLEAN=false
 DISTCLEAN=false
-TOOLCHAIN=GCC5
+TOOLCHAIN=GCC
 export ROOTDIR OUTDIR
 export GEN_ROOTFS=true
 export BUILD_GUI=false
@@ -186,7 +186,7 @@ done
 [ -f "configs/${DEVICE}.conf" ]||[ "${DEVICE}" == "all" ]||_error "Device configuration not found"
 
 export CROSS_COMPILE="${CROSS_COMPILE:-aarch64-linux-gnu-}"
-export GCC5_AARCH64_PREFIX="${CROSS_COMPILE}"
+export GCC_AARCH64_PREFIX="${CROSS_COMPILE}"
 export CLANG38_AARCH64_PREFIX="${CROSS_COMPILE}"
 # export PACKAGES_PATH="$_EDK2:$_EDK2_PLATFORMS:$_SIMPLE_INIT:$PWD"
 export PACKAGES_PATH="${ROOTDIR}/edk2:${ROOTDIR}/edk2-platforms:${ROOTDIR}/edk2-rockchip:${ROOTDIR}/edk2-rockchip-non-osi:${ROOTDIR}/edk2-non-osi:${ROOTDIR}:${_SIMPLE_INIT}"
