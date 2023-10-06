@@ -132,6 +132,11 @@ READ_LOCK_STATUS   = TRUE
   INF Silicon/Rockchip/RK3588/Drivers/GmacPlatformDxe/GmacPlatformDxe.inf
 
   #
+  # Device Tree Support
+  #
+  INF Silicon/Rockchip/RK3588/Drivers/FdtPlatformDxe/FdtPlatformDxe.inf
+
+  #
   # Custom platform components
   #
 !include $(RK_PLATFORM_FVMAIN_MODULES)

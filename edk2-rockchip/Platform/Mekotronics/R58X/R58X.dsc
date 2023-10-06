@@ -60,7 +60,7 @@
   gRockchipTokenSpaceGuid.PcdFamilyName|"R58"
   gRockchipTokenSpaceGuid.PcdProductUrl|"https://www.mekotronics.com/h-pd-75.html"
   gRockchipTokenSpaceGuid.PcdBoardName|"EDGE-RK3588-4D32-V1.2"
-  gRockchipTokenSpaceGuid.PcdDeviceTreeName|"rk3588-blueberry-edge-v10-linux.dtb"
+  gRockchipTokenSpaceGuid.PcdDeviceTreeName|"rk3588-blueberry-edge-v12-linux"
 
   # I2C
   gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x42, 0x43, 0x51 }

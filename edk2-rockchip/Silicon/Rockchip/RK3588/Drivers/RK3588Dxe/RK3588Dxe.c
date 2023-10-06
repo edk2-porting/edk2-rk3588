@@ -34,7 +34,7 @@
 #include "CpuPerformance.h"
 #include "ComboPhy.h"
 #include "PciExpress30.h"
-#include "Acpi.h"
+#include "ConfigTable.h"
 #include "FanControl.h"
 #include "UsbDpPhy.h"
 
@@ -159,7 +159,7 @@ SetupVariables (
   SetupCpuPerfVariables ();
   SetupComboPhyVariables ();
   SetupPcie30Variables ();
-  SetupAcpiVariables ();
+  SetupConfigTableVariables ();
   SetupCoolingFanVariables ();
   SetupUsbDpPhyVariables ();
 
@@ -204,7 +204,7 @@ ApplyVariables (
   ApplyCpuClockVariables ();
   ApplyComboPhyVariables ();
   ApplyPcie30Variables ();
-  ApplyAcpiVariables ();
+  ApplyConfigTableVariables ();
   ApplyCoolingFanVariables ();
   ApplyUsbDpPhyVariables ();
 

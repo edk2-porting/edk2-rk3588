@@ -59,7 +59,7 @@
   gRockchipTokenSpaceGuid.PcdPlatformVendorName|"Khadas"
   gRockchipTokenSpaceGuid.PcdFamilyName|"Edge"
   gRockchipTokenSpaceGuid.PcdProductUrl|"https://www.khadas.com/edge2"
-  gRockchipTokenSpaceGuid.PcdDeviceTreeName|"rk3588s-khadas-edge2.dtb"
+  gRockchipTokenSpaceGuid.PcdDeviceTreeName|"rk3588s-khadas-edge2"
 
   # I2C
   gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x42, 0x43, 0x51, 0x18 }

@@ -1,0 +1,61 @@
+#/** @file
+#
+#  Flattened Device Tree platform driver
+#
+#  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = FdtPlatformDxe
+  FILE_GUID                      = 5d028f9c-bb17-4ff5-8c61-dbb4474e4a13
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = FdtPlatformDxeInitialize
+
+[Sources]
+  FdtPlatformDxe.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Silicon/Rockchip/RockchipPkg.dec
+  Silicon/Rockchip/RK3588/RK3588.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  PrintLib
+  DxeServicesLib
+  MemoryAllocationLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+  FdtLib
+
+[Guids]
+  gFdtTableGuid
+  gDtPlatformDefaultDtbFileGuid
+  gEfiEventReadyToBootGuid
+  gEfiEventExitBootServicesGuid
+
+[Protocols]
+  gEfiLoadedImageProtocolGuid
+  gEfiSimpleFileSystemProtocolGuid
+
+[Pcd]
+  gRockchipTokenSpaceGuid.PcdDeviceTreeName
+  gRK3588TokenSpaceGuid.PcdConfigTableMode
+  gRK3588TokenSpaceGuid.PcdFdtSupportOverrides
+  gRK3588TokenSpaceGuid.PcdComboPhy0Mode
+  gRK3588TokenSpaceGuid.PcdComboPhy1Mode
+  gRK3588TokenSpaceGuid.PcdComboPhy2Mode
+  gRK3588TokenSpaceGuid.PcdPcie30Supported
+  gRK3588TokenSpaceGuid.PcdPcie30State
+
+[Depex]
+  gRockchipPlatformConfigAppliedProtocolGuid

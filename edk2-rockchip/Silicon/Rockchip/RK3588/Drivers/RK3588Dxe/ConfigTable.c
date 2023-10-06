@@ -14,7 +14,7 @@
 #include <VarStoreData.h>
 
 #include "RK3588DxeFormSetGuid.h"
-#include "Acpi.h"
+#include "ConfigTable.h"
 
 STATIC CONST EFI_GUID mAcpiTableFile = {
   0x7E374E25, 0x8E01, 0x4FEE, { 0x87, 0xf2, 0x39, 0x0C, 0x23, 0xC6, 0x06, 0xCD }
@@ -178,31 +178,50 @@ AcpiHandleDynamicNamespace (
 
 VOID
 EFIAPI
-ApplyAcpiVariables (
+ApplyConfigTableVariables (
   VOID
   )
 {
-  // TO-DO: Add a HII variable to let the user decide if they want ACPI (and/or DT).
-  LocateAndInstallAcpiFromFvConditional (&mAcpiTableFile, &AcpiHandleDynamicNamespace);
+  if (PcdGet32 (PcdConfigTableMode) & CONFIG_TABLE_MODE_ACPI) {
+    LocateAndInstallAcpiFromFvConditional (&mAcpiTableFile, &AcpiHandleDynamicNamespace);
+  }
 }
 
 VOID
 EFIAPI
-SetupAcpiVariables (
+SetupConfigTableVariables (
   VOID
   )
 {
   UINTN      Size;
   UINT32     Var32;
+  UINT8      Var8;
   EFI_STATUS Status;
 
   Size = sizeof (UINT32);
+  Status = gRT->GetVariable (L"ConfigTableMode",
+                            &gRK3588DxeFormSetGuid,
+                            NULL, &Size, &Var32);
+  if (EFI_ERROR (Status)) {
+    Status = PcdSet32S (PcdConfigTableMode, PcdGet32 (PcdConfigTableMode));
+    ASSERT_EFI_ERROR (Status);
+  }
 
+  Size = sizeof (UINT32);
   Status = gRT->GetVariable (L"AcpiUsb2State",
                             &gRK3588DxeFormSetGuid,
                             NULL, &Size, &Var32);
   if (EFI_ERROR (Status)) {
     Status = PcdSet32S (PcdAcpiUsb2State, FixedPcdGet32 (PcdAcpiUsb2StateDefault));
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  Size = sizeof (UINT8);
+  Status = gRT->GetVariable (L"FdtSupportOverrides",
+                            &gRK3588DxeFormSetGuid,
+                            NULL, &Size, &Var8);
+  if (EFI_ERROR (Status)) {
+    Status = PcdSet8S (PcdFdtSupportOverrides, PcdGet8 (PcdFdtSupportOverrides));
     ASSERT_EFI_ERROR (Status);
   }
 }

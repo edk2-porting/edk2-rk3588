@@ -76,11 +76,6 @@
   INF MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
 
   #
-  # DeviceTree Support
-  #
-  INF EmbeddedPkg/Drivers/DtPlatformDxe/DtPlatformDxe.inf
-
-  #
   # SMBIOS Support
   #
   INF MdeModulePkg/Universal/SmbiosDxe/SmbiosDxe.inf

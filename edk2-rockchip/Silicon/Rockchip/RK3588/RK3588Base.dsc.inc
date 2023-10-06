@@ -44,6 +44,10 @@
   DEFINE USBDP_PHY_USB3_STATE_DISABLED  = 0
   DEFINE USBDP_PHY_USB3_STATE_ENABLED   = 1
 
+  DEFINE CONFIG_TABLE_MODE_ACPI         =  0x00000001
+  DEFINE CONFIG_TABLE_MODE_FDT          =  0x00000002
+  DEFINE CONFIG_TABLE_MODE_ACPI_FDT     =  0x00000003
+
   #
   # Silicon/Rockchip/RK3588/Drivers/RK3588Dxe/CpuPerformance.h
   #
@@ -297,9 +301,11 @@
   gRK3588TokenSpaceGuid.PcdPcie30State|L"Pcie30State"|gRK3588DxeFormSetGuid|0x0|gRK3588TokenSpaceGuid.PcdPcie30Supported
 
   #
-  # ACPI
+  # ACPI / Device Tree
   #
+  gRK3588TokenSpaceGuid.PcdConfigTableMode|L"ConfigTableMode"|gRK3588DxeFormSetGuid|0x0|$(CONFIG_TABLE_MODE_ACPI)
   gRK3588TokenSpaceGuid.PcdAcpiUsb2State|L"AcpiUsb2State"|gRK3588DxeFormSetGuid|0x0|gRK3588TokenSpaceGuid.PcdAcpiUsb2StateDefault
+  gRK3588TokenSpaceGuid.PcdFdtSupportOverrides|L"FdtSupportOverrides"|gRK3588DxeFormSetGuid|0x0|FALSE
 
   #
   # Cooling Fan
@@ -342,3 +348,8 @@
   # GMAC Init Driver
   #
   Silicon/Rockchip/RK3588/Drivers/GmacPlatformDxe/GmacPlatformDxe.inf
+
+  #
+  # Device Tree Support
+  #
+  Silicon/Rockchip/RK3588/Drivers/FdtPlatformDxe/FdtPlatformDxe.inf

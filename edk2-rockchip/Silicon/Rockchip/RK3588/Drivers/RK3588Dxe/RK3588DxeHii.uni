@@ -123,13 +123,25 @@
 #string STR_PCIE30_STATE_HELP                              #language en-US "Enable or disable PCIe 3.0 support."
 
 /*
- * ACPI configuration
+ * ACPI / Device Tree configuration
  */
-#string STR_ACPI_FORM_TITLE                                #language en-US "ACPI"
-#string STR_ACPI_FORM_HELP                                 #language en-US "Configure the ACPI support."
+#string STR_CONFIG_TABLE_FORM_TITLE                        #language en-US "ACPI / Device Tree"
+#string STR_CONFIG_TABLE_FORM_HELP                         #language en-US "Configure the ACPI and Device Tree system tables support."
+
+#string STR_CONFIG_TABLE_MODE_PROMPT                       #language en-US "Config Table Mode"
+#string STR_CONFIG_TABLE_MODE_HELP                         #language en-US "Choose what config tables to expose to the OS.\n\nACPI - provides basic hardware support (USB, PCIe, SATA) for most OS/kernel versions.\n\nDevice Tree - provides extensive hardware support specific to a kernel version.\nThe firmware includes a DTB compatible with Rockchip SDK Linux 5.10 legacy kernel.\n\nIf both are exposed, the OS will decide which one to use."
+#string STR_CONFIG_TABLE_MODE_ACPI                         #language en-US "ACPI"
+#string STR_CONFIG_TABLE_MODE_FDT                          #language en-US "Device Tree"
+#string STR_CONFIG_TABLE_MODE_ACPI_FDT                     #language en-US "Both"
+
+#string STR_CONFIG_TABLE_ACPI_SUBTITLE                     #language en-US "ACPI Configuration"
 
 #string STR_ACPI_USB2_STATE_PROMPT                         #language en-US "USB 2.0 Support"
 #string STR_ACPI_USB2_STATE_HELP                           #language en-US "Enable or disable the USB 2.0 (EHCI) controllers.\n\nThis option is disabled by default due to compatibility issues with Windows, but it can be enabled for other OSes."
+
+#string STR_CONFIG_TABLE_FDT_SUBTITLE                      #language en-US "Device Tree Configuration"
+#string STR_FDT_SUPPORT_OVERRIDES_PROMPT                   #language en-US "Support DTB override & overlays"
+#string STR_FDT_SUPPORT_OVERRIDES_HELP                     #language en-US "Enable or disable support for overriding the firmware-provided DTB and installing overlays.\n\nCheck firmware documentation for more details."
 
 /*
  * Cooling fan configuration

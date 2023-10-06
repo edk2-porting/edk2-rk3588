@@ -42,4 +42,4 @@
   gRockchipTokenSpaceGuid.PcdPlatformVendorName|"Firefly"
   gRockchipTokenSpaceGuid.PcdFamilyName|"ROC"
   gRockchipTokenSpaceGuid.PcdProductUrl|"https://en.t-firefly.com/product/industry/rocrk3588spc"
-  gRockchipTokenSpaceGuid.PcdDeviceTreeName|"roc-rk3588s-pc.dtb"
+  gRockchipTokenSpaceGuid.PcdDeviceTreeName|"roc-rk3588s-pc"

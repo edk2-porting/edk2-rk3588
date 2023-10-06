@@ -79,7 +79,9 @@
 
   gRK3588TokenSpaceGuid.PcdPcie30State|0|UINT32|0x00000201
 
+  gRK3588TokenSpaceGuid.PcdConfigTableMode|0|UINT32|0x00000300
   gRK3588TokenSpaceGuid.PcdAcpiUsb2State|0|UINT32|0x00000301
+  gRK3588TokenSpaceGuid.PcdFdtSupportOverrides|0|UINT8|0x00000351
 
   gRK3588TokenSpaceGuid.PcdCoolingFanState|0|UINT32|0x00000401
   gRK3588TokenSpaceGuid.PcdCoolingFanSpeed|0|UINT32|0x00000402

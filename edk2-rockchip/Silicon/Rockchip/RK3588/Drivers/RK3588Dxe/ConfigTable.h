@@ -6,8 +6,8 @@
  *
  **/
 
-#ifndef __RK3588DXE_ACPI_H__
-#define __RK3588DXE_ACPI_H__
+#ifndef __RK3588DXE_CONFIG_TABLE_H__
+#define __RK3588DXE_CONFIG_TABLE_H__
 
 //
 // Don't declare these in the VFR file.
@@ -15,15 +15,15 @@
 #ifndef VFR_FILE_INCLUDE
 VOID
 EFIAPI
-ApplyAcpiVariables (
+ApplyConfigTableVariables (
   VOID
   );
 
 VOID
 EFIAPI
-SetupAcpiVariables (
+SetupConfigTableVariables (
   VOID
   );
 #endif // VFR_FILE_INCLUDE
 
-#endif // __RK3588DXE_ACPI_H__
+#endif // __RK3588DXE_CONFIG_TABLE_H__

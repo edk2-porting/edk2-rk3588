@@ -54,7 +54,7 @@
   gRockchipTokenSpaceGuid.PcdPlatformVendorName|"Radxa"
   gRockchipTokenSpaceGuid.PcdFamilyName|"ROCK 5"
   gRockchipTokenSpaceGuid.PcdProductUrl|"https://wiki.radxa.com/Rock5/hardware/5a"
-  gRockchipTokenSpaceGuid.PcdDeviceTreeName|"rk3588s-rock-5a.dtb"
+  gRockchipTokenSpaceGuid.PcdDeviceTreeName|"rk3588s-rock-5a"
 
   # I2C
   gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x42, 0x43 }

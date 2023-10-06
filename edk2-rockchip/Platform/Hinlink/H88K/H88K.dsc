@@ -60,7 +60,7 @@
   gRockchipTokenSpaceGuid.PcdPlatformVendorName|"Hinlink"
   gRockchipTokenSpaceGuid.PcdFamilyName|"H88K"
   gRockchipTokenSpaceGuid.PcdProductUrl|"http://www.hinlink.com/"
-  gRockchipTokenSpaceGuid.PcdDeviceTreeName|"rk3588-hinlink-h88k.dtb"
+  gRockchipTokenSpaceGuid.PcdDeviceTreeName|"rk3588-hinlink-h88k"
 
   # I2C
   gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x42, 0x43, 0x51 }

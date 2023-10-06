@@ -62,7 +62,7 @@
   gRockchipTokenSpaceGuid.PcdPlatformVendorName|"ameriDroid"
   gRockchipTokenSpaceGuid.PcdFamilyName|"Indiedroid"
   gRockchipTokenSpaceGuid.PcdProductUrl|"https://indiedroid.us"
-  gRockchipTokenSpaceGuid.PcdDeviceTreeName|"rk3588s-9tripod-linux.dtb"
+  gRockchipTokenSpaceGuid.PcdDeviceTreeName|"rk3588s-9tripod-linux"
 
   # I2C
   gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x42, 0x43, 0x51 }

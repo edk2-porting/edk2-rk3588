@@ -46,17 +46,23 @@ Applicable to all platforms unless otherwise noted.
 | Voltage regulators (RK806, RK860)  | 🟢 Working     | |
 | FUSB302 USB Type-C Controller      | 🔴 Not working | Required for PD negotiation and connector orientation switching |
 
-## Supported OSes (with ACPI)
+## Supported OSes
+### In ACPI mode
 | OS | Version | Tested/supported hardware | Notes |
 | --- | --- | --- | --- |
 | Windows | 10 (1904x), 11 | [Status](https://github.com/worproject/Rockchip-Windows-Drivers#hardware-support-status) ||
 | NetBSD | 10 | Display, UART, USB, PCIe (incl. NVME), SATA, eMMC, GMAC Ethernet ||
 | VMware ESXi Arm Fling | >= 1.12 | Display, USB | * PCIe devices will hang at boot, need to disable in settings or leave the ports empty.<br>* GMAC Ethernet gets detected but does not work. |
-| Linux | tested Ubuntu 22.04, kernel 5.15.0-75-generic | Display, UART, USB, PCIe (incl. NVME & Ethernet), SATA | For full hardware functionality, use a kernel with RK3588 support and platform Device Tree supplied by Grub. |
+| Linux | tested Ubuntu 22.04, kernel 5.15.0-75-generic | Display, UART, USB, PCIe (incl. NVME & Ethernet), SATA | For full hardware functionality, use a kernel with RK3588 support and switch to Device Tree mode. |
 
 #### Additional limitations when using ACPI
 * Devices behind PCIe switches do not work (e.g. the two NICs on Mixtile Blade 3).
 * GMAC is limited to Gigabit speed (i.e. no 10/100).
+
+### In Device Tree mode
+| OS | Version | Tested/supported hardware | Notes |
+| --- | --- | --- | --- |
+| Rockchip SDK Linux | 5.10 legacy, tested with [Armbian rk3588-live-iso](https://github.com/amazingfate/rk3588-live-iso) | Platform-dependent, most peripherals work. | If using a different kernel, see [Device Tree configuration](#device-tree-configuration). |
 
 ## Getting started
 ### 1. Requirements
@@ -105,11 +111,59 @@ Configuration through the user interface is fairly straightforward and help info
 Configuration through the UEFI shell is more advanced and mostly useful for scripts. See [Setting configuration options via the shell](#setting-configuration-options-via-the-shell).
 
 ### Tips
-* If you only wish to boot non-Windows OSes, go to the configuration menu -> `ACPI` and set `USB 2.0 Support` to `Enabled`, in order to get maximum speed from USB 2.0 ports.
+* CPU clocks are set to 816 MHz (boot default) on platforms without a cooling fan included. If you have adequate cooling, go to the configuration menu -> `CPU Performance` and set all Cluster Presets to `Maximum`.
+
+* If you only wish to boot non-Windows OSes in ACPI mode, go to the configuration menu -> `ACPI / Device Tree` and set `USB 2.0 Support` to `Enabled`, in order to get maximum speed from USB 2.0 ports.
 
   Booting Windows with this option enabled will cause it to crash.
 
-* CPU clocks are set to 816 MHz (boot default) on platforms without a cooling fan included. If you have adequate cooling, go to the configuration menu -> `CPU Performance` and set all Cluster Presets to `Maximum`.
+### Device Tree configuration
+For rich Linux support, it is recommended to enable Device Tree mode. You can do so by going to the configuration menu -> `ACPI / Device Tree` and setting `Config Table Mode` to `Device Tree`.
+
+By default, the firmware installs a [DTB compatible with (most) Rockchip SDK Linux 5.10 legacy kernel variants](https://github.com/edk2-porting/edk2-rk3588/tree/master/edk2-rockchip-non-osi/Platform/Rockchip/DeviceTree).
+
+#### Custom Device Tree Blob (DTB) override and overlays
+It is also possible to provide a custom DTB and overlays. To enable this, go to the configuration menu -> `ACPI / Device Tree` and set `Support DTB override & overlays` to `Enabled`.
+
+The firmware will now look for overrides in the partition of a selected boot option / OS loader. In most cases this will be the first FAT32 EFI System Partition.
+
+* The base DTB must be located at `\dtb\base\<PLATFORM-DT-NAME>.dtb`.
+
+* The overlays can be placed in:
+  * `\dtb\overlays` - will be applied first, regardless of the platform.
+  * `\dtb\overlays\<PLATFORM-DT-NAME>` - will be applied only to the specified platform.
+
+  and must have the `.dtbo` extension.
+
+The paths above are relative to the root of the file system. That is, the `dtb` directory must not be placed in a sub-directory.
+
+`<PLATFORM-DT-NAME>` can be:
+| Name                                    | Platform                      |
+| --------------------------------------- | ----------------------------- |
+| `rk3588s-9tripod-linux`                 | Indiedroid Nova               |
+| `roc-rk3588s-pc`                        | ROC-RK3588S-PC / Station M3   |
+| `rk3588-nanopc-t6`                      | NanoPC T6                     |
+| `rk3588s-nanopi-r6c`                    | NanoPi R6C                    |
+| `rk3588s-nanopi-r6s`                    | NanoPi R6S                    |
+| `rk3588-hinlink-h88k`                   | H88K                          |
+| `rk3588s-khadas-edge2`                  | Edge2                         |
+| `rk3588-blueberry-minipc-linux`         | R58 Mini                      |
+| `rk3588-blueberry-edge-v12-linux`       | R58X (v1.2)                   |
+| `rk3588-blade3-v101-linux`              | Blade 3                       |
+| `rk3588s-orangepi-5`                    | Orange Pi 5                   |
+| `rk3588-orangepi-5-plus`                | Orange Pi 5 Plus              |
+| `rk3588s-rock-5a`                       | ROCK 5A                       |
+| `rk3588-rock-5b`                        | ROCK 5B                       |
+
+In the absence of a custom base DTB override, the overlays are applied on top of the firmware-provided DTB.
+
+The firmware applies some fix-ups to its own DTB depending on the user settings (e.g. PCIe/SATA/USB selection, making SATA overlays redundant). These fix-ups are not applied to a custom base DTB - overlays must be used instead.
+
+If the application of an overlay fails (e.g. due to it being invalid in regard to the base DTB), all overlays are discarded, including those that got applied up to that point.
+
+If the custom base DTB is invalid, the firmware-provided one will be passed to the OS instead.
+
+This entire process is logged to the [serial console](#advanced-troubleshooting). There's currently no other way to see potential errors.
 
 ## Updating the firmware
 If the storage is only used for UEFI and nothing else, simply download the latest image and flash it as described in the [Getting started](#getting-started) section.
@@ -342,10 +396,20 @@ Default values and supported options depend on the platform. Check documentation
 | ------------- | ------------- | --------------------------------- |
 | Support State | `Pcie30State` | Enabled = `0x00000001`<br> Disabled = `0x00000000` |
 
-### ACPI configuration
+### ACPI / Device Tree
+| Variable          |    NAME           |  VALUE                            |
+| ----------------- | ----------------- | --------------------------------- |
+| Config Table Mode | `ConfigTableMode` | ACPI = `0x00000001`<br> DeviceTree = `0x00000002`<br> Both = `0x00000003` |
+
+#### ACPI Configuration
 | Variable        |    NAME         |  VALUE                            |
 | --------------- | --------------- | --------------------------------- |
 | USB 2.0 Support | `AcpiUsb2State` | Enabled = `0x00000001`<br> Disabled = `0x00000000` |
+
+#### Device Tree Configuration
+| Variable                        |    NAME               |  VALUE                            |
+| ------------------------------- | --------------------- | --------------------------------- |
+| Support DTB override & overlays | `FdtSupportOverrides` | Enabled = `0x01`<br> Disabled = `0x00` |
 
 ### Cooling fan
 | Variable        |    NAME           |  VALUE                            |
@@ -371,7 +435,7 @@ Some non-critical components have been ported from Rockchip's U-Boot fork and ar
 * UsbDpPhy
 * DwDpLib
 
-The firmware will continue to work without them, minus the additional functionality they provide.
+The files in `edk2-rockchip-non-osi` are licensed as **GPL-2.0-only**.
 
 The license for some of the blobs in the `misc/rkbin/` directory can be found at: <https://github.com/rockchip-linux/rkbin/blob/master/LICENSE>. Note that it also contains binaries built from open-source projects such as U-Boot (SPL), Arm Trusted Firmware and OP-TEE, having a different license.
 

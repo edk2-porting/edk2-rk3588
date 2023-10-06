@@ -42,7 +42,7 @@
   gRockchipTokenSpaceGuid.PcdPlatformVendorName|"Station PC"
   gRockchipTokenSpaceGuid.PcdFamilyName|"Station M"
   gRockchipTokenSpaceGuid.PcdProductUrl|"https://www.stationpc.com/product/stationm3"
-  gRockchipTokenSpaceGuid.PcdDeviceTreeName|"roc-rk3588s-pc.dtb"
+  gRockchipTokenSpaceGuid.PcdDeviceTreeName|"roc-rk3588s-pc"
 
   #
   # CPU Performance default values
