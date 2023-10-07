@@ -9,6 +9,7 @@
 
 #include <Library/DebugLib.h>
 #include <Library/IoLib.h>
+#include <Library/TimerLib.h>
 #include <Library/PWMLib.h>
 
 #define PWM_INT_EN(ch)                      (1 << (ch))
@@ -81,6 +82,7 @@ RkPwmSetConfig (
   Ctrl = MmioRead32(Base + ChannelOffset + PWM_CTRL_OFFSET);
   Ctrl |= PWM_LOCK;
   MmioWrite32(Base + ChannelOffset + PWM_CTRL_OFFSET, Ctrl);
+  MicroSecondDelay (1);
 
   MmioWrite32(Base + ChannelOffset + PWM_PERIOD_HPR_OFFSET, PeriodCycle);
   MmioWrite32(Base + ChannelOffset + PWM_DUTY_LPR_OFFSET, DutyCycle);
