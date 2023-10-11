@@ -30,9 +30,11 @@
   AcpiLib
   BaseMemoryLib
   DebugLib
+  UefiBootServicesTableLib
   UefiDriverEntryPoint
 
 [Guids]
+  gEfiEndOfDxeEventGroupGuid
 
 [Protocols]
 
@@ -44,6 +46,7 @@
   gRK3588TokenSpaceGuid.PcdComboPhy2Mode
   gRK3588TokenSpaceGuid.PcdPcie30Supported
   gRK3588TokenSpaceGuid.PcdPcie30State
+  gRK3588TokenSpaceGuid.PcdPcieEcamCompliantSegmentsMask
 
 [Depex]
   gRockchipPlatformConfigAppliedProtocolGuid

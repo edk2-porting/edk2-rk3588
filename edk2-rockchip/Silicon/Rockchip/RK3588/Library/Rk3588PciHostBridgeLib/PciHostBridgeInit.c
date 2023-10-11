@@ -197,7 +197,7 @@ PciePinmuxInit(
       ASSERT(MuxNum < 2);
       GpioSetIomuxConfig(&mPcie20x1_2_IomuxConfigs[MuxNum][0], 3);
       break;
-    
+
     default:
       return;
   }
@@ -255,7 +255,7 @@ PciSetupClocks (
 		default:
 			break;
 	}
-	
+
 }
 
 STATIC
@@ -448,6 +448,29 @@ PciSetupAtu (
   gBS->Stall (10000);
 }
 
+STATIC
+VOID
+PciValidateCfg0 (
+  IN  UINT32                 Segment,
+  IN  EFI_PHYSICAL_ADDRESS   Cfg0Base
+  )
+{
+  EFI_STATUS Status;
+
+  //
+  // If the downstream device doesn't appear mirrored, config accesses
+  // must not be shifted by 0x8000 anymore.
+  //
+  if (MmioRead32 (Cfg0Base) != 0xffffffff
+      && MmioRead32 (Cfg0Base + 0x8000) == 0xffffffff) {
+    Status = PcdSet32S (PcdPcieEcamCompliantSegmentsMask,
+                PcdGet32 (PcdPcieEcamCompliantSegmentsMask) | (1 << Segment));
+    ASSERT_EFI_ERROR (Status);
+
+    DEBUG((DEBUG_INFO, "PCIe: Working CFG0 TLP filtering for connected device!\n"));
+  }
+}
+
 EFI_STATUS
 InitializePciHost (
   UINT32 Segment
@@ -563,6 +586,8 @@ InitializePciHost (
 
   PciGetLinkSpeedWidth (DbiBase, &LinkSpeed, &LinkWidth);
   PciPrintLinkSpeedWidth (LinkSpeed, LinkWidth);
+
+  PciValidateCfg0 (Segment, PcieBase + Cfg0Base);
 
   return EFI_SUCCESS;
 }

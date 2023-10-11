@@ -51,3 +51,5 @@
   gRK3588TokenSpaceGuid.PcdComboPhy2Mode
 
   gRK3588TokenSpaceGuid.PcdPcie30State
+
+  gRK3588TokenSpaceGuid.PcdPcieEcamCompliantSegmentsMask

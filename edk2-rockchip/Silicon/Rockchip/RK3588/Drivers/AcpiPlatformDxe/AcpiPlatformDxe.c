@@ -12,6 +12,8 @@
 #include <Library/AcpiLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <AcpiTables.h>
 #include <VarStoreData.h>
 
 STATIC CONST EFI_GUID mAcpiTableFile = {
@@ -153,12 +155,26 @@ AcpiVerifyUpdateTable (
   return Result;
 }
 
-//
-// Monitor the ACPI tables being installed and when
-// a DSDT/SSDT is detected validate that we want to
-// install it, and if so update any "NameOp" defined
-// variables contained in the table from PCD values
-//
+STATIC
+BOOLEAN
+AcpiFixupMcfg (
+  IN  EFI_ACPI_DESCRIPTION_HEADER   *AcpiHeader
+  )
+{
+  RK3588_MCFG_TABLE   *Table;
+  UINT32              Seg;
+
+  Table = (RK3588_MCFG_TABLE *) AcpiHeader;
+
+  for (Seg = 0; Seg < ARRAY_SIZE (Table->Entry); Seg++) {
+    if ((PcdGet32 (PcdPcieEcamCompliantSegmentsMask) & (1 << Seg)) != 0) {
+      Table->Entry[Seg].BaseAddress -= 0x8000;
+    }
+  }
+
+  return TRUE;
+}
+
 STATIC
 BOOLEAN
 AcpiHandleDynamicNamespace (
@@ -169,9 +185,28 @@ AcpiHandleDynamicNamespace (
     case SIGNATURE_32 ('D', 'S', 'D', 'T'):
     case SIGNATURE_32 ('S', 'S', 'D', 'T'):
       return AcpiVerifyUpdateTable (AcpiHeader);
+    case SIGNATURE_32 ('M', 'C', 'F', 'G'):
+      return AcpiFixupMcfg (AcpiHeader);
   }
 
   return TRUE;
+}
+
+STATIC
+VOID
+EFIAPI
+NotifyEndOfDxeEvent (
+  IN EFI_EVENT    Event,
+  IN VOID         *Context
+  )
+{
+  EFI_STATUS    Status;
+
+  Status = LocateAndInstallAcpiFromFvConditional (&mAcpiTableFile, &AcpiHandleDynamicNamespace);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_WARN, "AcpiPlatform: Failed to install firmware ACPI as config table. Status=%r\n",
+            Status));
+  }
 }
 
 EFI_STATUS
@@ -182,18 +217,22 @@ AcpiPlatformDxeInitialize (
   )
 {
   EFI_STATUS    Status;
+  EFI_EVENT     Event;
 
   if ((PcdGet32 (PcdConfigTableMode) & CONFIG_TABLE_MODE_ACPI) == 0) {
     DEBUG ((DEBUG_WARN, "AcpiPlatform: ACPI support is disabled by the settings.\n"));
     return EFI_UNSUPPORTED;
   }
 
-  Status = LocateAndInstallAcpiFromFvConditional (&mAcpiTableFile, &AcpiHandleDynamicNamespace);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_WARN, "AcpiPlatform: Failed to install firmware ACPI as config table. Status=%r\n",
-            Status));
-    return Status;
-  }
+  Status = gBS->CreateEventEx (
+                    EVT_NOTIFY_SIGNAL,                // Type
+                    TPL_CALLBACK,                     // NotifyTpl
+                    NotifyEndOfDxeEvent,              // NotifyFunction
+                    NULL,                             // NotifyContext
+                    &gEfiEndOfDxeEventGroupGuid,      // EventGroup
+                    &Event                            // Event
+                    );
+  ASSERT_EFI_ERROR (Status);
 
   return EFI_SUCCESS;
 }

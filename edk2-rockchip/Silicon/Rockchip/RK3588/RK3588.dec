@@ -88,3 +88,6 @@
 
   gRK3588TokenSpaceGuid.PcdUsbDpPhy0Usb3State|0|UINT32|0x00000501
   gRK3588TokenSpaceGuid.PcdUsbDpPhy1Usb3State|0|UINT32|0x00000502
+
+[PcdsDynamicEx]
+  gRK3588TokenSpaceGuid.PcdPcieEcamCompliantSegmentsMask|0|UINT32|0x20000001

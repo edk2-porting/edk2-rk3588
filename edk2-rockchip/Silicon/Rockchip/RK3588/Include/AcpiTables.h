@@ -15,6 +15,7 @@
 #define __ACPITABLES_H__
 
 #include <IndustryStandard/Acpi.h>
+#include <IndustryStandard/MemoryMappedConfigurationSpaceAccessTable.h>
 
 #define EFI_ACPI_OEM_ID                       {'R','K','C','P',' ',' '}
 
@@ -57,5 +58,12 @@
     PhysAddress,                                                              \
     0                                                                         \
   }
+
+#pragma pack(push, 1)
+typedef struct {
+  EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_HEADER Header;
+  EFI_ACPI_MEMORY_MAPPED_ENHANCED_CONFIGURATION_SPACE_BASE_ADDRESS_ALLOCATION_STRUCTURE Entry[5];
+} RK3588_MCFG_TABLE;
+#pragma pack(pop)
 
 #endif // __ACPITABLES_H__

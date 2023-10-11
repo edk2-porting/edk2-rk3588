@@ -9,27 +9,17 @@
  *
  **/
 
-#include <IndustryStandard/Acpi.h>
-#include <IndustryStandard/MemoryMappedConfigurationSpaceAccessTable.h>
 #include "AcpiTables.h"
 
-#pragma pack(push, 1)
-
 //
-// The root port config is not part of ECAM.
-// OSes can parse additional config spaces in MCFG, but we'll hide it for now.
+// MCFG may get patched by AcpiPlatformDxe.
 //
 
-typedef struct {
-  EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_BASE_ADDRESS_TABLE_HEADER Header;
-  EFI_ACPI_MEMORY_MAPPED_ENHANCED_CONFIGURATION_SPACE_BASE_ADDRESS_ALLOCATION_STRUCTURE Entry[5];
-} EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_DESCRIPTION_TABLE;
-
-EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_DESCRIPTION_TABLE Mcfg = {
+RK3588_MCFG_TABLE Mcfg = {
   {
     ACPI_HEADER (
       EFI_ACPI_6_4_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_BASE_ADDRESS_DESCRIPTION_TABLE_SIGNATURE,
-      EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_DESCRIPTION_TABLE,
+      RK3588_MCFG_TABLE,
       EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_TABLE_REVISION
       ),
   },
@@ -71,7 +61,5 @@ EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_DESCRIPTION_TABLE Mcfg = {
     }
   }
 };
-
-#pragma pack(pop)
 
 VOID* CONST ReferenceAcpiTable = &Mcfg;
