@@ -189,7 +189,9 @@ done
 [ -n "${_SIMPLE_INIT}" ]||[ ${BUILD_GUI} == false ]||error "SimpleInit not found, please see README.md"
 [ -f "configs/${DEVICE}.conf" ]||[ "${DEVICE}" == "all" ]||_error "Device configuration not found"
 
-export CROSS_COMPILE="${CROSS_COMPILE:-aarch64-linux-gnu-}"
+if [ ${MACHINE_TYPE} != 'aarch64' ]; then
+	export CROSS_COMPILE="${CROSS_COMPILE:-aarch64-linux-gnu-}"
+fi
 export GCC_AARCH64_PREFIX="${CROSS_COMPILE}"
 export CLANG38_AARCH64_PREFIX="${CROSS_COMPILE}"
 # export PACKAGES_PATH="$_EDK2:$_EDK2_PLATFORMS:$_SIMPLE_INIT:$PWD"
