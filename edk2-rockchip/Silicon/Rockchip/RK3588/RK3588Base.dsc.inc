@@ -224,6 +224,7 @@
   #gRockchipTokenSpaceGuid.PcdEdpId|0x00000001 #edp1
   gRockchipTokenSpaceGuid.PcdHdmiId|0x00000000 #hdmi0
   #gRockchipTokenSpaceGuid.PcdHdmiId|0x00000001 #hdmi1
+  gRockchipTokenSpaceGuid.PcdHdmiDDCI2CPinMux|0x00000000 #hdmitx_i2c_m0
 
   #
   # CPU Performance default values

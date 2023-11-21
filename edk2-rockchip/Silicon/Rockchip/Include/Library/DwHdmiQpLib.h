@@ -914,10 +914,42 @@
 #define PMU1CRU_SOFTRST_CON03	0xA0C
 #define PMU1CRU_SOFTRST_CON04	0xA10
 
+struct DwHdmiQpI2c {
+  BOOLEAN Cmp;
+	UINT32 Stat;
+  UINT32 PinMux;
+
+	UINT8 SlaveReg;
+	BOOLEAN IsSegment;
+  BOOLEAN IsRegAddr;
+};
+
 struct DwHdmiQpDevice {
   UINT32 Id;
   BOOLEAN ForceHpd;
+  struct DwHdmiQpI2c I2c;
+  UINT32 ScdcIntr;
+  UINT32 FltIntr;
+  UINT32 EarcIntr;
+
+  BOOLEAN FltCmp;
 }; 
+
+struct i2c_msg {
+	UINT16 addr;
+	UINT16 flags;
+#define I2C_M_RD		0x0001	/* guaranteed to be 0x0001! */
+#define I2C_M_TEN		0x0010	/* use only if I2C_FUNC_10BIT_ADDR */
+#define I2C_M_DMA_SAFE		0x0200	/* use only in kernel space */
+#define I2C_M_RECV_LEN		0x0400	/* use only if I2C_FUNC_SMBUS_READ_BLOCK_DATA */
+#define I2C_M_NO_RD_ACK		0x0800	/* use only if I2C_FUNC_PROTOCOL_MANGLING */
+#define I2C_M_IGNORE_NAK	0x1000	/* use only if I2C_FUNC_PROTOCOL_MANGLING */
+#define I2C_M_REV_DIR_ADDR	0x2000	/* use only if I2C_FUNC_PROTOCOL_MANGLING */
+#define I2C_M_NOSTART		0x4000	/* use only if I2C_FUNC_NOSTART */
+#define I2C_M_STOP		0x8000	/* use only if I2C_FUNC_PROTOCOL_MANGLING */
+	UINT16 len;
+  UINT8 *buf;
+};
 
 /* Rockchip Htx Phy */
 
