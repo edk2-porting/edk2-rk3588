@@ -81,7 +81,7 @@ ArmPlatformGetVirtualMemoryMap (
   // Base System RAM
   VirtualMemoryTable[Index].PhysicalBase    = mSystemMemoryBase;
   VirtualMemoryTable[Index].VirtualBase     = VirtualMemoryTable[Index].PhysicalBase;
-  VirtualMemoryTable[Index].Length          = MIN (mSystemMemorySize, 0xF0000000UL);
+  VirtualMemoryTable[Index].Length          = MIN (mSystemMemorySize, 0xF0000000UL - mSystemMemoryBase);
   VirtualMemoryTable[Index].Attributes      = ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK;
   VirtualMemoryInfo[Index].Type             = RK3588_MEM_BASIC_REGION;
   VirtualMemoryInfo[Index++].Name           = L"System RAM";
