@@ -87,7 +87,7 @@ InitComPhyConfig (
       MmioWrite32 (PhpBaseAddr + 0x0, 0xFFFF0129);
       MmioWrite32 (PhpBaseAddr + 0x4, 0xFFFF4000);
       MmioWrite32 (PhpBaseAddr + 0x8, 0xFFFF80c1);
-      MmioWrite32 (PhpBaseAddr + 0xc, 0xFFFF0407);
+      MmioWrite32 (PhpBaseAddr + 0xc, 0xFFFF4007);
 
       /* Should we tune the rest of the parameters too? */
 
