@@ -12,7 +12,8 @@
 //
 Device (GPI0)
 {
-  Name (_HID, "PRP0001")
+  Name (_HID, "RKCP3002")
+  Name (_CID, "PRP0001")
   Name (_UID, 0x0)
   Name (_DSD, Package () {
     ToUUID("daffd814-6eba-4d8c-8a91-bc9bbf4aa301"),
@@ -38,7 +39,8 @@ Device (GPI0)
 
 Device (GPI1)
 {
-  Name (_HID, "PRP0001")
+  Name (_HID, "RKCP3002")
+  Name (_CID, "PRP0001")
   Name (_UID, 0x1)
   Name (_DSD, Package () {
     ToUUID("daffd814-6eba-4d8c-8a91-bc9bbf4aa301"),
@@ -63,7 +65,8 @@ Device (GPI1)
 
 Device (GPI2)
 {
-  Name (_HID, "PRP0001")
+  Name (_HID, "RKCP3002")
+  Name (_CID, "PRP0001")
   Name (_UID, 0x2)
   Name (_DSD, Package () {
     ToUUID("daffd814-6eba-4d8c-8a91-bc9bbf4aa301"),
@@ -88,7 +91,8 @@ Device (GPI2)
 
 Device (GPI3)
 {
-  Name (_HID, "PRP0001")
+  Name (_HID, "RKCP3002")
+  Name (_CID, "PRP0001")
   Name (_UID, 0x3)
   Name (_DSD, Package () {
     ToUUID("daffd814-6eba-4d8c-8a91-bc9bbf4aa301"),
@@ -113,7 +117,8 @@ Device (GPI3)
 
 Device (GPI4)
 {
-  Name (_HID, "PRP0001")
+  Name (_HID, "RKCP3002")
+  Name (_CID, "PRP0001")
   Name (_UID, 0x4)
   Name (_DSD, Package () {
     ToUUID("daffd814-6eba-4d8c-8a91-bc9bbf4aa301"),
