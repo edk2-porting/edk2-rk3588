@@ -21,10 +21,11 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 2, "RKCP  ", "RK3588  ", 2)
 
     include ("Emmc.asl")
     include ("Sdhc.asl")
+    include ("Dma.asl")
     include ("Gmac0.asl")
     include ("Gmac1.asl")
     // include ("Gpio.asl")
-    // include ("I2c.asl")
+    include ("I2c.asl")
     include ("Uart.asl")
     // include ("Spi.asl")
 
