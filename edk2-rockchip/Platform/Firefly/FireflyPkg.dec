@@ -1,0 +1,27 @@
+## @file
+#
+#  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+#  Copyright (c) 2023, Shimrra Shai <shimmyshai00@gmail.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  DEC_SPECIFICATION              = 0x00010005
+  PACKAGE_NAME                   = FireflyPkg
+  PACKAGE_GUID                   = af4ed3c6-c9de-489f-b72a-ec849b51dbda
+  PACKAGE_VERSION                = 0.1
+
+[Includes]
+  Include
+
+[Protocols]
+  gPca95xxProtocolGuid = { 0x7e91391b, 0xa23c, 0x4a51, { 0x9d, 0xf7, 0xf6, 0x74, 0xef, 0x1d, 0x51, 0x1b } }
+
+[Guids]
+  gFireflyTokenSpaceGuid = { 0x3d05ddc7, 0x0f61, 0x4190, { 0x95, 0xf9, 0x6d, 0x36, 0x51, 0x35, 0x4f, 0x98 } }
+
+[PcdsFixedAtBuild]
+  gFireflyTokenSpaceGuid.PcdPca9555Address|0|UINT8|0x00000001
+  gFireflyTokenSpaceGuid.PcdPca9555Bus|0|UINT8|0x00000002
