@@ -15,8 +15,5 @@
     SECTION RAW = Platform/Rockchip/DeviceTree/itx-3588j.dtb
   }
 
-  # PCA9555 GPIO chipset
-  INF $(VENDOR_DIRECTORY)/Drivers/Pca9555Dxe/Pca9555Dxe.inf
-  
   # Splash screen logo
   INF $(VENDOR_DIRECTORY)/Drivers/LogoDxe/LogoDxe.inf

@@ -24,7 +24,6 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
-  Platform/Firefly/FireflyPkg.dec
   Silicon/Rockchip/RockchipPkg.dec
 
 [LibraryClasses]
@@ -41,8 +40,8 @@
   gRockchipI2cMasterProtocolGuid
   
 [Pcd]
-  gFireflyTokenSpaceGuid.PcdPca9555Address
-  gFireflyTokenSpaceGuid.PcdPca9555Bus
+  gRockchipTokenSpaceGuid.PcdPca9555Address
+  gRockchipTokenSpaceGuid.PcdPca9555Bus
 
 [Depex]
   TRUE
