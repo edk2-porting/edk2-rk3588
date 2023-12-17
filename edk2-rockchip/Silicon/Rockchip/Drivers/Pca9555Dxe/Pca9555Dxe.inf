@@ -1,0 +1,48 @@
+#/** @file
+#
+#  PCA9555 GPIO initializer for Rockchip platforms.
+#
+#  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+#  Copyright (c) 2023, Shimrra Shai <shimmyshai00@gmail.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = Pca9555Dxe
+  FILE_GUID                      = 2ee8d685-8066-4f37-ae0e-5235730b9cc7
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = Pca9555DxeInitialize
+
+[Sources.common]
+  Pca9555Dxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  EmbeddedPkg/EmbeddedPkg.dec
+  Silicon/Rockchip/RockchipPkg.dec
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiLib
+  UefiBootServicesTableLib
+  MemoryAllocationLib
+  DebugLib
+
+[Protocols]
+  gEfiDriverBindingProtocolGuid
+  gEfiI2cIoProtocolGuid                 ## CONSUMES
+  gPca95xxProtocolGuid                  ## PRODUCES
+  gRockchipI2cMasterProtocolGuid
+  
+[Pcd]
+  gRockchipTokenSpaceGuid.PcdPca9555Address
+  gRockchipTokenSpaceGuid.PcdPca9555Bus
+
+[Depex]
+  TRUE
+  

@@ -589,6 +589,9 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
 !if $(RK_RTC8563_ENABLE) == TRUE
   Silicon/Rockchip/Drivers/Rtc8563PlatformDxe/Rtc8563PlatformDxe.inf
 !endif
+!if $(RK_PCA9555_ENABLE) == TRUE
+  Silicon/Rockchip/Drivers/Pca9555Dxe/Pca9555Dxe.inf
+!endif
   # Silicon/Rockchip/Drivers/I2c/I2cDemoDxe/I2cDemoDxe.inf
 
   #
