@@ -46,4 +46,51 @@ Device (MAC1) {
       Package () { "snps,blen", Package () { 0, 0, 0, 0, 16, 8, 4 } },
     }
   })
+
+  Method (_DSM, 4, Serialized) {
+    // PHP_GRF_CLK_CON1
+    OperationRegion (PGRF, SystemMemory, 0xfd5b0070, 0x4)
+    Field (PGRF, DWordAcc, NoLock, Preserve) {
+      CON1, 32
+    }
+
+    // Check the UUID
+    If (Arg0 == ToUUID ("d637828d-556c-4829-966a-237072f00ff1")) {
+      // Check the revision
+      If (Arg1 >= 0) {
+        // Check the function index
+        Switch (ToInteger (Arg2)) {
+          //
+          // Supported functions:
+          // Bit 0 - Indicates support for functions other than 0
+          // Bit 1 - Indicates support for setting the MII speed
+          //
+          Case (0) {
+            Return (Buffer () { 0x03 })
+          }
+
+          //
+          // Function Index 1: Set MII speed
+          //
+          Case (1) {
+            Local0 = DerefOf (Arg3[0])
+
+            Switch (ToInteger (Local0)) {
+              Case (1000) {
+                CON1 = 0x01800000
+              }
+              Case (100) {
+                CON1 = 0x01800180
+              }
+              Case (10) {
+                CON1 = 0x01800100
+              }
+            }
+            Return (Buffer () { 0x00 })
+          }
+        } // Function index check
+      } // Revision check
+    } // UUID check
+    Return (Buffer () { 0x0 })
+  } // _DSM
 }
