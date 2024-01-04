@@ -367,9 +367,21 @@ PlatformSetStatusLed (
 
 VOID
 EFIAPI
+PlatformWiFiEnable (
+  IN BOOLEAN Enable
+  )
+{
+  // WiFi - enable
+  GpioPinWrite (0, GPIO_PIN_PC4, Enable);
+  GpioPinSetDirection (0, GPIO_PIN_PC4, GPIO_PIN_OUTPUT);
+}
+
+VOID
+EFIAPI
 PlatformEarlyInit (
   VOID
   )
 {
   // Configure various things specific to this platform
+  PlatformWiFiEnable (TRUE);
 }
