@@ -15,4 +15,4 @@
   }
 
   # Splash screen logo
-  INF MdeModulePkg/Logo/LogoDxe.inf
+  INF $(VENDOR_DIRECTORY)/Drivers/LogoDxe/LogoDxe.inf
