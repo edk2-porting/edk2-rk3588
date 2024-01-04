@@ -209,6 +209,10 @@ UsbPortPowerEnable (
   GpioPinWrite (4, GPIO_PIN_PB0, TRUE);
   GpioPinSetDirection (4, GPIO_PIN_PB0, GPIO_PIN_OUTPUT);
 
+  /* Set GPIO4 PC6 output high to power the 4G/LTE module */
+  GpioPinWrite (4, GPIO_PIN_PC6, TRUE);
+  GpioPinSetDirection (4, GPIO_PIN_PC6, GPIO_PIN_OUTPUT);
+
   /* Set GPIO1 PD2 (TYPEC5V_PWREN) output high to power the type-c port */
   GpioPinWrite (1, GPIO_PIN_PD2, TRUE);
   GpioPinSetDirection (1, GPIO_PIN_PD2, GPIO_PIN_OUTPUT);
