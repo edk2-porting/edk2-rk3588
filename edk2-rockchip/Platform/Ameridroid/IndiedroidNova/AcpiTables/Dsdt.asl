@@ -12,9 +12,7 @@
  **/
 
 #include "AcpiTables.h"
-
-#define BOARD_ENABLE_I2S0
-#define BOARD_I2S0_TPLG "i2s-jack"
+#include "../onboard.h"
 
 DefinitionBlock ("Dsdt.aml", "DSDT", 2, "RKCP  ", "RK3588  ", 2)
 {
@@ -36,5 +34,9 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 2, "RKCP  ", "RK3588  ", 2)
     include ("Usb1Host.asl")
     include ("Usb3Host0.asl")
     include ("Usb3Host2.asl")
+  }
+
+  Scope (\_SB_.I2C7) {
+    include ("Es8388.asl")
   }
 }
