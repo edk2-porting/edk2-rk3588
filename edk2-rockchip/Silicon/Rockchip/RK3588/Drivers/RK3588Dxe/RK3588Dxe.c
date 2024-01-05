@@ -24,6 +24,7 @@
 #include <Library/DxeServicesTableLib.h>
 #include <Library/NonDiscoverableDeviceRegistrationLib.h>
 #include <Library/CruLib.h>
+#include <Library/GpioLib.h>
 #include <Library/RK806.h>
 #include <VarStoreData.h>
 #include <Soc.h>
@@ -280,6 +281,28 @@ RK3588InitPeripherals (
 
   /* MTCMOS -- Multi-threshold CMOS */
   // MtcmosInit ();
+  
+  // Warning: Only enable I2S if present.
+  // E.g. Enabling I2S1 on OPI5+ causes PCIe devices to disappear
+  if (FixedPcdGetBool(PcdI2S0Supported)){
+    //Configure I2S0 (e.g. Orange Pi 5 Plus)
+    GpioPinSetFunction(1, GPIO_PIN_PD4, 2); //i2s0_sdi0
+    GpioPinSetFunction(1, GPIO_PIN_PC7, 1); //i2s0_sdo0
+    
+    GpioPinSetFunction(1, GPIO_PIN_PC5, 1); //i2s0_lrck
+    GpioPinSetFunction(1, GPIO_PIN_PC3, 1); //i2s0_sclk
+    GpioPinSetFunction(1, GPIO_PIN_PC2, 1); //i2s0_mclk
+  }
+  
+  if (FixedPcdGetBool(PcdI2S1Supported)){
+    //Configure I2S1 (e.g. Orange Pi 5)
+    GpioPinSetFunction(4, GPIO_PIN_PA6, 3); //i2s1m0_sdi1
+    GpioPinSetFunction(4, GPIO_PIN_PB4, 3); //i2s1m0_sdo3
+    
+    GpioPinSetFunction(4, GPIO_PIN_PA2, 3); //i2s1m0_lrck
+    GpioPinSetFunction(4, GPIO_PIN_PA1, 3); //i2s1m0_sclk
+    GpioPinSetFunction(4, GPIO_PIN_PA0, 3); //i2s1m0_mclk
+  }
 
   Rk806Configure();
 

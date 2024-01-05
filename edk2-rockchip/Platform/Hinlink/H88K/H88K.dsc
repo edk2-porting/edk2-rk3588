@@ -103,6 +103,11 @@
   gRK3588TokenSpaceGuid.PcdGmac0Supported|TRUE
   gRK3588TokenSpaceGuid.PcdGmac0TxDelay|0x44
 
+  #
+  # I2S
+  #
+  gRK3588TokenSpaceGuid.PcdI2S0Supported|TRUE
+
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform.

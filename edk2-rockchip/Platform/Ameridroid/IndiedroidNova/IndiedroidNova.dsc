@@ -94,6 +94,11 @@
   gRK3588TokenSpaceGuid.PcdDp0LaneMux|{ 0x2, 0x3 }
 
   #
+  # I2S
+  #
+  gRK3588TokenSpaceGuid.PcdI2S0Supported|TRUE
+
+  #
   # On-Board fan output
   #
   gRK3588TokenSpaceGuid.PcdHasOnBoardFanOutput|TRUE

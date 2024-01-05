@@ -106,7 +106,12 @@
   gRK3588TokenSpaceGuid.PcdGmac0Supported|TRUE
   gRK3588TokenSpaceGuid.PcdGmac1Supported|TRUE
   gRK3588TokenSpaceGuid.PcdGmac0TxDelay|0x44
-  gRK3588TokenSpaceGuid.PcdGmac1TxDelay|0x42
+  gRK3588TokenSpaceGuid.PcdGmac1TxDelay|0x42 
+
+  #
+  # I2S
+  #
+  gRK3588TokenSpaceGuid.PcdI2S0Supported|TRUE
 
 ################################################################################
 #

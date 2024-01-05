@@ -90,7 +90,12 @@
   #
   gRK3588TokenSpaceGuid.PcdGmac1Supported|TRUE
   gRK3588TokenSpaceGuid.PcdGmac1TxDelay|0x3a
-  gRK3588TokenSpaceGuid.PcdGmac1RxDelay|0x3e
+  gRK3588TokenSpaceGuid.PcdGmac1RxDelay|0x3e 
+
+  #
+  # I2S
+  #
+  gRK3588TokenSpaceGuid.PcdI2S0Supported|TRUE
 
   #
   # On-Board fan output
