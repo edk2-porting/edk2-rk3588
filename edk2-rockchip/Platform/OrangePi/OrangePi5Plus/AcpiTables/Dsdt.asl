@@ -13,6 +13,9 @@
 
 #include "AcpiTables.h"
 
+#define BOARD_ENABLE_I2S0
+#define BOARD_I2S0_TPLG "i2s-jack"
+
 DefinitionBlock ("Dsdt.aml", "DSDT", 2, "RKCP  ", "RK3588  ", 2)
 {
   Scope (\_SB_)
@@ -27,6 +30,8 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 2, "RKCP  ", "RK3588  ", 2)
     include ("I2c.asl")
     include ("Uart.asl")
     // include ("Spi.asl")
+
+    include ("I2s.asl")
 
     include ("Usb1Host.asl")
     include ("Usb3Host0.asl")
