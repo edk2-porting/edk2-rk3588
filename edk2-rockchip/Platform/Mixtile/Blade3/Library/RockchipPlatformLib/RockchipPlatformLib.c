@@ -165,27 +165,36 @@ I2cIomux (
 {
   switch (id) {
   case 0:
-    /* io mux M2 */
-    PMU2_IOC->GPIO0D_IOMUX_SEL_L = (0x0F00UL << 16) | 0x0300;
-    PMU2_IOC->GPIO0D_IOMUX_SEL_L = (0x00F0UL << 16) | 0x0030;
+    GpioPinSetFunction(0, GPIO_PIN_PB3, 2); //i2c0_scl_m0
+    GpioPinSetFunction(0, GPIO_PIN_PA6, 2); //i2c0_sda_m0
     break;
   case 1:
-    /* io mux */
-    //BUS_IOC->GPIO0B_IOMUX_SEL_H = (0x0FF0UL << 16) | 0x0990;
-    //PMU2_IOC->GPIO0B_IOMUX_SEL_H = (0x0FF0UL << 16) | 0x0880;
+    GpioPinSetFunction(0, GPIO_PIN_PB5, 9); //i2c1_scl_m0
+    GpioPinSetFunction(0, GPIO_PIN_PB6, 9); //i2c1_sda_m0
     break;
   case 2:
-    /* io mux */
-    BUS_IOC->GPIO0B_IOMUX_SEL_H = (0xF000UL << 16) | 0x9000;
-    BUS_IOC->GPIO0C_IOMUX_SEL_L = (0x000FUL << 16) | 0x0009;
-    PMU2_IOC->GPIO0B_IOMUX_SEL_H = (0xF000UL << 16) | 0x8000;
-    PMU2_IOC->GPIO0C_IOMUX_SEL_L = (0x000FUL << 16) | 0x0008;
+    GpioPinSetFunction(0, GPIO_PIN_PB7, 9); //i2c2_scl_m0
+    GpioPinSetFunction(0, GPIO_PIN_PC0, 9); //i2c2_sda_m0
     break;
   case 3:
+    GpioPinSetFunction(1, GPIO_PIN_PC1, 9); //i2c3_scl_m0
+    GpioPinSetFunction(1, GPIO_PIN_PC0, 9); //i2c3_sda_m0
     break;
   case 4:
+    GpioPinSetFunction(3, GPIO_PIN_PA6, 9); //i2c4_scl_m0
+    GpioPinSetFunction(3, GPIO_PIN_PA5, 9); //i2c4_sda_m0
     break;
   case 5:
+    GpioPinSetFunction(3, GPIO_PIN_PC7, 9); //i2c5_scl_m0
+    GpioPinSetFunction(3, GPIO_PIN_PD0, 9); //i2c5_sda_m0
+    break;
+  case 6:
+    GpioPinSetFunction(0, GPIO_PIN_PD0, 9); //i2c6_scl_m0
+    GpioPinSetFunction(0, GPIO_PIN_PC7, 9); //i2c6_sda_m0
+    break;
+  case 7:
+    GpioPinSetFunction(1, GPIO_PIN_PD0, 9); //i2c7_scl_m0
+    GpioPinSetFunction(1, GPIO_PIN_PD1, 9); //i2c7_sda_m0
     break;
   default:
     break;
