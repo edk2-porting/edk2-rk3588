@@ -1,4 +1,4 @@
-#define BOARD_I2S1_TPLG "i2s-jack"
+#define BOARD_I2S0_TPLG "i2s-jack"
 
 #define BOARD_AUDIO_CODEC_HID "ESSX8316"
 #define BOARD_CODEC_I2C "\\_SB.I2C7"
