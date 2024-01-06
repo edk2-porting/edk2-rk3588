@@ -16,6 +16,7 @@
 
 #include <IndustryStandard/Acpi.h>
 #include <IndustryStandard/MemoryMappedConfigurationSpaceAccessTable.h>
+#include <Library/GpioLib.h>
 
 #define EFI_ACPI_OEM_ID                       {'R','K','C','P',' ',' '}
 
