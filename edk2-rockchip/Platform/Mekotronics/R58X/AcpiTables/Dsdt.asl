@@ -36,9 +36,9 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 2, "RKCP  ", "RK3588  ", 2)
     include ("Usb3Host0.asl")
     include ("Usb3Host1.asl")
     include ("Usb3Host2.asl")
-  }
 
-  Scope (\_SB_.I2C3) {
-    include ("Es8388.asl")
+    Scope (I2C3) {
+      include ("Es8388.asl")
+    }
   }
 }
