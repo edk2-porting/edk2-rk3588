@@ -1,4 +1,3 @@
-#define BOARD_ENABLE_I2S0
 #define BOARD_I2S0_TPLG "i2s-jack"
 
 #define BOARD_AUDIO_CODEC_HID "ESSX8388"

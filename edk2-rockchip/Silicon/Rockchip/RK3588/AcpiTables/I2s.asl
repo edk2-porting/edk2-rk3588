@@ -7,7 +7,7 @@
  **/
 #include "AcpiTables.h"
 
-#ifdef BOARD_ENABLE_I2S0
+#if FixedPcdGetBool(PcdI2S0Supported)
   Device (I2S0) {
     Name (_HID, "RKCP3003")
     Name (_UID, 0)
@@ -33,7 +33,7 @@
   }
 #endif
 
-#ifdef BOARD_ENABLE_I2S1
+#if FixedPcdGetBool(PcdI2S1Supported)
   Device (I2S1) {
     Name (_HID, "RKCP3003")
     Name (_UID, 1)

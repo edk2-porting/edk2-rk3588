@@ -13,7 +13,6 @@
 
 #include "AcpiTables.h"
 
-#define BOARD_ENABLE_I2S0
 #define BOARD_I2S0_TPLG "i2s-jack"
 
 DefinitionBlock ("Dsdt.aml", "DSDT", 2, "RKCP  ", "RK3588  ", 2)
