@@ -253,7 +253,7 @@ GpioPinSetPull (
 {
   ASSERT (Group < GPIO_NGROUPS);
   
-  UINTN Idx;
+  INTN Idx;
   EFI_PHYSICAL_ADDRESS Reg;
   CONST UINT32 Value = GRF_GPIO_P_MASK (Pin) | ((UINT32)Pull << GRF_GPIO_P_SHIFT (Pin));
 
@@ -278,7 +278,7 @@ GpioPinSetDrive (
 {
   ASSERT (Group < GPIO_NGROUPS);
   
-  UINTN Idx;
+  INTN Idx;
   EFI_PHYSICAL_ADDRESS Reg;
   CONST UINT32 Value = GRF_GPIO_DS_MASK (Pin) | ((UINT32)Drive << GRF_GPIO_DS_SHIFT (Pin));
 
@@ -303,7 +303,7 @@ GpioPinSetInput (
 {
   ASSERT (Group < GPIO_NGROUPS);
   
-  UINTN Idx;
+  INTN Idx;
   EFI_PHYSICAL_ADDRESS Reg;
   CONST UINT32 Value = GRF_GPIO_IE_MASK (Pin) | ((UINT32)InputEnable << GRF_GPIO_IE_SHIFT (Pin));
 
