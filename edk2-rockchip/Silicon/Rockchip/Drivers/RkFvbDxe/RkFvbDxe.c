@@ -1010,7 +1010,7 @@ FvbConfigureFlashInstance (
   FtwSpareSize = PcdGet32 (PcdFlashNvStorageFtwSpareSize);
 
   FlashInstance->FvbSize = VariableSize + FtwWorkingSize + FtwSpareSize;
-  FlashInstance->FvbOffset = PcdGet32 (PcdNvStorageVariableBase);
+  FlashInstance->FvbOffset = PcdGet64 (PcdFlashNvStorageVariableBase64);
 
   FlashInstance->Media.MediaId = 0;
   FlashInstance->Media.BlockSize = SIZE_4KB;//FlashInstance->SpiDevice.Info->SectorSize;

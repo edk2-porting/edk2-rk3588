@@ -52,15 +52,15 @@ FV = BL33_AP_UEFI
 
 # NV_VARIABLE_STORE
 0x007C0000|0x00010000
-gRockchipTokenSpaceGuid.PcdNvStorageVariableBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
+gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
 
 # NV_FTW_WORKING header
 0x007D0000|0x00010000
-gRockchipTokenSpaceGuid.PcdNvStorageFtwWorkingBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
+gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
 
 # NV_FTW_WORKING data
 0x007E0000|0x00010000
-gRockchipTokenSpaceGuid.PcdNvStorageFtwSpareBase|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
+gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
 
 ################################################################################
 #

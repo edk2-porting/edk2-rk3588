@@ -260,10 +260,6 @@
   gRK3588TokenSpaceGuid.PcdAcpiUsb2StateDefault|$(ACPI_USB2_STATE_DISABLED)
 
 [PcdsDynamicDefault.common]
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64|0x007C0000
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64|0x007CF000
-  gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64|0x007D0000
-
   #
   # Display
   #

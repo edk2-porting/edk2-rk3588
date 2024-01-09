@@ -67,9 +67,6 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
-#  gRockchipTokenSpaceGuid.PcdSpiMemoryBase
-#  gRockchipTokenSpaceGuid.PcdSpiMemoryMapped
-  gRockchipTokenSpaceGuid.PcdNvStorageVariableBase
   gRockchipTokenSpaceGuid.PcdNvStoragePreferSpiFlash
   gRockchipTokenSpaceGuid.PcdDwcSdhciBaseAddress
   gRockchipTokenSpaceGuid.PcdRkSdmmcBaseAddress

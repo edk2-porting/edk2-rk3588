@@ -26,7 +26,7 @@ STATIC UINT64 mSystemMemorySize = FixedPcdGet64 (PcdSystemMemorySize);
 STATIC BOOLEAN                     VirtualMemoryInfoInitialized = FALSE;
 STATIC RK3588_MEMORY_REGION_INFO   VirtualMemoryInfo[MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS];
 
-#define VariablesBase FixedPcdGet64(PcdNvStorageVariableBase)
+#define VariablesBase FixedPcdGet64(PcdFlashNvStorageVariableBase64)
 
 #define VariablesSize (FixedPcdGet32(PcdFlashNvStorageVariableSize)   + \
                        FixedPcdGet32(PcdFlashNvStorageFtwWorkingSize) + \
@@ -137,7 +137,7 @@ ArmPlatformGetVirtualMemoryMap (
     VirtualMemoryInfo[Index].Type             = RK3588_MEM_RESERVED_REGION;
     VirtualMemoryInfo[Index++].Name           = L"BAD2";
   }
-  
+
   // Firmware Volume
   // VirtualMemoryTable[Index].PhysicalBase    = FixedPcdGet64 (PcdFdBaseAddress);
   // VirtualMemoryTable[Index].VirtualBase     = VirtualMemoryTable[Index].PhysicalBase;
