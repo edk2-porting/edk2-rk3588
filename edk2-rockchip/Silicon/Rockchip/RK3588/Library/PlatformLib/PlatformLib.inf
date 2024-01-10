@@ -28,12 +28,14 @@
 
 [LibraryClasses]
   ArmLib
+  BaseVariableLib
   FdtLib
   IoLib
   MemoryAllocationLib
   PcdLib
   PrintLib
   SdramLib
+  SerialPortLib
 
 [Sources.common]
   Rk3588.c
@@ -62,5 +64,11 @@
   gArmTokenSpaceGuid.PcdSystemMemoryBase
   gArmTokenSpaceGuid.PcdSystemMemorySize
 
+[PatchPcd]
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
+
 [Ppis]
   gArmMpCoreInfoPpiGuid
+
+[Guids]
+  gRK3588DxeFormSetGuid

@@ -16,6 +16,7 @@
 #define VFR_FILE_INCLUDE
 #include "CpuPerformance.h"
 #include "FanControl.h"
+#include "DebugSerialPort.h"
 
 //
 // EFI Variable attributes
@@ -146,6 +147,11 @@ formset
       name  = CoolingFanSpeed,
       guid  = RK3588DXE_FORMSET_GUID;
 
+    efivarstore DEBUG_SERIAL_PORT_BAUD_RATE_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = DebugSerialPortBaudRate,
+      guid  = RK3588DXE_FORMSET_GUID;
+
     form formid = 1,
       title  = STRING_TOKEN(STR_FORM_SET_TITLE);
       subtitle text = STRING_TOKEN(STR_FORM_SET_TITLE_SUBTITLE);
@@ -182,6 +188,9 @@ formset
         help = STRING_TOKEN(STR_COOLING_FAN_FORM_HELP);
 #endif
 
+      goto 0x1006,
+        prompt = STRING_TOKEN(STR_DEBUG_SERIAL_PORT_FORM_TITLE),
+        help = STRING_TOKEN(STR_DEBUG_SERIAL_PORT_FORM_HELP);
     endform;
 
     form formid = 0x1000,
@@ -524,7 +533,23 @@ formset
           endnumeric;
         endif;
     endform;
-
 #endif
+
+    form formid = 0x1006,
+        title  = STRING_TOKEN(STR_DEBUG_SERIAL_PORT_FORM_TITLE);
+
+        numeric varid = DebugSerialPortBaudRate.Value,
+          prompt  = STRING_TOKEN(STR_DEBUG_SERIAL_PORT_BAUD_RATE_PROMPT),
+          help    = STRING_TOKEN(STR_NULL_STRING),
+          flags   = DISPLAY_UINT_DEC | NUMERIC_SIZE_8 | INTERACTIVE | RESET_REQUIRED,
+          minimum = DEBUG_SERIAL_PORT_BAUD_RATE_MIN,
+          maximum = DEBUG_SERIAL_PORT_BAUD_RATE_MAX,
+          step    = 0,
+          default = DEBUG_SERIAL_PORT_BAUD_RATE_DEFAULT,
+        endnumeric;
+
+        subtitle text = STRING_TOKEN(STR_NULL_STRING);
+        subtitle text = STRING_TOKEN(STR_DEBUG_SERIAL_PORT_SUBTITLE);
+    endform;
 
 endformset;

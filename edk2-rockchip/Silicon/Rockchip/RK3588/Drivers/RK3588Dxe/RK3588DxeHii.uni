@@ -155,3 +155,12 @@
 
 #string STR_COOLING_FAN_SPEED_PROMPT                       #language en-US "Fan Speed (%)"
 #string STR_COOLING_FAN_SPEED_HELP                         #language en-US "PWM duty cycle of on-board fan output."
+
+/*
+ * Debug Serial Port configuration
+ */
+#string STR_DEBUG_SERIAL_PORT_FORM_TITLE                   #language en-US "Debug Serial Port"
+#string STR_DEBUG_SERIAL_PORT_FORM_HELP                    #language en-US "Configure the debug (UART) serial port."
+#string STR_DEBUG_SERIAL_PORT_SUBTITLE                     #language en-US "Note: These settings only take effect in UEFI and might be overridden by the OS. Earlier boot messages will be printed at the default settings."
+
+#string STR_DEBUG_SERIAL_PORT_BAUD_RATE_PROMPT             #language en-US "Baud Rate"

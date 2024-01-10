@@ -12,6 +12,8 @@
 #include <Library/IoLib.h>
 #include <Library/ArmPlatformLib.h>
 #include <Library/DebugLib.h>
+#include <Library/BaseVariableLib.h>
+#include <Library/SerialPortLib.h>
 #include <Pi/PiBootMode.h>
 
 #include <Ppi/ArmMpCoreInfo.h>
@@ -40,6 +42,27 @@ ArmPlatformInitialize (
   IN  UINTN  MpId
   )
 {
+  EFI_STATUS  Status;
+  UINTN       Size;
+  UINT64      BaudRate;
+
+  Size = sizeof (UINT64);
+  Status = BaseGetVariable (
+             L"DebugSerialPortBaudRate",
+             &gRK3588DxeFormSetGuid,
+             NULL,
+             &Size,
+             &BaudRate
+             );
+  if (EFI_ERROR (Status) || BaudRate == 0) {
+    return RETURN_SUCCESS;
+  }
+
+  DEBUG ((DEBUG_INFO, "%a: Setting baud rate to %lu\n", __func__, BaudRate));
+
+  PatchPcdSet64 (PcdUartDefaultBaudRate, BaudRate);
+  SerialPortInitialize ();
+
   return RETURN_SUCCESS;
 }
 

@@ -78,4 +78,8 @@ typedef struct {
   UINT32 State;
 } USBDP_PHY_USB3_STATE_VARSTORE_DATA;
 
+typedef struct {
+  UINT64 Value;
+} DEBUG_SERIAL_PORT_BAUD_RATE_VARSTORE_DATA;
+
 #endif // __VARSTORE_DATA_H__

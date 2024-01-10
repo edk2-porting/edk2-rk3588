@@ -100,8 +100,8 @@
   # ACPI helpers
   AcpiLib|EmbeddedPkg/Library/AcpiLib/AcpiLib.inf
 
-  # UART library
-  SerialPortLib|Silicon/Hisilicon/Library/Dw8250SerialPortLib/Dw8250SerialPortLib.inf
+  # Debug UART library
+  SerialPortLib|Silicon/Rockchip/Library/Dw8250SerialPortLib/DebugDw8250SerialPortLib.inf
 
   # SoC and memory descriptors
   ArmPlatformLib|Silicon/Rockchip/RK3588/Library/PlatformLib/PlatformLib.inf
@@ -166,7 +166,6 @@
   # UART2 - Serial Terminal
   DEFINE SERIAL_BASE = 0xFEB50000 # UART2
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase|$(SERIAL_BASE)
-  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|1500000
   gHisiTokenSpaceGuid.PcdSerialPortSendDelay|500000
   gHisiTokenSpaceGuid.PcdUartClkInHz|24000000
 
@@ -259,6 +258,9 @@
   # EHCI disabled by default since it crashes Windows.
   gRK3588TokenSpaceGuid.PcdAcpiUsb2StateDefault|$(ACPI_USB2_STATE_DISABLED)
 
+[PcdsPatchableInModule]
+  gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|1500000
+
 [PcdsDynamicDefault.common]
   #
   # Display
@@ -322,6 +324,15 @@
 #
 ################################################################################
 [Components.common]
+  #
+  # PEI Phase modules
+  #
+  ArmPlatformPkg/PrePi/PeiUniCore.inf {
+    <LibraryClasses>
+      # Full UART library
+      SerialPortLib|Silicon/Rockchip/Library/Dw8250SerialPortLib/Dw8250SerialPortLib.inf
+  }
+
   # General platform manager
   Silicon/Rockchip/RK3588/Drivers/RK3588Dxe/RK3588Dxe.inf
 

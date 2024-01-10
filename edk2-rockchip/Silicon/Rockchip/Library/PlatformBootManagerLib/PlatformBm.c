@@ -65,10 +65,10 @@ STATIC PLATFORM_SERIAL_CONSOLE  mSerialConsole = {
   {
     { MESSAGING_DEVICE_PATH, MSG_UART_DP,  DP_NODE_LEN (UART_DEVICE_PATH)   },
     0,                                      // Reserved
-    FixedPcdGet64 (PcdUartDefaultBaudRate), // BaudRate
-    FixedPcdGet8 (PcdUartDefaultDataBits),  // DataBits
-    FixedPcdGet8 (PcdUartDefaultParity),    // Parity
-    FixedPcdGet8 (PcdUartDefaultStopBits)   // StopBits
+    0,                                      // BaudRate
+    0,                                      // DataBits
+    0,                                      // Parity
+    0,                                      // StopBits
   },
 
   //
@@ -925,6 +925,11 @@ PlatformBootManagerBeforeConsole (
     FixedPcdGet8 (PcdUartDefaultStopBits) != 0,
     "PcdUartDefaultStopBits must be set to an actual value, not 'default'"
     );
+
+  mSerialConsole.Uart.BaudRate = PcdGet64 (PcdUartDefaultBaudRate);
+  mSerialConsole.Uart.DataBits = PcdGet8 (PcdUartDefaultDataBits);
+  mSerialConsole.Uart.Parity = PcdGet8 (PcdUartDefaultParity);
+  mSerialConsole.Uart.StopBits = PcdGet8 (PcdUartDefaultStopBits);
 
   CopyGuid (&mSerialConsole.TermType.Guid, &gEfiTtyTermGuid);
 

@@ -232,6 +232,8 @@
   PWMLib|Silicon/Rockchip/Library/PWMLib/PWMLib.inf
   RockchipDisplayLib|Silicon/Rockchip/Library/DisplayLib/RockchipDisplayLib.inf
 
+  BaseVariableLib|Silicon/Rockchip/Library/BaseVariableLib/BaseVariableLib.inf
+
 [LibraryClasses.common.SEC]
   ArmGicArchLib|ArmPkg/Library/ArmGicArchSecLib/ArmGicArchSecLib.inf
   PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf

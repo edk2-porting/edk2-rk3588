@@ -15,14 +15,15 @@
 
 [Sources.common]
   RK3588Dxe.c
+  RK3588DxeHii.uni
+  RK3588DxeHii.vfr
   CpuPerformance.c
   ComboPhy.c
   PciExpress30.c
   ConfigTable.c
   FanControl.c
   UsbDpPhy.c
-  RK3588DxeHii.uni
-  RK3588DxeHii.vfr
+  DebugSerialPort.c
 
 [Packages]
   ArmPkg/ArmPkg.dec
