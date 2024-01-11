@@ -860,6 +860,20 @@ PlatformBootManagerBeforeConsole (
   EfiBootManagerDispatchDeferredImages ();
 
   //
+  // Add the hardcoded short-form USB keyboard device path to ConIn.
+  // This must be done prior to connecting any USB bus controllers, because
+  // when a keyboard gets installed, ConPlatformDxe will immediately check
+  // that its device path exists in the ConIn variable before enabling input
+  // from it. Since this variable is not initially populated at first boot,
+  // we would otherwise end up with no keyboard input during BDS countdown.
+  //
+  EfiBootManagerUpdateConsoleVariable (
+    ConIn,
+    (EFI_DEVICE_PATH_PROTOCOL *)&mUsbKeyboard,
+    NULL
+    );
+
+  //
   // Locate the PCI root bridges and make the PCI bus driver connect each,
   // non-recursively. This will produce a number of child handles with PciIo on
   // them.
@@ -900,15 +914,6 @@ PlatformBootManagerBeforeConsole (
   // in time.
   //
   FilterAndProcess (&gEfiBlockIoProtocolGuid, IsSdBootBlockIo, Connect);
-
-  //
-  // Add the hardcoded short-form USB keyboard device path to ConIn.
-  //
-  EfiBootManagerUpdateConsoleVariable (
-    ConIn,
-    (EFI_DEVICE_PATH_PROTOCOL *)&mUsbKeyboard,
-    NULL
-    );
 
   //
   // Add the hardcoded serial console device path to ConIn, ConOut, ErrOut.
