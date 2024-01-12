@@ -380,5 +380,5 @@ PlatformEarlyInit (
   VOID
   )
 {
-
+  GpioPinSetFunction(3, GPIO_PIN_PB2, 0); //jdet
 }

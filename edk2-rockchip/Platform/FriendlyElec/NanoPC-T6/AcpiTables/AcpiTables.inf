@@ -49,6 +49,7 @@
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
   Silicon/Rockchip/RockchipPkg.dec
+  Silicon/Rockchip/RK3588/RK3588.dec
 
 [FixedPcd]
   gArmTokenSpaceGuid.PcdArmArchTimerIntrNum
@@ -59,3 +60,5 @@
   gArmTokenSpaceGuid.PcdGicDistributorBase
   gArmTokenSpaceGuid.PcdGicRedistributorsBase
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase
+  gRK3588TokenSpaceGuid.PcdI2S0Supported
+  gRK3588TokenSpaceGuid.PcdI2S1Supported

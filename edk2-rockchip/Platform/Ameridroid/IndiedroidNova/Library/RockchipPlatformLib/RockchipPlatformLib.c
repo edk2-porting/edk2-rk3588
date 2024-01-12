@@ -292,4 +292,5 @@ PlatformEarlyInit (
   )
 {
   // Configure various things specific to this platform
+  GpioPinSetFunction(4, GPIO_PIN_PA7, 0); //jdet
 }

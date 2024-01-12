@@ -378,4 +378,6 @@ PlatformEarlyInit (
   )
 {
   // Configure various things specific to this platform
+  GpioPinSetFunction(1, GPIO_PIN_PD3, 0); //jdet
+  GpioPinSetFunction(1, GPIO_PIN_PD0, 0); //spk_con
 }

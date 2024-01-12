@@ -63,9 +63,9 @@
 
   # I2C
   gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x42, 0x43, 0x51 }
-  gRockchipTokenSpaceGuid.PcdI2cSlaveBuses|{ 0x0, 0x0, 0x6 }
-  gRockchipTokenSpaceGuid.PcdI2cSlaveBusesRuntimeSupport|{ FALSE, FALSE, TRUE }
-  gRockchipTokenSpaceGuid.PcdRk860xRegulatorAddresses|{ 0x42, 0x43 }
+  gRockchipTokenSpaceGuid.PcdI2cSlaveBuses|{ 0x0, 0x0, 0x6, 0x7 }
+  gRockchipTokenSpaceGuid.PcdI2cSlaveBusesRuntimeSupport|{ FALSE, FALSE, TRUE, FALSE }
+  gRockchipTokenSpaceGuid.PcdRk860xRegulatorAddresses|{ 0x42, 0x43, 0x11 }
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorBuses|{ 0x0, 0x0 }
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorTags|{ $(SCMI_CLK_CPUB01), $(SCMI_CLK_CPUB23) }
   gPcf8563RealTimeClockLibTokenSpaceGuid.PcdI2cSlaveAddress|0x51
@@ -95,6 +95,11 @@
   gRK3588TokenSpaceGuid.PcdUsbDpPhy1Supported|TRUE
   gRK3588TokenSpaceGuid.PcdDp0LaneMux|{ 0x2, 0x3 }
   gRK3588TokenSpaceGuid.PcdDp1LaneMux|{ 0x0 }
+
+  #
+  # I2S
+  #
+  gRK3588TokenSpaceGuid.PcdI2S0Supported|TRUE
 
   #
   # On-Board fan output

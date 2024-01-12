@@ -106,6 +106,9 @@
   gRK3588TokenSpaceGuid.PcdUsbDpPhy0Usb3State
   gRK3588TokenSpaceGuid.PcdUsbDpPhy1Usb3State
 
+  gRK3588TokenSpaceGuid.PcdI2S0Supported
+  gRK3588TokenSpaceGuid.PcdI2S1Supported
+
 [Guids]
   gRK3588DxeFormSetGuid
   gEfiEndOfDxeEventGroupGuid

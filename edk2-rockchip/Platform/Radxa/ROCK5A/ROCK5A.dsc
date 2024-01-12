@@ -57,9 +57,9 @@
   gRockchipTokenSpaceGuid.PcdDeviceTreeName|"rk3588s-rock-5a"
 
   # I2C
-  gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x42, 0x43 }
-  gRockchipTokenSpaceGuid.PcdI2cSlaveBuses|{ 0x0, 0x0 }
-  gRockchipTokenSpaceGuid.PcdI2cSlaveBusesRuntimeSupport|{ FALSE, FALSE }
+  gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x42, 0x43, 0x11 }
+  gRockchipTokenSpaceGuid.PcdI2cSlaveBuses|{ 0x0, 0x0, 0x7 }
+  gRockchipTokenSpaceGuid.PcdI2cSlaveBusesRuntimeSupport|{ FALSE, FALSE, FALSE }
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorAddresses|{ 0x42, 0x43 }
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorBuses|{ 0x0, 0x0 }
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorTags|{ $(SCMI_CLK_CPUB01), $(SCMI_CLK_CPUB23) }
@@ -90,7 +90,12 @@
   #
   gRK3588TokenSpaceGuid.PcdGmac1Supported|TRUE
   gRK3588TokenSpaceGuid.PcdGmac1TxDelay|0x3a
-  gRK3588TokenSpaceGuid.PcdGmac1RxDelay|0x3e
+  gRK3588TokenSpaceGuid.PcdGmac1RxDelay|0x3e 
+
+  #
+  # I2S
+  #
+  gRK3588TokenSpaceGuid.PcdI2S0Supported|TRUE
 
   #
   # On-Board fan output

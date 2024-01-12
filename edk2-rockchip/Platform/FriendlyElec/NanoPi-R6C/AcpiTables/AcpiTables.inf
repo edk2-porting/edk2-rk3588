@@ -60,3 +60,5 @@
   gArmTokenSpaceGuid.PcdGicDistributorBase
   gArmTokenSpaceGuid.PcdGicRedistributorsBase
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase
+  gRK3588TokenSpaceGuid.PcdI2S0Supported
+  gRK3588TokenSpaceGuid.PcdI2S1Supported

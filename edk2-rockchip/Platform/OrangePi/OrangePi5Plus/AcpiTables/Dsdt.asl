@@ -13,6 +13,14 @@
 
 #include "AcpiTables.h"
 
+#define BOARD_I2S0_TPLG "i2s-jack"
+
+#define BOARD_AUDIO_CODEC_HID "ESSX8388"
+#define BOARD_CODEC_I2C "\\_SB.I2C7"
+#define BOARD_CODEC_I2C_ADDR 0x11
+#define BOARD_CODEC_GPIO "\\_SB.GPI1"
+#define BOARD_CODEC_GPIO_PIN GPIO_PIN_PD3
+
 DefinitionBlock ("Dsdt.aml", "DSDT", 2, "RKCP  ", "RK3588  ", 2)
 {
   Scope (\_SB_)
@@ -28,8 +36,14 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 2, "RKCP  ", "RK3588  ", 2)
     include ("Uart.asl")
     // include ("Spi.asl")
 
+    include ("I2s.asl")
+
     include ("Usb1Host.asl")
     include ("Usb3Host0.asl")
     include ("Usb3Host1.asl")
+
+    Scope (I2C7) {
+      include ("Es8388.asl")
+    }
   }
 }

@@ -59,6 +59,9 @@
   gRK3588TokenSpaceGuid.PcdGmac1TxDelay|0|UINT8|0x00010605
   gRK3588TokenSpaceGuid.PcdGmac1RxDelay|0|UINT8|0x00010606
 
+  gRK3588TokenSpaceGuid.PcdI2S0Supported|FALSE|BOOLEAN|0x00010701
+  gRK3588TokenSpaceGuid.PcdI2S1Supported|FALSE|BOOLEAN|0x00010702
+
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   gRK3588TokenSpaceGuid.PcdCPULClusterClockPreset|0|UINT32|0x00000001
   gRK3588TokenSpaceGuid.PcdCPULClusterClockCustom|0|UINT32|0x00000002
