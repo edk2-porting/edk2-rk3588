@@ -14,7 +14,6 @@
 #include <Library/PWMLib.h>
 #include <Soc.h>
 #include <Library/UefiBootServicesTableLib.h>
-#include "../../onboard.h"
 
 static struct regulator_init_data rk806_init_data[] = {
   /* Master PMIC */
@@ -365,5 +364,5 @@ PlatformEarlyInit (
   VOID
   )
 {
-  GpioPinSetFunction(1, BOARD_CODEC_GPIO_PIN, 0); //jdet
+  GpioPinSetFunction(1, GPIO_PIN_PA6, 0); //jdet
 }

@@ -13,7 +13,6 @@
 #include <Library/Rk3588Pcie.h>
 #include <Library/PWMLib.h>
 #include <Soc.h>
-#include "../../onboard.h"
 
 static struct regulator_init_data rk806_init_data[] = {
   /* Master PMIC */
@@ -382,5 +381,5 @@ PlatformEarlyInit (
   // Configure various things specific to this platform
   PlatformWiFiEnable (TRUE);
   
-  GpioPinSetFunction(1, BOARD_CODEC_GPIO_PIN, 0); //jdet
+  GpioPinSetFunction(1, GPIO_PIN_PD3, 0); //jdet
 }
