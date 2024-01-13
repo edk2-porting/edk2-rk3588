@@ -197,7 +197,7 @@ I2cIomux (
   switch (id) {
   case 0:
     GpioPinSetFunction(0, GPIO_PIN_PD1, 3); //i2c0_scl_m2
-    GpioPinSetFunction(0, GPIO_PIN_PD2, 2); //i2c0_sda_m2
+    GpioPinSetFunction(0, GPIO_PIN_PD2, 3); //i2c0_sda_m2
     break;
   case 1:
     break;
