@@ -154,6 +154,7 @@ The paths above are relative to the root of the file system. That is, the `dtb` 
 | `rk3588-orangepi-5-plus`                | Orange Pi 5 Plus              |
 | `rk3588s-rock-5a`                       | ROCK 5A                       |
 | `rk3588-rock-5b`                        | ROCK 5B                       |
+| `yourland`                              | GEDU YourLand Notebook        |
 
 In the absence of a custom base DTB override, the overlays are applied on top of the firmware-provided DTB.
 
