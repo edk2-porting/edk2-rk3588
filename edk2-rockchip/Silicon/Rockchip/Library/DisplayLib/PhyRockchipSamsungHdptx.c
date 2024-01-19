@@ -18,9 +18,8 @@
 #include <Library/PWMLib.h>
 #include <Library/DrmModes.h>
 
-#define BITS_PER_LONG   32
-#define GENMASK(h, l)  \
-  (((~0UL) << (l)) & (~0UL >> (BITS_PER_LONG - 1 - (h))))
+#include "uboot-env.h"
+
 #define RO_REF_CLK_SEL				GENMASK(11, 10)
 #define LC_REF_CLK_SEL				GENMASK(9, 8)
 #define PLL_EN					BIT(7)

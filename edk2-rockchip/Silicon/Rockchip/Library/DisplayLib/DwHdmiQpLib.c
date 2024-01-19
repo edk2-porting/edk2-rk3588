@@ -21,11 +21,11 @@
 #include <Library/DrmModes.h>
 #include <Library/GpioLib.h>
 
-#include <string.h>
-
 #include <Protocol/RockchipConnectorProtocol.h>
 
 #include <Uefi/UefiBaseType.h>
+
+#include "uboot-env.h"
 
 #define HIWORD_UPDATE(val, mask)	(val | (mask) << 16)
 

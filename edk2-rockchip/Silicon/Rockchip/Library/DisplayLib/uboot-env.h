@@ -6,7 +6,7 @@
 #include <Library/IoLib.h>
 #include <Library/TimerLib.h>
 #include <Library/BaseLib.h>
-#include <string.h>
+#include <Library/BaseMemoryLib.h>
 #include <Soc.h>
 #include "errno.h"
 
@@ -19,6 +19,7 @@ typedef UINT64 u64;
 typedef unsigned int uint;
 typedef UINTN ulong;
 typedef INTN ssize_t;
+typedef UINTN size_t;
 typedef BOOLEAN bool;
 
 #define true TRUE
@@ -131,5 +132,17 @@ static inline u32 get_unaligned_le32(const void *p)
 {
 	return __get_unaligned_le32((const u8 *)p);
 }
+
+#define memcpy(dest, source, count)         CopyMem(dest,source, (UINTN)(count))
+#define memset(dest, ch, count)             SetMem(dest, (UINTN)(count),(UINT8)(ch))
+#define memchr(buf, ch, count)              ScanMem8(buf, (UINTN)(count),(UINT8)ch)
+#define memcmp(buf1, buf2, count)           (int)(CompareMem(buf1, buf2, (UINTN)(count)))
+#define memmove(dest, source, count)        CopyMem(dest, source, (UINTN)(count))
+#define strlen(str)                         (size_t)(AsciiStrLen(str))
+#define strnlen(str, count)                 (size_t)(AsciiStrnLenS(str, count))
+#define strncpy(strDest, strSource, count)  AsciiStrnCpyS(strDest, MAX_STRING_SIZE, strSource, (UINTN)count)
+#define strcat(strDest, strSource)          AsciiStrCatS(strDest, MAX_STRING_SIZE, strSource)
+#define strcmp(string1, string2, count)     (int)(AsciiStrCmp(string1, string2))
+#define strncmp(string1, string2, count)    (int)(AsciiStrnCmp(string1, string2, (UINTN)(count)))
 
 #endif // _UBOOT_ENV_H

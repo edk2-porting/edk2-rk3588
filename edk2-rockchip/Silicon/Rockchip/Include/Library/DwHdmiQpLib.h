@@ -21,10 +21,6 @@
 #define EINVAL          22      /* Invalid argument */
 #define ETIMEDOUT       110     /* Connection timed out */
 
-#define BITS_PER_LONG   32
-#define GENMASK(h, l)  \
-  (((~0U) << (l)) & (~0U >> (BITS_PER_LONG - 1 - (h))))
-
 /* Main Unit Registers */
 #define CORE_ID						0x0
 #define VER_NUMBER					0x4
@@ -910,7 +906,6 @@
 #define HDPTXPHY0_GRF_BASE	0xFD5E0000
 #define HDPTXPHY1_GRF_BASE	0xFD5E4000
 
-#define PMU1CRU_BASE		0xFD7F0000
 #define PMU1CRU_SOFTRST_CON03	0xA0C
 #define PMU1CRU_SOFTRST_CON04	0xA10
 

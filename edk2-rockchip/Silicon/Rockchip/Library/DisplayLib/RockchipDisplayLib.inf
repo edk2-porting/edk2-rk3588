@@ -24,6 +24,7 @@
   UefiBootServicesTableLib
   MemoryAllocationLib
   BaseLib
+  BaseMemoryLib
 
 [Packages]
   ArmPlatformPkg/ArmPlatformPkg.dec

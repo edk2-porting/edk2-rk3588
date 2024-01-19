@@ -31,6 +31,7 @@
   IoLib
   DebugLib
   BaseLib
+  BaseMemoryLib
   MemoryAllocationLib
   RockchipDisplayLib
   UefiDriverEntryPoint

@@ -7,7 +7,6 @@
 #include <Library/DebugLib.h>
 #include <Library/IoLib.h>
 #include <Library/PcdLib.h>
-#include <string.h>
 #include <Library/TimerLib.h>
 #include <Library/SpiMem.h>
 #include <Library/Fspi.h>
@@ -1003,7 +1002,7 @@ SpiFlashUpdateBlock (
     }
 
   if (Align) {
-    memcpy(&TmpBuf[Align], Buf, ToUpdate);
+    CopyMem (&TmpBuf[Align], Buf, ToUpdate);
     Status = HAL_SNOR_ProgData (g_nor, Offset - Align, TmpBuf, EraseSize);
     if (EFI_ERROR (Status)) {
       DEBUG((DEBUG_ERROR, "SpiFlash: Update: Error while writing new data\n"));
