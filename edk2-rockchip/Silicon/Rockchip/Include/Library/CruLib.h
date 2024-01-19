@@ -1,7 +1,11 @@
-/* SPDX-License-Identifier: BSD-3-Clause */
-/*
- * Copyright (c) 2020-2021 Rockchip Electronics Co., Ltd.
- */
+/** @file
+ *
+ *  Copyright (c) 2024, Mario Bălănică <mariobalanica02@gmail.com>
+ *  Copyright (c) 2020-2021 Rockchip Electronics Co., Ltd.
+ *
+ *  SPDX-License-Identifier: BSD-2-Clause-Patent
+ *
+ **/
 
 /** @addtogroup RK_HAL_Driver
  *  @{
@@ -28,14 +32,14 @@
 #define PLL_INPUT_OSC_RATE (24 * MHZ)
 #endif
 
+#define CRU_CON_REG_ADDRESS(_regBase, _offset, _index) \
+    ((_regBase) + (_offset) + ((_index) * sizeof(uint32_t)))
+
 #define CLK_RESET_GET_REG_OFFSET(x) ((uint32_t)((x) / 16))
 #define CLK_RESET_GET_BITS_SHIFT(x) ((uint32_t)((x) % 16))
 
 #define CLK_GATE_GET_REG_OFFSET(x) ((uint32_t)((x) / 16))
 #define CLK_GATE_GET_BITS_SHIFT(x) ((uint32_t)((x) % 16))
-
-#define CLK_GET_MUX(x) ((x) & 0x0F0F00FFU)
-#define CLK_GET_DIV(x) ((((x) & 0xFF00U) >> 8) | (((x) & 0xF0F00000U) >> 4))
 
 #define WIDTH_TO_MASK(width) ((1 << (width)) - 1)
 
@@ -125,13 +129,118 @@ typedef enum {
     GLB_RST_SND_WDT2,
 } eCRU_WdtRstType;
 
+typedef enum {
+    CLOCK_SUPPORT_MUX = 1 << 0,
+    CLOCK_SUPPORT_DIV = 1 << 1,
+    CLOCK_SUPPORT_GATE = 1 << 2,
+    CLOCK_SUPPORT_ALL = 0xFFFFFFFF
+} CRU_CLOCK_SUPPORT_FLAGS;
+
+#define CRU_CLOCK_INIT(_id, _regBase, _muxOffset, _mux,                  \
+                    _divOffset, _div, _gateOffset, _gate)                \
+    [_id] = {                                                            \
+        .regBase = _regBase,                                             \
+        .flags = CLOCK_SUPPORT_ALL,                                      \
+        .muxOffset = _muxOffset,                                         \
+        .mux = _mux,                                                     \
+        .divOffset = _divOffset,                                         \
+        .div = _div,                                                     \
+        .gateOffset = _gateOffset,                                       \
+        .gate = _gate,                                                   \
+    }
+
+#define CRU_CLOCK_NOMUX_INIT(_id, _regBase,                              \
+                    _divOffset, _div, _gateOffset, _gate)                \
+    [_id] = {                                                            \
+        .regBase = _regBase,                                             \
+        .flags = CLOCK_SUPPORT_ALL & ~CLOCK_SUPPORT_MUX,                 \
+        .divOffset = _divOffset,                                         \
+        .div = _div,                                                     \
+        .gateOffset = _gateOffset,                                       \
+        .gate = _gate,                                                   \
+    }
+
+#define CRU_CLOCK_NODIV_INIT(_id, _regBase, _muxOffset, _mux,            \
+                    _gateOffset, _gate)                                  \
+    [_id] = {                                                            \
+        .regBase = _regBase,                                             \
+        .flags = CLOCK_SUPPORT_ALL & ~CLOCK_SUPPORT_DIV,                 \
+        .muxOffset = _muxOffset,                                         \
+        .mux = _mux,                                                     \
+        .gateOffset = _gateOffset,                                       \
+        .gate = _gate,                                                   \
+    }
+
+#define CRU_CLOCK_NOGATE_INIT(_id, _regBase, _muxOffset, _mux,           \
+                    _divOffset, _div)                                    \
+    [_id] = {                                                            \
+        .regBase = _regBase,                                             \
+        .flags = CLOCK_SUPPORT_ALL & ~CLOCK_SUPPORT_GATE,                \
+        .muxOffset = _muxOffset,                                         \
+        .mux = _mux,                                                     \
+        .divOffset = _divOffset,                                         \
+        .div = _div,                                                     \
+    }
+
+#define CRU_CLOCK_MUX_INIT(_id, _regBase, _muxOffset, _mux)              \
+    [_id] = {                                                            \
+        .regBase = _regBase,                                             \
+        .flags = CLOCK_SUPPORT_MUX,                                      \
+        .muxOffset = _muxOffset,                                         \
+        .mux = _mux,                                                     \
+    }
+
+#define CRU_CLOCK_DIV_INIT(_id, _regBase, _divOffset, _div)              \
+    [_id] = {                                                            \
+        .regBase = _regBase,                                             \
+        .flags = CLOCK_SUPPORT_DIV,                                      \
+        .divOffset = _divOffset,                                         \
+        .div = _div,                                                     \
+    }
+
+#define CRU_CLOCK_GATE_INIT(_id, _regBase, _gateOffset, _gate)           \
+    [_id] = {                                                            \
+        .regBase = _regBase,                                             \
+        .flags = CLOCK_SUPPORT_GATE,                                     \
+        .gateOffset = _gateOffset,                                       \
+        .gate = _gate,                                                   \
+    }
+
+#define CRU_RESET_INIT(id, _regBase, _srstOffset, _srst)                 \
+    [_id] = {                                                            \
+        .regBase = _regBase,                                             \
+        .srstOffset = _srstOffset,                                       \
+        .srst = _srst,                                                   \
+    }
+
 /***************************** Structure Definition **************************/
+
+typedef struct {
+    uint64_t                    regBase;
+    CRU_CLOCK_SUPPORT_FLAGS     flags;
+    uint32_t                    muxOffset;
+    uint32_t                    mux;
+    uint32_t                    divOffset;
+    uint32_t                    div;
+    uint32_t                    gateOffset;
+    uint32_t                    gate;
+} CRU_CLOCK;
+
+typedef struct {
+    uint64_t regBase;
+    uint32_t srstOffset;
+    uint32_t srst;
+} CRU_RESET;
 
 /** @} */
 /***************************** Function Declare ******************************/
 /** @defgroup CRU_Public_Function_Declare Public Function Declare
  *  @{
  */
+
+CRU_CLOCK * HAL_CRU_ClkGetById(uint32_t clockId);
+CRU_RESET * HAL_CRU_RstGetById(uint32_t resetId);
+
 uint32_t HAL_CRU_GetPllFreq(struct PLL_SETUP *pSetup);
 HAL_Status HAL_CRU_SetPllFreq(struct PLL_SETUP *pSetup, uint32_t rate);
 HAL_Status HAL_CRU_SetPllPowerUp(struct PLL_SETUP *pSetup);
@@ -140,37 +249,37 @@ HAL_Status HAL_CRU_SetPllPowerDown(struct PLL_SETUP *pSetup);
 uint32_t HAL_CRU_GetPllV1Freq(struct PLL_SETUP *pSetup);
 HAL_Status HAL_CRU_SetPllV1Freq(struct PLL_SETUP *pSetup, uint32_t rate);
 
-HAL_Check HAL_CRU_ClkIsEnabled(uint32_t clk);
-HAL_Status HAL_CRU_ClkEnable(uint32_t clk);
-HAL_Status HAL_CRU_ClkDisable(uint32_t clk);
+HAL_Check HAL_CRU_ClkIsEnabled(uint32_t clockId);
+HAL_Status HAL_CRU_ClkEnable(uint32_t clockId);
+HAL_Status HAL_CRU_ClkDisable(uint32_t clockId);
 
-HAL_Check HAL_CRU_ClkIsReset(uint32_t clk);
-HAL_Status HAL_CRU_ClkResetAssert(uint32_t clk);
-HAL_Status HAL_CRU_ClkResetDeassert(uint32_t clk);
+HAL_Status HAL_CRU_ClkSetDiv(uint32_t clockId, uint32_t divValue);
+uint32_t HAL_CRU_ClkGetDiv(uint32_t clockId);
 
-HAL_Status HAL_CRU_ClkSetDiv(uint32_t divName, uint32_t divValue);
-uint32_t HAL_CRU_ClkGetDiv(uint32_t divName);
-
-HAL_Status HAL_CRU_ClkSetMux(uint32_t muxName, uint32_t muxValue);
-uint32_t HAL_CRU_ClkGetMux(uint32_t muxName);
+HAL_Status HAL_CRU_ClkSetMux(uint32_t clockId, uint32_t muxValue);
+uint32_t HAL_CRU_ClkGetMux(uint32_t clockId);
 
 HAL_Status HAL_CRU_FracdivGetConfig(uint32_t rateOut, uint32_t rate,
                                     uint32_t *numerator,
                                     uint32_t *denominator);
 
-uint32_t HAL_CRU_ClkGetFreq(eCLOCK_Name clockName);
-HAL_Status HAL_CRU_ClkSetFreq(eCLOCK_Name clockName, uint32_t rate);
+uint32_t HAL_CRU_ClkGetFreq(uint32_t clockId);
+HAL_Status HAL_CRU_ClkSetFreq(uint32_t clockId, uint32_t rate);
 
 HAL_Status HAL_CRU_VopDclkEnable(uint32_t gateId);
 HAL_Status HAL_CRU_VopDclkDisable(uint32_t gateId);
 
-HAL_Status HAL_CRU_ClkNp5BestDiv(eCLOCK_Name clockName, uint32_t rate, uint32_t pRate, uint32_t *bestdiv);
+HAL_Status HAL_CRU_ClkNp5BestDiv(uint32_t clockId, uint32_t rate, uint32_t pRate, uint32_t *bestdiv);
 
 HAL_Status HAL_CRU_SetGlbSrst(eCRU_GlbSrstType type);
 
 HAL_Status HAL_CRU_WdtGlbRstEnable(eCRU_WdtRstType wdtType);
 
-HAL_Status HAL_CRU_PllCompensation(eCLOCK_Name clockName, int ppm);
+HAL_Status HAL_CRU_PllCompensation(uint32_t clockId, int ppm);
+
+HAL_Check HAL_CRU_RstIsAsserted(uint32_t resetId);
+HAL_Status HAL_CRU_RstAssert(uint32_t resetId);
+HAL_Status HAL_CRU_RstDeassert(uint32_t resetId);
 
 #ifdef HAL_CRU_AS_FEATURE_ENABLED
 /**

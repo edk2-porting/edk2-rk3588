@@ -1,11 +1,17 @@
-/* SPDX-License-Identifier: BSD-3-Clause */
-/*
- * Copyright (c) 2020-2021 Rockchip Electronics Co., Ltd.
- */
+/** @file
+ *
+ *  Copyright (c) 2024, Mario Bălănică <mariobalanica02@gmail.com>
+ *  Copyright (c) 2020-2021 Rockchip Electronics Co., Ltd.
+ *
+ *  SPDX-License-Identifier: BSD-2-Clause-Patent
+ *
+ **/
+
 #include "Include/Library/CruLib.h"
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/TimerLib.h>
+#include <Library/IoLib.h>
 
 /** @addtogroup RK_HAL_Driver
  *  @{
@@ -655,25 +661,25 @@ HAL_Status HAL_CRU_SetPllPowerDown(struct PLL_SETUP *pSetup)
  * @param  clk: clk gate id
  * @return HAL_Check
  */
-HAL_Check HAL_CRU_ClkIsEnabled(uint32_t clk)
+HAL_Check HAL_CRU_ClkIsEnabled(uint32_t clockId)
 {
-    uint32_t index = CLK_GATE_GET_REG_OFFSET(clk);
-    uint32_t shift = CLK_GATE_GET_BITS_SHIFT(clk);
+    CRU_CLOCK *clk;
+    uint32_t index, shift, address;
     HAL_Check ret;
 
-#ifdef CRU_GATE_CON_CNT
-    if (index < CRU_GATE_CON_CNT) {
-        ret = (HAL_Check)(!((CRU->CRU_CLKGATE_CON[index] & (1 << shift)) >> shift));
-    } else {
-#ifdef PMUCRU_BASE
-        ret = (HAL_Check)(!((PMUCRU->CRU_CLKGATE_CON[index - CRU_GATE_CON_CNT] & (1 << shift)) >> shift));
-#else
-        ret = (HAL_Check)(!((CRU->PMU_CLKGATE_CON[index - CRU_GATE_CON_CNT] & (1 << shift)) >> shift));
-#endif
+    clk = HAL_CRU_ClkGetById(clockId);
+    if (clk == NULL) {
+        ASSERT (FALSE);
+        return HAL_FALSE;
+    } else if ((clk->flags & CLOCK_SUPPORT_GATE) == 0) {
+        return HAL_TRUE;
     }
-#else
-    ret = (HAL_Check)(!((CRU->CRU_CLKGATE_CON[index] & (1 << shift)) >> shift));
-#endif
+
+    index = CLK_GATE_GET_REG_OFFSET(clk->gate);
+    shift = CLK_GATE_GET_BITS_SHIFT(clk->gate);
+    address = CRU_CON_REG_ADDRESS(clk->regBase, clk->gateOffset, index);
+
+    ret = (HAL_Check)(!((MmioRead32(address) & (1 << shift)) >> shift));
 
     return ret;
 }
@@ -683,24 +689,22 @@ HAL_Check HAL_CRU_ClkIsEnabled(uint32_t clk)
  * @param  clk: clk gate id
  * @return NONE
  */
-HAL_Status HAL_CRU_ClkEnable(uint32_t clk)
+HAL_Status HAL_CRU_ClkEnable(uint32_t clockId)
 {
-    uint32_t index = CLK_GATE_GET_REG_OFFSET(clk);
-    uint32_t shift = CLK_GATE_GET_BITS_SHIFT(clk);
+    CRU_CLOCK *clk;
+    uint32_t index, shift, address;
 
-#ifdef CRU_GATE_CON_CNT
-    if (index < CRU_GATE_CON_CNT) {
-        CRU->CRU_CLKGATE_CON[index] = VAL_MASK_WE(1U << shift, 0U << shift);
-    } else {
-#ifdef PMUCRU_BASE
-        PMUCRU->CRU_CLKGATE_CON[index - CRU_GATE_CON_CNT] = VAL_MASK_WE(1U << shift, 0U << shift);
-#else
-        CRU->PMU_CLKGATE_CON[index - CRU_GATE_CON_CNT] = VAL_MASK_WE(1U << shift, 0U << shift);
-#endif
+    clk = HAL_CRU_ClkGetById(clockId);
+    if (clk == NULL || (clk->flags & CLOCK_SUPPORT_GATE) == 0) {
+        ASSERT (FALSE);
+        return HAL_ERROR;
     }
-#else
-    CRU->CRU_CLKGATE_CON[index] = VAL_MASK_WE(1U << shift, 0U << shift);
-#endif
+
+    index = CLK_GATE_GET_REG_OFFSET(clk->gate);
+    shift = CLK_GATE_GET_BITS_SHIFT(clk->gate);
+    address = CRU_CON_REG_ADDRESS(clk->regBase, clk->gateOffset, index);
+
+    MmioWrite32(address, VAL_MASK_WE(1U << shift, 0U << shift));
 
     return HAL_OK;
 }
@@ -710,227 +714,138 @@ HAL_Status HAL_CRU_ClkEnable(uint32_t clk)
  * @param  clk: clk gate id
  * @return NONE
  */
-HAL_Status HAL_CRU_ClkDisable(uint32_t clk)
+HAL_Status HAL_CRU_ClkDisable(uint32_t clockId)
 {
-    uint32_t index = CLK_GATE_GET_REG_OFFSET(clk);
-    uint32_t shift = CLK_GATE_GET_BITS_SHIFT(clk);
+    CRU_CLOCK *clk;
+    uint32_t index, shift, address;
 
-#ifdef CRU_GATE_CON_CNT
-    if (index < CRU_GATE_CON_CNT) {
-        CRU->CRU_CLKGATE_CON[index] = VAL_MASK_WE(1U << shift, 1U << shift);
-    } else {
-#ifdef PMUCRU_BASE
-        PMUCRU->CRU_CLKGATE_CON[index - CRU_GATE_CON_CNT] = VAL_MASK_WE(1U << shift, 1U << shift);
-#else
-        CRU->PMU_CLKGATE_CON[index - CRU_GATE_CON_CNT] = VAL_MASK_WE(1U << shift, 1U << shift);
-#endif
+    clk = HAL_CRU_ClkGetById(clockId);
+    if (clk == NULL || (clk->flags & CLOCK_SUPPORT_GATE) == 0) {
+        ASSERT (FALSE);
+        return HAL_ERROR;
     }
-#else
-    CRU->CRU_CLKGATE_CON[index] = VAL_MASK_WE(1U << shift, 1U << shift);
-#endif
 
-    return HAL_OK;
-}
+    index = CLK_GATE_GET_REG_OFFSET(clk->gate);
+    shift = CLK_GATE_GET_BITS_SHIFT(clk->gate);
+    address = CRU_CON_REG_ADDRESS(clk->regBase, clk->gateOffset, index);
 
-/**
- * @brief  IP Clock is reset API
- * @param  clk: clk reset id
- * @return HAL_Check
- */
-HAL_Check HAL_CRU_ClkIsReset(uint32_t clk)
-{
-    uint32_t index = CLK_GATE_GET_REG_OFFSET(clk);
-    uint32_t shift = CLK_GATE_GET_BITS_SHIFT(clk);
-    HAL_Check ret;
-
-#ifdef CRU_SRST_CON_CNT
-    if (index < CRU_SRST_CON_CNT) {
-        ret = (HAL_Check)((CRU->CRU_CLKGATE_CON[index] & (1 << shift)) >> shift);
-    } else {
-        ret = (HAL_Check)((PMUCRU->CRU_CLKGATE_CON[index - CRU_SRST_CON_CNT] & (1 << shift)) >> shift);
-    }
-#else
-    ret = (HAL_Check)((CRU->CRU_CLKGATE_CON[index] & (1 << shift)) >> shift);
-#endif
-
-    return ret;
-}
-
-/**
- * @brief  IP Clock Reset Assert API
- * @param  clk: clk reset id
- * @return NONE
- */
-HAL_Status HAL_CRU_ClkResetAssert(uint32_t clk)
-{
-    uint32_t index = CLK_RESET_GET_REG_OFFSET(clk);
-    uint32_t shift = CLK_RESET_GET_BITS_SHIFT(clk);
-
-    HAL_ASSERT(shift < 16);
-#ifdef CRU_SRST_CON_CNT
-    if (index < CRU_SRST_CON_CNT) {
-        CRU->CRU_SOFTRST_CON[index] = VAL_MASK_WE(1U << shift, 1U << shift);
-    } else {
-        PMUCRU->CRU_SOFTRST_CON[index - CRU_SRST_CON_CNT] = VAL_MASK_WE(1U << shift, 1U << shift);
-    }
-#else
-    CRU->CRU_SOFTRST_CON[index] = VAL_MASK_WE(1U << shift, 1U << shift);
-#endif
-
-    return HAL_OK;
-}
-
-/**
- * @brief  IP Clock Reset Deassert API
- * @param  clk: clk reset id
- * @return NONE
- */
-HAL_Status HAL_CRU_ClkResetDeassert(uint32_t clk)
-{
-    uint32_t index = CLK_RESET_GET_REG_OFFSET(clk);
-    uint32_t shift = CLK_RESET_GET_BITS_SHIFT(clk);
-
-    HAL_ASSERT(shift < 16);
-#ifdef CRU_SRST_CON_CNT
-    if (index < CRU_SRST_CON_CNT) {
-        CRU->CRU_SOFTRST_CON[index] = VAL_MASK_WE(1U << shift, 0U << shift);
-    } else {
-        PMUCRU->CRU_SOFTRST_CON[index - CRU_SRST_CON_CNT] = VAL_MASK_WE(1U << shift, 0U << shift);
-    }
-#else
-    CRU->CRU_SOFTRST_CON[index] = VAL_MASK_WE(1U << shift, 0U << shift);
-#endif
+    MmioWrite32(address, VAL_MASK_WE(1U << shift, 1U << shift));
 
     return HAL_OK;
 }
 
 /**
  * @brief  IP Clock set div API
- * @param  divName: div id(Contains div offset, shift, mask information)
+ * @param  clockId: div id(Contains div offset, shift, mask information)
  * @param  divValue: div value
  * @return NONE
  */
-HAL_Status HAL_CRU_ClkSetDiv(uint32_t divName, uint32_t divValue)
+HAL_Status HAL_CRU_ClkSetDiv(uint32_t clockId, uint32_t divValue)
 {
-    uint32_t shift, mask, index;
+    CRU_CLOCK *clk;
+    uint32_t shift, mask, index, address;
 
-    index = CLK_DIV_GET_REG_OFFSET(divName);
-    shift = CLK_DIV_GET_BITS_SHIFT(divName);
+    clk = HAL_CRU_ClkGetById(clockId);
+    if (clk == NULL || (clk->flags & CLOCK_SUPPORT_DIV) == 0) {
+        ASSERT (FALSE);
+        return HAL_ERROR;
+    }
+
+    index = CLK_DIV_GET_REG_OFFSET(clk->div);
+    shift = CLK_DIV_GET_BITS_SHIFT(clk->div);
     HAL_ASSERT(shift < 16);
-    mask = CLK_DIV_GET_MASK(divName);
+    mask = CLK_DIV_GET_MASK(clk->div);
+    address = CRU_CON_REG_ADDRESS(clk->regBase, clk->divOffset, index);
+
     if (divValue > mask) {
         divValue = mask;
     }
 
-#ifdef CRU_CLK_DIV_CON_CNT
-    if (index < CRU_CLK_DIV_CON_CNT) {
-        CRU->CRU_CLKSEL_CON[index] = VAL_MASK_WE(mask, (divValue - 1U) << shift);
-    } else {
-#ifdef PMUCRU_BASE
-        PMUCRU->CRU_CLKSEL_CON[index - CRU_CLK_DIV_CON_CNT] = VAL_MASK_WE(mask, (divValue - 1U) << shift);
-#else
-        CRU->PMU_CLKSEL_CON[index - CRU_CLK_DIV_CON_CNT] = VAL_MASK_WE(mask, (divValue - 1U) << shift);
-#endif
-    }
-#else
-    CRU->CRU_CLKSEL_CON[index] = VAL_MASK_WE(mask, (divValue - 1U) << shift);
-#endif
+    MmioWrite32(address, VAL_MASK_WE(mask, (divValue - 1U) << shift));
 
     return HAL_OK;
 }
 
 /**
  * @brief  IP Clock get div API
- * @param  divName: div id(Contains div offset, shift, mask information)
+ * @param  clockId: div id(Contains div offset, shift, mask information)
  * @return div value
  */
-uint32_t HAL_CRU_ClkGetDiv(uint32_t divName)
+uint32_t HAL_CRU_ClkGetDiv(uint32_t clockId)
 {
-    uint32_t shift, mask, index, divValue;
+    CRU_CLOCK *clk;
+    uint32_t shift, mask, index, divValue, address;
 
-    index = CLK_DIV_GET_REG_OFFSET(divName);
-    shift = CLK_DIV_GET_BITS_SHIFT(divName);
-    HAL_ASSERT(shift < 16);
-    mask = CLK_DIV_GET_MASK(divName);
-
-#ifdef CRU_CLK_DIV_CON_CNT
-    if (index < CRU_CLK_DIV_CON_CNT) {
-        divValue = ((((CRU->CRU_CLKSEL_CON[index]) & mask) >> shift) + 1);
-    } else {
-#ifdef PMUCRU_BASE
-        divValue = ((((PMUCRU->CRU_CLKSEL_CON[index - CRU_CLK_DIV_CON_CNT]) & mask) >> shift) + 1);
-#else
-        divValue = ((((CRU->PMU_CLKSEL_CON[index - CRU_CLK_DIV_CON_CNT]) & mask) >> shift) + 1);
-#endif
+    clk = HAL_CRU_ClkGetById(clockId);
+    if (clk == NULL || (clk->flags & CLOCK_SUPPORT_DIV) == 0) {
+        ASSERT (clk != NULL);
+        return 1;
     }
-#else
-    divValue = ((((CRU->CRU_CLKSEL_CON[index]) & mask) >> shift) + 1);
-#endif
+
+    index = CLK_DIV_GET_REG_OFFSET(clk->div);
+    shift = CLK_DIV_GET_BITS_SHIFT(clk->div);
+    HAL_ASSERT(shift < 16);
+    mask = CLK_DIV_GET_MASK(clk->div);
+    address = CRU_CON_REG_ADDRESS(clk->regBase, clk->divOffset, index);
+
+    divValue = ((MmioRead32(address) & mask) >> shift) + 1;
 
     return divValue;
 }
 
 /**
  * @brief  IP Clock set mux API
- * @param  muxName: mux id(Contains mux offset, shift, mask information)
+ * @param  clockId: mux id(Contains mux offset, shift, mask information)
  * @param  muxValue: mux value
  * @return NONE
  */
 HAL_SECTION_SRAM_CODE
-HAL_Status HAL_CRU_ClkSetMux(uint32_t muxName, uint32_t muxValue)
+HAL_Status HAL_CRU_ClkSetMux(uint32_t clockId, uint32_t muxValue)
 {
-    uint32_t shift, mask, index;
+    CRU_CLOCK *clk;
+    uint32_t shift, mask, index, address;
 
-    index = CLK_MUX_GET_REG_OFFSET(muxName);
-    shift = CLK_MUX_GET_BITS_SHIFT(muxName);
-    HAL_ASSERT(shift < 16);
-    mask = CLK_MUX_GET_MASK(muxName);
-
-#ifdef CRU_CLK_SEL_CON_CNT
-    if (index < CRU_CLK_DIV_CON_CNT) {
-        CRU->CRU_CLKSEL_CON[index] = VAL_MASK_WE(mask, muxValue << shift);
-    } else {
-#ifdef PMUCRU_BASE
-        PMUCRU->CRU_CLKSEL_CON[index - CRU_CLK_SEL_CON_CNT] = VAL_MASK_WE(mask, muxValue << shift);
-#else
-        CRU->PMU_CLKSEL_CON[index - CRU_CLK_SEL_CON_CNT] = VAL_MASK_WE(mask, muxValue << shift);
-#endif
+    clk = HAL_CRU_ClkGetById(clockId);
+    if (clk == NULL || (clk->flags & CLOCK_SUPPORT_MUX) == 0) {
+        ASSERT (FALSE);
+        return HAL_ERROR;
     }
-#else
-    CRU->CRU_CLKSEL_CON[index] = VAL_MASK_WE(mask, muxValue << shift);
-#endif
+
+    index = CLK_MUX_GET_REG_OFFSET(clk->mux);
+    shift = CLK_MUX_GET_BITS_SHIFT(clk->mux);
+    HAL_ASSERT(shift < 16);
+    mask = CLK_MUX_GET_MASK(clk->mux);
+    address = CRU_CON_REG_ADDRESS(clk->regBase, clk->muxOffset, index);
+
+    MmioWrite32(address, VAL_MASK_WE(mask, muxValue << shift));
 
     return HAL_OK;
 }
 
 /**
  * @brief  IP Clock get mux API
- * @param  muxName: mux id(Contains mux offset, shift, mask information)
+ * @param  clockId: mux id(Contains mux offset, shift, mask information)
  * @return mux value
  */
 HAL_SECTION_SRAM_CODE
-uint32_t HAL_CRU_ClkGetMux(uint32_t muxName)
+uint32_t HAL_CRU_ClkGetMux(uint32_t clockId)
 {
-    uint32_t shift, mask, index, muxValue;
+    CRU_CLOCK *clk;
+    uint32_t shift, mask, index, muxValue, address;
 
-    index = CLK_MUX_GET_REG_OFFSET(muxName);
-    shift = CLK_MUX_GET_BITS_SHIFT(muxName);
-    HAL_ASSERT(shift < 16);
-    mask = CLK_MUX_GET_MASK(muxName);
-
-#ifdef CRU_CLK_SEL_CON_CNT
-    if (index < CRU_CLK_SEL_CON_CNT) {
-        muxValue = ((CRU->CRU_CLKSEL_CON[index] & mask) >> shift);
-    } else {
-#ifdef PMUCRU_BASE
-        muxValue = ((PMUCRU->CRU_CLKSEL_CON[index - CRU_CLK_SEL_CON_CNT] & mask) >> shift);
-#else
-        muxValue = ((CRU->PMU_CLKSEL_CON[index - CRU_CLK_SEL_CON_CNT] & mask) >> shift);
-#endif
+    clk = HAL_CRU_ClkGetById(clockId);
+    if (clk == NULL || (clk->flags & CLOCK_SUPPORT_MUX) == 0) {
+        ASSERT (FALSE);
+        return 0;
     }
-#else
-    muxValue = ((CRU->CRU_CLKSEL_CON[index] & mask) >> shift);
-#endif
+
+    index = CLK_MUX_GET_REG_OFFSET(clk->mux);
+    shift = CLK_MUX_GET_BITS_SHIFT(clk->mux);
+    HAL_ASSERT(shift < 16);
+    mask = CLK_MUX_GET_MASK(clk->mux);
+    address = CRU_CON_REG_ADDRESS(clk->regBase, clk->muxOffset, index);
+
+    muxValue = ((MmioRead32(address) & mask) >> shift);
 
     return muxValue;
 }
@@ -970,17 +885,24 @@ HAL_Status HAL_CRU_FracdivGetConfig(uint32_t rateOut, uint32_t rate,
 
 /**
  * @brief  Get Np5 best div.
- * @param  clockName: clk id.
+ * @param  clockId: clk id.
  * @param  rate: clk rate.
  * @param  pRate: clk parent rate
  * @param  bestdiv: the returned bestdiv.
  * @return HAL_Status.
  */
-HAL_Status HAL_CRU_ClkNp5BestDiv(eCLOCK_Name clockName, uint32_t rate, uint32_t pRate, uint32_t *bestdiv)
+HAL_Status HAL_CRU_ClkNp5BestDiv(uint32_t clockId, uint32_t rate, uint32_t pRate, uint32_t *bestdiv)
 {
-    uint32_t div = CLK_GET_DIV(clockName);
-    uint32_t maxDiv = CLK_DIV_GET_MASK(div);
+    CRU_CLOCK *clk;
+    uint32_t maxDiv;
     uint32_t i;
+
+    clk = HAL_CRU_ClkGetById(clockId);
+    if (clk == NULL) {
+        return HAL_ERROR;
+    }
+
+    maxDiv = CLK_DIV_GET_MASK(clk->div);
 
     for (i = 0; i < maxDiv; i++) {
         if (((pRate * 2) == (rate * (i * 2 + 3)))) {
@@ -1038,6 +960,85 @@ HAL_Status HAL_CRU_SetGlbSrst(eCRU_GlbSrstType type)
 #endif
 
     return HAL_INVAL;
+}
+
+/**
+ * @brief  IP Clock is reset API
+ * @param  clk: clk reset id
+ * @return HAL_Check
+ */
+HAL_Check HAL_CRU_RstIsAsserted(uint32_t resetId)
+{
+    CRU_RESET *rst;
+    uint32_t index, shift, address;
+    HAL_Check ret;
+
+    rst = HAL_CRU_RstGetById(resetId);
+    if (rst == NULL) {
+        ASSERT (FALSE);
+        return HAL_FALSE;
+    }
+
+    index = CLK_RESET_GET_REG_OFFSET(rst->srst);
+    shift = CLK_RESET_GET_BITS_SHIFT(rst->srst);
+    HAL_ASSERT(shift < 16);
+    address = CRU_CON_REG_ADDRESS(rst->regBase, rst->srstOffset, index);
+
+    ret = (HAL_Check)((MmioRead32(address) & (1 << shift)) >> shift);
+
+    return ret;
+}
+
+/**
+ * @brief  IP Clock Reset Assert API
+ * @param  clk: clk reset id
+ * @return NONE
+ */
+HAL_Status HAL_CRU_RstAssert(uint32_t resetId)
+{
+    CRU_RESET *rst;
+    uint32_t index, shift, address;
+
+    rst = HAL_CRU_RstGetById(resetId);
+    if (rst == NULL) {
+        ASSERT (FALSE);
+        return HAL_ERROR;
+    }
+
+    index = CLK_RESET_GET_REG_OFFSET(rst->srst);
+    shift = CLK_RESET_GET_BITS_SHIFT(rst->srst);
+    HAL_ASSERT(shift < 16);
+    address = CRU_CON_REG_ADDRESS(rst->regBase, rst->srstOffset, index);
+
+    MmioWrite32(address, VAL_MASK_WE(1U << shift, 1U << shift));
+
+    return HAL_OK;
+}
+
+/**
+ * @brief  IP Clock Reset Deassert API
+ * @param  clk: clk reset id
+ * @return NONE
+ */
+HAL_Status HAL_CRU_RstDeassert(uint32_t resetId)
+{
+    CRU_RESET *rst;
+    uint32_t index, shift, address;
+
+    rst = HAL_CRU_RstGetById(resetId);
+    if (rst == NULL) {
+        ASSERT (FALSE);
+        return HAL_ERROR;
+    }
+
+    index = CLK_RESET_GET_REG_OFFSET(rst->srst);
+    shift = CLK_RESET_GET_BITS_SHIFT(rst->srst);
+    HAL_ASSERT(shift < 16);
+    address = CRU_CON_REG_ADDRESS(rst->regBase, rst->srstOffset, index);
+
+    MmioWrite32(address, VAL_MASK_WE(1U << shift, 0U << shift));
+
+    return HAL_OK;
 }
 
 /** @} */

@@ -1,7 +1,12 @@
-/* SPDX-License-Identifier: BSD-3-Clause */
-/*
- * Copyright (c) 2022 Rockchip Electronics Co., Ltd.
- */
+/** @file
+ *
+ *  Copyright (c) 2024, Mario Bălănică <mariobalanica02@gmail.com>
+ *  Copyright (c) 2020-2021 Rockchip Electronics Co., Ltd.
+ *
+ *  SPDX-License-Identifier: BSD-2-Clause-Patent
+ *
+ **/
+
 #include "Include/Library/CruLib.h"
 #include <Library/DebugLib.h>
 /** @addtogroup RK_HAL_Driver
@@ -146,10 +151,49 @@ static struct PLL_SETUP PPLL = {
     .rateTable = PLL_TABLE,
 };
 
+static CRU_CLOCK Clocks[CLK_COUNT] = {
+    CRU_CLOCK_INIT (CCLK_EMMC, CRU_BASE,
+        CRU_CLKSEL_CON_OFFSET, CCLK_EMMC_SEL,
+        CRU_CLKSEL_CON_OFFSET, CCLK_EMMC_DIV,
+        CRU_CLKGATE_CON_OFFSET, CCLK_EMMC_GATE),
+    CRU_CLOCK_INIT (SCLK_SFC, CRU_BASE,
+        CRU_CLKSEL_CON_OFFSET, SCLK_SFC_SEL,
+        CRU_CLKSEL_CON_OFFSET, SCLK_SFC_DIV,
+        CRU_CLKGATE_CON_OFFSET, SCLK_SFC_GATE),
+    CRU_CLOCK_INIT (CCLK_SRC_SDIO, CRU_BASE,
+        CRU_CLKSEL_CON_OFFSET, CCLK_SRC_SDIO_SEL,
+        CRU_CLKSEL_CON_OFFSET, CCLK_SRC_SDIO_DIV,
+        CRU_CLKGATE_CON_OFFSET, CCLK_SRC_SDIO_GATE),
+    CRU_CLOCK_INIT (BCLK_EMMC, CRU_BASE,
+        CRU_CLKSEL_CON_OFFSET, BCLK_EMMC_SEL,
+        CRU_CLKSEL_CON_OFFSET, BCLK_EMMC_DIV,
+        CRU_CLKGATE_CON_OFFSET, BCLK_EMMC_GATE),
+    CRU_CLOCK_INIT (CLK_REF_PIPE_PHY0, CRU_BASE,
+        CRU_CLKSEL_CON_OFFSET, CLK_REF_PIPE_PHY0_SEL,
+        CRU_CLKSEL_CON_OFFSET, CLK_REF_PIPE_PHY0_PLL_SRC_DIV,
+        CRU_CLKGATE_CON_OFFSET, CLK_REF_PIPE_PHY0_PLL_SRC_GATE),
+    CRU_CLOCK_INIT (CLK_REF_PIPE_PHY1, CRU_BASE,
+        CRU_CLKSEL_CON_OFFSET, CLK_REF_PIPE_PHY1_SEL,
+        CRU_CLKSEL_CON_OFFSET, CLK_REF_PIPE_PHY1_PLL_SRC_DIV,
+        CRU_CLKGATE_CON_OFFSET, CLK_REF_PIPE_PHY1_PLL_SRC_GATE),
+    CRU_CLOCK_INIT (CLK_REF_PIPE_PHY2, CRU_BASE,
+        CRU_CLKSEL_CON_OFFSET, CLK_REF_PIPE_PHY2_SEL,
+        CRU_CLKSEL_CON_OFFSET, CLK_REF_PIPE_PHY2_PLL_SRC_DIV,
+        CRU_CLKGATE_CON_OFFSET, CLK_REF_PIPE_PHY2_PLL_SRC_GATE),
+    CRU_CLOCK_INIT (DCLK_VOP2_SRC, CRU_BASE,
+        CRU_CLKSEL_CON_OFFSET, DCLK_VOP2_SRC_SEL,
+        CRU_CLKSEL_CON_OFFSET, DCLK_VOP2_SRC_DIV,
+        CRU_CLKGATE_CON_OFFSET, DCLK_VOP2_SRC_GATE),
+};
+
+static CRU_RESET Resets[RESET_COUNT] = {
+    // TO-DO
+};
+
 /********************* Private Variable Definition ***************************/
 
 static uint32_t s_lpllFreq;
-static uint32_t s_cpllFreq = 1500 * 1000 * 1000;;
+static uint32_t s_cpllFreq = 1500 * 1000 * 1000;
 static uint32_t s_gpllFreq = 1188 * 1000 * 1000;
 static uint32_t s_npllFreq;
 static uint32_t s_v0pllFreq;
@@ -161,18 +205,38 @@ static uint32_t s_aupllFreq;
 /** @} */
 /********************* Public Function Definition ****************************/
 
+CRU_CLOCK *
+EFIAPI
+HAL_CRU_ClkGetById(uint32_t clockId)
+{
+    ASSERT (clockId < CLK_COUNT);
+    if (clockId >= CLK_COUNT) {
+        return NULL;
+    }
+    return &Clocks[clockId];
+}
+
+CRU_RESET *
+EFIAPI
+HAL_CRU_RstGetById(uint32_t resetId)
+{
+    ASSERT (resetId < RESET_COUNT);
+    if (resetId >= RESET_COUNT) {
+        return NULL;
+    }
+    return &Resets[resetId];
+}
+
 /**
  * @brief Get clk freq.
- * @param  clockName: CLOCK_Name id.
+ * @param  clockId: CLOCK_Name id.
  * @return rate.
  * @attention these APIs allow direct use in the HAL layer.
  */
 uint32_t
 EFIAPI
-HAL_CRU_ClkGetFreq(eCLOCK_Name clockName)
+HAL_CRU_ClkGetFreq(uint32_t clockId)
 {
-    uint32_t clkMux = CLK_GET_MUX(clockName);
-    uint32_t clkDiv = CLK_GET_DIV(clockName);
     uint32_t pRate = 0, freq;
 
     if (!s_cpllFreq) {
@@ -183,7 +247,7 @@ HAL_CRU_ClkGetFreq(eCLOCK_Name clockName)
         s_v0pllFreq = HAL_CRU_GetPllV1Freq(&V0PLL);
     }
 
-    switch (clockName) {
+    switch (clockId) {
     case PLL_LPLL:
         freq = HAL_CRU_GetPllV1Freq(&LPLL);
         s_lpllFreq = freq;
@@ -230,49 +294,41 @@ HAL_CRU_ClkGetFreq(eCLOCK_Name clockName)
      case CCLK_EMMC:
      case SCLK_SFC:
      case CCLK_SRC_SDIO:
-        if (HAL_CRU_ClkGetMux(clkMux) == 0) {
+        if (HAL_CRU_ClkGetMux(clockId) == 0) {
             pRate = s_gpllFreq;
-        } else if (HAL_CRU_ClkGetMux(clkMux) == 1) {
+        } else if (HAL_CRU_ClkGetMux(clockId) == 1) {
             pRate = s_cpllFreq;
-        } else if (HAL_CRU_ClkGetMux(clkMux) == 2) {
+        } else if (HAL_CRU_ClkGetMux(clockId) == 2) {
             pRate = PLL_INPUT_OSC_RATE;
         }
 
-        return pRate / HAL_CRU_ClkGetDiv(clkDiv) ;
+        return pRate / HAL_CRU_ClkGetDiv(clockId) ;
     case BCLK_EMMC:
-        if (HAL_CRU_ClkGetMux(clkMux) == 0) {
+        if (HAL_CRU_ClkGetMux(clockId) == 0) {
             pRate = s_gpllFreq;
-        } else if (HAL_CRU_ClkGetMux(clkMux) == 1) {
+        } else if (HAL_CRU_ClkGetMux(clockId) == 1) {
             pRate = s_cpllFreq;
         }
 
-        return pRate / HAL_CRU_ClkGetDiv(clkDiv) ;
+        return pRate / HAL_CRU_ClkGetDiv(clockId) ;
     case CLK_REF_PIPE_PHY0:
     case CLK_REF_PIPE_PHY1:
     case CLK_REF_PIPE_PHY2:
-        if (HAL_CRU_ClkGetMux(clkMux) == 0) {
+        if (HAL_CRU_ClkGetMux(clockId) == 0) {
             return PLL_INPUT_OSC_RATE;
-        } else if (HAL_CRU_ClkGetMux(clkMux) == 1) {
-             return s_ppllFreq / HAL_CRU_ClkGetDiv(clkDiv) ;
+        } else if (HAL_CRU_ClkGetMux(clockId) == 1) {
+             return s_ppllFreq / HAL_CRU_ClkGetDiv(clockId) ;
         }
 
     case DCLK_VOP2_SRC:
-        ASSERT (HAL_CRU_ClkGetMux(clkMux) == 2);
+        ASSERT (HAL_CRU_ClkGetMux(clockId) == 2);
         pRate = s_v0pllFreq;
         break;
     default:
         break;
     }
 
-    if ((clkMux == 0) && (clkDiv == 0)) {
-        return 0;
-    }
-
-    if (clkDiv) {
-        freq = pRate / (HAL_CRU_ClkGetDiv(clkDiv));
-    } else {
-        freq = pRate;
-    }
+    freq = pRate / HAL_CRU_ClkGetDiv(clockId);
 
     return freq;
 }
@@ -281,18 +337,16 @@ HAL_CRU_ClkGetFreq(eCLOCK_Name clockName)
 
 /**
  * @brief Set clk freq.
- * @param  clockName: CLOCK_Name id.
+ * @param  clockId: CLOCK_Name id.
  * @param  rate: clk rate.
  * @return HAL_Status.
  * @attention these APIs allow direct use in the HAL layer.
  */
 HAL_Status
 EFIAPI
-HAL_CRU_ClkSetFreq(eCLOCK_Name clockName, uint32_t rate)
+HAL_CRU_ClkSetFreq(uint32_t clockId, uint32_t rate)
 {
     HAL_Status error = HAL_OK;
-    uint32_t clkMux = CLK_GET_MUX(clockName);
-    uint32_t clkDiv = CLK_GET_DIV(clockName);
     uint32_t mux = 0, div = 0, pRate = 0;
 
     if (!s_cpllFreq) {
@@ -303,7 +357,7 @@ HAL_CRU_ClkSetFreq(eCLOCK_Name clockName, uint32_t rate)
         s_v0pllFreq = HAL_CRU_GetPllV1Freq(&V0PLL);
     }
 
-    switch (clockName) {
+    switch (clockId) {
     case PLL_LPLL:
         error = HAL_CRU_SetPllV1Freq(&LPLL, rate);
         s_lpllFreq = HAL_CRU_GetPllV1Freq(&LPLL);
@@ -376,24 +430,24 @@ HAL_CRU_ClkSetFreq(eCLOCK_Name clockName, uint32_t rate)
     case CLK_REF_PIPE_PHY1:
     case CLK_REF_PIPE_PHY2:
         if (rate == PLL_INPUT_OSC_RATE) {
-            HAL_CRU_ClkSetMux(clkMux, 0);
-            HAL_CRU_ClkSetDiv(clkDiv, 0);
+            HAL_CRU_ClkSetMux(clockId, 0);
+            HAL_CRU_ClkSetDiv(clockId, 0);
         } else {
             div = HAL_DIV_ROUND_UP(s_ppllFreq, rate);
-            HAL_CRU_ClkSetDiv(clkDiv, div);
-            HAL_CRU_ClkSetMux(clkMux, 1);
+            HAL_CRU_ClkSetDiv(clockId, div);
+            HAL_CRU_ClkSetMux(clockId, 1);
         }
         return HAL_OK;
 
     case DCLK_VOP2_SRC:
-        HAL_CRU_ClkSetMux(clkMux, 2);
+        HAL_CRU_ClkSetMux(clockId, 2);
 
         if (s_v0pllFreq >= RK3588_VOP_PLL_LIMIT_FREQ && s_v0pllFreq % rate == 0) {
             div = HAL_DIV_ROUND_UP(s_v0pllFreq, rate);
-            HAL_CRU_ClkSetDiv(clkDiv, div);
+            HAL_CRU_ClkSetDiv(clockId, div);
         } else {
             div = HAL_DIV_ROUND_UP(RK3588_VOP_PLL_LIMIT_FREQ, rate);
-            HAL_CRU_ClkSetDiv(clkDiv, div);
+            HAL_CRU_ClkSetDiv(clockId, div);
             error = HAL_CRU_ClkSetFreq(PLL_V0PLL, div * rate);
         }
         return error;
@@ -401,17 +455,10 @@ HAL_CRU_ClkSetFreq(eCLOCK_Name clockName, uint32_t rate)
         break;
     }
 
-    if ((clkMux == 0) && (clkDiv == 0)) {
-        return HAL_INVAL;
-    }
-
     div = HAL_DIV_ROUND_UP(pRate, rate);
-    if (clkMux) {
-        HAL_CRU_ClkSetMux(clkMux, mux);
-    }
-    if (clkDiv) {
-        HAL_CRU_ClkSetDiv(clkDiv, div);
-    }
+
+    HAL_CRU_ClkSetMux(clockId, mux);
+    HAL_CRU_ClkSetDiv(clockId, div);
 
     return HAL_OK;
 }

@@ -1,7 +1,11 @@
-/* SPDX-License-Identifier: BSD-3-Clause */
-/*
- * Copyright (c) 2021 Rockchip Electronics Co., Ltd.
- */
+/** @file
+ *
+ *  Copyright (c) 2024, Mario Bălănică <mariobalanica02@gmail.com>
+ *  Copyright (c) 2020-2021 Rockchip Electronics Co., Ltd.
+ *
+ *  SPDX-License-Identifier: BSD-2-Clause-Patent
+ *
+ **/
 
 #ifndef __SOC_H
 #define __SOC_H
@@ -48,13 +52,8 @@
 /******************************************CRU*******************************************/
 #define PLL_INPUT_OSC_RATE (24 * 1000 * 1000)
 
-#define CLK(mux, div) \
-    (((mux) & 0x0F0F00FFU) | (((div) & 0xFFU) << 8) | (((div) & 0x0F0F0000U) << 4))
-
-#ifndef __ASSEMBLY__
-typedef enum CLOCK_Name {
-    CLK_INVALID = 0U,
-    PLL_LPLL,
+typedef enum {
+    PLL_LPLL = 0,
     PLL_B0PLL,
     PLL_B1PLL,
     PLL_CPLL,
@@ -63,16 +62,20 @@ typedef enum CLOCK_Name {
     PLL_V0PLL,
     PLL_PPLL,
     PLL_AUPLL,
-    CCLK_EMMC             = CLK(CCLK_EMMC_SEL, CCLK_EMMC_DIV),
-    SCLK_SFC             = CLK(SCLK_SFC_SEL, SCLK_SFC_DIV),
-    CCLK_SRC_SDIO             = CLK(CCLK_SRC_SDIO_SEL, CCLK_SRC_SDIO_DIV),
-    BCLK_EMMC              = CLK(BCLK_EMMC_SEL, BCLK_EMMC_DIV),
-    CLK_REF_PIPE_PHY0              = CLK(CLK_REF_PIPE_PHY0_SEL, CLK_REF_PIPE_PHY0_PLL_SRC_DIV),
-    CLK_REF_PIPE_PHY1              = CLK(CLK_REF_PIPE_PHY1_SEL, CLK_REF_PIPE_PHY1_PLL_SRC_DIV),
-    CLK_REF_PIPE_PHY2              = CLK(CLK_REF_PIPE_PHY2_SEL, CLK_REF_PIPE_PHY2_PLL_SRC_DIV),
-    DCLK_VOP2_SRC            = CLK(DCLK_VOP2_SRC_SEL, DCLK_VOP2_SRC_DIV),
-} eCLOCK_Name;
-#endif
+    CCLK_EMMC,
+    SCLK_SFC,
+    CCLK_SRC_SDIO,
+    BCLK_EMMC,
+    CLK_REF_PIPE_PHY0,
+    CLK_REF_PIPE_PHY1,
+    CLK_REF_PIPE_PHY2,
+    DCLK_VOP2_SRC,
+    CLK_COUNT
+} RK3588_CLOCK_IDS;
+
+typedef enum {
+  RESET_COUNT = 0
+} RK3588_RESET_IDS;
 
 #ifdef __cplusplus
 }
