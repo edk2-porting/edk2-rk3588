@@ -217,12 +217,14 @@ ApplyVariables (
   AfterApplyVariablesInit ();
 }
 
-EFI_STATUS
-RK3588InitPeripherals (
+STATIC
+VOID
+RK3588SetupAudio (
   IN VOID
   )
 {
-  DEBUG((DEBUG_INIT, "RK3588InitPeripherals: Entry\n"));
+  // Source PLL, ACPI expects this exact rate.
+  HAL_CRU_ClkSetFreq (PLL_AUPLL, 786432000);
 
   // Warning: Only enable I2S if present.
   // E.g. Enabling I2S1 on OPI5+ causes PCIe devices to disappear
@@ -234,6 +236,9 @@ RK3588InitPeripherals (
     GpioPinSetFunction(1, GPIO_PIN_PC5, 1); //i2s0_lrck
     GpioPinSetFunction(1, GPIO_PIN_PC3, 1); //i2s0_sclk
     GpioPinSetFunction(1, GPIO_PIN_PC2, 1); //i2s0_mclk
+
+    HAL_CRU_ClkSetMux (CLK_I2S0_8CH_TX_SRC, 0x1); // clk_aupll_mux
+    HAL_CRU_ClkSetMux (MCLK_I2S0_8CH_TX, 0x1); // clk_i2s0_8ch_tx_frac
   }
 
   if (FixedPcdGetBool(PcdI2S1Supported)){
@@ -244,7 +249,20 @@ RK3588InitPeripherals (
     GpioPinSetFunction(4, GPIO_PIN_PA2, 3); //i2s1m0_lrck
     GpioPinSetFunction(4, GPIO_PIN_PA1, 3); //i2s1m0_sclk
     GpioPinSetFunction(4, GPIO_PIN_PA0, 3); //i2s1m0_mclk
+
+    // CLK_I2S1_8CH_TX_SRC fixed parent: PLL_CPLL
+    HAL_CRU_ClkSetMux (MCLK_I2S1_8CH_TX, 0x1); // clk_i2s1_8ch_tx_frac
   }
+}
+
+EFI_STATUS
+RK3588InitPeripherals (
+  IN VOID
+  )
+{
+  DEBUG((DEBUG_INIT, "RK3588InitPeripherals: Entry\n"));
+
+  RK3588SetupAudio ();
 
   Rk806Configure();
 
