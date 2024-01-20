@@ -219,48 +219,40 @@ ApplyVariables (
 
 STATIC
 VOID
-UartInit (
+RK3588SetupAudio (
   IN VOID
   )
 {
-  //UINT32     Val;
+  // Source PLL, ACPI expects this exact rate.
+  HAL_CRU_ClkSetFreq (PLL_AUPLL, 786432000);
 
-  DEBUG((DEBUG_INIT, "RK3588InitPeripherals: UartInit()\n"));
-  /* make UART1 out of reset */
-  //MmioWrite32 (CRU_BASE + SC_PERIPH_RSTDIS3, PERIPH_RST3_UART1);
-  //MmioWrite32 (CRU_BASE + SC_PERIPH_CLKEN3, PERIPH_RST3_UART1);
-  /* make UART2 out of reset */
-  //MmioWrite32 (CRU_BASE + SC_PERIPH_RSTDIS3, PERIPH_RST3_UART2);
-  //MmioWrite32 (CRU_BASE + SC_PERIPH_CLKEN3, PERIPH_RST3_UART2);
-  /* make UART3 out of reset */
-  //MmioWrite32 (CRU_BASE + SC_PERIPH_RSTDIS3, PERIPH_RST3_UART3);
-  //MmioWrite32 (CRU_BASE + SC_PERIPH_CLKEN3, PERIPH_RST3_UART3);
-  /* make UART4 out of reset */
-  //MmioWrite32 (CRU_BASE + SC_PERIPH_RSTDIS3, PERIPH_RST3_UART4);
-  //MmioWrite32 (CRU_BASE + SC_PERIPH_CLKEN3, PERIPH_RST3_UART4);
+  // Warning: Only enable I2S if present.
+  // E.g. Enabling I2S1 on OPI5+ causes PCIe devices to disappear
+  if (FixedPcdGetBool(PcdI2S0Supported)){
+    //Configure I2S0 (e.g. Orange Pi 5 Plus)
+    GpioPinSetFunction(1, GPIO_PIN_PD4, 2); //i2s0_sdi0
+    GpioPinSetFunction(1, GPIO_PIN_PC7, 1); //i2s0_sdo0
 
-  /* make DW_MMC2 out of reset */
-  //MmioWrite32 (CRU_BASE + SC_PERIPH_RSTDIS0, PERIPH_RST0_MMC2);
+    GpioPinSetFunction(1, GPIO_PIN_PC5, 1); //i2s0_lrck
+    GpioPinSetFunction(1, GPIO_PIN_PC3, 1); //i2s0_sclk
+    GpioPinSetFunction(1, GPIO_PIN_PC2, 1); //i2s0_mclk
 
-  /* enable clock for BT/WIFI */
-  //Val = MmioRead32 (PMUSSI_ONOFF8_REG) | PMUSSI_ONOFF8_EN_32KB;
-  //MmioWrite32 (PMUSSI_ONOFF8_REG, Val);
-}
+    HAL_CRU_ClkSetMux (CLK_I2S0_8CH_TX_SRC, 0x1); // clk_aupll_mux
+    HAL_CRU_ClkSetMux (MCLK_I2S0_8CH_TX, 0x1); // clk_i2s0_8ch_tx_frac
+  }
 
-STATIC
-VOID
-MtcmosInit (
-  IN VOID
-  )
-{
-  //UINT32     Data;
+  if (FixedPcdGetBool(PcdI2S1Supported)){
+    //Configure I2S1 (e.g. Orange Pi 5)
+    GpioPinSetFunction(4, GPIO_PIN_PA6, 3); //i2s1m0_sdi1
+    GpioPinSetFunction(4, GPIO_PIN_PB4, 3); //i2s1m0_sdo3
 
-  DEBUG((DEBUG_INIT, "RK3588InitPeripherals: MtcmosInit()\n"));
-  /* enable MTCMOS for GPU */
-  //MmioWrite32 (AO_CTRL_BASE + SC_PW_MTCMOS_EN0, PW_EN0_G3D);
-  //do {
-  //  Data = MmioRead32 (AO_CTRL_BASE + SC_PW_MTCMOS_ACK_STAT0);
-  //} while ((Data & PW_EN0_G3D) == 0);
+    GpioPinSetFunction(4, GPIO_PIN_PA2, 3); //i2s1m0_lrck
+    GpioPinSetFunction(4, GPIO_PIN_PA1, 3); //i2s1m0_sclk
+    GpioPinSetFunction(4, GPIO_PIN_PA0, 3); //i2s1m0_mclk
+
+    // CLK_I2S1_8CH_TX_SRC fixed parent: PLL_CPLL
+    HAL_CRU_ClkSetMux (MCLK_I2S1_8CH_TX, 0x1); // clk_i2s1_8ch_tx_frac
+  }
 }
 
 EFI_STATUS
@@ -268,44 +260,9 @@ RK3588InitPeripherals (
   IN VOID
   )
 {
-  //UINT32     Data, Bits;
-
   DEBUG((DEBUG_INIT, "RK3588InitPeripherals: Entry\n"));
 
-  /* make I2C0/I2C1/I2C2/SPI0 out of reset */
-  //Bits = PERIPH_RST3_I2C0 | PERIPH_RST3_I2C1 | PERIPH_RST3_I2C2 | PERIPH_RST3_SSP;
-  //MmioWrite32 (CRU_BASE + SC_PERIPH_RSTDIS3, Bits);
-
-  //do {
-  //  Data = MmioRead32 (CRU_BASE + SC_PERIPH_RSTSTAT3);
-  //} while (Data & Bits);
-
-  // UartInit ();
-
-  /* MTCMOS -- Multi-threshold CMOS */
-  // MtcmosInit ();
-  
-  // Warning: Only enable I2S if present.
-  // E.g. Enabling I2S1 on OPI5+ causes PCIe devices to disappear
-  if (FixedPcdGetBool(PcdI2S0Supported)){
-    //Configure I2S0 (e.g. Orange Pi 5 Plus)
-    GpioPinSetFunction(1, GPIO_PIN_PD4, 2); //i2s0_sdi0
-    GpioPinSetFunction(1, GPIO_PIN_PC7, 1); //i2s0_sdo0
-    
-    GpioPinSetFunction(1, GPIO_PIN_PC5, 1); //i2s0_lrck
-    GpioPinSetFunction(1, GPIO_PIN_PC3, 1); //i2s0_sclk
-    GpioPinSetFunction(1, GPIO_PIN_PC2, 1); //i2s0_mclk
-  }
-  
-  if (FixedPcdGetBool(PcdI2S1Supported)){
-    //Configure I2S1 (e.g. Orange Pi 5)
-    GpioPinSetFunction(4, GPIO_PIN_PA6, 3); //i2s1m0_sdi1
-    GpioPinSetFunction(4, GPIO_PIN_PB4, 3); //i2s1m0_sdo3
-    
-    GpioPinSetFunction(4, GPIO_PIN_PA2, 3); //i2s1m0_lrck
-    GpioPinSetFunction(4, GPIO_PIN_PA1, 3); //i2s1m0_sclk
-    GpioPinSetFunction(4, GPIO_PIN_PA0, 3); //i2s1m0_mclk
-  }
+  RK3588SetupAudio ();
 
   Rk806Configure();
 

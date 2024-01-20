@@ -11,6 +11,7 @@
 #include <Library/IoLib.h>
 #include <Library/TimerLib.h>
 #include <Library/BaseLib.h>
+#include <Library/BaseMemoryLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/RockchipDisplayLib.h>
@@ -18,8 +19,6 @@
 
 #include <Library/MediaBusFormat.h>
 #include <Library/DrmModes.h>
-
-#include <string.h>
 
 #include <Protocol/RockchipCrtcProtocol.h>
 
@@ -1435,7 +1434,7 @@ Vop2PreInit (
     RockchipVop2->Version = mVop2RK3588.Version;
     RockchipVop2->Data = &mVop2RK3588;
     RockchipVop2->GlobalInit = FALSE;
-    memset(RockchipVop2->VpPlaneMask, 0, sizeof(VOP2_VP_PLANE_MASK) * VOP2_VP_MAX);
+    ZeroMem (RockchipVop2->VpPlaneMask, sizeof(VOP2_VP_PLANE_MASK) * VOP2_VP_MAX);
   }
 
   CrtcState->Private = RockchipVop2;

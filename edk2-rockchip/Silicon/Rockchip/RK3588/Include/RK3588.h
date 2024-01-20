@@ -449,7 +449,7 @@ struct PMU1CRU_REG {
 #define BIGCORE1CRU_BASE               0xFD812000U /* BIGCORE1CRU base address */
 #define DSUCRU_BASE                    0xFD818000U /* DSUCRU base address */
 #define PHPTOPCRU_BASE                 0xFD7C8000U /* PHPTOPCRU base address */
-#define PMU1CRU_BASE                   0xFD7E0000U /* PMU1CRU base address */
+#define PMU1CRU_BASE                   0xFD7F0000U /* PMU1CRU base address */
 #define UART0_BASE                     0xFD890000U /* UART0 base address */
 #define WDTPMU_BASE                    0xFD8E0000U /* WDTPMU base address */
 #define TIMERPMU_BASE                  0xFD8F0000U /* TIMERPMU base address */
@@ -553,6 +553,11 @@ struct PMU1CRU_REG {
 /*                               Register Bitmap Section                                */
 /*                                                                                      */
 /****************************************************************************************/
+/*****************************************CRU*****************************************/
+#define CRU_CLKSEL_CON_OFFSET                              0x300
+#define CRU_CLKGATE_CON_OFFSET                             0x800
+#define CRU_SOFTRST_CON_OFFSET                             0xA00
+
 /*****************************************DCACHE*****************************************/
 /* CACHE_CTRL */
 #define DCACHE_CACHE_CTRL_OFFSET                           (0x0U)
@@ -4771,35 +4776,35 @@ struct PMU1CRU_REG {
 #define ACLK_JPEG_DECODER_ROOT_DIV 0x05000063U
 #define CLK_IEP2P0_CORE_DIV 0x05070063U
 /********Name=PMU1CLKSEL_CON00,Offset=0x300********/
-#define CLK_MATRIX_PMU1_50M_SRC_DIV 0x04000001U
-#define CLK_MATRIX_PMU1_100M_SRC_DIV 0x03040001U
-#define CLK_MATRIX_PMU1_200M_SRC_DIV 0x03070001U
-#define CLK_MATRIX_PMU1_300M_SRC_DIV 0x050A0001U
+#define CLK_MATRIX_PMU1_50M_SRC_DIV 0x04000000U
+#define CLK_MATRIX_PMU1_100M_SRC_DIV 0x03040000U
+#define CLK_MATRIX_PMU1_200M_SRC_DIV 0x03070000U
+#define CLK_MATRIX_PMU1_300M_SRC_DIV 0x050A0000U
 /********Name=PMU1CLKSEL_CON01,Offset=0x304********/
 #define CLK_MATRIX_PMU1_400M_SRC_DIV 0x05000001U
 /********Name=PMU1CLKSEL_CON02,Offset=0x308********/
-#define CLK_PMU_CM0_RTC_DIV 0x05000001U
+#define CLK_PMU_CM0_RTC_DIV 0x05000002U
 /********Name=PMU1CLKSEL_CON03,Offset=0x30C********/
-#define CLK_UART0_SRC_DIV 0x05070001U
+#define CLK_UART0_SRC_DIV 0x05070003U
 /********Name=PMU1CLKSEL_CON04,Offset=0x310********/
-#define CLK_UART0_FRAC_DIV 0x20000001U
+#define CLK_UART0_FRAC_DIV 0x20000004U
 /********Name=PMU1CLKSEL_CON05,Offset=0x314********/
-#define CLK_I2S1_8CH_TX_SRC_DIV 0x05020001U
+#define CLK_I2S1_8CH_TX_SRC_DIV 0x05020005U
 /********Name=PMU1CLKSEL_CON06,Offset=0x318********/
-#define CLK_I2S1_8CH_TX_FRAC_DIV 0x20000001U
+#define CLK_I2S1_8CH_TX_FRAC_DIV 0x20000006U
 /********Name=PMU1CLKSEL_CON07,Offset=0x31C********/
-#define CLK_I2S1_8CH_RX_SRC_DIV 0x05020001U
+#define CLK_I2S1_8CH_RX_SRC_DIV 0x05020007U
 /********Name=PMU1CLKSEL_CON08,Offset=0x320********/
-#define CLK_I2S1_8CH_RX_FRAC_DIV 0x20000001U
+#define CLK_I2S1_8CH_RX_FRAC_DIV 0x20000008U
 /********Name=PMU1CLKSEL_CON09,Offset=0x324********/
-#define CLK_USBDP_COMBO_PHY0_REF_XTAL_DIV 0x05050001U
+#define CLK_USBDP_COMBO_PHY0_REF_XTAL_DIV 0x05050009U
 /********Name=PMU1CLKSEL_CON12,Offset=0x330********/
-#define CLK_HDPTX0_REF_XTAL_DIV 0x05060001U
+#define CLK_HDPTX0_REF_XTAL_DIV 0x0506000CU
 /********Name=PMU1CLKSEL_CON14,Offset=0x338********/
-#define CLK_REF_MIPI_DCPHY0_DIV 0x07000001U
-#define CLK_OTGPHY_U3_0_DIV 0x05090001U
+#define CLK_REF_MIPI_DCPHY0_DIV 0x0700000EU
+#define CLK_OTGPHY_U3_0_DIV 0x0509000EU
 /********Name=PMU1CLKSEL_CON15,Offset=0x33C********/
-#define CLK_CR_PARA_DIV 0x05000001U
+#define CLK_CR_PARA_DIV 0x0500000FU
 /********Name=PMU1CLKSEL_CON17,Offset=0x344********/
 /********Name=PMU1SCLKSEL_CON00,Offset=0x300********/
 /********Name=PMU1SCLKSEL_CON02,Offset=0x308********/
@@ -5451,7 +5456,7 @@ struct PMU1CRU_REG {
 #define CLK_IEP2P0_CORE_SEL_CLK_CPLL_MUX 0U
 
 /********Name=PMU1CLKSEL_CON00,Offset=0x300********/
-#define CLK_MATRIX_PMU1_300M_SRC_SEL 0x010F0001U
+#define CLK_MATRIX_PMU1_300M_SRC_SEL 0x010F0000U
 #define CLK_MATRIX_PMU1_300M_SRC_SEL_XIN_OSC0_FUNC 0U
 /********Name=PMU1CLKSEL_CON01,Offset=0x304********/
 #define CLK_MATRIX_PMU1_400M_SRC_SEL 0x01050001U
@@ -5463,48 +5468,48 @@ struct PMU1CRU_REG {
 #define HCLK_PMU_CM0_ROOT_I_SEL 0x020A0001U
 #define HCLK_PMU_CM0_ROOT_I_SEL_XIN_OSC0_FUNC 0U
 /********Name=PMU1CLKSEL_CON02,Offset=0x308********/
-#define CLK_PMU_CM0_RTC_SEL 0x01050001U
+#define CLK_PMU_CM0_RTC_SEL 0x01050002U
 #define CLK_PMU_CM0_RTC_SEL_CLK_DEEPSLOW 0U
-#define TCLK_PMU1WDT_SEL 0x01060001U
+#define TCLK_PMU1WDT_SEL 0x01060002U
 #define TCLK_PMU1WDT_SEL_CLK_DEEPSLOW 0U
-#define CLK_PMU1TIMER_ROOT_SEL 0x02070001U
+#define CLK_PMU1TIMER_ROOT_SEL 0x02070002U
 #define CLK_PMU1TIMER_ROOT_SEL_CLK_MATRIX_PMU1_100M_SRC 0U
-#define CLK_PMU1PWM_SEL 0x02090001U
+#define CLK_PMU1PWM_SEL 0x02090002U
 #define CLK_PMU1PWM_SEL_XIN_OSC0_FUNC 0U
 /********Name=PMU1CLKSEL_CON03,Offset=0x30C********/
-#define CLK_I2C0_SEL 0x01060001U
+#define CLK_I2C0_SEL 0x01060003U
 #define CLK_I2C0_SEL_CLK_MATRIX_PMU1_100M_SRC 0U
 /********Name=PMU1CLKSEL_CON04,Offset=0x310********/
 /********Name=PMU1CLKSEL_CON05,Offset=0x314********/
-#define SCLK_UART0_SEL 0x02000001U
+#define SCLK_UART0_SEL 0x02000005U
 #define SCLK_UART0_SEL_XIN_OSC0_FUNC 0U
 /********Name=PMU1CLKSEL_CON06,Offset=0x318********/
 /********Name=PMU1CLKSEL_CON07,Offset=0x31C********/
-#define MCLK_I2S1_8CH_TX_SEL 0x02000001U
+#define MCLK_I2S1_8CH_TX_SEL 0x02000007U
 #define MCLK_I2S1_8CH_TX_SEL_XIN_OSC0_HALF 0U
 /********Name=PMU1CLKSEL_CON08,Offset=0x320********/
 /********Name=PMU1CLKSEL_CON09,Offset=0x324********/
-#define MCLK_I2S1_8CH_RX_SEL 0x02000001U
+#define MCLK_I2S1_8CH_RX_SEL 0x02000009U
 #define MCLK_I2S1_8CH_RX_SEL_XIN_OSC0_HALF 0U
-#define I2S1_8CH_MCLKOUT_SEL 0x02020001U
+#define I2S1_8CH_MCLKOUT_SEL 0x02020009U
 #define I2S1_8CH_MCLKOUT_SEL_XIN_OSC0_HALF 0U
-#define MCLK_PDM0_SEL 0x01040001U
+#define MCLK_PDM0_SEL 0x01040009U
 #define MCLK_PDM0_SEL_CLK_MATRIX_PMU1_200M_SRC 0U
-#define CLK_USBDP_COMBO_PHY0_REF_XTAL_SEL 0x010A0001U
+#define CLK_USBDP_COMBO_PHY0_REF_XTAL_SEL 0x010A0009U
 #define CLK_USBDP_COMBO_PHY0_REF_XTAL_SEL_CLK_PPLL 0U
 /********Name=PMU1CLKSEL_CON12,Offset=0x330********/
-#define CLK_HDPTX0_REF_XTAL_SEL 0x010B0001U
+#define CLK_HDPTX0_REF_XTAL_SEL 0x010B000CU
 #define CLK_HDPTX0_REF_XTAL_SEL_CLK_PPLL 0U
 /********Name=PMU1CLKSEL_CON14,Offset=0x338********/
-#define CLK_REF_MIPI_DCPHY0_SEL 0x02070001U
+#define CLK_REF_MIPI_DCPHY0_SEL 0x0207000EU
 #define CLK_REF_MIPI_DCPHY0_SEL_CLK_SPLL_MUX 0U
-#define CLK_OTGPHY_U3_0_SEL 0x010E0001U
+#define CLK_OTGPHY_U3_0_SEL 0x010E000EU
 #define CLK_OTGPHY_U3_0_SEL_CLK_PPLL 0U
 /********Name=PMU1CLKSEL_CON15,Offset=0x33C********/
-#define CLK_CR_PARA_SEL 0x02050001U
+#define CLK_CR_PARA_SEL 0x0205000FU
 #define CLK_CR_PARA_SEL_CLK_SPLL_MUX 0U
 /********Name=PMU1CLKSEL_CON17,Offset=0x344********/
-#define DBCLK_GPIO0_SEL 0x01000001U
+#define DBCLK_GPIO0_SEL 0x01000011U
 #define DBCLK_GPIO0_SEL_CLK_DEEPSLOW 0U
 
 #ifdef __cplusplus
