@@ -93,8 +93,6 @@
   gRK3588TokenSpaceGuid.PcdPcie30State
 
   gRK3588TokenSpaceGuid.PcdConfigTableMode
-  gRK3588TokenSpaceGuid.PcdAcpiUsb2StateDefault
-  gRK3588TokenSpaceGuid.PcdAcpiUsb2State
   gRK3588TokenSpaceGuid.PcdFdtSupportOverrides
 
   gRK3588TokenSpaceGuid.PcdHasOnBoardFanOutput

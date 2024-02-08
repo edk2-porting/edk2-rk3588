@@ -3,15 +3,19 @@
  *  ACPI platform driver
  *
  *  Copyright (c) 2020, Jeremy Linton
- *  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+ *  Copyright (c) 2024, Mario Bălănică <mariobalanica02@gmail.com>
  *
  *  SPDX-License-Identifier: BSD-2-Clause-Patent
  *
  **/
 
+#include <IndustryStandard/AcpiAml.h>
+#include <IndustryStandard/PeImage.h>
 #include <Library/AcpiLib.h>
+#include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <AcpiTables.h>
 #include <VarStoreData.h>
@@ -20,89 +24,77 @@ STATIC CONST EFI_GUID mAcpiTableFile = {
   0x7E374E25, 0x8E01, 0x4FEE, { 0x87, 0xf2, 0x39, 0x0C, 0x23, 0xC6, 0x06, 0xCD }
 };
 
-typedef struct {
-  CHAR8 Name[4];
-  UINTN PcdToken;
-} AML_NAME_OP_REPLACE;
+STATIC EFI_EXIT_BOOT_SERVICES    mOriginalExitBootServices;
 
-#define SSDT_PATTERN_LEN 5
-#define AML_NAMEOP_8   0x0A
-#define AML_NAMEOP_16  0x0B
-#define AML_NAMEOP_32  0x0C
-#define AML_NAMEOP_STR 0x0D
+STATIC EFI_ACPI_SDT_PROTOCOL     *mAcpiSdtProtocol;
+
+typedef enum {
+  AcpiOsUnknown = 0,
+  AcpiOsWindows,
+} ACPI_OS_BOOT_TYPE;
+
+#define SDT_PATTERN_LEN (AML_NAME_SEG_SIZE + 1)
+
 //
-// Scan the given namespace table (DSDT/SSDT) for AML NameOps
-// listed in the NameOpReplace structure. If one is found then
-// update the value in the table from the specified Pcd
-//
-// This allows us to have conditionals in AML controlled
-// by options in the BDS or detected during firmware bootstrap.
-// We could extend this concept for strings/etc but due to len
-// variations its probably easier to encode the strings
-// in the ASL and pick the correct one based off a variable.
+// Simple NameOp integer patcher.
+// Does not allocate memory and can be safely used at ExitBootServices.
 //
 STATIC
-VOID
-AcpiUpdateSdtNameOps (
-  EFI_ACPI_DESCRIPTION_HEADER  *AcpiTable,
-  CONST AML_NAME_OP_REPLACE    *NameOpReplace
+EFI_STATUS
+AcpiUpdateSdtNameInteger (
+  IN  EFI_ACPI_DESCRIPTION_HEADER  *AcpiTable,
+  IN  CHAR8                        Name[AML_NAME_SEG_SIZE],
+  IN  UINTN                        Value
   )
 {
-  UINTN  Idx;
-  UINTN  Index;
-  CHAR8  Pattern[SSDT_PATTERN_LEN];
-  UINTN  PcdVal;
-  UINT8  *SdtPtr;
-  UINT32 SdtSize;
+  UINTN   Index;
+  CHAR8   Pattern[SDT_PATTERN_LEN];
+  UINT8   *SdtPtr;
+  UINT32  DataSize;
+  UINT32  ValueOffset;
 
-  SdtSize = AcpiTable->Length;
+  if (AcpiTable->Length <= SDT_PATTERN_LEN) {
+    return EFI_INVALID_PARAMETER;
+  }
 
-  if (SdtSize > 0) {
-    SdtPtr = (UINT8 *)AcpiTable;
+  SdtPtr = (UINT8 *)AcpiTable;
+  //
+  // Do a single NameOp variable replacement. These are of the
+  // form "08 XXXX SIZE VAL", where SIZE is: 0A=byte, 0B=word, 0C=dword,
+  // XXXX is the name and VAL is the value.
+  //
+  Pattern[0] = AML_NAME_OP;
+  CopyMem (Pattern + 1, Name, AML_NAME_SEG_SIZE);
 
-    for (Idx = 0; NameOpReplace && NameOpReplace[Idx].PcdToken; Idx++) {
-      //
-      // Do a single NameOp variable replacement these are of the
-      // form 08 XXXX SIZE VAL, where SIZE is 0A=byte, 0B=word, 0C=dword
-      // and XXXX is the name and VAL is the value
-      //
-      Pattern[0] = 0x08;
-      Pattern[1] = NameOpReplace[Idx].Name[0];
-      Pattern[2] = NameOpReplace[Idx].Name[1];
-      Pattern[3] = NameOpReplace[Idx].Name[2];
-      Pattern[4] = NameOpReplace[Idx].Name[3];
+  ValueOffset = SDT_PATTERN_LEN + 1;
 
-      for (Index = 0; Index < (SdtSize - SSDT_PATTERN_LEN); Index++) {
-        if (CompareMem (SdtPtr + Index, Pattern, SSDT_PATTERN_LEN) == 0) {
-          PcdVal = LibPcdGet32 (NameOpReplace[Idx].PcdToken);
-          switch (SdtPtr[Index + SSDT_PATTERN_LEN]) {
-          case AML_NAMEOP_32:
-            SdtPtr[Index + SSDT_PATTERN_LEN + 4] = (PcdVal >> 24) & 0xFF;
-            SdtPtr[Index + SSDT_PATTERN_LEN + 3] = (PcdVal >> 16) & 0xFF;
-            // Fallthrough
-          case AML_NAMEOP_16:
-            SdtPtr[Index + SSDT_PATTERN_LEN + 2] = (PcdVal >> 8) & 0xFF;
-            // Fallthrough
-          case AML_NAMEOP_8:
-            SdtPtr[Index + SSDT_PATTERN_LEN + 1] = PcdVal & 0xFF;
-            break;
-          case 0:
-          case 1:
-            SdtPtr[Index + SSDT_PATTERN_LEN + 1] = !!PcdVal;
-            break;
-          case AML_NAMEOP_STR:
-            //
-            // If the string val is added to the NameOpReplace, we can
-            // dynamically update things like _HID too as long as the
-            // string length matches.
-            //
-            break;
-          }
+  for (Index = 0; Index < (AcpiTable->Length - SDT_PATTERN_LEN); Index++) {
+    if (CompareMem (SdtPtr + Index, Pattern, SDT_PATTERN_LEN) == 0) {
+      switch (SdtPtr[Index + SDT_PATTERN_LEN]) {
+        case AML_QWORD_PREFIX:
+          DataSize = sizeof (UINT64);
           break;
-        }
+        case AML_DWORD_PREFIX:
+          DataSize = sizeof (UINT32);
+          break;
+        case AML_WORD_PREFIX:
+          DataSize = sizeof (UINT16);
+          break;
+        case AML_ONE_OP:
+        case AML_ZERO_OP:
+          ValueOffset--;
+          // Fallthrough
+        case AML_BYTE_PREFIX:
+          DataSize = sizeof (UINT8);
+          break;
+        default:
+          return EFI_UNSUPPORTED;
       }
+      CopyMem (SdtPtr + Index + ValueOffset, &Value, DataSize);
+      return EFI_SUCCESS;
     }
   }
+  return EFI_NOT_FOUND;
 }
 
 STATIC
@@ -112,10 +104,8 @@ AcpiVerifyUpdateTable (
   )
 {
   BOOLEAN              Result;
-  AML_NAME_OP_REPLACE  *NameOpReplace;
 
   Result = TRUE;
-  NameOpReplace = NULL;
 
   switch (AcpiHeader->OemTableId) {
     case SIGNATURE_64 ('P', 'C', 'I', 'E', '3', '4', 'L', '0'):
@@ -143,13 +133,6 @@ AcpiVerifyUpdateTable (
     case SIGNATURE_64 ('A', 'H', 'C', 'S', 'A', 'T', 'A', '2'):
       Result = PcdGet32 (PcdComboPhy2Mode) == COMBO_PHY_MODE_SATA;
       break;
-    case SIGNATURE_64 ('U', 'S', 'B', '2', 'H', 'O', 'S', 'T'):
-      Result = PcdGet32 (PcdAcpiUsb2State) == ACPI_USB2_STATE_ENABLED;
-      break;
-  }
-
-  if (Result && NameOpReplace) {
-    AcpiUpdateSdtNameOps (AcpiHeader, NameOpReplace);
   }
 
   return Result;
@@ -202,11 +185,144 @@ NotifyEndOfDxeEvent (
 {
   EFI_STATUS    Status;
 
+  Status = gBS->LocateProtocol (
+                  &gEfiAcpiSdtProtocolGuid,
+                  NULL,
+                  (VOID **)&mAcpiSdtProtocol);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "AcpiPlatform: Couldn't locate gEfiAcpiSdtProtocolGuid! Status=%r\n", Status));
+    return;
+  }
+
   Status = LocateAndInstallAcpiFromFvConditional (&mAcpiTableFile, &AcpiHandleDynamicNamespace);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_WARN, "AcpiPlatform: Failed to install firmware ACPI as config table. Status=%r\n",
             Status));
   }
+}
+
+STATIC
+VOID
+EFIAPI
+AcpiPlatformOsBootHandler (
+  IN ACPI_OS_BOOT_TYPE OsType
+  )
+{
+  EFI_STATUS                    Status;
+  EFI_ACPI_DESCRIPTION_HEADER   *Table;
+  UINTN                         TableKey;
+  UINTN                         TableIndex;
+
+  if (mAcpiSdtProtocol == NULL) {
+    return;
+  }
+
+  TableIndex = 0;
+  Status = AcpiLocateTableBySignature (
+             mAcpiSdtProtocol,
+             EFI_ACPI_6_3_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE,
+             &TableIndex,
+             &Table,
+             &TableKey);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: Couldn't locate ACPI DSDT table! Status=%r\n",
+            __func__, Status));
+    return;
+  }
+
+  //
+  // Hide EHCI PNP ID for Windows to avoid binding to the inbox driver,
+  // which by default uses atomics on uncached memory and would crash
+  // the system.
+  //
+  if (OsType == AcpiOsWindows) {
+    AcpiUpdateSdtNameInteger (Table, "EHID", 0);
+  }
+
+  AcpiUpdateChecksum ((UINT8 *)Table, Table->Length);
+}
+
+STATIC
+UINTN
+EFIAPI
+FindPeImageBase (
+  EFI_PHYSICAL_ADDRESS  Base
+  )
+{
+  EFI_IMAGE_DOS_HEADER                 *DosHdr;
+  EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION  Hdr;
+
+  Base &= ~(EFI_PAGE_SIZE - 1);
+
+  while (Base != 0) {
+    DosHdr = (EFI_IMAGE_DOS_HEADER *)Base;
+    if (DosHdr->e_magic == EFI_IMAGE_DOS_SIGNATURE) {
+      Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)(Base + DosHdr->e_lfanew);
+      if (Hdr.Pe32->Signature == EFI_IMAGE_NT_SIGNATURE) {
+        break;
+      }
+    }
+
+    Base -= EFI_PAGE_SIZE;
+  }
+
+  return Base;
+}
+
+STATIC CHAR8 mWinLoadNameStr[] = "winload";
+#define PDB_NAME_MAX_LENGTH   256
+
+STATIC
+BOOLEAN
+IsPeImageWinLoader (
+  IN VOID *PeImage
+ )
+{
+  CHAR8  *PdbStr;
+  UINTN  Index;
+
+  PdbStr = (CHAR8 *)PeCoffLoaderGetPdbPointer (PeImage);
+  if (PdbStr == NULL) {
+    return FALSE;
+  }
+
+  for (Index = 0; Index < PDB_NAME_MAX_LENGTH && PdbStr[Index] != '\0'; Index++) {
+    if (AsciiStrnCmp (PdbStr + Index, mWinLoadNameStr, sizeof (mWinLoadNameStr) - sizeof (CHAR8)) == 0) {
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+AcpiPlatformExitBootServicesHook (
+  IN EFI_HANDLE  ImageHandle,
+  IN UINTN       MapKey
+  )
+{
+  UINTN               ReturnAddress;
+  UINTN               OsLoaderAddress;
+  ACPI_OS_BOOT_TYPE   OsType;
+
+  ReturnAddress = (UINTN)RETURN_ADDRESS (0);
+
+  gBS->ExitBootServices = mOriginalExitBootServices;
+
+  OsType = AcpiOsUnknown;
+
+  OsLoaderAddress = FindPeImageBase (ReturnAddress);
+  if (OsLoaderAddress > 0) {
+    if (IsPeImageWinLoader ((VOID *)OsLoaderAddress)) {
+      OsType = AcpiOsWindows;
+    }
+  }
+
+  AcpiPlatformOsBootHandler (OsType);
+
+  return gBS->ExitBootServices (ImageHandle, MapKey);
 }
 
 EFI_STATUS
@@ -233,6 +349,9 @@ AcpiPlatformDxeInitialize (
                     &Event                            // Event
                     );
   ASSERT_EFI_ERROR (Status);
+
+  mOriginalExitBootServices = gBS->ExitBootServices;
+  gBS->ExitBootServices = AcpiPlatformExitBootServicesHook;
 
   return EFI_SUCCESS;
 }

@@ -43,15 +43,6 @@ SetupConfigTableVariables (
     ASSERT_EFI_ERROR (Status);
   }
 
-  Size = sizeof (UINT32);
-  Status = gRT->GetVariable (L"AcpiUsb2State",
-                            &gRK3588DxeFormSetGuid,
-                            NULL, &Size, &Var32);
-  if (EFI_ERROR (Status)) {
-    Status = PcdSet32S (PcdAcpiUsb2State, FixedPcdGet32 (PcdAcpiUsb2StateDefault));
-    ASSERT_EFI_ERROR (Status);
-  }
-
   Size = sizeof (UINT8);
   Status = gRT->GetVariable (L"FdtSupportOverrides",
                             &gRK3588DxeFormSetGuid,

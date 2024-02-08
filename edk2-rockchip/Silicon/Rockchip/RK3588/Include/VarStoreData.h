@@ -52,12 +52,6 @@ typedef struct {
   UINT32 Mode;
 } CONFIG_TABLE_MODE_VARSTORE_DATA;
 
-#define ACPI_USB2_STATE_DISABLED                    0
-#define ACPI_USB2_STATE_ENABLED                     1
-typedef struct {
-  UINT32 State;
-} ACPI_USB2_STATE_VARSTORE_DATA;
-
 typedef struct {
   UINT8 State;
 } FDT_SUPPORT_OVERRIDES_VARSTORE_DATA;

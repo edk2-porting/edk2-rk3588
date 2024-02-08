@@ -32,7 +32,7 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 2, "RKCP  ", "RK3588  ", 2)
 
     include ("I2s.asl")
 
-    include ("Usb1Host.asl")
+    include ("Usb2Host.asl")
     include ("Usb3Host0.asl")
     include ("Usb3Host1.asl")
     // include ("Usb3Host2.asl")

@@ -35,9 +35,6 @@
   DEFINE COMBO_PHY_MODE_SATA          = 2
   DEFINE COMBO_PHY_MODE_USB3          = 3
 
-  DEFINE ACPI_USB2_STATE_DISABLED     = 0
-  DEFINE ACPI_USB2_STATE_ENABLED      = 1
-
   DEFINE COOLING_FAN_STATE_DISABLED   = 0
   DEFINE COOLING_FAN_STATE_ENABLED    = 1
 
@@ -255,8 +252,6 @@
   #
   # ACPI support flags and default values
   #
-  # EHCI disabled by default since it crashes Windows.
-  gRK3588TokenSpaceGuid.PcdAcpiUsb2StateDefault|$(ACPI_USB2_STATE_DISABLED)
 
 [PcdsPatchableInModule]
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|1500000
@@ -303,7 +298,6 @@
   # ACPI / Device Tree
   #
   gRK3588TokenSpaceGuid.PcdConfigTableMode|L"ConfigTableMode"|gRK3588DxeFormSetGuid|0x0|$(CONFIG_TABLE_MODE_ACPI)
-  gRK3588TokenSpaceGuid.PcdAcpiUsb2State|L"AcpiUsb2State"|gRK3588DxeFormSetGuid|0x0|gRK3588TokenSpaceGuid.PcdAcpiUsb2StateDefault
   gRK3588TokenSpaceGuid.PcdFdtSupportOverrides|L"FdtSupportOverrides"|gRK3588DxeFormSetGuid|0x0|FALSE
 
   #

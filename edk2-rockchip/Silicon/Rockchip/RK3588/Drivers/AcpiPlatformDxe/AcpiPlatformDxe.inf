@@ -28,8 +28,10 @@
 
 [LibraryClasses]
   AcpiLib
+  BaseLib
   BaseMemoryLib
   DebugLib
+  PeCoffGetEntryPointLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
 
@@ -37,10 +39,10 @@
   gEfiEndOfDxeEventGroupGuid
 
 [Protocols]
+  gEfiAcpiSdtProtocolGuid
 
 [Pcd]
   gRK3588TokenSpaceGuid.PcdConfigTableMode
-  gRK3588TokenSpaceGuid.PcdAcpiUsb2State
   gRK3588TokenSpaceGuid.PcdComboPhy0Mode
   gRK3588TokenSpaceGuid.PcdComboPhy1Mode
   gRK3588TokenSpaceGuid.PcdComboPhy2Mode
