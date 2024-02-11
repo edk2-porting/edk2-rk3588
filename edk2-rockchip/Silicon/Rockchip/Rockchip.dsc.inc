@@ -52,6 +52,20 @@
 
   DEFINE DEBUG_PRINT_ERROR_LEVEL_NO_INFO = $(DEBUG_PRINT_ERROR_LEVEL) & ~0x00000040
 
+  #
+  # DEBUG_ASSERT_ENABLED       0x01
+  # DEBUG_PRINT_ENABLED        0x02
+  # DEBUG_CODE_ENABLED         0x04
+  # CLEAR_MEMORY_ENABLED       0x08
+  # ASSERT_BREAKPOINT_ENABLED  0x10
+  # ASSERT_DEADLOOP_ENABLED    0x20
+  #
+!if $(TARGET) == RELEASE
+  DEFINE DEBUG_PROPERTY_MASK             = 0x00
+!else
+  DEFINE DEBUG_PROPERTY_MASK             = 0x0f
+!endif
+
 ################################################################################
 #
 # Library Class section - list of all common Library Classes needed by Rockchip platforms.
@@ -395,17 +409,7 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
   gEfiMdePkgTokenSpaceGuid.PcdUefiLibMaxPrintBufferSize|320
   gEfiMdePkgTokenSpaceGuid.PcdDefaultTerminalType|4
 
-  # DEBUG_ASSERT_ENABLED       0x01
-  # DEBUG_PRINT_ENABLED        0x02
-  # DEBUG_CODE_ENABLED         0x04
-  # CLEAR_MEMORY_ENABLED       0x08
-  # ASSERT_BREAKPOINT_ENABLED  0x10
-  # ASSERT_DEADLOOP_ENABLED    0x20
-!if $(TARGET) == RELEASE
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x00
-!else
-  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|0x0f
-!endif
+  gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|$(DEBUG_PROPERTY_MASK)
 
   gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|$(DEBUG_PRINT_ERROR_LEVEL)
 
@@ -571,7 +575,10 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
   #
   # ACPI Support
   #
-  MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf
+  MdeModulePkg/Universal/Acpi/AcpiTableDxe/AcpiTableDxe.inf {
+    <PcdsFixedAtBuild>
+      gEfiMdePkgTokenSpaceGuid.PcdDebugPropertyMask|$(DEBUG_PROPERTY_MASK) & ~0x04
+  }
   MdeModulePkg/Universal/Acpi/BootGraphicsResourceTableDxe/BootGraphicsResourceTableDxe.inf
 
   #

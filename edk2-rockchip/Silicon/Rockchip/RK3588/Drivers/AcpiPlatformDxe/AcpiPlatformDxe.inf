@@ -43,6 +43,7 @@
 
 [Pcd]
   gRK3588TokenSpaceGuid.PcdConfigTableMode
+  gRK3588TokenSpaceGuid.PcdAcpiPcieEcamCompatMode
   gRK3588TokenSpaceGuid.PcdComboPhy0Mode
   gRK3588TokenSpaceGuid.PcdComboPhy1Mode
   gRK3588TokenSpaceGuid.PcdComboPhy2Mode

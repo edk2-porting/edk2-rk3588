@@ -26,7 +26,8 @@ STATIC CONST EFI_GUID mAcpiTableFile = {
 
 STATIC EFI_EXIT_BOOT_SERVICES    mOriginalExitBootServices;
 
-STATIC EFI_ACPI_SDT_PROTOCOL     *mAcpiSdtProtocol;
+STATIC EFI_ACPI_SDT_PROTOCOL        *mAcpiSdtProtocol;
+STATIC EFI_ACPI_DESCRIPTION_HEADER  *mDsdtTable;
 
 typedef enum {
   AcpiOsUnknown = 0,
@@ -98,81 +99,41 @@ AcpiUpdateSdtNameInteger (
 }
 
 STATIC
-BOOLEAN
-AcpiVerifyUpdateTable (
-  IN  EFI_ACPI_DESCRIPTION_HEADER   *AcpiHeader
+VOID
+EFIAPI
+AcpiDsdtFixupStatus (
+  IN EFI_ACPI_SDT_PROTOCOL    *AcpiSdtProtocol,
+  IN EFI_ACPI_HANDLE          TableHandle
   )
 {
-  BOOLEAN              Result;
+  EFI_STATUS  Status;
+  UINTN       Index;
 
-  Result = TRUE;
+  struct {
+    CHAR8    *ObjectPath;
+    BOOLEAN  Enabled;
+  } DevStatus[] = {
+    { "\\_SB.PCI0._STA", FixedPcdGetBool (PcdPcie30Supported) &&
+                         PcdGet32 (PcdPcie30State) == PCIE30_STATE_ENABLED },
+    { "\\_SB.PCI1._STA", FALSE }, // not supported yet
+    { "\\_SB.PCI2._STA", PcdGet32 (PcdComboPhy1Mode) == COMBO_PHY_MODE_PCIE },
+    { "\\_SB.PCI3._STA", PcdGet32 (PcdComboPhy2Mode) == COMBO_PHY_MODE_PCIE },
+    { "\\_SB.PCI4._STA", PcdGet32 (PcdComboPhy0Mode) == COMBO_PHY_MODE_PCIE },
+    { "\\_SB.ATA0._STA", PcdGet32 (PcdComboPhy0Mode) == COMBO_PHY_MODE_SATA },
+    { "\\_SB.ATA1._STA", PcdGet32 (PcdComboPhy1Mode) == COMBO_PHY_MODE_SATA },
+    { "\\_SB.ATA2._STA", PcdGet32 (PcdComboPhy2Mode) == COMBO_PHY_MODE_SATA },
+  };
 
-  switch (AcpiHeader->OemTableId) {
-    case SIGNATURE_64 ('P', 'C', 'I', 'E', '3', '4', 'L', '0'):
-      Result = FixedPcdGetBool (PcdPcie30Supported)
-                && PcdGet32 (PcdPcie30State) == PCIE30_STATE_ENABLED;
-      break;
-    case SIGNATURE_64 ('P', 'C', 'I', 'E', '3', '2', 'L', '0'):
-      Result = FALSE; // not supported yet
-      break;
-    case SIGNATURE_64 ('P', 'C', 'I', 'E', '2', '1', 'L', '0'):
-      Result = PcdGet32 (PcdComboPhy1Mode) == COMBO_PHY_MODE_PCIE;
-      break;
-    case SIGNATURE_64 ('P', 'C', 'I', 'E', '2', '1', 'L', '1'):
-      Result = PcdGet32 (PcdComboPhy2Mode) == COMBO_PHY_MODE_PCIE;
-      break;
-    case SIGNATURE_64 ('P', 'C', 'I', 'E', '2', '1', 'L', '2'):
-      Result = PcdGet32 (PcdComboPhy0Mode) == COMBO_PHY_MODE_PCIE;
-      break;
-    case SIGNATURE_64 ('A', 'H', 'C', 'S', 'A', 'T', 'A', '0'):
-      Result = PcdGet32 (PcdComboPhy0Mode) == COMBO_PHY_MODE_SATA;
-      break;
-    case SIGNATURE_64 ('A', 'H', 'C', 'S', 'A', 'T', 'A', '1'):
-      Result = PcdGet32 (PcdComboPhy1Mode) == COMBO_PHY_MODE_SATA;
-      break;
-    case SIGNATURE_64 ('A', 'H', 'C', 'S', 'A', 'T', 'A', '2'):
-      Result = PcdGet32 (PcdComboPhy2Mode) == COMBO_PHY_MODE_SATA;
-      break;
-  }
-
-  return Result;
-}
-
-STATIC
-BOOLEAN
-AcpiFixupMcfg (
-  IN  EFI_ACPI_DESCRIPTION_HEADER   *AcpiHeader
-  )
-{
-  RK3588_MCFG_TABLE   *Table;
-  UINT32              Seg;
-
-  Table = (RK3588_MCFG_TABLE *) AcpiHeader;
-
-  for (Seg = 0; Seg < ARRAY_SIZE (Table->Entry); Seg++) {
-    if ((PcdGet32 (PcdPcieEcamCompliantSegmentsMask) & (1 << Seg)) != 0) {
-      Table->Entry[Seg].BaseAddress -= 0x8000;
+  for (Index = 0; Index < ARRAY_SIZE (DevStatus); Index++) {
+    if (DevStatus[Index].Enabled == FALSE) {
+      Status = AcpiAmlObjectUpdateInteger (AcpiSdtProtocol, TableHandle,
+                  DevStatus[Index].ObjectPath, 0x0);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "AcpiPlatform: Failed to patch %a. Status=%r\n",
+                DevStatus[Index].ObjectPath, Status));
+      }
     }
   }
-
-  return TRUE;
-}
-
-STATIC
-BOOLEAN
-AcpiHandleDynamicNamespace (
-  IN  EFI_ACPI_DESCRIPTION_HEADER   *AcpiHeader
-  )
-{
-  switch (AcpiHeader->Signature) {
-    case SIGNATURE_32 ('D', 'S', 'D', 'T'):
-    case SIGNATURE_32 ('S', 'S', 'D', 'T'):
-      return AcpiVerifyUpdateTable (AcpiHeader);
-    case SIGNATURE_32 ('M', 'C', 'F', 'G'):
-      return AcpiFixupMcfg (AcpiHeader);
-  }
-
-  return TRUE;
 }
 
 STATIC
@@ -183,7 +144,10 @@ NotifyEndOfDxeEvent (
   IN VOID         *Context
   )
 {
-  EFI_STATUS    Status;
+  EFI_STATUS        Status;
+  UINTN             TableKey;
+  UINTN             TableIndex;
+  EFI_ACPI_HANDLE   TableHandle;
 
   Status = gBS->LocateProtocol (
                   &gEfiAcpiSdtProtocolGuid,
@@ -194,11 +158,144 @@ NotifyEndOfDxeEvent (
     return;
   }
 
-  Status = LocateAndInstallAcpiFromFvConditional (&mAcpiTableFile, &AcpiHandleDynamicNamespace);
+  Status = LocateAndInstallAcpiFromFvConditional (&mAcpiTableFile, NULL);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_WARN, "AcpiPlatform: Failed to install firmware ACPI as config table. Status=%r\n",
             Status));
   }
+
+  TableIndex = 0;
+  Status = AcpiLocateTableBySignature (
+             mAcpiSdtProtocol,
+             EFI_ACPI_6_3_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE,
+             &TableIndex,
+             &mDsdtTable,
+             &TableKey);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "AcpiPlatform: Couldn't locate ACPI DSDT table!\n", __func__));
+    return;
+  }
+
+  Status = mAcpiSdtProtocol->OpenSdt (TableKey, &TableHandle);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "AcpiPlatform: Couldn't open ACPI DSDT table!\n", __func__));
+    mAcpiSdtProtocol->Close (TableHandle);
+    return;
+  }
+
+  AcpiDsdtFixupStatus (mAcpiSdtProtocol, TableHandle);
+
+  mAcpiSdtProtocol->Close (TableHandle);
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+AcpiFixupPcieEcam (
+  IN ACPI_OS_BOOT_TYPE OsType
+  )
+{
+  EFI_STATUS                    Status;
+  UINTN                         Index;
+  RK3588_MCFG_TABLE             *McfgTable;
+  EFI_ACPI_DESCRIPTION_HEADER   *FadtTable;
+  UINTN                         TableKey;
+  UINT32                        PcieEcamMode;
+  UINT8                         PcieBusMin;
+  UINT8                         PcieBusMax;
+  UINT8                         McfgMainBusMin;
+  BOOLEAN                       McfgSplitRootPort;
+  BOOLEAN                       McfgSingleDevQuirk;
+
+  Index = 0;
+  Status = AcpiLocateTableBySignature (
+             mAcpiSdtProtocol,
+             EFI_ACPI_6_4_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_BASE_ADDRESS_DESCRIPTION_TABLE_SIGNATURE,
+             &Index,
+             (EFI_ACPI_DESCRIPTION_HEADER **)&McfgTable,
+             &TableKey);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "AcpiPlatform: Couldn't locate ACPI MCFG table! Status=%r\n",
+            Status));
+    return Status;
+  }
+
+  PcieEcamMode = PcdGet32 (PcdAcpiPcieEcamCompatMode);
+
+  if (PcieEcamMode == ACPI_PCIE_ECAM_COMPAT_MODE_NXPMX6_SINGLE_DEV ||
+      PcieEcamMode == ACPI_PCIE_ECAM_COMPAT_MODE_NXPMX6_GRAVITON) {
+    if (OsType == AcpiOsWindows) {
+      PcieEcamMode = ACPI_PCIE_ECAM_COMPAT_MODE_NXPMX6;
+    } else {
+      PcieEcamMode &= ~ACPI_PCIE_ECAM_COMPAT_MODE_NXPMX6;
+    }
+  }
+
+  switch (PcieEcamMode) {
+    case ACPI_PCIE_ECAM_COMPAT_MODE_NXPMX6:
+      PcieBusMin = 0;
+      PcieBusMax = PCIE_BUS_LIMIT;
+      McfgMainBusMin = 1;
+      McfgSplitRootPort = TRUE;
+      McfgSingleDevQuirk = FALSE;
+
+      Index = 0;
+      Status = AcpiLocateTableBySignature (
+                mAcpiSdtProtocol,
+                EFI_ACPI_6_3_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE,
+                &Index,
+                &FadtTable,
+                &TableKey);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((DEBUG_ERROR, "AcpiPlatform: Couldn't locate ACPI FADT table! Status=%r\n",
+                Status));
+        return Status;
+      }
+
+      CopyMem (FadtTable->OemId, "NXPMX6", sizeof (FadtTable->OemId));
+      AcpiUpdateChecksum ((UINT8 *)FadtTable, FadtTable->Length);
+      break;
+
+    case ACPI_PCIE_ECAM_COMPAT_MODE_GRAVITON:
+      PcieBusMin = 0;
+      PcieBusMax = PCIE_BUS_LIMIT;
+      McfgMainBusMin = 0;
+      McfgSplitRootPort = FALSE;
+      McfgSingleDevQuirk = FALSE;
+
+      CopyMem (McfgTable->Header.Header.OemId, "AMAZON", sizeof (McfgTable->Header.Header.OemId));
+      McfgTable->Header.Header.OemTableId = SIGNATURE_64 ('G','R','A','V','I','T','O','N');
+      break;
+
+    default: // ACPI_PCIE_ECAM_COMPAT_MODE_SINGLE_DEV
+      PcieBusMin = 1;
+      PcieBusMax = 1;
+      McfgMainBusMin = 1;
+      McfgSplitRootPort = FALSE;
+      McfgSingleDevQuirk = TRUE;
+      break;
+  }
+
+  for (Index = 0; Index < ARRAY_SIZE (McfgTable->MainEntries); Index++) {
+    if (McfgSingleDevQuirk) {
+      if ((PcdGet32 (PcdPcieEcamCompliantSegmentsMask) & (1 << Index)) == 0) {
+        McfgTable->MainEntries[Index].BaseAddress += 0x8000;
+      }
+    }
+    McfgTable->MainEntries[Index].StartBusNumber = McfgMainBusMin;
+    McfgTable->MainEntries[Index].EndBusNumber = PcieBusMax;
+  }
+
+  if (McfgSplitRootPort == FALSE) {
+    McfgTable->Header.Header.Length -= sizeof (McfgTable->RootPortEntries);
+  }
+
+  AcpiUpdateChecksum ((UINT8 *)McfgTable, McfgTable->Header.Header.Length);
+
+  AcpiUpdateSdtNameInteger (mDsdtTable, "PBMI", PcieBusMin);
+  AcpiUpdateSdtNameInteger (mDsdtTable, "PBMA", PcieBusMax);
+
+  return EFI_SUCCESS;
 }
 
 STATIC
@@ -208,25 +305,7 @@ AcpiPlatformOsBootHandler (
   IN ACPI_OS_BOOT_TYPE OsType
   )
 {
-  EFI_STATUS                    Status;
-  EFI_ACPI_DESCRIPTION_HEADER   *Table;
-  UINTN                         TableKey;
-  UINTN                         TableIndex;
-
-  if (mAcpiSdtProtocol == NULL) {
-    return;
-  }
-
-  TableIndex = 0;
-  Status = AcpiLocateTableBySignature (
-             mAcpiSdtProtocol,
-             EFI_ACPI_6_3_DIFFERENTIATED_SYSTEM_DESCRIPTION_TABLE_SIGNATURE,
-             &TableIndex,
-             &Table,
-             &TableKey);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: Couldn't locate ACPI DSDT table! Status=%r\n",
-            __func__, Status));
+  if (mAcpiSdtProtocol == NULL || mDsdtTable == NULL) {
     return;
   }
 
@@ -236,10 +315,12 @@ AcpiPlatformOsBootHandler (
   // the system.
   //
   if (OsType == AcpiOsWindows) {
-    AcpiUpdateSdtNameInteger (Table, "EHID", 0);
+    AcpiUpdateSdtNameInteger (mDsdtTable, "EHID", 0);
   }
 
-  AcpiUpdateChecksum ((UINT8 *)Table, Table->Length);
+  AcpiFixupPcieEcam (OsType);
+
+  AcpiUpdateChecksum ((UINT8 *)mDsdtTable, mDsdtTable->Length);
 }
 
 STATIC

@@ -45,6 +45,12 @@
   DEFINE CONFIG_TABLE_MODE_FDT          =  0x00000002
   DEFINE CONFIG_TABLE_MODE_ACPI_FDT     =  0x00000003
 
+  DEFINE ACPI_PCIE_ECAM_COMPAT_MODE_SINGLE_DEV            = 0x00000001
+  DEFINE ACPI_PCIE_ECAM_COMPAT_MODE_NXPMX6                = 0x00000002
+  DEFINE ACPI_PCIE_ECAM_COMPAT_MODE_GRAVITON              = 0x00000004
+  DEFINE ACPI_PCIE_ECAM_COMPAT_MODE_NXPMX6_SINGLE_DEV     = 0x00000003
+  DEFINE ACPI_PCIE_ECAM_COMPAT_MODE_NXPMX6_GRAVITON       = 0x00000006
+
   #
   # Silicon/Rockchip/RK3588/Drivers/RK3588Dxe/CpuPerformance.h
   #
@@ -252,6 +258,7 @@
   #
   # ACPI support flags and default values
   #
+  gRK3588TokenSpaceGuid.PcdAcpiPcieEcamCompatModeDefault|$(ACPI_PCIE_ECAM_COMPAT_MODE_NXPMX6_SINGLE_DEV)
 
 [PcdsPatchableInModule]
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|1500000
@@ -298,6 +305,7 @@
   # ACPI / Device Tree
   #
   gRK3588TokenSpaceGuid.PcdConfigTableMode|L"ConfigTableMode"|gRK3588DxeFormSetGuid|0x0|$(CONFIG_TABLE_MODE_ACPI)
+  gRK3588TokenSpaceGuid.PcdAcpiPcieEcamCompatMode|L"AcpiPcieEcamCompatMode"|gRK3588DxeFormSetGuid|0x0|gRK3588TokenSpaceGuid.PcdAcpiPcieEcamCompatModeDefault
   gRK3588TokenSpaceGuid.PcdFdtSupportOverrides|L"FdtSupportOverrides"|gRK3588DxeFormSetGuid|0x0|FALSE
 
   #

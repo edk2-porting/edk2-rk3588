@@ -70,6 +70,8 @@
 #define PL_MISC_CONTROL_1_OFF           0x08BC
 #define  DBI_RO_WR_EN                   BIT0
 
+#define PCIE_TYPE0_HDR_DBI2_OFFSET      0x100000
+
 /* ATU Registers */
 #define ATU_CAP_BASE                    0x300000
 #define IATU_REGION_CTRL_OUTBOUND(n)    (ATU_CAP_BASE + ((n) << 9))
@@ -287,6 +289,10 @@ PciSetupBars (
   )
 {
   MmioWrite16 (DbiBase + PCI_DEVICE_CLASS, (PCI_CLASS_BRIDGE << 8) | PCI_CLASS_BRIDGE_P2P);
+
+  // Disable BAR0 + BAR1 of root port as they're invalid.
+  MmioWrite32 (DbiBase + PCIE_TYPE0_HDR_DBI2_OFFSET + PCI_BAR0, 0x0);
+  MmioWrite32 (DbiBase + PCIE_TYPE0_HDR_DBI2_OFFSET + PCI_BAR1, 0x0);
 }
 
 STATIC

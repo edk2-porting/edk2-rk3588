@@ -58,4 +58,6 @@ PciePinmuxInit(
 
 #define PCIE_MEM64_SIZE  (PCIE_CFG_SIZE - PCIE_IO_SIZE - PCIE_MEM64_OFFSET)
 
+#define PCIE_BUS_LIMIT  252 // limited by CFG1 iATU window size
+
 #endif

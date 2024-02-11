@@ -32,14 +32,6 @@
   $(RK_COMMON_ACPI_DIR)/Mcfg.aslc
   $(RK_COMMON_ACPI_DIR)/Dbg2.aslc
   $(RK_COMMON_ACPI_DIR)/Pptt.aslc
-  $(RK_COMMON_ACPI_DIR)/Pcie3x4.asl
-  $(RK_COMMON_ACPI_DIR)/Pcie3x2.asl
-  $(RK_COMMON_ACPI_DIR)/Pcie2x1l0.asl
-  $(RK_COMMON_ACPI_DIR)/Pcie2x1l1.asl
-  $(RK_COMMON_ACPI_DIR)/Pcie2x1l2.asl
-  $(RK_COMMON_ACPI_DIR)/Sata0.asl
-  $(RK_COMMON_ACPI_DIR)/Sata1.asl
-  $(RK_COMMON_ACPI_DIR)/Sata2.asl
   
 [Packages]
   ArmPkg/ArmPkg.dec

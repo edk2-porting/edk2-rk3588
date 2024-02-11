@@ -108,12 +108,6 @@ PciSegmentLibReadWorker (
   case PciCfgWidthUint16:
     return MmioRead16 (Base + (UINT32)Address);
   case PciCfgWidthUint32:
-    if (GET_BUS_NUM (Address) == 0) {
-      if (GET_REG_NUM (Address) == 0x10 || GET_REG_NUM (Address) == 0x14) {
-        // Hide BAR0 + BAR1 of root port
-        return 0;
-      }
-    }
     return MmioRead32 (Base + (UINT32)Address);
   default:
     ASSERT (FALSE);

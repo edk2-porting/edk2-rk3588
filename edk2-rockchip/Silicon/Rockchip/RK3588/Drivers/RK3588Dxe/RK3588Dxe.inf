@@ -93,6 +93,8 @@
   gRK3588TokenSpaceGuid.PcdPcie30State
 
   gRK3588TokenSpaceGuid.PcdConfigTableMode
+  gRK3588TokenSpaceGuid.PcdAcpiPcieEcamCompatModeDefault
+  gRK3588TokenSpaceGuid.PcdAcpiPcieEcamCompatMode
   gRK3588TokenSpaceGuid.PcdFdtSupportOverrides
 
   gRK3588TokenSpaceGuid.PcdHasOnBoardFanOutput

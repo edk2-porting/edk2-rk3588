@@ -43,6 +43,15 @@ SetupConfigTableVariables (
     ASSERT_EFI_ERROR (Status);
   }
 
+  Size = sizeof (UINT32);
+  Status = gRT->GetVariable (L"AcpiPcieEcamCompatMode",
+                            &gRK3588DxeFormSetGuid,
+                            NULL, &Size, &Var32);
+  if (EFI_ERROR (Status)) {
+    Status = PcdSet32S (PcdAcpiPcieEcamCompatMode, FixedPcdGet32 (PcdAcpiPcieEcamCompatModeDefault));
+    ASSERT_EFI_ERROR (Status);
+  }
+
   Size = sizeof (UINT8);
   Status = gRT->GetVariable (L"FdtSupportOverrides",
                             &gRK3588DxeFormSetGuid,

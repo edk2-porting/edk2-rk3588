@@ -127,6 +127,11 @@ formset
       name  = ConfigTableMode,
       guid  = RK3588DXE_FORMSET_GUID;
 
+    efivarstore ACPI_PCIE_ECAM_COMPAT_MODE_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = AcpiPcieEcamCompatMode,
+      guid  = RK3588DXE_FORMSET_GUID;
+
     efivarstore FDT_SUPPORT_OVERRIDES_VARSTORE_DATA,
       attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
       name  = FdtSupportOverrides,
@@ -474,12 +479,22 @@ formset
           option text = STRING_TOKEN(STR_CONFIG_TABLE_MODE_ACPI_FDT), value = CONFIG_TABLE_MODE_ACPI_FDT, flags = 0;
         endoneof;
 
-#if 0
         suppressif (get(ConfigTableMode.Mode) & CONFIG_TABLE_MODE_ACPI) == 0;
           subtitle text = STRING_TOKEN(STR_NULL_STRING);
           subtitle text = STRING_TOKEN(STR_CONFIG_TABLE_ACPI_SUBTITLE);
+
+          oneof varid = AcpiPcieEcamCompatMode.Mode,
+            prompt      = STRING_TOKEN(STR_ACPI_PCIE_ECAM_COMPAT_MODE_PROMPT),
+            help        = STRING_TOKEN(STR_ACPI_PCIE_ECAM_COMPAT_MODE_HELP),
+            flags       = NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+            default     = FixedPcdGet32 (PcdAcpiPcieEcamCompatModeDefault),
+            option text = STRING_TOKEN(STR_ACPI_PCIE_ECAM_COMPAT_MODE_NXPMX6_SINGLE_DEV), value = ACPI_PCIE_ECAM_COMPAT_MODE_NXPMX6_SINGLE_DEV, flags = 0;
+            option text = STRING_TOKEN(STR_ACPI_PCIE_ECAM_COMPAT_MODE_NXPMX6_GRAVITON), value = ACPI_PCIE_ECAM_COMPAT_MODE_NXPMX6_GRAVITON, flags = 0;
+            option text = STRING_TOKEN(STR_ACPI_PCIE_ECAM_COMPAT_MODE_SINGLE_DEV), value = ACPI_PCIE_ECAM_COMPAT_MODE_SINGLE_DEV, flags = 0;
+            option text = STRING_TOKEN(STR_ACPI_PCIE_ECAM_COMPAT_MODE_NXPMX6), value = ACPI_PCIE_ECAM_COMPAT_MODE_NXPMX6, flags = 0;
+            option text = STRING_TOKEN(STR_ACPI_PCIE_ECAM_COMPAT_MODE_GRAVITON), value = ACPI_PCIE_ECAM_COMPAT_MODE_GRAVITON, flags = 0;
+          endoneof;
         endif;
-#endif
 
         suppressif (get(ConfigTableMode.Mode) & CONFIG_TABLE_MODE_FDT) == 0;
           subtitle text = STRING_TOKEN(STR_NULL_STRING);

@@ -3,7 +3,7 @@
  *  PCI Express Memory-mapped Configuration Space base address description table (MCFG)
  *
  *  Copyright (c) 2021, Jared McNeill <jmcneill@invisible.ca>
- *  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+ *  Copyright (c) 2024, Mario Bălănică <mariobalanica02@gmail.com>
  *
  *  SPDX-License-Identifier: BSD-2-Clause-Patent
  *
@@ -12,7 +12,7 @@
 #include "AcpiTables.h"
 
 //
-// MCFG may get patched by AcpiPlatformDxe.
+// MCFG is patched by AcpiPlatformDxe.
 //
 
 RK3588_MCFG_TABLE Mcfg = {
@@ -23,40 +23,77 @@ RK3588_MCFG_TABLE Mcfg = {
       EFI_ACPI_MEMORY_MAPPED_CONFIGURATION_SPACE_ACCESS_TABLE_REVISION
       ),
   },
-  {
+  { // Main config space
     {
-      0x0000000900000000 + 0x8000,
+      PCIE_CFG_BASE (0),
       0,  // PciSegmentNumber
       1,  // PciBusMin
       1,  // PciBusMax
       0   // Reserved
     },
     {
-      0x0000000940000000 + 0x8000,
+      PCIE_CFG_BASE (1),
       1,  // PciSegmentNumber
       1,  // PciBusMin
       1,  // PciBusMax
       0   // Reserved
     },
     {
-      0x0000000980000000 + 0x8000,
+      PCIE_CFG_BASE (2),
       2,  // PciSegmentNumber
       1,  // PciBusMin
       1,  // PciBusMax
       0   // Reserved
     },
     {
-      0x00000009C0000000 + 0x8000,
+      PCIE_CFG_BASE (3),
       3,  // PciSegmentNumber
       1,  // PciBusMin
       1,  // PciBusMax
       0   // Reserved
     },
     {
-      0x0000000A00000000 + 0x8000,
+      PCIE_CFG_BASE (4),
       4,  // PciSegmentNumber
       1,  // PciBusMin
       1,  // PciBusMax
+      0   // Reserved
+    }
+  },
+  { // Root Port DBI config space (for Windows)
+    {
+      PCIE_DBI_BASE (0),
+      0,  // PciSegmentNumber
+      0,  // PciBusMin
+      0,  // PciBusMax
+      0   // Reserved
+    },
+    {
+      PCIE_DBI_BASE (1),
+      1,  // PciSegmentNumber
+      0,  // PciBusMin
+      0,  // PciBusMax
+      0   // Reserved
+    },
+    {
+      PCIE_DBI_BASE (2),
+      2,  // PciSegmentNumber
+      0,  // PciBusMin
+      0,  // PciBusMax
+      0   // Reserved
+    },
+    {
+      PCIE_DBI_BASE (3),
+      3,  // PciSegmentNumber
+      0,  // PciBusMin
+      0,  // PciBusMax
+      0   // Reserved
+    },
+    {
+      PCIE_DBI_BASE (4),
+      4,  // PciSegmentNumber
+      0,  // PciBusMin
+      0,  // PciBusMax
       0   // Reserved
     }
   }
