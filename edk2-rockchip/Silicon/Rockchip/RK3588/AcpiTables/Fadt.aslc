@@ -57,7 +57,7 @@ EFI_ACPI_6_3_FIXED_ACPI_DESCRIPTION_TABLE Fadt = {
   0,                                                                        // UINT8      DayAlrm
   0,                                                                        // UINT8      MonAlrm
   0,                                                                        // UINT8      Century
-  EFI_ACPI_RESERVED_WORD,                                                   // UINT16     IaPcBootArch (Reserved on ARM)
+  EFI_ACPI_6_3_MSI_NOT_SUPPORTED,                                           // UINT16     IaPcBootArch (Reserved on ARM)
   EFI_ACPI_RESERVED_BYTE,                                                   // UINT8      Reserved1
   EFI_ACPI_6_3_WBINVD | EFI_ACPI_6_3_SLP_BUTTON |                           // UINT32     Flags
   EFI_ACPI_6_3_HW_REDUCED_ACPI,
