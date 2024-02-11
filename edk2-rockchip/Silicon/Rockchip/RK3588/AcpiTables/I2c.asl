@@ -25,7 +25,6 @@
       Package () {
         Package (2) { "i2c,clk-rate", 198000000 },
         Package (2) { "rockchip,bclk", 198000000 },
-        Package (2) { "compatible", "rockchip,rk3399-i2c" },
         Package (2) { "#address-cells", 1 },
         Package (2) { "#size-cells", 0 },
       }
@@ -50,7 +49,6 @@
       Package () {
         Package (2) { "i2c,clk-rate", 198000000 },
         Package (2) { "rockchip,bclk", 198000000 },
-        Package (2) { "compatible", "rockchip,rk3399-i2c" },
         Package (2) { "#address-cells", 1 },
         Package (2) { "#size-cells", 0 },
       }
@@ -75,7 +73,6 @@
       Package () {
         Package (2) { "i2c,clk-rate", 198000000 },
         Package (2) { "rockchip,bclk", 198000000 },
-        Package (2) { "compatible", "rockchip,rk3399-i2c" },
         Package (2) { "#address-cells", 1 },
         Package (2) { "#size-cells", 0 },
       }
@@ -100,7 +97,6 @@
       Package () {
         Package (2) { "i2c,clk-rate", 198000000 },
         Package (2) { "rockchip,bclk", 198000000 },
-        Package (2) { "compatible", "rockchip,rk3399-i2c" },
         Package (2) { "#address-cells", 1 },
         Package (2) { "#size-cells", 0 },
       }
@@ -125,7 +121,6 @@
       Package () {
         Package (2) { "i2c,clk-rate", 198000000 },
         Package (2) { "rockchip,bclk", 198000000 },
-        Package (2) { "compatible", "rockchip,rk3399-i2c" },
         Package (2) { "#address-cells", 1 },
         Package (2) { "#size-cells", 0 },
       }
@@ -150,7 +145,6 @@
       Package () {
         Package (2) { "i2c,clk-rate", 198000000 },
         Package (2) { "rockchip,bclk", 198000000 },
-        Package (2) { "compatible", "rockchip,rk3399-i2c" },
         Package (2) { "#address-cells", 1 },
         Package (2) { "#size-cells", 0 },
       }
@@ -175,7 +169,6 @@
       Package () {
         Package (2) { "i2c,clk-rate", 198000000 },
         Package (2) { "rockchip,bclk", 198000000 },
-        Package (2) { "compatible", "rockchip,rk3399-i2c" },
         Package (2) { "#address-cells", 1 },
         Package (2) { "#size-cells", 0 },
       }
@@ -200,7 +193,6 @@
       Package () {
         Package (2) { "i2c,clk-rate", 198000000 },
         Package (2) { "rockchip,bclk", 198000000 },
-        Package (2) { "compatible", "rockchip,rk3399-i2c" },
         Package (2) { "#address-cells", 1 },
         Package (2) { "#size-cells", 0 },
       }
