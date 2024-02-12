@@ -464,16 +464,24 @@ PciValidateCfg0 (
   EFI_STATUS Status;
 
   //
-  // If the downstream device doesn't appear mirrored, config accesses
-  // must not be shifted by 0x8000 anymore.
+  // Check if the downstream device appears mirrored (due to 64 KB iATU granularity)
+  // and needs to have config acesses shifted for single device ECAM mode in ACPI.
   //
-  if (MmioRead32 (Cfg0Base) != 0xffffffff
-      && MmioRead32 (Cfg0Base + 0x8000) == 0xffffffff) {
+  // Warning:
+  // Bus hang ups have been observed when doing CFG0 cycles to 01:01.0 (+0x8000)
+  // for some devices that have working filtering and aren't mirrored (e.g. VIA VL805).
+  //
+  // Checking 01:01.0 before 01:00.0 and then never again seems fine, at least for UEFI.
+  // In single-device ECAM mode, an OS is going to scan the entire affected bus again, so
+  // there's still a risk of locking up the system, but we can't do anything about it.
+  //
+  if (MmioRead32 (Cfg0Base + 0x8000) == 0xffffffff
+      && MmioRead32 (Cfg0Base) != 0xffffffff) {
     Status = PcdSet32S (PcdPcieEcamCompliantSegmentsMask,
                 PcdGet32 (PcdPcieEcamCompliantSegmentsMask) | (1 << Segment));
     ASSERT_EFI_ERROR (Status);
 
-    DEBUG((DEBUG_INFO, "PCIe: Working CFG0 TLP filtering for connected device!\n"));
+    DEBUG ((DEBUG_INFO, "PCIe: Working CFG0 TLP filtering for connected device!\n"));
   }
 }
 
