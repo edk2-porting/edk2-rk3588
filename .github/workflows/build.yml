@@ -80,15 +80,19 @@ jobs:
       - name: Build platform
         shell: bash
         run: |
-          export BUILD_FLAGS="-D SECURE_BOOT_ENABLE=TRUE"
-          export DEFAULT_KEYS="-D DEFAULT_KEYS=TRUE \
-                               -D PK_DEFAULT_FILE=keys/pk.cer \
-                               -D KEK_DEFAULT_FILE1=keys/ms_kek.cer \
-                               -D DB_DEFAULT_FILE1=keys/ms_db1.cer \
-                               -D DB_DEFAULT_FILE2=keys/ms_db2.cer \
-                               -D DBX_DEFAULT_FILE1=keys/arm64_dbx.bin"
+          export EDK2_SECUREBOOT_FLAGS=" \
+              -D DEFAULT_KEYS=TRUE \
+              -D PK_DEFAULT_FILE=keys/pk.cer \
+              -D KEK_DEFAULT_FILE1=keys/ms_kek.cer \
+              -D DB_DEFAULT_FILE1=keys/ms_db1.cer \
+              -D DB_DEFAULT_FILE2=keys/ms_db2.cer \
+              -D DBX_DEFAULT_FILE1=keys/arm64_dbx.bin \
+              -D SECURE_BOOT_ENABLE=TRUE"
 
-          ./build.sh --device ${{matrix.PLATFORM}} --release ${{matrix.CONFIGURATION}} --build-flags="${BUILD_FLAGS} ${DEFAULT_KEYS}"
+          export EDK2_BUILD_FLAGS=" \
+              ${EDK2_SECUREBOOT_FLAGS}"
+
+          ./build.sh --device ${{matrix.PLATFORM}} --release ${{matrix.CONFIGURATION}} --edk2-flags "${EDK2_BUILD_FLAGS}"
           mv RK3588_NOR_FLASH.img ${{matrix.PLATFORM}}_UEFI_${{matrix.CONFIGURATION}}_${{steps.get_version_tag.outputs.version}}.img
 
       - name: Upload artifact
