@@ -80,17 +80,12 @@
         SUPP = CDW2                                                            \
         CTRL = CDW3                                                            \
                                                                                \
-        /* Only allow native hot plug control if OS supports: */               \
-        /*  ASPM */                                                            \
-        /*  Clock PM */                                                        \
-        /*  MSI/MSI-X */                                                       \
-        If ((SUPP & 0x16) != 0x16) {                                           \
-          Ctrl &= 0x3E /* Mask bit 0 (and undefined bits) */                   \
-        }                                                                      \
+        /* Mask out native hot plug control */                                 \
+        CTRL &= 0x1E                                                           \
                                                                                \
         /* Always allow native PME, AER and Capability Structure control */    \
         /* Never allow SHPC and LTR control */                                 \
-        Ctrl &= 0x1D                                                           \
+        CTRL &= 0x1D                                                           \
                                                                                \
         /* Unknown revision */                                                 \
         If (Arg1 != 1) {                                                       \
