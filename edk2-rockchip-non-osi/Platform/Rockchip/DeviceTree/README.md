@@ -7,6 +7,8 @@
 * itx-3588j: <https://gitlab.com/firefly-linux/kernel/-/tree/e14c28295dd7ee8f807899e9b0b7da5f79742e4f/arch/arm64/boot/dts/rockchip>
   (note: in the dtb given here, the builtin bootargs in the source above were commented out
    before building. Not sure if that was a necessary step - SS)
-  
+
+* rk3588-firefly-aio-3588q: <https://gitlab.com/firefly-linux/kernel/-/tree/fa0e053fd911339b825407cb6d4b167fad7cdc49/arch/arm64/boot/dts/rockchip>
+
 ## License
 SPDX-License-Identifier: GPL-2.0-only
