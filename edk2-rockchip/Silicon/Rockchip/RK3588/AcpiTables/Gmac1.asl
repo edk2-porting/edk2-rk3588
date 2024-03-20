@@ -35,6 +35,10 @@ Device (MAC1) {
       Package () { "snps,mixed-burst", 1 },
       Package () { "snps,tso", 1 },
       Package () { "snps,axi-config", "AXIC" },
+#ifdef GMAC1_CONFIGURE_PHY
+      Package () { "phy-mode", GMAC1_PHY_MODE },
+      Package () { "phy-handle", GMAC1_PHY_HANDLE },
+#endif // GMAC1_CONFIGURE_PHY
     }
   })
 
@@ -93,4 +97,14 @@ Device (MAC1) {
     } // UUID check
     Return (Buffer () { 0x0 })
   } // _DSM
+  
+  Device (MDIO) {
+    Name (_ADR, 0x1)
+    Name (_DSD, Package () {
+      ToUUID("daffd814-6eba-4d8c-8a91-bc9bbf4aa301"),
+      Package () {
+        Package () { "compatible", "snps,dwmac-mdio" },
+      }
+    })
+  }
 }
