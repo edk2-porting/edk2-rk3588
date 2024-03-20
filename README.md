@@ -142,6 +142,7 @@ The paths above are relative to the root of the file system. That is, the `dtb` 
 | --------------------------------------- | ----------------------------- |
 | `rk3588s-9tripod-linux`                 | Indiedroid Nova               |
 | `roc-rk3588s-pc`                        | ROC-RK3588S-PC / Station M3   |
+| `itx-3588j`                             | Firefly ITX-3588J             |
 | `rk3588-nanopc-t6`                      | NanoPC T6                     |
 | `rk3588s-nanopi-r6c`                    | NanoPi R6C                    |
 | `rk3588s-nanopi-r6s`                    | NanoPi R6S                    |
