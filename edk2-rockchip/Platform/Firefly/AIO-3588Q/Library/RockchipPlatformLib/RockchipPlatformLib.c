@@ -53,7 +53,6 @@ GetPca9555Protocol (
   EFI_HANDLE          *HandleBuffer;
   EFI_STATUS           Status;
   UINTN                HandleCount;
-  UINTN                Index;
 
   /* Locate Handles of all PCA95XX_PROTOCOL producers */
   Status = gBS->LocateHandleBuffer (ByProtocol,
@@ -302,7 +301,7 @@ UsbPortPowerEnable (
   /* On Firefly AIO-3588Q this is controlled via the PCA9555. */
   Status = GetPca9555Protocol(&Pca95xxProtocol);
   if (EFI_ERROR(Status)) {
-    DEBUG ((DEBUG_ERROR, "Failed to get PCA9555! (%d)\n", Status));
+    DEBUG ((DEBUG_ERROR, "UsbPortPowerEnable failed to get PCA9555! (%d)\n", Status));
   } else {
     /* USB-C */
     Pca95xxProtocol->GpioProtocol.Set(
@@ -371,7 +370,7 @@ PcieIoInit (
     /* reset */
     GpioPinSetDirection (4, GPIO_PIN_PB6, GPIO_PIN_OUTPUT);
     /* vcc3v3_pcie30 */
-    GpioPinSetDirection (2, GPIO_PIN_PC5, GPIO_PIN_OUTPUT);
+    GpioPinSetDirection (4, GPIO_PIN_PC6, GPIO_PIN_OUTPUT);
   }
 }
 
@@ -384,7 +383,7 @@ PciePowerEn (
 {
   if(Segment == PCIE_SEGMENT_PCIE30X4) {
     /* vcc3v3_pcie30 */
-    GpioPinWrite (2, GPIO_PIN_PC5, Enable);
+    GpioPinWrite (4, GPIO_PIN_PC6, Enable);
   }
 }
 
@@ -419,7 +418,7 @@ PwmFanIoSetup (
 
   Status = GetPca9555Protocol(&Pca95xxProtocol);
   if (EFI_ERROR(Status)) {
-    DEBUG ((DEBUG_ERROR, "Failed to get PCA9555! (%d)\n", Status));
+    DEBUG ((DEBUG_ERROR, "PwmFanIoSetup failed to get PCA9555! (%d)\n", Status));
   } else {
     Pca95xxProtocol->GpioProtocol.Set(
       &Pca95xxProtocol->GpioProtocol,
@@ -440,7 +439,7 @@ PwmFanSetSpeed (
 
   Status = GetPca9555Protocol(&Pca95xxProtocol);
   if (EFI_ERROR(Status)) {
-    DEBUG ((DEBUG_ERROR, "Failed to get PCA9555! (%d)\n", Status));
+    DEBUG ((DEBUG_ERROR, "PwmFanSetSpeed failed to get PCA9555! (%d)\n", Status));
   } else {
     /* (SS) NB: (TBA?) It doesn't *appear* we can regulate the fan speed,
      *      only power up/down, but I could be wrong
@@ -490,7 +489,7 @@ PlatformSetStatusLed (
   /* On Firefly AIO-3588Q this is controlled via the PCA9555. */
   Status = GetPca9555Protocol(&Pca95xxProtocol);
   if (EFI_ERROR(Status)) {
-    DEBUG ((DEBUG_ERROR, "Failed to get PCA9555! (%d)\n", Status));
+    DEBUG ((DEBUG_ERROR, "PlatformSetStatusLed failed to get PCA9555! (%d)\n", Status));
   } else {
     Pca95xxProtocol->GpioProtocol.Set(
       &Pca95xxProtocol->GpioProtocol,
