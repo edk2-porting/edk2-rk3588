@@ -26,6 +26,7 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 2, "RKCP  ", "RK3588  ", 2)
   Scope (\_SB_)
   {
     include ("Cpu.asl")
+    include ("Cru.asl")
 
     include ("Pcie.asl")
     include ("Sata.asl")

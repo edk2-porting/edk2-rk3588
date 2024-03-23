@@ -19,6 +19,7 @@
 #include <IndustryStandard/MemoryMappedConfigurationSpaceAccessTable.h>
 #include <Library/GpioLib.h>
 #include <Library/Rk3588Pcie.h>
+#include <Library/CruLibAnnex.h>
 
 #define EFI_ACPI_OEM_ID                       {'R','K','C','P',' ',' '}
 
