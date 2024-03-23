@@ -104,6 +104,11 @@
   gRK3588TokenSpaceGuid.PcdGmac1TxDelay|0x4f
 
   #
+  # I2S
+  #
+  gRK3588TokenSpaceGuid.PcdI2S0Supported|TRUE
+
+  #
   # On-Board fan output
   #
   gRK3588TokenSpaceGuid.PcdHasOnBoardFanOutput|TRUE

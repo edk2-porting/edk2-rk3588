@@ -400,12 +400,12 @@ PciePeReset (
 }
 
 PWM_DATA pwm_data = {
-  .ControllerID = PWM_CONTROLLER2,
+  .ControllerID = PWM_CONTROLLER3,
   .ChannelID = PWM_CHANNEL3,
   .PeriodNs = 50000,
   .DutyNs = 50000,
   .Polarity = FALSE,
-}; // PWM2_CH3
+}; // PWM15
 
 VOID
 EFIAPI
@@ -413,19 +413,9 @@ PwmFanIoSetup (
   VOID
   )
 {
-  EFI_STATUS Status = EFI_SUCCESS;
-  PCA95XX_PROTOCOL *Pca95xxProtocol;
-
-  Status = GetPca9555Protocol(&Pca95xxProtocol);
-  if (EFI_ERROR(Status)) {
-    DEBUG ((DEBUG_ERROR, "PwmFanIoSetup failed to get PCA9555! (%d)\n", Status));
-  } else {
-    Pca95xxProtocol->GpioProtocol.Set(
-      &Pca95xxProtocol->GpioProtocol,
-      11, /* vcc_fan_pwr_en */
-      GPIO_MODE_OUTPUT_1
-    );
-  }
+  GpioPinSetFunction (1, GPIO_PIN_PC6, 0xB); // PWM15_IR_M2
+  RkPwmSetConfig (&pwm_data);
+  RkPwmEnable (&pwm_data);
 }
 
 VOID
@@ -434,22 +424,8 @@ PwmFanSetSpeed (
   IN UINT32 Percentage
   )
 {
-  EFI_STATUS Status = EFI_SUCCESS;
-  PCA95XX_PROTOCOL *Pca95xxProtocol;
-
-  Status = GetPca9555Protocol(&Pca95xxProtocol);
-  if (EFI_ERROR(Status)) {
-    DEBUG ((DEBUG_ERROR, "PwmFanSetSpeed failed to get PCA9555! (%d)\n", Status));
-  } else {
-    /* (SS) NB: (TBA?) It doesn't *appear* we can regulate the fan speed,
-     *      only power up/down, but I could be wrong
-     */
-    Pca95xxProtocol->GpioProtocol.Set(
-      &Pca95xxProtocol->GpioProtocol,
-      11, /* vcc_fan_pwr_en */
-      (Percentage > 0) ? GPIO_MODE_OUTPUT_1 : GPIO_MODE_OUTPUT_0
-    );
-  }
+  pwm_data.DutyNs = pwm_data.PeriodNs * Percentage / 100;
+  RkPwmSetConfig (&pwm_data);
 }
 
 VOID
@@ -506,5 +482,5 @@ PlatformEarlyInit (
   VOID
   )
 {
-
+  GpioPinSetFunction(1, GPIO_PIN_PC4, 0); //jdet
 }
