@@ -30,6 +30,7 @@ jobs:
           - indiedroid-nova
           - roc-rk3588s-pc
           - itx-3588j
+          - aio-3588q
           - station-m3
           - r58x
           - r58-mini
