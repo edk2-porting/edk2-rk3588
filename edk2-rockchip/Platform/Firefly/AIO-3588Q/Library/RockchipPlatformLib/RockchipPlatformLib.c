@@ -103,9 +103,7 @@ SdhciEmmcIoMux (
   )
 {
   /* sdmmc0 iomux */
-  BUS_IOC->GPIO2A_IOMUX_SEL_L = (0xFFFFUL << 16) | (0x1111); //EMMC_CMD,EMMC_CLKOUT,EMMC_DATASTROBE,EMMC_RSTN
-  BUS_IOC->GPIO2D_IOMUX_SEL_L = (0xFFFFUL << 16) | (0x1111); //EMMC_D0,EMMC_D1,EMMC_D2,EMMC_D3
-  BUS_IOC->GPIO2D_IOMUX_SEL_H = (0xFFFFUL << 16) | (0x1111); //EMMC_D4,EMMC_D5,EMMC_D6,EMMC_D7
+  /* Do not override, set by earlier boot stages. */
 }
 
 #define NS_CRU_BASE         0xFD7C0000
@@ -159,25 +157,7 @@ NorFspiIomux (
   )
 {
   /* io mux */
-  MmioWrite32(NS_CRU_BASE + CRU_CLKSEL_CON78,
-             (((0x3 << 12) | (0x3f << 6)) << 16) | (0x0 << 12) | (0x3f << 6));
-#define FSPI_M1
-#if defined(FSPI_M0)
-   /*FSPI M0*/
-  BUS_IOC->GPIO2A_IOMUX_SEL_L = ((0xF << 0) << 16) | (2 << 0); //FSPI_CLK_M0
-  BUS_IOC->GPIO2D_IOMUX_SEL_L = (0xFFFFUL << 16) | (0x2222); //FSPI_D0_M0,FSPI_D1_M0,FSPI_D2_M0,FSPI_D3_M0
-  BUS_IOC->GPIO2D_IOMUX_SEL_H = ((0xF << 8) << 16) | (0x2 << 8); //FSPI_CS0N_M0
-#elif defined(FSPI_M1)
-  /*FSPI M1*/
-  BUS_IOC->GPIO2A_IOMUX_SEL_H = (0xFF00UL << 16) | (0x3300); //FSPI_D0_M1,FSPI_D1_M1
-  BUS_IOC->GPIO2B_IOMUX_SEL_L = (0xF0FFUL << 16) | (0x3033); //FSPI_D2_M1,FSPI_D3_M1,FSPI_CLK_M1
-  BUS_IOC->GPIO2B_IOMUX_SEL_H = (0xF << 16) | (0x3); //FSPI_CS0N_M1
-#else
-  /*FSPI M2*/
-  BUS_IOC->GPIO3A_IOMUX_SEL_L = (0xFFFFUL << 16) | (0x5555); //[FSPI_D0_M2-FSPI_D3_M2]
-  BUS_IOC->GPIO3A_IOMUX_SEL_H = (0xF0UL << 16) | (0x50); //FSPI_CLK_M2
-  BUS_IOC->GPIO3C_IOMUX_SEL_H = (0xF << 16) | (0x2); //FSPI_CS0_M2
-#endif
+  /* Do not override, set by earlier boot stages. */
 }
 
 VOID
@@ -255,34 +235,20 @@ I2cIomux (
 {
   switch (id) {
   case 0:
-    /* io mux M2 */
-    PMU2_IOC->GPIO0D_IOMUX_SEL_L = (0x0F00UL << 16) | 0x0300;
-    PMU2_IOC->GPIO0D_IOMUX_SEL_L = (0x00F0UL << 16) | 0x0030;
+    GpioPinSetFunction(0, GPIO_PIN_PD1, 3); // I2C0_SCL_M2
+    GpioPinSetFunction(0, GPIO_PIN_PD2, 3); // I2C0_SDA_M2
     break;
   case 1:
-    /* io mux */
-    //BUS_IOC->GPIO0B_IOMUX_SEL_H = (0x0FF0UL << 16) | 0x0990;
-    //PMU2_IOC->GPIO0B_IOMUX_SEL_H = (0x0FF0UL << 16) | 0x0880;
-    break;
-  case 2:
-    /* io mux */
-    BUS_IOC->GPIO0B_IOMUX_SEL_H = (0xF000UL << 16) | 0x9000;
-    BUS_IOC->GPIO0C_IOMUX_SEL_L = (0x000FUL << 16) | 0x0009;
-    PMU2_IOC->GPIO0B_IOMUX_SEL_H = (0xF000UL << 16) | 0x8000;
-    PMU2_IOC->GPIO0C_IOMUX_SEL_L = (0x000FUL << 16) | 0x0008;
+    GpioPinSetFunction(0, GPIO_PIN_PD4, 9); // I2C1_SCL_M2
+    GpioPinSetFunction(0, GPIO_PIN_PD5, 9); // I2C1_SDA_M2
     break;
   case 3:
-    break;
-  case 4:
-    break;
-  case 5:
+    GpioPinSetFunction(1, GPIO_PIN_PC1, 9); // I2C3_SCL_M0
+    GpioPinSetFunction(1, GPIO_PIN_PC0, 9); // I2C3_SDA_M0
     break;
   case 6:
-    /* io mux M0 */
-    BUS_IOC->GPIO0C_IOMUX_SEL_H = (0xF000UL << 16) | 0x9000;
-    BUS_IOC->GPIO0D_IOMUX_SEL_L = (0x000FUL << 16) | 0x0009;
-    PMU2_IOC->GPIO0C_IOMUX_SEL_H = (0xF000UL << 16) | 0x8000;
-    PMU2_IOC->GPIO0D_IOMUX_SEL_L = (0x000FUL << 16) | 0x0008;
+    GpioPinSetFunction(0, GPIO_PIN_PD0, 9); // I2C6_SCL_M0
+    GpioPinSetFunction(0, GPIO_PIN_PC7, 9); // I2C6_SDA_M0
     break;
   default:
     break;
@@ -365,12 +331,18 @@ PcieIoInit (
   UINT32 Segment
   )
 {
-  /* Set reset and power IO to gpio output mode */
-  if(Segment == PCIE_SEGMENT_PCIE30X4) {
-    /* reset */
-    GpioPinSetDirection (4, GPIO_PIN_PB6, GPIO_PIN_OUTPUT);
-    /* vcc3v3_pcie30 */
-    GpioPinSetDirection (4, GPIO_PIN_PC6, GPIO_PIN_OUTPUT);
+  switch (Segment) {
+  case PCIE_SEGMENT_PCIE30X4:
+    GpioPinSetDirection (4, GPIO_PIN_PB6, GPIO_PIN_OUTPUT); // PCIE30X4_PERSTN_M1
+    GpioPinSetDirection (4, GPIO_PIN_PC6, GPIO_PIN_OUTPUT); // vcc3v3_pcie30
+    break;
+  case PCIE_SEGMENT_PCIE20L0:
+    GpioPinSetDirection (1, GPIO_PIN_PB4, GPIO_PIN_OUTPUT);
+    break;
+  case PCIE_SEGMENT_PCIE20L1:
+    break;
+  case PCIE_SEGMENT_PCIE20L2:
+    break;
   }
 }
 
@@ -381,9 +353,16 @@ PciePowerEn (
   BOOLEAN Enable
   )
 {
-  if(Segment == PCIE_SEGMENT_PCIE30X4) {
-    /* vcc3v3_pcie30 */
-    GpioPinWrite (4, GPIO_PIN_PC6, Enable);
+  switch (Segment) {
+  case PCIE_SEGMENT_PCIE30X4:
+    GpioPinWrite (4, GPIO_PIN_PC6, Enable); // vcc3v3_pcie30
+    break;
+  case PCIE_SEGMENT_PCIE20L0:
+    break;
+  case PCIE_SEGMENT_PCIE20L1:
+    break;
+  case PCIE_SEGMENT_PCIE20L2:
+    break;
   }
 }
 
@@ -394,8 +373,17 @@ PciePeReset (
   BOOLEAN Enable
   )
 {
-  if(Segment == PCIE_SEGMENT_PCIE30X4) {
-    GpioPinWrite (4, GPIO_PIN_PB6, !Enable);
+  switch (Segment) {
+  case PCIE_SEGMENT_PCIE30X4:
+    GpioPinWrite (4, GPIO_PIN_PB6, !Enable); // PCIE30X4_PERSTN_M1
+    break;
+  case PCIE_SEGMENT_PCIE20L0:
+    GpioPinWrite (1, GPIO_PIN_PB4, !Enable);
+    break;
+  case PCIE_SEGMENT_PCIE20L1:
+    break;
+  case PCIE_SEGMENT_PCIE20L2:
+    break;
   }
 }
 
@@ -434,19 +422,8 @@ PlatformInitLeds (
   VOID
   )
 {
-  /* Activate power LED only */
-  GpioPinWrite (3, GPIO_PIN_PB2, TRUE);
-  GpioPinSetDirection (3, GPIO_PIN_PB2, GPIO_PIN_OUTPUT);
-
-#if 0
-  /* Red off, Green for status, Blue for power */
   GpioPinWrite (3, GPIO_PIN_PB2, FALSE);
   GpioPinSetDirection (3, GPIO_PIN_PB2, GPIO_PIN_OUTPUT);
-  GpioPinWrite (3, GPIO_PIN_PC0, FALSE);
-  GpioPinSetDirection (3, GPIO_PIN_PC0, GPIO_PIN_OUTPUT);
-  GpioPinWrite (1, GPIO_PIN_PD5, TRUE);
-  GpioPinSetDirection (1, GPIO_PIN_PD5, GPIO_PIN_OUTPUT);
-#endif
 }
 
 VOID
@@ -455,25 +432,7 @@ PlatformSetStatusLed (
   IN BOOLEAN Enable
   )
 {
-  /* (SS) does not seem to work and causes errors on I2C complaining
-   * about something being too high
-   */
-#if 0
-  EFI_STATUS Status = EFI_SUCCESS;
-  PCA95XX_PROTOCOL *Pca95xxProtocol;
-
-  /* On Firefly AIO-3588Q this is controlled via the PCA9555. */
-  Status = GetPca9555Protocol(&Pca95xxProtocol);
-  if (EFI_ERROR(Status)) {
-    DEBUG ((DEBUG_ERROR, "PlatformSetStatusLed failed to get PCA9555! (%d)\n", Status));
-  } else {
-    Pca95xxProtocol->GpioProtocol.Set(
-      &Pca95xxProtocol->GpioProtocol,
-      3, /* user_led */
-      Enable ? GPIO_MODE_OUTPUT_1 : GPIO_MODE_OUTPUT_0
-    );
-  }
-#endif
+  GpioPinWrite (3, GPIO_PIN_PB2, Enable);
 }
 
 VOID
@@ -482,5 +441,7 @@ PlatformEarlyInit (
   VOID
   )
 {
-  GpioPinSetFunction(1, GPIO_PIN_PC4, 0); //jdet
+  GpioPinSetDirection (4, GPIO_PIN_PB0, GPIO_PIN_OUTPUT); // headphone enable
+  GpioPinWrite (4, GPIO_PIN_PB0, TRUE);
+  GpioPinSetFunction (1, GPIO_PIN_PC4, 0); // headphone detect
 }

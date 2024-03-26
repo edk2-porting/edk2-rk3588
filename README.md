@@ -7,6 +7,8 @@ This repository contains an UEFI firmware implementation based on EDK2 for vario
 - [Orange Pi 5](http://www.orangepi.org/html/hardWare/computerAndMicrocontrollers/details/Orange-Pi-5.html)
 - [Orange Pi 5 Plus](http://www.orangepi.org/html/hardWare/computerAndMicrocontrollers/details/Orange-Pi-5-plus.html)
 - [ameriDroid Indiedroid Nova](https://indiedroid.us)
+- [Firefly AIO-3588Q](https://en.t-firefly.com/product/industry/aio3588q)
+- [Firefly ITX-3588J](https://en.t-firefly.com/product/industry/itx3588j)
 - [Firefly ROC-RK3588S-PC](https://en.t-firefly.com/product/industry/rocrk3588spc)
 - [StationPC Station M3](https://www.stationpc.com/product/stationm3)
 - [Mekotronics R58X](https://www.mekotronics.com/h-pd-75.html)
@@ -141,6 +143,8 @@ The paths above are relative to the root of the file system. That is, the `dtb` 
 | Name                                    | Platform                      |
 | --------------------------------------- | ----------------------------- |
 | `rk3588s-9tripod-linux`                 | Indiedroid Nova               |
+| `aio-3588q`                             | Firefly AIO-3588Q             |
+| `itx-3588j`                             | Firefly ITX-3588J             |
 | `roc-rk3588s-pc`                        | ROC-RK3588S-PC / Station M3   |
 | `rk3588-nanopc-t6`                      | NanoPC T6                     |
 | `rk3588s-nanopi-r6c`                    | NanoPi R6C                    |
