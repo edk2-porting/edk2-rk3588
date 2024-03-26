@@ -373,6 +373,9 @@ PciePeReset (
   BOOLEAN Enable
   )
 {
+  EFI_STATUS Status = EFI_SUCCESS;
+  PCA95XX_PROTOCOL *Pca95xxProtocol;
+
   switch (Segment) {
   case PCIE_SEGMENT_PCIE30X4:
     GpioPinWrite (4, GPIO_PIN_PB6, !Enable); // PCIE30X4_PERSTN_M1
@@ -383,6 +386,16 @@ PciePeReset (
   case PCIE_SEGMENT_PCIE20L1:
     break;
   case PCIE_SEGMENT_PCIE20L2:
+    Status = GetPca9555Protocol(&Pca95xxProtocol);
+    if (EFI_ERROR(Status)) {
+      DEBUG ((DEBUG_ERROR, "PciePeReset(L2) failed to get PCA9555! (%d)\n", Status));
+    } else {
+      Pca95xxProtocol->GpioProtocol.Set(
+        &Pca95xxProtocol->GpioProtocol,
+        14, /* PCA_IO1_6 */
+        Enable ? GPIO_MODE_OUTPUT_0 : GPIO_MODE_OUTPUT_1
+      );
+    }
     break;
   }
 }

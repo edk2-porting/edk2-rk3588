@@ -85,7 +85,7 @@
   gRK3588TokenSpaceGuid.PcdComboPhy0Switchable|TRUE
   gRK3588TokenSpaceGuid.PcdComboPhy1Switchable|TRUE
   gRK3588TokenSpaceGuid.PcdComboPhy2Switchable|TRUE
-  gRK3588TokenSpaceGuid.PcdComboPhy0ModeDefault|$(COMBO_PHY_MODE_SATA)
+  gRK3588TokenSpaceGuid.PcdComboPhy0ModeDefault|$(COMBO_PHY_MODE_PCIE)
   gRK3588TokenSpaceGuid.PcdComboPhy1ModeDefault|$(COMBO_PHY_MODE_PCIE)
   gRK3588TokenSpaceGuid.PcdComboPhy2ModeDefault|$(COMBO_PHY_MODE_USB3)
 
@@ -93,6 +93,7 @@
   # USB/DP Combo PHY support flags and default values
   #
   gRK3588TokenSpaceGuid.PcdUsbDpPhy0Supported|TRUE
+  gRK3588TokenSpaceGuid.PcdDp0LaneMux|{ 0x2, 0x3 }
   gRK3588TokenSpaceGuid.PcdUsbDpPhy1Supported|TRUE
   gRK3588TokenSpaceGuid.PcdDp1LaneMux|{ 0x2, 0x3 }
 
@@ -125,3 +126,9 @@
 
   # Splash screen logo
   $(VENDOR_DIRECTORY)/Drivers/LogoDxe/LogoDxe.inf
+
+  # Hack to enable use of PCA9555 during PCIe initialization.
+  MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf {
+    <LibraryClasses>
+      RockchipPlatformLib|Platform/Firefly/AIO-3588Q/Library/RockchipPlatformLib/RockchipPlatformLibPcaDepex.inf
+  }
