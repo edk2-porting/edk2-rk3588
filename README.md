@@ -19,6 +19,7 @@ This repository contains an UEFI firmware implementation based on EDK2 for vario
 - [FriendlyELEC NanoPi R6C](https://wiki.friendlyelec.com/wiki/index.php/NanoPi_R6C)
 - [FriendlyELEC NanoPi R6S](https://wiki.friendlyelec.com/wiki/index.php/NanoPi_R6S)
 - [Hinlink H88K](http://www.hinlink.com)
+- [YourLand Notebook](https://nanocode.cn/#/yl/index)
 
 ## Supported peripherals
 Applicable to all platforms unless otherwise noted.
@@ -158,6 +159,7 @@ The paths above are relative to the root of the file system. That is, the `dtb` 
 | `rk3588-orangepi-5-plus`                | Orange Pi 5 Plus              |
 | `rk3588s-rock-5a`                       | ROCK 5A                       |
 | `rk3588-rock-5b`                        | ROCK 5B                       |
+| `yourland`                              | GEDU YourLand Notebook        |
 
 In the absence of a custom base DTB override, the overlays are applied on top of the firmware-provided DTB.
 
