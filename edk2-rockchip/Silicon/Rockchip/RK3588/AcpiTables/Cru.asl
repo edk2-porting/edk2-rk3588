@@ -1,6 +1,6 @@
 /** @file
  *
- *  RK3588 Clock and Register Unit (CRU) definition.
+ *  RK3588 Clock and Reset Unit (CRU) definition.
  *
  *  Copyright (c) 2024, Shimrra Shai <shimmyshai00@gmail.com>
  *  Copyright (c) 2021, ARM Limited. All rights reserved.
