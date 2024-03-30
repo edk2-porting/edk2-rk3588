@@ -25,6 +25,8 @@
     Name (_DSD, Package () {
       ToUUID("daffd814-6eba-4d8c-8a91-bc9bbf4aa301"),
       Package () {
+        Package (2) { "i2c,clk-rate", 198000000 },
+        Package (2) { "rockchip,bclk", 198000000 },
         Package (2) { "#address-cells", 1 },
         Package (2) { "#size-cells", 0 },
       }
@@ -49,6 +51,8 @@
     Name (_DSD, Package () {
       ToUUID("daffd814-6eba-4d8c-8a91-bc9bbf4aa301"),
       Package () {
+        Package (2) { "i2c,clk-rate", 198000000 },
+        Package (2) { "rockchip,bclk", 198000000 },
         Package (2) { "#address-cells", 1 },
         Package (2) { "#size-cells", 0 },
       }
@@ -73,6 +77,8 @@
     Name (_DSD, Package () {
       ToUUID("daffd814-6eba-4d8c-8a91-bc9bbf4aa301"),
       Package () {
+        Package (2) { "i2c,clk-rate", 198000000 },
+        Package (2) { "rockchip,bclk", 198000000 },
         Package (2) { "#address-cells", 1 },
         Package (2) { "#size-cells", 0 },
       }
@@ -97,6 +103,8 @@
     Name (_DSD, Package () {
       ToUUID("daffd814-6eba-4d8c-8a91-bc9bbf4aa301"),
       Package () {
+        Package (2) { "i2c,clk-rate", 198000000 },
+        Package (2) { "rockchip,bclk", 198000000 },
         Package (2) { "#address-cells", 1 },
         Package (2) { "#size-cells", 0 },
       }
@@ -121,6 +129,8 @@
     Name (_DSD, Package () {
       ToUUID("daffd814-6eba-4d8c-8a91-bc9bbf4aa301"),
       Package () {
+        Package (2) { "i2c,clk-rate", 198000000 },
+        Package (2) { "rockchip,bclk", 198000000 },
         Package (2) { "#address-cells", 1 },
         Package (2) { "#size-cells", 0 },
       }
@@ -145,6 +155,8 @@
     Name (_DSD, Package () {
       ToUUID("daffd814-6eba-4d8c-8a91-bc9bbf4aa301"),
       Package () {
+        Package (2) { "i2c,clk-rate", 198000000 },
+        Package (2) { "rockchip,bclk", 198000000 },
         Package (2) { "#address-cells", 1 },
         Package (2) { "#size-cells", 0 },
       }
@@ -169,6 +181,8 @@
     Name (_DSD, Package () {
       ToUUID("daffd814-6eba-4d8c-8a91-bc9bbf4aa301"),
       Package () {
+        Package (2) { "i2c,clk-rate", 198000000 },
+        Package (2) { "rockchip,bclk", 198000000 },
         Package (2) { "#address-cells", 1 },
         Package (2) { "#size-cells", 0 },
       }
@@ -193,6 +207,8 @@
     Name (_DSD, Package () {
       ToUUID("daffd814-6eba-4d8c-8a91-bc9bbf4aa301"),
       Package () {
+        Package (2) { "i2c,clk-rate", 198000000 },
+        Package (2) { "rockchip,bclk", 198000000 },
         Package (2) { "#address-cells", 1 },
         Package (2) { "#size-cells", 0 },
       }
