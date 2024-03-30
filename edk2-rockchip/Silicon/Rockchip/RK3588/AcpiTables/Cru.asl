@@ -11,7 +11,7 @@
 #include "AcpiTables.h"
 
   Device (CRU_) {
-    Name (_HID, "RKCP0001")
+    Name (_HID, "RKCP000F")
     Name (_UID, 0)
     Name (_CCA, 0)
 
@@ -47,81 +47,97 @@
 
     // PLL_PPLL
     Device (CLK0) {
-      Name (_ADR, 0x0)
+      Name (_HID, "RKCP0010")
+      Name (_UID, 0x0)
     }
     
     // PLL_AUPLL
     Device (CLK1) {
-      Name (_ADR, 0x1)
+      Name (_HID, "RKCP0011")
+      Name (_UID, 0x1)
     }
     
     // PLL_NPLL
     Device (CLK2) {
-      Name (_ADR, 0x2)
+      Name (_HID, "RKCP0012")
+      Name (_UID, 0x2)
     }
     
     // PLL_GPLL
     Device (CLK3) {
-      Name (_ADR, 0x3)
+      Name (_HID, "RKCP0013")
+      Name (_UID, 0x3)
     }
     
     // ACLK_CENTER_ROOT
     Device (CLK4) {
-      Name (_ADR, 0x4)
+      Name (_HID, "RKCP0014")
+      Name (_UID, 0x4)
     }
     
     // HCLK_CENTER_ROOT
     Device (CLK5) {
-      Name (_ADR, 0x5)
+      Name (_HID, "RKCP0015")
+      Name (_UID, 0x5)
     }
     
     // ACLK_CENTER_LOW_ROOT
     Device (CLK6) {
-      Name (_ADR, 0x6)
+      Name (_HID, "RKCP0016")
+      Name (_UID, 0x6)
     }
     
     // ACLK_TOP_ROOT
     Device (CLK7) {
-      Name (_ADR, 0x7)
+      Name (_HID, "RKCP0017")
+      Name (_UID, 0x7)
     }
     
     // PCLK_TOP_ROOT
     Device (CLK8) {
-      Name (_ADR, 0x8)
+      Name (_HID, "RKCP0018")
+      Name (_UID, 0x8)
     }
     
     // ACLK_LOW_TOP_ROOT
     Device (CLK9) {
-      Name (_ADR, 0x9)
+      Name (_HID, "RKCP0019")
+      Name (_UID, 0x9)
     }
     
     // PCLK_PMU0_ROOT
     Device (CLKA) {
-      Name (_ADR, 0xa)
+      Name (_HID, "RKCP001A")
+      Name (_UID, 0xa)
     }
     
     // HCLK_PMU_CM0_ROOT
     Device (CLKB) {
-      Name (_ADR, 0xb)
+      Name (_HID, "RKCP001B")
+      Name (_UID, 0xb)
     }
     
     // ACLK_VOP
     Device (CLKC) {
-      Name (_ADR, 0xc)
+      Name (_HID, "RKCP001C")
+      Name (_UID, 0xc)
     }
     
     // ACLK_BUS_ROOT
     Device (CLKD) {
-      Name (_ADR, 0xd)
+      Name (_HID, "RKCP001D")
+      Name (_UID, 0xd)
     }
     
     // CLK_150M_SRC
     Device (CLKE) {
-      Name (_ADR, 0xe)
+      Name (_HID, "RKCP001E")
+      Name (_UID, 0xe)
     }
     
     // CLK_GPU
     Device (CLKF) {
-      Name (_ADR, 0xf)
+      Name (_HID, "RKCP001F")
+      Name (_UID, 0xf)
     }
   }
