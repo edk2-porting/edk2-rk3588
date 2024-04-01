@@ -1,6 +1,7 @@
 # Rockchip Platform Device Trees
 ## Sources
-* <https://github.com/armbian/linux-rockchip/tree/a8384552a2e009797aa5b3e9a046d30e8d2e5d3c/arch/arm64/boot/dts/rockchip>
+* <https://github.com/armbian/linux-rockchip/tree/f3fb30ac9de06b41fb621d17bc53603f1f48ac90/arch/arm64/boot/dts/rockchip>
+  * Updated to `rk-6.1-rkr1` branch, currently called `vendor` branch in armbian/build
 
 * roc-rk3588s-pc: <https://gitlab.com/firefly-linux/kernel/-/tree/b8646da2122f45a2c02082d949427b80d2e89b1f/arch/arm64/boot/dts/rockchip>
 
