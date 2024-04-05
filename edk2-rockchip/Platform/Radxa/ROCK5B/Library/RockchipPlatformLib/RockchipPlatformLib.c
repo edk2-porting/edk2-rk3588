@@ -354,10 +354,31 @@ PlatformSetStatusLed (
 
 VOID
 EFIAPI
+PlatformPcieWiFiEnable (
+  IN BOOLEAN Enable
+  )
+{
+  // WiFi - enable
+  GpioPinWrite (0, GPIO_PIN_PC4, Enable);
+  GpioPinSetDirection (0, GPIO_PIN_PC4, GPIO_PIN_OUTPUT);
+  GpioPinWrite (4, GPIO_PIN_PA2, Enable);
+  GpioPinSetDirection (4, GPIO_PIN_PA2, GPIO_PIN_OUTPUT);
+
+  // bluetooth - enable
+  GpioPinWrite (3, GPIO_PIN_PD5, Enable);
+  GpioPinSetDirection (3, GPIO_PIN_PD5, GPIO_PIN_OUTPUT);
+  GpioPinWrite (3, GPIO_PIN_PA6, Enable);
+  GpioPinSetDirection (3, GPIO_PIN_PA6, GPIO_PIN_OUTPUT);
+
+}
+
+VOID
+EFIAPI
 PlatformEarlyInit (
   VOID
   )
 {
   // Configure various things specific to this platform
+  PlatformPcieWiFiEnable(TRUE);
   GpioPinSetFunction(1, GPIO_PIN_PD5, 0); //jdet
 }
