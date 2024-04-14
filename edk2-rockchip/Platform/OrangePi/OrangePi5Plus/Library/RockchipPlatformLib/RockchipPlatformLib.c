@@ -165,30 +165,34 @@ I2cIomux (
 {
   switch (id) {
   case 0:
-    GpioPinSetFunction(0, GPIO_PIN_PD1, 3); //i2c0_scl_m2
-    GpioPinSetFunction(0, GPIO_PIN_PD2, 3); //i2c0_sda_m2
+    /* io mux M2 */
+    PMU2_IOC->GPIO0D_IOMUX_SEL_L = (0x0F00UL << 16) | 0x0300;
+    PMU2_IOC->GPIO0D_IOMUX_SEL_L = (0x00F0UL << 16) | 0x0030;
     break;
   case 1:
-    GpioPinSetFunction(0, GPIO_PIN_PD4, 9); //i2c1_scl_m2
-    GpioPinSetFunction(0, GPIO_PIN_PD5, 9); //i2c1_sda_m2
+    /* io mux */
+    //BUS_IOC->GPIO0B_IOMUX_SEL_H = (0x0FF0UL << 16) | 0x0990;
+    //PMU2_IOC->GPIO0B_IOMUX_SEL_H = (0x0FF0UL << 16) | 0x0880;
     break;
   case 2:
+    /* io mux */
+    BUS_IOC->GPIO0B_IOMUX_SEL_H = (0xF000UL << 16) | 0x9000;
+    BUS_IOC->GPIO0C_IOMUX_SEL_L = (0x000FUL << 16) | 0x0009;
+    PMU2_IOC->GPIO0B_IOMUX_SEL_H = (0xF000UL << 16) | 0x8000;
+    PMU2_IOC->GPIO0C_IOMUX_SEL_L = (0x000FUL << 16) | 0x0008;
     break;
   case 3:
-    GpioPinSetFunction(1, GPIO_PIN_PC1, 9); //i2c3_scl_m0
-    GpioPinSetFunction(1, GPIO_PIN_PC0, 9); //i2c3_sda_m0
     break;
   case 4:
     break;
   case 5:
     break;
   case 6:
-    GpioPinSetFunction(0, GPIO_PIN_PD0, 9); //i2c6_scl_m0
-    GpioPinSetFunction(0, GPIO_PIN_PC7, 9); //i2c6_sda_m0
-    break;
-  case 7:
-    GpioPinSetFunction(1, GPIO_PIN_PD0, 9); //i2c7_scl_m0
-    GpioPinSetFunction(1, GPIO_PIN_PD1, 9); //i2c7_sda_m0
+    /* io mux M0 */
+    BUS_IOC->GPIO0C_IOMUX_SEL_H = (0xF000UL << 16) | 0x9000;
+    BUS_IOC->GPIO0D_IOMUX_SEL_L = (0x000FUL << 16) | 0x0009;
+    PMU2_IOC->GPIO0C_IOMUX_SEL_H = (0xF000UL << 16) | 0x8000;
+    PMU2_IOC->GPIO0D_IOMUX_SEL_L = (0x000FUL << 16) | 0x0008;
     break;
   default:
     break;
@@ -380,6 +384,5 @@ PlatformEarlyInit (
 {
   // Configure various things specific to this platform
   PlatformWiFiEnable (TRUE);
-  
-  GpioPinSetFunction(1, GPIO_PIN_PD3, 0); //jdet
+  PlatformSetStatusLed (FALSE);
 }
