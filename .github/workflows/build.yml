@@ -25,6 +25,7 @@ jobs:
         PLATFORM:
           - rock-5b
           - rock-5a
+          - rock-5-itx
           - orangepi-5
           - orangepi-5plus
           - indiedroid-nova
