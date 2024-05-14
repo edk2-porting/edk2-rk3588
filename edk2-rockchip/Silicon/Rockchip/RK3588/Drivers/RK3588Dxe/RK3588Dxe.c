@@ -26,6 +26,7 @@
 #include <Library/CruLib.h>
 #include <Library/GpioLib.h>
 #include <Library/RK806.h>
+#include <Library/Rk3588Pcie.h>
 #include <VarStoreData.h>
 #include <Soc.h>
 #include <RK3588RegsPeri.h>
@@ -89,12 +90,31 @@ InstallSataDevices (
   )
 {
   UINT32 Index;
+  UINT32 PcieSlotIndex;
   UINT32 ComPhyMode[] = { PcdGet32 (PcdComboPhy0Mode),
                           PcdGet32 (PcdComboPhy1Mode),
                           PcdGet32 (PcdComboPhy2Mode) };
 
   for (Index = 0; Index < ARRAY_SIZE (ComPhyMode); Index++) {
     if (ComPhyMode[Index] == COMBO_PHY_MODE_SATA) {
+      /* Enable power at the M.2 PCIe/SATA slots */
+      switch (Index) {
+        case 0:
+          PcieSlotIndex = PCIE_SEGMENT_PCIE20L2;
+          break;
+        case 1:
+          PcieSlotIndex = PCIE_SEGMENT_PCIE20L0;
+          break;
+        case 2:
+          PcieSlotIndex = PCIE_SEGMENT_PCIE20L1;
+          break;
+        default:
+          ASSERT (FALSE);
+          continue;
+      }
+      PcieIoInit(PcieSlotIndex);
+      PciePowerEn(PcieSlotIndex, TRUE);
+
       /* Set port implemented flag */
       MmioWrite32 (AhciReg[Index] + SATA_PI, 0x1);
 
