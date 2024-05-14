@@ -44,6 +44,7 @@ typedef enum {
 #define SYS_REG1_CS0_ROW_CH_HI(x, c)    (((x) >> ((c) ? 7 : 5)) & 0x1)
 #define SYS_REG1_CS1_ROW_CH_HI(x, c)    (((x) >> ((c) ? 6 : 4)) & 0x1)
 #define SYS_REG1_CS1_COL_CH(x, c)       (((x) >> ((c) ? 2 : 0)) & 0x3)
+#define SYS_REG1_EXTENDED_DDRTYPE(x)    (((x) >> 12) & 0x3)
 
 UINT64
 SdramGetMemorySize (
@@ -64,23 +65,37 @@ SdramGetMemorySize (
     INT32 Bg;
     INT32 ChSizeMb;
     INT32 SizeMb = 0;
+    UINT32 Version;
+    UINT32 DdrType;
 
     for (Bank = 0; Bank < SDRAM_BANK_COUNT; Bank++) {
-
         OsReg = MmioRead32 (SDRAM_OS_REG_BASE + 8 * Bank);
         OsReg1 = MmioRead32 (SDRAM_OS_REG_BASE + 8 * Bank + 4);
+
+        Version = SYS_REG1_VERSION(OsReg1);
+
+        DdrType = SYS_REG_DDRTYPE(OsReg);
+        if (Version >= 3) {
+            DdrType |= SYS_REG1_EXTENDED_DDRTYPE(OsReg1) << 3;
+        }
 
         ChNum = 1 + SYS_REG_CHANNELNUM(OsReg);
 
         DEBUG ((DEBUG_INFO, "%a(): Bank #%d: %d channel(s), type 0x%X, version 0x%X\n",
-                __func__, Bank, ChNum, SYS_REG_DDRTYPE(OsReg), SYS_REG1_VERSION(OsReg1)));
+                __func__, Bank, ChNum, SYS_REG_DDRTYPE(OsReg), Version));
 
         for (Ch = 0; Ch < ChNum; Ch++) {
             Rank = 1 + SYS_REG_RANK_CH(OsReg, Ch);
             Cs0Col = 9 + SYS_REG_COL_CH(OsReg, Ch);
             Cs1Col = Cs0Col;
-            Bk = 3 - SYS_REG_BK_CH(OsReg, Ch);
-            if (SYS_REG1_VERSION(OsReg1) >= 0x2) {
+
+            if (DdrType == SDRAM_LPDDR5) {
+                Bk = 3 + SYS_REG_BK_CH(OsReg, Ch);
+            } else {
+                Bk = 3 - SYS_REG_BK_CH(OsReg, Ch);
+            }
+
+            if (Version >= 0x2) {
                 Cs1Col = 9 + SYS_REG1_CS1_COL_CH(OsReg1, Ch);
                 if (((SYS_REG1_CS0_ROW_CH_HI(OsReg1, Ch) << 2) +
                       SYS_REG_CS0_ROW_CH_LO(OsReg, Ch)) == 7) {
@@ -102,7 +117,7 @@ SdramGetMemorySize (
             }
             Bw = 2 >> SYS_REG_BW_CH(OsReg, Ch);
             Row34 = SYS_REG_ROW34_CH(OsReg, Ch);
-            if (SYS_REG_DDRTYPE(OsReg) == SDRAM_DDR4 && SYS_REG1_VERSION(OsReg1) != 0x3) {
+            if (DdrType == SDRAM_DDR4 && Version != 0x3) {
                 Bg = SYS_REG_DBW_CH(OsReg, Ch) == 2 ? 2 : 1;
             } else {
                 Bg = 0;
