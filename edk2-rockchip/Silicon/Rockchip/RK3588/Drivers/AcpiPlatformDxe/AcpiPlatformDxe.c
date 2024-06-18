@@ -11,12 +11,17 @@
 
 #include <IndustryStandard/AcpiAml.h>
 #include <IndustryStandard/PeImage.h>
+#include <Protocol/LoadedImage.h>
+#include <Protocol/NonDiscoverableDevice.h>
 #include <Library/AcpiLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/DevicePathLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/UefiBootServicesTableLib.h>
+#include <Library/UefiLib.h>
 #include <AcpiTables.h>
 #include <VarStoreData.h>
 
@@ -28,6 +33,8 @@ STATIC EFI_EXIT_BOOT_SERVICES    mOriginalExitBootServices;
 
 STATIC EFI_ACPI_SDT_PROTOCOL        *mAcpiSdtProtocol;
 STATIC EFI_ACPI_DESCRIPTION_HEADER  *mDsdtTable;
+
+STATIC BOOLEAN  mIsSdmmcBoot = FALSE;
 
 typedef enum {
   AcpiOsUnknown = 0,
@@ -318,6 +325,14 @@ AcpiPlatformOsBootHandler (
     AcpiUpdateSdtNameInteger (mDsdtTable, "EHID", 0);
   }
 
+  //
+  // If the boot device is SDMMC, mark the slot as non-removable.
+  // This allows Windows to create a page file on it.
+  //
+  if (mIsSdmmcBoot) {
+    AcpiUpdateSdtNameInteger (mDsdtTable, "SDRM", 0);
+  }
+
   AcpiFixupPcieEcam (OsType);
 
   AcpiUpdateChecksum ((UINT8 *)mDsdtTable, mDsdtTable->Length);
@@ -406,6 +421,124 @@ AcpiPlatformExitBootServicesHook (
   return gBS->ExitBootServices (ImageHandle, MapKey);
 }
 
+STATIC
+BOOLEAN
+IsDeviceSdmmc (
+  IN EFI_HANDLE Handle
+  )
+{
+  EFI_STATUS                          Status;
+  EFI_DEVICE_PATH_PROTOCOL            *DevicePath;
+  EFI_HANDLE                          DeviceHandle;
+  NON_DISCOVERABLE_DEVICE             *Device;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR   *Descriptor;
+
+  DevicePath = DevicePathFromHandle (Handle);
+
+  if (DevicePath == NULL
+      || DevicePath->Type != HARDWARE_DEVICE_PATH
+      || DevicePath->SubType != HW_VENDOR_DP) {
+    return FALSE;
+  }
+
+  Status = gBS->LocateDevicePath (&gEdkiiNonDiscoverableDeviceProtocolGuid,
+                   &DevicePath, &DeviceHandle);
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  Status = gBS->HandleProtocol (DeviceHandle,
+                   &gEdkiiNonDiscoverableDeviceProtocolGuid, (VOID **) &Device);
+  if (EFI_ERROR (Status)) {
+    return FALSE;
+  }
+
+  Descriptor = &Device->Resources[0];
+
+  if (Descriptor->Desc != ACPI_ADDRESS_SPACE_DESCRIPTOR ||
+      Descriptor->ResType != ACPI_ADDRESS_SPACE_TYPE_MEM) {
+    return FALSE;
+  }
+
+  return Descriptor->AddrRangeMin == PcdGet32 (PcdRkSdmmcBaseAddress);
+}
+
+
+STATIC  VOID   *mLoadedImageEventRegistration;
+
+STATIC
+VOID
+EFIAPI
+NotifyLoadedImage (
+  IN EFI_EVENT    Event,
+  IN VOID         *Context
+  )
+{
+  EFI_STATUS                          Status;
+  EFI_HANDLE                          *Handles;
+  UINTN                               HandleCount;
+  EFI_LOADED_IMAGE_PROTOCOL           *LoadedImage;
+
+  while (TRUE) {
+    Status = gBS->LocateHandleBuffer (
+                    ByRegisterNotify,
+                    NULL,
+                    mLoadedImageEventRegistration,
+                    &HandleCount,
+                    &Handles
+                    );
+    if (EFI_ERROR (Status)) {
+      if (Status != EFI_NOT_FOUND) {
+        DEBUG ((DEBUG_ERROR, "AcpiPlatform: Failed to locate gEfiLoadedImageProtocolGuid. Status=%r\n",
+                Status));
+      }
+      break;
+    }
+    ASSERT (HandleCount == 1);
+
+    Status = gBS->HandleProtocol (
+                    Handles[0],
+                    &gEfiLoadedImageProtocolGuid,
+                    (VOID **)&LoadedImage
+                    );
+    FreePool (Handles);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_ERROR, "AcpiPlatform: Failed to get gEfiLoadedImageProtocolGuid. Status=%r\n",
+              Status));
+      break;
+    }
+
+    if (LoadedImage->DeviceHandle == NULL) {
+      continue;
+    }
+
+    //
+    // If the last image was loaded from SDMMC, then assume that's
+    // the boot device.
+    //
+    mIsSdmmcBoot = IsDeviceSdmmc (LoadedImage->DeviceHandle);
+  }
+}
+
+STATIC
+VOID
+EFIAPI
+NotifyReadyToBoot (
+  IN EFI_EVENT    Event,
+  IN VOID         *Context
+  )
+{
+  gBS->CloseEvent (Event);
+
+  EfiCreateProtocolNotifyEvent (
+        &gEfiLoadedImageProtocolGuid,
+        TPL_CALLBACK,
+        NotifyLoadedImage,
+        NULL,
+        &mLoadedImageEventRegistration
+        );
+}
+
 EFI_STATUS
 EFIAPI
 AcpiPlatformDxeInitialize (
@@ -427,6 +560,16 @@ AcpiPlatformDxeInitialize (
                     NotifyEndOfDxeEvent,              // NotifyFunction
                     NULL,                             // NotifyContext
                     &gEfiEndOfDxeEventGroupGuid,      // EventGroup
+                    &Event                            // Event
+                    );
+  ASSERT_EFI_ERROR (Status);
+
+  Status = gBS->CreateEventEx (
+                    EVT_NOTIFY_SIGNAL,                // Type
+                    TPL_CALLBACK,                     // NotifyTpl
+                    NotifyReadyToBoot,                // NotifyFunction
+                    NULL,                             // NotifyContext
+                    &gEfiEventReadyToBootGuid,        // EventGroup
                     &Event                            // Event
                     );
   ASSERT_EFI_ERROR (Status);

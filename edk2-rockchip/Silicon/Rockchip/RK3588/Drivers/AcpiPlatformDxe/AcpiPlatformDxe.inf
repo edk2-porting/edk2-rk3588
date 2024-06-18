@@ -2,7 +2,7 @@
 #
 #  ACPI platform driver
 #
-#  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+#  Copyright (c) 2024, Mario Bălănică <mariobalanica02@gmail.com>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -31,15 +31,21 @@
   BaseLib
   BaseMemoryLib
   DebugLib
+  DevicePathLib
+  MemoryAllocationLib
   PeCoffGetEntryPointLib
   UefiBootServicesTableLib
+  UefiLib
   UefiDriverEntryPoint
 
 [Guids]
   gEfiEndOfDxeEventGroupGuid
+  gEfiEventReadyToBootGuid
 
 [Protocols]
+  gEdkiiNonDiscoverableDeviceProtocolGuid
   gEfiAcpiSdtProtocolGuid
+  gEfiLoadedImageProtocolGuid
 
 [Pcd]
   gRK3588TokenSpaceGuid.PcdConfigTableMode
@@ -50,6 +56,7 @@
   gRK3588TokenSpaceGuid.PcdPcie30Supported
   gRK3588TokenSpaceGuid.PcdPcie30State
   gRK3588TokenSpaceGuid.PcdPcieEcamCompliantSegmentsMask
+  gRockchipTokenSpaceGuid.PcdRkSdmmcBaseAddress
 
 [Depex]
   gRockchipPlatformConfigAppliedProtocolGuid
