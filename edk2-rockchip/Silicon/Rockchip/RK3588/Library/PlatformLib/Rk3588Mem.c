@@ -21,7 +21,7 @@ UINT64 mSystemMemoryBase = FixedPcdGet64 (PcdSystemMemoryBase);
 STATIC UINT64 mSystemMemorySize = FixedPcdGet64 (PcdSystemMemorySize);
 
 // The total number of descriptors, including the final "end-of-table" descriptor.
-#define MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS 11
+#define MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS 12
 
 STATIC BOOLEAN                     VirtualMemoryInfoInitialized = FALSE;
 STATIC RK3588_MEMORY_REGION_INFO   VirtualMemoryInfo[MAX_VIRTUAL_MEMORY_MAP_DESCRIPTORS];
@@ -62,49 +62,42 @@ ArmPlatformGetVirtualMemoryMap (
     return;
   }
 
-  // MMIO
-  VirtualMemoryTable[Index].PhysicalBase    = 0xF0000000;
-  VirtualMemoryTable[Index].VirtualBase     = VirtualMemoryTable[Index].PhysicalBase;
-  VirtualMemoryTable[Index].Length          = 0x10000000;
-  VirtualMemoryTable[Index].Attributes      = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
-  VirtualMemoryInfo[Index].Type             = RK3588_MEM_UNMAPPED_REGION;
-  VirtualMemoryInfo[Index++].Name           = L"Reserved";
-
-  // MMIO > 32GB
-  VirtualMemoryTable[Index].PhysicalBase    = 0x0000000900000000UL;
-  VirtualMemoryTable[Index].VirtualBase     = VirtualMemoryTable[Index].PhysicalBase;
-  VirtualMemoryTable[Index].Length          = 0x0000000141400000UL;
-  VirtualMemoryTable[Index].Attributes      = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
-  VirtualMemoryInfo[Index].Type             = RK3588_MEM_UNMAPPED_REGION;
-  VirtualMemoryInfo[Index++].Name           = L"Reserved > 4GB";
-
-  // Base System RAM
-  VirtualMemoryTable[Index].PhysicalBase    = mSystemMemoryBase;
-  VirtualMemoryTable[Index].VirtualBase     = VirtualMemoryTable[Index].PhysicalBase;
-  VirtualMemoryTable[Index].Length          = MIN (mSystemMemorySize, 0xF0000000UL - mSystemMemoryBase);
-  VirtualMemoryTable[Index].Attributes      = ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK;
-  VirtualMemoryInfo[Index].Type             = RK3588_MEM_BASIC_REGION;
-  VirtualMemoryInfo[Index++].Name           = L"System RAM";
-
-  if (mSystemMemoryBase + mSystemMemorySize > 0x100000000UL) {
-    // Base System RAM > 4GB
-    VirtualMemoryTable[Index].PhysicalBase    = 0x100000000;
-    VirtualMemoryTable[Index].VirtualBase     = VirtualMemoryTable[Index].PhysicalBase;
-    VirtualMemoryTable[Index].Length          = mSystemMemoryBase + mSystemMemorySize - 0x100000000;
-    VirtualMemoryTable[Index].Attributes      = ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK;
-    VirtualMemoryInfo[Index].Type             = RK3588_MEM_BASIC_REGION;
-    VirtualMemoryInfo[Index++].Name           = L"System RAM > 4GB";
-  }
-
-  // TF-A Region.
+  //
+  // TF-A Region
+  // Must be unmapped for the shared memory to retain its attributes.
+  //
   VirtualMemoryTable[Index].PhysicalBase    = 0x00000000;
   VirtualMemoryTable[Index].VirtualBase     = VirtualMemoryTable[Index].PhysicalBase;
   VirtualMemoryTable[Index].Length          = 0x200000;
   VirtualMemoryTable[Index].Attributes      = ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED;
-  VirtualMemoryInfo[Index].Type             = RK3588_MEM_RESERVED_REGION;
-  VirtualMemoryInfo[Index++].Name           = L"TF-A";
+  VirtualMemoryInfo[Index].Type             = RK3588_MEM_UNMAPPED_REGION;
+  VirtualMemoryInfo[Index++].Name           = L"TF-A + Shared Memory";
 
-  // OP-TEE Region.
+  // Firmware Volume
+  VirtualMemoryTable[Index].PhysicalBase    = FixedPcdGet64 (PcdFvBaseAddress);
+  VirtualMemoryTable[Index].VirtualBase     = VirtualMemoryTable[Index].PhysicalBase;
+  VirtualMemoryTable[Index].Length          = FixedPcdGet32 (PcdFvSize);
+  VirtualMemoryTable[Index].Attributes      = ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK;
+  VirtualMemoryInfo[Index].Type             = RK3588_MEM_RESERVED_REGION;
+  VirtualMemoryInfo[Index++].Name           = L"UEFI FV";
+
+  // Variable Volume
+  VirtualMemoryTable[Index].PhysicalBase    = VariablesBase;
+  VirtualMemoryTable[Index].VirtualBase     = VirtualMemoryTable[Index].PhysicalBase;
+  VirtualMemoryTable[Index].Length          = VariablesSize;
+  VirtualMemoryTable[Index].Attributes      = ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK;
+  VirtualMemoryInfo[Index].Type             = RK3588_MEM_RUNTIME_REGION;
+  VirtualMemoryInfo[Index++].Name           = L"Variable Store";
+
+  // Base System RAM (< OP-TEE)
+  VirtualMemoryTable[Index].PhysicalBase    = VariablesBase + VariablesSize;
+  VirtualMemoryTable[Index].VirtualBase     = VirtualMemoryTable[Index].PhysicalBase;
+  VirtualMemoryTable[Index].Length          = MIN (mSystemMemorySize, 0x08400000 - VirtualMemoryTable[Index].PhysicalBase);
+  VirtualMemoryTable[Index].Attributes      = ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK;
+  VirtualMemoryInfo[Index].Type             = RK3588_MEM_BASIC_REGION;
+  VirtualMemoryInfo[Index++].Name           = L"System RAM (< OP-TEE)";
+
+  // OP-TEE Region
   VirtualMemoryTable[Index].PhysicalBase    = 0x08400000;
   VirtualMemoryTable[Index].VirtualBase     = VirtualMemoryTable[Index].PhysicalBase;
   VirtualMemoryTable[Index].Length          = 0x1000000;
@@ -112,13 +105,39 @@ ArmPlatformGetVirtualMemoryMap (
   VirtualMemoryInfo[Index].Type             = RK3588_MEM_RESERVED_REGION;
   VirtualMemoryInfo[Index++].Name           = L"OP-TEE";
 
-  // SCMI Mailbox
-  VirtualMemoryTable[Index].PhysicalBase    = 0x10f000;
+  // Base System RAM (< 4GB)
+  VirtualMemoryTable[Index].PhysicalBase    = 0x08400000 + 0x1000000;
   VirtualMemoryTable[Index].VirtualBase     = VirtualMemoryTable[Index].PhysicalBase;
-  VirtualMemoryTable[Index].Length          = 0x1000;
-  VirtualMemoryTable[Index].Attributes      = ARM_MEMORY_REGION_ATTRIBUTE_UNCACHED_UNBUFFERED;
-  VirtualMemoryInfo[Index].Type             = RK3588_MEM_RESERVED_REGION;
-  VirtualMemoryInfo[Index++].Name           = L"SCMI";
+  VirtualMemoryTable[Index].Length          = MIN (mSystemMemorySize, 0xF0000000 - VirtualMemoryTable[Index].PhysicalBase);
+  VirtualMemoryTable[Index].Attributes      = ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK;
+  VirtualMemoryInfo[Index].Type             = RK3588_MEM_BASIC_REGION;
+  VirtualMemoryInfo[Index++].Name           = L"System RAM (< 4GB)";
+
+  // MMIO
+  VirtualMemoryTable[Index].PhysicalBase    = 0xF0000000;
+  VirtualMemoryTable[Index].VirtualBase     = VirtualMemoryTable[Index].PhysicalBase;
+  VirtualMemoryTable[Index].Length          = 0x10000000;
+  VirtualMemoryTable[Index].Attributes      = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
+  VirtualMemoryInfo[Index].Type             = RK3588_MEM_UNMAPPED_REGION;
+  VirtualMemoryInfo[Index++].Name           = L"MMIO";
+
+  if (mSystemMemorySize > 0x100000000UL) {
+    // Base System RAM >= 4GB
+    VirtualMemoryTable[Index].PhysicalBase    = 0x100000000;
+    VirtualMemoryTable[Index].VirtualBase     = VirtualMemoryTable[Index].PhysicalBase;
+    VirtualMemoryTable[Index].Length          = mSystemMemorySize - 0x100000000;
+    VirtualMemoryTable[Index].Attributes      = ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK;
+    VirtualMemoryInfo[Index].Type             = RK3588_MEM_BASIC_REGION;
+    VirtualMemoryInfo[Index++].Name           = L"System RAM >= 4GB";
+  }
+
+  // MMIO > 32GB
+  VirtualMemoryTable[Index].PhysicalBase    = 0x0000000900000000UL;
+  VirtualMemoryTable[Index].VirtualBase     = VirtualMemoryTable[Index].PhysicalBase;
+  VirtualMemoryTable[Index].Length          = 0x0000000141400000UL;
+  VirtualMemoryTable[Index].Attributes      = ARM_MEMORY_REGION_ATTRIBUTE_DEVICE;
+  VirtualMemoryInfo[Index].Type             = RK3588_MEM_UNMAPPED_REGION;
+  VirtualMemoryInfo[Index++].Name           = L"MMIO > 32GB";
 
   if (mSystemMemoryBase + mSystemMemorySize > 0x3fc000000UL) {
     // Bad memory range 1
@@ -137,22 +156,6 @@ ArmPlatformGetVirtualMemoryMap (
     VirtualMemoryInfo[Index].Type             = RK3588_MEM_RESERVED_REGION;
     VirtualMemoryInfo[Index++].Name           = L"BAD2";
   }
-
-  // Firmware Volume
-  // VirtualMemoryTable[Index].PhysicalBase    = FixedPcdGet64 (PcdFdBaseAddress);
-  // VirtualMemoryTable[Index].VirtualBase     = VirtualMemoryTable[Index].PhysicalBase;
-  // VirtualMemoryTable[Index].Length          = FixedPcdGet32 (PcdFdSize);
-  // VirtualMemoryTable[Index].Attributes      = ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK;
-  // VirtualMemoryInfo[Index].Type             = RK3588_MEM_RESERVED_REGION;
-  // VirtualMemoryInfo[Index++].Name           = L"FD";
-
-  // Variable Volume
-  VirtualMemoryTable[Index].PhysicalBase    = VariablesBase;
-  VirtualMemoryTable[Index].VirtualBase     = VirtualMemoryTable[Index].PhysicalBase;
-  VirtualMemoryTable[Index].Length          = VariablesSize;
-  VirtualMemoryTable[Index].Attributes      = ARM_MEMORY_REGION_ATTRIBUTE_WRITE_BACK;
-  VirtualMemoryInfo[Index].Type             = RK3588_MEM_RUNTIME_REGION;
-  VirtualMemoryInfo[Index++].Name           = L"Variable Store";
 
   // End of Table
   VirtualMemoryTable[Index].PhysicalBase    = 0;
