@@ -10,8 +10,10 @@ function _help(){
     echo "  -d, --device DEV            Build for DEV, or 'all'."
     echo "  -r, --release MODE          Release mode for building, default is 'DEBUG', 'RELEASE' alternatively."
     echo "  -t, --toolchain TOOLCHAIN   Set toolchain, default is 'GCC'."
+    echo "  --open-tfa ENABLE           Use open-source TF-A submodule. Default: ${OPEN_TFA}"
     echo "  -C, --clean                 Clean workspace and output."
     echo "  -D, --distclean             Clean up all files that are not in repo."
+    echo "  --tfa-flags \"FLAGS\"         Flags appended to open TF-A build process."
     echo "  --edk2-flags \"FLAGS\"        Flags appended to the EDK2 build process."
     echo "  -h, --help                  Show this help."
     echo
@@ -41,12 +43,25 @@ function _build_fit() {
     echo " => Building FIT"
     pushd ${WORKSPACE}
 
-    BL31=$(grep '^PATH=.*_bl31_' ${ROOTDIR}/misc/rkbin/RKTRUST/${TRUST_INI} | cut -d = -f 2-)
-    BL32=$(grep '^PATH=.*_bl32_' ${ROOTDIR}/misc/rkbin/RKTRUST/${TRUST_INI} | cut -d = -f 2-)
+    BL31_RKBIN=$(grep '^PATH=.*_bl31_' ${ROOTDIR}/misc/rkbin/RKTRUST/${TRUST_INI} | cut -d = -f 2-)
+    BL32_RKBIN=$(grep '^PATH=.*_bl32_' ${ROOTDIR}/misc/rkbin/RKTRUST/${TRUST_INI} | cut -d = -f 2-)
+
+    BL31="${ROOTDIR}/misc/rkbin/${BL31_RKBIN}"
+    BL32="${ROOTDIR}/misc/rkbin/${BL32_RKBIN}"
+
+    if [ ${OPEN_TFA} == 1 ]; then
+        BL31="${ROOTDIR}/arm-trusted-firmware/build/${TFA_PLAT}/${RELEASE_TYPE,,}/bl31/bl31.elf"
+    fi
+
     rm -f bl31_0x*.bin ${WORKSPACE}/BL33_AP_UEFI.Fv ${SOC_L}_${DEVICE}_EFI.its
 
-    ${ROOTDIR}/misc/extractbl31.py ${ROOTDIR}/misc/rkbin/${BL31}
-    cp ${ROOTDIR}/misc/rkbin/${BL32} ${WORKSPACE}/bl32.bin
+    ${ROOTDIR}/misc/extractbl31.py ${BL31}
+    if [ ! -f bl31_0x000f0000.bin ]; then
+        # Not used but FIT expects it.
+        touch bl31_0x000f0000.bin
+    fi
+
+    cp ${BL32} ${WORKSPACE}/bl32.bin
     cp ${ROOTDIR}/misc/${SOC_L}_spl.dtb ${WORKSPACE}/${DEVICE}.dtb
     cp ${WORKSPACE}/Build/${PLATFORM_NAME}/${RELEASE_TYPE}_${TOOLCHAIN}/FV/BL33_AP_UEFI.Fv ${WORKSPACE}/
     cat ${ROOTDIR}/misc/uefi_${SOC_L}.its | sed "s,@DEVICE@,${DEVICE},g" > ${SOC_L}_${DEVICE}_EFI.its
@@ -91,6 +106,23 @@ function _build(){
     rm -f "${OUTDIR}/RK35*_NOR_FLASH.img"
 
     #
+    # Build TF-A
+    #
+    if [ ${OPEN_TFA} == 1 ]; then
+        pushd arm-trusted-firmware
+
+        if [ ${RELEASE_TYPE} == "DEBUG" ]; then
+            DEBUG=1
+        else
+            DEBUG=0
+        fi
+
+        make PLAT=${TFA_PLAT} DEBUG=${DEBUG} all ${TFA_FLAGS}
+
+        popd
+    fi
+
+    #
     # Build EDK2
     #
     [ -d "${WORKSPACE}/Conf" ] || mkdir -p "${WORKSPACE}/Conf"
@@ -131,6 +163,8 @@ typeset -u RELEASE_TYPE
 DEVICE=""
 RELEASE_TYPE=DEBUG
 TOOLCHAIN=GCC
+OPEN_TFA=1
+TFA_FLAGS=""
 EDK2_FLAGS=""
 CLEAN=false
 DISTCLEAN=false
@@ -139,13 +173,15 @@ OUTDIR="${PWD}"
 #
 # Get options
 #
-OPTS=$(getopt -o "d:r:t:CDh" -l "device:,release:,toolchain:,edk2-flags:,clean,distclean,help" -n build.sh -- "${@}") || _help $?
+OPTS=$(getopt -o "d:r:t:CDh" -l "device:,release:,toolchain:,open-tfa:,tfa-flags:,edk2-flags:,clean,distclean,help" -n build.sh -- "${@}") || _help $?
 eval set -- "${OPTS}"
 while true; do
     case "${1}" in
         -d|--device) DEVICE="${2}"; shift 2 ;;
         -r|--release) RELEASE_TYPE="${2}"; shift 2 ;;
         -t|--toolchain) TOOLCHAIN="${2}"; shift 2 ;;
+        --open-tfa) OPEN_TFA="${2}"; shift 2 ;;
+        --tfa-flags) TFA_FLAGS="${2}"; shift 2 ;;
         --edk2-flags) EDK2_FLAGS="${2}"; shift 2 ;;
         -C|--clean) CLEAN=true; shift ;;
         -D|--distclean) DISTCLEAN=true; shift ;;

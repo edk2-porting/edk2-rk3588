@@ -10,3 +10,7 @@
 [submodule "misc/rkbin"]
 	path = misc/rkbin
 	url = https://github.com/rockchip-linux/rkbin.git
+[submodule "arm-trusted-firmware"]
+	path = arm-trusted-firmware
+	url = https://github.com/worproject/arm-trusted-firmware
+	branch = rk3588
