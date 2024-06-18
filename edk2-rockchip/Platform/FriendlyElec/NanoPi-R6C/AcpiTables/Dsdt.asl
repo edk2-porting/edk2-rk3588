@@ -17,6 +17,8 @@ DefinitionBlock ("Dsdt.aml", "DSDT", 2, "RKCP  ", "RK3588S", 2)
 {
   Scope (\_SB_)
   {
+    include ("DsdtCommon.asl")
+
     include ("Cpu.asl")
 
     include ("Pcie.asl")
