@@ -219,6 +219,8 @@
   TlsLib|CryptoPkg/Library/TlsLib/TlsLib.inf
   #PlatformFlashAccessLib|Silicon/Rockchip/Library/PlatformFlashAccessLib/PlatformFlashAccessLibDxe.inf
 
+  ImagePropertiesRecordLib|MdeModulePkg/Library/ImagePropertiesRecordLib/ImagePropertiesRecordLib.inf
+
   #
   # It is not possible to prevent the ARM compiler for generic intrinsic functions.
   # This library provides the instrinsic functions generate by a given compiler.
