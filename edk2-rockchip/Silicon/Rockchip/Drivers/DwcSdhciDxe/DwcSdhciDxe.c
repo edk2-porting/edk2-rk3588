@@ -59,6 +59,15 @@ EmmcSdMmcCapability (
     return EFI_NOT_FOUND;
   }
 
+  //
+  // Disable ADMA2 to avoid data corruption.
+  // This controller has the limitation that a single descriptor
+  // cannot cross 128 MB boundaries and must be split.
+  // This would require a patch in SdMmcPciHcDxe, but SDMA works
+  // fine for the time being.
+  //
+  Capability->Adma2 = 0;
+
   Capability->Hs400 = !EMMC_DISABLE_HS400;
 
   if (EMMC_FORCE_HIGH_SPEED) {
