@@ -91,7 +91,6 @@
   # Base platform description
   #
 !include Silicon/Rockchip/Rockchip.dsc.inc
-!include MdePkg/MdeLibs.dsc.inc
 
 ################################################################################
 #
