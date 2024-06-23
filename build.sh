@@ -29,11 +29,20 @@ function _build_idblock() {
     FLASHFILES="FlashHead.bin FlashData.bin FlashBoot.bin"
     rm -f rk35*_spl_loader_*.bin idblock.bin rk35*_ddr_*.bin rk35*_usbplug*.bin UsbHead.bin ${FLASHFILES}
 
-    DDRBIN=$(grep '^FlashData' ${ROOTDIR}/misc/rkbin/RKBOOT/${MINIALL_INI} | cut -d = -f 2-)
-    SPL=$(grep '^FlashBoot' ${ROOTDIR}/misc/rkbin/RKBOOT/${MINIALL_INI} | cut -d = -f 2-)
+    DDRBIN_RKBIN=$(grep '^FlashData' ${ROOTDIR}/misc/rkbin/RKBOOT/${MINIALL_INI} | cut -d = -f 2-)
+    SPL_RKBIN=$(grep '^FlashBoot' ${ROOTDIR}/misc/rkbin/RKBOOT/${MINIALL_INI} | cut -d = -f 2-)
+
+    DDRBIN="${ROOTDIR}/misc/rkbin/${DDRBIN_RKBIN}"
+
+    #
+    # SPL v1.13 has broken SD card support!
+    # Use v1.12 instead.
+    #
+    # SPL="${ROOTDIR}/misc/rkbin/${SPL_RKBIN}"
+    SPL="${ROOTDIR}/misc/rk3588_spl_v1.12.bin"
 
     # Create idblock.bin
-    ${ROOTDIR}/misc/tools/${MACHINE_TYPE}/mkimage -n rk3588 -T rksd -d ${ROOTDIR}/misc/rkbin/${DDRBIN}:${ROOTDIR}/misc/rkbin/${SPL} idblock.bin
+    ${ROOTDIR}/misc/tools/${MACHINE_TYPE}/mkimage -n rk3588 -T rksd -d ${DDRBIN}:${SPL} idblock.bin
 
     popd
     echo " => idblock.bin build done"
