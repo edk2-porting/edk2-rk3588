@@ -1,9 +1,10 @@
 # EDK2 UEFI firmware for Rockchip RK3588 platforms
 This repository contains an UEFI firmware implementation based on EDK2 for various RK3588 boards.
 
-## Supported platforms
-- [Radxa ROCK 5B](https://wiki.radxa.com/Rock5/hardware/5b)
-- [Radxa ROCK 5A](https://wiki.radxa.com/Rock5/hardware/5a)
+# Supported platforms
+- [Radxa ROCK 5B](https://radxa.com/products/rock5/5b/)
+- [Radxa ROCK 5A](https://radxa.com/products/rock5/5a/)
+- [Radxa ROCK 5 ITX](https://radxa.com/products/rock5/5itx/)
 - [Orange Pi 5](http://www.orangepi.org/html/hardWare/computerAndMicrocontrollers/details/Orange-Pi-5.html)
 - [Orange Pi 5 Plus](http://www.orangepi.org/html/hardWare/computerAndMicrocontrollers/details/Orange-Pi-5-plus.html)
 - [ameriDroid Indiedroid Nova](https://indiedroid.us)
@@ -20,8 +21,29 @@ This repository contains an UEFI firmware implementation based on EDK2 for vario
 - [FriendlyELEC NanoPi R6S](https://wiki.friendlyelec.com/wiki/index.php/NanoPi_R6S)
 - [Hinlink H88K](http://www.hinlink.com)
 
-## Supported peripherals
-Applicable to all platforms unless otherwise noted.
+# Supported OSes
+## In ACPI mode
+| OS | Version | Tested/supported hardware | Notes |
+| --- | --- | --- | --- |
+| Windows | 11 | [Status](https://github.com/worproject/Rockchip-Windows-Drivers#hardware-support-status) ||
+| NetBSD | 10 | Display, UART, USB, PCIe (incl. NVME), SATA, eMMC, GMAC Ethernet ||
+| VMware ESXi Arm Fling | >= 1.12 | Display, USB | * PCIe devices will hang at boot, need to disable in settings or leave the ports empty.<br>* GMAC Ethernet gets detected but does not work. |
+| Linux | tested Ubuntu 22.04, kernel 5.15.0-75-generic | Display, UART, USB, PCIe (incl. NVME & Ethernet), SATA | For full hardware functionality, use a kernel with RK3588 support and switch to Device Tree mode. |
+
+> [!NOTE]
+> ACPI support is only being developed and tested against Windows. There are no plans to further improve functionality for other OSes. Consider using Device Tree instead (where applicable, for instance Linux).
+
+## In Device Tree mode
+| OS | Version | Tested/supported hardware | Notes |
+| --- | --- | --- | --- |
+| Rockchip SDK Linux | 5.10 legacy, tested with [Armbian rk3588-live-iso](https://github.com/amazingfate/rk3588-live-iso) | Platform-dependent, most peripherals work. | If using a different kernel, see [Device Tree configuration](#device-tree-configuration). |
+
+# Supported peripherals in UEFI
+
+> [!NOTE]
+> Applicable to all platforms unless otherwise noted.
+>
+> Only devices relevant to the firmware itself (not OS) are listed below.
 
 | Device | Status | Notes |
 | --- | --- | --- |
@@ -31,7 +53,7 @@ Applicable to all platforms unless otherwise noted.
 | SATA                               | 🟢 Working     | |
 | SD/eMMC                            | 🟢 Working     | |
 | HDMI output                        | 🟡 Partial     | Single display with mode limited at 1080p 60 Hz |
-| DisplayPort output (USB-C)         | 🟡 Partial     | Mode fixed at 1080p 60 Hz, only works in one orientation of the Type-C port. |
+| DisplayPort output (USB-C)         | 🟡 Partial     | Mode fixed at 1080p 60 Hz, only works in one orientation of the Type-C port. Some displays may not work regardless. |
 | eDP output                         | 🟡 Partial     | Disabled, requires manual configuration depending on the platform and panel. |
 | DSI output                         | 🔴 Not working | |
 | GMAC Ethernet                      | 🔴 Not working | Only brought-up for OS usage |
@@ -43,45 +65,28 @@ Applicable to all platforms unless otherwise noted.
 | PWM                                | 🟢 Working     | |
 | SPI NOR Flash                      | 🟢 Working     | |
 | HYM8563 real-time clock            | 🟢 Working     | |
+| RNG                                | 🟢 Working     | |
 | Cooling fan                        | 🟢 Working     | Supported on most platforms. Fan connector where present, otherwise available at the GPIO header for 3-pin PWM fans (do *not* connect 2-pin fans there!):<br>* Orange Pi 5: `GPIO4_B2`<br>* Indiedroid Nova: `GPIO4_B4` |
 | Status LED                         | 🟢 Working     | |
 | Voltage regulators (RK806, RK860)  | 🟢 Working     | |
 | FUSB302 USB Type-C Controller      | 🔴 Not working | Required for PD negotiation and connector orientation switching |
 
-## Supported OSes
-### In ACPI mode
-| OS | Version | Tested/supported hardware | Notes |
-| --- | --- | --- | --- |
-| Windows | 10 (1904x), 11 | [Status](https://github.com/worproject/Rockchip-Windows-Drivers#hardware-support-status) ||
-| NetBSD | 10 | Display, UART, USB, PCIe (incl. NVME), SATA, eMMC, GMAC Ethernet ||
-| VMware ESXi Arm Fling | >= 1.12 | Display, USB | * PCIe devices will hang at boot, need to disable in settings or leave the ports empty.<br>* GMAC Ethernet gets detected but does not work. |
-| Linux | tested Ubuntu 22.04, kernel 5.15.0-75-generic | Display, UART, USB, PCIe (incl. NVME & Ethernet), SATA | For full hardware functionality, use a kernel with RK3588 support and switch to Device Tree mode. |
-
-#### Additional limitations when using ACPI
-* Devices behind PCIe switches do not work (e.g. the two NICs on Mixtile Blade 3).
-* GMAC is limited to Gigabit speed (i.e. no 10/100).
-
-### In Device Tree mode
-| OS | Version | Tested/supported hardware | Notes |
-| --- | --- | --- | --- |
-| Rockchip SDK Linux | 5.10 legacy, tested with [Armbian rk3588-live-iso](https://github.com/amazingfate/rk3588-live-iso) | Platform-dependent, most peripherals work. | If using a different kernel, see [Device Tree configuration](#device-tree-configuration). |
-
-## Getting started
-### 1. Requirements
+# Getting started
+## 1. Requirements
 * One of the [supported devices](#supported-platforms).
-* Either SPI NOR flash (included with some devices), SD card or eMMC to store the firmware on.
+* Storage for the firmware: SPI NOR flash (included with some devices), SD card or eMMC.
 * Quality power supply that can provide at least 15 W. Depending on the peripherals you use, more may be needed.
 
   Note: on Mixtile Blade 3, a fixed voltage *higher than* 5V must be supplied. The board cannot power any external peripherals if the input voltage is just 5V. USB-PD negotiation is not supported by firmware.
 * HDMI or DisplayPort (USB-C) screen capable of at least 1080p 60Hz.
 * Optionally, if display is not available or for debugging purposes, an UART adapter capable of 1500000 baud rate (e.g. USB CH340, CP2104).
 
-### 2. Download the firmware image
+## 2. Download the firmware image
 The latest version can be obtained from <https://github.com/edk2-porting/edk2-rk3588/releases>.
 
 If your platform is not yet supported, using an image meant for another device is **not** recommended. Although they are generally similar, voltage setup can happen to be different and you may risk damaging the board. External peripherals are unlikely to work either.
 
-### 3. Flash the firmware
+## 3. Flash the firmware
 UEFI can be flashed to either a SPI NOR flash, SD card or eMMC module:
 * For removable SD or eMMC (easiest), you can simply use balenaEtcher, RPi Imager or dd.
 * For SPI NOR or soldered eMMC, instructions can be found at: <https://wiki.radxa.com/Rock5/install/spi>.
@@ -94,37 +99,31 @@ If you wish to have both UEFI and an OS on the same SD or eMMC device: flash UEF
 
 Note: Using SPI NOR (if present) is recommeded, as it leaves the other storage options free for other purposes. Additionally, SD/eMMC will limit the firmware's ability to access its own storage (variable store) when an OS is running. This feature is mostly used by OS installers to create the boot menu options, it is not mandatory.
 
-### 4. Connect peripherals and power on the device
+## 4. Connect peripherals and power on the device
 If the flashing process has been done correctly, you should see the status LED blinking (if present), and shortly after, the platform's boot logo with a progress bar at the bottom on the connected display.
 
 At this stage, you can press <kbd>Esc</kbd> to enter the firmware setup, <kbd>F1</kbd> to launch the UEFI Shell, or, provided you also have an UEFI bootloader/app on a storage device, you can let the system automatically run that, which is the default behavior if no action is taken.
 
-Check the [Supported peripherals](#supported-peripherals) and [Supported OSes](#supported-oses-with-acpi) sections to see what's currently possible with this firmware.
+Check the [Supported OSes](#supported-oses) and [Supported peripherals in UEFI](#supported-peripherals-in-uefi) sections to see what's currently possible with this firmware.
 
 Also check the configuration options described below, some of which may need to be changed depending on the OS used.
 
 If you experience any issues, please see the [Troubleshooting](#troubleshooting) section.
 
-## Configuration settings
-The UEFI provides a few configuration options, like CPU frequency, PCIe/SATA selection for an M.2 port, fan control, etc. These can be viewed and changed using both the UI configuration menu (under `Device Manager` -> `Rockchip Platform Configuration`), as well as the UEFI Shell.
+# Configuration settings
+The UEFI provides a few configuration options, like CPU frequency, PCIe/SATA selection for an M.2 port, fan control, etc. These can be viewed and changed using the UI configuration menu (under `Device Manager` -> `Rockchip Platform Configuration`).
 
-Configuration through the user interface is fairly straightforward and help information is provided on the right side of the menu.
+Configuration through the user interface is fairly straightforward and help/navigation information is provided around the menus.
 
-Configuration through the UEFI shell is more advanced and mostly useful for scripts. See [Setting configuration options via the shell](#setting-configuration-options-via-the-shell).
-
-### Tips
+## Tips
 * CPU clocks are set to 816 MHz (boot default) on platforms without a cooling fan included. If you have adequate cooling, go to the configuration menu -> `CPU Performance` and set all Cluster Presets to `Maximum`.
 
-* If you only wish to boot non-Windows OSes in ACPI mode, go to the configuration menu -> `ACPI / Device Tree` and set `USB 2.0 Support` to `Enabled`, in order to get maximum speed from USB 2.0 ports.
-
-  Booting Windows with this option enabled will cause it to crash.
-
-### Device Tree configuration
+## Device Tree configuration
 For rich Linux support, it is recommended to enable Device Tree mode. You can do so by going to the configuration menu -> `ACPI / Device Tree` and setting `Config Table Mode` to `Device Tree`.
 
 By default, the firmware installs a [DTB compatible with (most) Rockchip SDK Linux 5.10 legacy kernel variants](https://github.com/edk2-porting/edk2-rk3588/tree/master/edk2-rockchip-non-osi/Platform/Rockchip/DeviceTree).
 
-#### Custom Device Tree Blob (DTB) override and overlays
+### Custom Device Tree Blob (DTB) override and overlays
 It is also possible to provide a custom DTB and overlays. To enable this, go to the configuration menu -> `ACPI / Device Tree` and set `Support DTB override & overlays` to `Enabled`.
 
 The firmware will now look for overrides in the partition of a selected boot option / OS loader. In most cases this will be the first FAT32 EFI System Partition.
@@ -142,22 +141,23 @@ The paths above are relative to the root of the file system. That is, the `dtb` 
 `<PLATFORM-DT-NAME>` can be:
 | Name                                    | Platform                      |
 | --------------------------------------- | ----------------------------- |
+| `rk3588-rock-5b`                        | ROCK 5B                       |
+| `rk3588s-rock-5a`                       | ROCK 5A                       |
+| `rk3588-rock-5-itx`                     | ROCK 5 ITX                    |
+| `rk3588s-orangepi-5`                    | Orange Pi 5                   |
+| `rk3588-orangepi-5-plus`                | Orange Pi 5 Plus              |
 | `rk3588s-9tripod-linux`                 | Indiedroid Nova               |
-| `aio-3588q`                             | Firefly AIO-3588Q             |
+| `rk3588-firefly-aio-3588q`              | Firefly AIO-3588Q             |
 | `itx-3588j`                             | Firefly ITX-3588J             |
 | `roc-rk3588s-pc`                        | ROC-RK3588S-PC / Station M3   |
+| `rk3588-blueberry-edge-v12-linux`       | R58X (v1.2)                   |
+| `rk3588-blueberry-minipc-linux`         | R58 Mini                      |
+| `rk3588s-khadas-edge2`                  | Edge2                         |
+| `rk3588-blade3-v101-linux`              | Blade 3                       |
 | `rk3588-nanopc-t6`                      | NanoPC T6                     |
 | `rk3588s-nanopi-r6c`                    | NanoPi R6C                    |
 | `rk3588s-nanopi-r6s`                    | NanoPi R6S                    |
 | `rk3588-hinlink-h88k`                   | H88K                          |
-| `rk3588s-khadas-edge2`                  | Edge2                         |
-| `rk3588-blueberry-minipc-linux`         | R58 Mini                      |
-| `rk3588-blueberry-edge-v12-linux`       | R58X (v1.2)                   |
-| `rk3588-blade3-v101-linux`              | Blade 3                       |
-| `rk3588s-orangepi-5`                    | Orange Pi 5                   |
-| `rk3588-orangepi-5-plus`                | Orange Pi 5 Plus              |
-| `rk3588s-rock-5a`                       | ROCK 5A                       |
-| `rk3588-rock-5b`                        | ROCK 5B                       |
 
 In the absence of a custom base DTB override, the overlays are applied on top of the firmware-provided DTB.
 
@@ -169,7 +169,7 @@ If the custom base DTB is invalid, the firmware-provided one will be passed to t
 
 This entire process is logged to the [serial console](#advanced-troubleshooting). There's currently no other way to see potential errors.
 
-## Updating the firmware
+# Updating the firmware
 If the storage is only used for UEFI and nothing else, simply download the latest image and flash it as described in the [Getting started](#getting-started) section.
 
 If it is also used by an OS and has additional partitions, only part of the image needs to be applied. This can be done with the `dd` tool:
@@ -183,12 +183,16 @@ dd if=FIRMWARE.img of=DESTINATION bs=512 skip=64 seek=64 conv=notrunc
 
 Here we skip the GPT and copy the firmware starting at offset 0x8000 (`64` blocks * `512` bytes block size) until its end. See [Flash layout](#flash-layout) for more details.
 
-## Troubleshooting
-First of all, make sure your device can only possibly load the UEFI firmware and nothing else. U-Boot must not present on either SPI NOR, SD or eMMC, otherwise it could take precedence.
+# Troubleshooting
+
+> [!IMPORTANT]
+> First of all, make sure your device can only possibly load the UEFI firmware and nothing else.
+>
+> **U-Boot must not present on either SPI NOR, SD or eMMC, otherwise it could take precedence and cause hidden issues.**
 
 Below you can find some basic debugging information. If none of this helps, please see the [Advanced troubleshooting](#advanced-troubleshooting) section.
 
-### Meaning of the Status LED
+## Meaning of the Status LED
 If your device has an activity LED, the firmware will blink it in different patterns to indicate the current system status.
 
 1. Immediately after power on, the LED should start pulsing quickly. This indicates that the firmware is initializing.
@@ -203,8 +207,8 @@ If the LED:
 
   Note that it is only expected to stop as described at point 3) above.
 
-### Common issues
-#### Nothing shows up on the screen
+## Common issues
+### Nothing shows up on the screen
 Make sure you've flashed the firmware correctly and that it is the version designed for your device. In most cases this is the culprit.
 
 Assuming the firmware loads fine:
@@ -214,12 +218,21 @@ Assuming the firmware loads fine:
 
 If you are not able to get any display output, the only way to interact with UEFI is via the [serial console](#advanced-troubleshooting).
 
-#### USB 3 devices do not work
+### Configuration settings do not get saved
+This has been observed in cases where U-Boot was still present on another boot device (SD, eMMC or SPI NOR).  This is not a supported scenario. The solution is to unplug or erase devices that may have other firmware on them.
+
+What's happening:
+1. Board loads U-Boot from a storage device that has higher priority (let's say eMMC).
+2. That U-Boot image in turn loads UEFI and its settings from another device with lower priority (let's say SD).
+3. UEFI cannot accurately determine to which device it belongs. The parameter used to verify this points to eMMC (U-Boot), while UEFI actually got loaded from SD.
+4. Consequently, UEFI mistakenly saves the user settings to eMMC. On reboot, U-Boot loads UEFI and the original/unchanged settings from SD and the cycle repeats.
+
+### USB 3 devices do not work
 * Try a different port.
 * If you're using USB-C, 3.0 devices will only work in one orientation of the connector. Check both.
-* Make sure the power supply and cable are good
+* Make sure the power supply and cable are good.
 
-#### Networking does not work
+### Networking does not work
 * Only Realtek PCIe and USB controllers are supported. Native Gigabit provided by RK3588 isn't.
 
 * Some boards with Realtek NICs do not have a MAC address set at factory and will show-up as being all zeros in UEFI, possibly preventing the adapter from obtaining an IP address.
@@ -262,7 +275,7 @@ If you are not able to get any display output, the only way to interact with UEF
 
   **Note:** the number of eFuses is limited, thus MAC addresses can only be changed a few times.
 
-### Advanced troubleshooting
+## Advanced troubleshooting
 The firmware will log detailed information to the serial console when using a debug version. See the [release notes](https://github.com/edk2-porting/edk2-rk3588/releases) for details on how to obtain this version.
 
 1. The debug image needs to be flashed in place of the existing one.
@@ -273,18 +286,18 @@ The firmware will log detailed information to the serial console when using a de
 
 4. Power on the device.
 
-You should be able to see a lot of debug messages being printed. If that's not the case, double check the connections (swap RX/TX), make sure the adapter is functional and configured correctly.
+You should be able to see many debug messages being printed to the console. If that's not the case, double check the connections (swap RX/TX), make sure the adapter is functional and configured correctly.
 
 The logs should give an insight of what's going on. If you need help analyzing them, feel free to open an issue ticket.
 
-## Reporting issues
+# Reporting issues
 You can open issues related to UEFI at <https://github.com/edk2-porting/edk2-rk3588/issues>.
 
 Please include as many details as possible: expected behavior, what actually happens, steps to reproduce, [serial logs](#advanced-troubleshooting), etc.
 
 Also check the existing issues in case yours might be already reported.
 
-## Building
+# Building
 The firmware can only be built on Linux currently. For Windows use WSL.
 
 1. Install required packages:
@@ -312,9 +325,9 @@ The firmware can only be built on Linux currently. For Windows use WSL.
 
 If you get build errors, it is very likely that you're still missing some dependencies. The list of packages above is not complete and depending on the distro you may need to install additional ones. In most cases, looking up the error messages on the internet will point you at the right packages.
 
-## Notes
+# Notes
 
-### Flash layout
+## Flash layout
 | Address    | Size       | Desc                  | File                   |
 | ---------- | ---------- | --------------------- | ---------------------- |
 | 0x00000000 | 0x00004400 | GPT Table             | rk3588_spi_nor_gpt.img |
@@ -328,7 +341,7 @@ The variable store is not included in the flash image, in order to prevent overw
 
 The firmware expects these exact offsets, do not change them.
 
-### Memory Map
+## Memory Map
 | Address    | Size       | Desc                  | File                |
 | ---------- | ---------  | --------------------- | ------------------- |
 | 0x00040000 |            | ATF                   | bl31_0x00040000.bin |
@@ -339,98 +352,6 @@ The firmware expects these exact offsets, do not change them.
 | 0x007E0000 | 0x00010000 | NV_FTW_SPARE          |                     |
 | 0x08400000 |            | OP-TEE                | bl32.bin            |
 | 0xff100000 |            | ATF (PMU_MEM)         | bl31_0xff100000.bin |
-
-### Setting configuration options via the shell
-To configure using the UEFI Shell, use `setvar` command to read/write the UEFI variables with GUID = `10f41c33-a468-42cd-85ee-7043213f73a3`.
-
-The syntax to read a setting is:
-```
-setvar <NAME> -guid 10f41c33-a468-42cd-85ee-7043213f73a3
-```
-
-The syntax to write a setting is:
-```
-setvar <NAME> -guid 10f41c33-a468-42cd-85ee-7043213f73a3 -bs -rt -nv =<VALUE>
-```
-`VALUE` must be in hexadecimal.
-
-For string-type settings, the syntax to write is:
-```
-setvar <NAME> -guid 10f41c33-a468-42cd-85ee-7043213f73a3 -bs -rt -nv =L"<VALUE>" =0x0000
-```
-
-### CPU Performance
-#### Cluster clocks / voltages
-| Variable                          |    NAME                            |  VALUE                       |
-| --------------------------------- |----------------------------------- |----------------------------- |
-| CPU`x` Clock Preset               | `CpuPerf_CPUxClusterClockPreset`   | Boot default = `0x00000000`<br> Min = `0x00000001`<br> Max = `0x00000002`<br> Custom = `0x00000003` |
-| CPU`x` Custom Clock Preset (MHz)  | `CpuPerf_CPUxClusterClockCustom`   | Hex numeric option, 4-bytes<br> See below. |
-| CPU`x` Voltage Mode               | `CpuPerf_CPUxClusterVoltageMode`   | Auto = `0x00000000` (default)<br> Custom = `0x00000001`|
-| CPU`x` Custom Voltage (uV)        | `CpuPerf_CPUxClusterVoltageCustom` | Hex numeric value, 4-bytes<br> See below. |
-
-`x` can be :
-* `L` for LITTLE cluster
-* `B01` for big cluster #0
-* `B23` for big cluster #1
-
-`CpuPerf_CPUxClusterClockCustom` can have one of the following values:
-* All clusters: `408000000`, `600000000`, `816000000`, `1008000000`, `1200000000`, `1416000000`, `1608000000`, `1800000000`
-* Big cluster additional clocks: `2016000000`, `2208000000`, `2256000000`, `2304000000`, `2352000000`, `2400000000`
-
-`CpuPerf_CPUxClusterVoltageCustom` is the cluster voltage in microvolts. Min: `500000`, Max: `1500000`.
-Default value depends on cluster type.
-
-### PCIe/SATA/USB Combo PIPE PHY
-| Variable    |    NAME         |  VALUE                             |
-| ----------- | --------------- | ---------------------------------- |
-| PHY #0 Mode | `ComboPhy0Mode` | Unconnected = `0x00000000`<br> PCIe = `0x00000001`<br> SATA = `0x00000002` |
-| PHY #1 Mode | `ComboPhy1Mode` | Unconnected = `0x00000000`<br> PCIe = `0x00000001`<br> SATA = `0x00000002` |
-| PHY #2 Mode | `ComboPhy2Mode` | Unconnected = `0x00000000`<br> PCIe = `0x00000001`<br> SATA = `0x00000002`<br> USB3 = `0x00000003` |
-
-Default values and supported options depend on the platform. Check documentation and schematics for more details on PHY wiring.
-
-### USB/DP Combo PHY
-| Variable                      |    NAME              |  VALUE                            |
-| ----------------------------- | -------------------- | --------------------------------- |
-| PHY #0 USB 3 SuperSpeed State | `UsbDpPhy0Usb3State` | Enabled = `0x00000001`<br> Disabled = `0x00000000` |
-| PHY #1 USB 3 SuperSpeed State | `UsbDpPhy1Usb3State` | Enabled = `0x00000001`<br> Disabled = `0x00000000` |
-
-### PCI Express 3.0
-| Variable      |    NAME       |  VALUE                            |
-| ------------- | ------------- | --------------------------------- |
-| Support State | `Pcie30State` | Enabled = `0x00000001`<br> Disabled = `0x00000000` |
-
-### ACPI / Device Tree
-| Variable          |    NAME           |  VALUE                            |
-| ----------------- | ----------------- | --------------------------------- |
-| Config Table Mode | `ConfigTableMode` | ACPI = `0x00000001`<br> DeviceTree = `0x00000002`<br> Both = `0x00000003` |
-
-#### ACPI Configuration
-| Variable        |    NAME         |  VALUE                            |
-| --------------- | --------------- | --------------------------------- |
-| USB 2.0 Support | `AcpiUsb2State` | Enabled = `0x00000001`<br> Disabled = `0x00000000` |
-
-#### Device Tree Configuration
-| Variable                        |    NAME               |  VALUE                            |
-| ------------------------------- | --------------------- | --------------------------------- |
-| Support DTB override & overlays | `FdtSupportOverrides` | Enabled = `0x01`<br> Disabled = `0x00` |
-
-### Cooling fan
-| Variable        |    NAME           |  VALUE                            |
-| --------------- | ----------------- | --------------------------------- |
-| On-board Fan    | `CoolingFanState` | Enabled = `0x00000001`<br> Disabled = `0x00000000` |
-| Fan Speed (%)   | `CoolingFanSpeed` | Hex numeric value, 4-bytes<br> Percentage: 0-100 |
-
-**Examples:**
-- To read the 'CPUL Clock Preset' setting :
-```
-setvar CpuPerf_CPULClusterClockPreset -guid 10f41c33-a468-42cd-85ee-7043213f73a3
-```
-
-- To change the 'CPUL Clock Preset' setting to 'Maximum' :
-```
-setvar CpuPerf_CPULClusterClockPreset -guid 10f41c33-a468-42cd-85ee-7043213f73a3 -bs -rt -nv =0x00000002
-```
 
 ## Licenses
 Most of the UEFI code is licensed under the default EDK2 license, which is [BSD-2-Clause-Patent](https://github.com/tianocore/edk2/blob/master/License.txt).
@@ -444,7 +365,6 @@ The files in `edk2-rockchip-non-osi` are licensed as **GPL-2.0-only**.
 The license for some of the blobs in the `misc/rkbin/` directory can be found at: <https://github.com/rockchip-linux/rkbin/blob/master/LICENSE>. Note that it also contains binaries built from open-source projects such as U-Boot (SPL), Arm Trusted Firmware and OP-TEE, having a different license.
 
 ## Community
-* Radxa forum: <https://forum.radxa.com/t/windows-uefi-on-rock-5-mega-thread/12924>
 * Hack w/ Rockchip Telegram: <https://t.me/UEFIonRockchip>
 * Windows on R Discord: <https://discord.gg/vjHwptUCa3>
 
