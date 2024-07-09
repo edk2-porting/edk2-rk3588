@@ -13,6 +13,7 @@
 #include <Library/DebugLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/GpioLib.h>
+#include <Library/IoLib.h>
 #include <Library/RockchipPlatformLib.h>
 #include <Protocol/ArmScmiClockProtocol.h>
 
@@ -45,6 +46,11 @@ RkSdmmcSetIoMux (
   VOID
   )
 {
+#define SYS_GRF_SOC_CON6 	(0xFD58C000 + 0x0318)
+
+  // Clear force_jtag (SD slot is muxed with JTAG)
+  MmioWrite32(SYS_GRF_SOC_CON6, 0x40000000);
+
   GpioPinSetDirection (0, GPIO_PIN_PA4, GPIO_PIN_INPUT);
   SdmmcIoMux ();
 }

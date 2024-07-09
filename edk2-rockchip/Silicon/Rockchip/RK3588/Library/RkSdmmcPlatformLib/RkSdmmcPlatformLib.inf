@@ -29,4 +29,5 @@
   DebugLib
   UefiBootServicesTableLib
   GpioLib
+  IoLib
   RockchipPlatformLib
