@@ -8,6 +8,7 @@ This repository contains an UEFI firmware implementation based on EDK2 for vario
 - [Orange Pi 5](http://www.orangepi.org/html/hardWare/computerAndMicrocontrollers/details/Orange-Pi-5.html)
 - [Orange Pi 5 Plus](http://www.orangepi.org/html/hardWare/computerAndMicrocontrollers/details/Orange-Pi-5-plus.html)
 - [ameriDroid Indiedroid Nova](https://indiedroid.us)
+- [Fydetab Duo](https://fydetabduo.com/)
 - [Firefly AIO-3588Q](https://en.t-firefly.com/product/industry/aio3588q)
 - [Firefly ITX-3588J](https://en.t-firefly.com/product/industry/itx3588j)
 - [Firefly ROC-RK3588S-PC](https://en.t-firefly.com/product/industry/rocrk3588spc)

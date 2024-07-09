@@ -79,6 +79,9 @@
 !ifndef RK_AHCI_ENABLE
   DEFINE RK_AHCI_ENABLE             = TRUE
 !endif
+!ifndef RK_DW_HDMI_QP_ENABLE
+  DEFINE RK_DW_HDMI_QP_ENABLE       = TRUE
+!endif
 
   #
   # RK3588-specific flags

@@ -109,7 +109,9 @@
   #
   INF Silicon/Rockchip/Drivers/Vop2Dxe/Vop2Dxe.inf
   # INF Silicon/Rockchip/Library/DisplayLib/AnalogixDpLib.inf
+!if $(RK_DW_HDMI_QP_ENABLE) == TRUE
   INF Silicon/Rockchip/Library/DisplayLib/DwHdmiQpLib.inf
+!endif
   INF Silicon/Rockchip/Library/DisplayLib/DwDpLib.inf
   INF Silicon/Rockchip/Drivers/LcdGraphicsOutputDxe/LcdGraphicsOutputDxe.inf
 
