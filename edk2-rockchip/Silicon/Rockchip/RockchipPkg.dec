@@ -61,6 +61,7 @@
   gRockchipTokenSpaceGuid.PcdRtc8563Bus|0|UINT8|0x0200000E
 
   gRockchipTokenSpaceGuid.PcdRkSdmmcBaseAddress|0x0|UINT32|0x40000030
+  gRockchipTokenSpaceGuid.PcdRkSdmmcCardDetectInverted|FALSE|BOOLEAN|0x40000031
 
   gRockchipTokenSpaceGuid.PcdDwcSdhciBaseAddress|0x0|UINT32|0x40000035
   gRockchipTokenSpaceGuid.PcdDwcSdhciForceHighSpeed|FALSE|BOOLEAN|0x40000036

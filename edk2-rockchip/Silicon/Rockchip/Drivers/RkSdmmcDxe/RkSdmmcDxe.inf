@@ -43,6 +43,7 @@
 
 [Pcd]
   gRockchipTokenSpaceGuid.PcdRkSdmmcBaseAddress
+  gRockchipTokenSpaceGuid.PcdRkSdmmcCardDetectInverted
 
 [Depex]
   TRUE
