@@ -25,7 +25,7 @@
 
 #include <Uefi/UefiBaseType.h>
 
-#include "uboot-env.h"
+#include <Library/uboot-env.h>
 
 #define HIWORD_UPDATE(val, mask)	(val | (mask) << 16)
 

@@ -10,6 +10,7 @@
 **/
 
 #include <PiDxe.h>
+#include <Protocol/RockchipDsiPanel.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/UefiBootServicesTableLib.h>
@@ -52,25 +53,6 @@ STATIC OVER_SCAN mDefaultOverScanParas = {
   .TopMargin = 100,
   .BottomMargin = 100
 };
-
-typedef struct {
-  UINT32                      Resolution;
-  UINT32                      Sync;
-  UINT32                      BackPorch;
-  UINT32                      FrontPorch;
-} SCAN_TIMINGS;
-
-typedef struct {
-  UINT32                      CrtcId;
-  UINT32                      OscFreq;
-  SCAN_TIMINGS                Horizontal;
-  SCAN_TIMINGS                Vertical;
-  UINT32                      HsyncActive;
-  UINT32                      VsyncActive;
-  UINT32                      DenActive;
-  UINT32                      ClkActive;
-  UINT32                      VpsConfigModeID;
-} DISPLAY_MODE;
 
 STATIC DISPLAY_MODE mDisplayModes[] = {
   {
@@ -331,34 +313,17 @@ LcdGraphicsOutputInit (
   // logic to let users choose the primary display through a setup option.
   //
 
-  HorizontalResolution = PcdGet32 (PcdVideoHorizontalResolution);
-  VerticalResolution = PcdGet32 (PcdVideoVerticalResolution);
-
-  for (ModeIndex = 0; ModeIndex < mMaxMode; ModeIndex++) {
-    Mode = &mDisplayModes[ModeIndex];
-    if (Mode->Horizontal.Resolution == HorizontalResolution && Mode->Vertical.Resolution == VerticalResolution) {
-      break;
-    }
-  }
-
-  if (ModeIndex >= mMaxMode) {
-    DEBUG ((DEBUG_ERROR, "%a: %dx%d mode not supported.\n",
-            __func__, HorizontalResolution, VerticalResolution));
-    return EFI_UNSUPPORTED;
-  }
+  //
+  // Assume mode #0 is the highest supported mode for now.
+  //
+  ModeIndex = 0;
+  Mode = &mDisplayModes[ModeIndex];
 
   InitializeListHead (&mDisplayStateList);
 
   for (Index = 0; Index < ConnectorCount; Index++) {
     DisplayState = AllocateZeroPool (sizeof(DISPLAY_STATE));
     InitializeListHead (&DisplayState->ListHead);
-
-    /* adapt to UEFI architecture */
-    DisplayState->ModeNumber = ModeIndex;
-    DisplayState->VpsConfigModeID = Mode->VpsConfigModeID;
-
-    DisplayState->CrtcState.Crtc = (VOID *) Crtc;
-    DisplayState->CrtcState.CrtcID = Mode->CrtcId;
 
     Status = gBS->HandleProtocol (ConnectorHandles[Index],
                                   &gRockchipConnectorProtocolGuid,
@@ -368,6 +333,27 @@ LcdGraphicsOutputInit (
               __func__, Index, Status));
       return Status;
     }
+
+    //
+    // DSI panel has a hardcoded mode. Overwrite the current one.
+    // This is all pretty ugly and prevents using multiple displays,
+    // but whatever...
+    //
+    ROCKCHIP_DSI_PANEL_PROTOCOL *DsiPanel;
+
+    Status = gBS->HandleProtocol (ConnectorHandles[Index],
+                                  &gRockchipDsiPanelProtocolGuid,
+                                  (VOID **) &DsiPanel);
+    if (!EFI_ERROR (Status)) {
+      CopyMem (Mode, &DsiPanel->NativeMode, sizeof (*Mode));
+    }
+
+    /* adapt to UEFI architecture */
+    DisplayState->ModeNumber = ModeIndex;
+    DisplayState->VpsConfigModeID = Mode->VpsConfigModeID;
+
+    DisplayState->CrtcState.Crtc = (VOID *) Crtc;
+    DisplayState->CrtcState.CrtcID = Mode->CrtcId;
 
     DisplayState->ConnectorState.OverScan.LeftMargin = mDefaultOverScanParas.LeftMargin;
     DisplayState->ConnectorState.OverScan.RightMargin = mDefaultOverScanParas.RightMargin;

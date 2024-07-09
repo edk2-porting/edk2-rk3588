@@ -24,7 +24,7 @@
 
 #include <Uefi/UefiBaseType.h>
 
-#include "uboot-env.h"
+#include <Library/uboot-env.h>
 
 # define DP_MAX_LINK_RATE                    0x001
 # define DP_MAX_LANE_COUNT                   0x002

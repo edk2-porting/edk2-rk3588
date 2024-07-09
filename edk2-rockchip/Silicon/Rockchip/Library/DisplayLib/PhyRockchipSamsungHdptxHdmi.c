@@ -18,7 +18,7 @@
 #include <Library/PWMLib.h>
 #include <Library/DrmModes.h>
 
-#include "uboot-env.h"
+#include <Library/uboot-env.h>
 
 #define UPDATE(x, h, l)		(((x) << (l)) & GENMASK((h), (l)))
 

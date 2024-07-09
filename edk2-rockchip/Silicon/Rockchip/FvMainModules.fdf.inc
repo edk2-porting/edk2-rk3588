@@ -113,6 +113,7 @@
   INF Silicon/Rockchip/Library/DisplayLib/DwHdmiQpLib.inf
 !endif
   INF Silicon/Rockchip/Library/DisplayLib/DwDpLib.inf
+  INF Silicon/Rockchip/Library/DisplayLib/DwMipiDsi2Lib.inf
   INF Silicon/Rockchip/Drivers/LcdGraphicsOutputDxe/LcdGraphicsOutputDxe.inf
 
   #

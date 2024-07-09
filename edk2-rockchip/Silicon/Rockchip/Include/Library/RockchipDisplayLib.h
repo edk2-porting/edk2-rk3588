@@ -11,6 +11,8 @@
 #define __ROCKCHIP_DISPLAY_H__
 
 #include <Uefi/UefiBaseType.h>
+#include <Library/uboot-env.h>
+#include <Library/drm_dsc.h>
 
 #define LIST_FOR_EACH_ENTRY(Pos, Head, Member)				\
 	for (Pos = BASE_CR((Head)->ForwardLink, typeof(*Pos), Member);	\
@@ -23,8 +25,6 @@
 #define ALIGN(x, a) (((x) + (a) - 1) & ~((a) - 1))
 
 #define INLINE static inline
-
-#define BIT(x)                (1 << x)
 
 #define EDID_SIZE             128
 
@@ -46,6 +46,8 @@ typedef enum {
 #define ROCKCHIP_OUTPUT_DUAL_CHANNEL_ODD_EVEN_MODE      BIT(1)
 #define ROCKCHIP_OUTPUT_DATA_SWAP                       BIT(2)
 #define ROCKCHIP_OUTPUT_MIPI_DS_MODE                    BIT(3)
+
+#define ROCKCHIP_DSC_PPS_SIZE_BYTE			88
 
 /*
  * display output interface supported by rockchip lcdc
@@ -89,6 +91,27 @@ typedef struct {
   UINT32                      Width;
   UINT32                      Height;
 } VOP_RECT;
+
+struct rockchip_dsc_sink_cap {
+	/**
+	 * @slice_width: the number of pixel columns that comprise the slice width
+	 * @slice_height: the number of pixel rows that comprise the slice height
+	 * @block_pred: Does block prediction
+	 * @native_420: Does sink support DSC with 4:2:0 compression
+	 * @bpc_supported: compressed bpc supported by sink : 10, 12 or 16 bpc
+	 * @version_major: DSC major version
+	 * @version_minor: DSC minor version
+	 * @target_bits_per_pixel_x16: bits num after compress and multiply 16
+	 */
+	UINT16 slice_width;
+	UINT16 slice_height;
+	BOOLEAN block_pred;
+	BOOLEAN native_420;
+	UINT8 bpc_supported;
+	UINT8 version_major;
+	UINT8 version_minor;
+	UINT16 target_bits_per_pixel_x16;
+};
 
 typedef struct {
   UINT32                      LeftMargin;
@@ -194,6 +217,19 @@ typedef struct {
   UINT32                      DMAAddress;
   BOOLEAN                     YUVOverlay;
   VOP_RECT                    MaxOutput;
+
+  UINT32                      DclkCoreDiv;
+  UINT32                      DclkOutDiv;
+
+  UINT8 dsc_id;
+  UINT8 dsc_enable;
+  UINT8 dsc_slice_num;
+  UINT8 dsc_pixel_num;
+  UINT64 dsc_txp_clk_rate;
+  UINT64 dsc_pxl_clk_rate;
+  UINT64 dsc_cds_clk_rate;
+  struct drm_dsc_picture_parameter_set pps;
+  struct rockchip_dsc_sink_cap dsc_sink_cap;
 } CRTC_STATE;
 
 typedef struct {
@@ -214,6 +250,25 @@ typedef struct {
   UINT32                      ForceOutputFormat;
 } DISPLAY_STATE;
 
+typedef struct {
+  UINT32                      Resolution;
+  UINT32                      Sync;
+  UINT32                      BackPorch;
+  UINT32                      FrontPorch;
+} SCAN_TIMINGS;
+
+typedef struct {
+  UINT32                      CrtcId;
+  UINT32                      OscFreq;
+  SCAN_TIMINGS                Horizontal;
+  SCAN_TIMINGS                Vertical;
+  UINT32                      HsyncActive;
+  UINT32                      VsyncActive;
+  UINT32                      DenActive;
+  UINT32                      ClkActive;
+  UINT32                      VpsConfigModeID;
+} DISPLAY_MODE;
+
 EFIAPI
 EFI_STATUS
 DisplaySetCrtcInfo (
@@ -221,11 +276,10 @@ DisplaySetCrtcInfo (
   IN  UINT32                               AdjustFlags
   );
 
+UINT32
 EFIAPI
-EFI_STATUS
-DisplaySetFramebuffer (
-  OUT EFI_PHYSICAL_ADDRESS*                VramBaseAddress,
-  OUT UINTN*                               VramSize
+DrmModeVRefresh (
+  DRM_DISPLAY_MODE *Mode
   );
 
 #endif

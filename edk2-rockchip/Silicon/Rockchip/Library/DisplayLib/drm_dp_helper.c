@@ -21,8 +21,8 @@
  * OF THIS SOFTWARE.
  */
 
-#include "uboot-env.h"
-#include "drm_dp_helper.h"
+#include <Library/uboot-env.h>
+#include <Library/drm_dp_helper.h>
 
 /**
  * DOC: dp helpers

@@ -7,8 +7,9 @@
 #include <Library/TimerLib.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
+#include <Library/MemoryAllocationLib.h>
+#include <Library/errno.h>
 #include <Soc.h>
-#include "errno.h"
 
 #define __maybe_unused
 
@@ -21,6 +22,7 @@ typedef UINTN ulong;
 typedef INTN ssize_t;
 typedef UINTN size_t;
 typedef BOOLEAN bool;
+typedef UINT16 __be16;
 
 #define true TRUE
 #define false FALSE
@@ -34,6 +36,10 @@ typedef BOOLEAN bool;
 #define printf(args...)		DEBUG ((DEBUG_INFO, args))
 #define debug(args...)		DEBUG ((DEBUG_INFO, args))
 #define WARN(x, args...)	DEBUG ((DEBUG_WARN, args))
+
+#define BUILD_BUG_ON(condition) ((void)sizeof(char[1 - 2*!!(condition)]))
+
+#define BIT(x)                (1 << (x))
 
 #define BITS_PER_LONG 	(sizeof(UINTN) * 8)
 #define GENMASK(h, l) \
@@ -51,6 +57,8 @@ typedef BOOLEAN bool;
 		(typeof(_mask))(((_reg) & (_mask)) >> __bf_shf(_mask));	\
 	})
 
+#define fls(x) HighBitSet32(x)
+
 #define min(x,y) ({ \
 	typeof(x) _x = (x);	\
 	typeof(y) _y = (y);	\
@@ -65,6 +73,35 @@ typedef BOOLEAN bool;
 
 #define min_t(type, a, b) min(((type) a), ((type) b))
 #define max_t(type, a, b) max(((type) a), ((type) b))
+
+#define do_div(n,base) ({					\
+	uint32_t __base = (base);				\
+	uint32_t __rem;						\
+	__rem = ((uint64_t)(n)) % __base;			\
+	(n) = ((uint64_t)(n)) / __base;				\
+	__rem;							\
+ })
+
+#define DIV_ROUND_CLOSEST(x, divisor) (((x) + ((divisor) / 2)) / (divisor))
+
+#define writel(val, addr)	MmioWrite32(addr, val)
+#define readl(addr)		MmioRead32(addr)
+
+//
+// TODO: Actually check for timeout below...
+//
+#define readx_poll_timeout(op, addr, val, cond, timeout_us)	\
+({ \
+	for (;;) { \
+		(val) = op(addr); \
+		if (cond) \
+			break; \
+	} \
+	(cond) ? 0 : -ETIMEDOUT; \
+})
+
+#define readl_poll_timeout(addr, val, cond, timeout_us) \
+	readx_poll_timeout(readl, addr, val, cond, timeout_us)
 
 #define regmap_read_poll_timeout(map, addr, val, cond, sleep_us, \
 				      timeout_ms) \
@@ -133,6 +170,39 @@ static inline u32 get_unaligned_le32(const void *p)
 	return __get_unaligned_le32((const u8 *)p);
 }
 
+static inline u64 div_u64_rem(u64 dividend, u32 divisor, u32 *remainder)
+{
+	*remainder = dividend % divisor;
+	return dividend / divisor;
+}
+
+static inline u64 div_u64(u64 dividend, u32 divisor)
+{
+	u32 remainder;
+	return div_u64_rem(dividend, divisor, &remainder);
+}
+
+#define div64_ul(x, y)   div_u64((x), (y))
+
+#define abs(x) ({						\
+		long ret;					\
+		if (sizeof(x) == sizeof(long)) {		\
+			long __x = (x);				\
+			ret = (__x < 0) ? -__x : __x;		\
+		} else {					\
+			int __x = (x);				\
+			ret = (__x < 0) ? -__x : __x;		\
+		}						\
+		ret;						\
+	})
+
+#define uswap_16(x) \
+	((((x) & 0xff00) >> 8) | \
+	 (((x) & 0x00ff) << 8))
+
+#define cpu_to_be16(x)		uswap_16(x)
+#define be16_to_cpu(x)		uswap_16(x)
+
 #define memcpy(dest, source, count)         CopyMem(dest,source, (UINTN)(count))
 #define memset(dest, ch, count)             SetMem(dest, (UINTN)(count),(UINT8)(ch))
 #define memchr(buf, ch, count)              ScanMem8(buf, (UINTN)(count),(UINT8)ch)
@@ -144,5 +214,9 @@ static inline u32 get_unaligned_le32(const void *p)
 #define strcat(strDest, strSource)          AsciiStrCatS(strDest, MAX_STRING_SIZE, strSource)
 #define strcmp(string1, string2, count)     (int)(AsciiStrCmp(string1, string2))
 #define strncmp(string1, string2, count)    (int)(AsciiStrnCmp(string1, string2, (UINTN)(count)))
+
+#define malloc(sz)			AllocatePool(sz)
+#define calloc(num, sz)		AllocateZeroPool((num) * (sz));
+#define free(buf)			FreePool(buf)
 
 #endif // _UBOOT_ENV_H

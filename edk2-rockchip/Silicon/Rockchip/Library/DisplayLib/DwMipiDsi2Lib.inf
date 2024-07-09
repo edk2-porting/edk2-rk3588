@@ -1,0 +1,53 @@
+#/** @file
+#
+#  Synopsys DesignWare MIPI DSI2 controller driver
+#
+#  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = DwMipiDsi2Lib
+  FILE_GUID                      = aa11f6f3-96a8-45f9-b757-47e1c793d409
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = DwMipiDsi2Init
+
+[Sources.common]
+  DwMipiDsi2Lib.c
+  drm_dsc.c
+  drm_mipi_dsi.c
+  rockchip_phy.c
+  samsung_mipi_dcphy.c
+
+[LibraryClasses]
+  UefiDriverEntryPoint
+  UefiLib
+  UefiBootServicesTableLib
+  TimerLib
+  DebugLib
+  IoLib
+  BaseLib
+  BaseMemoryLib
+  MemoryAllocationLib
+  RockchipDisplayLib
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Silicon/Rockchip/RockchipPkg.dec
+  Silicon/Rockchip/RK3588/RK3588.dec
+
+[BuildOptions]
+
+[Pcd]
+
+[Protocols]
+  gRockchipConnectorProtocolGuid        ## PRODUCES
+  gRockchipDsiPanelProtocolGuid         ## CONSUMES
+
+[Depex]
+  TRUE

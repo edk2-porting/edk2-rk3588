@@ -75,3 +75,33 @@ DisplaySetCrtcInfo (
 
   return EFI_SUCCESS;
 }
+
+UINT32
+EFIAPI
+DrmModeVRefresh (
+  DRM_DISPLAY_MODE *Mode
+  )
+{
+  UINT32 Refresh = 0;
+  UINT32 CalcVal;
+
+  if (Mode->VRefresh > 0) {
+    Refresh = Mode->VRefresh;
+  } else if (Mode->HTotal > 0 && Mode->VTotal > 0) {
+    int VTotal;
+
+    VTotal = Mode->VTotal;
+    /* work out VRefresh the value will be x1000 */
+    CalcVal = (Mode->Clock * 1000);
+    CalcVal /= Mode->HTotal;
+    Refresh = (CalcVal + VTotal / 2) / VTotal;
+
+    if (Mode->Flags & DRM_MODE_FLAG_INTERLACE)
+    Refresh *= 2;
+    if (Mode->Flags & DRM_MODE_FLAG_DBLSCAN)
+    Refresh /= 2;
+    if (Mode->VScan > 1)
+    Refresh /= Mode->VScan;
+  }
+  return Refresh;
+}

@@ -215,30 +215,27 @@ static VOP2_POWER_DOMAIN_DATA mCluster0PdDataRK3588 = {
 };
 
 static VOP2_POWER_DOMAIN_DATA mCluster1PdDataRK3588 = {
-  .IsParentNeeded = TRUE,
   .PdEnShift = RK3588_CLUSTER1_PD_EN_SHIFT,
   .PdStatusShift = RK3588_CLUSTER1_PD_STATUS_SHIFT,
   .PmuStatusShift = RK3588_PD_CLUSTER1_PWR_STAT_SHIFI,
   .BisrEnStatusShift = RK3588_PD_CLUSTER1_REPAIR_EN_SHIFT,
-  .ParentPhyID = ROCKCHIP_VOP2_CLUSTER0,
+  .ParentPdData = &mCluster0PdDataRK3588,
 };
 
 static VOP2_POWER_DOMAIN_DATA mCluster2PdDataRK3588 = {
-  .IsParentNeeded = TRUE,
   .PdEnShift = RK3588_CLUSTER2_PD_EN_SHIFT,
   .PdStatusShift = RK3588_CLUSTER2_PD_STATUS_SHIFT,
   .PmuStatusShift = RK3588_PD_CLUSTER2_PWR_STAT_SHIFI,
   .BisrEnStatusShift = RK3588_PD_CLUSTER2_REPAIR_EN_SHIFT,
-  .ParentPhyID = ROCKCHIP_VOP2_CLUSTER0,
+  .ParentPdData = &mCluster0PdDataRK3588,
 };
 
 static VOP2_POWER_DOMAIN_DATA mCluster3PdDataRK3588 = {
-  .IsParentNeeded = TRUE,
   .PdEnShift = RK3588_CLUSTER3_PD_EN_SHIFT,
   .PdStatusShift = RK3588_CLUSTER3_PD_STATUS_SHIFT,
   .PmuStatusShift = RK3588_PD_CLUSTER3_PWR_STAT_SHIFI,
   .BisrEnStatusShift = RK3588_PD_CLUSTER3_REPAIR_EN_SHIFT,
-  .ParentPhyID = ROCKCHIP_VOP2_CLUSTER0,
+  .ParentPdData = &mCluster0PdDataRK3588,
 };
 
 static VOP2_POWER_DOMAIN_DATA mEsmartPdDataRK3588 = {
@@ -246,6 +243,20 @@ static VOP2_POWER_DOMAIN_DATA mEsmartPdDataRK3588 = {
   .PdStatusShift = RK3588_ESMART_PD_STATUS_SHIFT,
   .PmuStatusShift = RK3588_PD_ESMART_PWR_STAT_SHIFI,
   .BisrEnStatusShift = RK3588_PD_ESMART_REPAIR_EN_SHIFT,
+};
+
+static VOP2_POWER_DOMAIN_DATA mDsc8KPdDataRK3588 = {
+  .PdEnShift = RK3588_DSC_8K_PD_EN_SHIFT,
+  .PdStatusShift = RK3588_DSC_8K_PD_STATUS_SHIFT,
+  .PmuStatusShift = RK3588_PD_DSC_8K_PWR_STAT_SHIFI,
+  .BisrEnStatusShift = RK3588_PD_DSC_8K_REPAIR_EN_SHIFT,
+};
+
+static VOP2_POWER_DOMAIN_DATA mDsc4KPdDataRK3588 = {
+  .PdEnShift = RK3588_DSC_4K_PD_EN_SHIFT,
+  .PdStatusShift = RK3588_DSC_4K_PD_STATUS_SHIFT,
+  .PmuStatusShift = RK3588_PD_DSC_4K_PWR_STAT_SHIFI,
+  .BisrEnStatusShift = RK3588_PD_DSC_4K_REPAIR_EN_SHIFT,
 };
 
 static VOP2_WIN_DATA mWinDataRK3588[8] = {
@@ -330,12 +341,38 @@ static VOP2_WIN_DATA mWinDataRK3588[8] = {
   },
 };
 
+STATIC VOP2_DSC_DATA mDscDataRK3588[] = {
+  {
+    .id = ROCKCHIP_VOP2_DSC_8K,
+    .PdData = &mDsc8KPdDataRK3588,
+    .max_slice_num = 8,
+    .max_linebuf_depth = 11,
+    .min_bits_per_pixel = 8,
+    .dsc_txp_clk_src_name = "dsc_8k_txp_clk_src",
+    .dsc_txp_clk_name = "dsc_8k_txp_clk",
+    .dsc_pxl_clk_name = "dsc_8k_pxl_clk",
+    .dsc_cds_clk_name = "dsc_8k_cds_clk",
+  },
+
+  {
+    .id = ROCKCHIP_VOP2_DSC_4K,
+    .PdData = &mDsc4KPdDataRK3588,
+    .max_slice_num = 2,
+    .max_linebuf_depth = 11,
+    .min_bits_per_pixel = 8,
+    .dsc_txp_clk_src_name = "dsc_4k_txp_clk_src",
+    .dsc_txp_clk_name = "dsc_4k_txp_clk",
+    .dsc_pxl_clk_name = "dsc_4k_pxl_clk",
+    .dsc_cds_clk_name = "dsc_4k_cds_clk",
+  },
+};
 
 STATIC VOP2_DATA mVop2RK3588 = {
   .Version = VOP_VERSION_RK3588,
   .NrVps = 4,
   .VpData = mVpDataRK3588,
   .WinData = mWinDataRK3588,
+  .DscData = mDscDataRK3588,
 /*
   .plane_table = rk3588_plane_table,
 */
@@ -452,6 +489,18 @@ Vop2GrfWrite (
 
   TempVal = (Value << Shift) | (Mask << (Shift + 16));
   MmioWrite32(Address + Offset, TempVal);
+}
+
+INLINE
+UINT32
+Vop2GrfRead (
+  IN  UINTN                                 Address,
+  IN  UINT32                                Offset,
+  IN  UINT32                                Mask,
+  IN  UINT32                                Shift
+  )
+{
+  return (MmioRead32(Address + Offset) >> Shift) & Mask;
 }
 
 INLINE
@@ -953,6 +1002,33 @@ Vop2CalcCruConfig (
     }
     *DclkOutDiv = DclkRate / DclkOutRate;
     *DclkCoreDiv = DclkRate / DclkCoreRate;
+  } else if (OutputType == DRM_MODE_CONNECTOR_DSI) {
+    if (ConnectorState->OutputFlags & ROCKCHIP_OUTPUT_DUAL_CHANNEL_LEFT_RIGHT_MODE)
+      K = 2;
+    if (CrtcState->dsc_enable)
+      /* dsc output is 96bit, dsi input is 192 bit */
+      IfPixclkRate = CrtcState->dsc_cds_clk_rate >> 1;
+    else
+      IfPixclkRate = DclkCoreRate / K;
+    /* dclk_core = dclk_out * K = if_pixclk * K = VPixclk / 4 */
+    DclkOutRate = DclkCoreRate / K;
+    /* DclkRate = N * DclkCoreRate N = (1,2,4 ), we get a little factor here */
+    DclkRate = Vop2CalcDclk(DclkOutRate,
+                  Vop2->Data->VpData->MaxDclk);
+    if (!DclkRate) {
+      DEBUG ((DEBUG_INFO, "MIPI dclk out of range(max_dclk: %d KHZ, DclkRate: %ld KHZ)\n",
+              Vop2->Data->VpData->MaxDclk, DclkRate));
+      return -EINVAL;
+    }
+
+    if (CrtcState->dsc_enable)
+      DclkRate /= CrtcState->dsc_slice_num;
+
+    *DclkOutDiv = DclkRate / DclkOutRate;
+    *DclkCoreDiv = DclkRate / DclkCoreRate;
+    *IfPixclkDiv = 1;       /*mipi pixclk == dclk_out*/
+    if (CrtcState->dsc_enable)
+      *IfPixclkDiv = DclkOutRate * 1000LL / IfPixclkRate;
   }
 
   *IfPixclkDiv = LogCalculate(*IfPixclkDiv);
@@ -969,6 +1045,39 @@ Vop2CalcCruConfig (
 }
 
 STATIC
+EFI_STATUS
+Vop2CalcDscClk (
+  OUT DISPLAY_STATE                        *DisplayState
+  )
+{
+  CRTC_STATE *CrtcState = &DisplayState->CrtcState;
+  CONNECTOR_STATE *ConnectorState = &DisplayState->ConnectorState;
+  DRM_DISPLAY_MODE *DisplayMode = &ConnectorState->DisplayMode;
+  UINT64 VPixclk = DisplayMode->CrtcClock * 1000LL; /* video timing pixclk */
+  UINT8 K = 1;
+
+  if (ConnectorState->OutputFlags & ROCKCHIP_OUTPUT_DUAL_CHANNEL_LEFT_RIGHT_MODE)
+    K = 2;
+
+  CrtcState->dsc_txp_clk_rate = VPixclk;
+  do_div(CrtcState->dsc_txp_clk_rate, (CrtcState->dsc_pixel_num * K));
+
+  CrtcState->dsc_pxl_clk_rate = VPixclk;
+  do_div(CrtcState->dsc_pxl_clk_rate, (CrtcState->dsc_slice_num * K));
+
+  /* dsc_cds = crtc_clock / (cds_dat_width / bits_per_pixel)
+    * cds_dat_width = 96;
+    * bits_per_pixel = [8-12];
+    * As cds clk is div from txp clk and only support 1/2/4 div,
+    * so when txp_clk is equal to VPixclk, we set dsc_cds = crtc_clock / 4,
+    * otherwise dsc_cds = crtc_clock / 8;
+    */
+  CrtcState->dsc_cds_clk_rate = VPixclk / (CrtcState->dsc_txp_clk_rate == VPixclk ? 4 : 8);
+
+  return 0;
+}
+
+STATIC
 UINT32
 Vop2IfConfig (
   OUT DISPLAY_STATE                        *DisplayState,
@@ -978,6 +1087,7 @@ Vop2IfConfig (
   CRTC_STATE *CrtcState = &DisplayState->CrtcState;
   CONNECTOR_STATE *ConnectorState = &DisplayState->ConnectorState;
   DRM_DISPLAY_MODE *DisplayMode = &ConnectorState->DisplayMode;
+  struct rockchip_dsc_sink_cap *dsc_sink_cap = &CrtcState->dsc_sink_cap;
   UINT32 VPOffset = CrtcState->CrtcID * 0x100;
   UINT32 OutputIf = ConnectorState->OutputInterface;
   UINT32 DclkCoreDiv = 0;
@@ -995,7 +1105,80 @@ Vop2IfConfig (
     Val |= (DisplayMode->Flags & DRM_MODE_FLAG_NVSYNC) ? 0 : BIT(VSYNC_POSITIVE);
   }
 
+  if (CrtcState->dsc_enable) {
+    UINT32 K = 1;
+
+    if (!Vop2->Data->NrDscs) {
+      DEBUG ((DEBUG_ERROR, "Unsupported DSC\n"));
+      return 0;
+    }
+
+    if (ConnectorState->OutputFlags & ROCKCHIP_OUTPUT_DUAL_CHANNEL_LEFT_RIGHT_MODE)
+      K = 2;
+
+    CrtcState->dsc_id = OutputIf & (VOP_OUTPUT_IF_MIPI0 | VOP_OUTPUT_IF_HDMI0) ? 0 : 1;
+    CrtcState->dsc_slice_num = DisplayMode->CrtcHDisplay / dsc_sink_cap->slice_width / K;
+    CrtcState->dsc_pixel_num = CrtcState->dsc_slice_num > 4 ? 4 : CrtcState->dsc_slice_num;
+
+    Vop2CalcDscClk(DisplayState);
+    DEBUG ((DEBUG_INFO, "Enable DSC%d slice:%dx%d, slice num:%d\n",
+            CrtcState->dsc_id, dsc_sink_cap->slice_width,
+            dsc_sink_cap->slice_height, CrtcState->dsc_slice_num));
+  }
+
   DclkRate = Vop2CalcCruConfig(DisplayState, &DclkCoreDiv, &DclkOutDiv, &IfPixclkDiv, &IfDclkDiv);
+  CrtcState->DclkCoreDiv = DclkCoreDiv;
+  CrtcState->DclkOutDiv = DclkOutDiv;
+
+  if (OutputIf & VOP_OUTPUT_IF_MIPI0) {
+    if (CrtcState->CrtcID == 2)
+      Val = 0;
+    else
+      Val = 1;
+
+    if (ConnectorState->OutputFlags & ROCKCHIP_OUTPUT_MIPI_DS_MODE)
+      Vop2MaskWrite (Vop2->BaseAddress, RK3568_DSP_IF_CTRL, EN_MASK,
+          RK3588_MIPI_DSI0_MODE_SEL_SHIFT, 1, FALSE);
+
+    Vop2MaskWrite (Vop2->BaseAddress, RK3568_DSP_IF_EN, EN_MASK, RK3588_MIPI0_EN_SHIFT,
+        1, FALSE);
+    Vop2MaskWrite (Vop2->BaseAddress, RK3568_DSP_IF_EN, 1, RK3588_MIPI0_MUX_SHIFT, Val, FALSE);
+    Vop2MaskWrite (Vop2->BaseAddress, RK3568_DSP_IF_CTRL, 3, MIPI0_PIXCLK_DIV_SHIFT,
+        IfPixclkDiv, FALSE);
+
+    if (ConnectorState->hold_mode) {
+      Vop2MaskWrite (Vop2->BaseAddress, RK3568_VP0_MIPI_CTRL + VPOffset,
+          EN_MASK, EDPI_TE_EN, TRUE, FALSE);
+      Vop2MaskWrite (Vop2->BaseAddress, RK3568_VP0_MIPI_CTRL + VPOffset,
+          EN_MASK, EDPI_WMS_HOLD_EN, 1, FALSE);
+    }
+  }
+
+  if (OutputIf & VOP_OUTPUT_IF_MIPI1) {
+    if (CrtcState->CrtcID == 2)
+      Val = 0;
+    else if (CrtcState->CrtcID == 3)
+      Val = 1;
+    else
+      Val = 3; /*VP1*/
+    if (ConnectorState->OutputFlags & ROCKCHIP_OUTPUT_MIPI_DS_MODE)
+      Vop2MaskWrite (Vop2->BaseAddress, RK3568_DSP_IF_CTRL, EN_MASK,
+          RK3588_MIPI_DSI1_MODE_SEL_SHIFT, 1, FALSE);
+
+    Vop2MaskWrite (Vop2->BaseAddress, RK3568_DSP_IF_EN, EN_MASK, RK3588_MIPI1_EN_SHIFT,
+        1, FALSE);
+    Vop2MaskWrite (Vop2->BaseAddress, RK3568_DSP_IF_EN, IF_MUX_MASK, MIPI1_MUX_SHIFT,
+        Val, FALSE);
+    Vop2MaskWrite (Vop2->BaseAddress, RK3568_DSP_IF_CTRL, 3, MIPI1_PIXCLK_DIV_SHIFT,
+        IfPixclkDiv, FALSE);
+
+    if (ConnectorState->hold_mode) {
+      Vop2MaskWrite (Vop2->BaseAddress, RK3568_VP0_MIPI_CTRL + VPOffset,
+          EN_MASK, EDPI_TE_EN, TRUE, FALSE);
+      Vop2MaskWrite (Vop2->BaseAddress, RK3568_VP0_MIPI_CTRL + VPOffset,
+          EN_MASK, EDPI_WMS_HOLD_EN, 1, FALSE);
+    }
+  }
 
   if (OutputIf & VOP_OUTPUT_IF_eDP0) {
     Vop2MaskWrite (Vop2->BaseAddress, RK3568_DSP_IF_EN, EN_MASK,
@@ -1381,6 +1564,57 @@ Vop2PostConfig (
 }
 
 STATIC
+INT32
+Vop2WaitPowerDomainOn (
+  OUT VOP2                                 *Vop2,
+  OUT VOP2_POWER_DOMAIN_DATA               *PdData
+  )
+{
+  UINT32 Val = 0;
+  BOOLEAN IsBisrEn = FALSE;
+
+  IsBisrEn = Vop2GrfRead (Vop2->SysPmu, RK3588_PMU_BISR_CON3, EN_MASK, PdData->BisrEnStatusShift);
+  if (IsBisrEn) {
+    return readl_poll_timeout(Vop2->SysPmu + RK3588_PMU_BISR_STATUS5, Val,
+            ((Val >> PdData->PmuStatusShift) & 0x1), 50 * 1000);
+  } else {
+    return readl_poll_timeout(Vop2->BaseAddress + RK3568_SYS_STATUS0, Val,
+            !((Val >> PdData->PdStatusShift) & 0x1), 50 * 1000);
+  }
+}
+
+STATIC
+EFI_STATUS
+Vop2PowerDomainOn (
+  OUT VOP2                                 *Vop2,
+  OUT VOP2_POWER_DOMAIN_DATA               *PdData
+  )
+{
+  INT32 Ret = 0;
+
+  if (!PdData)
+    return 0;
+
+  if (PdData->ParentPdData) {
+    Ret = Vop2PowerDomainOn (Vop2, PdData->ParentPdData);
+    if (Ret) {
+      DEBUG ((DEBUG_ERROR, "can't open parent power domain\n"));
+      return EFI_INVALID_PARAMETER;
+    }
+  }
+
+  Vop2MaskWrite (Vop2->BaseAddress, RK3568_SYS_PD_CTRL, EN_MASK,
+      PdData->PdEnShift, 0, FALSE);
+  Ret = Vop2WaitPowerDomainOn(Vop2, PdData);
+  if (Ret) {
+    DEBUG ((DEBUG_ERROR, "wait vop2 power domain timeout\n"));
+    return EFI_TIMEOUT;
+  }
+
+  return EFI_SUCCESS;
+}
+
+STATIC
 EFI_STATUS
 Vop2SetClk (
   IN UINT32                                CrtcId,
@@ -1431,6 +1665,7 @@ Vop2PreInit (
   if (!RockchipVop2) {
     RockchipVop2 = AllocatePool (sizeof(*RockchipVop2));
     RockchipVop2->BaseAddress = RK3588_VOP2_REG_BASE;
+    RockchipVop2->SysPmu = SYS_PMU_BASE;
     RockchipVop2->Version = mVop2RK3588.Version;
     RockchipVop2->Data = &mVop2RK3588;
     RockchipVop2->GlobalInit = FALSE;
@@ -1474,6 +1709,250 @@ Vop2PostColorSwap (
 
   Vop2MaskWrite (Vop2->BaseAddress, RK3568_VP0_DSP_CTRL + VPOffset, DATA_SWAP_MASK,
                  DATA_SWAP_SHIFT, DateSwap, FALSE);
+}
+
+STATIC
+VOID
+Vop2CalcDscCruCfg (
+  OUT DISPLAY_STATE                        *DisplayState,
+  OUT UINT32                               *dsc_txp_clk_div,
+  OUT UINT32                               *dsc_pxl_clk_div,
+  OUT UINT32                               *dsc_cds_clk_div,
+  IN UINT64                                dclk_rate
+  )
+{
+  CRTC_STATE *CrtcState = &DisplayState->CrtcState;
+
+  *dsc_txp_clk_div = dclk_rate / CrtcState->dsc_txp_clk_rate;
+  *dsc_pxl_clk_div = dclk_rate / CrtcState->dsc_pxl_clk_rate;
+  *dsc_cds_clk_div = dclk_rate / CrtcState->dsc_cds_clk_rate;
+
+  *dsc_txp_clk_div = LogCalculate(*dsc_txp_clk_div);
+  *dsc_pxl_clk_div = LogCalculate(*dsc_pxl_clk_div);
+  *dsc_cds_clk_div = LogCalculate(*dsc_cds_clk_div);
+}
+
+STATIC
+VOID
+Vop2LoadPps (
+  OUT DISPLAY_STATE                        *DisplayState,
+  OUT VOP2                                 *Vop2,
+  IN UINT8                                 dsc_id
+  )
+{
+  CRTC_STATE *CrtcState = &DisplayState->CrtcState;
+  struct drm_dsc_picture_parameter_set *pps = &CrtcState->pps;
+  struct drm_dsc_picture_parameter_set config_pps;
+  const VOP2_DSC_DATA *dsc_data = &Vop2->Data->DscData[dsc_id];
+  UINT32 *pps_val = (UINT32 *)&config_pps;
+  UINT32 decoder_regs_offset = (dsc_id * 0x100);
+  UINT32 i = 0;
+
+  memcpy(&config_pps, pps, sizeof(config_pps));
+
+  if ((config_pps.pps_3 & 0xf) > dsc_data->max_linebuf_depth) {
+    config_pps.pps_3 &= 0xf0;
+    config_pps.pps_3 |= dsc_data->max_linebuf_depth;
+    DEBUG((DEBUG_INFO, "DSC%d max_linebuf_depth is: %d, current set value is: %d\n",
+            dsc_id, dsc_data->max_linebuf_depth, config_pps.pps_3 & 0xf));
+  }
+
+  for (i = 0; i < DSC_NUM_BUF_RANGES; i++) {
+    config_pps.rc_range_parameters[i] =
+      (pps->rc_range_parameters[i] >> 3 & 0x1f) |
+      ((pps->rc_range_parameters[i] >> 14 & 0x3) << 5) |
+      ((pps->rc_range_parameters[i] >> 0 & 0x7) << 7) |
+      ((pps->rc_range_parameters[i] >> 8 & 0x3f) << 10);
+  }
+
+  for (i = 0; i < ROCKCHIP_DSC_PPS_SIZE_BYTE / 4; i++)
+    Vop2Writel (Vop2->BaseAddress, RK3588_DSC_8K_PPS0_3 + decoder_regs_offset + i * 4, *pps_val++);
+}
+
+STATIC
+VOID
+Vop2DscEnable (
+  OUT DISPLAY_STATE                        *DisplayState,
+  OUT VOP2                                 *Vop2,
+  IN UINT8                                 dsc_id,
+  IN UINT64                                dclk_rate
+  )
+{
+  CONNECTOR_STATE *ConnectorState = &DisplayState->ConnectorState;
+  DRM_DISPLAY_MODE *Mode = &ConnectorState->DisplayMode;
+  CRTC_STATE *CrtcState = &DisplayState->CrtcState;
+  struct rockchip_dsc_sink_cap *dsc_sink_cap = &CrtcState->dsc_sink_cap;
+  const VOP2_DSC_DATA *dsc_data = &Vop2->Data->DscData[dsc_id];
+  BOOLEAN mipi_ds_mode = FALSE;
+  UINT8 dsc_interface_mode = 0;
+  UINT16 hsync_len = Mode->CrtcHSyncEnd - Mode->CrtcHSyncStart;
+  UINT16 hdisplay = Mode->CrtcHDisplay;
+  UINT16 htotal = Mode->CrtcHTotal;
+  UINT16 hact_st = Mode->CrtcHTotal - Mode->CrtcHSyncStart;
+  UINT16 vdisplay = Mode->CrtcVDisplay;
+  UINT16 vtotal = Mode->CrtcVTotal;
+  UINT16 vsync_len = Mode->CrtcVSyncEnd - Mode->CrtcVSyncStart;
+  UINT16 vact_st = Mode->CrtcVTotal - Mode->CrtcVSyncStart;
+  UINT16 vact_end = vact_st + vdisplay;
+  UINT32 ctrl_regs_offset = (dsc_id * 0x30);
+  UINT32 decoder_regs_offset = (dsc_id * 0x100);
+  UINT32 dsc_txp_clk_div = 0;
+  UINT32 dsc_pxl_clk_div = 0;
+  UINT32 dsc_cds_clk_div = 0;
+  UINT32 val = 0;
+
+  if (!Vop2->Data->NrDscs) {
+    DEBUG ((DEBUG_ERROR, "Unsupported DSC\n"));
+    return;
+  }
+
+  if (CrtcState->dsc_slice_num > dsc_data->max_slice_num)
+    DEBUG ((DEBUG_INFO, "DSC%d supported max slice is: %d, current is: %d\n",
+            dsc_data->id, dsc_data->max_slice_num, CrtcState->dsc_slice_num));
+
+  if (dsc_data->PdData) {
+    if (Vop2PowerDomainOn (Vop2, dsc_data->PdData))
+      DEBUG ((DEBUG_ERROR, "open dsc%d pd fail\n", dsc_id));
+  }
+
+  Vop2MaskWrite (Vop2->BaseAddress, RK3588_DSC_8K_INIT_DLY + ctrl_regs_offset, EN_MASK,
+      SCAN_TIMING_PARA_IMD_EN_SHIFT, 1, FALSE);
+  Vop2MaskWrite (Vop2->BaseAddress, RK3588_DSC_8K_SYS_CTRL + ctrl_regs_offset, DSC_PORT_SEL_MASK,
+      DSC_PORT_SEL_SHIFT, CrtcState->CrtcID, FALSE);
+  if (ConnectorState->OutputInterface & (VOP_OUTPUT_IF_HDMI0 | VOP_OUTPUT_IF_HDMI1)) {
+    dsc_interface_mode = VOP_DSC_IF_HDMI;
+  } else {
+    mipi_ds_mode = !!(ConnectorState->OutputFlags & ROCKCHIP_OUTPUT_MIPI_DS_MODE);
+    if (mipi_ds_mode)
+      dsc_interface_mode = VOP_DSC_IF_MIPI_DS_MODE;
+    else
+      dsc_interface_mode = VOP_DSC_IF_MIPI_VIDEO_MODE;
+  }
+
+  if (ConnectorState->OutputFlags & ROCKCHIP_OUTPUT_DUAL_CHANNEL_LEFT_RIGHT_MODE)
+    Vop2MaskWrite (Vop2->BaseAddress, RK3588_DSC_8K_SYS_CTRL + ctrl_regs_offset, DSC_MAN_MODE_MASK,
+        DSC_MAN_MODE_SHIFT, 0, FALSE);
+  else
+    Vop2MaskWrite (Vop2->BaseAddress, RK3588_DSC_8K_SYS_CTRL + ctrl_regs_offset, DSC_MAN_MODE_MASK,
+        DSC_MAN_MODE_SHIFT, 1, FALSE);
+
+  Vop2CalcDscCruCfg(DisplayState, &dsc_txp_clk_div, &dsc_pxl_clk_div, &dsc_cds_clk_div, dclk_rate);
+
+  Vop2MaskWrite (Vop2->BaseAddress, RK3588_DSC_8K_SYS_CTRL + ctrl_regs_offset, DSC_INTERFACE_MODE_MASK,
+      DSC_INTERFACE_MODE_SHIFT, dsc_interface_mode, FALSE);
+  Vop2MaskWrite (Vop2->BaseAddress, RK3588_DSC_8K_SYS_CTRL + ctrl_regs_offset, DSC_PIXEL_NUM_MASK,
+      DSC_PIXEL_NUM_SHIFT, CrtcState->dsc_pixel_num >> 1, FALSE);
+  Vop2MaskWrite (Vop2->BaseAddress, RK3588_DSC_8K_SYS_CTRL + ctrl_regs_offset, DSC_TXP_CLK_DIV_MASK,
+      DSC_TXP_CLK_DIV_SHIFT, dsc_txp_clk_div, FALSE);
+  Vop2MaskWrite (Vop2->BaseAddress, RK3588_DSC_8K_SYS_CTRL + ctrl_regs_offset, DSC_PXL_CLK_DIV_MASK,
+      DSC_PXL_CLK_DIV_SHIFT, dsc_pxl_clk_div, FALSE);
+  Vop2MaskWrite (Vop2->BaseAddress, RK3588_DSC_8K_SYS_CTRL + ctrl_regs_offset, DSC_CDS_CLK_DIV_MASK,
+      DSC_CDS_CLK_DIV_SHIFT, dsc_cds_clk_div, FALSE);
+  Vop2MaskWrite (Vop2->BaseAddress, RK3588_DSC_8K_SYS_CTRL + ctrl_regs_offset, EN_MASK,
+      DSC_SCAN_EN_SHIFT, !mipi_ds_mode, FALSE);
+  Vop2MaskWrite (Vop2->BaseAddress, RK3588_DSC_8K_SYS_CTRL + ctrl_regs_offset, DSC_CDS_CLK_DIV_MASK,
+      DSC_HALT_EN_SHIFT, mipi_ds_mode, FALSE);
+
+  if (!mipi_ds_mode) {
+    UINT16 dsc_hsync, dsc_htotal, dsc_hact_st, dsc_hact_end;
+    UINT32 target_bpp = dsc_sink_cap->target_bits_per_pixel_x16;
+    UINT64 dsc_cds_rate = CrtcState->dsc_cds_clk_rate;
+    UINT32 v_pixclk_mhz = Mode->CrtcClock / 1000; /* video timing pixclk */
+    UINT32 dly_num, dsc_cds_rate_mhz, val = 0;
+    UINT32 k = 1;
+
+    if (ConnectorState->OutputFlags & ROCKCHIP_OUTPUT_DUAL_CHANNEL_LEFT_RIGHT_MODE)
+      k = 2;
+
+    if (target_bpp >> 4 < dsc_data->min_bits_per_pixel)
+      DEBUG ((DEBUG_WARN, "Unsupported bpp less than: %d\n", dsc_data->min_bits_per_pixel));
+
+    /*
+      * dly_num = delay_line_num * T(one-line) / T (dsc_cds)
+      * T (one-line) = 1/v_pixclk_mhz * htotal = htotal/v_pixclk_mhz
+      * T (dsc_cds) = 1 / dsc_cds_rate_mhz
+      *
+      * HDMI:
+      * delay_line_num: according the pps initial_xmit_delay to adjust vop dsc delay
+      *                 delay_line_num = 4 - BPP / 8
+      *                                = (64 - target_bpp / 8) / 16
+      * dly_num = htotal * dsc_cds_rate_mhz / v_pixclk_mhz * (64 - target_bpp / 8) / 16;
+      *
+      * MIPI DSI[4320 and 9216 is buffer size for DSC]:
+      * DSC0:delay_line_num = 4320 * 8 / slince_num / chunk_size;
+      *	delay_line_num = delay_line_num > 5 ? 5 : delay_line_num;
+      * DSC1:delay_line_num = 9216 * 2 / slince_num / chunk_size;
+      *	delay_line_num = delay_line_num > 5 ? 5 : delay_line_num;
+      * dly_num = htotal * dsc_cds_rate_mhz / v_pixclk_mhz * delay_line_num
+      */
+    do_div(dsc_cds_rate, 1000000); /* hz to Mhz */
+    dsc_cds_rate_mhz = dsc_cds_rate;
+    dsc_hsync = hsync_len / 2;
+    if (dsc_interface_mode == VOP_DSC_IF_HDMI) {
+      dly_num = htotal * dsc_cds_rate_mhz / v_pixclk_mhz * (64 - target_bpp / 8) / 16;
+    } else {
+      UINT32 dsc_buf_size  = dsc_id == 0 ? 4320 * 8 : 9216 * 2;
+      UINT32 delay_line_num = dsc_buf_size / CrtcState->dsc_slice_num /
+                be16_to_cpu(CrtcState->pps.chunk_size);
+
+      delay_line_num = delay_line_num > 5 ? 5 : delay_line_num;
+      dly_num = htotal * dsc_cds_rate_mhz / v_pixclk_mhz * delay_line_num;
+
+      /* The dsc mipi video mode dsc_hsync minimum size is 8 pixels */
+      if (dsc_hsync < 8)
+        dsc_hsync = 8;
+    }
+    Vop2MaskWrite (Vop2->BaseAddress, RK3588_DSC_8K_INIT_DLY + ctrl_regs_offset, DSC_INIT_DLY_MODE_MASK,
+        DSC_INIT_DLY_MODE_SHIFT, 0, FALSE);
+    Vop2MaskWrite (Vop2->BaseAddress, RK3588_DSC_8K_INIT_DLY + ctrl_regs_offset, DSC_INIT_DLY_NUM_MASK,
+        DSC_INIT_DLY_NUM_SHIFT, dly_num, FALSE);
+
+    /*
+      * htotal / dclk_core = dsc_htotal /cds_clk
+      *
+      * dclk_core = DCLK / (1 << dclk_core->div_val)
+      * cds_clk = txp_clk / (1 << dsc_cds_clk->div_val)
+      * txp_clk = DCLK / (1 << dsc_txp_clk->div_val)
+      *
+      * dsc_htotal = htotal * (1 << dclk_core->div_val) /
+      *              ((1 << dsc_txp_clk->div_val) * (1 << dsc_cds_clk->div_val))
+      */
+    dsc_htotal = htotal * (1 << CrtcState->DclkCoreDiv) /
+            ((1 << dsc_txp_clk_div) * (1 << dsc_cds_clk_div));
+    val = dsc_htotal << 16 | dsc_hsync;
+    Vop2MaskWrite (Vop2->BaseAddress, RK3588_DSC_8K_HTOTAL_HS_END + ctrl_regs_offset, DSC_HTOTAL_PW_MASK,
+        DSC_HTOTAL_PW_SHIFT, val, FALSE);
+
+    dsc_hact_st = hact_st / 2;
+    dsc_hact_end = (hdisplay / k * target_bpp >> 4) / 24 + dsc_hact_st;
+    val = dsc_hact_end << 16 | dsc_hact_st;
+    Vop2MaskWrite (Vop2->BaseAddress, RK3588_DSC_8K_HACT_ST_END + ctrl_regs_offset, DSC_HACT_ST_END_MASK,
+        DSC_HACT_ST_END_SHIFT, val, FALSE);
+
+    Vop2MaskWrite (Vop2->BaseAddress, RK3588_DSC_8K_VTOTAL_VS_END + ctrl_regs_offset, DSC_VTOTAL_PW_MASK,
+        DSC_VTOTAL_PW_SHIFT, vtotal << 16 | vsync_len, FALSE);
+    Vop2MaskWrite (Vop2->BaseAddress, RK3588_DSC_8K_VACT_ST_END + ctrl_regs_offset, DSC_VACT_ST_END_MASK,
+        DSC_VACT_ST_END_SHIFT, vact_end << 16 | vact_st, FALSE);
+  }
+
+  Vop2MaskWrite (Vop2->BaseAddress, RK3588_DSC_8K_RST + ctrl_regs_offset, RST_DEASSERT_MASK,
+      RST_DEASSERT_SHIFT, 1, FALSE);
+  udelay(10);
+
+  val |= DSC_CTRL0_DEF_CON | (LogCalculate(CrtcState->dsc_slice_num) << DSC_NSLC_SHIFT) |
+          ((dsc_sink_cap->version_minor == 2 ? 1 : 0) << DSC_IFEP_SHIFT);
+  Vop2Writel (Vop2->BaseAddress, RK3588_DSC_8K_CTRL0 + decoder_regs_offset, val);
+
+  Vop2LoadPps(DisplayState, Vop2, dsc_id);
+
+  val |= (1 << DSC_PPS_UPD_SHIFT);
+  Vop2Writel (Vop2->BaseAddress, RK3588_DSC_8K_CTRL0 + decoder_regs_offset, val);
+
+  DEBUG ((DEBUG_INFO, "DSC%d: txp:%lld div:%d, pxl:%lld div:%d, dsc:%lld div:%d\n",
+          dsc_id,
+          CrtcState->dsc_txp_clk_rate, dsc_txp_clk_div,
+          CrtcState->dsc_pxl_clk_rate, dsc_pxl_clk_div,
+          CrtcState->dsc_cds_clk_rate, dsc_cds_clk_div));
 }
 
 EFI_STATUS
@@ -1632,6 +2111,15 @@ Vop2Init (
 
   Vop2TVConfigUpdate (DisplayState, Vop2);
   Vop2PostConfig (DisplayState, Vop2);
+
+  if (CrtcState->dsc_enable) {
+    if (ConnectorState->OutputFlags & ROCKCHIP_OUTPUT_DUAL_CHANNEL_LEFT_RIGHT_MODE) {
+      Vop2DscEnable(DisplayState, Vop2, 0, DclkRate * 1000LL);
+      Vop2DscEnable(DisplayState, Vop2, 1, DclkRate * 1000LL);
+    } else {
+      Vop2DscEnable(DisplayState, Vop2, CrtcState->dsc_id, DclkRate * 1000LL);
+    }
+  }
 
   Vop2SetClk (CrtcState->CrtcID, DclkRate * 1000);
 
@@ -1976,6 +2464,30 @@ Vop2SetPlane (
   return EFI_SUCCESS;
 }
 
+STATIC
+VOID
+Vop2DscCfgDone (
+  IN  ROCKCHIP_CRTC_PROTOCOL               *This,
+  OUT DISPLAY_STATE                        *DisplayState
+  )
+{
+  CONNECTOR_STATE *ConnectorState = &DisplayState->ConnectorState;
+  CRTC_STATE *CrtcState = &DisplayState->CrtcState;
+  VOP2 *Vop2 = CrtcState->Private;
+  UINT8 dsc_id = CrtcState->dsc_id;
+  UINT32 ctrl_regs_offset = (dsc_id * 0x30);
+
+  if (ConnectorState->OutputFlags & ROCKCHIP_OUTPUT_DUAL_CHANNEL_LEFT_RIGHT_MODE) {
+    Vop2MaskWrite (Vop2->BaseAddress, RK3588_DSC_8K_CFG_DONE, EN_MASK,
+        DSC_CFG_DONE_SHIFT, 1, FALSE);
+    Vop2MaskWrite (Vop2->BaseAddress, RK3588_DSC_8K_CFG_DONE + 0x30, EN_MASK,
+        DSC_CFG_DONE_SHIFT, 1, FALSE);
+  } else {
+    Vop2MaskWrite (Vop2->BaseAddress, RK3588_DSC_8K_CFG_DONE + ctrl_regs_offset, EN_MASK,
+        DSC_CFG_DONE_SHIFT, 1, FALSE);
+  }
+}
+
 EFI_STATUS
 Vop2Enable (
   IN  ROCKCHIP_CRTC_PROTOCOL               *This,
@@ -1990,6 +2502,10 @@ Vop2Enable (
   Vop2MaskWrite (Vop2->BaseAddress, RK3568_VP0_DSP_CTRL + VPOffset, EN_MASK,
                  STANDBY_EN_SHIFT, 0, FALSE);
   Vop2Writel (Vop2->BaseAddress, RK3568_REG_CFG_DONE, CfgDone);
+
+  if (CrtcState->dsc_enable) {
+    Vop2DscCfgDone(This, DisplayState);
+  }
 
 #ifdef DEBUG_DUMP_REG
   Vop2DumpRegisters (DisplayState, Vop2FindWinByPhysID (Vop2, Vop2->VpPlaneMask[CrtcState->CrtcID].PrimaryPlaneId));

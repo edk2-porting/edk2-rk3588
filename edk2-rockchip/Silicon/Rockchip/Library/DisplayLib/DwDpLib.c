@@ -32,12 +32,11 @@
 #include <Library/DrmModes.h>
 #include <Library/MediaBusFormat.h>
 #include <Library/DrmModes.h>
+#include <Library/uboot-env.h>
+#include <Library/drm_dp_helper.h>
 
 #include <Protocol/RockchipConnectorProtocol.h>
 #include <Protocol/DpPhy.h>
-
-#include "uboot-env.h"
-#include "drm_dp_helper.h"
 
 #define DPTX_VERSION_NUMBER			0x0000
 #define DPTX_VERSION_TYPE			0x0004

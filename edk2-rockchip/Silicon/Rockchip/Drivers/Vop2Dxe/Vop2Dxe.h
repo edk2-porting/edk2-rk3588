@@ -61,6 +61,25 @@
 /* KHz */
 #define VOP2_MAX_DCLK_RATE			600000
 
+/*
+ * vop2 dsc id
+ */
+#define ROCKCHIP_VOP2_DSC_8K	0
+#define ROCKCHIP_VOP2_DSC_4K	1
+
+/*
+ * vop2 internal power domain id,
+ * should be all none zero, 0 will be
+ * treat as invalid;
+ */
+#define VOP2_PD_CLUSTER0			BIT(0)
+#define VOP2_PD_CLUSTER1			BIT(1)
+#define VOP2_PD_CLUSTER2			BIT(2)
+#define VOP2_PD_CLUSTER3			BIT(3)
+#define VOP2_PD_DSC_8K				BIT(5)
+#define VOP2_PD_DSC_4K				BIT(6)
+#define VOP2_PD_ESMART				BIT(7)
+
 typedef enum {
   CSC_BT601L,
   CSC_BT709L,
@@ -128,13 +147,19 @@ typedef enum {
   SCALE_DOWN = 0x2,
 } SCALE_MODE;
 
-typedef struct {
-  BOOLEAN                     IsParentNeeded;
-  CHAR8                       PdEnShift;
-  CHAR8                       PdStatusShift;
-  CHAR8                       PmuStatusShift;
-  CHAR8                       BisrEnStatusShift;
-  CHAR8                       ParentPhyID;
+typedef enum {
+	VOP_DSC_IF_DISABLE = 0,
+	VOP_DSC_IF_HDMI = 1,
+	VOP_DSC_IF_MIPI_DS_MODE = 2,
+	VOP_DSC_IF_MIPI_VIDEO_MODE = 3,
+} VOP2_DSC_INTERFACE_MODE;
+
+typedef struct VOP2_POWER_DOMAIN_DATA {
+  CHAR8                           PdEnShift;
+  CHAR8                           PdStatusShift;
+  CHAR8                           PmuStatusShift;
+  CHAR8                           BisrEnStatusShift;
+  struct VOP2_POWER_DOMAIN_DATA   *ParentPdData;
 } VOP2_POWER_DOMAIN_DATA;
 
 typedef struct {
@@ -163,6 +188,18 @@ typedef struct {
 } VOP2_VP_PLANE_MASK;
 
 typedef struct {
+  UINT8                       id;
+  VOP2_POWER_DOMAIN_DATA      *PdData;
+  UINT8                       max_slice_num;
+  UINT8                       max_linebuf_depth;	/* used to generate the bitstream */
+  UINT8                       min_bits_per_pixel;	/* bit num after encoder compress */
+  const CHAR8                 *dsc_txp_clk_src_name;
+  const CHAR8                 *dsc_txp_clk_name;
+  const CHAR8                 *dsc_pxl_clk_name;
+  const CHAR8                 *dsc_cds_clk_name;
+} VOP2_DSC_DATA;
+
+typedef struct {
   UINT32                      Version;
   VOP2_VP_DATA                *VpData;
   VOP2_WIN_DATA               *WinData;
@@ -170,6 +207,8 @@ typedef struct {
   struct vop2_plane_table *plane_table;
   */
   VOP2_VP_PLANE_MASK          *PlaneMask;
+
+  VOP2_DSC_DATA               *DscData;
 
   UINT8                       NrVps;
   UINT8                       NrLayers;
@@ -181,6 +220,7 @@ typedef struct {
 
 typedef struct {
   UINT32                      BaseAddress;
+  UINTN                       SysPmu;
   UINT32                      Version;
   BOOLEAN                     GlobalInit;
   VOP2_DATA                   *Data;

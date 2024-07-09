@@ -451,6 +451,7 @@ struct PMU1CRU_REG {
 #define PHPTOPCRU_BASE                 0xFD7C8000U /* PHPTOPCRU base address */
 #define PMU1CRU_BASE                   0xFD7F0000U /* PMU1CRU base address */
 #define UART0_BASE                     0xFD890000U /* UART0 base address */
+#define SYS_PMU_BASE                   0xFD8D8000U /* SYS_PMU base address */
 #define WDTPMU_BASE                    0xFD8E0000U /* WDTPMU base address */
 #define TIMERPMU_BASE                  0xFD8F0000U /* TIMERPMU base address */
 #define WDTNPU_BASE                    0xFDAF8000U /* WDTNPU base address */

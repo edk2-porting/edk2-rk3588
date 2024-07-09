@@ -624,6 +624,7 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
   Silicon/Rockchip/Library/DisplayLib/DwHdmiQpLib.inf
 !endif
   Silicon/Rockchip/Library/DisplayLib/DwDpLib.inf
+  Silicon/Rockchip/Library/DisplayLib/DwMipiDsi2Lib.inf
   Silicon/Rockchip/Drivers/LcdGraphicsOutputDxe/LcdGraphicsOutputDxe.inf
 
   #

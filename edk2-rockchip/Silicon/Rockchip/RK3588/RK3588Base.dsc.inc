@@ -269,8 +269,8 @@
   #
   # Display
   #
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution|0x780
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|0x438
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|0
 

@@ -18,7 +18,7 @@
 #include <Library/PWMLib.h>
 #include <Library/DrmModes.h>
 
-#include "uboot-env.h"
+#include <Library/uboot-env.h>
 
 #define RO_REF_CLK_SEL				GENMASK(11, 10)
 #define LC_REF_CLK_SEL				GENMASK(9, 8)

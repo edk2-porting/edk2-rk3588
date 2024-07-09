@@ -47,14 +47,13 @@
   gEfiGraphicsOutputProtocolGuid
   gRockchipCrtcProtocolGuid
   gRockchipConnectorProtocolGuid
+  gRockchipDsiPanelProtocolGuid
 
 [Guids]
   gEfiEndOfDxeEventGroupGuid
 
 [Pcd]
   gRockchipTokenSpaceGuid.PcdLcdPixelFormat
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution
 
 [FeaturePcd]
   gArmPlatformTokenSpaceGuid.PcdGopDisableOnExitBootServices
