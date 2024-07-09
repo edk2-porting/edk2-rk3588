@@ -29,7 +29,13 @@
   CruLib
   GpioLib
   PWMLib
+  TimerLib
+  UefiBootServicesTableLib
+
+[Protocols]
+  gRockchipDsiPanelProtocolGuid
 
 [Sources.common]
   RockchipPlatformLib.c
+  CsotDsiPanel.c
   $(RKPLATLIB_COMMON_DIR)/RK3588CruLib.c

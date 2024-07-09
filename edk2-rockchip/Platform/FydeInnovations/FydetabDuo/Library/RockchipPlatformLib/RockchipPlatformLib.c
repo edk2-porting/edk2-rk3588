@@ -279,6 +279,13 @@ PlatformSetStatusLed (
   GpioPinWrite (3, GPIO_PIN_PC2, Enable);
 }
 
+extern
+EFI_STATUS
+EFIAPI
+AttachCsotDsiPanel (
+  VOID
+  );
+
 VOID
 EFIAPI
 PlatformEarlyInit (
@@ -294,4 +301,6 @@ PlatformEarlyInit (
   /* spk-con-gpio */
   GpioPinWrite (4, GPIO_PIN_PA5, TRUE);
   GpioPinSetDirection (4, GPIO_PIN_PA5, GPIO_PIN_OUTPUT);
+
+  AttachCsotDsiPanel();
 }
