@@ -21,6 +21,14 @@
 #define BOARD_CODEC_GPIO "\\_SB.GPI1"
 #define BOARD_CODEC_GPIO_PIN GPIO_PIN_PC0
 
+//
+// WORKAROUND:
+// SDMMC may be unreliable at UHS-I speeds.
+//
+#define SDMMC_CAP_DDR50 0
+#define SDMMC_CAP_SDR50 0
+#define SDMMC_CAP_SDR104 0
+
 DefinitionBlock ("Dsdt.aml", "DSDT", 2, "RKCP  ", "RK3588  ", 2)
 {
   Scope (\_SB_)
