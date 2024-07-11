@@ -54,6 +54,7 @@ Scope (\_SB_) {
         Package () { "sd-uhs-ddr50", SDMMC_CAP_DDR50 },
         Package () { "sd-uhs-sdr50", SDMMC_CAP_SDR50 },
         Package () { "sd-uhs-sdr104", SDMMC_CAP_SDR104 },
+        Package () { "broken-cd", FixedPcdGetBool (PcdRkSdmmcCardDetectBroken) },
       }
     })
 

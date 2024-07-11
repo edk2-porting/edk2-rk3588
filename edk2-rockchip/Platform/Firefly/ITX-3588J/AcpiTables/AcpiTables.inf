@@ -55,3 +55,4 @@
   gRK3588TokenSpaceGuid.PcdI2S1Supported
   gRockchipTokenSpaceGuid.PcdRkMtlMailBoxBase
   gRockchipTokenSpaceGuid.PcdRkMtlMailBoxSize
+  gRockchipTokenSpaceGuid.PcdRkSdmmcCardDetectBroken
