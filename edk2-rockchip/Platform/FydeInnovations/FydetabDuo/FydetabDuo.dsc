@@ -62,7 +62,7 @@
   gRockchipTokenSpaceGuid.PcdPlatformVendorName|"Fyde Innovations"
   gRockchipTokenSpaceGuid.PcdFamilyName|"Fydetab"
   gRockchipTokenSpaceGuid.PcdProductUrl|"https://fydetabduo.com/"
-  gRockchipTokenSpaceGuid.PcdDeviceTreeName|"rk3588s-12c"
+  gRockchipTokenSpaceGuid.PcdDeviceTreeName|"rk3588s-tablet-12c-linux"
 
   # I2C
   gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x42, 0x43, 0x50, 0x51, 0x11 }
