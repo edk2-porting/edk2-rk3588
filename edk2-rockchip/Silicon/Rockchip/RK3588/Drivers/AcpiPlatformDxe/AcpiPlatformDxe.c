@@ -122,7 +122,7 @@ AcpiDsdtFixupStatus (
   } DevStatus[] = {
     { "\\_SB.PCI0._STA", FixedPcdGetBool (PcdPcie30Supported) &&
                          PcdGet32 (PcdPcie30State) == PCIE30_STATE_ENABLED },
-    { "\\_SB.PCI1._STA", FALSE }, // not supported yet
+    { "\\_SB.PCI1._STA", FALSE }, // TODO: fix acpi
     { "\\_SB.PCI2._STA", PcdGet32 (PcdComboPhy1Mode) == COMBO_PHY_MODE_PCIE },
     { "\\_SB.PCI3._STA", PcdGet32 (PcdComboPhy2Mode) == COMBO_PHY_MODE_PCIE },
     { "\\_SB.PCI4._STA", PcdGet32 (PcdComboPhy0Mode) == COMBO_PHY_MODE_PCIE },

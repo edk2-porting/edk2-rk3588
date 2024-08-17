@@ -45,6 +45,15 @@ typedef struct {
   UINT32 State;
 } PCIE30_STATE_VARSTORE_DATA;
 
+#define PCIE30_PHY_MODE_AGGREGATION                 4
+#define PCIE30_PHY_MODE_NANBNB                      0
+#define PCIE30_PHY_MODE_NANBBI                      1
+#define PCIE30_PHY_MODE_NABINB                      2
+#define PCIE30_PHY_MODE_NABIBI                      3
+typedef struct {
+  UINT8 Mode;
+} PCIE30_PHY_MODE_VARSTORE_DATA;
+
 #define CONFIG_TABLE_MODE_ACPI                      0x00000001
 #define CONFIG_TABLE_MODE_FDT                       0x00000002
 #define CONFIG_TABLE_MODE_ACPI_FDT                  0x00000003

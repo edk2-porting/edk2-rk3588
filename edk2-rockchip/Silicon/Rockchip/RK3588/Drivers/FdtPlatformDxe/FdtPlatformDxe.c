@@ -602,6 +602,7 @@ FdtFixupPcie3Devices (
 
   DEBUG ((DEBUG_INFO, "FdtPlatform: Fixing up PCIe 3 devices\n"));
 
+  // TODO: pci2
   FdtEnableNode (Fdt, "/pcie@fe150000",
               PcdGet32 (PcdPcie30State) == PCIE30_STATE_ENABLED);
 }

@@ -27,6 +27,10 @@ PciePinmuxInit(
 
 #define NUM_PCIE_CONTROLLER 5
 
+/*
+ * All pcie controllers supports PCIe 3.0
+ * Here we name them using their device tree name in the linux kernel source
+ */
 #define PCIE_SEGMENT_PCIE30X4 0
 #define PCIE_SEGMENT_PCIE30X2 1
 #define PCIE_SEGMENT_PCIE20L0 2

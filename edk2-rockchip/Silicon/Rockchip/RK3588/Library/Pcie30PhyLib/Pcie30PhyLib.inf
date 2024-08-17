@@ -35,4 +35,7 @@
 
 [FixedPcd]
 
+[Pcd]
+  gRK3588TokenSpaceGuid.PcdPcie30PhyMode
+
 [Guids]
