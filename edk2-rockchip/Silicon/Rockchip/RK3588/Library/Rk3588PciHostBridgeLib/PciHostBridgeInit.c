@@ -98,29 +98,29 @@ IsPcieNumEnabled(
   BOOLEAN Enabled = FALSE;
   switch (PcieNum)
   {
-	/* No bifurcation config yet */
-	case PCIE_SEGMENT_PCIE30X4:
-		Enabled = (FixedPcdGetBool (PcdPcie30Supported) && PcdGet32 (PcdPcie30State) == PCIE30_STATE_ENABLED);
-		break;
+  /* No bifurcation config yet */
+  case PCIE_SEGMENT_PCIE30X4:
+    Enabled = (FixedPcdGetBool (PcdPcie30Supported) && PcdGet32 (PcdPcie30State) == PCIE30_STATE_ENABLED);
+    break;
 
-	case PCIE_SEGMENT_PCIE30X2:
-		Enabled = FALSE;
-		break;
+  case PCIE_SEGMENT_PCIE30X2:
+    Enabled = FALSE;
+    break;
 
-	case PCIE_SEGMENT_PCIE20L0:
-		Enabled = (PcdGet32(PcdComboPhy1Mode) == COMBO_PHY_MODE_PCIE);
-		break;
+  case PCIE_SEGMENT_PCIE20L0:
+    Enabled = (PcdGet32(PcdComboPhy1Mode) == COMBO_PHY_MODE_PCIE);
+    break;
 
-	case PCIE_SEGMENT_PCIE20L1:
-		Enabled = (PcdGet32(PcdComboPhy2Mode) == COMBO_PHY_MODE_PCIE);
-		break;
+  case PCIE_SEGMENT_PCIE20L1:
+    Enabled = (PcdGet32(PcdComboPhy2Mode) == COMBO_PHY_MODE_PCIE);
+    break;
 
-	case PCIE_SEGMENT_PCIE20L2:
-		Enabled = (PcdGet32(PcdComboPhy0Mode) == COMBO_PHY_MODE_PCIE);
-		break;
+  case PCIE_SEGMENT_PCIE20L2:
+    Enabled = (PcdGet32(PcdComboPhy0Mode) == COMBO_PHY_MODE_PCIE);
+    break;
 
-	default:
-	  break;
+  default:
+    break;
   }
 
   return Enabled;
@@ -213,50 +213,50 @@ PciSetupClocks (
   )
 {
   MmioWrite32(0xFD7C8800, (0x1 << 17)|(0x1 << 25));  // pclk_phptop_cru_en
-	MmioWrite32(0xFD7C0880, 0xffff0000);  //CRU_GATE_CON32
-	switch(Segment) {
-		case PCIE_SEGMENT_PCIE30X4:
-			MmioWrite32(0xFD7C8A00, (0x1 << 24)|(0x1 << 26)); //PHPTOPCRU_SOFTRST_CON00
+  MmioWrite32(0xFD7C0880, 0xffff0000);  //CRU_GATE_CON32
+  switch(Segment) {
+    case PCIE_SEGMENT_PCIE30X4:
+      MmioWrite32(0xFD7C8A00, (0x1 << 24)|(0x1 << 26)); //PHPTOPCRU_SOFTRST_CON00
       MmioWrite32(0xFD7C8800, (0x1 << 24));  //PHPTOPCRU_GATE_CON00
       MmioWrite32(0xFD7C0A80, (0x1 << 29));  //CRU_SOFTRST_CON32:resetn_pcie_4l_power_up
       MmioWrite32(0xFD7C089c, (0x1 << 16));  //CRU_GATE_CON39:clk_pcie_4l_pipe_en
-	    MmioWrite32(0xFD7C0888, (0x1 << 17));  //CRU_GATE_CON34:clk_pcie_4l_aux_en
-	    MmioWrite32(0xFD7C0884, (0x1 << 28)|(0x1 << 23)|(0x1 << 18));  //CRU_GATE_CON33:pclk_pcie_4l_en,aclk_pcie_4l_slv_en,aclk_pcie_4l_mstr_en
-			break;
-		case PCIE_SEGMENT_PCIE20L2: //phy0
-			MmioWrite32(0xFD7C8A00, (0x1 << 21)|(0x1 << 18)); //PHPTOPCRU_SOFTRST_CON00
+      MmioWrite32(0xFD7C0888, (0x1 << 17));  //CRU_GATE_CON34:clk_pcie_4l_aux_en
+      MmioWrite32(0xFD7C0884, (0x1 << 28)|(0x1 << 23)|(0x1 << 18));  //CRU_GATE_CON33:pclk_pcie_4l_en,aclk_pcie_4l_slv_en,aclk_pcie_4l_mstr_en
+      break;
+    case PCIE_SEGMENT_PCIE20L2: //phy0
+      MmioWrite32(0xFD7C8A00, (0x1 << 21)|(0x1 << 18)); //PHPTOPCRU_SOFTRST_CON00
       MmioWrite32(0xFD7C8800, (0x1 << 21)|(0x1 << 18));  //PHPTOPCRU_GATE_CON00
       MmioWrite32(0xFD7C0A84, (0x1 << 17));  //CRU_SOFTRST_CON33:resetn_pcie_1l2_power_up
-	    MmioWrite32(0xFD7C0898, (0x1 << 29));  //CRU_GATE_CON38:clk_pcie_1l2_pipe_en
-	    MmioWrite32(0xFD7C0888, (0x1 << 21)|(0x1 << 16));  //CRU_GATE_CON34:clk_pcie_1l2_aux_en,pclk_pcie_1l2_en
-	    MmioWrite32(0xFD7C0884, (0x1 << 27)|(0x1 << 22));  //CRU_GATE_CON33:aclk_pcie_1l2_slv_en,aclk_pcie_1l2_mstr_en
-			break;
-		case PCIE_SEGMENT_PCIE20L0: //phy1
-			MmioWrite32(0xFD7C8A00, (0x1 << 22)|(0x1 << 19)); //PHPTOPCRU_SOFTRST_CON00
+      MmioWrite32(0xFD7C0898, (0x1 << 29));  //CRU_GATE_CON38:clk_pcie_1l2_pipe_en
+      MmioWrite32(0xFD7C0888, (0x1 << 21)|(0x1 << 16));  //CRU_GATE_CON34:clk_pcie_1l2_aux_en,pclk_pcie_1l2_en
+      MmioWrite32(0xFD7C0884, (0x1 << 27)|(0x1 << 22));  //CRU_GATE_CON33:aclk_pcie_1l2_slv_en,aclk_pcie_1l2_mstr_en
+      break;
+    case PCIE_SEGMENT_PCIE20L0: //phy1
+      MmioWrite32(0xFD7C8A00, (0x1 << 22)|(0x1 << 19)); //PHPTOPCRU_SOFTRST_CON00
       MmioWrite32(0xFD7C8800, (0x1 << 22)|(0x1 << 19));  //PHPTOPCRU_GATE_CON00
       MmioWrite32(0xFD7C0A80, (0x1 << 31));  //CRU_SOFTRST_CON32:resetn_pcie_1l0_power_up
-	    MmioWrite32(0xFD7C0898, (0x1 << 30));  //CRU_GATE_CON38:clk_pcie_1l0_pipe_en
-	    MmioWrite32(0xFD7C0888, (0x1 << 19));  //CRU_GATE_CON34:clk_pcie_1l0_aux_en
-	    MmioWrite32(0xFD7C0884, (0x1 << 30)|(0x1 << 25)|(0x1 << 20));  //CRU_GATE_CON33:pclk_pcie_1l0_en,aclk_pcie_1l0_slv_en,aclk_pcie_1l0_mstr_en
-			break;
-		case PCIE_SEGMENT_PCIE20L1: //phy2
-			MmioWrite32(0xFD7C8A00, (0x1 << 23)|(0x1 << 20)); //PHPTOPCRU_SOFTRST_CON00
+      MmioWrite32(0xFD7C0898, (0x1 << 30));  //CRU_GATE_CON38:clk_pcie_1l0_pipe_en
+      MmioWrite32(0xFD7C0888, (0x1 << 19));  //CRU_GATE_CON34:clk_pcie_1l0_aux_en
+      MmioWrite32(0xFD7C0884, (0x1 << 30)|(0x1 << 25)|(0x1 << 20));  //CRU_GATE_CON33:pclk_pcie_1l0_en,aclk_pcie_1l0_slv_en,aclk_pcie_1l0_mstr_en
+      break;
+    case PCIE_SEGMENT_PCIE20L1: //phy2
+      MmioWrite32(0xFD7C8A00, (0x1 << 23)|(0x1 << 20)); //PHPTOPCRU_SOFTRST_CON00
       MmioWrite32(0xFD7C8800, (0x1 << 23)|(0x1 << 20));  //PHPTOPCRU_GATE_CON00
       MmioWrite32(0xFD7C0A84, (0x1 << 16));  //CRU_SOFTRST_CON33:resetn_pcie_1l1_power_up
-	    MmioWrite32(0xFD7C0898, (0x1 << 31));  //CRU_GATE_CON38:clk_pcie_1l1_pipe_en
-	    MmioWrite32(0xFD7C0888, (0x1 << 20));  //CRU_GATE_CON34:clk_pcie_1l1_aux_en
-	    MmioWrite32(0xFD7C0884, (0x1 << 31)|(0x1 << 26)|(0x1 << 21));  //CRU_GATE_CON33:pclk_pcie_1l1_en,aclk_pcie_1l1_slv_en,aclk_pcie_1l1_mstr_en
-			break;
+      MmioWrite32(0xFD7C0898, (0x1 << 31));  //CRU_GATE_CON38:clk_pcie_1l1_pipe_en
+      MmioWrite32(0xFD7C0888, (0x1 << 20));  //CRU_GATE_CON34:clk_pcie_1l1_aux_en
+      MmioWrite32(0xFD7C0884, (0x1 << 31)|(0x1 << 26)|(0x1 << 21));  //CRU_GATE_CON33:pclk_pcie_1l1_en,aclk_pcie_1l1_slv_en,aclk_pcie_1l1_mstr_en
+      break;
 
-		case PCIE_SEGMENT_PCIE30X2:
+    case PCIE_SEGMENT_PCIE30X2:
       MmioWrite32(0xFD7C0A80, (0x1 << 30));  //CRU_SOFTRST_CON32:resetn_pcie_2l_power_up
       MmioWrite32(0xFD7C089c, (0x1 << 17));  //CRU_GATE_CON39:clk_pcie_2l_pipe_en
-	    MmioWrite32(0xFD7C0888, (0x1 << 18));  //CRU_GATE_CON34:clk_pcie_2l_aux_en
-	    MmioWrite32(0xFD7C0884, (0x1 << 29)|(0x1 << 24)|(0x1 << 19));  //CRU_GATE_CON33:pclk_pcie_2l_en,aclk_pcie_2l_slv_en,aclk_pcie_2l_mstr_en
+      MmioWrite32(0xFD7C0888, (0x1 << 18));  //CRU_GATE_CON34:clk_pcie_2l_aux_en
+      MmioWrite32(0xFD7C0884, (0x1 << 29)|(0x1 << 24)|(0x1 << 19));  //CRU_GATE_CON33:pclk_pcie_2l_en,aclk_pcie_2l_slv_en,aclk_pcie_2l_mstr_en
       break;
-		default:
-			break;
-	}
+    default:
+      break;
+  }
 
 }
 
