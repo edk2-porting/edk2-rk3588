@@ -256,6 +256,7 @@
   # PCI Express 3.0 support flags and default values
   #
   gRK3588TokenSpaceGuid.PcdPcie30Supported|FALSE
+  gRK3588TokenSpaceGuid.PcdPcie30PhyModeDefault|4 # AGGREGATION
 
   #
   # ACPI support flags and default values
@@ -302,6 +303,7 @@
   # PCI Express 3.0
   #
   gRK3588TokenSpaceGuid.PcdPcie30State|L"Pcie30State"|gRK3588DxeFormSetGuid|0x0|gRK3588TokenSpaceGuid.PcdPcie30Supported
+  gRK3588TokenSpaceGuid.PcdPcie30PhyMode|L"Pcie30PhyMode"|gRK3588DxeFormSetGuid|0x0|4 # AGGREGATION
 
   #
   # ACPI / Device Tree

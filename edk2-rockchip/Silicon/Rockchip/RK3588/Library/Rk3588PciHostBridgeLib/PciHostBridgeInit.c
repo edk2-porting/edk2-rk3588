@@ -96,15 +96,20 @@ IsPcieNumEnabled(
   )
 {
   BOOLEAN Enabled = FALSE;
+
+  /*
+   * According to TRM Part 1 6.19.2 PCIe3PHY_GRF_CMN_CON0,
+   * if pcie l4(PCIE30X4) bifurcation enabled (phymode & 0b01), pcie3phy lane 1 is connected to 1l0
+   * if pcie l2(PCIE30X2) bifurcation enabled (phymode & 0b10), pcie3phy lane 3 is connected to 1l1
+  */
   switch (PcieNum)
   {
-  /* No bifurcation config yet */
   case PCIE_SEGMENT_PCIE30X4:
     Enabled = (FixedPcdGetBool (PcdPcie30Supported) && PcdGet32 (PcdPcie30State) == PCIE30_STATE_ENABLED);
     break;
 
   case PCIE_SEGMENT_PCIE30X2:
-    Enabled = FALSE;
+    Enabled = (PcdGet8 (PcdPcie30PhyMode) != PCIE30_PHY_MODE_AGGREGATION);
     break;
 
   case PCIE_SEGMENT_PCIE20L0:
@@ -223,6 +228,12 @@ PciSetupClocks (
       MmioWrite32(0xFD7C0888, (0x1 << 17));  //CRU_GATE_CON34:clk_pcie_4l_aux_en
       MmioWrite32(0xFD7C0884, (0x1 << 28)|(0x1 << 23)|(0x1 << 18));  //CRU_GATE_CON33:pclk_pcie_4l_en,aclk_pcie_4l_slv_en,aclk_pcie_4l_mstr_en
       break;
+    case PCIE_SEGMENT_PCIE30X2:
+      MmioWrite32(0xFD7C0A80, (0x1 << 30));  //CRU_SOFTRST_CON32:resetn_pcie_2l_power_up
+      MmioWrite32(0xFD7C089c, (0x1 << 17));  //CRU_GATE_CON39:clk_pcie_2l_pipe_en
+      MmioWrite32(0xFD7C0888, (0x1 << 18));  //CRU_GATE_CON34:clk_pcie_2l_aux_en
+      MmioWrite32(0xFD7C0884, (0x1 << 29)|(0x1 << 24)|(0x1 << 19));  //CRU_GATE_CON33:pclk_pcie_2l_en,aclk_pcie_2l_slv_en,aclk_pcie_2l_mstr_en
+      break;
     case PCIE_SEGMENT_PCIE20L2: //phy0
       MmioWrite32(0xFD7C8A00, (0x1 << 21)|(0x1 << 18)); //PHPTOPCRU_SOFTRST_CON00
       MmioWrite32(0xFD7C8800, (0x1 << 21)|(0x1 << 18));  //PHPTOPCRU_GATE_CON00
@@ -246,13 +257,6 @@ PciSetupClocks (
       MmioWrite32(0xFD7C0898, (0x1 << 31));  //CRU_GATE_CON38:clk_pcie_1l1_pipe_en
       MmioWrite32(0xFD7C0888, (0x1 << 20));  //CRU_GATE_CON34:clk_pcie_1l1_aux_en
       MmioWrite32(0xFD7C0884, (0x1 << 31)|(0x1 << 26)|(0x1 << 21));  //CRU_GATE_CON33:pclk_pcie_1l1_en,aclk_pcie_1l1_slv_en,aclk_pcie_1l1_mstr_en
-      break;
-
-    case PCIE_SEGMENT_PCIE30X2:
-      MmioWrite32(0xFD7C0A80, (0x1 << 30));  //CRU_SOFTRST_CON32:resetn_pcie_2l_power_up
-      MmioWrite32(0xFD7C089c, (0x1 << 17));  //CRU_GATE_CON39:clk_pcie_2l_pipe_en
-      MmioWrite32(0xFD7C0888, (0x1 << 18));  //CRU_GATE_CON34:clk_pcie_2l_aux_en
-      MmioWrite32(0xFD7C0884, (0x1 << 29)|(0x1 << 24)|(0x1 << 19));  //CRU_GATE_CON33:pclk_pcie_2l_en,aclk_pcie_2l_slv_en,aclk_pcie_2l_mstr_en
       break;
     default:
       break;
@@ -485,6 +489,50 @@ PciValidateCfg0 (
   }
 }
 
+#define NUM_SEGMENTS 5
+#define NUM_MODES 5
+
+STATIC struct {
+  UINT32 Speed;
+  UINT32 Width;
+} LinkSpeedWidthMap[NUM_MODES][NUM_SEGMENTS] = {
+  /* NANBNB */ {
+    { 3, 2 },
+    { 3, 2 },
+    { 2, 1 },
+    { 2, 1 },
+    { 2, 1 },
+  },
+  /* NANBBI */ {
+    { 3, 1 },
+    { 3, 2 },
+    { 3, 1 },
+    { 2, 1 },
+    { 2, 1 },
+  },
+  /* NABINB */ {
+    { 3, 2 },
+    { 3, 1 },
+    { 2, 1 },
+    { 3, 1 },
+    { 2, 1 },
+  },
+  /* NABIBI */ {
+    { 3, 1 },
+    { 3, 1 },
+    { 3, 1 },
+    { 3, 1 },
+    { 2, 1 },
+  },
+  /* AGGREGATION */ {
+    { 3, 4 },
+    { 0, 0 },
+    { 2, 1 },
+    { 2, 1 },
+    { 2, 1 },
+  },
+};
+
 EFI_STATUS
 InitializePciHost (
   UINT32 Segment
@@ -502,25 +550,25 @@ InitializePciHost (
   UINT64                   Cfg1Size;
   UINT64                   PciIoBase;
   UINT64                   PciIoSize;
+  UINT8                    Pcie30PhyMode;
 
-  switch(Segment) {
-    case PCIE_SEGMENT_PCIE30X4:
-      LinkSpeed = 3;
-      LinkWidth = 4;
-      break;
-    case PCIE_SEGMENT_PCIE30X2:
-      LinkSpeed = 3;
-      LinkWidth = 2;
-      break;
-    case PCIE_SEGMENT_PCIE20L0:
-    case PCIE_SEGMENT_PCIE20L1:
-    case PCIE_SEGMENT_PCIE20L2:
-      LinkSpeed = 2;
-      LinkWidth = 1;
-      break;
-    default:
-      ASSERT(0 == 1);
-      break;
+  Pcie30PhyMode = PcdGet8 (PcdPcie30PhyMode);
+  if (Pcie30PhyMode >= NUM_MODES) {
+    /* If one modified this to some strange value, this will make all things about to work */
+    DEBUG ((DEBUG_WARN, "PCIe: Invalid PCIe 3.0 PHY mode %u, use NANBNB(x2x2)\n", Pcie30PhyMode));
+    Pcie30PhyMode = PCIE30_PHY_MODE_NANBNB;
+  }
+  if (Segment >= NUM_SEGMENTS) {
+    DEBUG ((DEBUG_WARN, "PCIe: Invalid segment %u\n", Segment));
+    return EFI_INVALID_PARAMETER;
+  }
+
+  LinkSpeed = LinkSpeedWidthMap[Pcie30PhyMode][Segment].Speed;
+  LinkWidth = LinkSpeedWidthMap[Pcie30PhyMode][Segment].Width;
+  if (LinkSpeed == 0 || LinkWidth == 0) {
+    /* should never here */
+    DEBUG ((DEBUG_WARN, "PCIe: Segment %u not enabled\n", Segment));
+    return EFI_UNSUPPORTED;
   }
 
   /* Log settings */

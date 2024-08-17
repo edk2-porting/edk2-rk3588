@@ -122,6 +122,14 @@
 #string STR_PCIE30_STATE_PROMPT                            #language en-US "Support State"
 #string STR_PCIE30_STATE_HELP                              #language en-US "Enable or disable PCIe 3.0 support."
 
+#string STR_PCIE30_PHY_MODE_PROMPT                         #language en-US "PHY Mode"
+#string STR_PCIE30_PHY_MODE_HELP                           #language en-US "Choose PHY Mode\n\nx4:\n    4l -> PCIe3 PHY lane 0123\n    2l -> Not connected\n    1l0 -> Combo PHY #1\n    1l1 -> Combo PHY #2\n    1l2 -> Combo PHY #0\n\nx2 x2:\n    4l -> PCIe3 PHY lane 01\n    2l -> PCIe3 PHY lane 23\n    1l0 -> Combo PHY #1\n    1l1 -> Combo PHY #2\n    1l2 -> Combo PHY #0\n\nx1x1 x2:\n    4l -> PCIe3 PHY lane 0\n    2l -> PCIe3 PHY lane 23\n    1l0 -> PCIe3 PHY lane 1\n    1l1 -> Combo PHY #2\n    1l2 -> Combo PHY #0\n\nx2 x1x1:\n    4l -> PCIe3 PHY lane 01\n    2l -> PCIe3 PHY lane 2\n    1l0 -> Combo PHY #1\n    1l1 -> PCIe3 PHY lane 3\n    1l2 -> Combo PHY #0\n\nx1x1 x1x1:\n    4l -> PCIe3 PHY lane 0\n    2l -> PCIe3 PHY lane 2\n    1l0 -> PCIe3 PHY lane 1\n    1l1 -> PCIe3 PHY lane 3\n    1l2 -> Combo PHY #0\n"
+#string STR_PCIE30_PHY_MODE_AGGREGATION                    #language en-US "x4"
+#string STR_PCIE30_PHY_MODE_NANBNB                         #language en-US "x2 x2"
+#string STR_PCIE30_PHY_MODE_NANBBI                         #language en-US "x1x1 x2"
+#string STR_PCIE30_PHY_MODE_NABINB                         #language en-US "x2 x1x1"
+#string STR_PCIE30_PHY_MODE_NABIBI                         #language en-US "x1x1 x1x1"
+
 /*
  * ACPI / Device Tree configuration
  */

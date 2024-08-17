@@ -17,8 +17,7 @@
 #include <Library/TimerLib.h>
 #include <Library/CruLib.h>
 #include <Library/UefiBootServicesTableLib.h>
-
-#define PHY_MODE_PCIE_AGGREGATION           4 // hardcoded for now
+#include <Library/PcdLib.h>
 
 #define PCIE30_PHY_GRF                      0xfd5b8000
 /* PCIEPHY_GRF */
@@ -64,14 +63,15 @@ Pcie30PhyInit (
     // UINTN Retry;
 
     DEBUG ((DEBUG_INFO, "PCIe30: PHY init\n"));
+    DEBUG ((DEBUG_INFO, "PCIe30: PHY mode %d\n", PcdGet8(PcdPcie30PhyMode)));
 
     // MicroSecondDelay(100000);
 
     /* Disable power domain */
     MmioWrite32(0xFD8D8150, 0x1 << 23 | 0x1 << 21); // PD_PCIE & PD_PHP
 
-    /* Phy mode: Aggregation NBNB */
-    MmioWrite32(GRF_PCIE30_PHY_CON(0), (0x7 << 16) | PHY_MODE_PCIE_AGGREGATION);
+    /* Phy mode: from pcd Pcie30PhyMode */
+    MmioWrite32(GRF_PCIE30_PHY_CON(0), (0x7 << 16) | PcdGet8(PcdPcie30PhyMode));
 
     MmioWrite32(0xFD7C8A00, (0x1 << 10) | (0x1 << 26)); 
 
