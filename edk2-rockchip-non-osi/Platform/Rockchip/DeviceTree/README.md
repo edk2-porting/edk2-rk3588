@@ -11,5 +11,7 @@
 
 * rk3588-firefly-aio-3588q: <https://gitlab.com/firefly-linux/kernel/-/tree/fa0e053fd911339b825407cb6d4b167fad7cdc49/arch/arm64/boot/dts/rockchip>
 
+* rk3588-rock-5b-plus: <https://github.com/radxa/kernel/blob/3b95df6d8bf567857b69e5266f1cb0651a6cfb3e/arch/arm64/boot/dts/rockchip/>
+
 ## License
 SPDX-License-Identifier: GPL-2.0-only
