@@ -30,7 +30,8 @@ SetupPcie30Variables (
 {
   UINTN      Size;
   UINT32     Var32;
-  UINT8     Var8;
+  UINT8      Var8;
+
   EFI_STATUS Status;
 
   Size = sizeof (UINT32);
