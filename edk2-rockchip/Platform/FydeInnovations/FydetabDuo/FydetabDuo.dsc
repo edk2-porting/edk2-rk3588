@@ -98,7 +98,7 @@
   gRK3588TokenSpaceGuid.PcdI2S0Supported|TRUE
 
   # SD card detect signal is inverted
-  gRockchipTokenSpaceGuid.PcdRkSdmmcCardDetectInverted|TRUE
+  gRockchipTokenSpaceGuid.PcdRkSdmmcCardDetectBroken|TRUE
 
 ################################################################################
 #

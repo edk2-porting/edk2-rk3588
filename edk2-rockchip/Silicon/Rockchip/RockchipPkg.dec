@@ -63,7 +63,6 @@
 
   gRockchipTokenSpaceGuid.PcdRkSdmmcBaseAddress|0x0|UINT32|0x40000030
   gRockchipTokenSpaceGuid.PcdRkSdmmcCardDetectBroken|FALSE|BOOLEAN|0x40000031
-  gRockchipTokenSpaceGuid.PcdRkSdmmcCardDetectInverted|FALSE|BOOLEAN|0x40000032
 
   gRockchipTokenSpaceGuid.PcdDwcSdhciBaseAddress|0x0|UINT32|0x40000035
   gRockchipTokenSpaceGuid.PcdDwcSdhciForceHighSpeed|FALSE|BOOLEAN|0x40000036
