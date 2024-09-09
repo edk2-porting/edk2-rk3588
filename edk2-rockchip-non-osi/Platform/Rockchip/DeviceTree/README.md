@@ -13,5 +13,8 @@
 
 * rk3588-rock-5b-plus: <https://github.com/radxa/kernel/blob/3b95df6d8bf567857b69e5266f1cb0651a6cfb3e/arch/arm64/boot/dts/rockchip/>
 
+* rk3588s-fydetab-duo: <https://github.com/Linux-for-Fydetab-Duo/linux-rockchip/tree/14294048d2a0deb7f38c890329aded87038d3299/arch/arm64/boot/dts/rockchip>
+  (note: dtb taken from the `noble` branch which is based on the rockchip 6.1 rkr3 bsp kernel)
+
 ## License
 SPDX-License-Identifier: GPL-2.0-only

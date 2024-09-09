@@ -148,6 +148,7 @@ The paths above are relative to the root of the file system. That is, the `dtb` 
 | `rk3588s-orangepi-5`                    | Orange Pi 5                   |
 | `rk3588-orangepi-5-plus`                | Orange Pi 5 Plus              |
 | `rk3588s-9tripod-linux`                 | Indiedroid Nova               |
+| `rk3588s-fydetab-duo`                   | Fydetab Duo                   |
 | `rk3588-firefly-aio-3588q`              | Firefly AIO-3588Q             |
 | `itx-3588j`                             | Firefly ITX-3588J             |
 | `roc-rk3588s-pc`                        | ROC-RK3588S-PC / Station M3   |
