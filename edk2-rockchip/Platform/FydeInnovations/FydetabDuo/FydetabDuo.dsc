@@ -62,7 +62,7 @@
   gRockchipTokenSpaceGuid.PcdPlatformVendorName|"Fyde Innovations"
   gRockchipTokenSpaceGuid.PcdFamilyName|"Fydetab"
   gRockchipTokenSpaceGuid.PcdProductUrl|"https://fydetabduo.com/"
-  gRockchipTokenSpaceGuid.PcdDeviceTreeName|"rk3588s-12c"
+  gRockchipTokenSpaceGuid.PcdDeviceTreeName|"rk3588s-fydetab-duo"
 
   # I2C
   gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x42, 0x43, 0x50, 0x51, 0x11 }
@@ -98,7 +98,7 @@
   gRK3588TokenSpaceGuid.PcdI2S0Supported|TRUE
 
   # SD card detect signal is inverted
-  gRockchipTokenSpaceGuid.PcdRkSdmmcCardDetectBroken|TRUE
+  gRockchipTokenSpaceGuid.PcdRkSdmmcCardDetectInverted|TRUE
 
 ################################################################################
 #

@@ -128,7 +128,11 @@ RkSdmmcCardDetect (
     return TRUE; // let the driver do software detection
   }
 
-  return PresenceState == RkSdmmcCardPresent;
+  if (FixedPcdGetBool (PcdRkSdmmcCardDetectInverted)) {
+    return PresenceState != RkSdmmcCardPresent;
+  } else {
+    return PresenceState == RkSdmmcCardPresent;
+  }
 }
 
 STATIC PLATFORM_DW_MMC_PROTOCOL mDwMmcDeviceProtocol = {
