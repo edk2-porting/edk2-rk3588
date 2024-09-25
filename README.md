@@ -306,7 +306,7 @@ The firmware can only be built on Linux currently. For Windows use WSL.
 
    For Ubuntu/Debian:
    ```bash
-   sudo apt install git gcc g++ build-essential gcc-aarch64-linux-gnu iasl python3-pyelftools uuid-dev python-is-python3 device-tree-compiler
+   sudo apt install git gcc g++ build-essential gcc-aarch64-linux-gnu acpica-tools python3-pyelftools uuid-dev python-is-python3 device-tree-compiler
    ```
    For Arch Linux:
    ```bash
