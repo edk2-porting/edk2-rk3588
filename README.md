@@ -6,6 +6,7 @@ This repository contains an UEFI firmware implementation based on EDK2 for vario
 - [Radxa ROCK 5A](https://radxa.com/products/rock5/5a/)
 - [Radxa ROCK 5 ITX](https://radxa.com/products/rock5/5itx/)
 - [Orange Pi 5](http://www.orangepi.org/html/hardWare/computerAndMicrocontrollers/details/Orange-Pi-5.html)
+- [Orange Pi 5 Pro](http://www.orangepi.org/html/hardWare/computerAndMicrocontrollers/details/Orange-Pi-5-Pro.html)
 - [Orange Pi 5 Plus](http://www.orangepi.org/html/hardWare/computerAndMicrocontrollers/details/Orange-Pi-5-plus.html)
 - [ameriDroid Indiedroid Nova](https://indiedroid.us)
 - [Fydetab Duo](https://fydetabduo.com/)
@@ -146,6 +147,7 @@ The paths above are relative to the root of the file system. That is, the `dtb` 
 | `rk3588s-rock-5a`                       | ROCK 5A                       |
 | `rk3588-rock-5-itx`                     | ROCK 5 ITX                    |
 | `rk3588s-orangepi-5`                    | Orange Pi 5                   |
+| `rk3588s-orangepi-5-pro`                | Orange Pi 5 Pro               |
 | `rk3588-orangepi-5-plus`                | Orange Pi 5 Plus              |
 | `rk3588s-9tripod-linux`                 | Indiedroid Nova               |
 | `rk3588s-fydetab-duo`                   | Fydetab Duo                   |
@@ -306,7 +308,18 @@ The firmware can only be built on Linux currently. For Windows use WSL.
 
    For Ubuntu/Debian:
    ```bash
-   sudo apt install git gcc g++ build-essential gcc-aarch64-linux-gnu iasl python3-pyelftools uuid-dev
+   sudo apt install --yes \
+    acpica-tools \
+    build-essential \
+    device-tree-compiler \
+    g++ \
+    gcc \
+    gcc-aarch64-linux-gnu \
+    git \
+    python-is-python3 \
+    python3 \
+    python3-pyelftools \
+    uuid-dev
    ```
    For Arch Linux:
    ```bash
