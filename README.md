@@ -20,6 +20,7 @@ This repository contains an UEFI firmware implementation based on EDK2 for vario
 - [FriendlyELEC NanoPC T6](https://wiki.friendlyelec.com/wiki/index.php/NanoPC-T6)
 - [FriendlyELEC NanoPi R6C](https://wiki.friendlyelec.com/wiki/index.php/NanoPi_R6C)
 - [FriendlyELEC NanoPi R6S](https://wiki.friendlyelec.com/wiki/index.php/NanoPi_R6S)
+- [FriendlyELEC NanoPi M6](https://wiki.friendlyelec.com/wiki/index.php/NanoPi_M6)
 - [Hinlink H88K](http://www.hinlink.com)
 
 # Supported OSes
@@ -159,6 +160,7 @@ The paths above are relative to the root of the file system. That is, the `dtb` 
 | `rk3588-nanopc-t6`                      | NanoPC T6                     |
 | `rk3588s-nanopi-r6c`                    | NanoPi R6C                    |
 | `rk3588s-nanopi-r6s`                    | NanoPi R6S                    |
+| `rk3588s-nanopi-m6`                     | NanoPi M6                     |
 | `rk3588-hinlink-h88k`                   | H88K                          |
 
 In the absence of a custom base DTB override, the overlays are applied on top of the firmware-provided DTB.
