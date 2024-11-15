@@ -15,7 +15,7 @@
 ################################################################################
 [Defines]
   PLATFORM_NAME                  = OrangePi5
-  PLATFORM_VENDOR                = OrangePi
+  PLATFORM_VENDOR                = Xunlong
   PLATFORM_GUID                  = e6443926-7196-4fc4-9554-91fc1fb34256
   PLATFORM_VERSION               = 0.2
   DSC_SPECIFICATION              = 0x00010019
@@ -57,7 +57,7 @@
 [PcdsFixedAtBuild.common]
   # SMBIOS platform config
   gRockchipTokenSpaceGuid.PcdPlatformName|"Orange Pi 5"
-  gRockchipTokenSpaceGuid.PcdPlatformVendorName|"Orange Pi"
+  gRockchipTokenSpaceGuid.PcdPlatformVendorName|"Xunlong"
   gRockchipTokenSpaceGuid.PcdFamilyName|"Orange Pi 5"
   gRockchipTokenSpaceGuid.PcdProductUrl|"http://www.orangepi.org/html/hardWare/computerAndMicrocontrollers/details/Orange-Pi-5.html"
   gRockchipTokenSpaceGuid.PcdDeviceTreeName|"rk3588s-orangepi-5"
