@@ -157,6 +157,7 @@ The paths above are relative to the root of the file system. That is, the `dtb` 
 | `rk3588s-khadas-edge2`                  | Edge2                         |
 | `rk3588-blade3-v101-linux`              | Blade 3                       |
 | `rk3588-nanopc-t6`                      | NanoPC T6                     |
+| `rk3588-nanopc-cm3588-nas`              | NanoPC CM3588-NAS             |
 | `rk3588s-nanopi-r6c`                    | NanoPi R6C                    |
 | `rk3588s-nanopi-r6s`                    | NanoPi R6S                    |
 | `rk3588-hinlink-h88k`                   | H88K                          |

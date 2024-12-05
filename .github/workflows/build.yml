@@ -40,6 +40,7 @@ jobs:
           - nanopi-r6c
           - nanopi-r6s
           - nanopc-t6
+          - nanopc-cm3588-nas
           - blade3
           - h88k
         CONFIGURATION: ${{ fromJSON(format('[{0}]', inputs.build-configs || '"Debug"')) }}
