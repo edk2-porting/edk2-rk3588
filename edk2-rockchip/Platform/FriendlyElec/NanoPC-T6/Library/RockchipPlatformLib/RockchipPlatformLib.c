@@ -211,6 +211,9 @@ UsbPortPowerEnable (
   GpioPinWrite (1, GPIO_PIN_PD2, TRUE);
   GpioPinSetDirection (1, GPIO_PIN_PD2, GPIO_PIN_OUTPUT);
 
+  /* Set GPIO1 PA4 (USB20_HOST_PWREN) output high to power USB 2.0 ports */
+  GpioPinWrite (1, GPIO_PIN_PA4, TRUE);
+  GpioPinSetDirection (1, GPIO_PIN_PA4, GPIO_PIN_OUTPUT);
   // DEBUG((DEBUG_INFO, "Trying to enable on-board LED1\n"));
   // GpioPinWrite (2, GPIO_PIN_PC0, TRUE);
   // GpioPinSetDirection (2, GPIO_PIN_PC0, GPIO_PIN_OUTPUT);
