@@ -39,6 +39,7 @@ jobs:
           - edge2
           - nanopi-r6c
           - nanopi-r6s
+          - nanopi-m6
           - nanopc-t6
           - nanopc-cm3588-nas
           - blade3
