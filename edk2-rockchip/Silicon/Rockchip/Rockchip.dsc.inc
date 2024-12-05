@@ -2,7 +2,7 @@
 #
 #  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 #  Copyright (c) 2021-2022, Rockchip Limited. All rights reserved.
-#  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+#  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -171,7 +171,6 @@
   ArmDisassemblerLib|ArmPkg/Library/ArmDisassemblerLib/ArmDisassemblerLib.inf
   ArmGicLib|ArmPkg/Drivers/ArmGic/ArmGicLib.inf
   ArmGicArchLib|ArmPkg/Library/ArmGicArchLib/ArmGicArchLib.inf
-  ArmPlatformStackLib|ArmPlatformPkg/Library/ArmPlatformStackLib/ArmPlatformStackLib.inf
   ArmSmcLib|ArmPkg/Library/ArmSmcLib/ArmSmcLib.inf
   ArmMmuLib|ArmPkg/Library/ArmMmuLib/ArmMmuBaseLib.inf
   ArmLib|ArmPkg/Library/ArmLib/ArmBaseLib.inf
@@ -206,7 +205,6 @@
   VariablePolicyHelperLib|MdeModulePkg/Library/VariablePolicyHelperLib/VariablePolicyHelperLib.inf
 
   ExtractGuidedSectionLib|MdePkg/Library/DxeExtractGuidedSectionLib/DxeExtractGuidedSectionLib.inf
-  LzmaDecompressLib|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
 
   NonDiscoverableDeviceRegistrationLib|MdeModulePkg/Library/NonDiscoverableDeviceRegistrationLib/NonDiscoverableDeviceRegistrationLib.inf
 
@@ -228,16 +226,6 @@
   #PlatformFlashAccessLib|Silicon/Rockchip/Library/PlatformFlashAccessLib/PlatformFlashAccessLibDxe.inf
 
   ImagePropertiesRecordLib|MdeModulePkg/Library/ImagePropertiesRecordLib/ImagePropertiesRecordLib.inf
-
-  #
-  # It is not possible to prevent the ARM compiler for generic intrinsic functions.
-  # This library provides the instrinsic functions generate by a given compiler.
-  # And NULL mean link this library into all ARM images.
-  #
-  NULL|ArmPkg/Library/CompilerIntrinsicsLib/CompilerIntrinsicsLib.inf
-
-  # Add support for GCC stack protector
-  NULL|MdePkg/Library/BaseStackCheckLib/BaseStackCheckLib.inf
 
   # RkSdmmcDxe dependencies
   RkSdmmcPlatformLib|Silicon/Rockchip/Library/RkSdmmcPlatformLibNull/RkSdmmcPlatformLibNull.inf
@@ -491,7 +479,10 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
   #
   # PEI Phase modules
   #
-  ArmPlatformPkg/PrePi/PeiUniCore.inf
+  ArmPlatformPkg/PeilessSec/PeilessSec.inf {
+    <LibraryClasses>
+      NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
+  }
 
   #
   # DXE

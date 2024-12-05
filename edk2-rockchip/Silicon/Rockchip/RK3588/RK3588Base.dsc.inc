@@ -2,7 +2,7 @@
 #
 #  Copyright (c) 2014-2018, Linaro Limited. All rights reserved.
 #  Copyright (c) 2021-2022, Rockchip Limited. All rights reserved.
-#  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+#  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -100,6 +100,9 @@
 # Library Class section - list of all common Library Classes needed by RK3588 platforms.
 #
 ################################################################################
+
+[LibraryClasses.common.SEC]
+  SerialPortLib|Silicon/Rockchip/Library/Dw8250SerialPortLib/Dw8250SerialPortLib.inf
 
 [LibraryClasses.common]
   # ACPI helpers
@@ -330,15 +333,6 @@
 #
 ################################################################################
 [Components.common]
-  #
-  # PEI Phase modules
-  #
-  ArmPlatformPkg/PrePi/PeiUniCore.inf {
-    <LibraryClasses>
-      # Full UART library
-      SerialPortLib|Silicon/Rockchip/Library/Dw8250SerialPortLib/Dw8250SerialPortLib.inf
-  }
-
   # General platform manager
   Silicon/Rockchip/RK3588/Drivers/RK3588Dxe/RK3588Dxe.inf
 
