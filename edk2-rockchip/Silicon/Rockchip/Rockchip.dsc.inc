@@ -735,6 +735,11 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
 !endif
 
   #
+  # EFI Memory Attribute Protocol state manager (rhboot shim workaround)
+  #
+  EmbeddedPkg/Drivers/MemoryAttributeManagerDxe/MemoryAttributeManagerDxe.inf
+
+  #
   # Bds
   #
   MdeModulePkg/Universal/DevicePathDxe/DevicePathDxe.inf

@@ -113,7 +113,6 @@
 
 [Guids]
   gRK3588DxeFormSetGuid
-  gEfiEndOfDxeEventGroupGuid
 
 [Depex]
   TRUE
