@@ -6,7 +6,7 @@
 #  Copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.
 #  Copyright (c) 2017 Marvell International Ltd.
 #  Copyright (c) 2021-2022 Rockchip Electronics Co., Ltd.
-#  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+#  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -53,7 +53,6 @@
   gEfiSystemNvDataFvGuid
   gEfiVariableGuid
   gEfiEventReadyToBootGuid
-  gRockchipEventResetGuid
 
 [Protocols]
   gEfiDevicePathProtocolGuid
@@ -62,6 +61,7 @@
   gEfiDiskIoProtocolGuid
   gEfiBlockIoProtocolGuid
   gEdkiiNonDiscoverableDeviceProtocolGuid
+  gEfiResetNotificationProtocolGuid
 
 [FixedPcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
@@ -77,6 +77,4 @@
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64
 
 [Depex]
-  TRUE
-  #gEfiCpuArchProtocolGuid AND
-  #gUniNorFlashProtocolGuid
+  gEfiResetNotificationProtocolGuid

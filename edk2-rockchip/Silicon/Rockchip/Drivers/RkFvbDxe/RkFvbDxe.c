@@ -7,7 +7,7 @@
  *  Copyright (c) 2017 Marvell International Ltd.
  *  Copyright (c) 2021-2022 Rockchip Electronics Co., Ltd.
  *  Copyright (c) 2023, Jared McNeill <jmcneill@invisible.ca>
- *  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+ *  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
  *
  *  SPDX-License-Identifier: BSD-2-Clause-Patent
  *
@@ -29,6 +29,7 @@
 #include <Protocol/DiskIo.h>
 #include <Protocol/LoadedImage.h>
 #include <Protocol/NonDiscoverableDevice.h>
+#include <Protocol/ResetNotification.h>
 #include <Guid/NvVarStoreFormatted.h>
 #include <Guid/SystemNvDataGuid.h>
 #include <Guid/VariableFormat.h>
@@ -1107,10 +1108,8 @@ FvbDiskDumpNvData (
 
 STATIC
 VOID
-EFIAPI
-FvbDiskNvDumpEventHandler (
-  IN EFI_EVENT Event,
-  IN VOID *Context
+FvbDiskNvDumpHandler (
+  VOID
   )
 {
   EFI_STATUS Status;
@@ -1140,6 +1139,30 @@ FvbDiskNvDumpEventHandler (
   DEBUG ((DEBUG_INFO, "NV data dumped!\n"));
 
   mFvbDevice->DiskDataInvalidated = FALSE;
+}
+
+STATIC
+VOID
+EFIAPI
+FvbDiskNvDumpEventHandler (
+  IN EFI_EVENT Event,
+  IN VOID *Context
+  )
+{
+  FvbDiskNvDumpHandler ();
+}
+
+STATIC
+VOID
+EFIAPI
+FvbDiskNvDumpResetHandler (
+  IN EFI_RESET_TYPE  ResetType,
+  IN EFI_STATUS      ResetStatus,
+  IN UINTN           DataSize,
+  IN VOID            *ResetData OPTIONAL
+  )
+{
+  FvbDiskNvDumpHandler ();
 }
 
 STATIC
@@ -1320,16 +1343,22 @@ FvbInstallDiskNvDumpEventHandlers (
   )
 {
   EFI_STATUS Status;
-  EFI_EVENT ResetEvent;
+  EFI_RESET_NOTIFICATION_PROTOCOL *ResetNotify;
   EFI_EVENT ReadyToBootEvent;
 
-  Status = gBS->CreateEventEx (EVT_NOTIFY_SIGNAL,
-                               TPL_CALLBACK,
-                               FvbDiskNvDumpEventHandler,
-                               NULL,
-                               &gRockchipEventResetGuid,
-                               &ResetEvent);
+  Status = gBS->LocateProtocol (
+                  &gEfiResetNotificationProtocolGuid,
+                  NULL,
+                  (VOID **)&ResetNotify
+                  );
   ASSERT_EFI_ERROR (Status);
+  if (!EFI_ERROR (Status)) {
+    Status = ResetNotify->RegisterResetNotify (
+                            ResetNotify,
+                            FvbDiskNvDumpResetHandler
+                            );
+    ASSERT_EFI_ERROR (Status);
+  }
 
   Status = gBS->CreateEventEx (EVT_NOTIFY_SIGNAL,
                                TPL_CALLBACK,

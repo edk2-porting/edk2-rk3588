@@ -181,7 +181,7 @@
   # UartLib|Silicon/Rockchip/Library/SerialPortLib/UartLib.inf
 
   # Runtime reset helper
-  ResetSystemLib|Silicon/Rockchip/Library/ResetSystemLib/ResetSystemLib.inf
+  ResetSystemLib|ArmPkg/Library/ArmPsciResetSystemLib/ArmPsciResetSystemLib.inf
 
   #
   # Uncomment (and comment out the next line) For RealView Debugger. The Standard IO window
@@ -547,7 +547,11 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
   Silicon/Rockchip/Drivers/NorFlashDxe/NorFlashDxe.inf
 !endif
   Silicon/Rockchip/Drivers/RkFvbDxe/RkFvbDxe.inf
-  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf
+  MdeModulePkg/Universal/Variable/RuntimeDxe/VariableRuntimeDxe.inf {
+    <LibraryClasses>
+      # Depex on gEdkiiNvVarStoreFormattedGuid installed by RkFvbDxe
+      NULL|EmbeddedPkg/Library/NvVarStoreFormattedLib/NvVarStoreFormattedLib.inf
+  }
   MdeModulePkg/Universal/FaultTolerantWriteDxe/FaultTolerantWriteDxe.inf
 
   #
