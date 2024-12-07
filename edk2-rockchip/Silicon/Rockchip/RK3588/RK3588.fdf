@@ -2,7 +2,7 @@
 #
 #  Copyright (c) 2014-2018, Linaro Limited. All rights reserved.
 #  Copyright (c) 2021-2022, Rockchip Limited. All rights reserved.
-#  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+#  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -109,6 +109,11 @@ READ_LOCK_STATUS   = TRUE
   # General platform manager
   #
   INF Silicon/Rockchip/RK3588/Drivers/RK3588Dxe/RK3588Dxe.inf
+
+  #
+  # Custom reset handler
+  #
+  INF Silicon/Rockchip/RK3588/Drivers/ResetPlatformDxe/ResetPlatformDxe.inf
 
   #
   # PCI Support

@@ -227,6 +227,8 @@
 
   ImagePropertiesRecordLib|MdeModulePkg/Library/ImagePropertiesRecordLib/ImagePropertiesRecordLib.inf
 
+  ResetUtilityLib|MdeModulePkg/Library/ResetUtilityLib/ResetUtilityLib.inf
+
   # RkSdmmcDxe dependencies
   RkSdmmcPlatformLib|Silicon/Rockchip/Library/RkSdmmcPlatformLibNull/RkSdmmcPlatformLibNull.inf
 
@@ -793,3 +795,6 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
 
   # SPI Flash Cmd application
   # Silicon/Rockchip/Applications/SpiTool/SpiFlashCmd.inf
+
+  # Maskrom Reset application
+  Silicon/Rockchip/Applications/MaskromReset/MaskromReset.inf

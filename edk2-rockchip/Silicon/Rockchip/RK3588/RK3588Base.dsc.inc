@@ -337,6 +337,11 @@
   Silicon/Rockchip/RK3588/Drivers/RK3588Dxe/RK3588Dxe.inf
 
   #
+  # Custom reset handler
+  #
+  Silicon/Rockchip/RK3588/Drivers/ResetPlatformDxe/ResetPlatformDxe.inf
+
+  #
   # PCI Support
   #
 !if $(RK3588_PCIE_ENABLE) == TRUE

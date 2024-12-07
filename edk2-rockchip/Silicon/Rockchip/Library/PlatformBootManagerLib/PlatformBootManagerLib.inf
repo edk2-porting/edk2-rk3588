@@ -85,6 +85,7 @@
   gEfiTtyTermGuid
   gUefiShellFileGuid
   gRockchipEventPlatformBmAfterConsoleGuid
+  gRockchipMaskromResetFileGuid
 
 [Protocols]
   gEdkiiNonDiscoverableDeviceProtocolGuid
