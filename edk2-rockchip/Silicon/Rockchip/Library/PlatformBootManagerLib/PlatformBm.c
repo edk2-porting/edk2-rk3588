@@ -1,6 +1,7 @@
 /** @file
   Implementation for PlatformBootManagerLib library class interfaces.
 
+  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
   Copyright (C) 2015-2016, Red Hat, Inc.
   Copyright (c) 2014 - 2021, ARM Ltd. All rights reserved.<BR>
   Copyright (c) 2004 - 2018, Intel Corporation. All rights reserved.<BR>
@@ -38,6 +39,8 @@
 #include <Protocol/FirmwareVolume2.h>
 
 #include "PlatformBm.h"
+
+#define BOOT_PROMPT   L"Setup (ESC/F2)   Shell (F1)   Reset to MaskROM (F4)   Continue (Enter)"
 
 #define DP_NODE_LEN(Type)  { (UINT8)sizeof (Type), (UINT8)(sizeof (Type) >> 8) }
 
@@ -789,6 +792,8 @@ PlatformRegisterOptionsAndKeys (
   EFI_INPUT_KEY                 Enter;
   EFI_INPUT_KEY                 F2;
   EFI_INPUT_KEY                 Esc;
+  EFI_INPUT_KEY                 F1;
+  EFI_INPUT_KEY                 F4;
   EFI_BOOT_MANAGER_LOAD_OPTION  BootOption;
 
   GetPlatformOptions ();
@@ -826,6 +831,22 @@ PlatformRegisterOptionsAndKeys (
              NULL
              );
   ASSERT (Status == EFI_SUCCESS || Status == EFI_ALREADY_STARTED);
+
+  //
+  // Register UEFI Shell
+  //
+  F1.ScanCode    = SCAN_F1;
+  F1.UnicodeChar = CHAR_NULL;
+  PlatformRegisterFvBootOption (&gUefiShellFileGuid, L"UEFI Shell", 0, &F1);
+
+  //
+  // Register Maskrom Reset
+  //
+  F4.ScanCode     = SCAN_F4;
+  F4.UnicodeChar  = CHAR_NULL;
+  PlatformRegisterFvBootOption (&gRockchipMaskromResetFileGuid, L"Reset to MaskROM", 0, &F4);
+
+  RemoveStaleFvFileOptions ();
 }
 
 //
@@ -1158,7 +1179,6 @@ PlatformBootManagerAfterConsole (
   UINTN                         FirmwareVerLength;
   UINTN                         PosX;
   UINTN                         PosY;
-  EFI_INPUT_KEY                 Key;
 
   EfiEventGroupSignal (&gRockchipEventPlatformBmAfterConsoleGuid);
 
@@ -1175,7 +1195,7 @@ PlatformBootManagerAfterConsole (
         PcdGetPtr (PcdFirmwareVersionString)
         );
     }
-    Print (L"Press ESCAPE for boot options");
+    Print (BOOT_PROMPT);
   } else if (FirmwareVerLength > 0) {
     Status = gBS->HandleProtocol (
                     gST->ConsoleOutHandle,
@@ -1213,15 +1233,6 @@ PlatformBootManagerAfterConsole (
   // feedback about what is going on.
   //
   HandleCapsules ();
-
-  //
-  // Register UEFI Shell
-  //
-  Key.ScanCode    = SCAN_NULL;
-  Key.UnicodeChar = L's';
-  PlatformRegisterFvBootOption (&gUefiShellFileGuid, L"UEFI Shell", 0, &Key);
-
-  RemoveStaleFvFileOptions ();
 }
 
 /**
@@ -1249,7 +1260,7 @@ PlatformBootManagerWaitCallback (
   Status = BootLogoUpdateProgress (
              White.Pixel,
              Black.Pixel,
-             L"Press ESCAPE for boot options",
+             BOOT_PROMPT,
              White.Pixel,
              (Timeout - TimeoutRemain) * 100 / Timeout,
              0
