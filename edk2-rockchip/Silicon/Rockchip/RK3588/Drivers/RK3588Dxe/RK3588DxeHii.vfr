@@ -2,7 +2,7 @@
  *
  *  Copyright (c) 2018 Andrei Warkentin <andrey.warkentin@gmail.com>
  *  Copyright (c) 2020, ARM Limited. All rights reserved.
- *  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+ *  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
  *
  *  SPDX-License-Identifier: BSD-2-Clause-Patent
  *
@@ -135,6 +135,26 @@ formset
     efivarstore ACPI_PCIE_ECAM_COMPAT_MODE_VARSTORE_DATA,
       attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
       name  = AcpiPcieEcamCompatMode,
+      guid  = RK3588DXE_FORMSET_GUID;
+
+    efivarstore FDT_COMPAT_MODE_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = FdtCompatMode,
+      guid  = RK3588DXE_FORMSET_GUID;
+
+    efivarstore UINT8,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS,
+      name  = FdtCompatModeVendorSupported,
+      guid  = RK3588DXE_FORMSET_GUID;
+
+    efivarstore UINT8,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS,
+      name  = FdtCompatModeMainlineSupported,
+      guid  = RK3588DXE_FORMSET_GUID;
+
+    efivarstore FDT_FORCE_GOP_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = FdtForceGop,
       guid  = RK3588DXE_FORMSET_GUID;
 
     efivarstore FDT_SUPPORT_OVERRIDES_VARSTORE_DATA,
@@ -491,7 +511,7 @@ formset
           prompt      = STRING_TOKEN(STR_CONFIG_TABLE_MODE_PROMPT),
           help        = STRING_TOKEN(STR_CONFIG_TABLE_MODE_HELP),
           flags       = NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
-          default     = CONFIG_TABLE_MODE_ACPI,
+          default     = FixedPcdGet32 (PcdConfigTableModeDefault),
           option text = STRING_TOKEN(STR_CONFIG_TABLE_MODE_ACPI), value = CONFIG_TABLE_MODE_ACPI, flags = 0;
           option text = STRING_TOKEN(STR_CONFIG_TABLE_MODE_FDT), value = CONFIG_TABLE_MODE_FDT, flags = 0;
           option text = STRING_TOKEN(STR_CONFIG_TABLE_MODE_ACPI_FDT), value = CONFIG_TABLE_MODE_ACPI_FDT, flags = 0;
@@ -518,11 +538,37 @@ formset
           subtitle text = STRING_TOKEN(STR_NULL_STRING);
           subtitle text = STRING_TOKEN(STR_CONFIG_TABLE_FDT_SUBTITLE);
 
+          suppressif ideqval FdtCompatModeVendorSupported == 0 AND ideqval FdtCompatModeMainlineSupported == 0;
+          grayoutif  ideqval FdtCompatModeVendorSupported == 0 OR ideqval FdtCompatModeMainlineSupported == 0;
+            oneof varid = FdtCompatMode.Mode,
+              prompt      = STRING_TOKEN(STR_FDT_COMPAT_MODE_PROMPT),
+              help        = STRING_TOKEN(STR_FDT_COMPAT_MODE_HELP),
+              flags       = NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+              default     = FixedPcdGet32 (PcdFdtCompatModeDefault),
+              option text = STRING_TOKEN(STR_FDT_COMPAT_MODE_VENDOR), value = FDT_COMPAT_MODE_VENDOR, flags = 0;
+              option text = STRING_TOKEN(STR_FDT_COMPAT_MODE_MAINLINE), value = FDT_COMPAT_MODE_MAINLINE, flags = 0;
+            endoneof;
+            subtitle text = STRING_TOKEN(STR_NULL_STRING);
+          endif;
+          endif;
+
+          suppressif get(FdtCompatMode.Mode) != FDT_COMPAT_MODE_MAINLINE;
+            oneof varid = FdtForceGop.State,
+              prompt      = STRING_TOKEN(STR_FDT_FORCE_GOP_PROMPT),
+              help        = STRING_TOKEN(STR_FDT_FORCE_GOP_HELP),
+              flags       = NUMERIC_SIZE_1 | INTERACTIVE | RESET_REQUIRED,
+              default     = FixedPcdGet8 (PcdFdtForceGopDefault),
+              option text = STRING_TOKEN(STR_DISABLED), value = FALSE, flags = 0;
+              option text = STRING_TOKEN(STR_ENABLED), value = TRUE, flags = 0;
+            endoneof;
+            subtitle text = STRING_TOKEN(STR_NULL_STRING);
+          endif;
+
           oneof varid = FdtSupportOverrides.State,
             prompt      = STRING_TOKEN(STR_FDT_SUPPORT_OVERRIDES_PROMPT),
             help        = STRING_TOKEN(STR_FDT_SUPPORT_OVERRIDES_HELP),
             flags       = NUMERIC_SIZE_1 | INTERACTIVE | RESET_REQUIRED,
-            default     = FALSE,
+            default     = FixedPcdGet8 (PcdFdtSupportOverridesDefault),
             option text = STRING_TOKEN(STR_DISABLED), value = FALSE, flags = 0;
             option text = STRING_TOKEN(STR_ENABLED), value = TRUE, flags = 0;
           endoneof;

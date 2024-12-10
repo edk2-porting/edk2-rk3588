@@ -1,7 +1,7 @@
 #/** @file
 #
 #    Copyright (c) 2021, Rockchip Limited. All rights reserved.
-#    Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+#    Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
 #
 #    SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -136,4 +136,9 @@
   FILE FREEFORM = $(NAMED_GUID) {
     RAW ACPI               |.acpi
     RAW ASL                |.aml
+  }
+
+[Rule.Common.USER_DEFINED.DTB]
+  FILE FREEFORM = $(NAMED_GUID) {
+    RAW BIN                |.dtb
   }

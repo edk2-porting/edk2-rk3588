@@ -1,6 +1,6 @@
 ## @file
 #
-#  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+#  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -10,9 +10,7 @@
   INF RuleOverride = ACPITABLE Platform/Firefly/AIO-3588Q/AcpiTables/AcpiTables.inf
 
   # Device Tree Support
-  FILE FREEFORM = gDtPlatformDefaultDtbFileGuid {
-    SECTION RAW = Platform/Rockchip/DeviceTree/rk3588-firefly-aio-3588q.dtb
-  }
+  INF RuleOverride = DTB Platform/Firefly/AIO-3588Q/DeviceTree/Vendor.inf
 
   # Splash screen logo
   INF $(VENDOR_DIRECTORY)/Drivers/LogoDxe/LogoDxe.inf

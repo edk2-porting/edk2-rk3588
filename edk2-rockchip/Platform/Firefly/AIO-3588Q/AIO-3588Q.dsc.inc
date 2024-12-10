@@ -1,7 +1,7 @@
 ## @file
 #
 #  Copyright (c) 2014-2018, Linaro Limited. All rights reserved.
-#  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+#  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -123,6 +123,9 @@
 [Components.common]
   # ACPI Support
   Platform/Firefly/AIO-3588Q/AcpiTables/AcpiTables.inf
+
+  # Device Tree Support
+  Platform/Firefly/AIO-3588Q/DeviceTree/Vendor.inf
 
   # Splash screen logo
   $(VENDOR_DIRECTORY)/Drivers/LogoDxe/LogoDxe.inf

@@ -1,6 +1,7 @@
 #
 #  Copyright (c) 2013 - 2014, ARM Ltd. All rights reserved.
 #  Copyright (c) 2018, Linaro Ltd. All rights reserved.
+#  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -94,9 +95,15 @@
   gRK3588TokenSpaceGuid.PcdPcie30PhyMode
   gRK3588TokenSpaceGuid.PcdPcie30PhyModeDefault
 
+  gRK3588TokenSpaceGuid.PcdConfigTableModeDefault
   gRK3588TokenSpaceGuid.PcdConfigTableMode
   gRK3588TokenSpaceGuid.PcdAcpiPcieEcamCompatModeDefault
   gRK3588TokenSpaceGuid.PcdAcpiPcieEcamCompatMode
+  gRK3588TokenSpaceGuid.PcdFdtCompatModeDefault
+  gRK3588TokenSpaceGuid.PcdFdtCompatMode
+  gRK3588TokenSpaceGuid.PcdFdtForceGopDefault
+  gRK3588TokenSpaceGuid.PcdFdtForceGop
+  gRK3588TokenSpaceGuid.PcdFdtSupportOverridesDefault
   gRK3588TokenSpaceGuid.PcdFdtSupportOverrides
 
   gRK3588TokenSpaceGuid.PcdHasOnBoardFanOutput

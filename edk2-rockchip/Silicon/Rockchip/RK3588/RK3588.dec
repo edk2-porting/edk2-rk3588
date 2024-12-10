@@ -1,7 +1,7 @@
 ## @file
 #
 #  Copyright (c) 2021-2022, Rockchip Limited. All rights reserved.
-#  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+#  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -44,7 +44,11 @@
   gRK3588TokenSpaceGuid.PcdPcie30Supported|FALSE|BOOLEAN|0x00010201
   gRK3588TokenSpaceGuid.PcdPcie30PhyModeDefault|4|UINT8|0x00010202
 
+  gRK3588TokenSpaceGuid.PcdConfigTableModeDefault|0|UINT32|0x00010300
   gRK3588TokenSpaceGuid.PcdAcpiPcieEcamCompatModeDefault|0|UINT32|0x00010301
+  gRK3588TokenSpaceGuid.PcdFdtCompatModeDefault|0|UINT32|0x00010351
+  gRK3588TokenSpaceGuid.PcdFdtForceGopDefault|0|UINT8|0x00010352
+  gRK3588TokenSpaceGuid.PcdFdtSupportOverridesDefault|0|UINT8|0x00010353
 
   gRK3588TokenSpaceGuid.PcdHasOnBoardFanOutput|FALSE|BOOLEAN|0x10401
 
@@ -86,7 +90,9 @@
 
   gRK3588TokenSpaceGuid.PcdConfigTableMode|0|UINT32|0x00000300
   gRK3588TokenSpaceGuid.PcdAcpiPcieEcamCompatMode|0|UINT32|0x00000301
-  gRK3588TokenSpaceGuid.PcdFdtSupportOverrides|0|UINT8|0x00000351
+  gRK3588TokenSpaceGuid.PcdFdtCompatMode|0|UINT32|0x00000351
+  gRK3588TokenSpaceGuid.PcdFdtForceGop|0|UINT8|0x00000352
+  gRK3588TokenSpaceGuid.PcdFdtSupportOverrides|0|UINT8|0x00000353
 
   gRK3588TokenSpaceGuid.PcdCoolingFanState|0|UINT32|0x00000401
   gRK3588TokenSpaceGuid.PcdCoolingFanSpeed|0|UINT32|0x00000402

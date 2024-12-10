@@ -1,6 +1,6 @@
 ## @file
 #
-#  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+#  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
 #  Copyright (c) 2023, Sergey Tyuryukanov <s199p.wa1k9r@gmail.com>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -11,9 +11,8 @@
   INF RuleOverride = ACPITABLE $(PLATFORM_DIRECTORY)/AcpiTables/AcpiTables.inf
 
   # Device Tree Support
-  FILE FREEFORM = gDtPlatformDefaultDtbFileGuid {
-    SECTION RAW = Platform/Rockchip/DeviceTree/rk3588s-nanopi-r6c.dtb
-  }
+  INF RuleOverride = DTB $(PLATFORM_DIRECTORY)/DeviceTree/Vendor.inf
+  INF RuleOverride = DTB $(PLATFORM_DIRECTORY)/DeviceTree/Mainline.inf
 
   # Splash screen logo
   INF $(VENDOR_DIRECTORY)/Drivers/LogoDxe/LogoDxe.inf

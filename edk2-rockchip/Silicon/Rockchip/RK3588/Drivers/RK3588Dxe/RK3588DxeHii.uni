@@ -1,6 +1,6 @@
 /** @file
  *
- *  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+ *  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
  *
  *  SPDX-License-Identifier: BSD-2-Clause-Patent
  *
@@ -137,7 +137,9 @@
 #string STR_CONFIG_TABLE_FORM_HELP                         #language en-US "Configure the ACPI and Device Tree system tables support."
 
 #string STR_CONFIG_TABLE_MODE_PROMPT                       #language en-US "Config Table Mode"
-#string STR_CONFIG_TABLE_MODE_HELP                         #language en-US "Choose what config tables to expose to the OS.\n\nACPI - provides basic hardware support (USB, PCIe, SATA) for most OS/kernel versions.\n\nDevice Tree - provides extensive hardware support specific to a kernel version.\nThe firmware includes a DTB compatible with Rockchip SDK Linux 5.10 legacy kernel.\n\nIf both are exposed, the OS will decide which one to use."
+#string STR_CONFIG_TABLE_MODE_HELP                         #language en-US "Choose what config tables to expose to the OS.\n\n"
+                                                                           "ACPI - provides basic hardware support (USB, PCIe, SATA) for most OS/kernel versions, such as Windows, BSD, VMware ESXi. It is not recommended for Linux usage; please use a recent kernel with Device Tree instead.\n\n"
+                                                                           "Device Tree - provides extensive hardware support specific to a kernel variant.\nDepending on the platform, the firmware may include DTBs compatible with either the Rockchip SDK Linux kernel or the generic mainline/upstream kernels.\n\nIf both options are exposed, the OS will decide which one to use. Linux prefers DT, while Windows will only use ACPI."
 #string STR_CONFIG_TABLE_MODE_ACPI                         #language en-US "ACPI"
 #string STR_CONFIG_TABLE_MODE_FDT                          #language en-US "Device Tree"
 #string STR_CONFIG_TABLE_MODE_ACPI_FDT                     #language en-US "Both"
@@ -157,6 +159,17 @@
 #string STR_ACPI_PCIE_ECAM_COMPAT_MODE_GRAVITON            #language en-US "AMAZON GRAVITON"
 
 #string STR_CONFIG_TABLE_FDT_SUBTITLE                      #language en-US "Device Tree Configuration"
+
+#string STR_FDT_COMPAT_MODE_PROMPT                         #language en-US "Compatibility Mode"
+#string STR_FDT_COMPAT_MODE_HELP                           #language en-US "Choose what Device Tree to expose to the OS.\n\n"
+                                                                           "Vendor - compatible with Rockchip SDK Linux 6.1 kernel only.\n\n"
+                                                                           "Mainline - compatible with generic upstream Linux 6.10 or newer kernel. This option is under active development and may lack certain features. Therefore, it is always recommended to use the latest kernel and firmware available in order to benefit from better device support."
+#string STR_FDT_COMPAT_MODE_VENDOR                         #language en-US "Vendor"
+#string STR_FDT_COMPAT_MODE_MAINLINE                       #language en-US "Mainline"
+
+#string STR_FDT_FORCE_GOP_PROMPT                           #language en-US "Force UEFI GOP Display"
+#string STR_FDT_FORCE_GOP_HELP                             #language en-US "This option allows using the basic display output provided by UEFI GOP (HDMI/DP/DSI) on Linux kernels older than 6.13, which lack native driver support."
+
 #string STR_FDT_SUPPORT_OVERRIDES_PROMPT                   #language en-US "Support DTB override & overlays"
 #string STR_FDT_SUPPORT_OVERRIDES_HELP                     #language en-US "Enable or disable support for overriding the firmware-provided DTB and installing overlays.\n\nCheck firmware documentation for more details."
 

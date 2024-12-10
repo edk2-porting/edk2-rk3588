@@ -1,6 +1,6 @@
 ## @file
 #
-#  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+#  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -10,9 +10,7 @@
   INF RuleOverride = ACPITABLE Platform/Firefly/ROC-RK3588S-PC/AcpiTables/AcpiTables.inf
 
   # Device Tree Support
-  FILE FREEFORM = gDtPlatformDefaultDtbFileGuid {
-    SECTION RAW = Platform/Rockchip/DeviceTree/roc-rk3588s-pc.dtb
-  }
+  INF RuleOverride = DTB Platform/Firefly/ROC-RK3588S-PC/DeviceTree/Vendor.inf
 
   # Splash screen logo
   INF $(VENDOR_DIRECTORY)/Drivers/LogoDxe/LogoDxe.inf

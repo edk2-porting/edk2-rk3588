@@ -1,10 +1,12 @@
 /** @file
 *
 *  Copyright (c) 2021, Rockchip Limited. All rights reserved.
+*  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
 *
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
 **/
+
 #include <Base.h>
 #include <Library/DebugLib.h>
 #include <Library/IoLib.h>
@@ -13,6 +15,7 @@
 #include <Library/Rk3588Pcie.h>
 #include <Library/PWMLib.h>
 #include <Soc.h>
+#include <VarStoreData.h>
 #include <Library/UefiBootServicesTableLib.h>
 
 #include <Protocol/Pca9555.h>
@@ -65,12 +68,12 @@ GetPca9555Protocol (
     DEBUG ((DEBUG_ERROR, "%a: Unable to locate handles\n", __FUNCTION__));
     return Status;
   }
-  
-  DEBUG ((DEBUG_INFO, 
-          "%a: got %d PCA95XX_PROTOCOLs\n", 
-          __FUNCTION__, 
+
+  DEBUG ((DEBUG_INFO,
+          "%a: got %d PCA95XX_PROTOCOLs\n",
+          __FUNCTION__,
           HandleCount));
-  
+
   /*
    * Open Pca95xxProtocl. With EFI_OPEN_PROTOCOL_GET_PROTOCOL attribute
    * the consumer is not obliged to call CloseProtocol.
@@ -81,7 +84,7 @@ GetPca9555Protocol (
                   HandleBuffer[0],
                   NULL,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL);
-                    
+
   return Status;
 }
 
@@ -298,7 +301,7 @@ UsbPortPowerEnable (
 {
   EFI_STATUS Status = EFI_SUCCESS;
   PCA95XX_PROTOCOL *Pca95xxProtocol;
-  
+
   /* On Firefly ITX-3588J this is controlled via the PCA9555. */
   Status = GetPca9555Protocol(&Pca95xxProtocol);
   if (EFI_ERROR(Status)) {
@@ -310,16 +313,16 @@ UsbPortPowerEnable (
       12, /* vbus5v0_typec_pwr_en */
       GPIO_MODE_OUTPUT_0
     );
-    
+
     gBS->Stall(1200000);
-    
+
     Pca95xxProtocol->GpioProtocol.Set(
       &Pca95xxProtocol->GpioProtocol,
       12, /* vbus5v0_typec_pwr_en */
       GPIO_MODE_OUTPUT_1
-    );    
+    );
 
-    /* other USB stuff */    
+    /* other USB stuff */
     Pca95xxProtocol->GpioProtocol.Set(
       &Pca95xxProtocol->GpioProtocol,
       5, /* vcc5v0_host */
@@ -331,13 +334,13 @@ UsbPortPowerEnable (
       4, /* vcc_hub_reset */
       GPIO_MODE_OUTPUT_1
     );
-    
+
     Pca95xxProtocol->GpioProtocol.Set(
       &Pca95xxProtocol->GpioProtocol,
       6, /* vcc_hub3_reset */
       GPIO_MODE_OUTPUT_1
-    );  
-    
+    );
+
     Pca95xxProtocol->GpioProtocol.Set(
       &Pca95xxProtocol->GpioProtocol,
       7, /* vcc5v0_host3 */
@@ -416,7 +419,7 @@ PwmFanIoSetup (
 {
   EFI_STATUS Status = EFI_SUCCESS;
   PCA95XX_PROTOCOL *Pca95xxProtocol;
-  
+
   Status = GetPca9555Protocol(&Pca95xxProtocol);
   if (EFI_ERROR(Status)) {
     DEBUG ((DEBUG_ERROR, "Failed to get PCA9555! (%d)\n", Status));
@@ -437,7 +440,7 @@ PwmFanSetSpeed (
 {
   EFI_STATUS Status = EFI_SUCCESS;
   PCA95XX_PROTOCOL *Pca95xxProtocol;
-  
+
   Status = GetPca9555Protocol(&Pca95xxProtocol);
   if (EFI_ERROR(Status)) {
     DEBUG ((DEBUG_ERROR, "Failed to get PCA9555! (%d)\n", Status));
@@ -462,7 +465,7 @@ PlatformInitLeds (
   /* Activate power LED only */
   GpioPinWrite (1, GPIO_PIN_PB3, TRUE);
   GpioPinSetDirection (1, GPIO_PIN_PB3, GPIO_PIN_OUTPUT);
-  
+
 #if 0
   /* Red off, Green for status, Blue for power */
   GpioPinWrite (3, GPIO_PIN_PB2, FALSE);
@@ -486,7 +489,7 @@ PlatformSetStatusLed (
 #if 0
   EFI_STATUS Status = EFI_SUCCESS;
   PCA95XX_PROTOCOL *Pca95xxProtocol;
-  
+
   /* On Firefly ITX-3588J this is controlled via the PCA9555. */
   Status = GetPca9555Protocol(&Pca95xxProtocol);
   if (EFI_ERROR(Status)) {
@@ -499,6 +502,24 @@ PlatformSetStatusLed (
     );
   }
 #endif
+}
+
+CONST EFI_GUID *
+EFIAPI
+PlatformGetDtbFileGuid (
+  IN UINT32 CompatMode
+  )
+{
+  STATIC CONST EFI_GUID VendorDtbFileGuid = {         // DeviceTree/Vendor.inf
+    0xd58b4028, 0x43d8, 0x4e97, { 0x87, 0xd4, 0x4e, 0x37, 0x16, 0x13, 0x65, 0x80 }
+  };
+
+  switch (CompatMode) {
+    case FDT_COMPAT_MODE_VENDOR:
+      return &VendorDtbFileGuid;
+  }
+
+  return NULL;
 }
 
 VOID

@@ -9,10 +9,8 @@
   # ACPI Support
   INF RuleOverride = ACPITABLE $(PLATFORM_DIRECTORY)/AcpiTables/AcpiTables.inf
 
-  # TODO: Device Tree Support
-  FILE FREEFORM = gDtPlatformDefaultDtbFileGuid {
-    SECTION RAW = Platform/Rockchip/DeviceTree/rk3588s-fydetab-duo.dtb
-  }
+  # Device Tree Support
+  INF RuleOverride = DTB $(PLATFORM_DIRECTORY)/DeviceTree/Vendor.inf
 
   # Splash screen logo
   INF $(PLATFORM_DIRECTORY)/Drivers/LogoDxe/LogoDxe.inf

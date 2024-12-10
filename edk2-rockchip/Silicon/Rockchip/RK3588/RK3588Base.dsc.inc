@@ -51,6 +51,10 @@
   DEFINE ACPI_PCIE_ECAM_COMPAT_MODE_NXPMX6_SINGLE_DEV     = 0x00000003
   DEFINE ACPI_PCIE_ECAM_COMPAT_MODE_NXPMX6_GRAVITON       = 0x00000006
 
+  DEFINE FDT_COMPAT_MODE_UNSUPPORTED    = 0
+  DEFINE FDT_COMPAT_MODE_VENDOR         = 1
+  DEFINE FDT_COMPAT_MODE_MAINLINE       = 2
+
   #
   # Silicon/Rockchip/RK3588/Drivers/RK3588Dxe/CpuPerformance.h
   #
@@ -262,9 +266,13 @@
   gRK3588TokenSpaceGuid.PcdPcie30PhyModeDefault|4 # AGGREGATION
 
   #
-  # ACPI support flags and default values
+  # ACPI / Device Tree support flags and default values
   #
+  gRK3588TokenSpaceGuid.PcdConfigTableModeDefault|$(CONFIG_TABLE_MODE_ACPI_FDT)
   gRK3588TokenSpaceGuid.PcdAcpiPcieEcamCompatModeDefault|$(ACPI_PCIE_ECAM_COMPAT_MODE_NXPMX6_SINGLE_DEV)
+  gRK3588TokenSpaceGuid.PcdFdtCompatModeDefault|$(FDT_COMPAT_MODE_MAINLINE)
+  gRK3588TokenSpaceGuid.PcdFdtForceGopDefault|FALSE
+  gRK3588TokenSpaceGuid.PcdFdtSupportOverridesDefault|FALSE
 
 [PcdsPatchableInModule]
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|1500000
@@ -311,9 +319,11 @@
   #
   # ACPI / Device Tree
   #
-  gRK3588TokenSpaceGuid.PcdConfigTableMode|L"ConfigTableMode"|gRK3588DxeFormSetGuid|0x0|$(CONFIG_TABLE_MODE_ACPI)
+  gRK3588TokenSpaceGuid.PcdConfigTableMode|L"ConfigTableMode"|gRK3588DxeFormSetGuid|0x0|gRK3588TokenSpaceGuid.PcdConfigTableModeDefault
   gRK3588TokenSpaceGuid.PcdAcpiPcieEcamCompatMode|L"AcpiPcieEcamCompatMode"|gRK3588DxeFormSetGuid|0x0|gRK3588TokenSpaceGuid.PcdAcpiPcieEcamCompatModeDefault
-  gRK3588TokenSpaceGuid.PcdFdtSupportOverrides|L"FdtSupportOverrides"|gRK3588DxeFormSetGuid|0x0|FALSE
+  gRK3588TokenSpaceGuid.PcdFdtCompatMode|L"FdtCompatMode"|gRK3588DxeFormSetGuid|0x0|gRK3588TokenSpaceGuid.PcdFdtCompatModeDefault
+  gRK3588TokenSpaceGuid.PcdFdtForceGop|L"FdtForceGop"|gRK3588DxeFormSetGuid|0x0|gRK3588TokenSpaceGuid.PcdFdtForceGopDefault
+  gRK3588TokenSpaceGuid.PcdFdtSupportOverrides|L"FdtSupportOverrides"|gRK3588DxeFormSetGuid|0x0|gRK3588TokenSpaceGuid.PcdFdtSupportOverridesDefault
 
   #
   # Cooling Fan

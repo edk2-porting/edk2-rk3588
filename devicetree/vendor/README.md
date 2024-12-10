@@ -1,4 +1,4 @@
-# Rockchip Platform Device Trees
+# Rockchip Vendor BSP Device Trees
 ## Sources
 * <https://github.com/armbian/linux-rockchip/tree/f3fb30ac9de06b41fb621d17bc53603f1f48ac90/arch/arm64/boot/dts/rockchip>
   * Updated to `rk-6.1-rkr1` branch, currently called `vendor` branch in armbian/build

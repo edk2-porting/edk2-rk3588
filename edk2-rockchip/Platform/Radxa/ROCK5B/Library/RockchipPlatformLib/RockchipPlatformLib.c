@@ -1,10 +1,12 @@
 /** @file
 *
 *  Copyright (c) 2021, Rockchip Limited. All rights reserved.
+*  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
 *
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
 **/
+
 #include <Base.h>
 #include <Library/DebugLib.h>
 #include <Library/IoLib.h>
@@ -13,6 +15,7 @@
 #include <Library/Rk3588Pcie.h>
 #include <Library/PWMLib.h>
 #include <Soc.h>
+#include <VarStoreData.h>
 
 static struct regulator_init_data rk806_init_data[] = {
   /* Master PMIC */
@@ -370,6 +373,29 @@ PlatformPcieWiFiEnable (
   GpioPinWrite (3, GPIO_PIN_PA6, Enable);
   GpioPinSetDirection (3, GPIO_PIN_PA6, GPIO_PIN_OUTPUT);
 
+}
+
+CONST EFI_GUID *
+EFIAPI
+PlatformGetDtbFileGuid (
+  IN UINT32 CompatMode
+  )
+{
+  STATIC CONST EFI_GUID VendorDtbFileGuid = {         // DeviceTree/Vendor.inf
+    0xd58b4028, 0x43d8, 0x4e97, { 0x87, 0xd4, 0x4e, 0x37, 0x16, 0x13, 0x65, 0x80 }
+  };
+  STATIC CONST EFI_GUID MainlineDtbFileGuid = {       // DeviceTree/Mainline.inf
+    0x84492e97, 0xa10f, 0x49a7, { 0x85, 0xe9, 0x02, 0x5d, 0x19, 0x66, 0xb3, 0x43 }
+  };
+
+  switch (CompatMode) {
+    case FDT_COMPAT_MODE_VENDOR:
+      return &VendorDtbFileGuid;
+    case FDT_COMPAT_MODE_MAINLINE:
+      return &MainlineDtbFileGuid;
+  }
+
+  return NULL;
 }
 
 VOID

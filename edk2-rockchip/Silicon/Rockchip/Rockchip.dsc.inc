@@ -360,6 +360,9 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
   *_*_*_CC_FLAGS = -DDEFAULT_DARK
   GCC:*_*_AARCH64_CC_FLAGS  = -Wno-error=uninitialized -Wno-error=stringop-overflow -Wno-error=unused-function -Wno-error=unused-variable
 
+  # Compile with symbols to support overlays.
+  *_*_*_DTC_FLAGS = -@
+
 [BuildOptions.common.EDKII.DXE_RUNTIME_DRIVER]
   GCC:*_*_ARM_DLINK_FLAGS = -z common-page-size=0x1000
   GCC:*_*_AARCH64_DLINK_FLAGS = -z common-page-size=0x10000

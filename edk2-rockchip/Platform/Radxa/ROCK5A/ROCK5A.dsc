@@ -2,7 +2,7 @@
 #
 #  Copyright (c) 2014-2018, Linaro Limited. All rights reserved.
 #  Copyright (c) 2023, Molly Sophia <mollysophia379@gmail.com>
-#  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+#  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -90,7 +90,7 @@
   #
   gRK3588TokenSpaceGuid.PcdGmac1Supported|TRUE
   gRK3588TokenSpaceGuid.PcdGmac1TxDelay|0x3a
-  gRK3588TokenSpaceGuid.PcdGmac1RxDelay|0x3e 
+  gRK3588TokenSpaceGuid.PcdGmac1RxDelay|0x3e
 
   #
   # I2S
@@ -110,6 +110,10 @@
 [Components.common]
   # ACPI Support
   $(PLATFORM_DIRECTORY)/AcpiTables/AcpiTables.inf
+
+  # Device Tree Support
+  $(PLATFORM_DIRECTORY)/DeviceTree/Vendor.inf
+  $(PLATFORM_DIRECTORY)/DeviceTree/Mainline.inf
 
   # Splash screen logo
   $(VENDOR_DIRECTORY)/Drivers/LogoDxe/LogoDxe.inf

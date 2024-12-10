@@ -1,7 +1,7 @@
 ## @file
 #
 #  Copyright (c) 2014-2018, Linaro Limited. All rights reserved.
-#  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+#  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
 #  Copyright (c) 2023, Shimrra Shai <shimmyshai00@gmail.com>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -22,7 +22,7 @@
   # I2C location configured by PCDs below.
   #
   DEFINE RK_RTC8563_ENABLE = TRUE
-  
+
   #
   # PCA9555 GPIO extender support
   # I2C location configured by PCDs below.
@@ -92,7 +92,7 @@
   gRK3588TokenSpaceGuid.PcdUsbDpPhy0Supported|TRUE
   gRK3588TokenSpaceGuid.PcdUsbDpPhy1Supported|TRUE
   gRK3588TokenSpaceGuid.PcdDp1LaneMux|{ 0x2, 0x3 }
-  
+
   #
   # GMAC
   #
@@ -115,6 +115,8 @@
   # ACPI Support
   Platform/Firefly/ITX-3588J/AcpiTables/AcpiTables.inf
 
+  # Device Tree Support
+  Platform/Firefly/ITX-3588J/DeviceTree/Vendor.inf
+
   # Splash screen logo
   $(VENDOR_DIRECTORY)/Drivers/LogoDxe/LogoDxe.inf
-  

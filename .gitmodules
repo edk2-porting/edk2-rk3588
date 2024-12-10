@@ -14,3 +14,6 @@
 	path = arm-trusted-firmware
 	url = https://github.com/worproject/arm-trusted-firmware
 	branch = rk3588
+[submodule "devicetree/mainline/upstream"]
+	path = devicetree/mainline/upstream
+	url = https://git.kernel.org/pub/scm/linux/kernel/git/devicetree/devicetree-rebasing.git

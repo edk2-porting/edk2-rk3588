@@ -1,6 +1,6 @@
 /** @file
  *
- *  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+ *  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
  *
  *  SPDX-License-Identifier: BSD-2-Clause-Patent
  *
@@ -69,6 +69,17 @@ typedef struct {
 typedef struct {
   UINT32 Mode;
 } ACPI_PCIE_ECAM_COMPAT_MODE_VARSTORE_DATA;
+
+#define FDT_COMPAT_MODE_UNSUPPORTED                 0
+#define FDT_COMPAT_MODE_VENDOR                      1
+#define FDT_COMPAT_MODE_MAINLINE                    2
+typedef struct {
+  UINT32 Mode;
+} FDT_COMPAT_MODE_VARSTORE_DATA;
+
+typedef struct {
+  UINT8 State;
+} FDT_FORCE_GOP_VARSTORE_DATA;
 
 typedef struct {
   UINT8 State;
