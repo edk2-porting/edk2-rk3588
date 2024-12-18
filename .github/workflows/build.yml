@@ -23,27 +23,28 @@ jobs:
     strategy:
       matrix:
         PLATFORM:
-          - rock-5b
-          - rock-5a
-          - rock-5-itx
-          - orangepi-5
-          - orangepi-5plus
-          - indiedroid-nova
-          - fydetab-duo
-          - roc-rk3588s-pc
-          - itx-3588j
           - aio-3588q
-          - station-m3
-          - r58x
-          - r58-mini
+          - blade3
           - edge2
+          - fydetab-duo
+          - h88k
+          - indiedroid-nova
+          - itx-3588j
+          - nanopc-cm3588-nas
+          - nanopc-t6
+          - nanopi-m6
           - nanopi-r6c
           - nanopi-r6s
-          - nanopi-m6
-          - nanopc-t6
-          - nanopc-cm3588-nas
-          - blade3
-          - h88k
+          - orangepi-5
+          - orangepi-5plus
+          - r58-mini
+          - r58x
+          - roc-rk3588s-pc
+          - rock-5-itx
+          - rock-5a
+          - rock-5b
+          - rock-5bplus
+          - station-m3
         CONFIGURATION: ${{ fromJSON(format('[{0}]', inputs.build-configs || '"Debug"')) }}
     steps:
       - name: Checkout
