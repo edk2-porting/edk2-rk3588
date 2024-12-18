@@ -65,7 +65,8 @@ jobs:
           gcc-aarch64-linux-gnu \
           libc6-dev-arm64-cross \
           python3 \
-          python3-pyelftools
+          python3-pyelftools \
+          uuid-dev
 
       - name: Get version tag
         id: get_version_tag
