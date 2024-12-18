@@ -73,11 +73,13 @@ typedef enum {
     CLK_I2S0_8CH_TX_SRC,
     MCLK_I2S0_8CH_TX,
     MCLK_I2S1_8CH_TX,
+    CLK_SARADC,
     CLK_COUNT
 } RK3588_CLOCK_IDS;
 
 typedef enum {
-  RESET_COUNT = 0
+    RESET_SRST_P_SARADC = 0,
+    RESET_COUNT
 } RK3588_RESET_IDS;
 
 #ifdef __cplusplus

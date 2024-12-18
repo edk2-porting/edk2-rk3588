@@ -1,0 +1,30 @@
+#/** @file
+#
+#  Copyright (c) 2024, Mario Bălănică <mariobalanica02@gmail.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = SaradcLib
+  FILE_GUID                      = ff2f92c7-428e-49c0-8c39-91091ee278c0
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = SaradcLib
+  CONSTRUCTOR                    = SaradcLibConstructor
+
+[Sources]
+  SaradcLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  Silicon/Rockchip/RK3588/RK3588.dec
+
+[LibraryClasses]
+  BaseLib
+  CruLib
+  DebugLib
+  IoLib
+  TimerLib

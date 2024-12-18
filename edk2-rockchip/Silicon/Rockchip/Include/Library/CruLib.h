@@ -206,7 +206,7 @@ typedef enum {
         .gate = _gate,                                                   \
     }
 
-#define CRU_RESET_INIT(id, _regBase, _srstOffset, _srst)                 \
+#define CRU_RESET_INIT(_id, _regBase, _srstOffset, _srst)                 \
     [_id] = {                                                            \
         .regBase = _regBase,                                             \
         .srstOffset = _srstOffset,                                       \

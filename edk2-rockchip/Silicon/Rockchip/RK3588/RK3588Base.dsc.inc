@@ -136,6 +136,7 @@
   # Other SoC-specific libraries
   OtpLib|Silicon/Rockchip/RK3588/Library/OtpLib/OtpLib.inf
   GpioLib|Silicon/Rockchip/RK3588/Library/GpioLib/GpioLib.inf
+  SaradcLib|Silicon/Rockchip/RK3588/Library/SaradcLib/SaradcLib.inf
 
 [LibraryClasses.common.SEC]
   MemoryInitPeiLib|Silicon/Rockchip/RK3588/Library/MemoryInitPeiLib/MemoryInitPeiLib.inf

@@ -195,10 +195,15 @@ static CRU_CLOCK Clocks[CLK_COUNT] = {
     CRU_CLOCK_NODIV_INIT (MCLK_I2S1_8CH_TX, PMU1CRU_BASE,
         CRU_CLKSEL_CON_OFFSET, MCLK_I2S1_8CH_TX_SEL,
         CRU_CLKGATE_CON_OFFSET, MCLK_I2S1_8CH_TX_GATE),
+    CRU_CLOCK_INIT (CLK_SARADC, CRU_BASE,
+        CRU_CLKSEL_CON_OFFSET, CLK_SARADC_SEL,
+        CRU_CLKSEL_CON_OFFSET, CLK_SARADC_DIV,
+        CRU_CLKGATE_CON_OFFSET, CLK_SARADC_GATE),
 };
 
 static CRU_RESET Resets[RESET_COUNT] = {
-    // TO-DO
+    CRU_RESET_INIT (RESET_SRST_P_SARADC, CRU_BASE,
+        CRU_SOFTRST_CON_OFFSET, SRST_P_SARADC),
 };
 
 /********************* Private Variable Definition ***************************/
@@ -335,6 +340,14 @@ HAL_CRU_ClkGetFreq(uint32_t clockId)
         ASSERT (HAL_CRU_ClkGetMux(clockId) == 2);
         pRate = s_v0pllFreq;
         break;
+
+    case CLK_SARADC:
+        if (HAL_CRU_ClkGetMux(clockId) == 1) {
+            pRate = PLL_INPUT_OSC_RATE;
+        } else {
+            pRate = s_gpllFreq;
+        }
+        break;
     default:
         break;
     }
@@ -462,6 +475,16 @@ HAL_CRU_ClkSetFreq(uint32_t clockId, uint32_t rate)
             error = HAL_CRU_ClkSetFreq(PLL_V0PLL, div * rate);
         }
         return error;
+
+    case CLK_SARADC:
+         if (PLL_INPUT_OSC_RATE % rate == 0){
+            pRate = PLL_INPUT_OSC_RATE;
+            mux = 1;
+        } else {
+            pRate = s_gpllFreq;
+            mux = 0;
+        }
+        break;
     default:
         break;
     }
