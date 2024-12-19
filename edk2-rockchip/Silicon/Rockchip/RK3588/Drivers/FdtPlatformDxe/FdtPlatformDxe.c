@@ -699,7 +699,7 @@ FdtFixupVopDevices (
   Root = fdt_path_offset (Fdt, "/");
   ASSERT (Root >= 0);
   if (Root < 0) {
-    DEBUG ((DEBUG_ERROR, "FdtPlatform: Couldn't locate FDT root. Ret=%a\n", fdt_strerror (Node)));
+    DEBUG ((DEBUG_ERROR, "FdtPlatform: Couldn't locate FDT root. Ret=%a\n", fdt_strerror (Root)));
     return;
   }
 
