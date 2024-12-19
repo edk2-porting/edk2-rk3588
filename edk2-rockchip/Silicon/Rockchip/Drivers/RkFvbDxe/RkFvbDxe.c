@@ -34,11 +34,18 @@
 #include <Guid/SystemNvDataGuid.h>
 #include <Guid/VariableFormat.h>
 #include <Guid/EventGroup.h>
+#include <libfdt.h>
 
 #include "RkFvbDxe.h"
 
-RKATAG_BOOTDEV_TYPE  mBootDeviceType;
-VOID                 *mDiskIoRegistration;
+STATIC RKATAG_BOOTDEV_TYPE  mBootDeviceType;
+
+// This matches the expected SPL boot order.
+STATIC FVB_RK_BOOT_DEVICE  mFvbSecondaryRkBootDevices[] = {
+  { RkAtagBootDevTypeSd0,  FixedPcdGet32 (PcdRkSdmmcBaseAddress)  },
+  { RkAtagBootDevTypeEmmc, FixedPcdGet32 (PcdDwcSdhciBaseAddress) },
+};
+
 STATIC EFI_EVENT     mFvbVirtualAddrChangeEvent;
 STATIC FVB_DEVICE    *mFvbDevice;
 STATIC CONST FVB_DEVICE mRkFvbFlashInstanceTemplate = {
@@ -1196,8 +1203,9 @@ FvbReadyToBootEventHandler (
 
 STATIC
 BOOLEAN
-FvbCheckIsBootDevice (
-  IN EFI_HANDLE Handle
+FvbCheckRkBootDeviceSupported (
+  IN EFI_HANDLE           Handle,
+  IN FVB_RK_BOOT_DEVICE   *BootDevice
   )
 {
   EFI_STATUS                          Status;
@@ -1208,10 +1216,8 @@ FvbCheckIsBootDevice (
 
   DevicePath = DevicePathFromHandle (Handle);
 
-  DEBUG ((DEBUG_INFO, "%a: DevPath type 0x%x subtype 0x%x\n",
-          __FUNCTION__, DevicePath->Type, DevicePath->SubType));
-
-  if (DevicePath->Type != HARDWARE_DEVICE_PATH
+  if (DevicePath == NULL
+      || DevicePath->Type != HARDWARE_DEVICE_PATH
       || DevicePath->SubType != HW_VENDOR_DP) {
     return FALSE;
   }
@@ -1235,105 +1241,226 @@ FvbCheckIsBootDevice (
     return FALSE;
   }
 
-  if (mBootDeviceType == RkAtagBootDevTypeEmmc) {
-    return Descriptor->AddrRangeMin == PcdGet32 (PcdDwcSdhciBaseAddress);
-  }
-  if (mBootDeviceType == RkAtagBootDevTypeSd0) {
-    return Descriptor->AddrRangeMin == PcdGet32 (PcdRkSdmmcBaseAddress);
+  return Descriptor->AddrRangeMin == BootDevice->ControllerBaseAddress;
+}
+
+STATIC
+BOOLEAN
+FvbCheckBootDiskDeviceHasFirmware (
+  IN EFI_HANDLE  Handle,
+  IN UINT32      MediaId,
+  IN CHAR16      *DevicePathText
+  )
+{
+  EFI_STATUS            Status;
+  EFI_DISK_IO_PROTOCOL  *DiskIo;
+  UINT64                Offset;
+  UINTN                 Size;
+  struct fdt_header     FdtHeader;
+  VOID                  *Fdt = NULL;
+  INT32                 Ret;
+  INT32                 Node;
+  BOOLEAN               Found = FALSE;
+
+  Status = gBS->HandleProtocol (Handle, &gEfiDiskIoProtocolGuid, (VOID **)&DiskIo);
+  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    goto Exit;
   }
 
-  return FALSE;
+  Offset = FixedPcdGet64 (PcdFitImageFlashAddress);
+
+  Size   = sizeof (FdtHeader);
+  Status = DiskIo->ReadDisk (DiskIo, MediaId, Offset, Size, &FdtHeader);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: [%s] Failed to read %u bytes at 0x%lx. Status=%r\n",
+            __FUNCTION__, DevicePathText, Size, Offset, Status));
+    goto Exit;
+  }
+
+  Ret = fdt_check_header (&FdtHeader);
+  if (Ret) {
+    DEBUG ((DEBUG_ERROR, "%a: [%s] FIT has an invalid header! Ret=%a\n",
+            __FUNCTION__, DevicePathText, fdt_strerror (Ret)));
+    goto Exit;
+  }
+
+  Size = fdt_totalsize (&FdtHeader);
+  Fdt  = AllocatePool (Size);
+
+  Status = DiskIo->ReadDisk (DiskIo, MediaId, Offset, Size, Fdt);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: [%s] Failed to read %u bytes at 0x%lx. Status=%r\n",
+            __FUNCTION__, DevicePathText, Size, Offset, Status));
+    goto Exit;
+  }
+
+  Node = fdt_path_offset (Fdt, "/images/edk2");
+  if (Node < 0) {
+    DEBUG ((DEBUG_ERROR, "%a: [%s] FIT: Couldn't locate '/images/edk2' node! Ret=%a\n",
+            __FUNCTION__, DevicePathText, fdt_strerror (Node)));
+    goto Exit;
+  }
+
+  Found = TRUE;
+
+Exit:
+  if (Fdt != NULL) {
+    FreePool (Fdt);
+  }
+
+  return Found;
+}
+
+STATIC
+VOID
+FvbProcessBootDiskDeviceHandle (
+  IN EFI_HANDLE           Handle,
+  IN FVB_RK_BOOT_DEVICE   *BootDevice
+  )
+{
+  EFI_STATUS                Status;
+  EFI_BLOCK_IO_PROTOCOL     *BlkIo;
+  EFI_DEVICE_PATH_PROTOCOL  *Device = NULL;
+  CHAR16                    *DevicePathText = NULL;
+
+  if (!FvbCheckRkBootDeviceSupported (Handle, BootDevice)) {
+    return;
+  }
+
+  Status = gBS->HandleProtocol (Handle, &gEfiBlockIoProtocolGuid, (VOID **)&BlkIo);
+  ASSERT_EFI_ERROR (Status);
+  if (EFI_ERROR (Status)) {
+    return;
+  }
+
+  Device = DuplicateDevicePath (DevicePathFromHandle (Handle));
+  if (Device == NULL) {
+    ASSERT (FALSE);
+    return;
+  }
+
+  DevicePathText = ConvertDevicePathToText (Device, FALSE, FALSE);
+
+  if (!BlkIo->Media->MediaPresent) {
+    DEBUG ((DEBUG_ERROR, "%a: [%s] Media not present!\n", __FUNCTION__, DevicePathText));
+    goto Exit;
+  }
+  if (BlkIo->Media->ReadOnly) {
+    DEBUG ((DEBUG_ERROR, "%a: [%s] Media is read-only!\n", __FUNCTION__, DevicePathText));
+    goto Exit;
+  }
+
+  Status = gBS->ConnectController (Handle, NULL, NULL, FALSE);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: [%s] ConnectController failed. Status=%r\n", __FUNCTION__, DevicePathText, Status));
+    goto Exit;
+  }
+
+  if (!FvbCheckBootDiskDeviceHasFirmware (Handle, BlkIo->Media->MediaId, DevicePathText)) {
+    DEBUG ((DEBUG_INFO, "%a: [%s] No compatible firmware found. Skipping.\n", __FUNCTION__, DevicePathText));
+    goto Exit;
+  }
+
+  Status = FvbDiskDumpNvData (Device, BlkIo->Media->MediaId);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: [%s] Couldn't update NV data!\n", __FUNCTION__, DevicePathText));
+    ASSERT_EFI_ERROR (Status);
+    goto Exit;
+  }
+
+  DEBUG ((DEBUG_INFO, "%a: [%s] Found boot disk for NV storage!\n", __FUNCTION__, DevicePathText));
+
+  mFvbDevice->DiskDevice = Device;
+  mFvbDevice->DiskMediaId = BlkIo->Media->MediaId;
+
+Exit:
+  if ((Device != NULL) && (mFvbDevice->DiskDevice != Device)) {
+    FreePool (Device);
+  }
+  if (DevicePathText != NULL) {
+    FreePool (DevicePathText);
+  }
+}
+
+STATIC
+VOID
+FvbFindBootDiskDevice (
+  VOID
+  )
+{
+  EFI_STATUS          Status;
+  EFI_HANDLE          *Handles = NULL;
+  UINTN               NoHandles;
+  UINTN               DevIndex;
+  UINTN               HandleIndex;
+  EFI_HANDLE          Handle;
+  FVB_RK_BOOT_DEVICE  *RkBootDevice;
+
+  Status = gBS->LocateHandleBuffer (
+                  ByProtocol,
+                  &gEfiBlockIoProtocolGuid,
+                  NULL,
+                  &NoHandles,
+                  &Handles
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR,"%a: Failed to locate block devices. Status=%r\n", __FUNCTION__, Status));
+    goto Fail;
+  }
+  ASSERT (NoHandles > 0);
+
+  for (DevIndex = 0; DevIndex < ARRAY_SIZE (mFvbSecondaryRkBootDevices); DevIndex++) {
+    RkBootDevice = &mFvbSecondaryRkBootDevices[DevIndex];
+
+    for (HandleIndex = 0; HandleIndex < NoHandles; HandleIndex++) {
+      Handle = Handles[HandleIndex];
+
+      FvbProcessBootDiskDeviceHandle (Handle, RkBootDevice);
+
+      if (mFvbDevice->DiskDevice != NULL) {
+        if ((mBootDeviceType != RkAtagBootDevTypeUnknown) &&
+            (mBootDeviceType != RkBootDevice->AtagBootDevType))
+        {
+          DEBUG ((DEBUG_WARN, "%a: WARNING: Found boot device type (0x%x) does not match SPL (0x%x)!\n",
+                  __FUNCTION__, RkBootDevice->AtagBootDevType, mBootDeviceType));
+          DEBUG ((DEBUG_WARN, "%a: WARNING: Variable store might be using the wrong device!\n", __FUNCTION__));
+          DEBUG ((DEBUG_WARN, "%a: WARNING: Consider erasing any firmware present on other devices (SPI/EMMC/SD)!\n",
+                  __FUNCTION__));
+        }
+
+        Status = gBS->InstallMultipleProtocolInterfaces (
+                        &Handle,
+                        &gRockchipFirmwareBootDeviceProtocolGuid,
+                        NULL,
+                        NULL
+                        );
+        ASSERT_EFI_ERROR (Status);
+
+        goto Done;
+      }
+    }
+  }
+
+Fail:
+  DEBUG ((DEBUG_WARN, "%a: WARNING: Boot disk device not found!\n", __FUNCTION__));
+  DEBUG ((DEBUG_WARN, "%a: WARNING: Variable store changes will NOT persist!\n", __FUNCTION__));
+
+Done:
+  if (Handles != NULL) {
+    gBS->FreePool (Handles);
+  }
 }
 
 STATIC
 VOID
 EFIAPI
-FvbDiskIoRegistrationHandler (
-  IN EFI_EVENT Event,
-  IN VOID *Context
+NotifyEndOfDxeEvent (
+  IN EFI_EVENT    Event,
+  IN VOID         *Context
   )
 {
-  EFI_STATUS Status;
-  UINTN HandleSize;
-  EFI_HANDLE Handle;
-  EFI_DEVICE_PATH_PROTOCOL *Device;
-  EFI_BLOCK_IO_PROTOCOL *BlkIo;
-  CHAR16 *DevicePathText = NULL;
-
-  if (mFvbDevice->DiskDevice != NULL) {
-    //
-    // We've already found the NV disk before,
-    // and it is not removed from the system (hopefully).
-    //
-    return;
-  }
-
-  while (TRUE) {
-    HandleSize = sizeof (EFI_HANDLE);
-    Status = gBS->LocateHandle (ByRegisterNotify,
-                                NULL,
-                                mDiskIoRegistration,
-                                &HandleSize,
-                                &Handle);
-    if (Status == EFI_NOT_FOUND) {
-      break;
-    }
-
-    ASSERT_EFI_ERROR (Status);
-
-    if (!FvbCheckIsBootDevice (Handle)) {
-      continue;
-    }
-
-    Device = NULL;
-    Status = gBS->HandleProtocol (Handle,
-                                  &gEfiBlockIoProtocolGuid,
-                                  (VOID*)&BlkIo);
-    if (EFI_ERROR (Status)) {
-      continue;
-    }
-    Device = DuplicateDevicePath (DevicePathFromHandle (Handle));
-    ASSERT (Device != NULL);
-
-    if (DevicePathText != NULL) {
-      gBS->FreePool (DevicePathText);
-    }
-    DevicePathText = ConvertDevicePathToText (Device, FALSE, FALSE);
-
-    if (!BlkIo->Media->MediaPresent) {
-      DEBUG ((DEBUG_ERROR, "%a: [%s] Media not present!\n",
-              __FUNCTION__, DevicePathText));
-      continue;
-    }
-    if (BlkIo->Media->ReadOnly) {
-      DEBUG ((DEBUG_ERROR, "%a: [%s] Media is read-only!\n",
-              __FUNCTION__, DevicePathText));
-      continue;
-    }
-
-    Status = FvbDiskDumpNvData (Device, BlkIo->Media->MediaId);
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: [%s] Couldn't update NV data!\n",
-              __FUNCTION__, DevicePathText));
-      ASSERT_EFI_ERROR (Status);
-      continue;
-    }
-
-    if (mFvbDevice->DiskDevice != NULL) {
-      gBS->FreePool (mFvbDevice->DiskDevice);
-    }
-
-    DEBUG ((DEBUG_INFO, "%a: [%s] Found boot disk for NV storage!\n",
-            __FUNCTION__, DevicePathText));
-
-    mFvbDevice->DiskDevice = Device;
-    mFvbDevice->DiskMediaId = BlkIo->Media->MediaId;
-    break;
-  }
-
-  if (DevicePathText != NULL) {
-    gBS->FreePool (DevicePathText);
-  }
+  FvbFindBootDiskDevice ();
 }
 
 STATIC
@@ -1375,19 +1502,17 @@ FvbInstallDiskNotifyHandler (
   VOID
   )
 {
-  EFI_STATUS Status;
-  EFI_EVENT Event;
+  EFI_STATUS  Status;
+  EFI_EVENT   Event;
 
-  Status = gBS->CreateEvent (EVT_NOTIFY_SIGNAL,
-                             TPL_CALLBACK,
-                             FvbDiskIoRegistrationHandler,
-                             NULL,
-                             &Event);
-  ASSERT_EFI_ERROR (Status);
-
-  Status = gBS->RegisterProtocolNotify (&gEfiDiskIoProtocolGuid,
-                                        Event,
-                                        &mDiskIoRegistration);
+  Status = gBS->CreateEventEx (
+                    EVT_NOTIFY_SIGNAL,                // Type
+                    TPL_CALLBACK,                     // NotifyTpl
+                    NotifyEndOfDxeEvent,              // NotifyFunction
+                    NULL,                             // NotifyContext
+                    &gEfiEndOfDxeEventGroupGuid,      // EventGroup
+                    &Event                            // Event
+                    );
   ASSERT_EFI_ERROR (Status);
 }
 

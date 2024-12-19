@@ -1,6 +1,7 @@
 ## @file
 #  Implementation for PlatformBootManagerLib library class interfaces.
 #
+#  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
 #  Copyright (C) 2015-2016, Red Hat, Inc.
 #  Copyright (c) 2014, ARM Ltd. All rights reserved.<BR>
 #  Copyright (c) 2007 - 2014, Intel Corporation. All rights reserved.<BR>
@@ -51,7 +52,6 @@
   UefiBootServicesTableLib
   UefiLib
   UefiRuntimeServicesTableLib
-  RkAtagsLib
 
 [FeaturePcd]
   gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
@@ -68,8 +68,6 @@
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultParity
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultStopBits
   gEfiMdeModulePkgTokenSpaceGuid.PcdBootDiscoveryPolicy
-  gRockchipTokenSpaceGuid.PcdDwcSdhciBaseAddress
-  gRockchipTokenSpaceGuid.PcdRkSdmmcBaseAddress
 
 [Guids]
   gBootDiscoveryPolicyMgrFormsetGuid
@@ -95,7 +93,6 @@
   gEfiLoadedImageProtocolGuid
   gEfiPciRootBridgeIoProtocolGuid
   gEfiSimpleFileSystemProtocolGuid
-  gEfiBlockIoProtocolGuid
   gEsrtManagementProtocolGuid
   gPlatformBootManagerProtocolGuid
   gOhciDeviceProtocolGuid

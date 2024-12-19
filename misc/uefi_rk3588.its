@@ -11,12 +11,12 @@
 	#address-cells = <1>;
 
 	images {
-		uboot {
+		edk2 {
 			description = "UEFI";
 			data = /incbin/("./BL33_AP_UEFI.Fv");
 			type = "standalone";
 			arch = "arm64";
-			os = "U-Boot";
+			os = "EDK2";
 			compression = "none";
 			load = <0x00200000>;
 			hash {
@@ -98,7 +98,7 @@
 			description = "@DEVICE@";
 			rollback-index = <0x0>;
 			firmware = "atf-1";
-			loadables = "uboot", "atf-2", "atf-3", "optee", "nvdata";
+			loadables = "edk2", "atf-2", "atf-3", "optee", "nvdata";
 			fdt = "fdt";
 			signature {
 				algo = "sha256,rsa2048";

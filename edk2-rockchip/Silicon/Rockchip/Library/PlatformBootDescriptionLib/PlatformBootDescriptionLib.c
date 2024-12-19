@@ -16,68 +16,25 @@
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/PrintLib.h>
-#include <Library/RkAtagsLib.h>
-#include <Protocol/NonDiscoverableDevice.h>
-
-RKATAG_BOOTDEV_TYPE  mBootDeviceType;
 
 CHAR16               mBootDescFirmwareSuffix[]       = L" [Fw]";
 
 STATIC
-NON_DISCOVERABLE_DEVICE *
-GetNonDiscoverableDevice (
-  IN EFI_DEVICE_PATH_PROTOCOL *DevicePath
-  )
-{
-  EFI_STATUS                 Status;
-  EFI_HANDLE                 DeviceHandle;
-  NON_DISCOVERABLE_DEVICE    *Device;
-  EFI_DEVICE_PATH_PROTOCOL   *CurrentDevicePath;
-
-  CurrentDevicePath = DevicePath;
-
-  if (DevicePath->Type != HARDWARE_DEVICE_PATH
-      || DevicePath->SubType != HW_VENDOR_DP) {
-    return NULL;
-  }
-
-  Status = gBS->LocateDevicePath (&gEdkiiNonDiscoverableDeviceProtocolGuid,
-                   &CurrentDevicePath, &DeviceHandle);
-  if (EFI_ERROR (Status)) {
-    return NULL;
-  }
-
-  Status = gBS->HandleProtocol (DeviceHandle,
-                   &gEdkiiNonDiscoverableDeviceProtocolGuid, (VOID **) &Device);
-  if (EFI_ERROR (Status)) {
-    return NULL;
-  }
-
-  return Device;
-}
-
-STATIC
 BOOLEAN
 CheckIsBootDevice (
-  IN NON_DISCOVERABLE_DEVICE *Device
+  IN EFI_HANDLE  Handle
   )
 {
-  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  *Descriptor;
-  Descriptor = &Device->Resources[0];
+  EFI_STATUS  Status;
+  VOID        *Instance;
 
-  if (Descriptor->Desc != ACPI_ADDRESS_SPACE_DESCRIPTOR ||
-      Descriptor->ResType != ACPI_ADDRESS_SPACE_TYPE_MEM) {
-    return FALSE;
-  }
+  Status = gBS->HandleProtocol (
+                  Handle,
+                  &gRockchipFirmwareBootDeviceProtocolGuid,
+                  &Instance
+                  );
 
-  if (mBootDeviceType == RkAtagBootDevTypeEmmc) {
-    return Descriptor->AddrRangeMin == PcdGet32 (PcdDwcSdhciBaseAddress);
-  }
-  if (mBootDeviceType == RkAtagBootDevTypeSd0) {
-    return Descriptor->AddrRangeMin == PcdGet32 (PcdRkSdmmcBaseAddress);
-  }
-
-  return FALSE;
+  return !EFI_ERROR (Status);
 }
 
 STATIC
@@ -89,21 +46,14 @@ PlatformBootDescriptionHandler (
   )
 {
   EFI_DEVICE_PATH_PROTOCOL  *DevicePath;
-  NON_DISCOVERABLE_DEVICE   *NonDiscoverableDevice;
   CHAR16                    *Desc;
   UINTN                     DescSize;
 
+  if (!CheckIsBootDevice (Handle)) {
+    return NULL;
+  }
+
   DevicePath = DevicePathFromHandle (Handle);
-
-  NonDiscoverableDevice = GetNonDiscoverableDevice (DevicePath);
-  if (NonDiscoverableDevice == NULL) {
-    return NULL;
-  }
-
-  if (!CheckIsBootDevice (NonDiscoverableDevice)) {
-    return NULL;
-  }
-
   DevicePath = NextDevicePathNode (DevicePath);
 
   if (DevicePath->SubType == MSG_EMMC_DP) {
@@ -147,10 +97,5 @@ PlatformBootDescriptionLibConstructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  RKATAG_BOOTDEV *BootDevice;
-
-  BootDevice = RkAtagsGetBootDev ();
-  mBootDeviceType = BootDevice != NULL ? BootDevice->DevType : RkAtagBootDevTypeUnknown;
-
   return EfiBootManagerRegisterBootDescriptionHandler (PlatformBootDescriptionHandler);
 }

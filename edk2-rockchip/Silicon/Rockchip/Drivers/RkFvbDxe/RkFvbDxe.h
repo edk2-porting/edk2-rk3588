@@ -3,7 +3,7 @@
  *  Copyright (c) 2011 - 2014, ARM Ltd. All rights reserved.
  *  Copyright (c) 2017 Marvell International Ltd.
  *  Copyright (c) 2021-2022 Rockchip Electronics Co., Ltd.
- *  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+ *  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
  *
  *  SPDX-License-Identifier: BSD-2-Clause-Patent
  *
@@ -65,6 +65,11 @@ typedef struct {
 
   FVB_DEVICE_PATH                     DevicePath;
 } FVB_DEVICE;
+
+typedef struct {
+  UINT32    AtagBootDevType;
+  UINT32    ControllerBaseAddress;
+} FVB_RK_BOOT_DEVICE;
 
 EFI_STATUS
 EFIAPI

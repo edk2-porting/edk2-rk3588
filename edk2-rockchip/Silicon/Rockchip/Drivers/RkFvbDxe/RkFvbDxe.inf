@@ -45,6 +45,7 @@
   MemoryAllocationLib
   UefiRuntimeServicesTableLib
   RkAtagsLib
+  FdtLib
 
 [Guids]
   gEdkiiNvVarStoreFormattedGuid
@@ -53,6 +54,7 @@
   gEfiSystemNvDataFvGuid
   gEfiVariableGuid
   gEfiEventReadyToBootGuid
+  gEfiEndOfDxeEventGroupGuid
 
 [Protocols]
   gEfiDevicePathProtocolGuid
@@ -62,11 +64,13 @@
   gEfiBlockIoProtocolGuid
   gEdkiiNonDiscoverableDeviceProtocolGuid
   gEfiResetNotificationProtocolGuid
+  gRockchipFirmwareBootDeviceProtocolGuid
 
 [FixedPcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
   gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
+  gRockchipTokenSpaceGuid.PcdFitImageFlashAddress
   gRockchipTokenSpaceGuid.PcdNvStoragePreferSpiFlash
   gRockchipTokenSpaceGuid.PcdDwcSdhciBaseAddress
   gRockchipTokenSpaceGuid.PcdRkSdmmcBaseAddress

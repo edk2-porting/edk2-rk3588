@@ -31,10 +31,9 @@
   UefiBootManagerLib
   MemoryAllocationLib
   DevicePathLib
-  RkAtagsLib
 
 [Protocols]
-  gEdkiiNonDiscoverableDeviceProtocolGuid   ## SOMETIMES_CONSUMES
+  gRockchipFirmwareBootDeviceProtocolGuid   ## SOMETIMES_CONSUMES
 
 [Pcd]
   gRockchipTokenSpaceGuid.PcdDwcSdhciBaseAddress

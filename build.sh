@@ -151,6 +151,7 @@ function _build(){
         -p "${ROOTDIR}/${DSC_FILE}" \
         -b "${RELEASE_TYPE}" \
         -D FIRMWARE_VER="${GIT_COMMIT}" \
+        --pcd gRockchipTokenSpaceGuid.PcdFitImageFlashAddress=0x100000 \
         ${EDK2_FLAGS}
 
     #
