@@ -1,6 +1,6 @@
 /** @file
  *
- *  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+ *  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
  *
  *  SPDX-License-Identifier: BSD-2-Clause-Patent
  *
@@ -49,7 +49,7 @@ SetupPcie30Variables (
   Status = gRT->GetVariable (L"Pcie30PhyMode",
                             &gRK3588DxeFormSetGuid,
                             NULL, &Size, &Var8);
-  if (EFI_ERROR (Status) || !FixedPcdGetBool (PcdPcie30Supported)) {
+  if (EFI_ERROR (Status) || !FixedPcdGetBool (PcdPcie30PhyModeSwitchable)) {
     Status = PcdSet8S (PcdPcie30PhyMode, FixedPcdGet8 (PcdPcie30PhyModeDefault));
     ASSERT_EFI_ERROR (Status);
   }

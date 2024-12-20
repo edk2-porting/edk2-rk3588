@@ -624,10 +624,11 @@ FdtFixupPcie3Devices (
 
   FdtEnableNode (Fdt, "/pcie@fe150000",
               PcdGet32 (PcdPcie30State) == PCIE30_STATE_ENABLED);
-  if (PcdGet8 (PcdPcie30PhyMode) != PCIE30_PHY_MODE_AGGREGATION) {
-    FdtEnableNode (Fdt, "/pcie@fe160000",
-                PcdGet32 (PcdPcie30State) == PCIE30_STATE_ENABLED);
-  }
+
+  FdtEnableNode (Fdt, "/pcie@fe160000",
+              PcdGet32 (PcdPcie30State) == PCIE30_STATE_ENABLED &&
+              FixedPcdGetBool (PcdPcie30x2Supported) &&
+              PcdGet8 (PcdPcie30PhyMode) != PCIE30_PHY_MODE_AGGREGATION);
 }
 
 STATIC

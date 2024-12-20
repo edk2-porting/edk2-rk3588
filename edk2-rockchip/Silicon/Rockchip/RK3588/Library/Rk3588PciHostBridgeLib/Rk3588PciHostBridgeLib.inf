@@ -2,6 +2,7 @@
 #  PCI Host Bridge Library instance for Rockchip RK356x
 #
 #  Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
+#  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -43,7 +44,7 @@
   Pcie30PhyLib
 
 [FixedPcd]
-  gRK3588TokenSpaceGuid.PcdPcie30Supported
+  gRK3588TokenSpaceGuid.PcdPcie30x2Supported
 
 [Pcd]
   gRK3588TokenSpaceGuid.PcdComboPhy0Mode

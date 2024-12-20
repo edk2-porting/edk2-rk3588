@@ -94,6 +94,7 @@
   gRK3588TokenSpaceGuid.PcdPcie30State
   gRK3588TokenSpaceGuid.PcdPcie30PhyMode
   gRK3588TokenSpaceGuid.PcdPcie30PhyModeDefault
+  gRK3588TokenSpaceGuid.PcdPcie30PhyModeSwitchable
 
   gRK3588TokenSpaceGuid.PcdConfigTableModeDefault
   gRK3588TokenSpaceGuid.PcdConfigTableMode

@@ -3,6 +3,7 @@
   Copyright 2017, 2020 NXP
   Copyright 2021-2023, Jared McNeill <jmcneill@invisible.ca>
   Copyright 2023, Molly Sophia <mollysophia379@gmail.com>
+  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -105,11 +106,13 @@ IsPcieNumEnabled(
   switch (PcieNum)
   {
   case PCIE_SEGMENT_PCIE30X4:
-    Enabled = (FixedPcdGetBool (PcdPcie30Supported) && PcdGet32 (PcdPcie30State) == PCIE30_STATE_ENABLED);
+    Enabled = (PcdGet32 (PcdPcie30State) == PCIE30_STATE_ENABLED);
     break;
 
   case PCIE_SEGMENT_PCIE30X2:
-    Enabled = (PcdGet8 (PcdPcie30PhyMode) != PCIE30_PHY_MODE_AGGREGATION);
+    Enabled = (PcdGet32 (PcdPcie30State) == PCIE30_STATE_ENABLED &&
+               FixedPcdGetBool (PcdPcie30x2Supported) &&
+               PcdGet8 (PcdPcie30PhyMode) != PCIE30_PHY_MODE_AGGREGATION);
     break;
 
   case PCIE_SEGMENT_PCIE20L0:

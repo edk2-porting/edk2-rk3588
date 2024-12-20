@@ -83,7 +83,9 @@
   #
   # PCIe/SATA/USB Combo PIPE PHY support flags and default values
   #
-  gRK3588TokenSpaceGuid.PcdPcie30PhyModeDefault|0 # NANBNB
+  gRK3588TokenSpaceGuid.PcdPcie30PhyModeSwitchable|TRUE
+  gRK3588TokenSpaceGuid.PcdPcie30PhyModeDefault|$(PCIE30_PHY_MODE_NANBNB)
+  gRK3588TokenSpaceGuid.PcdPcie30x2Supported|TRUE
   gRK3588TokenSpaceGuid.PcdComboPhy0Switchable|FALSE
   gRK3588TokenSpaceGuid.PcdComboPhy1Switchable|TRUE
   gRK3588TokenSpaceGuid.PcdComboPhy2Switchable|TRUE

@@ -489,18 +489,19 @@ formset
           option text = STRING_TOKEN(STR_ENABLED), value = PCIE30_STATE_ENABLED, flags = 0;
         endoneof;
 
-        /* shoule we move this to single PHY settings form */
-        oneof varid = Pcie30PhyMode.Mode,
-          prompt      = STRING_TOKEN(STR_PCIE30_PHY_MODE_PROMPT),
-          help        = STRING_TOKEN(STR_PCIE30_PHY_MODE_HELP),
-          flags       = NUMERIC_SIZE_1 | INTERACTIVE | RESET_REQUIRED,
-          default     = FixedPcdGet8 (PcdPcie30PhyModeDefault),
-          option text = STRING_TOKEN(STR_PCIE30_PHY_MODE_AGGREGATION), value = PCIE30_PHY_MODE_AGGREGATION, flags = 0;
-          option text = STRING_TOKEN(STR_PCIE30_PHY_MODE_NANBNB), value = PCIE30_PHY_MODE_NANBNB, flags = 0;
-          option text = STRING_TOKEN(STR_PCIE30_PHY_MODE_NANBBI), value = PCIE30_PHY_MODE_NANBBI, flags = 0;
-          option text = STRING_TOKEN(STR_PCIE30_PHY_MODE_NABINB), value = PCIE30_PHY_MODE_NABINB, flags = 0;
-          option text = STRING_TOKEN(STR_PCIE30_PHY_MODE_NABIBI), value = PCIE30_PHY_MODE_NABIBI, flags = 0;
-        endoneof;
+        grayoutif FixedPcdGetBool (PcdPcie30PhyModeSwitchable) == 0;
+          oneof varid = Pcie30PhyMode.Mode,
+            prompt      = STRING_TOKEN(STR_PCIE30_PHY_MODE_PROMPT),
+            help        = STRING_TOKEN(STR_PCIE30_PHY_MODE_HELP),
+            flags       = NUMERIC_SIZE_1 | INTERACTIVE | RESET_REQUIRED,
+            default     = FixedPcdGet8 (PcdPcie30PhyModeDefault),
+            option text = STRING_TOKEN(STR_PCIE30_PHY_MODE_AGGREGATION), value = PCIE30_PHY_MODE_AGGREGATION, flags = 0;
+            option text = STRING_TOKEN(STR_PCIE30_PHY_MODE_NANBNB), value = PCIE30_PHY_MODE_NANBNB, flags = 0;
+            option text = STRING_TOKEN(STR_PCIE30_PHY_MODE_NANBBI), value = PCIE30_PHY_MODE_NANBBI, flags = 0;
+            option text = STRING_TOKEN(STR_PCIE30_PHY_MODE_NABINB), value = PCIE30_PHY_MODE_NABINB, flags = 0;
+            option text = STRING_TOKEN(STR_PCIE30_PHY_MODE_NABIBI), value = PCIE30_PHY_MODE_NABIBI, flags = 0;
+          endoneof;
+        endif;
     endform;
 #endif
 

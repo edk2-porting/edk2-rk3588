@@ -42,7 +42,9 @@
   gRK3588TokenSpaceGuid.PcdComboPhy2ModeDefault|0|UINT32|0x00010106
 
   gRK3588TokenSpaceGuid.PcdPcie30Supported|FALSE|BOOLEAN|0x00010201
-  gRK3588TokenSpaceGuid.PcdPcie30PhyModeDefault|4|UINT8|0x00010202
+  gRK3588TokenSpaceGuid.PcdPcie30x2Supported|FALSE|BOOLEAN|0x00010202
+  gRK3588TokenSpaceGuid.PcdPcie30PhyModeSwitchable|FALSE|BOOLEAN|0x00010203
+  gRK3588TokenSpaceGuid.PcdPcie30PhyModeDefault|0|UINT8|0x00010204
 
   gRK3588TokenSpaceGuid.PcdConfigTableModeDefault|0|UINT32|0x00010300
   gRK3588TokenSpaceGuid.PcdAcpiPcieEcamCompatModeDefault|0|UINT32|0x00010301
@@ -86,7 +88,7 @@
   gRK3588TokenSpaceGuid.PcdComboPhy2Mode|0|UINT32|0x00000103
 
   gRK3588TokenSpaceGuid.PcdPcie30State|0|UINT32|0x00000201
-  gRK3588TokenSpaceGuid.PcdPcie30PhyMode|0|UINT8|0x00000202
+  gRK3588TokenSpaceGuid.PcdPcie30PhyMode|0|UINT8|0x00000204
 
   gRK3588TokenSpaceGuid.PcdConfigTableMode|0|UINT32|0x00000300
   gRK3588TokenSpaceGuid.PcdAcpiPcieEcamCompatMode|0|UINT32|0x00000301

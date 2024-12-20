@@ -35,6 +35,12 @@
   DEFINE COMBO_PHY_MODE_SATA          = 2
   DEFINE COMBO_PHY_MODE_USB3          = 3
 
+  DEFINE PCIE30_PHY_MODE_AGGREGATION  = 4
+  DEFINE PCIE30_PHY_MODE_NANBNB       = 0
+  DEFINE PCIE30_PHY_MODE_NANBBI       = 1
+  DEFINE PCIE30_PHY_MODE_NABINB       = 2
+  DEFINE PCIE30_PHY_MODE_NABIBI       = 3
+
   DEFINE COOLING_FAN_STATE_DISABLED   = 0
   DEFINE COOLING_FAN_STATE_ENABLED    = 1
 
@@ -264,7 +270,9 @@
   # PCI Express 3.0 support flags and default values
   #
   gRK3588TokenSpaceGuid.PcdPcie30Supported|FALSE
-  gRK3588TokenSpaceGuid.PcdPcie30PhyModeDefault|4 # AGGREGATION
+  gRK3588TokenSpaceGuid.PcdPcie30x2Supported|FALSE
+  gRK3588TokenSpaceGuid.PcdPcie30PhyModeSwitchable|FALSE
+  gRK3588TokenSpaceGuid.PcdPcie30PhyModeDefault|$(PCIE30_PHY_MODE_AGGREGATION)
 
   #
   # ACPI / Device Tree support flags and default values
@@ -315,7 +323,7 @@
   # PCI Express 3.0
   #
   gRK3588TokenSpaceGuid.PcdPcie30State|L"Pcie30State"|gRK3588DxeFormSetGuid|0x0|gRK3588TokenSpaceGuid.PcdPcie30Supported
-  gRK3588TokenSpaceGuid.PcdPcie30PhyMode|L"Pcie30PhyMode"|gRK3588DxeFormSetGuid|0x0|4 # AGGREGATION
+  gRK3588TokenSpaceGuid.PcdPcie30PhyMode|L"Pcie30PhyMode"|gRK3588DxeFormSetGuid|0x0|gRK3588TokenSpaceGuid.PcdPcie30PhyModeDefault
 
   #
   # ACPI / Device Tree

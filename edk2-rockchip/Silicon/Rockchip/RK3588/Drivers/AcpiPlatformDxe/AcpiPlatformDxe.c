@@ -120,9 +120,10 @@ AcpiDsdtFixupStatus (
     CHAR8    *ObjectPath;
     BOOLEAN  Enabled;
   } DevStatus[] = {
-    { "\\_SB.PCI0._STA", FixedPcdGetBool (PcdPcie30Supported) &&
-                         PcdGet32 (PcdPcie30State) == PCIE30_STATE_ENABLED },
-    { "\\_SB.PCI1._STA", PcdGet8 (PcdPcie30PhyMode) != PCIE30_PHY_MODE_AGGREGATION },
+    { "\\_SB.PCI0._STA", PcdGet32 (PcdPcie30State) == PCIE30_STATE_ENABLED },
+    { "\\_SB.PCI1._STA", PcdGet32 (PcdPcie30State) == PCIE30_STATE_ENABLED &&
+                         FixedPcdGetBool (PcdPcie30x2Supported) &&
+                         PcdGet8 (PcdPcie30PhyMode) != PCIE30_PHY_MODE_AGGREGATION },
     { "\\_SB.PCI2._STA", PcdGet32 (PcdComboPhy1Mode) == COMBO_PHY_MODE_PCIE },
     { "\\_SB.PCI3._STA", PcdGet32 (PcdComboPhy2Mode) == COMBO_PHY_MODE_PCIE },
     { "\\_SB.PCI4._STA", PcdGet32 (PcdComboPhy0Mode) == COMBO_PHY_MODE_PCIE },
