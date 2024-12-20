@@ -6,7 +6,6 @@ workspace
 ramdisk
 .cache
 .vscode
-*.dts
 *.swp
 *.rej
 *.orig
