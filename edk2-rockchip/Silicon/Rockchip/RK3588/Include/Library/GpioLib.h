@@ -1,6 +1,7 @@
 /** @file
  *
  *  Copyright (c) 2021, Jared McNeill <jmcneill@invisible.ca>
+ *  Copyright (c) 2024, Mario Bălănică <mariobalanica02@gmail.com>
  *
  *  SPDX-License-Identifier: BSD-2-Clause-Patent
  *
@@ -48,9 +49,9 @@ typedef enum {
 } GPIO_PIN_DIRECTION;
 
 typedef enum {
-  GPIO_PIN_PULL_NONE  = 0,
-  GPIO_PIN_PULL_UP    = 1,
-  GPIO_PIN_PULL_DOWN  = 2
+  GPIO_PIN_PULL_NONE  = 0x0,
+  GPIO_PIN_PULL_DOWN  = 0x1,
+  GPIO_PIN_PULL_UP    = 0x3
 } GPIO_PIN_PULL;
 
 typedef enum {
