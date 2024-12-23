@@ -1,8 +1,11 @@
+#/** @file
 #
 #  Copyright (c) 2021, Rockchip Limited. All rights reserved.
+#  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
+#**/
 
 [Defines]
   INF_VERSION                    = 0x00010019
@@ -11,7 +14,6 @@
   MODULE_TYPE                    = BASE
   VERSION_STRING                 = 1.0
   LIBRARY_CLASS                  = RockchipPlatformLib
-  RKPLATLIB_COMMON_DIR           = Silicon/Rockchip/RK3588/Library/RockchipPlatformLibCommon
 
 [Packages]
   EmbeddedPkg/EmbeddedPkg.dec
@@ -32,4 +34,3 @@
 
 [Sources.common]
   RockchipPlatformLib.c
-  $(RKPLATLIB_COMMON_DIR)/RK3588CruLib.c

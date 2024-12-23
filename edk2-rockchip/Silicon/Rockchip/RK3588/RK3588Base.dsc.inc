@@ -140,6 +140,7 @@
   DwcSdhciPlatformLib|Silicon/Rockchip/RK3588/Library/DwcSdhciPlatformLib/DwcSdhciPlatformLib.inf
 
   # Other SoC-specific libraries
+  PlatformCruLib|Silicon/Rockchip/RK3588/Library/Rk3588CruLib/Rk3588CruLib.inf
   OtpLib|Silicon/Rockchip/RK3588/Library/OtpLib/OtpLib.inf
   GpioLib|Silicon/Rockchip/RK3588/Library/GpioLib/GpioLib.inf
   SaradcLib|Silicon/Rockchip/RK3588/Library/SaradcLib/SaradcLib.inf

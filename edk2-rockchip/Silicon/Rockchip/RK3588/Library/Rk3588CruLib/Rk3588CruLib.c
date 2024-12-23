@@ -7,8 +7,9 @@
  *
  **/
 
-#include "Include/Library/CruLib.h"
+#include <Library/CruLib.h>
 #include <Library/DebugLib.h>
+
 /** @addtogroup RK_HAL_Driver
  *  @{
  */

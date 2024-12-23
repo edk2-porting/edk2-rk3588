@@ -39,7 +39,7 @@
   DebugLib
   DevicePathLib
   MemoryAllocationLib
-  CruLib
+  RockchipPlatformLib
   GpioLib
   Pcie30PhyLib
 
