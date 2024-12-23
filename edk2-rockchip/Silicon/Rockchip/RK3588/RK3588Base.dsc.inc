@@ -115,6 +115,9 @@
   SerialPortLib|Silicon/Rockchip/Library/Dw8250SerialPortLib/Dw8250SerialPortLib.inf
 
 [LibraryClasses.common]
+  # Custom reset handler
+  ResetSystemLib|Silicon/Rockchip/RK3588/Library/ResetSystemLib/ResetSystemLib.inf
+
   # ACPI helpers
   AcpiLib|EmbeddedPkg/Library/AcpiLib/AcpiLib.inf
 
@@ -355,11 +358,6 @@
 [Components.common]
   # General platform manager
   Silicon/Rockchip/RK3588/Drivers/RK3588Dxe/RK3588Dxe.inf
-
-  #
-  # Custom reset handler
-  #
-  Silicon/Rockchip/RK3588/Drivers/ResetPlatformDxe/ResetPlatformDxe.inf
 
   #
   # PCI Support

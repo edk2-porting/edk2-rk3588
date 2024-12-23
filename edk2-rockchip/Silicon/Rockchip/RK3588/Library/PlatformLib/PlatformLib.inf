@@ -1,5 +1,6 @@
 #/** @file
 #
+#  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
 #  Copyright (c) 2021, Jared McNeill <jmcneill@invisible.ca>
 #  Copyright (c) 2017-2021, Andrei Warkentin <andrey.warkentin@gmail.com>
 #  Copyright (c) 2014-2016, Linaro Limited. All rights reserved.
@@ -34,6 +35,8 @@
   MemoryAllocationLib
   PcdLib
   PrintLib
+  ResetUtilityLib
+  SaradcLib
   SdramLib
   SerialPortLib
 
@@ -71,3 +74,4 @@
 
 [Guids]
   gRK3588DxeFormSetGuid
+  gRockchipResetTypeMaskromGuid
