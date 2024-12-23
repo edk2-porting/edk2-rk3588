@@ -296,8 +296,10 @@
   #
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution|0
   gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution|0
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|0
-  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|0
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutColumn|100
+  gEfiMdeModulePkgTokenSpaceGuid.PcdConOutRow|31
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupConOutColumn|100
+  gEfiMdeModulePkgTokenSpaceGuid.PcdSetupConOutRow|31
 
 [PcdsDynamicHii.common.DEFAULT]
   #
