@@ -1,25 +1,50 @@
 # EDK2 UEFI firmware for Rockchip RK3588 platforms
 This repository contains an UEFI firmware implementation based on EDK2 for various RK3588 boards.
 
+It delivers a PC-like standardized boot experience, supporting multiple operating systems, such as Windows, Linux, BSD and VMware ESXi.
+
+![EDK2 Front Page](images/edk2-frontpage.png)
+
 # Supported platforms
+Support levels are categorized into two tiers: Platinum and Bronze.
+
+Platinum devices are considered to have the best overall support, based on factors such as:
+- Device Tree and peripherals compatible with mainline Linux. [**Required**]
+- Active interest from the vendor in supporting their hardware.
+- Hardware design choices:
+  - If an Ethernet port is present, Realtek PCIe NIC (for netboot) or RK GMAC. [**Required**]
+  - SPI NOR flash for dedicated firmware storage. [Preferred]
+
+Bronze devices may have limitations such as:
+- Missing one or more required features listed above.
+- Low interest from vendors and/or the community.
+- Lack of proper validation, potentially affecting functionality.
+
+Note that this list is subject to change at any time as devices gain better support or fall behind.
+
+## Platinum
 - [Radxa ROCK 5B](https://radxa.com/products/rock5/5b/)
 - [Radxa ROCK 5A](https://radxa.com/products/rock5/5a/)
 - [Radxa ROCK 5 ITX](https://radxa.com/products/rock5/5itx/)
 - [Orange Pi 5](http://www.orangepi.org/html/hardWare/computerAndMicrocontrollers/details/Orange-Pi-5.html)
 - [Orange Pi 5 Plus](http://www.orangepi.org/html/hardWare/computerAndMicrocontrollers/details/Orange-Pi-5-plus.html)
-- [ameriDroid Indiedroid Nova](https://indiedroid.us)
-- [Fydetab Duo](https://fydetabduo.com/)
-- [Firefly AIO-3588Q](https://en.t-firefly.com/product/industry/aio3588q)
-- [Firefly ITX-3588J](https://en.t-firefly.com/product/industry/itx3588j)
-- [Firefly ROC-RK3588S-PC](https://en.t-firefly.com/product/industry/rocrk3588spc)
-- [StationPC Station M3](https://www.stationpc.com/product/stationm3)
-- [Mekotronics R58X](https://www.mekotronics.com/h-pd-75.html)
-- [Mekotronics R58 Mini](https://www.mekotronics.com/h-pd-76.html)
 - [Khadas Edge2](https://www.khadas.com/edge2)
-- [Mixtile Blade 3](https://www.mixtile.com/blade-3)
+- [BuzzTV P6](https://buzztvglobal.com/products/powerstation-6)
 - [FriendlyELEC NanoPC T6](https://wiki.friendlyelec.com/wiki/index.php/NanoPC-T6)
 - [FriendlyELEC NanoPi R6C](https://wiki.friendlyelec.com/wiki/index.php/NanoPi_R6C)
 - [FriendlyELEC NanoPi R6S](https://wiki.friendlyelec.com/wiki/index.php/NanoPi_R6S)
+- [FriendlyELEC NanoPC CM3588-NAS](https://wiki.friendlyelec.com/wiki/index.php/CM3588_NAS_Kit)
+- [ameriDroid Indiedroid Nova](https://indiedroid.us)
+
+## Bronze
+- [Radxa ROCK 5B+](https://radxa.com/products/rock5/5bp)
+- [Fydetab Duo](https://fydetabduo.com/)
+- [Firefly AIO-3588Q](https://en.t-firefly.com/product/industry/aio3588q)
+- [Firefly ITX-3588J](https://en.t-firefly.com/product/industry/itx3588j)
+- [Firefly ROC-RK3588S-PC](https://en.t-firefly.com/product/industry/rocrk3588spc) / [StationPC Station M3](https://www.stationpc.com/product/stationm3)
+- [Mekotronics R58X](https://www.mekotronics.com/h-pd-75.html)
+- [Mekotronics R58 Mini](https://www.mekotronics.com/h-pd-76.html)
+- [Mixtile Blade 3](https://www.mixtile.com/blade-3)
 - [FriendlyELEC NanoPi M6](https://wiki.friendlyelec.com/wiki/index.php/NanoPi_M6)
 - [Hinlink H88K](http://www.hinlink.com)
 
@@ -36,9 +61,18 @@ This repository contains an UEFI firmware implementation based on EDK2 for vario
 > ACPI support is only being developed and tested against Windows. There are no plans to further improve functionality for other OSes. Consider using Device Tree instead (where applicable, for instance Linux).
 
 ## In Device Tree mode
+### Vendor compatibility mode
 | OS | Version | Tested/supported hardware | Notes |
 | --- | --- | --- | --- |
-| Rockchip SDK Linux | 5.10 legacy, tested with [Armbian rk3588-live-iso](https://github.com/amazingfate/rk3588-live-iso) | Platform-dependent, most peripherals work. | If using a different kernel, see [Device Tree configuration](#device-tree-configuration). |
+| Rockchip SDK Linux | Kernel 5.10/6.1<br> Tested with:<br> - [Armbian rk3588-live-iso](https://github.com/amazingfate/rk3588-live-iso) | Platform-dependent, most peripherals work. | If using a different kernel, see [Device Tree configuration](#device-tree-configuration). |
+
+### Mainline compatibility mode
+| OS | Version | Tested/supported hardware | Notes |
+| --- | --- | --- | --- |
+| Generic upstream Linux | Kernel 6.10 or newer.<br> Tested with:<br> - Ubuntu 24.10<br> - Fedora Workstation 41 | Platform and kernel version dependent, see [Collabora's RK3588 upstream status](https://gitlab.collabora.com/hardware-enablement/rockchip-3588/notes-for-rockchip-3588/-/blob/main/mainline-status.md). | * Kernels older than 6.13 lack HDMI output. To work around this, see: [Device Tree configuration](#device-tree-configuration). |
+
+> [!NOTE]
+> Mainline support is only available on [Platinum](#platinum) platforms.
 
 # Supported peripherals in UEFI
 
@@ -49,29 +83,24 @@ This repository contains an UEFI firmware implementation based on EDK2 for vario
 
 | Device | Status | Notes |
 | --- | --- | --- |
-| USB 3 / 2.0 / 1.1                  | 🟢 Working     | Host-mode only, USB 3 devices connected to a Type-C port only work in one orientation. |
-| PCIe 3.0 (RK3588)                  | 🟢 Working     | No bifurcation support |
-| PCIe 2.1                           | 🟢 Working     | |
-| SATA                               | 🟢 Working     | |
-| SD/eMMC                            | 🟢 Working     | |
-| HDMI output                        | 🟡 Partial     | Single display with mode limited at 1080p 60 Hz |
-| DisplayPort output (USB-C)         | 🟡 Partial     | Mode fixed at 1080p 60 Hz, only works in one orientation of the Type-C port. Some displays may not work regardless. |
-| eDP output                         | 🟡 Partial     | Disabled, requires manual configuration depending on the platform and panel. |
-| DSI output                         | 🟢 Working     | Only enabled on Fydetab Duo. Requires manual configuration depending on the platform and panel. |
-| GMAC Ethernet                      | 🔴 Not working | Only brought-up for OS usage |
-| Realtek PCIe Ethernet              | 🟢 Working     | Some platforms don't have MAC addresses set, networking may not work in that case. |
-| UART                               | 🟢 Working     | UART2 console available at 1500000 baud rate |
-| GPIO                               | 🟡 Partial     | Only read, write and alt function supported |
-| I2C                                | 🟢 Working     | |
-| SPI                                | 🟢 Working     | |
-| PWM                                | 🟢 Working     | |
-| SPI NOR Flash                      | 🟢 Working     | |
-| HYM8563 real-time clock            | 🟢 Working     | |
-| RNG                                | 🟢 Working     | |
-| Cooling fan                        | 🟢 Working     | Supported on most platforms. Fan connector where present, otherwise available at the GPIO header for 3-pin PWM fans (do *not* connect 2-pin fans there!):<br>* Orange Pi 5: `GPIO4_B2`<br>* Indiedroid Nova: `GPIO4_B4` |
-| Status LED                         | 🟢 Working     | |
-| Voltage regulators (RK806, RK860)  | 🟢 Working     | |
-| FUSB302 USB Type-C Controller      | 🔴 Not working | Required for PD negotiation and connector orientation switching |
+| USB 3 / 2.0 / 1.1                     | 🟢 Working     | Host-mode only, USB 3 devices connected to a Type-C port only work in one orientation. |
+| PCIe 3.0 / 2.1                        | 🟢 Working     | |
+| SATA                                  | 🟢 Working     | |
+| SD/eMMC                               | 🟢 Working     | |
+| HDMI output                           | 🟡 Partial     | Single display with mode limited at 1080p 60 Hz |
+| DisplayPort output (USB-C)            | 🟡 Partial     | Mode fixed at 1080p 60 Hz, only works in one orientation of the Type-C port. Some displays may not work regardless. |
+| eDP output                            | 🟡 Partial     | Disabled, requires manual configuration depending on the platform and panel. |
+| DSI output                            | 🟢 Working     | Only enabled on Fydetab Duo. Requires manual configuration depending on the platform and panel. |
+| GMAC Ethernet                         | 🔴 Not working | Only brought-up for OS usage |
+| Realtek PCIe Ethernet                 | 🟢 Working     | Some platforms don't have MAC addresses set, networking may not work in that case. |
+| Low-speed (GPIO/UART/I2C/SPI/PWM)     | 🟢 Working     | UART2 console available at 1500000 baud rate |
+| SPI NOR Flash                         | 🟢 Working     | |
+| HYM8563 real-time clock               | 🟢 Working     | |
+| RNG                                   | 🟢 Working     | |
+| Cooling fan                           | 🟢 Working     | Supported on most platforms. Fan connector where present, otherwise available at the GPIO header for 3-pin PWM fans (do *not* connect 2-pin fans there!):<br>* Orange Pi 5: `GPIO4_B2`<br>* Indiedroid Nova: `GPIO4_B4` |
+| Status LED                            | 🟢 Working     | |
+| Voltage regulators (RK806/RK860)      | 🟢 Working     | |
+| FUSB302 USB Type-C Controller         | 🔴 Not working | Required for PD negotiation and connector orientation switching |
 
 # Getting started
 ## 1. Requirements
@@ -86,10 +115,10 @@ This repository contains an UEFI firmware implementation based on EDK2 for vario
 ## 2. Download the firmware image
 The latest version can be obtained from <https://github.com/edk2-porting/edk2-rk3588/releases>.
 
-If your platform is not yet supported, using an image meant for another device is **not** recommended. Although they are generally similar, voltage setup can happen to be different and you may risk damaging the board. External peripherals are unlikely to work either.
+If your platform is not yet supported, using an image meant for another device is **NOT** recommended. Although they are generally similar, voltage setup can happen to be different and you may risk damaging the board. External peripherals are unlikely to work either.
 
 ## 3. Flash the firmware
-UEFI can be flashed to either a SPI NOR flash, SD card or eMMC module:
+UEFI can be flashed to either an SPI NOR flash, SD card or eMMC module:
 * For removable SD or eMMC (easiest), you can simply use balenaEtcher, RPi Imager or dd.
 * For SPI NOR or soldered eMMC, instructions can be found at: <https://wiki.radxa.com/Rock5/install/spi>.
 
@@ -123,12 +152,21 @@ Configuration through the user interface is fairly straightforward and help/navi
 ## Device Tree configuration
 For rich Linux support, it is recommended to enable Device Tree mode. You can do so by going to the configuration menu -> `ACPI / Device Tree` and setting `Config Table Mode` to `Device Tree`.
 
-By default, the firmware installs a [DTB compatible with (most) Rockchip SDK Linux 5.10 legacy kernel variants](https://github.com/edk2-porting/edk2-rk3588/tree/master/edk2-rockchip-non-osi/Platform/Rockchip/DeviceTree).
+The firmware provides two compatibility modes:
+* `Vendor` - compatible with Rockchip SDK Linux 5.10/6.1 kernel only.
+* `Mainline` - compatible with generic upstream Linux 6.10 or newer kernel. This option is under active development and may lack certain features. Therefore, it is always recommended to use the latest kernel and firmware available in order to benefit from better device support.
+
+[Platinum](#platinum) platforms will have the `Mainline` option enabled by default, while [Bronze](#bronze) ones will fall back to `Vendor`.
+
+> [!TIP]
+> In `Mainline` mode with generic Linux kernels older than 6.13, the HDMI output will not be usable. To use the UEFI-initialized display instead, go to the configuration menu -> `ACPI / Device Tree` and enable `Force UEFI GOP Display`. Note that GPU acceleration cannot work in this mode.
 
 ### Custom Device Tree Blob (DTB) override and overlays
 It is also possible to provide a custom DTB and overlays. To enable this, go to the configuration menu -> `ACPI / Device Tree` and set `Support DTB override & overlays` to `Enabled`.
 
-The firmware will now look for overrides in the partition of a selected boot option / OS loader. In most cases this will be the first FAT32 EFI System Partition.
+The firmware will now look for overrides in the partition of a selected boot option / OS loader. In most cases, this will be the first FAT32 EFI System Partition.
+
+**Important:** The `dtb` directory must be placed at the root of the partition. It should not be inside any sub-directory.
 
 * The base DTB must be located at `\dtb\base\<PLATFORM-DT-NAME>.dtb`.
 
@@ -138,19 +176,19 @@ The firmware will now look for overrides in the partition of a selected boot opt
 
   and must have the `.dtbo` extension.
 
-The paths above are relative to the root of the file system. That is, the `dtb` directory must not be placed in a sub-directory.
-
 `<PLATFORM-DT-NAME>` can be:
 | Name                                    | Platform                      |
 | --------------------------------------- | ----------------------------- |
 | `rk3588-rock-5b`                        | ROCK 5B                       |
+| `rk3588-rock-5bp`                       | ROCK 5B+                      |
 | `rk3588s-rock-5a`                       | ROCK 5A                       |
 | `rk3588-rock-5-itx`                     | ROCK 5 ITX                    |
 | `rk3588s-orangepi-5`                    | Orange Pi 5                   |
 | `rk3588-orangepi-5-plus`                | Orange Pi 5 Plus              |
 | `rk3588s-9tripod-linux`                 | Indiedroid Nova               |
 | `rk3588s-fydetab-duo`                   | Fydetab Duo                   |
-| `rk3588-firefly-aio-3588q`              | Firefly AIO-3588Q             |
+| `rk3588-buzztv-p6`                      | PowerStation 6                |
+| `aio-3588q`                             | Firefly AIO-3588Q             |
 | `itx-3588j`                             | Firefly ITX-3588J             |
 | `roc-rk3588s-pc`                        | ROC-RK3588S-PC / Station M3   |
 | `rk3588-blueberry-edge-v12-linux`       | R58X (v1.2)                   |
@@ -193,7 +231,7 @@ Here we skip the GPT and copy the firmware starting at offset 0x8000 (`64` block
 > [!IMPORTANT]
 > First of all, make sure your device can only possibly load the UEFI firmware and nothing else.
 >
-> **U-Boot must not present on either SPI NOR, SD or eMMC, otherwise it could take precedence and cause hidden issues.**
+> **U-Boot must not be present on either SPI NOR, SD or eMMC, otherwise it could take precedence and cause issues.**
 
 Below you can find some basic debugging information. If none of this helps, please see the [Advanced troubleshooting](#advanced-troubleshooting) section.
 
@@ -212,6 +250,11 @@ If the LED:
 
   Note that it is only expected to stop as described at point 3) above.
 
+## Recovery
+In case you don't have easy access to the MaskROM button, UEFI provides a boot option for that purpose, accessible either via the Boot Manager or <kbd>F4</kbd> key during splash screen.
+
+Additionally, holding the Recovery (or volume up) button while powering on the device will also enter MaskROM mode.
+
 ## Common issues
 ### Nothing shows up on the screen
 Make sure you've flashed the firmware correctly and that it is the version designed for your device. In most cases this is the culprit.
@@ -224,13 +267,7 @@ Assuming the firmware loads fine:
 If you are not able to get any display output, the only way to interact with UEFI is via the [serial console](#advanced-troubleshooting).
 
 ### Configuration settings do not get saved
-This has been observed in cases where U-Boot was still present on another boot device (SD, eMMC or SPI NOR).  This is not a supported scenario. The solution is to unplug or erase devices that may have other firmware on them.
-
-What's happening:
-1. Board loads U-Boot from a storage device that has higher priority (let's say eMMC).
-2. That U-Boot image in turn loads UEFI and its settings from another device with lower priority (let's say SD).
-3. UEFI cannot accurately determine to which device it belongs. The parameter used to verify this points to eMMC (U-Boot), while UEFI actually got loaded from SD.
-4. Consequently, UEFI mistakenly saves the user settings to eMMC. On reboot, U-Boot loads UEFI and the original/unchanged settings from SD and the cycle repeats.
+This has been observed in cases where firmware was present on more than one device (SPI NOR, eMMC or SD). This is not a supported scenario, because UEFI will be unable to accurately determine the boot device it belongs to. The solution is to unplug or erase devices that may have other firmware on them.
 
 ### USB 3 devices do not work
 * Try a different port.
@@ -361,11 +398,7 @@ The firmware expects these exact offsets, do not change them.
 ## Licenses
 Most of the UEFI code is licensed under the default EDK2 license, which is [BSD-2-Clause-Patent](https://github.com/tianocore/edk2/blob/master/License.txt).
 
-Some non-critical components have been ported from Rockchip's U-Boot fork and are licensed as **GPL-2.0-or-later**:
-* UsbDpPhy
-* DwDpLib
-
-The files in `edk2-rockchip-non-osi` are licensed as **GPL-2.0-only**.
+Some components ported from Linux and Rockchip's U-Boot fork are licensed as **GPL-2.0** (check `SPDX-License-Identifier`).
 
 The license for some of the blobs in the `misc/rkbin/` directory can be found at: <https://github.com/rockchip-linux/rkbin/blob/master/LICENSE>. Note that it also contains binaries built from open-source projects such as U-Boot (SPL), Arm Trusted Firmware and OP-TEE, having a different license.
 
