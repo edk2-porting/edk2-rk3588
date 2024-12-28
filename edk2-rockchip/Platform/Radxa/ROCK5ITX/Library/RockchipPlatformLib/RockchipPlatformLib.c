@@ -241,6 +241,9 @@ PcieIoInit (
       GpioPinSetDirection (1, GPIO_PIN_PA4, GPIO_PIN_OUTPUT);
       // PciePinmuxInit(Segment, 1);
       break;
+    case PCIE_SEGMENT_PCIE30X2:
+      GpioPinSetDirection (4, GPIO_PIN_PB0, GPIO_PIN_OUTPUT);
+      break;
     case PCIE_SEGMENT_PCIE20L0:
       GpioPinSetDirection (4, GPIO_PIN_PA5, GPIO_PIN_OUTPUT);
       GpioPinSetDirection (1, GPIO_PIN_PD2, GPIO_PIN_OUTPUT);
@@ -295,6 +298,9 @@ PciePeReset (
   switch(Segment) {
     case PCIE_SEGMENT_PCIE30X4:
       GpioPinWrite (4, GPIO_PIN_PB6, !Enable);
+      break;
+    case PCIE_SEGMENT_PCIE30X2:
+      GpioPinWrite (4, GPIO_PIN_PB0, !Enable);
       break;
     case PCIE_SEGMENT_PCIE20L0: // m.2 a+e key
       GpioPinWrite (4, GPIO_PIN_PA5, !Enable);
