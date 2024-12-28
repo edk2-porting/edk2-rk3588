@@ -83,8 +83,11 @@
   # PCIe/SATA/USB Combo PIPE PHY support flags and default values
   # NanoPC CM3588 has one 2.5 GBE wired to the first PCIE2 port
   #
+  gRK3588TokenSpaceGuid.PcdPcie30PhyModeDefault|$(PCIE30_PHY_MODE_NABIBI)
+  gRK3588TokenSpaceGuid.PcdPcie30x2Supported|TRUE
   gRK3588TokenSpaceGuid.PcdComboPhy0Switchable|FALSE
   gRK3588TokenSpaceGuid.PcdComboPhy0ModeDefault|$(COMBO_PHY_MODE_PCIE)
+  gRK3588TokenSpaceGuid.PcdComboPhy2ModeDefault|$(COMBO_PHY_MODE_USB3)
 
   #
   # USB/DP Combo PHY support flags and default values
