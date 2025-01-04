@@ -10,7 +10,7 @@
  **/
 
 #include <IndustryStandard/AcpiAml.h>
-#include <IndustryStandard/PeImage.h>
+#include <Protocol/ExitBootServicesOsNotify.h>
 #include <Protocol/LoadedImage.h>
 #include <Protocol/NonDiscoverableDevice.h>
 #include <Library/AcpiLib.h>
@@ -19,7 +19,6 @@
 #include <Library/DebugLib.h>
 #include <Library/DevicePathLib.h>
 #include <Library/MemoryAllocationLib.h>
-#include <Library/PeCoffGetEntryPointLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
 #include <AcpiTables.h>
@@ -29,17 +28,10 @@ STATIC CONST EFI_GUID mAcpiTableFile = {
   0x7E374E25, 0x8E01, 0x4FEE, { 0x87, 0xf2, 0x39, 0x0C, 0x23, 0xC6, 0x06, 0xCD }
 };
 
-STATIC EFI_EXIT_BOOT_SERVICES    mOriginalExitBootServices;
-
 STATIC EFI_ACPI_SDT_PROTOCOL        *mAcpiSdtProtocol;
 STATIC EFI_ACPI_DESCRIPTION_HEADER  *mDsdtTable;
 
 STATIC BOOLEAN  mIsSdmmcBoot = FALSE;
-
-typedef enum {
-  AcpiOsUnknown = 0,
-  AcpiOsWindows,
-} ACPI_OS_BOOT_TYPE;
 
 #define SDT_PATTERN_LEN (AML_NAME_SEG_SIZE + 1)
 
@@ -200,7 +192,7 @@ STATIC
 EFI_STATUS
 EFIAPI
 AcpiFixupPcieEcam (
-  IN ACPI_OS_BOOT_TYPE OsType
+  IN EXIT_BOOT_SERVICES_OS_TYPE OsType
   )
 {
   EFI_STATUS                    Status;
@@ -232,7 +224,7 @@ AcpiFixupPcieEcam (
 
   if (PcieEcamMode == ACPI_PCIE_ECAM_COMPAT_MODE_NXPMX6_SINGLE_DEV ||
       PcieEcamMode == ACPI_PCIE_ECAM_COMPAT_MODE_NXPMX6_GRAVITON) {
-    if (OsType == AcpiOsWindows) {
+    if (OsType == ExitBootServicesOsWindows) {
       PcieEcamMode = ACPI_PCIE_ECAM_COMPAT_MODE_NXPMX6;
     } else {
       PcieEcamMode &= ~ACPI_PCIE_ECAM_COMPAT_MODE_NXPMX6;
@@ -309,10 +301,12 @@ AcpiFixupPcieEcam (
 STATIC
 VOID
 EFIAPI
-AcpiPlatformOsBootHandler (
-  IN ACPI_OS_BOOT_TYPE OsType
+AcpiPlatformExitBootServicesOsHandler (
+  IN EXIT_BOOT_SERVICES_OS_CONTEXT     *Context
   )
 {
+  EXIT_BOOT_SERVICES_OS_TYPE OsType = Context->OsType;
+
   if (mAcpiSdtProtocol == NULL || mDsdtTable == NULL) {
     return;
   }
@@ -322,7 +316,7 @@ AcpiPlatformOsBootHandler (
   // which by default uses atomics on uncached memory and would crash
   // the system.
   //
-  if (OsType == AcpiOsWindows) {
+  if (OsType == ExitBootServicesOsWindows) {
     AcpiUpdateSdtNameInteger (mDsdtTable, "EHID", 0);
   }
 
@@ -337,89 +331,6 @@ AcpiPlatformOsBootHandler (
   AcpiFixupPcieEcam (OsType);
 
   AcpiUpdateChecksum ((UINT8 *)mDsdtTable, mDsdtTable->Length);
-}
-
-STATIC
-UINTN
-EFIAPI
-FindPeImageBase (
-  EFI_PHYSICAL_ADDRESS  Base
-  )
-{
-  EFI_IMAGE_DOS_HEADER                 *DosHdr;
-  EFI_IMAGE_OPTIONAL_HEADER_PTR_UNION  Hdr;
-
-  Base &= ~(EFI_PAGE_SIZE - 1);
-
-  while (Base != 0) {
-    DosHdr = (EFI_IMAGE_DOS_HEADER *)Base;
-    if (DosHdr->e_magic == EFI_IMAGE_DOS_SIGNATURE) {
-      Hdr.Pe32 = (EFI_IMAGE_NT_HEADERS32 *)(Base + DosHdr->e_lfanew);
-      if (Hdr.Pe32->Signature == EFI_IMAGE_NT_SIGNATURE) {
-        break;
-      }
-    }
-
-    Base -= EFI_PAGE_SIZE;
-  }
-
-  return Base;
-}
-
-STATIC CHAR8 mWinLoadNameStr[] = "winload";
-#define PDB_NAME_MAX_LENGTH   256
-
-STATIC
-BOOLEAN
-IsPeImageWinLoader (
-  IN VOID *PeImage
- )
-{
-  CHAR8  *PdbStr;
-  UINTN  Index;
-
-  PdbStr = (CHAR8 *)PeCoffLoaderGetPdbPointer (PeImage);
-  if (PdbStr == NULL) {
-    return FALSE;
-  }
-
-  for (Index = 0; Index < PDB_NAME_MAX_LENGTH && PdbStr[Index] != '\0'; Index++) {
-    if (AsciiStrnCmp (PdbStr + Index, mWinLoadNameStr, sizeof (mWinLoadNameStr) - sizeof (CHAR8)) == 0) {
-      return TRUE;
-    }
-  }
-
-  return FALSE;
-}
-
-STATIC
-EFI_STATUS
-EFIAPI
-AcpiPlatformExitBootServicesHook (
-  IN EFI_HANDLE  ImageHandle,
-  IN UINTN       MapKey
-  )
-{
-  UINTN               ReturnAddress;
-  UINTN               OsLoaderAddress;
-  ACPI_OS_BOOT_TYPE   OsType;
-
-  ReturnAddress = (UINTN)RETURN_ADDRESS (0);
-
-  gBS->ExitBootServices = mOriginalExitBootServices;
-
-  OsType = AcpiOsUnknown;
-
-  OsLoaderAddress = FindPeImageBase (ReturnAddress);
-  if (OsLoaderAddress > 0) {
-    if (IsPeImageWinLoader ((VOID *)OsLoaderAddress)) {
-      OsType = AcpiOsWindows;
-    }
-  }
-
-  AcpiPlatformOsBootHandler (OsType);
-
-  return gBS->ExitBootServices (ImageHandle, MapKey);
 }
 
 STATIC
@@ -547,8 +458,9 @@ AcpiPlatformDxeInitialize (
   IN EFI_SYSTEM_TABLE   *SystemTable
   )
 {
-  EFI_STATUS    Status;
-  EFI_EVENT     Event;
+  EFI_STATUS                              Status;
+  EFI_EVENT                               Event;
+  EXIT_BOOT_SERVICES_OS_NOTIFY_PROTOCOL   *ExitBootServicesOsNotify;
 
   if ((PcdGet32 (PcdConfigTableMode) & CONFIG_TABLE_MODE_ACPI) == 0) {
     DEBUG ((DEBUG_WARN, "AcpiPlatform: ACPI support is disabled by the settings.\n"));
@@ -575,8 +487,19 @@ AcpiPlatformDxeInitialize (
                     );
   ASSERT_EFI_ERROR (Status);
 
-  mOriginalExitBootServices = gBS->ExitBootServices;
-  gBS->ExitBootServices = AcpiPlatformExitBootServicesHook;
+  Status = gBS->LocateProtocol (
+                  &gExitBootServicesOsNotifyProtocolGuid,
+                  NULL,
+                  (VOID **)&ExitBootServicesOsNotify
+                  );
+  ASSERT_EFI_ERROR (Status);
+  if (!EFI_ERROR (Status)) {
+    Status = ExitBootServicesOsNotify->RegisterHandler (
+                            ExitBootServicesOsNotify,
+                            AcpiPlatformExitBootServicesOsHandler
+                            );
+    ASSERT_EFI_ERROR (Status);
+  }
 
   return EFI_SUCCESS;
 }

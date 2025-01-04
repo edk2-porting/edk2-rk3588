@@ -33,7 +33,6 @@
   DebugLib
   DevicePathLib
   MemoryAllocationLib
-  PeCoffGetEntryPointLib
   UefiBootServicesTableLib
   UefiLib
   UefiDriverEntryPoint
@@ -46,6 +45,7 @@
   gEdkiiNonDiscoverableDeviceProtocolGuid
   gEfiAcpiSdtProtocolGuid
   gEfiLoadedImageProtocolGuid
+  gExitBootServicesOsNotifyProtocolGuid
 
 [Pcd]
   gRK3588TokenSpaceGuid.PcdConfigTableMode
@@ -60,4 +60,5 @@
   gRockchipTokenSpaceGuid.PcdRkSdmmcBaseAddress
 
 [Depex]
-  gRockchipPlatformConfigAppliedProtocolGuid
+  gRockchipPlatformConfigAppliedProtocolGuid AND
+  gExitBootServicesOsNotifyProtocolGuid

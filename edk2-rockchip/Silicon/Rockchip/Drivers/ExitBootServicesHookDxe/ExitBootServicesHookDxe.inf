@@ -1,0 +1,38 @@
+#/** @file
+#
+#  Copyright (c) 2024-2025, Mario Bălănică <mariobalanica02@gmail.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = ExitBootServicesHookDxe
+  FILE_GUID                      = 6fd64e41-870c-44cd-b8b1-6752255fb399
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = ExitBootServicesHookDxeInitialize
+
+[Sources]
+  ExitBootServicesHookDxe.c
+  OsIdentification.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  Silicon/Rockchip/RockchipPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  DebugLib
+  MemoryAllocationLib
+  PeCoffGetEntryPointLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+
+[Protocols]
+  gExitBootServicesOsNotifyProtocolGuid     ## PRODUCES
+
+[Depex]
+  TRUE
