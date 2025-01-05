@@ -36,6 +36,11 @@
   INF Silicon/Rockchip/Drivers/ExitBootServicesHookDxe/ExitBootServicesHookDxe.inf
 
   #
+  # Runtime Services state manager
+  #
+  INF Silicon/Rockchip/Drivers/RuntimeServicesManagerDxe/RuntimeServicesManagerDxe.inf
+
+  #
   # Status LED support
   #
 !if $(RK_STATUS_LED_ENABLE) == TRUE

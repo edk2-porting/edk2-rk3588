@@ -1,0 +1,39 @@
+#/** @file
+#
+#  Copyright (c) 2025, Mario Bălănică <mariobalanica02@gmail.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = RuntimeServicesManagerDxe
+  FILE_GUID                      = e83cd2ea-e435-48fd-94a8-97005d6296ec
+  MODULE_TYPE                    = DXE_RUNTIME_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = RuntimeServicesManagerDxeInitialize
+
+[Sources]
+  RuntimeServicesManagerDxe.c
+
+[Packages]
+  EmbeddedPkg/EmbeddedPkg.dec
+  MdePkg/MdePkg.dec
+  Silicon/Rockchip/RockchipPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  UefiLib
+  UefiDriverEntryPoint
+
+[Guids]
+  gFdtTableGuid
+
+[Protocols]
+  gExitBootServicesOsNotifyProtocolGuid
+
+[Depex]
+  gExitBootServicesOsNotifyProtocolGuid
