@@ -69,7 +69,7 @@ Note that this list is subject to change at any time as devices gain better supp
 ### Mainline compatibility mode
 | OS | Version | Tested/supported hardware | Notes |
 | --- | --- | --- | --- |
-| Generic upstream Linux | Kernel 6.10 or newer.<br> Tested with:<br> - Ubuntu 24.10<br> - Fedora Workstation 41 | Platform and kernel version dependent, see [Collabora's RK3588 upstream status](https://gitlab.collabora.com/hardware-enablement/rockchip-3588/notes-for-rockchip-3588/-/blob/main/mainline-status.md). | * Kernels older than 6.13 lack HDMI output. To work around this, see: [Device Tree configuration](#device-tree-configuration). |
+| Generic upstream Linux | Kernel 6.10 or newer.<br> Tested with:<br> - Ubuntu 24.10<br> - Fedora Workstation 41<br> - Fedora Workstation Rawhide | Platform and kernel version dependent, see [Collabora's RK3588 upstream status](https://gitlab.collabora.com/hardware-enablement/rockchip-3588/notes-for-rockchip-3588/-/blob/main/mainline-status.md). | * Kernels older than 6.13 lack HDMI output. To work around this, see: [Device Tree configuration](#device-tree-configuration). |
 
 > [!NOTE]
 > Mainline support is only available on [Platinum](#platinum) platforms.
