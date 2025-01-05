@@ -317,6 +317,20 @@ This has been observed in cases where firmware was present on more than one devi
 
   **Note:** the number of eFuses is limited, thus MAC addresses can only be changed a few times.
 
+### Wi-Fi / Bluetooth not working on mainline Linux
+The most likely cause is missing upstream firmware support. Check `dmesg` for messages that indicate firmware load errors.
+
+This can usually be fixed by manually copying the necessary blobs to `/usr/lib/firmware`.
+
+For instance, on Khadas Edge2 with an onboard AP6275P module (BCM/SYN43752):
+```bash
+sudo wget https://github.com/armbian/firmware/raw/refs/heads/master/brcm/brcmfmac43752-pcie.bin -P /usr/lib/firmware/brcm/
+sudo wget https://github.com/armbian/firmware/raw/refs/heads/master/brcm/brcmfmac43752-pcie.clm_blob -P /usr/lib/firmware/brcm/
+sudo wget https://github.com/armbian/firmware/raw/refs/heads/master/brcm/brcmfmac43752-pcie.txt -P /usr/lib/firmware/brcm/
+sudo wget https://github.com/armbian/firmware/raw/refs/heads/master/brcm/BCM4362A2.hcd -P /usr/lib/firmware/brcm/
+```
+then reboot.
+
 ## Advanced troubleshooting
 The firmware will log detailed information to the serial console when using a debug version. See the [release notes](https://github.com/edk2-porting/edk2-rk3588/releases) for details on how to obtain this version.
 
