@@ -28,23 +28,28 @@ SetupDebugSerialPortVariables (
   VOID
   )
 {
-  UINTN      Size;
-  UINT64     Var64;
-  EFI_STATUS Status;
+  UINTN       Size;
+  UINT64      Var64;
+  EFI_STATUS  Status;
 
   Size = sizeof (UINT64);
 
-  Status = gRT->GetVariable (L"DebugSerialPortBaudRate",
-                            &gRK3588DxeFormSetGuid,
-                            NULL, &Size, &Var64);
+  Status = gRT->GetVariable (
+                  L"DebugSerialPortBaudRate",
+                  &gRK3588DxeFormSetGuid,
+                  NULL,
+                  &Size,
+                  &Var64
+                  );
   if (EFI_ERROR (Status)) {
-    Var64 = DEBUG_SERIAL_PORT_BAUD_RATE_DEFAULT;
+    Var64  = DEBUG_SERIAL_PORT_BAUD_RATE_DEFAULT;
     Status = gRT->SetVariable (
                     L"DebugSerialPortBaudRate",
                     &gRK3588DxeFormSetGuid,
                     EFI_VARIABLE_NON_VOLATILE | EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS,
                     Size,
-                    &Var64);
+                    &Var64
+                    );
     ASSERT_EFI_ERROR (Status);
   }
 }

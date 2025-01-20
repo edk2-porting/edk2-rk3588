@@ -24,61 +24,61 @@
 
 #pragma pack(1)
 typedef struct {
-  EFI_ACPI_6_2_PPTT_STRUCTURE_PROCESSOR  Package;
-  UINT32                                 L3CacheRef;
+  EFI_ACPI_6_2_PPTT_STRUCTURE_PROCESSOR    Package;
+  UINT32                                   L3CacheRef;
 } RK3588_PPTT_PACKAGE_NODE;
 
 typedef struct {
-  EFI_ACPI_6_2_PPTT_STRUCTURE_PROCESSOR  Cluster;
+  EFI_ACPI_6_2_PPTT_STRUCTURE_PROCESSOR    Cluster;
 } RK3588_PPTT_CLUSTER_NODE;
 
 typedef struct {
-  EFI_ACPI_6_2_PPTT_STRUCTURE_PROCESSOR  Core;
-  UINT32                                 L1DCacheRef;
-  UINT32                                 L1ICacheRef;
-  UINT32                                 L2CacheRef;
+  EFI_ACPI_6_2_PPTT_STRUCTURE_PROCESSOR    Core;
+  UINT32                                   L1DCacheRef;
+  UINT32                                   L1ICacheRef;
+  UINT32                                   L2CacheRef;
 } RK3588_PPTT_CORE_NODE;
 
 typedef struct {
-  EFI_ACPI_6_2_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_HEADER  Header;
-  RK3588_PPTT_PACKAGE_NODE                                 Package;
-  RK3588_PPTT_CLUSTER_NODE                                 Clusters[3];
-  RK3588_PPTT_CORE_NODE                                    Cores[8];
-  EFI_ACPI_6_2_PPTT_STRUCTURE_CACHE                        PackageL3Cache;
-  EFI_ACPI_6_2_PPTT_STRUCTURE_CACHE                        A55L1DCache;
-  EFI_ACPI_6_2_PPTT_STRUCTURE_CACHE                        A55L1ICache;
-  EFI_ACPI_6_2_PPTT_STRUCTURE_CACHE                        A55L2Cache;
-  EFI_ACPI_6_2_PPTT_STRUCTURE_CACHE                        A76L1DCache;
-  EFI_ACPI_6_2_PPTT_STRUCTURE_CACHE                        A76L1ICache;
-  EFI_ACPI_6_2_PPTT_STRUCTURE_CACHE                        A76L2Cache;
+  EFI_ACPI_6_2_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_HEADER    Header;
+  RK3588_PPTT_PACKAGE_NODE                                   Package;
+  RK3588_PPTT_CLUSTER_NODE                                   Clusters[3];
+  RK3588_PPTT_CORE_NODE                                      Cores[8];
+  EFI_ACPI_6_2_PPTT_STRUCTURE_CACHE                          PackageL3Cache;
+  EFI_ACPI_6_2_PPTT_STRUCTURE_CACHE                          A55L1DCache;
+  EFI_ACPI_6_2_PPTT_STRUCTURE_CACHE                          A55L1ICache;
+  EFI_ACPI_6_2_PPTT_STRUCTURE_CACHE                          A55L2Cache;
+  EFI_ACPI_6_2_PPTT_STRUCTURE_CACHE                          A76L1DCache;
+  EFI_ACPI_6_2_PPTT_STRUCTURE_CACHE                          A76L1ICache;
+  EFI_ACPI_6_2_PPTT_STRUCTURE_CACHE                          A76L2Cache;
 } RK3588_PPTT;
 #pragma pack()
 
 ///
 /// For PPTT struct processor flags
 ///
-#define EFI_ACPI_6_2_PPTT_PACKAGE_NOT_PHYSICAL          0x0
-#define EFI_ACPI_6_2_PPTT_PACKAGE_PHYSICAL              0x1
-#define EFI_ACPI_6_2_PPTT_PROCESSOR_ID_INVALID          0x0
-#define EFI_ACPI_6_2_PPTT_PROCESSOR_ID_VALID            0x1
+#define EFI_ACPI_6_2_PPTT_PACKAGE_NOT_PHYSICAL  0x0
+#define EFI_ACPI_6_2_PPTT_PACKAGE_PHYSICAL      0x1
+#define EFI_ACPI_6_2_PPTT_PROCESSOR_ID_INVALID  0x0
+#define EFI_ACPI_6_2_PPTT_PROCESSOR_ID_VALID    0x1
 
 ///
 /// For PPTT struct cache flags
 ///
-#define EFI_ACPI_6_2_PPTT_CACHE_SIZE_INVALID            0x0
-#define EFI_ACPI_6_2_PPTT_CACHE_SIZE_VALID              0x1
-#define EFI_ACPI_6_2_PPTT_NUMBER_OF_SETS_INVALID        0x0
-#define EFI_ACPI_6_2_PPTT_NUMBER_OF_SETS_VALID          0x1
-#define EFI_ACPI_6_2_PPTT_ASSOCIATIVITY_INVALID         0x0
-#define EFI_ACPI_6_2_PPTT_ASSOCIATIVITY_VALID           0x1
-#define EFI_ACPI_6_2_PPTT_ALLOCATION_TYPE_INVALID       0x0
-#define EFI_ACPI_6_2_PPTT_ALLOCATION_TYPE_VALID         0x1
-#define EFI_ACPI_6_2_PPTT_CACHE_TYPE_INVALID            0x0
-#define EFI_ACPI_6_2_PPTT_CACHE_TYPE_VALID              0x1
-#define EFI_ACPI_6_2_PPTT_WRITE_POLICY_INVALID          0x0
-#define EFI_ACPI_6_2_PPTT_WRITE_POLICY_VALID            0x1
-#define EFI_ACPI_6_2_PPTT_LINE_SIZE_INVALID             0x0
-#define EFI_ACPI_6_2_PPTT_LINE_SIZE_VALID               0x1
+#define EFI_ACPI_6_2_PPTT_CACHE_SIZE_INVALID       0x0
+#define EFI_ACPI_6_2_PPTT_CACHE_SIZE_VALID         0x1
+#define EFI_ACPI_6_2_PPTT_NUMBER_OF_SETS_INVALID   0x0
+#define EFI_ACPI_6_2_PPTT_NUMBER_OF_SETS_VALID     0x1
+#define EFI_ACPI_6_2_PPTT_ASSOCIATIVITY_INVALID    0x0
+#define EFI_ACPI_6_2_PPTT_ASSOCIATIVITY_VALID      0x1
+#define EFI_ACPI_6_2_PPTT_ALLOCATION_TYPE_INVALID  0x0
+#define EFI_ACPI_6_2_PPTT_ALLOCATION_TYPE_VALID    0x1
+#define EFI_ACPI_6_2_PPTT_CACHE_TYPE_INVALID       0x0
+#define EFI_ACPI_6_2_PPTT_CACHE_TYPE_VALID         0x1
+#define EFI_ACPI_6_2_PPTT_WRITE_POLICY_INVALID     0x0
+#define EFI_ACPI_6_2_PPTT_WRITE_POLICY_VALID       0x1
+#define EFI_ACPI_6_2_PPTT_LINE_SIZE_INVALID        0x0
+#define EFI_ACPI_6_2_PPTT_LINE_SIZE_VALID          0x1
 
 #define PPTT_DATA_CACHE_ATTRIBUTES                                                \
   {                                                                               \
@@ -101,7 +101,7 @@ typedef struct {
     EFI_ACPI_6_2_CACHE_ATTRIBUTES_WRITE_POLICY_WRITE_BACK                         \
   }
 
-#define RK3588_PPTT_CLUSTER_NODE_INIT(ClusterUid) {                               \
+#define RK3588_PPTT_CLUSTER_NODE_INIT(ClusterUid)  {                              \
   {                                               /* Cluster */                   \
     EFI_ACPI_6_2_PPTT_TYPE_PROCESSOR,             /* Type */                      \
     sizeof (RK3588_PPTT_CLUSTER_NODE),            /* Length */                    \
@@ -120,7 +120,7 @@ typedef struct {
 }
 
 #define RK3588_PPTT_CORE_NODE_INIT(ClusterIndex, CoreUid,                         \
-  L1DCacheField, L1ICacheField, L2CacheField) {                                   \
+                                   L1DCacheField, L1ICacheField, L2CacheField)  { \
   {                                               /* Core */                      \
     EFI_ACPI_6_2_PPTT_TYPE_PROCESSOR,             /* Type */                      \
     sizeof (RK3588_PPTT_CORE_NODE),               /* Length */                    \
@@ -155,7 +155,7 @@ typedef struct {
   )
 
 #define RK3588_PPTT_CACHE_NODE_INIT(NextLevelOfCache, Size,                       \
-  NumberOfSets, Attributes) {                                                     \
+                                    NumberOfSets, Attributes)  {                  \
   EFI_ACPI_6_2_PPTT_TYPE_CACHE,                   /* Type */                      \
   sizeof (EFI_ACPI_6_2_PPTT_STRUCTURE_CACHE),     /* Length */                    \
   {                                               /* Reserved[2] */               \
@@ -179,13 +179,13 @@ typedef struct {
   64                                              /* LineSize */                  \
 }
 
-STATIC RK3588_PPTT Pptt = {
+STATIC RK3588_PPTT  Pptt = {
   {
     ACPI_HEADER (
       EFI_ACPI_6_2_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_STRUCTURE_SIGNATURE,
       RK3588_PPTT,
       EFI_ACPI_6_2_PROCESSOR_PROPERTIES_TOPOLOGY_TABLE_REVISION
-    ),
+      ),
   },
   {
     {                                             /* Package */
@@ -220,48 +220,55 @@ STATIC RK3588_PPTT Pptt = {
     RK3588_PPTT_A76_CORE_NODE_INIT (2, 6),        /* 2x Cortex-A76 (Big cluster 1) */
     RK3588_PPTT_A76_CORE_NODE_INIT (2, 7)
   },
-  RK3588_PPTT_CACHE_NODE_INIT (                   /* PackageL3Cache */
+  RK3588_PPTT_CACHE_NODE_INIT (
+    /* PackageL3Cache */
     0,                                            /* NextLevelOfCache */
     SIZE_1MB * 3,                                 /* Size */
     4096,                                         /* NumberOfSets */
     PPTT_UNIFIED_CACHE_ATTRIBUTES                 /* Attributes */
-  ),
-  RK3588_PPTT_CACHE_NODE_INIT (                   /* A55L1DCache */
+    ),
+  RK3588_PPTT_CACHE_NODE_INIT (
+    /* A55L1DCache */
     OFFSET_OF (RK3588_PPTT, A55L2Cache),          /* NextLevelOfCache */
     SIZE_32KB,                                    /* Size */
     128,                                          /* NumberOfSets */
     PPTT_DATA_CACHE_ATTRIBUTES                    /* Attributes */
-  ),
-  RK3588_PPTT_CACHE_NODE_INIT (                   /* A55L1ICache */
+    ),
+  RK3588_PPTT_CACHE_NODE_INIT (
+    /* A55L1ICache */
     OFFSET_OF (RK3588_PPTT, A55L2Cache),          /* NextLevelOfCache */
     SIZE_32KB,                                    /* Size */
     128,                                          /* NumberOfSets */
     PPTT_INST_CACHE_ATTRIBUTES                    /* Attributes */
-  ),
-  RK3588_PPTT_CACHE_NODE_INIT (                   /* A55L2Cache */
+    ),
+  RK3588_PPTT_CACHE_NODE_INIT (
+    /* A55L2Cache */
     0,                                            /* NextLevelOfCache */
     SIZE_128KB,                                   /* Size */
     512,                                          /* NumberOfSets */
     PPTT_UNIFIED_CACHE_ATTRIBUTES                 /* Attributes */
-  ),
-  RK3588_PPTT_CACHE_NODE_INIT (                   /* A76L1DCache */
+    ),
+  RK3588_PPTT_CACHE_NODE_INIT (
+    /* A76L1DCache */
     OFFSET_OF (RK3588_PPTT, A76L2Cache),          /* NextLevelOfCache */
     SIZE_64KB,                                    /* Size */
     256,                                          /* NumberOfSets */
     PPTT_DATA_CACHE_ATTRIBUTES                    /* Attributes */
-  ),
-  RK3588_PPTT_CACHE_NODE_INIT (                   /* A76L1ICache */
+    ),
+  RK3588_PPTT_CACHE_NODE_INIT (
+    /* A76L1ICache */
     OFFSET_OF (RK3588_PPTT, A76L2Cache),          /* NextLevelOfCache */
     SIZE_64KB,                                    /* Size */
     256,                                          /* NumberOfSets */
     PPTT_INST_CACHE_ATTRIBUTES                    /* Attributes */
-  ),
-  RK3588_PPTT_CACHE_NODE_INIT (                   /* A76L2Cache */
+    ),
+  RK3588_PPTT_CACHE_NODE_INIT (
+    /* A76L2Cache */
     0,                                            /* NextLevelOfCache */
     SIZE_512KB,                                   /* Size */
     1024,                                         /* NumberOfSets */
     PPTT_UNIFIED_CACHE_ATTRIBUTES                 /* Attributes */
-  )
+    )
 };
 
-VOID* CONST ReferenceAcpiTable = &Pptt;
+VOID *CONST  ReferenceAcpiTable = &Pptt;

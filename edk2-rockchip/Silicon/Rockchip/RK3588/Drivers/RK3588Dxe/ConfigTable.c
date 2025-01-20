@@ -28,7 +28,7 @@ STATIC FDT_COMPAT_MODE_VAR  mFdtCompatModeVarTable[] = {
 STATIC
 BOOLEAN
 IsFdtCompatModeSupported (
-  IN UINT32 CompatMode
+  IN UINT32  CompatMode
   )
 {
   return PlatformGetDtbFileGuid (CompatMode) != NULL;
@@ -49,26 +49,34 @@ SetupConfigTableVariables (
   VOID
   )
 {
-  UINTN      Size;
-  UINT32     Var32;
-  UINT8      Var8;
-  EFI_STATUS Status;
-  UINTN      Index;
-  UINT32     FirstFdtCompatModeSupported;
+  UINTN       Size;
+  UINT32      Var32;
+  UINT8       Var8;
+  EFI_STATUS  Status;
+  UINTN       Index;
+  UINT32      FirstFdtCompatModeSupported;
 
-  Size = sizeof (UINT32);
-  Status = gRT->GetVariable (L"ConfigTableMode",
-                            &gRK3588DxeFormSetGuid,
-                            NULL, &Size, &Var32);
+  Size   = sizeof (UINT32);
+  Status = gRT->GetVariable (
+                  L"ConfigTableMode",
+                  &gRK3588DxeFormSetGuid,
+                  NULL,
+                  &Size,
+                  &Var32
+                  );
   if (EFI_ERROR (Status)) {
     Status = PcdSet32S (PcdConfigTableMode, FixedPcdGet32 (PcdConfigTableModeDefault));
     ASSERT_EFI_ERROR (Status);
   }
 
-  Size = sizeof (UINT32);
-  Status = gRT->GetVariable (L"AcpiPcieEcamCompatMode",
-                            &gRK3588DxeFormSetGuid,
-                            NULL, &Size, &Var32);
+  Size   = sizeof (UINT32);
+  Status = gRT->GetVariable (
+                  L"AcpiPcieEcamCompatMode",
+                  &gRK3588DxeFormSetGuid,
+                  NULL,
+                  &Size,
+                  &Var32
+                  );
   if (EFI_ERROR (Status)) {
     Status = PcdSet32S (PcdAcpiPcieEcamCompatMode, FixedPcdGet32 (PcdAcpiPcieEcamCompatModeDefault));
     ASSERT_EFI_ERROR (Status);
@@ -77,14 +85,16 @@ SetupConfigTableVariables (
   FirstFdtCompatModeSupported = FDT_COMPAT_MODE_UNSUPPORTED;
 
   for (Index = 0; Index < ARRAY_SIZE (mFdtCompatModeVarTable); Index++) {
-    FDT_COMPAT_MODE_VAR CompatModeVar = mFdtCompatModeVarTable[Index];
-    UINT8 CompatModeSupported = IsFdtCompatModeSupported (CompatModeVar.Id);
+    FDT_COMPAT_MODE_VAR  CompatModeVar       = mFdtCompatModeVarTable[Index];
+    UINT8                CompatModeSupported = IsFdtCompatModeSupported (CompatModeVar.Id);
 
-    Status = gRT->SetVariable (CompatModeVar.SupportedVarString,
-                              &gRK3588DxeFormSetGuid,
-                              EFI_VARIABLE_BOOTSERVICE_ACCESS,
-                              sizeof (CompatModeSupported),
-                              &CompatModeSupported);
+    Status = gRT->SetVariable (
+                    CompatModeVar.SupportedVarString,
+                    &gRK3588DxeFormSetGuid,
+                    EFI_VARIABLE_BOOTSERVICE_ACCESS,
+                    sizeof (CompatModeSupported),
+                    &CompatModeSupported
+                    );
     ASSERT_EFI_ERROR (Status);
 
     if (CompatModeSupported &&
@@ -94,32 +104,45 @@ SetupConfigTableVariables (
     }
   }
 
-  Size = sizeof (UINT32);
-  Status = gRT->GetVariable (L"FdtCompatMode",
-                            &gRK3588DxeFormSetGuid,
-                            NULL, &Size, &Var32);
+  Size   = sizeof (UINT32);
+  Status = gRT->GetVariable (
+                  L"FdtCompatMode",
+                  &gRK3588DxeFormSetGuid,
+                  NULL,
+                  &Size,
+                  &Var32
+                  );
   if (EFI_ERROR (Status) || !IsFdtCompatModeSupported (Var32)) {
-    UINT32 FdtCompatModeDefault = FixedPcdGet32 (PcdFdtCompatModeDefault);
+    UINT32  FdtCompatModeDefault = FixedPcdGet32 (PcdFdtCompatModeDefault);
     if (!IsFdtCompatModeSupported (FdtCompatModeDefault)) {
       FdtCompatModeDefault = FirstFdtCompatModeSupported;
     }
+
     Status = PcdSet32S (PcdFdtCompatMode, FdtCompatModeDefault);
     ASSERT_EFI_ERROR (Status);
   }
 
-  Size = sizeof (UINT8);
-  Status = gRT->GetVariable (L"FdtForceGop",
-                            &gRK3588DxeFormSetGuid,
-                            NULL, &Size, &Var8);
+  Size   = sizeof (UINT8);
+  Status = gRT->GetVariable (
+                  L"FdtForceGop",
+                  &gRK3588DxeFormSetGuid,
+                  NULL,
+                  &Size,
+                  &Var8
+                  );
   if (EFI_ERROR (Status)) {
     Status = PcdSet8S (PcdFdtForceGop, FixedPcdGet8 (PcdFdtForceGopDefault));
     ASSERT_EFI_ERROR (Status);
   }
 
-  Size = sizeof (UINT8);
-  Status = gRT->GetVariable (L"FdtSupportOverrides",
-                            &gRK3588DxeFormSetGuid,
-                            NULL, &Size, &Var8);
+  Size   = sizeof (UINT8);
+  Status = gRT->GetVariable (
+                  L"FdtSupportOverrides",
+                  &gRK3588DxeFormSetGuid,
+                  NULL,
+                  &Size,
+                  &Var8
+                  );
   if (EFI_ERROR (Status)) {
     Status = PcdSet8S (PcdFdtSupportOverrides, FixedPcdGet8 (PcdFdtSupportOverridesDefault));
     ASSERT_EFI_ERROR (Status);

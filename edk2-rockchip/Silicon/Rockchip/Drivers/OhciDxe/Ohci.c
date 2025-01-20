@@ -7,10 +7,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #include "Ohci.h"
 
-STATIC OHCI_DEVICE_PATH OhciDevicePathProtocol = {
+STATIC OHCI_DEVICE_PATH  OhciDevicePathProtocol = {
   {
     {
       HARDWARE_DEVICE_PATH,
@@ -27,7 +26,7 @@ STATIC OHCI_DEVICE_PATH OhciDevicePathProtocol = {
     END_DEVICE_PATH_TYPE,
     END_ENTIRE_DEVICE_PATH_SUBTYPE,
     {
-      sizeof(EFI_DEVICE_PATH_PROTOCOL),
+      sizeof (EFI_DEVICE_PATH_PROTOCOL),
       0
     }
   }
@@ -53,20 +52,20 @@ OhciReset (
   IN UINT16               Attributes
   )
 {
-  EFI_STATUS              Status;
-  USB_OHCI_HC_DEV         *Ohc;
-  UINT8                   Index;
-  UINT8                   NumOfPorts;
-  UINT32                  PowerOnGoodTime;
-  UINT32                  Data32;
-  BOOLEAN                 Flag = FALSE;
+  EFI_STATUS       Status;
+  USB_OHCI_HC_DEV  *Ohc;
+  UINT8            Index;
+  UINT8            NumOfPorts;
+  UINT32           PowerOnGoodTime;
+  UINT32           Data32;
+  BOOLEAN          Flag = FALSE;
 
   if ((Attributes & ~(EFI_USB_HC_RESET_GLOBAL | EFI_USB_HC_RESET_HOST_CONTROLLER)) != 0) {
     return EFI_INVALID_PARAMETER;
   }
 
   Status = EFI_SUCCESS;
-  Ohc = USB_OHCI_HC_DEV_FROM_THIS (This);
+  Ohc    = USB_OHCI_HC_DEV_FROM_THIS (This);
 
   if ((Attributes & EFI_USB_HC_RESET_HOST_CONTROLLER) != 0) {
     gBS->Stall (50 * 1000);
@@ -74,6 +73,7 @@ OhciReset (
     if (EFI_ERROR (Status)) {
       return EFI_DEVICE_ERROR;
     }
+
     gBS->Stall (50 * 1000);
     //
     // Wait for host controller reset.
@@ -81,19 +81,22 @@ OhciReset (
     PowerOnGoodTime = 50;
     do {
       gBS->Stall (1 * 1000);
-      Data32 = OhciGetOperationalReg (Ohc, HC_COMMAND_STATUS );
+      Data32 = OhciGetOperationalReg (Ohc, HC_COMMAND_STATUS);
       if (EFI_ERROR (Status)) {
         return EFI_DEVICE_ERROR;
       }
+
       if ((Data32 & HC_RESET) == 0) {
         Flag = TRUE;
         break;
       }
-    }while(PowerOnGoodTime--);
-    if (!Flag){
+    } while (PowerOnGoodTime--);
+
+    if (!Flag) {
       return EFI_DEVICE_ERROR;
     }
   }
+
   OhciFreeIntTransferMemory (Ohc);
   Status = OhciInitializeInterruptList (Ohc);
   OhciSetFrameInterval (Ohc, FRAME_INTERVAL, 0x2edf);
@@ -102,8 +105,10 @@ OhciReset (
     if (EFI_ERROR (Status)) {
       return EFI_DEVICE_ERROR;
     }
+
     gBS->Stall (50 * 1000);
   }
+
   //
   // Initialize host controller operational registers
   //
@@ -114,8 +119,8 @@ OhciReset (
   OhciSetHcCommandStatus (Ohc, CONTROL_LIST_FILLED | BULK_LIST_FILLED, 0);
   OhciSetRootHubDescriptor (Ohc, RH_PSWITCH_MODE, 0);
   OhciSetRootHubDescriptor (Ohc, RH_NO_PSWITCH | RH_NOC_PROT, 1);
-  //OhciSetRootHubDescriptor (Hc, RH_PSWITCH_MODE | RH_NO_PSWITCH, 0);
-  //OhciSetRootHubDescriptor (Hc, RH_PSWITCH_MODE | RH_NOC_PROT, 1);
+  // OhciSetRootHubDescriptor (Hc, RH_PSWITCH_MODE | RH_NO_PSWITCH, 0);
+  // OhciSetRootHubDescriptor (Hc, RH_PSWITCH_MODE | RH_NOC_PROT, 1);
 
   OhciSetRootHubDescriptor (Ohc, RH_DEV_REMOVABLE, 0);
   OhciSetRootHubDescriptor (Ohc, RH_PORT_PWR_CTRL_MASK, 0xffff);
@@ -131,6 +136,7 @@ OhciReset (
       gBS->Stall (1000);
     }
   }
+
   OhciSetMemoryPointer (Ohc, HC_HCCA, Ohc->HccaMemoryBlock);
   OhciSetMemoryPointer (Ohc, HC_CONTROL_HEAD, NULL);
   OhciSetMemoryPointer (Ohc, HC_BULK_HEAD, NULL);
@@ -140,7 +146,9 @@ OhciReset (
   //
   // Wait till first SOF occurs, and then clear it
   //
-  while (OhciGetHcInterruptStatus (Ohc, START_OF_FRAME) == 0);
+  while (OhciGetHcInterruptStatus (Ohc, START_OF_FRAME) == 0) {
+  }
+
   OhciClearInterruptStatus (Ohc, START_OF_FRAME);
   gBS->Stall (1000);
 
@@ -160,7 +168,6 @@ OhciReset (
                                 retrieve the host controller's current state.
 
 **/
-
 EFI_STATUS
 EFIAPI
 OhciGetState (
@@ -168,8 +175,8 @@ OhciGetState (
   OUT EFI_USB_HC_STATE     *State
   )
 {
-  USB_OHCI_HC_DEV         *Ohc;
-  UINT32                  FuncState;
+  USB_OHCI_HC_DEV  *Ohc;
+  UINT32           FuncState;
 
   if (State == NULL) {
     return EFI_INVALID_PARAMETER;
@@ -196,6 +203,7 @@ OhciGetState (
     default:
       ASSERT (FALSE);
   }
+
   return EFI_SUCCESS;
 }
 
@@ -211,18 +219,17 @@ OhciGetState (
   @retval EFI_DEVICE_ERROR      Failed to set the state due to device error.
 
 **/
-
 EFI_STATUS
 EFIAPI
-OhciSetState(
+OhciSetState (
   IN EFI_USB_HC_PROTOCOL  *This,
   IN EFI_USB_HC_STATE     State
   )
 {
-  EFI_STATUS              Status;
-  USB_OHCI_HC_DEV         *Ohc;
+  EFI_STATUS       Status;
+  USB_OHCI_HC_DEV  *Ohc;
 
-  Ohc = USB_OHCI_HC_DEV_FROM_THIS(This);
+  Ohc = USB_OHCI_HC_DEV_FROM_THIS (This);
 
   switch (State) {
     case EfiUsbHcStateHalt:
@@ -280,8 +287,6 @@ OhciSetState(
                                 Caller should check TranferResult for detailed error information.
 
 --*/
-
-
 EFI_STATUS
 EFIAPI
 OhciControlTransfer (
@@ -297,45 +302,46 @@ OhciControlTransfer (
   OUT    UINT32                  *TransferResult
   )
 {
-  USB_OHCI_HC_DEV                *Ohc;
-  ED_DESCRIPTOR                  *HeadEd;
-  ED_DESCRIPTOR                  *Ed;
-  TD_DESCRIPTOR                  *HeadTd;
-  TD_DESCRIPTOR                  *SetupTd;
-  TD_DESCRIPTOR                  *DataTd;
-  TD_DESCRIPTOR                  *StatusTd;
-  TD_DESCRIPTOR                  *EmptyTd;
-  EFI_STATUS                     Status;
-  UINT32                         DataPidDir;
-  UINT32                         StatusPidDir;
-  UINTN                          TimeCount;
-  OHCI_ED_RESULT                 EdResult;
+  USB_OHCI_HC_DEV  *Ohc;
+  ED_DESCRIPTOR    *HeadEd;
+  ED_DESCRIPTOR    *Ed;
+  TD_DESCRIPTOR    *HeadTd;
+  TD_DESCRIPTOR    *SetupTd;
+  TD_DESCRIPTOR    *DataTd;
+  TD_DESCRIPTOR    *StatusTd;
+  TD_DESCRIPTOR    *EmptyTd;
+  EFI_STATUS       Status;
+  UINT32           DataPidDir;
+  UINT32           StatusPidDir;
+  UINTN            TimeCount;
+  OHCI_ED_RESULT   EdResult;
 
-  DMA_MAP_OPERATION              MapOp;
+  DMA_MAP_OPERATION  MapOp;
 
-  UINTN                          ActualSendLength;
-  UINTN                          LeftLength;
-  UINT8                          DataToggle;
+  UINTN  ActualSendLength;
+  UINTN  LeftLength;
+  UINT8  DataToggle;
 
-  VOID                           *ReqMapping = NULL;
-  UINTN                          ReqMapLength = 0;
-  EFI_PHYSICAL_ADDRESS           ReqMapPhyAddr = 0;
+  VOID                  *ReqMapping   = NULL;
+  UINTN                 ReqMapLength  = 0;
+  EFI_PHYSICAL_ADDRESS  ReqMapPhyAddr = 0;
 
-  VOID                           *DataMapping = NULL;
-  UINTN                          DataMapLength = 0;
-  EFI_PHYSICAL_ADDRESS           DataMapPhyAddr = 0;
+  VOID                  *DataMapping   = NULL;
+  UINTN                 DataMapLength  = 0;
+  EFI_PHYSICAL_ADDRESS  DataMapPhyAddr = 0;
 
   HeadTd = NULL;
   DataTd = NULL;
 
-  if ((TransferDirection != EfiUsbDataOut && TransferDirection != EfiUsbDataIn &&
-       TransferDirection != EfiUsbNoData) ||
-      Request == NULL || DataLength == NULL || TransferResult == NULL ||
-      (TransferDirection == EfiUsbNoData && (*DataLength != 0 || Data != NULL)) ||
-      (TransferDirection != EfiUsbNoData && (*DataLength == 0 || Data == NULL)) ||
-      (IsSlowDevice && MaxPacketLength != 8) ||
-      (MaxPacketLength != 8 && MaxPacketLength != 16 &&
-       MaxPacketLength != 32 && MaxPacketLength != 64)) {
+  if (((TransferDirection != EfiUsbDataOut) && (TransferDirection != EfiUsbDataIn) &&
+       (TransferDirection != EfiUsbNoData)) ||
+      (Request == NULL) || (DataLength == NULL) || (TransferResult == NULL) ||
+      ((TransferDirection == EfiUsbNoData) && ((*DataLength != 0) || (Data != NULL))) ||
+      ((TransferDirection != EfiUsbNoData) && ((*DataLength == 0) || (Data == NULL))) ||
+      (IsSlowDevice && (MaxPacketLength != 8)) ||
+      ((MaxPacketLength != 8) && (MaxPacketLength != 16) &&
+       (MaxPacketLength != 32) && (MaxPacketLength != 64)))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -344,29 +350,31 @@ OhciControlTransfer (
     return EFI_INVALID_PARAMETER;
   }
 
-  Ohc = USB_OHCI_HC_DEV_FROM_THIS(This);
+  Ohc = USB_OHCI_HC_DEV_FROM_THIS (This);
 
   if (TransferDirection == EfiUsbDataIn) {
-    DataPidDir = TD_IN_PID;
+    DataPidDir   = TD_IN_PID;
     StatusPidDir = TD_OUT_PID;
   } else {
-    DataPidDir = TD_OUT_PID;
+    DataPidDir   = TD_OUT_PID;
     StatusPidDir = TD_IN_PID;
   }
 
   Status = OhciSetHcControl (Ohc, CONTROL_ENABLE, 0);
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_INFO, "OhciControlTransfer: fail to disable CONTROL_ENABLE\r\n"));
     *TransferResult = EFI_USB_ERR_SYSTEM;
     return EFI_DEVICE_ERROR;
   }
+
   Status = OhciSetHcCommandStatus (Ohc, CONTROL_LIST_FILLED, 0);
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_INFO, "OhciControlTransfer: fail to disable CONTROL_LIST_FILLED\r\n"));
     *TransferResult = EFI_USB_ERR_SYSTEM;
     return EFI_DEVICE_ERROR;
   }
-  gBS->Stall(20 * 1000);
+
+  gBS->Stall (20 * 1000);
 
   OhciSetMemoryPointer (Ohc, HC_CONTROL_HEAD, NULL);
   Ed = OhciCreateED (Ohc);
@@ -375,6 +383,7 @@ OhciControlTransfer (
     DEBUG ((DEBUG_INFO, "OhciControlTransfer: Fail to allocate ED buffer\r\n"));
     goto CTRL_EXIT;
   }
+
   OhciSetEDField (Ed, ED_SKIP, 1);
   OhciSetEDField (Ed, ED_FUNC_ADD, DeviceAddress);
   OhciSetEDField (Ed, ED_ENDPT_NUM, 0);
@@ -391,21 +400,23 @@ OhciControlTransfer (
   //
   // Setup Stage
   //
-  if(Request != NULL) {
-    ReqMapLength = sizeof(EFI_USB_DEVICE_REQUEST);
-    MapOp = MapOperationBusMasterRead;
-    Status = DmaMap (MapOp, (UINT8 *)Request, &ReqMapLength, &ReqMapPhyAddr, &ReqMapping);
-    if (EFI_ERROR(Status)) {
+  if (Request != NULL) {
+    ReqMapLength = sizeof (EFI_USB_DEVICE_REQUEST);
+    MapOp        = MapOperationBusMasterRead;
+    Status       = DmaMap (MapOp, (UINT8 *)Request, &ReqMapLength, &ReqMapPhyAddr, &ReqMapping);
+    if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_INFO, "OhciControlTransfer: Fail to Map Request Buffer\r\n"));
       goto FREE_ED_BUFF;
     }
   }
+
   SetupTd = OhciCreateTD (Ohc);
   if (SetupTd == NULL) {
     Status = EFI_OUT_OF_RESOURCES;
     DEBUG ((DEBUG_INFO, "OhciControlTransfer: Fail to allocate Setup TD buffer\r\n"));
     goto UNMAP_SETUP_BUFF;
   }
+
   HeadTd = SetupTd;
   OhciSetTDField (SetupTd, TD_PDATA, 0);
   OhciSetTDField (SetupTd, TD_BUFFER_ROUND, 1);
@@ -418,39 +429,43 @@ OhciControlTransfer (
   OhciSetTDField (SetupTd, TD_NEXT_PTR, 0);
   OhciSetTDField (SetupTd, TD_BUFFER_END_PTR, (UINT32)(ReqMapPhyAddr + sizeof (EFI_USB_DEVICE_REQUEST) - 1));
   SetupTd->ActualSendLength = sizeof (EFI_USB_DEVICE_REQUEST);
-  SetupTd->DataBuffer = (UINT32)ReqMapPhyAddr;
-  SetupTd->NextTDPointer = 0;
+  SetupTd->DataBuffer       = (UINT32)ReqMapPhyAddr;
+  SetupTd->NextTDPointer    = 0;
 
   if (TransferDirection == EfiUsbDataIn) {
     MapOp = MapOperationBusMasterWrite;
   } else {
     MapOp = MapOperationBusMasterRead;
   }
+
   DataMapLength = *DataLength;
   if ((Data != NULL) && (DataMapLength != 0)) {
     Status = DmaMap (MapOp, Data, &DataMapLength, &DataMapPhyAddr, &DataMapping);
-    if (EFI_ERROR(Status)) {
+    if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_INFO, "OhciControlTransfer: Fail To Map Data Buffer\r\n"));
       goto FREE_TD_BUFF;
     }
   }
+
   //
-  //Data Stage
+  // Data Stage
   //
-  LeftLength = DataMapLength;
+  LeftLength       = DataMapLength;
   ActualSendLength = DataMapLength;
-  DataToggle = 1;
+  DataToggle       = 1;
   while (LeftLength > 0) {
     ActualSendLength = LeftLength;
     if (LeftLength > MaxPacketLength) {
       ActualSendLength = MaxPacketLength;
     }
+
     DataTd = OhciCreateTD (Ohc);
     if (DataTd == NULL) {
       DEBUG ((DEBUG_INFO, "OhciControlTransfer: Fail to allocate buffer for Data Stage TD\r\n"));
       Status = EFI_OUT_OF_RESOURCES;
       goto UNMAP_DATA_BUFF;
     }
+
     OhciSetTDField (DataTd, TD_PDATA, 0);
     OhciSetTDField (DataTd, TD_BUFFER_ROUND, 1);
     OhciSetTDField (DataTd, TD_DIR_PID, DataPidDir);
@@ -458,17 +473,18 @@ OhciControlTransfer (
     OhciSetTDField (DataTd, TD_DT_TOGGLE, DataToggle);
     OhciSetTDField (DataTd, TD_ERROR_CNT, 0);
     OhciSetTDField (DataTd, TD_COND_CODE, TD_TOBE_PROCESSED);
-    OhciSetTDField (DataTd, TD_CURR_BUFFER_PTR, (UINT32) DataMapPhyAddr);
+    OhciSetTDField (DataTd, TD_CURR_BUFFER_PTR, (UINT32)DataMapPhyAddr);
     OhciSetTDField (DataTd, TD_BUFFER_END_PTR, (UINT32)(DataMapPhyAddr + ActualSendLength - 1));
     OhciSetTDField (DataTd, TD_NEXT_PTR, 0);
     DataTd->ActualSendLength = (UINT32)ActualSendLength;
-    DataTd->DataBuffer = (UINT32)DataMapPhyAddr;
-    DataTd->NextTDPointer = 0;
+    DataTd->DataBuffer       = (UINT32)DataMapPhyAddr;
+    DataTd->NextTDPointer    = 0;
     OhciLinkTD (HeadTd, DataTd);
-    DataToggle ^= 1;
+    DataToggle     ^= 1;
     DataMapPhyAddr += ActualSendLength;
-    LeftLength -= ActualSendLength;
+    LeftLength     -= ActualSendLength;
   }
+
   //
   // Status Stage
   //
@@ -478,6 +494,7 @@ OhciControlTransfer (
     Status = EFI_OUT_OF_RESOURCES;
     goto UNMAP_DATA_BUFF;
   }
+
   OhciSetTDField (StatusTd, TD_PDATA, 0);
   OhciSetTDField (StatusTd, TD_BUFFER_ROUND, 1);
   OhciSetTDField (StatusTd, TD_DIR_PID, StatusPidDir);
@@ -489,8 +506,8 @@ OhciControlTransfer (
   OhciSetTDField (StatusTd, TD_NEXT_PTR, 0);
   OhciSetTDField (StatusTd, TD_BUFFER_END_PTR, 0);
   StatusTd->ActualSendLength = 0;
-  StatusTd->DataBuffer = 0;
-  StatusTd->NextTDPointer = 0;
+  StatusTd->DataBuffer       = 0;
+  StatusTd->NextTDPointer    = 0;
   OhciLinkTD (HeadTd, StatusTd);
   //
   // Empty Stage
@@ -500,11 +517,12 @@ OhciControlTransfer (
     Status = EFI_OUT_OF_RESOURCES;
     goto UNMAP_DATA_BUFF;
   }
+
   OhciSetTDField (EmptyTd, TD_PDATA, 0);
   OhciSetTDField (EmptyTd, TD_BUFFER_ROUND, 0);
   OhciSetTDField (EmptyTd, TD_DIR_PID, 0);
   OhciSetTDField (EmptyTd, TD_DELAY_INT, 0);
-  //OhciSetTDField (EmptyTd, TD_DT_TOGGLE, CurrentToggle);
+  // OhciSetTDField (EmptyTd, TD_DT_TOGGLE, CurrentToggle);
   EmptyTd->Word0.DataToggle = 0;
   OhciSetTDField (EmptyTd, TD_ERROR_CNT, 0);
   OhciSetTDField (EmptyTd, TD_COND_CODE, 0);
@@ -512,8 +530,8 @@ OhciControlTransfer (
   OhciSetTDField (EmptyTd, TD_BUFFER_END_PTR, 0);
   OhciSetTDField (EmptyTd, TD_NEXT_PTR, 0);
   EmptyTd->ActualSendLength = 0;
-  EmptyTd->DataBuffer = 0;
-  EmptyTd->NextTDPointer = 0;
+  EmptyTd->DataBuffer       = 0;
+  EmptyTd->NextTDPointer    = 0;
   OhciLinkTD (HeadTd, EmptyTd);
   Ed->TdTailPointer = (UINT32)(UINTN)EmptyTd;
   OhciAttachTDListToED (Ed, HeadTd);
@@ -521,38 +539,40 @@ OhciControlTransfer (
   // For debugging,  dump ED & TD buffer befor transferring
   //
   //
-  //OhciDumpEdTdInfo (Ohc, Ed, HeadTd, TRUE);
+  // OhciDumpEdTdInfo (Ohc, Ed, HeadTd, TRUE);
   //
   OhciSetEDField (Ed, ED_SKIP, 0);
   Status = OhciSetHcControl (Ohc, CONTROL_ENABLE, 1);
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_INFO, "OhciControlTransfer: fail to enable CONTROL_ENABLE\r\n"));
     *TransferResult = EFI_USB_ERR_SYSTEM;
-    Status = EFI_DEVICE_ERROR;
+    Status          = EFI_DEVICE_ERROR;
     goto UNMAP_DATA_BUFF;
   }
+
   Status = OhciSetHcCommandStatus (Ohc, CONTROL_LIST_FILLED, 1);
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_INFO, "OhciControlTransfer: fail to enable CONTROL_LIST_FILLED\r\n"));
     *TransferResult = EFI_USB_ERR_SYSTEM;
-    Status = EFI_DEVICE_ERROR;
+    Status          = EFI_DEVICE_ERROR;
     goto UNMAP_DATA_BUFF;
   }
-  gBS->Stall(20 * 1000);
 
+  gBS->Stall (20 * 1000);
 
   TimeCount = 0;
-  Status = CheckIfDone (Ohc, CONTROL_LIST, Ed, HeadTd, &EdResult);
+  Status    = CheckIfDone (Ohc, CONTROL_LIST, Ed, HeadTd, &EdResult);
 
   while (Status == EFI_NOT_READY && TimeCount <= TimeOut) {
     gBS->Stall (1000);
     TimeCount++;
     Status = CheckIfDone (Ohc, CONTROL_LIST, Ed, HeadTd, &EdResult);
   }
+
   //
   // For debugging, dump ED & TD buffer after transferring
   //
-  //OhciDumpEdTdInfo (Ohc, Ed, HeadTd, FALSE);
+  // OhciDumpEdTdInfo (Ohc, Ed, HeadTd, FALSE);
   //
   *TransferResult = ConvertErrorCode (EdResult.ErrorCode);
 
@@ -562,6 +582,7 @@ OhciControlTransfer (
     } else {
       DEBUG ((DEBUG_ERROR, "Control pipe broken\r\n"));
     }
+
     *DataLength = 0;
   } else {
     DEBUG ((DEBUG_INFO, "Control transfer successed\r\n"));
@@ -574,24 +595,25 @@ UNMAP_DATA_BUFF:
   } else {
     HeadEd->NextED = Ed->NextED;
   }
-  if(DataMapping != NULL) {
-    DmaUnmap(DataMapping);
+
+  if (DataMapping != NULL) {
+    DmaUnmap (DataMapping);
   }
 
 FREE_TD_BUFF:
   while (HeadTd) {
     DataTd = HeadTd;
     HeadTd = (TD_DESCRIPTOR *)(UINTN)(HeadTd->NextTDPointer);
-    UsbHcFreeMem(Ohc->MemPool, DataTd, sizeof(TD_DESCRIPTOR));
+    UsbHcFreeMem (Ohc->MemPool, DataTd, sizeof (TD_DESCRIPTOR));
   }
 
 UNMAP_SETUP_BUFF:
-  if(ReqMapping != NULL) {
-    DmaUnmap(ReqMapping);
+  if (ReqMapping != NULL) {
+    DmaUnmap (ReqMapping);
   }
 
 FREE_ED_BUFF:
-  UsbHcFreeMem(Ohc->MemPool, Ed, sizeof(ED_DESCRIPTOR));
+  UsbHcFreeMem (Ohc->MemPool, Ed, sizeof (ED_DESCRIPTOR));
 
 CTRL_EXIT:
   return Status;
@@ -635,11 +657,9 @@ CTRL_EXIT:
                                 Caller should check TranferResult for detailed error information.
 
 **/
-
-
 EFI_STATUS
 EFIAPI
-OhciBulkTransfer(
+OhciBulkTransfer (
   IN     EFI_USB_HC_PROTOCOL  *This,
   IN     UINT8                DeviceAddress,
   IN     UINT8                EndPointAddress,
@@ -651,36 +671,37 @@ OhciBulkTransfer(
   OUT    UINT32               *TransferResult
   )
 {
-  USB_OHCI_HC_DEV                *Ohc;
-  ED_DESCRIPTOR                  *HeadEd;
-  ED_DESCRIPTOR                  *Ed;
-  UINT32                         DataPidDir;
-  TD_DESCRIPTOR                  *HeadTd;
-  TD_DESCRIPTOR                  *DataTd;
-  TD_DESCRIPTOR                  *EmptyTd;
-  EFI_STATUS                     Status;
-  UINT8                          EndPointNum;
-  UINTN                          TimeCount;
-  OHCI_ED_RESULT                 EdResult;
+  USB_OHCI_HC_DEV  *Ohc;
+  ED_DESCRIPTOR    *HeadEd;
+  ED_DESCRIPTOR    *Ed;
+  UINT32           DataPidDir;
+  TD_DESCRIPTOR    *HeadTd;
+  TD_DESCRIPTOR    *DataTd;
+  TD_DESCRIPTOR    *EmptyTd;
+  EFI_STATUS       Status;
+  UINT8            EndPointNum;
+  UINTN            TimeCount;
+  OHCI_ED_RESULT   EdResult;
 
-  DMA_MAP_OPERATION              MapOp;
-  VOID                           *Mapping;
-  UINTN                          MapLength;
-  EFI_PHYSICAL_ADDRESS           MapPyhAddr;
-  UINTN                          LeftLength;
-  UINTN                          ActualSendLength;
-  BOOLEAN                        FirstTD;
+  DMA_MAP_OPERATION     MapOp;
+  VOID                  *Mapping;
+  UINTN                 MapLength;
+  EFI_PHYSICAL_ADDRESS  MapPyhAddr;
+  UINTN                 LeftLength;
+  UINTN                 ActualSendLength;
+  BOOLEAN               FirstTD;
 
-  Mapping = NULL;
-  MapLength = 0;
+  Mapping    = NULL;
+  MapLength  = 0;
   MapPyhAddr = 0;
   LeftLength = 0;
-  Status = EFI_SUCCESS;
+  Status     = EFI_SUCCESS;
 
-  if (Data == NULL || DataLength == NULL || DataToggle == NULL || TransferResult == NULL ||
-      *DataLength == 0 || (*DataToggle != 0 && *DataToggle != 1) ||
-      (MaxPacketLength != 8 && MaxPacketLength != 16 &&
-       MaxPacketLength != 32 && MaxPacketLength != 64)) {
+  if ((Data == NULL) || (DataLength == NULL) || (DataToggle == NULL) || (TransferResult == NULL) ||
+      (*DataLength == 0) || ((*DataToggle != 0) && (*DataToggle != 1)) ||
+      ((MaxPacketLength != 8) && (MaxPacketLength != 16) &&
+       (MaxPacketLength != 32) && (MaxPacketLength != 64)))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -688,28 +709,30 @@ OhciBulkTransfer(
 
   if ((EndPointAddress & 0x80) != 0) {
     DataPidDir = TD_IN_PID;
-    MapOp = MapOperationBusMasterWrite;
+    MapOp      = MapOperationBusMasterWrite;
   } else {
     DataPidDir = TD_OUT_PID;
-    MapOp = MapOperationBusMasterRead;
+    MapOp      = MapOperationBusMasterRead;
   }
 
-  EndPointNum = (EndPointAddress & 0xF);
+  EndPointNum         = (EndPointAddress & 0xF);
   EdResult.NextToggle = *DataToggle;
 
   Status = OhciSetHcControl (Ohc, BULK_ENABLE, 0);
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_INFO, "OhciControlTransfer: fail to disable BULK_ENABLE\r\n"));
     *TransferResult = EFI_USB_ERR_SYSTEM;
     return EFI_DEVICE_ERROR;
   }
+
   Status = OhciSetHcCommandStatus (Ohc, BULK_LIST_FILLED, 0);
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_INFO, "OhciControlTransfer: fail to disable BULK_LIST_FILLED\r\n"));
     *TransferResult = EFI_USB_ERR_SYSTEM;
     return EFI_DEVICE_ERROR;
   }
-  gBS->Stall(20 * 1000);
+
+  gBS->Stall (20 * 1000);
 
   OhciSetMemoryPointer (Ohc, HC_BULK_HEAD, NULL);
 
@@ -717,6 +740,7 @@ OhciBulkTransfer(
   if (Ed == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
+
   OhciSetEDField (Ed, ED_SKIP, 1);
   OhciSetEDField (Ed, ED_FUNC_ADD, DeviceAddress);
   OhciSetEDField (Ed, ED_ENDPT_NUM, EndPointNum);
@@ -731,32 +755,35 @@ OhciBulkTransfer(
   OhciSetEDField (Ed, ED_NEXT_EDPTR, 0);
   HeadEd = OhciAttachEDToList (Ohc, BULK_LIST, Ed, NULL);
 
-  if(Data != NULL) {
+  if (Data != NULL) {
     MapLength = *DataLength;
-    Status = DmaMap (MapOp, (UINT8 *)Data, &MapLength, &MapPyhAddr, &Mapping);
-    if (EFI_ERROR(Status)) {
+    Status    = DmaMap (MapOp, (UINT8 *)Data, &MapLength, &MapPyhAddr, &Mapping);
+    if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_INFO, "OhciBulkTransfer: Fail to Map Data Buffer for Bulk\r\n"));
       goto FREE_ED_BUFF;
     }
   }
+
   //
-  //Data Stage
+  // Data Stage
   //
-  LeftLength = MapLength;
+  LeftLength       = MapLength;
   ActualSendLength = MapLength;
-  HeadTd = NULL;
-  FirstTD = TRUE;
+  HeadTd           = NULL;
+  FirstTD          = TRUE;
   while (LeftLength > 0) {
     ActualSendLength = LeftLength;
     if (LeftLength > MaxPacketLength) {
       ActualSendLength = MaxPacketLength;
     }
+
     DataTd = OhciCreateTD (Ohc);
     if (DataTd == NULL) {
       DEBUG ((DEBUG_INFO, "OhciBulkTransfer: Fail to allocate buffer for Data Stage TD\r\n"));
       Status = EFI_OUT_OF_RESOURCES;
       goto FREE_OHCI_TDBUFF;
     }
+
     OhciSetTDField (DataTd, TD_PDATA, 0);
     OhciSetTDField (DataTd, TD_BUFFER_ROUND, 1);
     OhciSetTDField (DataTd, TD_DIR_PID, DataPidDir);
@@ -764,22 +791,24 @@ OhciBulkTransfer(
     OhciSetTDField (DataTd, TD_DT_TOGGLE, *DataToggle);
     OhciSetTDField (DataTd, TD_ERROR_CNT, 0);
     OhciSetTDField (DataTd, TD_COND_CODE, TD_TOBE_PROCESSED);
-    OhciSetTDField (DataTd, TD_CURR_BUFFER_PTR, (UINT32) MapPyhAddr);
+    OhciSetTDField (DataTd, TD_CURR_BUFFER_PTR, (UINT32)MapPyhAddr);
     OhciSetTDField (DataTd, TD_BUFFER_END_PTR, (UINT32)(MapPyhAddr + ActualSendLength - 1));
     OhciSetTDField (DataTd, TD_NEXT_PTR, 0);
     DataTd->ActualSendLength = (UINT32)ActualSendLength;
-    DataTd->DataBuffer = (UINT32)MapPyhAddr;
-    DataTd->NextTDPointer = 0;
+    DataTd->DataBuffer       = (UINT32)MapPyhAddr;
+    DataTd->NextTDPointer    = 0;
     if (FirstTD) {
-      HeadTd = DataTd;
+      HeadTd  = DataTd;
       FirstTD = FALSE;
     } else {
       OhciLinkTD (HeadTd, DataTd);
     }
+
     *DataToggle ^= 1;
-    MapPyhAddr += ActualSendLength;
-    LeftLength -= ActualSendLength;
+    MapPyhAddr  += ActualSendLength;
+    LeftLength  -= ActualSendLength;
   }
+
   //
   // Empty Stage
   //
@@ -789,11 +818,12 @@ OhciBulkTransfer(
     DEBUG ((DEBUG_INFO, "OhciBulkTransfer: Fail to allocate buffer for Empty TD\r\n"));
     goto FREE_OHCI_TDBUFF;
   }
+
   OhciSetTDField (EmptyTd, TD_PDATA, 0);
   OhciSetTDField (EmptyTd, TD_BUFFER_ROUND, 0);
   OhciSetTDField (EmptyTd, TD_DIR_PID, 0);
   OhciSetTDField (EmptyTd, TD_DELAY_INT, 0);
-  //OhciSetTDField (EmptyTd, TD_DT_TOGGLE, CurrentToggle);
+  // OhciSetTDField (EmptyTd, TD_DT_TOGGLE, CurrentToggle);
   EmptyTd->Word0.DataToggle = 0;
   OhciSetTDField (EmptyTd, TD_ERROR_CNT, 0);
   OhciSetTDField (EmptyTd, TD_COND_CODE, 0);
@@ -801,31 +831,33 @@ OhciBulkTransfer(
   OhciSetTDField (EmptyTd, TD_BUFFER_END_PTR, 0);
   OhciSetTDField (EmptyTd, TD_NEXT_PTR, 0);
   EmptyTd->ActualSendLength = 0;
-  EmptyTd->DataBuffer = 0;
-  EmptyTd->NextTDPointer = 0;
+  EmptyTd->DataBuffer       = 0;
+  EmptyTd->NextTDPointer    = 0;
   OhciLinkTD (HeadTd, EmptyTd);
   Ed->TdTailPointer = (UINT32)(UINTN)EmptyTd;
   OhciAttachTDListToED (Ed, HeadTd);
 
   OhciSetEDField (Ed, ED_SKIP, 0);
   Status = OhciSetHcCommandStatus (Ohc, BULK_LIST_FILLED, 1);
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     *TransferResult = EFI_USB_ERR_SYSTEM;
-    Status = EFI_DEVICE_ERROR;
+    Status          = EFI_DEVICE_ERROR;
     DEBUG ((DEBUG_INFO, "OhciControlTransfer: Fail to enable BULK_LIST_FILLED\r\n"));
     goto FREE_OHCI_TDBUFF;
   }
+
   Status = OhciSetHcControl (Ohc, BULK_ENABLE, 1);
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     *TransferResult = EFI_USB_ERR_SYSTEM;
-    Status = EFI_DEVICE_ERROR;
+    Status          = EFI_DEVICE_ERROR;
     DEBUG ((DEBUG_INFO, "OhciControlTransfer: Fail to enable BULK_ENABLE\r\n"));
     goto FREE_OHCI_TDBUFF;
   }
-  gBS->Stall(20 * 1000);
+
+  gBS->Stall (20 * 1000);
 
   TimeCount = 0;
-  Status = CheckIfDone (Ohc, BULK_LIST, Ed, HeadTd, &EdResult);
+  Status    = CheckIfDone (Ohc, BULK_LIST, Ed, HeadTd, &EdResult);
   while (Status == EFI_NOT_READY && TimeCount <= TimeOut) {
     gBS->Stall (1000);
     TimeCount++;
@@ -841,34 +873,38 @@ OhciBulkTransfer(
       DEBUG ((DEBUG_ERROR, "Bulk pipe broken\r\n"));
       *DataToggle = EdResult.NextToggle;
     }
+
     *DataLength = 0;
   } else {
     DEBUG ((DEBUG_INFO, "Bulk transfer successed\r\n"));
   }
-  //*DataToggle = (UINT8) OhciGetEDField (Ed, ED_DTTOGGLE);
+
+  // *DataToggle = (UINT8) OhciGetEDField (Ed, ED_DTTOGGLE);
 
 FREE_OHCI_TDBUFF:
   OhciSetEDField (Ed, ED_SKIP, 1);
   if (HeadEd == Ed) {
     OhciSetMemoryPointer (Ohc, HC_BULK_HEAD, NULL);
-  }else {
+  } else {
     HeadEd->NextED = Ed->NextED;
   }
+
   while (HeadTd) {
     DataTd = HeadTd;
     HeadTd = (TD_DESCRIPTOR *)(UINTN)(HeadTd->NextTDPointer);
-    UsbHcFreeMem(Ohc->MemPool, DataTd, sizeof(TD_DESCRIPTOR));
+    UsbHcFreeMem (Ohc->MemPool, DataTd, sizeof (TD_DESCRIPTOR));
   }
 
-  if(Mapping != NULL) {
-    DmaUnmap(Mapping);
+  if (Mapping != NULL) {
+    DmaUnmap (Mapping);
   }
 
 FREE_ED_BUFF:
-  UsbHcFreeMem(Ohc->MemPool, Ed, sizeof(ED_DESCRIPTOR));
+  UsbHcFreeMem (Ohc->MemPool, Ed, sizeof (ED_DESCRIPTOR));
 
   return Status;
 }
+
 /**
 
   Submits an interrupt transfer to an interrupt endpoint of a USB device.
@@ -921,7 +957,6 @@ FREE_ED_BUFF:
   @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
 
 **/
-
 EFI_STATUS
 OhciInterruptTransfer (
   IN     USB_OHCI_HC_DEV                  *Ohc,
@@ -956,11 +991,11 @@ OhciInterruptTransfer (
   EFI_TPL                  OldTpl;
   BOOLEAN                  FirstTD;
 
-  VOID                      *Mapping;
-  UINTN                     MapLength;
-  EFI_PHYSICAL_ADDRESS      MapPyhAddr;
-  UINTN                     LeftLength;
-  UINTN                     ActualSendLength;
+  VOID                  *Mapping;
+  UINTN                 MapLength;
+  EFI_PHYSICAL_ADDRESS  MapPyhAddr;
+  UINTN                 LeftLength;
+  UINTN                 ActualSendLength;
 
   if (DataLength > MAX_BYTES_PER_TD) {
     DEBUG ((DEBUG_ERROR, "OhciInterruptTransfer: Error param\r\n"));
@@ -968,10 +1003,10 @@ OhciInterruptTransfer (
   }
 
   if ((EndPointAddress & 0x80) != 0) {
-    EdDir = ED_IN_DIR;
+    EdDir      = ED_IN_DIR;
     DataPidDir = TD_IN_PID;
   } else {
-    EdDir = ED_OUT_DIR;
+    EdDir      = ED_OUT_DIR;
     DataPidDir = TD_OUT_PID;
   }
 
@@ -985,26 +1020,29 @@ OhciInterruptTransfer (
     gBS->RestoreTPL (OldTpl);
     return Status;
   }
+
   MapLength = DataLength;
-  Status = DmaMap(
-                   MapOperationBusMasterWrite,
-                   UCBuffer,
-                   &MapLength,
-                   &MapPyhAddr,
-                   &Mapping
-                   );
+  Status    = DmaMap (
+                MapOperationBusMasterWrite,
+                UCBuffer,
+                &MapLength,
+                &MapPyhAddr,
+                &Mapping
+                );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "OhciInterruptTransfer: Fail to Map buffer \r\n"));
     goto EXIT;
   }
+
   Depth = 5;
   Index = 1;
   while (PollingInterval >= Index * 2 && Depth > 0) {
     Index *= 2;
     Depth--;
   }
+
   //
-  //ED Stage
+  // ED Stage
   //
   HeadEd = OhciFindMinInterruptEDList (Ohc, (UINT32)Depth);
   if ((Ed = OhciFindWorkingEd (HeadEd, DeviceAddress, EndPointNum, EdDir)) != NULL) {
@@ -1016,6 +1054,7 @@ OhciInterruptTransfer (
       DEBUG ((DEBUG_ERROR, "OhciInterruptTransfer: Fail to allocate buffer for ED\r\n"));
       goto UNMAP_OHCI_XBUFF;
     }
+
     OhciSetEDField (Ed, ED_SKIP, 1);
     OhciSetEDField (Ed, ED_FUNC_ADD, DeviceAddress);
     OhciSetEDField (Ed, ED_ENDPT_NUM, EndPointNum);
@@ -1029,24 +1068,27 @@ OhciInterruptTransfer (
     OhciSetEDField (Ed, ED_NEXT_EDPTR, 0);
     OhciAttachEDToList (Ohc, INTERRUPT_LIST, Ed, HeadEd);
   }
+
   //
-  //Data Stage
+  // Data Stage
   //
-  LeftLength = MapLength;
+  LeftLength       = MapLength;
   ActualSendLength = MapLength;
-  HeadTd = NULL;
-  FirstTD = TRUE;
+  HeadTd           = NULL;
+  FirstTD          = TRUE;
   while (LeftLength > 0) {
     ActualSendLength = LeftLength;
     if (LeftLength > MaxPacketLength) {
       ActualSendLength = MaxPacketLength;
     }
+
     DataTd = OhciCreateTD (Ohc);
     if (DataTd == NULL) {
       Status = EFI_OUT_OF_RESOURCES;
       DEBUG ((DEBUG_ERROR, "OhciInterruptTransfer: Fail to allocate buffer for Data Stage TD\r\n"));
       goto FREE_OHCI_TDBUFF;
     }
+
     OhciSetTDField (DataTd, TD_PDATA, 0);
     OhciSetTDField (DataTd, TD_BUFFER_ROUND, 1);
     OhciSetTDField (DataTd, TD_DIR_PID, DataPidDir);
@@ -1054,21 +1096,22 @@ OhciInterruptTransfer (
     OhciSetTDField (DataTd, TD_DT_TOGGLE, *DataToggle);
     OhciSetTDField (DataTd, TD_ERROR_CNT, 0);
     OhciSetTDField (DataTd, TD_COND_CODE, TD_TOBE_PROCESSED);
-    OhciSetTDField (DataTd, TD_CURR_BUFFER_PTR, (UINT32) MapPyhAddr);
+    OhciSetTDField (DataTd, TD_CURR_BUFFER_PTR, (UINT32)MapPyhAddr);
     OhciSetTDField (DataTd, TD_BUFFER_END_PTR, (UINT32)(MapPyhAddr + ActualSendLength - 1));
     OhciSetTDField (DataTd, TD_NEXT_PTR, 0);
     DataTd->ActualSendLength = (UINT32)ActualSendLength;
-    DataTd->DataBuffer = (UINT32)(UINTN)MapPyhAddr;
-    DataTd->NextTDPointer = 0;
+    DataTd->DataBuffer       = (UINT32)(UINTN)MapPyhAddr;
+    DataTd->NextTDPointer    = 0;
     if (FirstTD) {
-      HeadTd = DataTd;
+      HeadTd  = DataTd;
       FirstTD = FALSE;
     } else {
       OhciLinkTD (HeadTd, DataTd);
     }
+
     *DataToggle ^= 1;
-    MapPyhAddr += ActualSendLength;
-    LeftLength -= ActualSendLength;
+    MapPyhAddr  += ActualSendLength;
+    LeftLength  -= ActualSendLength;
   }
 
   EmptTd = OhciCreateTD (Ohc);
@@ -1077,11 +1120,12 @@ OhciInterruptTransfer (
     DEBUG ((DEBUG_ERROR, "OhciInterruptTransfer: Fail to allocate buffer for Empty Stage TD\r\n"));
     goto FREE_OHCI_TDBUFF;
   }
+
   OhciSetTDField (EmptTd, TD_PDATA, 0);
   OhciSetTDField (EmptTd, TD_BUFFER_ROUND, 0);
   OhciSetTDField (EmptTd, TD_DIR_PID, 0);
   OhciSetTDField (EmptTd, TD_DELAY_INT, 0);
-  //OhciSetTDField (EmptTd, TD_DT_TOGGLE, CurrentToggle);
+  // OhciSetTDField (EmptTd, TD_DT_TOGGLE, CurrentToggle);
   EmptTd->Word0.DataToggle = 0;
   OhciSetTDField (EmptTd, TD_ERROR_CNT, 0);
   OhciSetTDField (EmptTd, TD_COND_CODE, 0);
@@ -1089,8 +1133,8 @@ OhciInterruptTransfer (
   OhciSetTDField (EmptTd, TD_BUFFER_END_PTR, 0);
   OhciSetTDField (EmptTd, TD_NEXT_PTR, 0);
   EmptTd->ActualSendLength = 0;
-  EmptTd->DataBuffer = 0;
-  EmptTd->NextTDPointer = 0;
+  EmptTd->DataBuffer       = 0;
+  EmptTd->NextTDPointer    = 0;
   OhciLinkTD (HeadTd, EmptTd);
   Ed->TdTailPointer = (UINT32)(UINTN)EmptTd;
   OhciAttachTDListToED (Ed, HeadTd);
@@ -1098,6 +1142,7 @@ OhciInterruptTransfer (
   if (OutputED != NULL) {
     *OutputED = Ed;
   }
+
   if (OutputTD != NULL) {
     *OutputTD = HeadTd;
   }
@@ -1108,23 +1153,24 @@ OhciInterruptTransfer (
       goto FREE_OHCI_TDBUFF;
     }
 
-    Entry->DeviceAddress = DeviceAddress;
-    Entry->EndPointAddress = EndPointAddress;
-    Entry->Ed = Ed;
-    Entry->DataTd = HeadTd;
-    Entry->IsSlowDevice = IsSlowDevice;
-    Entry->MaxPacketLength = MaxPacketLength;
-    Entry->PollingInterval = PollingInterval;
+    Entry->DeviceAddress    = DeviceAddress;
+    Entry->EndPointAddress  = EndPointAddress;
+    Entry->Ed               = Ed;
+    Entry->DataTd           = HeadTd;
+    Entry->IsSlowDevice     = IsSlowDevice;
+    Entry->MaxPacketLength  = MaxPacketLength;
+    Entry->PollingInterval  = PollingInterval;
     Entry->CallBackFunction = CallBackFunction;
-    Entry->Context = Context;
-    Entry->IsPeriodic = IsPeriodic;
-    Entry->UCBuffer = UCBuffer;
-    Entry->UCBufferMapping = Mapping;
-    Entry->DataLength = DataLength;
-    Entry->Toggle = DataToggle;
-    Entry->NextEntry = NULL;
+    Entry->Context          = Context;
+    Entry->IsPeriodic       = IsPeriodic;
+    Entry->UCBuffer         = UCBuffer;
+    Entry->UCBufferMapping  = Mapping;
+    Entry->DataLength       = DataLength;
+    Entry->Toggle           = DataToggle;
+    Entry->NextEntry        = NULL;
     OhciAddInterruptContextEntry (Ohc, Entry);
   }
+
   OhciSetEDField (Ed, ED_SKIP, 0);
 
   if (OhciGetHcControl (Ohc, PERIODIC_ENABLE) == 0) {
@@ -1138,25 +1184,25 @@ FREE_OHCI_TDBUFF:
   while (HeadTd) {
     DataTd = HeadTd;
     HeadTd = (TD_DESCRIPTOR *)(UINTN)(HeadTd->NextTDPointer);
-    UsbHcFreeMem(Ohc->MemPool, DataTd, sizeof(TD_DESCRIPTOR));
+    UsbHcFreeMem (Ohc->MemPool, DataTd, sizeof (TD_DESCRIPTOR));
   }
 
-//FREE_OHCI_EDBUFF:
+  // FREE_OHCI_EDBUFF:
   if ((HeadEd != Ed) && HeadEd && Ed) {
-    while(HeadEd->NextED != (UINT32)(UINTN)Ed) {
+    while (HeadEd->NextED != (UINT32)(UINTN)Ed) {
       HeadEd = (ED_DESCRIPTOR *)(UINTN)(HeadEd->NextED);
     }
-  HeadEd->NextED = Ed->NextED;
-    UsbHcFreeMem(Ohc->MemPool, Ed, sizeof(ED_DESCRIPTOR));
+
+    HeadEd->NextED = Ed->NextED;
+    UsbHcFreeMem (Ohc->MemPool, Ed, sizeof (ED_DESCRIPTOR));
   }
 
 UNMAP_OHCI_XBUFF:
-  DmaUnmap(Mapping);
+  DmaUnmap (Mapping);
 
 EXIT:
   return Status;
 }
-
 
 /**
 
@@ -1205,8 +1251,6 @@ EXIT:
   @retval EFI_OUT_OF_RESOURCES  The request could not be completed due to a lack of resources.
 
 **/
-
-
 EFI_STATUS
 EFIAPI
 OhciAsyncInterruptTransfer (
@@ -1223,25 +1267,27 @@ OhciAsyncInterruptTransfer (
   IN     VOID                             *Context           OPTIONAL
   )
 {
-  EFI_STATUS              Status;
-  USB_OHCI_HC_DEV         *Ohc;
-  VOID                    *UCBuffer;
-  UINTN                   Pages;
-  if (DataToggle == NULL || (EndPointAddress & 0x80) == 0 ||
-    (IsNewTransfer && (DataLength == 0 ||
-    (*DataToggle != 0 && *DataToggle != 1) || (PollingInterval < 1 || PollingInterval > 255)))) {
+  EFI_STATUS       Status;
+  USB_OHCI_HC_DEV  *Ohc;
+  VOID             *UCBuffer;
+  UINTN            Pages;
+
+  if ((DataToggle == NULL) || ((EndPointAddress & 0x80) == 0) ||
+      (IsNewTransfer && ((DataLength == 0) ||
+                         ((*DataToggle != 0) && (*DataToggle != 1)) || ((PollingInterval < 1) || (PollingInterval > 255)))))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
   Ohc = USB_OHCI_HC_DEV_FROM_THIS (This);
 
   if ( IsNewTransfer ) {
-    Pages = EFI_SIZE_TO_PAGES (DataLength);
+    Pages  = EFI_SIZE_TO_PAGES (DataLength);
     Status = DmaAllocateBuffer (
-                    EfiBootServicesData,
-                    Pages,
-                    &UCBuffer
-                    );
+               EfiBootServicesData,
+               Pages,
+               &UCBuffer
+               );
     if (EFI_ERROR (Status)) {
       return EFI_OUT_OF_RESOURCES;
     }
@@ -1268,13 +1314,13 @@ OhciAsyncInterruptTransfer (
              );
 
   if ( UCBuffer ) {
-    if (EFI_ERROR(Status)) {
+    if (EFI_ERROR (Status)) {
       DmaFreeBuffer (Pages, UCBuffer);
     }
   }
+
   return Status;
 }
-
 
 /**
 
@@ -1313,8 +1359,6 @@ OhciAsyncInterruptTransfer (
   @retval EFI_INVALID_PARAMETER Parameters not follow spec
 
 **/
-
-
 EFI_STATUS
 EFIAPI
 OhciSyncInterruptTransfer (
@@ -1330,24 +1374,26 @@ OhciSyncInterruptTransfer (
   OUT    UINT32               *TransferResult
   )
 {
-  USB_OHCI_HC_DEV         *Ohc;
-  EFI_STATUS              Status;
-  ED_DESCRIPTOR           *Ed;
-  TD_DESCRIPTOR           *HeadTd;
-  OHCI_ED_RESULT          EdResult;
-  VOID                    *UCBuffer;
+  USB_OHCI_HC_DEV  *Ohc;
+  EFI_STATUS       Status;
+  ED_DESCRIPTOR    *Ed;
+  TD_DESCRIPTOR    *HeadTd;
+  OHCI_ED_RESULT   EdResult;
+  VOID             *UCBuffer;
 
-  if ((EndPointAddress & 0x80) == 0 || Data == NULL || DataLength == NULL || *DataLength == 0 ||
-      (IsSlowDevice && MaxPacketLength > 8) || (!IsSlowDevice && MaxPacketLength > 64) ||
-      DataToggle == NULL || (*DataToggle != 0 && *DataToggle != 1) || TransferResult == NULL) {
+  if (((EndPointAddress & 0x80) == 0) || (Data == NULL) || (DataLength == NULL) || (*DataLength == 0) ||
+      (IsSlowDevice && (MaxPacketLength > 8)) || (!IsSlowDevice && (MaxPacketLength > 64)) ||
+      (DataToggle == NULL) || ((*DataToggle != 0) && (*DataToggle != 1)) || (TransferResult == NULL))
+  {
     return EFI_INVALID_PARAMETER;
   }
 
-  Ohc = USB_OHCI_HC_DEV_FROM_THIS (This);
+  Ohc      = USB_OHCI_HC_DEV_FROM_THIS (This);
   UCBuffer = AllocatePool (*DataLength);
   if (UCBuffer == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
+
   Status = OhciInterruptTransfer (
              Ohc,
              DeviceAddress,
@@ -1376,7 +1422,8 @@ OhciSyncInterruptTransfer (
 
     *TransferResult = ConvertErrorCode (EdResult.ErrorCode);
   }
-  CopyMem(Data, UCBuffer, *DataLength);
+
+  CopyMem (Data, UCBuffer, *DataLength);
   Status = OhciInterruptTransfer (
              Ohc,
              DeviceAddress,
@@ -1397,6 +1444,7 @@ OhciSyncInterruptTransfer (
 
   return Status;
 }
+
 /**
 
   Submits isochronous transfer to a target USB device.
@@ -1419,8 +1467,6 @@ OhciSyncInterruptTransfer (
   @retval EFI_INVALID_PARAMETER Data is NULL or DataLength is 0 or TransferResult is NULL
 
 **/
-
-
 EFI_STATUS
 EFIAPI
 OhciIsochronousTransfer (
@@ -1433,7 +1479,7 @@ OhciIsochronousTransfer (
   OUT    UINT32               *TransferResult
   )
 {
-  if (Data == NULL || DataLength == 0 || TransferResult == NULL) {
+  if ((Data == NULL) || (DataLength == 0) || (TransferResult == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1460,22 +1506,20 @@ OhciIsochronousTransfer (
   @retval EFI_INVALID_PARAMETER Data is NULL or Datalength is 0
 
 **/
-
 EFI_STATUS
 EFIAPI
 OhciAsyncIsochronousTransfer (
-  IN     EFI_USB_HC_PROTOCOL                *This,
-  IN     UINT8                              DeviceAddress,
-  IN     UINT8                              EndPointAddress,
-  IN     UINT8                              MaximumPacketLength,
-  IN OUT VOID                               *Data,
-  IN OUT UINTN                              DataLength,
-  IN     EFI_ASYNC_USB_TRANSFER_CALLBACK    IsochronousCallBack,
-  IN     VOID                               *Context OPTIONAL
+  IN     EFI_USB_HC_PROTOCOL              *This,
+  IN     UINT8                            DeviceAddress,
+  IN     UINT8                            EndPointAddress,
+  IN     UINT8                            MaximumPacketLength,
+  IN OUT VOID                             *Data,
+  IN OUT UINTN                            DataLength,
+  IN     EFI_ASYNC_USB_TRANSFER_CALLBACK  IsochronousCallBack,
+  IN     VOID                             *Context OPTIONAL
   )
 {
-
-  if (Data == NULL || DataLength == 0) {
+  if ((Data == NULL) || (DataLength == 0)) {
     return EFI_INVALID_PARAMETER;
   }
 
@@ -1499,16 +1543,18 @@ OhciGetRootHubNumOfPorts (
   )
 {
   USB_OHCI_HC_DEV  *Ohc;
+
   Ohc = USB_OHCI_HC_DEV_FROM_THIS (This);
 
   if (NumOfPorts == NULL) {
     return EFI_INVALID_PARAMETER;
   }
 
-  *NumOfPorts = (UINT8)OhciGetRootHubDescriptor(Ohc, RH_NUM_DS_PORTS);
+  *NumOfPorts = (UINT8)OhciGetRootHubDescriptor (Ohc, RH_NUM_DS_PORTS);
 
   return EFI_SUCCESS;
 }
+
 /**
 
   Retrieves the current status of a USB root hub port.
@@ -1525,8 +1571,6 @@ OhciGetRootHubNumOfPorts (
                                 was returned in PortStatus.
   @retval EFI_INVALID_PARAMETER Port number not valid
 **/
-
-
 EFI_STATUS
 EFIAPI
 OhciGetRootHubPortStatus (
@@ -1544,48 +1588,61 @@ OhciGetRootHubPortStatus (
   if (PortNumber >= NumOfPorts) {
     return EFI_INVALID_PARAMETER;
   }
-  PortStatus->PortStatus = 0;
+
+  PortStatus->PortStatus       = 0;
   PortStatus->PortChangeStatus = 0;
 
-  if (OhciReadRootHubPortStatus (Ohc,PortNumber, RH_CURR_CONNECT_STAT)) {
+  if (OhciReadRootHubPortStatus (Ohc, PortNumber, RH_CURR_CONNECT_STAT)) {
     PortStatus->PortStatus |= USB_PORT_STAT_CONNECTION;
   }
-  if (OhciReadRootHubPortStatus (Ohc,PortNumber, RH_PORT_ENABLE_STAT)) {
+
+  if (OhciReadRootHubPortStatus (Ohc, PortNumber, RH_PORT_ENABLE_STAT)) {
     PortStatus->PortStatus |= USB_PORT_STAT_ENABLE;
   }
-  if (OhciReadRootHubPortStatus (Ohc,PortNumber, RH_PORT_SUSPEND_STAT)) {
+
+  if (OhciReadRootHubPortStatus (Ohc, PortNumber, RH_PORT_SUSPEND_STAT)) {
     PortStatus->PortStatus |= USB_PORT_STAT_SUSPEND;
   }
-  if (OhciReadRootHubPortStatus (Ohc,PortNumber, RH_PORT_OC_INDICATOR)) {
+
+  if (OhciReadRootHubPortStatus (Ohc, PortNumber, RH_PORT_OC_INDICATOR)) {
     PortStatus->PortStatus |= USB_PORT_STAT_OVERCURRENT;
   }
-  if (OhciReadRootHubPortStatus (Ohc,PortNumber, RH_PORT_RESET_STAT)) {
+
+  if (OhciReadRootHubPortStatus (Ohc, PortNumber, RH_PORT_RESET_STAT)) {
     PortStatus->PortStatus |= USB_PORT_STAT_RESET;
   }
-  if (OhciReadRootHubPortStatus (Ohc,PortNumber, RH_PORT_POWER_STAT)) {
+
+  if (OhciReadRootHubPortStatus (Ohc, PortNumber, RH_PORT_POWER_STAT)) {
     PortStatus->PortStatus |= USB_PORT_STAT_POWER;
   }
-  if (OhciReadRootHubPortStatus (Ohc,PortNumber, RH_LSDEVICE_ATTACHED)) {
+
+  if (OhciReadRootHubPortStatus (Ohc, PortNumber, RH_LSDEVICE_ATTACHED)) {
     PortStatus->PortStatus |= USB_PORT_STAT_LOW_SPEED;
   }
+
   if (OhciReadRootHubPortStatus (Ohc, PortNumber, RH_PORT_ENABLE_STAT_CHANGE)) {
     PortStatus->PortChangeStatus |= USB_PORT_STAT_C_ENABLE;
   }
+
   if (OhciReadRootHubPortStatus (Ohc, PortNumber, RH_CONNECT_STATUS_CHANGE)) {
     PortStatus->PortChangeStatus |= USB_PORT_STAT_C_CONNECTION;
   }
+
   if (OhciReadRootHubPortStatus (Ohc, PortNumber, RH_PORT_SUSPEND_STAT_CHANGE)) {
     PortStatus->PortChangeStatus |= USB_PORT_STAT_C_SUSPEND;
   }
+
   if (OhciReadRootHubPortStatus (Ohc, PortNumber, RH_OC_INDICATOR_CHANGE)) {
     PortStatus->PortChangeStatus |= USB_PORT_STAT_C_OVERCURRENT;
   }
+
   if (OhciReadRootHubPortStatus (Ohc, PortNumber, RH_PORT_RESET_STAT_CHANGE)) {
     PortStatus->PortChangeStatus |= USB_PORT_STAT_C_RESET;
   }
 
   return EFI_SUCCESS;
 }
+
 /**
 
   Sets a feature for the specified root hub port.
@@ -1609,10 +1666,10 @@ OhciSetRootHubPortFeature (
   IN EFI_USB_PORT_FEATURE  PortFeature
   )
 {
-  USB_OHCI_HC_DEV         *Ohc;
-  EFI_STATUS              Status;
-  UINT8                   NumOfPorts;
-  UINTN                   RetryTimes;
+  USB_OHCI_HC_DEV  *Ohc;
+  EFI_STATUS       Status;
+  UINT8            NumOfPorts;
+  UINTN            RetryTimes;
 
   OhciGetRootHubNumOfPorts (This, &NumOfPorts);
   if (PortNumber >= NumOfPorts) {
@@ -1622,7 +1679,6 @@ OhciSetRootHubPortFeature (
   Ohc = USB_OHCI_HC_DEV_FROM_THIS (This);
 
   Status = EFI_SUCCESS;
-
 
   switch (PortFeature) {
     case EfiUsbPortPower:
@@ -1641,6 +1697,7 @@ OhciSetRootHubPortFeature (
       if (RetryTimes >= MAX_RETRY_TIMES) {
         return EFI_DEVICE_ERROR;
       }
+
       break;
 
     case EfiUsbPortReset:
@@ -1680,8 +1737,8 @@ OhciSetRootHubPortFeature (
       if (RetryTimes >= MAX_RETRY_TIMES) {
         return EFI_DEVICE_ERROR;
       }
-      break;
 
+      break;
 
     case EfiUsbPortSuspend:
       Status = OhciSetRootHubPortStatus (Ohc, PortNumber, RH_SET_PORT_SUSPEND);
@@ -1699,6 +1756,7 @@ OhciSetRootHubPortFeature (
       if (RetryTimes >= MAX_RETRY_TIMES) {
         return EFI_DEVICE_ERROR;
       }
+
       break;
 
     default:
@@ -1731,11 +1789,10 @@ OhciClearRootHubPortFeature (
   IN EFI_USB_PORT_FEATURE  PortFeature
   )
 {
-  USB_OHCI_HC_DEV         *Ohc;
-  EFI_STATUS              Status;
-  UINT8                   NumOfPorts;
-  UINTN                   RetryTimes;
-
+  USB_OHCI_HC_DEV  *Ohc;
+  EFI_STATUS       Status;
+  UINT8            NumOfPorts;
+  UINTN            RetryTimes;
 
   OhciGetRootHubNumOfPorts (This, &NumOfPorts);
   if (PortNumber >= NumOfPorts) {
@@ -1763,6 +1820,7 @@ OhciClearRootHubPortFeature (
       if (RetryTimes >= MAX_RETRY_TIMES) {
         return EFI_DEVICE_ERROR;
       }
+
       break;
 
     case EfiUsbPortSuspend:
@@ -1781,6 +1839,7 @@ OhciClearRootHubPortFeature (
       if (RetryTimes >= MAX_RETRY_TIMES) {
         return EFI_DEVICE_ERROR;
       }
+
       break;
 
     case EfiUsbPortReset:
@@ -1802,6 +1861,7 @@ OhciClearRootHubPortFeature (
       if (RetryTimes >= MAX_RETRY_TIMES) {
         return EFI_DEVICE_ERROR;
       }
+
       break;
 
     case EfiUsbPortConnectChange:
@@ -1820,6 +1880,7 @@ OhciClearRootHubPortFeature (
       if (RetryTimes >= MAX_RETRY_TIMES) {
         return EFI_DEVICE_ERROR;
       }
+
       break;
 
     case EfiUsbPortResetChange:
@@ -1838,8 +1899,8 @@ OhciClearRootHubPortFeature (
       if (RetryTimes >= MAX_RETRY_TIMES) {
         return EFI_DEVICE_ERROR;
       }
-      break;
 
+      break;
 
     case EfiUsbPortEnableChange:
       Status = OhciSetRootHubPortStatus (Ohc, PortNumber, RH_PORT_ENABLE_STAT_CHANGE);
@@ -1857,6 +1918,7 @@ OhciClearRootHubPortFeature (
       if (RetryTimes >= MAX_RETRY_TIMES) {
         return EFI_DEVICE_ERROR;
       }
+
       break;
 
     case EfiUsbPortSuspendChange:
@@ -1875,6 +1937,7 @@ OhciClearRootHubPortFeature (
       if (RetryTimes >= MAX_RETRY_TIMES) {
         return EFI_DEVICE_ERROR;
       }
+
       break;
 
     case EfiUsbPortOverCurrentChange:
@@ -1893,6 +1956,7 @@ OhciClearRootHubPortFeature (
       if (RetryTimes >= MAX_RETRY_TIMES) {
         return EFI_DEVICE_ERROR;
       }
+
       break;
 
     default:
@@ -1902,18 +1966,17 @@ OhciClearRootHubPortFeature (
   return Status;
 }
 
-
 EFI_STATUS
 OhcInitHC (
-IN USB_OHCI_HC_DEV            *Ohc
-)
+  IN USB_OHCI_HC_DEV  *Ohc
+  )
 {
-EFI_STATUS              Status;
-UINT8                   Index;
-UINT8                   NumOfPorts;
-UINT32                  PowerOnGoodTime;
-UINT32                  Data32;
-BOOLEAN                 Flag = FALSE;
+  EFI_STATUS  Status;
+  UINT8       Index;
+  UINT8       NumOfPorts;
+  UINT32      PowerOnGoodTime;
+  UINT32      Data32;
+  BOOLEAN     Flag = FALSE;
 
   Status = OhciSetHcCommandStatus (Ohc, HC_RESET, HC_RESET);
   if (EFI_ERROR (Status)) {
@@ -1926,23 +1989,26 @@ BOOLEAN                 Flag = FALSE;
   //
   PowerOnGoodTime = 50;
   do {
-    gBS->Stall(1000);
-    Data32 = OhciGetOperationalReg (Ohc, HC_COMMAND_STATUS );
+    gBS->Stall (1000);
+    Data32 = OhciGetOperationalReg (Ohc, HC_COMMAND_STATUS);
     if ((Data32 & HC_RESET) == 0) {
       Flag = TRUE;
       break;
     }
-  }while(PowerOnGoodTime--);
-  if (!Flag){
+  } while (PowerOnGoodTime--);
+
+  if (!Flag) {
     return EFI_DEVICE_ERROR;
   }
-  OhciInitializeInterruptList(Ohc);
+
+  OhciInitializeInterruptList (Ohc);
 
   OhciSetFrameInterval (Ohc, FRAME_INTERVAL, 0x2edf);
   Status = OhciSetHcControl (Ohc, HC_FUNCTIONAL_STATE, HC_STATE_RESET);
-    if (EFI_ERROR (Status)) {
-      return EFI_DEVICE_ERROR;
-    }
+  if (EFI_ERROR (Status)) {
+    return EFI_DEVICE_ERROR;
+  }
+
   gBS->Stall (50 * 1000);
   //
   // Initialize host controller operational registers
@@ -1959,7 +2025,7 @@ BOOLEAN                 Flag = FALSE;
   OhciSetRootHubDescriptor (Ohc, RH_PORT_PWR_CTRL_MASK, 0xffff);
   OhciSetRootHubStatus (Ohc, RH_LOCAL_PSTAT_CHANGE);
   OhciSetRootHubPortStatus (Ohc, 0, RH_SET_PORT_POWER);
-  NumOfPorts = OhciGetRootHubDescriptor(Ohc, RH_NUM_DS_PORTS);
+  NumOfPorts = OhciGetRootHubDescriptor (Ohc, RH_NUM_DS_PORTS);
 
   for (Index = 0; Index < NumOfPorts; Index++) {
     if (!EFI_ERROR (OhciSetRootHubPortFeature (&Ohc->UsbHc, Index, EfiUsbPortReset))) {
@@ -1980,13 +2046,14 @@ BOOLEAN                 Flag = FALSE;
   //
   // Wait till first SOF occurs, and then clear it
   //
-  while (OhciGetHcInterruptStatus (Ohc, START_OF_FRAME) == 0);
+  while (OhciGetHcInterruptStatus (Ohc, START_OF_FRAME) == 0) {
+  }
+
   OhciClearInterruptStatus (Ohc, START_OF_FRAME);
   gBS->Stall (1000);
 
   return EFI_SUCCESS;
 }
-
 
 /**
 
@@ -1997,7 +2064,7 @@ BOOLEAN                 Flag = FALSE;
 **/
 VOID
 OhciFreeDev (
-  IN USB_OHCI_HC_DEV      *Ohc
+  IN USB_OHCI_HC_DEV  *Ohc
   )
 {
   OhciFreeFixedIntMemory (Ohc);
@@ -2015,7 +2082,6 @@ OhciFreeDev (
   }
 
   if (Ohc->HccaMemoryMapping != NULL ) {
-
     DmaFreeBuffer (Ohc->HccaMemoryPages, Ohc->HccaMemoryBuf);
   }
 
@@ -2025,6 +2091,7 @@ OhciFreeDev (
 
   FreePool (Ohc);
 }
+
 /**
 
   Uninstall all Ohci Interface.
@@ -2088,19 +2155,20 @@ OhciCleanDevUp (
 VOID
 EFIAPI
 OhcExitBootService (
-  EFI_EVENT                      Event,
-  VOID                           *Context
+  EFI_EVENT  Event,
+  VOID       *Context
   )
 {
-  USB_OHCI_HC_DEV           *Ohc;
-  EFI_USB_HC_PROTOCOL       *UsbHc;
-  Ohc = (USB_OHCI_HC_DEV *) Context;
+  USB_OHCI_HC_DEV      *Ohc;
+  EFI_USB_HC_PROTOCOL  *UsbHc;
+
+  Ohc = (USB_OHCI_HC_DEV *)Context;
 
   UsbHc = &Ohc->UsbHc;
   //
   // Stop the Host Controller
   //
-  //OhciStopHc (Ohc, OHC_GENERIC_TIMEOUT);
+  // OhciStopHc (Ohc, OHC_GENERIC_TIMEOUT);
   OhciSetHcControl (Ohc, PERIODIC_ENABLE | CONTROL_ENABLE | ISOCHRONOUS_ENABLE | BULK_ENABLE, 0);
   UsbHc->Reset (UsbHc, EFI_USB_HC_RESET_GLOBAL);
   UsbHc->SetState (UsbHc, EfiUsbHcStateHalt);
@@ -2128,18 +2196,20 @@ OHCIDriverBindingSupported (
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   )
 {
-  OHCI_DEVICE_PROTOCOL               *Dev;
-  EFI_STATUS                         Status;
+  OHCI_DEVICE_PROTOCOL  *Dev;
+  EFI_STATUS            Status;
 
   //
   //  Connect to the non-discoverable device
   //
-  Status = gBS->OpenProtocol (ControllerHandle,
-                              &gOhciDeviceProtocolGuid,
-                              (VOID **)&Dev,
-                              This->DriverBindingHandle,
-                              ControllerHandle,
-                              EFI_OPEN_PROTOCOL_BY_DRIVER);
+  Status = gBS->OpenProtocol (
+                  ControllerHandle,
+                  &gOhciDeviceProtocolGuid,
+                  (VOID **)&Dev,
+                  This->DriverBindingHandle,
+                  ControllerHandle,
+                  EFI_OPEN_PROTOCOL_BY_DRIVER
+                  );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -2147,10 +2217,12 @@ OHCIDriverBindingSupported (
   //
   // Clean up.
   //
-  gBS->CloseProtocol (ControllerHandle,
-                      &gOhciDeviceProtocolGuid,
-                      This->DriverBindingHandle,
-                      ControllerHandle);
+  gBS->CloseProtocol (
+         ControllerHandle,
+         &gOhciDeviceProtocolGuid,
+         This->DriverBindingHandle,
+         ControllerHandle
+         );
 
   return EFI_SUCCESS;
 }
@@ -2164,7 +2236,6 @@ OHCIDriverBindingSupported (
   @return Allocated OHCI device  If err, return NULL.
 
 **/
-
 EFI_STATUS
 EFIAPI
 OHCIDriverBindingStart (
@@ -2173,32 +2244,38 @@ OHCIDriverBindingStart (
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath   OPTIONAL
   )
 {
-  USB_OHCI_HC_DEV         *Ohc;
-  EFI_STATUS              Status;
-  VOID                    *Buf;
-  EFI_PHYSICAL_ADDRESS    PhyAddr;
-  VOID                    *Map;
-  UINTN                   Pages;
-  UINTN                   Bytes;
+  USB_OHCI_HC_DEV       *Ohc;
+  EFI_STATUS            Status;
+  VOID                  *Buf;
+  EFI_PHYSICAL_ADDRESS  PhyAddr;
+  VOID                  *Map;
+  UINTN                 Pages;
+  UINTN                 Bytes;
 
   Ohc = AllocateZeroPool (sizeof (USB_OHCI_HC_DEV));
   if (Ohc == NULL) {
     return EFI_OUT_OF_RESOURCES;
   }
 
-  Status = gBS->OpenProtocol (ControllerHandle,
-                              &gOhciDeviceProtocolGuid,
-                              (VOID **)&Ohc->Protocol,
-                              This->DriverBindingHandle,
-                              ControllerHandle,
-                              EFI_OPEN_PROTOCOL_BY_DRIVER);
+  Status = gBS->OpenProtocol (
+                  ControllerHandle,
+                  &gOhciDeviceProtocolGuid,
+                  (VOID **)&Ohc->Protocol,
+                  This->DriverBindingHandle,
+                  ControllerHandle,
+                  EFI_OPEN_PROTOCOL_BY_DRIVER
+                  );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR,
-      "%a: Couldn't open protocol: %r\n", __FUNCTION__, Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Couldn't open protocol: %r\n",
+      __FUNCTION__,
+      Status
+      ));
     goto FREE_OHC;
   }
 
-  Ohc->Signature                      = USB_OHCI_HC_DEV_SIGNATURE;
+  Ohc->Signature = USB_OHCI_HC_DEV_SIGNATURE;
 
   Ohc->UsbHc.Reset                    = OhciReset;
   Ohc->UsbHc.GetState                 = OhciGetState;
@@ -2216,16 +2293,16 @@ OHCIDriverBindingStart (
   Ohc->UsbHc.MajorRevision            = 0x1;
   Ohc->UsbHc.MinorRevision            = 0x1;
   Ohc->UsbHcBaseAddress               = Ohc->Protocol->BaseAddress;
-  Ohc->HccaMemoryBlock = NULL;
-  Ohc->HccaMemoryMapping   = NULL;
-  Ohc->HccaMemoryBuf = NULL;
-  Ohc->HccaMemoryPages = 0;
-  Ohc->InterruptContextList = NULL;
-  Ohc->ControllerNameTable = NULL;
-  Ohc->HouseKeeperTimer = NULL;
+  Ohc->HccaMemoryBlock                = NULL;
+  Ohc->HccaMemoryMapping              = NULL;
+  Ohc->HccaMemoryBuf                  = NULL;
+  Ohc->HccaMemoryPages                = 0;
+  Ohc->InterruptContextList           = NULL;
+  Ohc->ControllerNameTable            = NULL;
+  Ohc->HouseKeeperTimer               = NULL;
 
-  Ohc->MemPool = UsbHcInitMemPool(TRUE, 0);
-  if(Ohc->MemPool == NULL) {
+  Ohc->MemPool = UsbHcInitMemPool (TRUE, 0);
+  if (Ohc->MemPool == NULL) {
     goto FREE_DEV_BUFFER;
   }
 
@@ -2233,34 +2310,34 @@ OHCIDriverBindingStart (
   Pages = EFI_SIZE_TO_PAGES (Bytes);
 
   Status = DmaAllocateBuffer (
-                    EfiBootServicesData,
-                    Pages,
-                    &Buf
-                    );
+             EfiBootServicesData,
+             Pages,
+             &Buf
+             );
 
   if (EFI_ERROR (Status)) {
     goto FREE_MEM_POOL;
   }
 
   Status = DmaMap (
-              MapOperationBusMasterCommonBuffer,
-              Buf,
-              &Bytes,
-              &PhyAddr,
-              &Map
-              );
+             MapOperationBusMasterCommonBuffer,
+             Buf,
+             &Bytes,
+             &PhyAddr,
+             &Map
+             );
 
   if (EFI_ERROR (Status) || (Bytes != 4096)) {
     goto FREE_MEM_PAGE;
   }
 
-  Ohc->HccaMemoryBlock = (HCCA_MEMORY_BLOCK *)(UINTN)PhyAddr;
+  Ohc->HccaMemoryBlock   = (HCCA_MEMORY_BLOCK *)(UINTN)PhyAddr;
   Ohc->HccaMemoryMapping = Map;
-  Ohc->HccaMemoryBuf = (VOID *)(UINTN)Buf;
-  Ohc->HccaMemoryPages = Pages;
+  Ohc->HccaMemoryBuf     = (VOID *)(UINTN)Buf;
+  Ohc->HccaMemoryPages   = Pages;
 
   //
-  //Install Host Controller Protocol
+  // Install Host Controller Protocol
   //
   Status = gBS->InstallProtocolInterface (
                   &ControllerHandle,
@@ -2314,8 +2391,13 @@ OHCIDriverBindingStart (
   if (EFI_ERROR (Status)) {
     goto FREE_OHC;
   }
-  DEBUG ((DEBUG_INFO, "OHCI started for controller @ %p, base address: 0x%p\n", 
-          ControllerHandle, Ohc->UsbHcBaseAddress));
+
+  DEBUG ((
+    DEBUG_INFO,
+    "OHCI started for controller @ %p, base address: 0x%p\n",
+    ControllerHandle,
+    Ohc->UsbHcBaseAddress
+    ));
   return EFI_SUCCESS;
 
 FREE_OHC:
@@ -2327,16 +2409,18 @@ UNINSTALL_USBHC:
          &Ohc->UsbHc,
          NULL
          );
-  gBS->CloseProtocol (ControllerHandle,
-        &gOhciDeviceProtocolGuid,
-        This->DriverBindingHandle,
-        ControllerHandle); 
+  gBS->CloseProtocol (
+         ControllerHandle,
+         &gOhciDeviceProtocolGuid,
+         This->DriverBindingHandle,
+         ControllerHandle
+         );
 FREE_MEM_PAGE:
   DmaFreeBuffer (Pages, Buf);
 FREE_MEM_POOL:
   UsbHcFreeMemPool (Ohc->MemPool);
 FREE_DEV_BUFFER:
-  FreePool(Ohc);
+  FreePool (Ohc);
 
   return Status;
 }
@@ -2378,7 +2462,7 @@ OHCIDriverBindingStop (
     return Status;
   }
 
-  OhciCleanDevUp(Controller, UsbHc);
+  OhciCleanDevUp (Controller, UsbHc);
 
   gBS->CloseProtocol (
          Controller,
@@ -2389,7 +2473,7 @@ OHCIDriverBindingStop (
   return EFI_SUCCESS;
 }
 
-EFI_DRIVER_BINDING_PROTOCOL gOhciDriverBinding = {
+EFI_DRIVER_BINDING_PROTOCOL  gOhciDriverBinding = {
   OHCIDriverBindingSupported,
   OHCIDriverBindingStart,
   OHCIDriverBindingStop,
@@ -2401,16 +2485,16 @@ EFI_DRIVER_BINDING_PROTOCOL gOhciDriverBinding = {
 EFI_STATUS
 EFIAPI
 OhciInitialise (
-  IN EFI_HANDLE  ImageHandle,
+  IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   return EfiLibInstallDriverBindingComponentName2 (
-              ImageHandle,
-              SystemTable,
-              &gOhciDriverBinding,
-              ImageHandle,
-              &gOhciComponentName,
-              &gOhciComponentName2
-              );
+           ImageHandle,
+           SystemTable,
+           &gOhciDriverBinding,
+           ImageHandle,
+           &gOhciComponentName,
+           &gOhciComponentName2
+           );
 }

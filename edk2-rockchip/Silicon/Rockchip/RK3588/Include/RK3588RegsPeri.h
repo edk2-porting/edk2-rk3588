@@ -9,5 +9,4 @@
 #ifndef __RK3588_REGS_PERI_H__
 #define __RK3588_REGS_PERI_H__
 
-
 #endif /* __RK3588_REGS_PERI_H__ */

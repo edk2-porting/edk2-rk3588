@@ -17,21 +17,23 @@
 #include <Library/RockchipPlatformLib.h>
 #include <Protocol/ArmScmiClockProtocol.h>
 
-#define SCMI_CCLK_SD			9
+#define SCMI_CCLK_SD  9
 
 EFI_STATUS
 EFIAPI
 RkSdmmcSetClockRate (
-  IN UINTN Frequency
+  IN UINTN  Frequency
   )
 {
-  EFI_STATUS            Status;
-  SCMI_CLOCK_PROTOCOL   *ClockProtocol;
-  EFI_GUID              ClockProtocolGuid = ARM_SCMI_CLOCK_PROTOCOL_GUID;
+  EFI_STATUS           Status;
+  SCMI_CLOCK_PROTOCOL  *ClockProtocol;
+  EFI_GUID             ClockProtocolGuid = ARM_SCMI_CLOCK_PROTOCOL_GUID;
 
-  Status = gBS->LocateProtocol (&ClockProtocolGuid,
-                                NULL,
-                                (VOID **) &ClockProtocol);
+  Status = gBS->LocateProtocol (
+                  &ClockProtocolGuid,
+                  NULL,
+                  (VOID **)&ClockProtocol
+                  );
   ASSERT (!EFI_ERROR (Status));
 
   Status = ClockProtocol->RateSet (ClockProtocol, SCMI_CCLK_SD, Frequency);
@@ -46,10 +48,10 @@ RkSdmmcSetIoMux (
   VOID
   )
 {
-#define SYS_GRF_SOC_CON6 	(0xFD58C000 + 0x0318)
+  #define SYS_GRF_SOC_CON6  (0xFD58C000 + 0x0318)
 
   // Clear force_jtag (SD slot is muxed with JTAG)
-  MmioWrite32(SYS_GRF_SOC_CON6, 0x40000000);
+  MmioWrite32 (SYS_GRF_SOC_CON6, 0x40000000);
 
   GpioPinSetDirection (0, GPIO_PIN_PA4, GPIO_PIN_INPUT);
   SdmmcIoMux ();

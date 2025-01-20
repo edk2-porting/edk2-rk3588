@@ -23,22 +23,22 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 #include <Protocol/FirmwareVolumeBlock.h>
 #include <Protocol/NorFlashProtocol.h>
 
-UNI_NOR_FLASH_PROTOCOL *SpiFlashProtocol;
+UNI_NOR_FLASH_PROTOCOL  *SpiFlashProtocol;
 
-CONST CHAR16 gShellSpiFlashFileName[] = L"ShellCommand";
-EFI_HANDLE gShellSfHiiHandle = NULL;
+CONST CHAR16  gShellSpiFlashFileName[] = L"ShellCommand";
+EFI_HANDLE    gShellSfHiiHandle        = NULL;
 
-STATIC CONST SHELL_PARAM_ITEM ParamList[] = {
-  {L"read", TypeFlag},
-  {L"readfile", TypeFlag},
-  {L"write", TypeFlag},
-  {L"writefile", TypeFlag},
-  {L"erase", TypeFlag},
-  {L"update", TypeFlag},
-  {L"updatefile", TypeFlag},
-  {L"help", TypeFlag},
-  {NULL , TypeMax}
-  };
+STATIC CONST SHELL_PARAM_ITEM  ParamList[] = {
+  { L"read",       TypeFlag },
+  { L"readfile",   TypeFlag },
+  { L"write",      TypeFlag },
+  { L"writefile",  TypeFlag },
+  { L"erase",      TypeFlag },
+  { L"update",     TypeFlag },
+  { L"updatefile", TypeFlag },
+  { L"help",       TypeFlag },
+  { NULL,          TypeMax  }
+};
 
 typedef enum {
   READ        = 2,
@@ -55,13 +55,12 @@ typedef enum {
 
   @return The string pointer to the file name.
 **/
-CONST CHAR16*
+CONST CHAR16 *
 EFIAPI
 ShellCommandGetManFileNameSpiFlash (
   VOID
   )
 {
-
   return gShellSpiFlashFileName;
 }
 
@@ -70,42 +69,43 @@ SfUsage (
   VOID
   )
 {
-  Print (L"\nBasic SPI command\n"
-         "sf [read | readfile | write | writefile | erase |"
-         "update | updatefile]"
-         "[<Address> | <FilePath>] <Offset> <Length>\n\n"
-         "Address  - Address in RAM to store/load data\n"
-         "FilePath - Path to file to read/write data from/to\n"
-         "Offset   - Offset from beginning of SPI flash to store/load data\n"
-         "Length   - Number of bytes to send\n"
-         "Examples:\n"
-         "Check if there is response from SPI flash\n"
-         "Read 32 bytes from 0xe00000 of SPI flash into RAM at address 0x100000\n"
-         "  sf read 0x100000 0xe00000 32\n"
-         "Read 0x20 bytes from 0x200000 of SPI flash into RAM at address 0x300000\n"
-         "  sf read 0x300000 0x200000 0x20\n"
-         "Erase 0x10000 bytes from offset 0x100000 of SPI flash\n"
-         "  sf erase 0x100000 0x100000\n"
-         "Write 16 bytes from 0x200000 at RAM into SPI flash at address 0x4000000\n"
-         "  sf write 0x200000 0x4000000 16\n"
-         "Update 100 bytes from 0x100000 at RAM in SPI flash at address 0xe00000\n"
-         "  sf update 0x100000 0xe00000 100\n"
-         "Read 0x3000 bytes from 0x0 of SPI flash into file fs2:file.bin\n"
-         "  sf readfile fs2:file.bin 0x0 0x3000 \n"
-         "Update data in SPI flash at 0x3000000 from file Linux.efi\n"
-         "  sf updatefile Linux.efi 0x3000000\n"
-  );
+  Print (
+    L"\nBasic SPI command\n"
+    "sf [read | readfile | write | writefile | erase |"
+    "update | updatefile]"
+    "[<Address> | <FilePath>] <Offset> <Length>\n\n"
+    "Address  - Address in RAM to store/load data\n"
+    "FilePath - Path to file to read/write data from/to\n"
+    "Offset   - Offset from beginning of SPI flash to store/load data\n"
+    "Length   - Number of bytes to send\n"
+    "Examples:\n"
+    "Check if there is response from SPI flash\n"
+    "Read 32 bytes from 0xe00000 of SPI flash into RAM at address 0x100000\n"
+    "  sf read 0x100000 0xe00000 32\n"
+    "Read 0x20 bytes from 0x200000 of SPI flash into RAM at address 0x300000\n"
+    "  sf read 0x300000 0x200000 0x20\n"
+    "Erase 0x10000 bytes from offset 0x100000 of SPI flash\n"
+    "  sf erase 0x100000 0x100000\n"
+    "Write 16 bytes from 0x200000 at RAM into SPI flash at address 0x4000000\n"
+    "  sf write 0x200000 0x4000000 16\n"
+    "Update 100 bytes from 0x100000 at RAM in SPI flash at address 0xe00000\n"
+    "  sf update 0x100000 0xe00000 100\n"
+    "Read 0x3000 bytes from 0x0 of SPI flash into file fs2:file.bin\n"
+    "  sf readfile fs2:file.bin 0x0 0x3000 \n"
+    "Update data in SPI flash at 0x3000000 from file Linux.efi\n"
+    "  sf updatefile Linux.efi 0x3000000\n"
+    );
 }
 
 STATIC
 EFI_STATUS
 OpenAndPrepareFile (
-  IN CHAR16 *FilePath,
-  SHELL_FILE_HANDLE *FileHandle
+  IN CHAR16          *FilePath,
+  SHELL_FILE_HANDLE  *FileHandle
   )
 {
-  EFI_STATUS Status;
-  UINT64 OpenMode;
+  EFI_STATUS  Status;
+  UINT64      OpenMode;
 
   OpenMode = EFI_FILE_MODE_READ | EFI_FILE_MODE_WRITE | EFI_FILE_MODE_CREATE;
 
@@ -115,9 +115,9 @@ OpenAndPrepareFile (
     return Status;
   }
 
-  Status = FileHandleSetPosition(*FileHandle, 0);
+  Status = FileHandleSetPosition (*FileHandle, 0);
 
-  if (EFI_ERROR(Status)) {
+  if (EFI_ERROR (Status)) {
     Print (L"sf: Cannot set file position to first byte\n");
     ShellCloseFile (FileHandle);
     return Status;
@@ -133,7 +133,7 @@ ShellCommandRunSpiFlash (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-EFI_STATUS              Status;
+  EFI_STATUS            Status;
   LIST_ENTRY            *CheckPackage;
   EFI_PHYSICAL_ADDRESS  Address = 0, Offset = 0;
   SHELL_FILE_HANDLE     FileHandle = NULL;
@@ -147,11 +147,11 @@ EFI_STATUS              Status;
   UINT8                 Flag = 0, CheckFlag = 0;
 
   Status = gBS->LocateProtocol (
-    &gUniNorFlashProtocolGuid,
-    NULL,
-    (VOID **)&SpiFlashProtocol
-  );
-  if (EFI_ERROR(Status)) {
+                  &gUniNorFlashProtocolGuid,
+                  NULL,
+                  (VOID **)&SpiFlashProtocol
+                  );
+  if (EFI_ERROR (Status)) {
     Print (L"sf: Cannot locate SpiFlash protocol\n");
     return SHELL_ABORTED;
   }
@@ -171,7 +171,7 @@ EFI_STATUS              Status;
   }
 
   if (ShellCommandLineGetFlag (CheckPackage, L"help")) {
-    SfUsage();
+    SfUsage ();
     return EFI_SUCCESS;
   }
 
@@ -189,37 +189,37 @@ EFI_STATUS              Status;
     I += CheckFlag & 1;
     if (I > 1) {
       Print (L"sf: Too many flags\n");
-      SfUsage();
+      SfUsage ();
       return SHELL_ABORTED;
     }
   }
 
   switch (Flag) {
-  case READ:
-  case WRITE:
-  case UPDATE:
-    AddressStr = ShellCommandLineGetRawValue (CheckPackage, 1);
-    OffsetStr = ShellCommandLineGetRawValue (CheckPackage, 2);
-    LengthStr = ShellCommandLineGetRawValue (CheckPackage, 3);
-    AddrFlag = TRUE;
-    break;
-  case ERASE:
-    OffsetStr = ShellCommandLineGetRawValue (CheckPackage, 1);
-    LengthStr = ShellCommandLineGetRawValue (CheckPackage, 2);
-    break;
-  case READ_FILE:
-    FileStr = ShellCommandLineGetRawValue (CheckPackage, 1);
-    OffsetStr = ShellCommandLineGetRawValue (CheckPackage, 2);
-    LengthStr = ShellCommandLineGetRawValue (CheckPackage, 3);
-    FileFlag = TRUE;
-    break;
-  case WRITE_FILE:
-  case UPDATE_FILE:
-    FileStr = ShellCommandLineGetRawValue (CheckPackage, 1);
-    OffsetStr = ShellCommandLineGetRawValue (CheckPackage, 2);
-    LengthFlag = FALSE;
-    FileFlag = TRUE;
-    break;
+    case READ:
+    case WRITE:
+    case UPDATE:
+      AddressStr = ShellCommandLineGetRawValue (CheckPackage, 1);
+      OffsetStr  = ShellCommandLineGetRawValue (CheckPackage, 2);
+      LengthStr  = ShellCommandLineGetRawValue (CheckPackage, 3);
+      AddrFlag   = TRUE;
+      break;
+    case ERASE:
+      OffsetStr = ShellCommandLineGetRawValue (CheckPackage, 1);
+      LengthStr = ShellCommandLineGetRawValue (CheckPackage, 2);
+      break;
+    case READ_FILE:
+      FileStr   = ShellCommandLineGetRawValue (CheckPackage, 1);
+      OffsetStr = ShellCommandLineGetRawValue (CheckPackage, 2);
+      LengthStr = ShellCommandLineGetRawValue (CheckPackage, 3);
+      FileFlag  = TRUE;
+      break;
+    case WRITE_FILE:
+    case UPDATE_FILE:
+      FileStr    = ShellCommandLineGetRawValue (CheckPackage, 1);
+      OffsetStr  = ShellCommandLineGetRawValue (CheckPackage, 2);
+      LengthFlag = FALSE;
+      FileFlag   = TRUE;
+      break;
   }
 
   // Read address parameter
@@ -264,8 +264,8 @@ EFI_STATUS              Status;
       Print (L"sf: No FilePath parameter!\n");
       return SHELL_ABORTED;
     } else {
-      FilePath = (CHAR16 *) FileStr;
-      Status = ShellIsFile (FilePath);
+      FilePath = (CHAR16 *)FileStr;
+      Status   = ShellIsFile (FilePath);
       // When read file into flash, file doesn't have to exist
       if (EFI_ERROR (Status) && !(Flag & READ_FILE)) {
         Print (L"sf: Wrong FilePath parameter!\n");
@@ -274,7 +274,7 @@ EFI_STATUS              Status;
     }
 
     Status = OpenAndPrepareFile (FilePath, &FileHandle);
-    if (EFI_ERROR(Status)) {
+    if (EFI_ERROR (Status)) {
       Print (L"sf: Error while preparing file\n");
       return SHELL_ABORTED;
     }
@@ -285,10 +285,11 @@ EFI_STATUS              Status;
       if (EFI_ERROR (Status)) {
         Print (L"sf: Cannot get file size\n");
       }
-      ByteCount = (UINTN) FileSize;
+
+      ByteCount = (UINTN)FileSize;
     }
 
-    FileBuffer = AllocateZeroPool ((UINTN) ByteCount);
+    FileBuffer = AllocateZeroPool ((UINTN)ByteCount);
     if (FileBuffer == NULL) {
       Print (L"sf: Cannot allocate memory\n");
       goto Error_Close_File;
@@ -300,7 +301,7 @@ EFI_STATUS              Status;
       if (EFI_ERROR (Status)) {
         Print (L"sf: Read from file error\n");
         goto Error_Free_Buffer;
-      } else if (ByteCount != (UINTN) FileSize) {
+      } else if (ByteCount != (UINTN)FileSize) {
         Print (L"sf: Not whole file read. Abort\n");
         goto Error_Free_Buffer;
       }
@@ -313,21 +314,21 @@ EFI_STATUS              Status;
   }
 
   switch (Flag) {
-  case READ:
-  case READ_FILE:
-    Status = SpiFlashProtocol->Read (SpiFlashProtocol, Offset, Buffer, ByteCount);
-    break;
-  case ERASE:
-    Status = SpiFlashProtocol->Erase (SpiFlashProtocol, Offset, ByteCount);
-    break;
-  case WRITE:
-  case WRITE_FILE:
-    Status = SpiFlashProtocol->Write (SpiFlashProtocol, Offset, Buffer, ByteCount);
-    break;
-  case UPDATE:
-  case UPDATE_FILE:
-    Status = SpiFlashProtocol->Update (SpiFlashProtocol, Offset, Buffer, ByteCount);
-    break;
+    case READ:
+    case READ_FILE:
+      Status = SpiFlashProtocol->Read (SpiFlashProtocol, Offset, Buffer, ByteCount);
+      break;
+    case ERASE:
+      Status = SpiFlashProtocol->Erase (SpiFlashProtocol, Offset, ByteCount);
+      break;
+    case WRITE:
+    case WRITE_FILE:
+      Status = SpiFlashProtocol->Write (SpiFlashProtocol, Offset, Buffer, ByteCount);
+      break;
+    case UPDATE:
+    case UPDATE_FILE:
+      Status = SpiFlashProtocol->Update (SpiFlashProtocol, Offset, Buffer, ByteCount);
+      break;
   }
 
   if (EFI_ERROR (Status)) {
@@ -336,28 +337,32 @@ EFI_STATUS              Status;
   }
 
   switch (Flag) {
-  case ERASE:
-    Print (L"sf: %d bytes succesfully erased at offset 0x%x\n", ByteCount,
-      Offset);
-    break;
-  case WRITE:
-  case WRITE_FILE:
-    Print (L"sf: Write %d bytes at offset 0x%x\n", ByteCount, Offset);
-    break;
-  case UPDATE:
-  case UPDATE_FILE:
-    Print (L"sf: Update %d bytes at offset 0x%x\n", ByteCount, Offset);
-    break;
-  case READ:
-    Print (L"sf: Read %d bytes from offset 0x%x\n", ByteCount, Offset);
-    break;
-  case READ_FILE:
-    Status = FileHandleWrite (FileHandle, &ByteCount, FileBuffer);
-    if (EFI_ERROR(Status)) {
-      Print (L"sf: Error while writing into file\n");
-      goto Error_Free_Buffer;
-    }
-    break;
+    case ERASE:
+      Print (
+        L"sf: %d bytes succesfully erased at offset 0x%x\n",
+        ByteCount,
+        Offset
+        );
+      break;
+    case WRITE:
+    case WRITE_FILE:
+      Print (L"sf: Write %d bytes at offset 0x%x\n", ByteCount, Offset);
+      break;
+    case UPDATE:
+    case UPDATE_FILE:
+      Print (L"sf: Update %d bytes at offset 0x%x\n", ByteCount, Offset);
+      break;
+    case READ:
+      Print (L"sf: Read %d bytes from offset 0x%x\n", ByteCount, Offset);
+      break;
+    case READ_FILE:
+      Status = FileHandleWrite (FileHandle, &ByteCount, FileBuffer);
+      if (EFI_ERROR (Status)) {
+        Print (L"sf: Error while writing into file\n");
+        goto Error_Free_Buffer;
+      }
+
+      break;
   }
 
   if (FileFlag) {
@@ -387,17 +392,25 @@ ShellSpiFlashLibConstructor (
   gShellSfHiiHandle = NULL;
 
   gShellSfHiiHandle = HiiAddPackages (
-                        &gShellSfHiiGuid, gImageHandle,
-                        UefiShellSpiFlashLibStrings, NULL
+                        &gShellSfHiiGuid,
+                        gImageHandle,
+                        UefiShellSpiFlashLibStrings,
+                        NULL
                         );
   if (gShellSfHiiHandle == NULL) {
     return EFI_DEVICE_ERROR;
   }
 
   ShellCommandRegisterCommandName (
-     L"sf", ShellCommandRunSpiFlash, ShellCommandGetManFileNameSpiFlash, 0,
-     L"sf", TRUE , gShellSfHiiHandle, STRING_TOKEN (STR_GET_HELP_SF)
-     );
+    L"sf",
+    ShellCommandRunSpiFlash,
+    ShellCommandGetManFileNameSpiFlash,
+    0,
+    L"sf",
+    TRUE,
+    gShellSfHiiHandle,
+    STRING_TOKEN (STR_GET_HELP_SF)
+    );
 
   return EFI_SUCCESS;
 }
@@ -409,9 +422,9 @@ ShellSpiFlashLibDestructor (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-
   if (gShellSfHiiHandle != NULL) {
     HiiRemovePackages (gShellSfHiiHandle);
   }
+
   return EFI_SUCCESS;
 }

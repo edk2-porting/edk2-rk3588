@@ -14,20 +14,19 @@
 #define RK_MTL_PRIVATE_LIB_H_
 
 // Mailbox transport layer.
-#define MTL_MAILBOX_BASE     (FixedPcdGet64 (PcdRkMtlMailBoxBase))
-#define MTL_MAILBOX_SIZE     (FixedPcdGet32 (PcdRkMtlMailBoxSize))
+#define MTL_MAILBOX_BASE  (FixedPcdGet64 (PcdRkMtlMailBoxBase))
+#define MTL_MAILBOX_SIZE  (FixedPcdGet32 (PcdRkMtlMailBoxSize))
 
-#define MTL_POLL         0
+#define MTL_POLL  0
 
-#define MTL_CHANNEL_BUSY    0
-#define MTL_CHANNEL_FREE    1
+#define MTL_CHANNEL_BUSY  0
+#define MTL_CHANNEL_FREE  1
 
 // Response time out value on a channel 1s.
 #define  RESPONSE_TIMEOUT  1000000
 #define  NUM_CHANNELS      1
 
 // Arbitarary poll time.
-#define MTL_POLL_WAIT_TIME 100000
+#define MTL_POLL_WAIT_TIME  100000
 
 #endif /* RK_MTL_PRIVATE_LIB_H_ */
-

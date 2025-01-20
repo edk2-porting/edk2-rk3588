@@ -12,34 +12,34 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/RockchipPlatformLib.h>
 
-#define REPEAT_INFINITE         MAX_UINT32
+#define REPEAT_INFINITE  MAX_UINT32
 
-#define LONG_PULSE_PERIOD_MS    840
-#define SHORT_PULSE_PERIOD_MS   140
+#define LONG_PULSE_PERIOD_MS   840
+#define SHORT_PULSE_PERIOD_MS  140
 
-#define MILLIS_TO_MICROS(x)     (x * 1000)
+#define MILLIS_TO_MICROS(x)  (x * 1000)
 
 // Timer for async execution
-EFI_EVENT mTimerEvent;
+EFI_EVENT  mTimerEvent;
 
 // Parameters
-UINT32 mAsyncLongPulseCount;
-UINT32 mAsyncShortPulseCount;
-UINT32 mAsyncRepeatCount;
-UINT32 mAsyncPatternDelayMs;
-UINT32 mAsyncContinueWithIdlePattern;
+UINT32  mAsyncLongPulseCount;
+UINT32  mAsyncShortPulseCount;
+UINT32  mAsyncRepeatCount;
+UINT32  mAsyncPatternDelayMs;
+UINT32  mAsyncContinueWithIdlePattern;
 
 // State variables
-UINT32 mAsyncRepeatIndex;
-UINT32 mAsyncShortPulseIndex;
-UINT32 mAsyncLongPulseIndex;
+UINT32  mAsyncRepeatIndex;
+UINT32  mAsyncShortPulseIndex;
+UINT32  mAsyncLongPulseIndex;
 
-BOOLEAN mLedEnabled;
+BOOLEAN  mLedEnabled;
 
 STATIC
 VOID
 SetLed (
-  IN BOOLEAN Enable
+  IN BOOLEAN  Enable
   )
 {
   PlatformSetStatusLed (Enable);
@@ -67,14 +67,14 @@ BlinkLedAsync (
 {
   gBS->SetTimer (mTimerEvent, TimerCancel, 0);
 
-  mAsyncLongPulseCount = LongPulseCount;
-  mAsyncShortPulseCount = ShortPulseCount;
-  mAsyncRepeatCount = RepeatCount;
-  mAsyncPatternDelayMs = PatternDelayMs;
+  mAsyncLongPulseCount          = LongPulseCount;
+  mAsyncShortPulseCount         = ShortPulseCount;
+  mAsyncRepeatCount             = RepeatCount;
+  mAsyncPatternDelayMs          = PatternDelayMs;
   mAsyncContinueWithIdlePattern = ContinueWithIdlePattern;
-  mAsyncRepeatIndex = 0;
-  mAsyncShortPulseIndex = 0;
-  mAsyncLongPulseIndex = 0;
+  mAsyncRepeatIndex             = 0;
+  mAsyncShortPulseIndex         = 0;
+  mAsyncLongPulseIndex          = 0;
 
   SetLed (FALSE);
 
@@ -104,10 +104,14 @@ TimerHandler (
     if (mLedEnabled) {
       mAsyncLongPulseIndex++;
     }
+
     SetLed (!mLedEnabled);
 
-    gBS->SetTimer (mTimerEvent, TimerRelative,
-          EFI_TIMER_PERIOD_MILLISECONDS (LONG_PULSE_PERIOD_MS));
+    gBS->SetTimer (
+           mTimerEvent,
+           TimerRelative,
+           EFI_TIMER_PERIOD_MILLISECONDS (LONG_PULSE_PERIOD_MS)
+           );
     return;
   }
 
@@ -118,10 +122,14 @@ TimerHandler (
     if (mLedEnabled) {
       mAsyncShortPulseIndex++;
     }
+
     SetLed (!mLedEnabled);
 
-    gBS->SetTimer (mTimerEvent, TimerRelative,
-          EFI_TIMER_PERIOD_MILLISECONDS (SHORT_PULSE_PERIOD_MS));
+    gBS->SetTimer (
+           mTimerEvent,
+           TimerRelative,
+           EFI_TIMER_PERIOD_MILLISECONDS (SHORT_PULSE_PERIOD_MS)
+           );
     return;
   }
 
@@ -135,6 +143,7 @@ TimerHandler (
     if (mAsyncContinueWithIdlePattern) {
       BlinkLedIdleAsync ();
     }
+
     return;
   }
 
@@ -143,18 +152,21 @@ TimerHandler (
   //
   if (mAsyncRepeatIndex < mAsyncRepeatCount) {
     mAsyncShortPulseIndex = 0;
-    mAsyncLongPulseIndex = 0;
+    mAsyncLongPulseIndex  = 0;
   }
 
   //
   // Keep repeating until completion above.
   //
   if (mAsyncRepeatCount != REPEAT_INFINITE) {
-     mAsyncRepeatIndex++;
+    mAsyncRepeatIndex++;
   }
 
-  gBS->SetTimer (mTimerEvent, TimerRelative,
-                 EFI_TIMER_PERIOD_MILLISECONDS (mAsyncPatternDelayMs));
+  gBS->SetTimer (
+         mTimerEvent,
+         TimerRelative,
+         EFI_TIMER_PERIOD_MILLISECONDS (mAsyncPatternDelayMs)
+         );
 }
 
 STATIC
@@ -167,8 +179,8 @@ BlinkLedSync (
   IN BOOLEAN  ContinueWithIdlePattern
   )
 {
-  UINT32 RepeatIndex = 0;
-  UINT32 PulseIndex = 0;
+  UINT32  RepeatIndex = 0;
+  UINT32  PulseIndex  = 0;
 
   gBS->SetTimer (mTimerEvent, TimerCancel, 0);
   SetLed (FALSE);
@@ -176,19 +188,19 @@ BlinkLedSync (
   while (RepeatIndex <= RepeatCount) {
     for (PulseIndex = 0; PulseIndex < LongPulseCount; PulseIndex++) {
       SetLed (TRUE);
-      gBS->Stall (MILLIS_TO_MICROS(LONG_PULSE_PERIOD_MS));
+      gBS->Stall (MILLIS_TO_MICROS (LONG_PULSE_PERIOD_MS));
       SetLed (FALSE);
-      gBS->Stall (MILLIS_TO_MICROS(LONG_PULSE_PERIOD_MS));
+      gBS->Stall (MILLIS_TO_MICROS (LONG_PULSE_PERIOD_MS));
     }
 
     for (PulseIndex = 0; PulseIndex < ShortPulseCount; PulseIndex++) {
       SetLed (TRUE);
-      gBS->Stall (MILLIS_TO_MICROS(SHORT_PULSE_PERIOD_MS));
+      gBS->Stall (MILLIS_TO_MICROS (SHORT_PULSE_PERIOD_MS));
       SetLed (FALSE);
-      gBS->Stall (MILLIS_TO_MICROS(SHORT_PULSE_PERIOD_MS));
+      gBS->Stall (MILLIS_TO_MICROS (SHORT_PULSE_PERIOD_MS));
     }
 
-    gBS->Stall (MILLIS_TO_MICROS(PatternDelayMs));
+    gBS->Stall (MILLIS_TO_MICROS (PatternDelayMs));
 
     if (RepeatCount != REPEAT_INFINITE) {
       RepeatIndex++;
@@ -204,8 +216,8 @@ STATIC
 VOID
 EFIAPI
 NotifyPlatformBmAfterConsole (
-  IN EFI_EVENT   Event,
-  IN VOID        *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
   //
@@ -220,8 +232,8 @@ STATIC
 VOID
 EFIAPI
 NotifyExitBootServices (
-  IN EFI_EVENT   Event,
-  IN VOID        *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
   //
@@ -233,12 +245,12 @@ NotifyExitBootServices (
 EFI_STATUS
 EFIAPI
 StatusLedDxeInitialize (
-  IN EFI_HANDLE         ImageHandle,
-  IN EFI_SYSTEM_TABLE   *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS Status;
-  EFI_EVENT Event = NULL;
+  EFI_STATUS  Status;
+  EFI_EVENT   Event = NULL;
 
   InitLed ();
 
@@ -257,22 +269,22 @@ StatusLedDxeInitialize (
   BlinkLedAsync (0, 1, REPEAT_INFINITE, 0, FALSE);
 
   Status = gBS->CreateEventEx (
-                    EVT_NOTIFY_SIGNAL,                          // Type
-                    TPL_NOTIFY,                                 // NotifyTpl
-                    NotifyPlatformBmAfterConsole,               // NotifyFunction
-                    NULL,                                       // NotifyContext
-                    &gRockchipEventPlatformBmAfterConsoleGuid,  // EventGroup
-                    &Event                                      // Event
-                    );
+                  EVT_NOTIFY_SIGNAL,                            // Type
+                  TPL_NOTIFY,                                   // NotifyTpl
+                  NotifyPlatformBmAfterConsole,                 // NotifyFunction
+                  NULL,                                         // NotifyContext
+                  &gRockchipEventPlatformBmAfterConsoleGuid,    // EventGroup
+                  &Event                                        // Event
+                  );
 
   Status = gBS->CreateEventEx (
-                    EVT_NOTIFY_SIGNAL,              // Type
-                    TPL_NOTIFY,                     // NotifyTpl
-                    NotifyExitBootServices,         // NotifyFunction
-                    NULL,                           // NotifyContext
-                    &gEfiEventExitBootServicesGuid, // EventGroup
-                    &Event                          // Event
-                    );
+                  EVT_NOTIFY_SIGNAL,                // Type
+                  TPL_NOTIFY,                       // NotifyTpl
+                  NotifyExitBootServices,           // NotifyFunction
+                  NULL,                             // NotifyContext
+                  &gEfiEventExitBootServicesGuid,   // EventGroup
+                  &Event                            // Event
+                  );
 
   return EFI_SUCCESS;
 }

@@ -20,11 +20,12 @@ ApplyCoolingFanVariables (
   VOID
   )
 {
-  UINT32 Var32 = PcdGet32 (PcdCoolingFanState);
+  UINT32  Var32 = PcdGet32 (PcdCoolingFanState);
+
   if (Var32 == COOLING_FAN_STATE_ENABLED) {
     Var32 = PcdGet32 (PcdCoolingFanSpeed);
-    PwmFanIoSetup();
-    PwmFanSetSpeed(Var32);
+    PwmFanIoSetup ();
+    PwmFanSetSpeed (Var32);
   }
 }
 
@@ -34,23 +35,31 @@ SetupCoolingFanVariables (
   VOID
   )
 {
-  UINTN      Size;
-  UINT32     Var32;
-  EFI_STATUS Status;
+  UINTN       Size;
+  UINT32      Var32;
+  EFI_STATUS  Status;
 
   Size = sizeof (UINT32);
 
-  Status = gRT->GetVariable (L"CoolingFanState",
-                            &gRK3588DxeFormSetGuid,
-                            NULL, &Size, &Var32);
+  Status = gRT->GetVariable (
+                  L"CoolingFanState",
+                  &gRK3588DxeFormSetGuid,
+                  NULL,
+                  &Size,
+                  &Var32
+                  );
   if (EFI_ERROR (Status)) {
     Status = PcdSet32S (PcdCoolingFanState, 1);
     ASSERT_EFI_ERROR (Status);
   }
 
-  Status = gRT->GetVariable (L"CoolingFanSpeed",
-                            &gRK3588DxeFormSetGuid,
-                            NULL, &Size, &Var32);
+  Status = gRT->GetVariable (
+                  L"CoolingFanSpeed",
+                  &gRK3588DxeFormSetGuid,
+                  NULL,
+                  &Size,
+                  &Var32
+                  );
   if (EFI_ERROR (Status)) {
     Status = PcdSet32S (PcdCoolingFanSpeed, FAN_PERCENTAGE_DEFAULT);
     ASSERT_EFI_ERROR (Status);

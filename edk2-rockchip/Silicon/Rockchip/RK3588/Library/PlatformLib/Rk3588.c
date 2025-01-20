@@ -20,8 +20,8 @@
 
 #include <Ppi/ArmMpCoreInfo.h>
 
-#define RECOVERY_KEY_SARADC_CHANNEL 1
-#define RECOVERY_KEY_PRESS_MAX_THRESHOLD 100
+#define RECOVERY_KEY_SARADC_CHANNEL       1
+#define RECOVERY_KEY_PRESS_MAX_THRESHOLD  100
 
 /**
   Return the current Boot Mode
@@ -61,7 +61,7 @@ ArmPlatformInitialize (
     }
   }
 
-  Size = sizeof (UINT64);
+  Size   = sizeof (UINT64);
   Status = BaseGetVariable (
              L"DebugSerialPortBaudRate",
              &gRK3588DxeFormSetGuid,
@@ -69,7 +69,7 @@ ArmPlatformInitialize (
              &Size,
              &BaudRate
              );
-  if (EFI_ERROR (Status) || BaudRate == 0) {
+  if (EFI_ERROR (Status) || (BaudRate == 0)) {
     return RETURN_SUCCESS;
   }
 
@@ -88,7 +88,7 @@ ArmPlatformInitializeSystemMemory (
 {
 }
 
-STATIC ARM_CORE_INFO mRk3588InfoTable[] = {
+STATIC ARM_CORE_INFO  mRk3588InfoTable[] = {
   { 0x0, 0x000 },             // Cluster 0, Core 0
   { 0x0, 0x100 },             // Cluster 0, Core 1
   { 0x0, 0x200 },             // Cluster 0, Core 2
@@ -107,16 +107,16 @@ PrePeiCoreGetMpCoreInfo (
   )
 {
   // Only support one cluster
-  *CoreCount = sizeof (mRk3588InfoTable) / sizeof (ARM_CORE_INFO);
+  *CoreCount    = sizeof (mRk3588InfoTable) / sizeof (ARM_CORE_INFO);
   *ArmCoreTable = mRk3588InfoTable;
 
   return EFI_SUCCESS;
 }
 
-STATIC ARM_MP_CORE_INFO_PPI mMpCoreInfoPpi = {
+STATIC ARM_MP_CORE_INFO_PPI    mMpCoreInfoPpi = {
   PrePeiCoreGetMpCoreInfo
 };
-STATIC EFI_PEI_PPI_DESCRIPTOR mPlatformPpiTable[] = {
+STATIC EFI_PEI_PPI_DESCRIPTOR  mPlatformPpiTable[] = {
   {
     EFI_PEI_PPI_DESCRIPTOR_PPI,
     &gArmMpCoreInfoPpiGuid,
@@ -131,5 +131,5 @@ ArmPlatformGetPlatformPpiList (
   )
 {
   *PpiListSize = sizeof (mPlatformPpiTable);
-  *PpiList = mPlatformPpiTable;
+  *PpiList     = mPlatformPpiTable;
 }

@@ -46,27 +46,27 @@ STATIC FVB_RK_BOOT_DEVICE  mFvbSecondaryRkBootDevices[] = {
   { RkAtagBootDevTypeEmmc, FixedPcdGet32 (PcdDwcSdhciBaseAddress) },
 };
 
-STATIC EFI_EVENT     mFvbVirtualAddrChangeEvent;
-STATIC FVB_DEVICE    *mFvbDevice;
-STATIC CONST FVB_DEVICE mRkFvbFlashInstanceTemplate = {
-  NULL, // SpiFlashProtocol ... NEED TO BE FILLED
+STATIC EFI_EVENT         mFvbVirtualAddrChangeEvent;
+STATIC FVB_DEVICE        *mFvbDevice;
+STATIC CONST FVB_DEVICE  mRkFvbFlashInstanceTemplate = {
+  NULL,  // SpiFlashProtocol ... NEED TO BE FILLED
   FALSE, // IsSpiFlashAvailable ... NEED TO BE FILLED
   FALSE, // IsFvbHeaderValid ... NEED TO BE FILLED
 
-  NULL, // DiskDevice ... NEED TO BE FILLED
-  0, // DiskMediaId ... NEED TO BE FILLED
+  NULL,  // DiskDevice ... NEED TO BE FILLED
+  0,     // DiskMediaId ... NEED TO BE FILLED
   FALSE, // DiskDataInvalidated ... NEED TO BE FILLED
 
   NULL, // Handle ... NEED TO BE FILLED
 
   FVB_FLASH_SIGNATURE, // Signature
 
-  0, // DeviceBaseAddress ... NEED TO BE FILLED
-  0, // RegionBaseAddress ... NEED TO BE FILLED
+  0,          // DeviceBaseAddress ... NEED TO BE FILLED
+  0,          // RegionBaseAddress ... NEED TO BE FILLED
   SIZE_256KB, // Size
-  0, // FvbOffset ... NEED TO BE FILLED
-  0, // FvbSize ... NEED TO BE FILLED
-  0, // StartLba
+  0,          // FvbOffset ... NEED TO BE FILLED
+  0,          // FvbSize ... NEED TO BE FILLED
+  0,          // StartLba
 
   {
     0,     // MediaId ... NEED TO BE FILLED
@@ -80,7 +80,7 @@ STATIC CONST FVB_DEVICE mRkFvbFlashInstanceTemplate = {
     0,     // LastBlock ... NEED TO BE FILLED
     0,     // LowestAlignedLba
     1,     // LogicalBlocksPerPhysicalBlock
-  }, //Media;
+  }, // Media;
 
   {
     FvbGetAttributes,       // GetAttributes
@@ -90,7 +90,7 @@ STATIC CONST FVB_DEVICE mRkFvbFlashInstanceTemplate = {
     FvbRead,                // Read
     FvbWrite,               // Write
     FvbEraseBlocks,         // EraseBlocks
-    NULL,                     // ParentHandle
+    NULL,                   // ParentHandle
   }, //  FvbProtocol;
 
   {
@@ -103,7 +103,8 @@ STATIC CONST FVB_DEVICE mRkFvbFlashInstanceTemplate = {
           (UINT8)((sizeof (VENDOR_DEVICE_PATH)) >> 8)
         }
       },
-      { 0xfc0cb972, 0x21df, 0x44d2, { 0x92, 0xa5, 0x78, 0x98, 0x99, 0xcb, 0xf6, 0x61 } }
+      { 0xfc0cb972,                        0x21df, 0x44d2, { 0x92, 0xa5, 0x78, 0x98, 0x99, 0xcb, 0xf6, 0x61 }
+      }
     },
     {
       END_DEVICE_PATH_TYPE,
@@ -133,13 +134,13 @@ STATIC CONST FVB_DEVICE mRkFvbFlashInstanceTemplate = {
 STATIC
 EFI_STATUS
 FvbInitFvAndVariableStoreHeaders (
-  IN FVB_DEVICE *FlashInstance
+  IN FVB_DEVICE  *FlashInstance
   )
 {
   EFI_FIRMWARE_VOLUME_HEADER  *FirmwareVolumeHeader;
   VARIABLE_STORE_HEADER       *VariableStoreHeader;
   EFI_STATUS                  Status;
-  VOID*                       Headers;
+  VOID                        *Headers;
   UINTN                       HeadersLength;
   UINTN                       BlockSize;
 
@@ -154,33 +155,43 @@ FvbInitFvAndVariableStoreHeaders (
   // FirmwareVolumeHeader->FvLength is declared to have the Variable area
   // AND the FTW working area AND the FTW Spare contiguous.
   //
-  ASSERT (PcdGet64 (PcdFlashNvStorageVariableBase64) +
+  ASSERT (
+    PcdGet64 (PcdFlashNvStorageVariableBase64) +
     PcdGet32 (PcdFlashNvStorageVariableSize) ==
-    PcdGet64 (PcdFlashNvStorageFtwWorkingBase64));
-  ASSERT (PcdGet64 (PcdFlashNvStorageFtwWorkingBase64) +
+    PcdGet64 (PcdFlashNvStorageFtwWorkingBase64)
+    );
+  ASSERT (
+    PcdGet64 (PcdFlashNvStorageFtwWorkingBase64) +
     PcdGet32 (PcdFlashNvStorageFtwWorkingSize) ==
-    PcdGet64 (PcdFlashNvStorageFtwSpareBase64));
+    PcdGet64 (PcdFlashNvStorageFtwSpareBase64)
+    );
 
   // Check if the size of the area is at least one block size
-  ASSERT ((PcdGet32 (PcdFlashNvStorageVariableSize) > 0) &&
-    (PcdGet32 (PcdFlashNvStorageVariableSize) / BlockSize > 0));
-  ASSERT ((PcdGet32 (PcdFlashNvStorageFtwWorkingSize) > 0) &&
-    (PcdGet32 (PcdFlashNvStorageFtwWorkingSize) / BlockSize > 0));
-  ASSERT ((PcdGet32 (PcdFlashNvStorageFtwSpareSize) > 0) &&
-    (PcdGet32 (PcdFlashNvStorageFtwSpareSize) / BlockSize > 0));
+  ASSERT (
+    (PcdGet32 (PcdFlashNvStorageVariableSize) > 0) &&
+    (PcdGet32 (PcdFlashNvStorageVariableSize) / BlockSize > 0)
+    );
+  ASSERT (
+    (PcdGet32 (PcdFlashNvStorageFtwWorkingSize) > 0) &&
+    (PcdGet32 (PcdFlashNvStorageFtwWorkingSize) / BlockSize > 0)
+    );
+  ASSERT (
+    (PcdGet32 (PcdFlashNvStorageFtwSpareSize) > 0) &&
+    (PcdGet32 (PcdFlashNvStorageFtwSpareSize) / BlockSize > 0)
+    );
 
   // Ensure the Variable areas are aligned on block size boundaries
-  //ASSERT ((PcdGet64 (PcdFlashNvStorageVariableBase64) % BlockSize) == 0);
+  // ASSERT ((PcdGet64 (PcdFlashNvStorageVariableBase64) % BlockSize) == 0);
   ASSERT ((PcdGet64 (PcdFlashNvStorageFtwWorkingBase64) % BlockSize) == 0);
   ASSERT ((PcdGet64 (PcdFlashNvStorageFtwSpareBase64) % BlockSize) == 0);
 
   //
   // EFI_FIRMWARE_VOLUME_HEADER
   //
-  FirmwareVolumeHeader = (EFI_FIRMWARE_VOLUME_HEADER*)Headers;
+  FirmwareVolumeHeader = (EFI_FIRMWARE_VOLUME_HEADER *)Headers;
   CopyGuid (&FirmwareVolumeHeader->FileSystemGuid, &gEfiSystemNvDataFvGuid);
-  FirmwareVolumeHeader->FvLength = FlashInstance->FvbSize;
-  FirmwareVolumeHeader->Signature = EFI_FVH_SIGNATURE;
+  FirmwareVolumeHeader->FvLength   = FlashInstance->FvbSize;
+  FirmwareVolumeHeader->Signature  = EFI_FVH_SIGNATURE;
   FirmwareVolumeHeader->Attributes = EFI_FVB2_READ_ENABLED_CAP |
                                      EFI_FVB2_READ_STATUS |
                                      EFI_FVB2_STICKY_WRITE |
@@ -191,14 +202,15 @@ FvbInitFvAndVariableStoreHeaders (
 
   FirmwareVolumeHeader->HeaderLength = sizeof (EFI_FIRMWARE_VOLUME_HEADER) +
                                        sizeof (EFI_FV_BLOCK_MAP_ENTRY);
-  FirmwareVolumeHeader->Revision = EFI_FVH_REVISION;
+  FirmwareVolumeHeader->Revision              = EFI_FVH_REVISION;
   FirmwareVolumeHeader->BlockMap[0].NumBlocks = FlashInstance->Media.LastBlock + 1;
-  FirmwareVolumeHeader->BlockMap[0].Length = FlashInstance->Media.BlockSize;
+  FirmwareVolumeHeader->BlockMap[0].Length    = FlashInstance->Media.BlockSize;
   FirmwareVolumeHeader->BlockMap[1].NumBlocks = 0;
-  FirmwareVolumeHeader->BlockMap[1].Length = 0;
-  FirmwareVolumeHeader->Checksum = CalculateCheckSum16 (
-                                     (UINT16 *)FirmwareVolumeHeader,
-                                     FirmwareVolumeHeader->HeaderLength);
+  FirmwareVolumeHeader->BlockMap[1].Length    = 0;
+  FirmwareVolumeHeader->Checksum              = CalculateCheckSum16 (
+                                                  (UINT16 *)FirmwareVolumeHeader,
+                                                  FirmwareVolumeHeader->HeaderLength
+                                                  );
 
   //
   // VARIABLE_STORE_HEADER
@@ -206,10 +218,10 @@ FvbInitFvAndVariableStoreHeaders (
   VariableStoreHeader = (VOID *)((UINTN)Headers +
                                  FirmwareVolumeHeader->HeaderLength);
   CopyGuid (&VariableStoreHeader->Signature, &gEfiAuthenticatedVariableGuid);
-  VariableStoreHeader->Size = PcdGet32(PcdFlashNvStorageVariableSize) -
+  VariableStoreHeader->Size = PcdGet32 (PcdFlashNvStorageVariableSize) -
                               FirmwareVolumeHeader->HeaderLength;
   VariableStoreHeader->Format = VARIABLE_STORE_FORMATTED;
-  VariableStoreHeader->State = VARIABLE_STORE_HEALTHY;
+  VariableStoreHeader->State  = VARIABLE_STORE_HEALTHY;
 
   // Install the combined super-header in the flash device
   Status = FvbWrite (&FlashInstance->FvbProtocol, 0, 0, &HeadersLength, Headers);
@@ -231,7 +243,7 @@ FvbInitFvAndVariableStoreHeaders (
 STATIC
 EFI_STATUS
 FvbValidateFvHeader (
-  IN  FVB_DEVICE *FlashInstance
+  IN  FVB_DEVICE  *FlashInstance
   )
 {
   UINT16                      Checksum;
@@ -244,28 +256,35 @@ FvbValidateFvHeader (
   // Verify the header revision, header signature, length
   if ((FwVolHeader->Revision  != EFI_FVH_REVISION) ||
       (FwVolHeader->Signature != EFI_FVH_SIGNATURE) ||
-      (FwVolHeader->FvLength  != FlashInstance->FvbSize)) {
-    DEBUG ((DEBUG_ERROR,
+      (FwVolHeader->FvLength  != FlashInstance->FvbSize))
+  {
+    DEBUG ((
+      DEBUG_ERROR,
       "%a: No Firmware Volume header present\n",
-      __FUNCTION__));
+      __FUNCTION__
+      ));
     return EFI_NOT_FOUND;
   }
 
   // Check the Firmware Volume Guid
   if (!CompareGuid (&FwVolHeader->FileSystemGuid, &gEfiSystemNvDataFvGuid)) {
-    DEBUG ((DEBUG_ERROR,
+    DEBUG ((
+      DEBUG_ERROR,
       "%a: Firmware Volume Guid non-compatible\n",
-      __FUNCTION__));
+      __FUNCTION__
+      ));
     return EFI_NOT_FOUND;
   }
 
   // Verify the header checksum
   Checksum = CalculateSum16 ((UINT16 *)FwVolHeader, FwVolHeader->HeaderLength);
   if (Checksum != 0) {
-    DEBUG ((DEBUG_ERROR,
+    DEBUG ((
+      DEBUG_ERROR,
       "%a: FV checksum is invalid (Checksum:0x%x)\n",
       __FUNCTION__,
-      Checksum));
+      Checksum
+      ));
     return EFI_NOT_FOUND;
   }
 
@@ -273,20 +292,27 @@ FvbValidateFvHeader (
 
   // Check the Variable Store Guid
   if (!CompareGuid (&VariableStoreHeader->Signature, &gEfiVariableGuid) &&
-      !CompareGuid (&VariableStoreHeader->Signature,
-                    &gEfiAuthenticatedVariableGuid)) {
-    DEBUG ((DEBUG_ERROR,
+      !CompareGuid (
+         &VariableStoreHeader->Signature,
+         &gEfiAuthenticatedVariableGuid
+         ))
+  {
+    DEBUG ((
+      DEBUG_ERROR,
       "%a: Variable Store Guid non-compatible\n",
-      __FUNCTION__));
+      __FUNCTION__
+      ));
     return EFI_NOT_FOUND;
   }
 
   VariableStoreLength = PcdGet32 (PcdFlashNvStorageVariableSize) -
                         FwVolHeader->HeaderLength;
   if (VariableStoreHeader->Size != VariableStoreLength) {
-    DEBUG ((DEBUG_ERROR,
+    DEBUG ((
+      DEBUG_ERROR,
       "%a: Variable Store Length does not match\n",
-      __FUNCTION__));
+      __FUNCTION__
+      ));
     return EFI_NOT_FOUND;
   }
 
@@ -310,8 +336,8 @@ FvbValidateFvHeader (
 EFI_STATUS
 EFIAPI
 FvbGetAttributes (
-  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL    *This,
-  OUT       EFI_FVB_ATTRIBUTES_2                   *Attributes
+  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL  *This,
+  OUT       EFI_FVB_ATTRIBUTES_2                 *Attributes
   )
 {
   EFI_FIRMWARE_VOLUME_HEADER  *FwVolHeader;
@@ -320,7 +346,7 @@ FvbGetAttributes (
 
   FlashInstance = INSTANCE_FROM_FVB_THIS (This);
 
-  FwVolHeader = (EFI_FIRMWARE_VOLUME_HEADER *)FlashInstance->RegionBaseAddress;
+  FwVolHeader        = (EFI_FIRMWARE_VOLUME_HEADER *)FlashInstance->RegionBaseAddress;
   FlashFvbAttributes = (EFI_FVB_ATTRIBUTES_2 *)&(FwVolHeader->Attributes);
 
   *Attributes = *FlashFvbAttributes;
@@ -358,7 +384,7 @@ FvbSetAttributes (
   EFI_FVB_ATTRIBUTES_2  OldAttributes;
   EFI_FVB_ATTRIBUTES_2  FlashFvbAttributes;
   EFI_FVB_ATTRIBUTES_2  UnchangedAttributes;
-  FVB_DEVICE           *FlashInstance;
+  FVB_DEVICE            *FlashInstance;
   UINT32                Capabilities;
   UINT32                OldStatus;
   UINT32                NewStatus;
@@ -391,9 +417,11 @@ FvbSetAttributes (
   // Some attributes of FV is read only can *not* be set
   //
   if ((OldAttributes & UnchangedAttributes) ^
-      (*Attributes & UnchangedAttributes)) {
+      (*Attributes & UnchangedAttributes))
+  {
     return EFI_INVALID_PARAMETER;
   }
+
   //
   // If firmware volume is locked, no status bit can be updated
   //
@@ -402,6 +430,7 @@ FvbSetAttributes (
       return EFI_ACCESS_DENIED;
     }
   }
+
   //
   // Test read disable
   //
@@ -410,6 +439,7 @@ FvbSetAttributes (
       return EFI_INVALID_PARAMETER;
     }
   }
+
   //
   // Test read enable
   //
@@ -418,6 +448,7 @@ FvbSetAttributes (
       return EFI_INVALID_PARAMETER;
     }
   }
+
   //
   // Test write disable
   //
@@ -426,6 +457,7 @@ FvbSetAttributes (
       return EFI_INVALID_PARAMETER;
     }
   }
+
   //
   // Test write enable
   //
@@ -434,6 +466,7 @@ FvbSetAttributes (
       return EFI_INVALID_PARAMETER;
     }
   }
+
   //
   // Test lock
   //
@@ -445,7 +478,7 @@ FvbSetAttributes (
 
   FlashFvbAttributes = FlashFvbAttributes & (0xFFFFFFFF & (~EFI_FVB2_STATUS));
   FlashFvbAttributes = FlashFvbAttributes | NewStatus;
-  *Attributes = FlashFvbAttributes;
+  *Attributes        = FlashFvbAttributes;
 
   return EFI_SUCCESS;
 }
@@ -474,7 +507,7 @@ FvbGetPhysicalAddress (
   OUT       EFI_PHYSICAL_ADDRESS                 *Address
   )
 {
-  FVB_DEVICE *FlashInstance;
+  FVB_DEVICE  *FlashInstance;
 
   ASSERT (Address != NULL);
 
@@ -520,20 +553,22 @@ FvbGetBlockSize (
   OUT       UINTN                                *NumberOfBlocks
   )
 {
-  FVB_DEVICE *FlashInstance;
+  FVB_DEVICE  *FlashInstance;
 
   FlashInstance = INSTANCE_FROM_FVB_THIS (This);
 
   if (Lba > FlashInstance->Media.LastBlock) {
-    DEBUG ((DEBUG_ERROR,
+    DEBUG ((
+      DEBUG_ERROR,
       "%a: Error: Requested LBA %ld is beyond the last available LBA (%ld).\n",
       __FUNCTION__,
       Lba,
-      FlashInstance->Media.LastBlock));
+      FlashInstance->Media.LastBlock
+      ));
     return EFI_INVALID_PARAMETER;
   } else {
     // Assume equal sized blocks in all flash devices
-    *BlockSize = (UINTN)FlashInstance->Media.BlockSize;
+    *BlockSize      = (UINTN)FlashInstance->Media.BlockSize;
     *NumberOfBlocks = (UINTN)(FlashInstance->Media.LastBlock - Lba + 1);
 
     return EFI_SUCCESS;
@@ -587,16 +622,16 @@ FvbGetBlockSize (
 EFI_STATUS
 EFIAPI
 FvbRead (
-  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL   *This,
-  IN        EFI_LBA                               Lba,
-  IN        UINTN                                 Offset,
-  IN OUT    UINTN                                 *NumBytes,
-  IN OUT    UINT8                                 *Buffer
+  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL  *This,
+  IN        EFI_LBA                              Lba,
+  IN        UINTN                                Offset,
+  IN OUT    UINTN                                *NumBytes,
+  IN OUT    UINT8                                *Buffer
   )
 {
-  FVB_DEVICE   *FlashInstance;
-  UINTN         BlockSize;
-  UINTN         DataOffset;
+  FVB_DEVICE  *FlashInstance;
+  UINTN       BlockSize;
+  UINTN       DataOffset;
 
   FlashInstance = INSTANCE_FROM_FVB_THIS (This);
 
@@ -608,15 +643,18 @@ FvbRead (
   // We need to check each variable individually because adding two large
   // values together overflows.
   //
-  if (Offset               >= BlockSize ||
-      *NumBytes            >  BlockSize ||
-      (Offset + *NumBytes) >  BlockSize) {
-    DEBUG ((DEBUG_ERROR,
+  if ((Offset               >= BlockSize) ||
+      (*NumBytes            >  BlockSize) ||
+      ((Offset + *NumBytes) >  BlockSize))
+  {
+    DEBUG ((
+      DEBUG_ERROR,
       "%a: Wrong buffer size: (Offset=0x%x + NumBytes=0x%x) > BlockSize=0x%x\n",
       __FUNCTION__,
       Offset,
       *NumBytes,
-      BlockSize));
+      BlockSize
+      ));
     return EFI_BAD_BUFFER_SIZE;
   }
 
@@ -625,9 +663,11 @@ FvbRead (
     return EFI_SUCCESS;
   }
 
-  DataOffset = GET_DATA_OFFSET (FlashInstance->RegionBaseAddress + Offset,
+  DataOffset = GET_DATA_OFFSET (
+                 FlashInstance->RegionBaseAddress + Offset,
                  FlashInstance->StartLba + Lba,
-                 FlashInstance->Media.BlockSize);
+                 FlashInstance->Media.BlockSize
+                 );
 
   // Read the memory-mapped data
   CopyMem (Buffer, (UINTN *)DataOffset, *NumBytes);
@@ -696,29 +736,32 @@ FvbRead (
 EFI_STATUS
 EFIAPI
 FvbWrite (
-  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL   *This,
-  IN        EFI_LBA                               Lba,
-  IN        UINTN                                 Offset,
-  IN OUT    UINTN                                 *NumBytes,
-  IN        UINT8                                 *Buffer
+  IN CONST  EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL  *This,
+  IN        EFI_LBA                              Lba,
+  IN        UINTN                                Offset,
+  IN OUT    UINTN                                *NumBytes,
+  IN        UINT8                                *Buffer
   )
 {
-  EFI_STATUS    Status;
-  FVB_DEVICE   *FlashInstance;
-  UINTN         DataOffset;
-
+  EFI_STATUS  Status;
+  FVB_DEVICE  *FlashInstance;
+  UINTN       DataOffset;
 
   FlashInstance = INSTANCE_FROM_FVB_THIS (This);
 
-  DataOffset = GET_DATA_OFFSET (FlashInstance->FvbOffset + Offset,
+  DataOffset = GET_DATA_OFFSET (
+                 FlashInstance->FvbOffset + Offset,
                  FlashInstance->StartLba + Lba,
-                 FlashInstance->Media.BlockSize);
+                 FlashInstance->Media.BlockSize
+                 );
 
   if (FlashInstance->IsSpiFlashAvailable) {
-    Status = FlashInstance->SpiFlashProtocol->Write (FlashInstance->SpiFlashProtocol,
+    Status = FlashInstance->SpiFlashProtocol->Write (
+                                                FlashInstance->SpiFlashProtocol,
                                                 DataOffset,
                                                 Buffer,
-                                                *NumBytes);
+                                                *NumBytes
+                                                );
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "%a: Failed to write to Spi device\n", __FUNCTION__));
       return Status;
@@ -726,9 +769,11 @@ FvbWrite (
   }
 
   // Update shadow buffer
-  DataOffset = GET_DATA_OFFSET (FlashInstance->RegionBaseAddress + Offset,
-                  FlashInstance->StartLba + Lba,
-                  FlashInstance->Media.BlockSize);
+  DataOffset = GET_DATA_OFFSET (
+                 FlashInstance->RegionBaseAddress + Offset,
+                 FlashInstance->StartLba + Lba,
+                 FlashInstance->Media.BlockSize
+                 );
 
   CopyMem ((UINTN *)DataOffset, Buffer, *NumBytes);
 
@@ -787,29 +832,31 @@ FvbWrite (
 EFI_STATUS
 EFIAPI
 FvbEraseBlocks (
-  IN CONST EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL *This,
+  IN CONST EFI_FIRMWARE_VOLUME_BLOCK2_PROTOCOL  *This,
   ...
   )
 {
-  EFI_FVB_ATTRIBUTES_2   FlashFvbAttributes;
+  EFI_FVB_ATTRIBUTES_2  FlashFvbAttributes;
   FVB_DEVICE            *FlashInstance;
-  EFI_STATUS             Status;
-  VA_LIST                Args;
-  UINTN                  BlockAddress; // Physical address of Lba to erase
-  EFI_LBA                StartingLba;  // Lba from which we start erasing
-  UINTN                  NumOfLba;     // Number of Lba blocks to erase
+  EFI_STATUS            Status;
+  VA_LIST               Args;
+  UINTN                 BlockAddress;  // Physical address of Lba to erase
+  EFI_LBA               StartingLba;   // Lba from which we start erasing
+  UINTN                 NumOfLba;      // Number of Lba blocks to erase
 
   FlashInstance = INSTANCE_FROM_FVB_THIS (This);
 
   Status = EFI_SUCCESS;
 
-  if(FlashInstance->IsFvbHeaderValid == TRUE) {
+  if (FlashInstance->IsFvbHeaderValid == TRUE) {
     // Detect WriteDisabled state
     FvbGetAttributes (This, &FlashFvbAttributes);
     if ((FlashFvbAttributes & EFI_FVB2_WRITE_STATUS) == 0) {
-      DEBUG ((DEBUG_ERROR,
+      DEBUG ((
+        DEBUG_ERROR,
         "%a: Device is in WriteDisabled state.\n",
-        __FUNCTION__));
+        __FUNCTION__
+        ));
       return EFI_ACCESS_DENIED;
     }
   }
@@ -825,7 +872,7 @@ FvbEraseBlocks (
 
     // Have we reached the end of the list?
     if (StartingLba == EFI_LBA_LIST_TERMINATOR) {
-      //Exit the while loop
+      // Exit the while loop
       break;
     }
 
@@ -833,20 +880,23 @@ FvbEraseBlocks (
     NumOfLba = VA_ARG (Args, UINT32);
 
     // All blocks must be within range
-    if (NumOfLba == 0 ||
-        (FlashInstance->StartLba + StartingLba + NumOfLba - 1) >
-        FlashInstance->Media.LastBlock) {
-
-      DEBUG ((DEBUG_ERROR,
+    if ((NumOfLba == 0) ||
+        ((FlashInstance->StartLba + StartingLba + NumOfLba - 1) >
+         FlashInstance->Media.LastBlock))
+    {
+      DEBUG ((
+        DEBUG_ERROR,
         "%a: Error: Requested LBA are beyond the last available LBA (%ld).\n",
         __FUNCTION__,
-        FlashInstance->Media.LastBlock));
+        FlashInstance->Media.LastBlock
+        ));
 
       VA_END (Args);
 
       return EFI_INVALID_PARAMETER;
     }
   } while (TRUE);
+
   VA_END (Args);
 
   //
@@ -868,16 +918,19 @@ FvbEraseBlocks (
 
     // Go through each one and erase it
     while (NumOfLba > 0) {
-
       // Get the physical address of Lba to erase
-      BlockAddress = GET_DATA_OFFSET (FlashInstance->FvbOffset,
+      BlockAddress = GET_DATA_OFFSET (
+                       FlashInstance->FvbOffset,
                        FlashInstance->StartLba + StartingLba,
-                       FlashInstance->Media.BlockSize);
+                       FlashInstance->Media.BlockSize
+                       );
       // Erase single block
       if (FlashInstance->IsSpiFlashAvailable) {
-        Status = FlashInstance->SpiFlashProtocol->Erase (FlashInstance->SpiFlashProtocol,
+        Status = FlashInstance->SpiFlashProtocol->Erase (
+                                                    FlashInstance->SpiFlashProtocol,
                                                     BlockAddress,
-                                                    FlashInstance->Media.BlockSize);
+                                                    FlashInstance->Media.BlockSize
+                                                    );
         if (EFI_ERROR (Status)) {
           VA_END (Args);
           return EFI_DEVICE_ERROR;
@@ -885,9 +938,11 @@ FvbEraseBlocks (
       }
 
       // Update shadow buffer
-      BlockAddress = GET_DATA_OFFSET (FlashInstance->RegionBaseAddress,
-                        FlashInstance->StartLba + StartingLba,
-                        FlashInstance->Media.BlockSize);
+      BlockAddress = GET_DATA_OFFSET (
+                       FlashInstance->RegionBaseAddress,
+                       FlashInstance->StartLba + StartingLba,
+                       FlashInstance->Media.BlockSize
+                       );
 
       SetMem ((UINTN *)BlockAddress, FlashInstance->Media.BlockSize, 0xFF);
 
@@ -899,6 +954,7 @@ FvbEraseBlocks (
       NumOfLba--;
     }
   } while (TRUE);
+
   VA_END (Args);
 
   return EFI_SUCCESS;
@@ -916,24 +972,24 @@ STATIC
 VOID
 EFIAPI
 FvbVirtualNotifyEvent (
-  IN EFI_EVENT        Event,
-  IN VOID             *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
   // Convert SPI memory mapped region
-  EfiConvertPointer (0x0, (VOID**)&mFvbDevice->RegionBaseAddress);
+  EfiConvertPointer (0x0, (VOID **)&mFvbDevice->RegionBaseAddress);
 
   // Convert SPI device description
-  //EfiConvertPointer (0x0, (VOID**)&mFvbDevice->SpiDevice.Info);
-  //EfiConvertPointer (0x0, (VOID**)&mFvbDevice->SpiDevice.HostRegisterBaseAddress);
-  //EfiConvertPointer (0x0, (VOID**)&mFvbDevice->SpiDevice);
+  // EfiConvertPointer (0x0, (VOID**)&mFvbDevice->SpiDevice.Info);
+  // EfiConvertPointer (0x0, (VOID**)&mFvbDevice->SpiDevice.HostRegisterBaseAddress);
+  // EfiConvertPointer (0x0, (VOID**)&mFvbDevice->SpiDevice);
 
   // Convert SpiFlashProtocol
-  EfiConvertPointer (0x0, (VOID**)&mFvbDevice->SpiFlashProtocol->Erase);
-  EfiConvertPointer (0x0, (VOID**)&mFvbDevice->SpiFlashProtocol->Write);
-  EfiConvertPointer (0x0, (VOID**)&mFvbDevice->SpiFlashProtocol->Read);
-  EfiConvertPointer (0x0, (VOID**)&mFvbDevice->SpiFlashProtocol->GetSize);
-  EfiConvertPointer (0x0, (VOID**)&mFvbDevice->SpiFlashProtocol);
+  EfiConvertPointer (0x0, (VOID **)&mFvbDevice->SpiFlashProtocol->Erase);
+  EfiConvertPointer (0x0, (VOID **)&mFvbDevice->SpiFlashProtocol->Write);
+  EfiConvertPointer (0x0, (VOID **)&mFvbDevice->SpiFlashProtocol->Read);
+  EfiConvertPointer (0x0, (VOID **)&mFvbDevice->SpiFlashProtocol->GetSize);
+  EfiConvertPointer (0x0, (VOID **)&mFvbDevice->SpiFlashProtocol);
 
   return;
 }
@@ -941,11 +997,11 @@ FvbVirtualNotifyEvent (
 STATIC
 EFI_STATUS
 FvbPrepareFvHeader (
-  IN FVB_DEVICE *FlashInstance
+  IN FVB_DEVICE  *FlashInstance
   )
 {
-  EFI_BOOT_MODE BootMode;
-  EFI_STATUS Status;
+  EFI_BOOT_MODE  BootMode;
+  EFI_STATUS     Status;
 
   // Check if it is required to use default environment
   BootMode = GetBootModeHob ();
@@ -960,17 +1016,21 @@ FvbPrepareFvHeader (
   if (EFI_ERROR (Status)) {
     // There is no valid header, so time to install one.
     DEBUG ((DEBUG_ERROR, "%a: The FVB Header is not valid.\n", __FUNCTION__));
-    DEBUG ((DEBUG_ERROR,
+    DEBUG ((
+      DEBUG_ERROR,
       "%a: Installing a correct one for this volume.\n",
-      __FUNCTION__));
+      __FUNCTION__
+      ));
 
     FlashInstance->IsFvbHeaderValid = FALSE;
 
     // Erase entire region that is reserved for variable storage
-    Status = FvbEraseBlocks (&FlashInstance->FvbProtocol,
-                             (EFI_LBA) 0,
-                             FlashInstance->FvbSize / FlashInstance->Media.BlockSize,
-                             EFI_LBA_LIST_TERMINATOR);
+    Status = FvbEraseBlocks (
+               &FlashInstance->FvbProtocol,
+               (EFI_LBA)0,
+               FlashInstance->FvbSize / FlashInstance->Media.BlockSize,
+               EFI_LBA_LIST_TERMINATOR
+               );
     if (EFI_ERROR (Status)) {
       return Status;
     }
@@ -990,22 +1050,24 @@ FvbPrepareFvHeader (
 STATIC
 EFI_STATUS
 FvbConfigureFlashInstance (
-  IN OUT FVB_DEVICE *FlashInstance
+  IN OUT FVB_DEVICE  *FlashInstance
   )
 {
-  EFI_STATUS Status;
-  UINTN     DataOffset;
-  UINTN     VariableSize, FtwWorkingSize, FtwSpareSize, MemorySize;
+  EFI_STATUS  Status;
+  UINTN       DataOffset;
+  UINTN       VariableSize, FtwWorkingSize, FtwSpareSize, MemorySize;
 
   // Locate SPI protocols
-  Status = gBS->LocateProtocol (&gUniNorFlashProtocolGuid,
+  Status = gBS->LocateProtocol (
+                  &gUniNorFlashProtocolGuid,
                   NULL,
-                  (VOID **)&FlashInstance->SpiFlashProtocol);
+                  (VOID **)&FlashInstance->SpiFlashProtocol
+                  );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_WARN, "%a: Cannot locate SpiFlash protocol\n", __FUNCTION__));
   } else {
     // Probe the SPI flash
-    if (FlashInstance->SpiFlashProtocol->GetSize(FlashInstance->SpiFlashProtocol)) {
+    if (FlashInstance->SpiFlashProtocol->GetSize (FlashInstance->SpiFlashProtocol)) {
       FlashInstance->IsSpiFlashAvailable = TRUE;
     } else {
       DEBUG ((DEBUG_WARN, "%a: SPI flash not present.\n", __FUNCTION__));
@@ -1013,24 +1075,25 @@ FvbConfigureFlashInstance (
   }
 
   // Fill remaining flash description
-  VariableSize = PcdGet32 (PcdFlashNvStorageVariableSize);
+  VariableSize   = PcdGet32 (PcdFlashNvStorageVariableSize);
   FtwWorkingSize = PcdGet32 (PcdFlashNvStorageFtwWorkingSize);
-  FtwSpareSize = PcdGet32 (PcdFlashNvStorageFtwSpareSize);
+  FtwSpareSize   = PcdGet32 (PcdFlashNvStorageFtwSpareSize);
 
-  FlashInstance->FvbSize = VariableSize + FtwWorkingSize + FtwSpareSize;
+  FlashInstance->FvbSize   = VariableSize + FtwWorkingSize + FtwSpareSize;
   FlashInstance->FvbOffset = PcdGet64 (PcdFlashNvStorageVariableBase64);
 
-  FlashInstance->Media.MediaId = 0;
-  FlashInstance->Media.BlockSize = SIZE_4KB;//FlashInstance->SpiDevice.Info->SectorSize;
+  FlashInstance->Media.MediaId   = 0;
+  FlashInstance->Media.BlockSize = SIZE_4KB;// FlashInstance->SpiDevice.Info->SectorSize;
   FlashInstance->Media.LastBlock = FlashInstance->Size /
                                    FlashInstance->Media.BlockSize - 1;
 
   // U-Boot maps NV data into memory at the same address as in flash.
   FlashInstance->RegionBaseAddress = FlashInstance->FvbOffset;
 
-  if (FlashInstance->IsSpiFlashAvailable
-      && mBootDeviceType != RkAtagBootDevTypeSpiNor
-      && mBootDeviceType != RkAtagBootDevTypeMtdBlkSpiNor) {
+  if (  FlashInstance->IsSpiFlashAvailable
+     && (mBootDeviceType != RkAtagBootDevTypeSpiNor)
+     && (mBootDeviceType != RkAtagBootDevTypeMtdBlkSpiNor))
+  {
     //
     // SPI flash is available but UEFI was booted from another storage,
     // check if user still prefers the NV data to be on the flash.
@@ -1040,13 +1103,17 @@ FvbConfigureFlashInstance (
       // Ignore the memory mapped NV data from the boot device and
       // read it directly from SPI flash.
       //
-      DataOffset = GET_DATA_OFFSET (FlashInstance->FvbOffset,
-                    FlashInstance->StartLba,
-                    FlashInstance->Media.BlockSize);
-      Status = FlashInstance->SpiFlashProtocol->Read (FlashInstance->SpiFlashProtocol,
+      DataOffset = GET_DATA_OFFSET (
+                     FlashInstance->FvbOffset,
+                     FlashInstance->StartLba,
+                     FlashInstance->Media.BlockSize
+                     );
+      Status = FlashInstance->SpiFlashProtocol->Read (
+                                                  FlashInstance->SpiFlashProtocol,
                                                   DataOffset,
                                                   (VOID *)FlashInstance->RegionBaseAddress,
-                                                  FlashInstance->FvbSize);
+                                                  FlashInstance->FvbSize
+                                                  );
       if (EFI_ERROR (Status)) {
         return Status;
       }
@@ -1059,20 +1126,26 @@ FvbConfigureFlashInstance (
     }
   }
 
-  Status = gBS->InstallMultipleProtocolInterfaces (&FlashInstance->Handle,
-                  &gEfiDevicePathProtocolGuid, &FlashInstance->DevicePath,
-                  &gEfiFirmwareVolumeBlockProtocolGuid, &FlashInstance->FvbProtocol,
-                  NULL);
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  &FlashInstance->Handle,
+                  &gEfiDevicePathProtocolGuid,
+                  &FlashInstance->DevicePath,
+                  &gEfiFirmwareVolumeBlockProtocolGuid,
+                  &FlashInstance->FvbProtocol,
+                  NULL
+                  );
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
   Status = FvbPrepareFvHeader (FlashInstance);
   if (EFI_ERROR (Status)) {
-    gBS->UninstallMultipleProtocolInterfaces (&FlashInstance->Handle,
-          &gEfiDevicePathProtocolGuid,
-          &gEfiFirmwareVolumeBlockProtocolGuid,
-          NULL);
+    gBS->UninstallMultipleProtocolInterfaces (
+           &FlashInstance->Handle,
+           &gEfiDevicePathProtocolGuid,
+           &gEfiFirmwareVolumeBlockProtocolGuid,
+           NULL
+           );
   }
 
   return Status;
@@ -1081,34 +1154,38 @@ FvbConfigureFlashInstance (
 STATIC
 EFI_STATUS
 FvbDiskDumpNvData (
-  IN EFI_DEVICE_PATH_PROTOCOL *Device,
-  IN UINT32 MediaId
+  IN EFI_DEVICE_PATH_PROTOCOL  *Device,
+  IN UINT32                    MediaId
   )
 {
-  EFI_STATUS Status;
-  EFI_DISK_IO_PROTOCOL *DiskIo = NULL;
-  EFI_HANDLE Handle;
-  UINTN DataOffset;
+  EFI_STATUS            Status;
+  EFI_DISK_IO_PROTOCOL  *DiskIo = NULL;
+  EFI_HANDLE            Handle;
+  UINTN                 DataOffset;
 
   Status = gBS->LocateDevicePath (&gEfiDiskIoProtocolGuid, &Device, &Handle);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  Status = gBS->HandleProtocol (Handle, &gEfiDiskIoProtocolGuid, (VOID **) &DiskIo);
+  Status = gBS->HandleProtocol (Handle, &gEfiDiskIoProtocolGuid, (VOID **)&DiskIo);
   if (EFI_ERROR (Status)) {
     return Status;
   }
 
-  DataOffset = GET_DATA_OFFSET (mFvbDevice->FvbOffset,
-                                mFvbDevice->StartLba,
-                                mFvbDevice->Media.BlockSize);
+  DataOffset = GET_DATA_OFFSET (
+                 mFvbDevice->FvbOffset,
+                 mFvbDevice->StartLba,
+                 mFvbDevice->Media.BlockSize
+                 );
 
-  Status = DiskIo->WriteDisk (DiskIo,
-                              MediaId,
-                              DataOffset,
-                              mFvbDevice->FvbSize,
-                              (VOID *) mFvbDevice->FvbOffset);
+  Status = DiskIo->WriteDisk (
+                     DiskIo,
+                     MediaId,
+                     DataOffset,
+                     mFvbDevice->FvbSize,
+                     (VOID *)mFvbDevice->FvbOffset
+                     );
 
   return Status;
 }
@@ -1119,7 +1196,7 @@ FvbDiskNvDumpHandler (
   VOID
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
   if (mFvbDevice->DiskDevice == NULL) {
     DEBUG ((DEBUG_WARN, "%a: NV disk device not found (yet?)\n", __FUNCTION__));
@@ -1132,9 +1209,13 @@ FvbDiskNvDumpHandler (
 
   Status = FvbDiskDumpNvData (mFvbDevice->DiskDevice, mFvbDevice->DiskMediaId);
   if (EFI_ERROR (Status)) {
-    CHAR16* DevicePathText = ConvertDevicePathToText (mFvbDevice->DiskDevice, FALSE, FALSE);
-    DEBUG ((DEBUG_ERROR, "%a: Couldn't dump NV data to disk [%s]\n",
-            __FUNCTION__, DevicePathText));
+    CHAR16  *DevicePathText = ConvertDevicePathToText (mFvbDevice->DiskDevice, FALSE, FALSE);
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Couldn't dump NV data to disk [%s]\n",
+      __FUNCTION__,
+      DevicePathText
+      ));
     if (DevicePathText != NULL) {
       gBS->FreePool (DevicePathText);
     }
@@ -1152,8 +1233,8 @@ STATIC
 VOID
 EFIAPI
 FvbDiskNvDumpEventHandler (
-  IN EFI_EVENT Event,
-  IN VOID *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
   FvbDiskNvDumpHandler ();
@@ -1175,24 +1256,28 @@ FvbDiskNvDumpResetHandler (
 STATIC
 VOID
 FvbReadyToBootEventHandler (
-  IN EFI_EVENT Event,
-  IN VOID *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
-  EFI_STATUS Status;
-  EFI_EVENT ImageInstallEvent;
-  VOID *ImageRegistration;
+  EFI_STATUS  Status;
+  EFI_EVENT   ImageInstallEvent;
+  VOID        *ImageRegistration;
 
-  Status = gBS->CreateEvent (EVT_NOTIFY_SIGNAL,
-                             TPL_CALLBACK,
-                             FvbDiskNvDumpEventHandler,
-                             NULL,
-                             &ImageInstallEvent);
+  Status = gBS->CreateEvent (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  FvbDiskNvDumpEventHandler,
+                  NULL,
+                  &ImageInstallEvent
+                  );
   ASSERT_EFI_ERROR (Status);
 
-  Status = gBS->RegisterProtocolNotify (&gEfiLoadedImageProtocolGuid,
-                                        ImageInstallEvent,
-                                        &ImageRegistration);
+  Status = gBS->RegisterProtocolNotify (
+                  &gEfiLoadedImageProtocolGuid,
+                  ImageInstallEvent,
+                  &ImageRegistration
+                  );
   ASSERT_EFI_ERROR (Status);
 
   FvbDiskNvDumpEventHandler (NULL, NULL);
@@ -1204,40 +1289,48 @@ FvbReadyToBootEventHandler (
 STATIC
 BOOLEAN
 FvbCheckRkBootDeviceSupported (
-  IN EFI_HANDLE           Handle,
-  IN FVB_RK_BOOT_DEVICE   *BootDevice
+  IN EFI_HANDLE          Handle,
+  IN FVB_RK_BOOT_DEVICE  *BootDevice
   )
 {
-  EFI_STATUS                          Status;
-  EFI_DEVICE_PATH_PROTOCOL            *DevicePath;
-  EFI_HANDLE                          DeviceHandle;
-  NON_DISCOVERABLE_DEVICE             *Device;
-  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR   *Descriptor;
+  EFI_STATUS                         Status;
+  EFI_DEVICE_PATH_PROTOCOL           *DevicePath;
+  EFI_HANDLE                         DeviceHandle;
+  NON_DISCOVERABLE_DEVICE            *Device;
+  EFI_ACPI_ADDRESS_SPACE_DESCRIPTOR  *Descriptor;
 
   DevicePath = DevicePathFromHandle (Handle);
 
-  if (DevicePath == NULL
-      || DevicePath->Type != HARDWARE_DEVICE_PATH
-      || DevicePath->SubType != HW_VENDOR_DP) {
+  if (  (DevicePath == NULL)
+     || (DevicePath->Type != HARDWARE_DEVICE_PATH)
+     || (DevicePath->SubType != HW_VENDOR_DP))
+  {
     return FALSE;
   }
 
-  Status = gBS->LocateDevicePath (&gEdkiiNonDiscoverableDeviceProtocolGuid,
-                   &DevicePath, &DeviceHandle);
+  Status = gBS->LocateDevicePath (
+                  &gEdkiiNonDiscoverableDeviceProtocolGuid,
+                  &DevicePath,
+                  &DeviceHandle
+                  );
   if (EFI_ERROR (Status)) {
     return FALSE;
   }
 
-  Status = gBS->HandleProtocol (DeviceHandle,
-                   &gEdkiiNonDiscoverableDeviceProtocolGuid, (VOID **) &Device);
+  Status = gBS->HandleProtocol (
+                  DeviceHandle,
+                  &gEdkiiNonDiscoverableDeviceProtocolGuid,
+                  (VOID **)&Device
+                  );
   if (EFI_ERROR (Status)) {
     return FALSE;
   }
 
   Descriptor = &Device->Resources[0];
 
-  if (Descriptor->Desc != ACPI_ADDRESS_SPACE_DESCRIPTOR ||
-      Descriptor->ResType != ACPI_ADDRESS_SPACE_TYPE_MEM) {
+  if ((Descriptor->Desc != ACPI_ADDRESS_SPACE_DESCRIPTOR) ||
+      (Descriptor->ResType != ACPI_ADDRESS_SPACE_TYPE_MEM))
+  {
     return FALSE;
   }
 
@@ -1273,15 +1366,27 @@ FvbCheckBootDiskDeviceHasFirmware (
   Size   = sizeof (FdtHeader);
   Status = DiskIo->ReadDisk (DiskIo, MediaId, Offset, Size, &FdtHeader);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: [%s] Failed to read %u bytes at 0x%lx. Status=%r\n",
-            __FUNCTION__, DevicePathText, Size, Offset, Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: [%s] Failed to read %u bytes at 0x%lx. Status=%r\n",
+      __FUNCTION__,
+      DevicePathText,
+      Size,
+      Offset,
+      Status
+      ));
     goto Exit;
   }
 
   Ret = fdt_check_header (&FdtHeader);
   if (Ret) {
-    DEBUG ((DEBUG_ERROR, "%a: [%s] FIT has an invalid header! Ret=%a\n",
-            __FUNCTION__, DevicePathText, fdt_strerror (Ret)));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: [%s] FIT has an invalid header! Ret=%a\n",
+      __FUNCTION__,
+      DevicePathText,
+      fdt_strerror (Ret)
+      ));
     goto Exit;
   }
 
@@ -1290,15 +1395,27 @@ FvbCheckBootDiskDeviceHasFirmware (
 
   Status = DiskIo->ReadDisk (DiskIo, MediaId, Offset, Size, Fdt);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "%a: [%s] Failed to read %u bytes at 0x%lx. Status=%r\n",
-            __FUNCTION__, DevicePathText, Size, Offset, Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: [%s] Failed to read %u bytes at 0x%lx. Status=%r\n",
+      __FUNCTION__,
+      DevicePathText,
+      Size,
+      Offset,
+      Status
+      ));
     goto Exit;
   }
 
   Node = fdt_path_offset (Fdt, "/images/edk2");
   if (Node < 0) {
-    DEBUG ((DEBUG_ERROR, "%a: [%s] FIT: Couldn't locate '/images/edk2' node! Ret=%a\n",
-            __FUNCTION__, DevicePathText, fdt_strerror (Node)));
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: [%s] FIT: Couldn't locate '/images/edk2' node! Ret=%a\n",
+      __FUNCTION__,
+      DevicePathText,
+      fdt_strerror (Node)
+      ));
     goto Exit;
   }
 
@@ -1315,13 +1432,13 @@ Exit:
 STATIC
 VOID
 FvbProcessBootDiskDeviceHandle (
-  IN EFI_HANDLE           Handle,
-  IN FVB_RK_BOOT_DEVICE   *BootDevice
+  IN EFI_HANDLE          Handle,
+  IN FVB_RK_BOOT_DEVICE  *BootDevice
   )
 {
   EFI_STATUS                Status;
   EFI_BLOCK_IO_PROTOCOL     *BlkIo;
-  EFI_DEVICE_PATH_PROTOCOL  *Device = NULL;
+  EFI_DEVICE_PATH_PROTOCOL  *Device         = NULL;
   CHAR16                    *DevicePathText = NULL;
 
   if (!FvbCheckRkBootDeviceSupported (Handle, BootDevice)) {
@@ -1346,6 +1463,7 @@ FvbProcessBootDiskDeviceHandle (
     DEBUG ((DEBUG_ERROR, "%a: [%s] Media not present!\n", __FUNCTION__, DevicePathText));
     goto Exit;
   }
+
   if (BlkIo->Media->ReadOnly) {
     DEBUG ((DEBUG_ERROR, "%a: [%s] Media is read-only!\n", __FUNCTION__, DevicePathText));
     goto Exit;
@@ -1371,13 +1489,14 @@ FvbProcessBootDiskDeviceHandle (
 
   DEBUG ((DEBUG_INFO, "%a: [%s] Found boot disk for NV storage!\n", __FUNCTION__, DevicePathText));
 
-  mFvbDevice->DiskDevice = Device;
+  mFvbDevice->DiskDevice  = Device;
   mFvbDevice->DiskMediaId = BlkIo->Media->MediaId;
 
 Exit:
   if ((Device != NULL) && (mFvbDevice->DiskDevice != Device)) {
     FreePool (Device);
   }
+
   if (DevicePathText != NULL) {
     FreePool (DevicePathText);
   }
@@ -1405,9 +1524,10 @@ FvbFindBootDiskDevice (
                   &Handles
                   );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR,"%a: Failed to locate block devices. Status=%r\n", __FUNCTION__, Status));
+    DEBUG ((DEBUG_ERROR, "%a: Failed to locate block devices. Status=%r\n", __FUNCTION__, Status));
     goto Fail;
   }
+
   ASSERT (NoHandles > 0);
 
   for (DevIndex = 0; DevIndex < ARRAY_SIZE (mFvbSecondaryRkBootDevices); DevIndex++) {
@@ -1422,11 +1542,19 @@ FvbFindBootDiskDevice (
         if ((mBootDeviceType != RkAtagBootDevTypeUnknown) &&
             (mBootDeviceType != RkBootDevice->AtagBootDevType))
         {
-          DEBUG ((DEBUG_WARN, "%a: WARNING: Found boot device type (0x%x) does not match SPL (0x%x)!\n",
-                  __FUNCTION__, RkBootDevice->AtagBootDevType, mBootDeviceType));
+          DEBUG ((
+            DEBUG_WARN,
+            "%a: WARNING: Found boot device type (0x%x) does not match SPL (0x%x)!\n",
+            __FUNCTION__,
+            RkBootDevice->AtagBootDevType,
+            mBootDeviceType
+            ));
           DEBUG ((DEBUG_WARN, "%a: WARNING: Variable store might be using the wrong device!\n", __FUNCTION__));
-          DEBUG ((DEBUG_WARN, "%a: WARNING: Consider erasing any firmware present on other devices (SPI/EMMC/SD)!\n",
-                  __FUNCTION__));
+          DEBUG ((
+            DEBUG_WARN,
+            "%a: WARNING: Consider erasing any firmware present on other devices (SPI/EMMC/SD)!\n",
+            __FUNCTION__
+            ));
         }
 
         Status = gBS->InstallMultipleProtocolInterfaces (
@@ -1456,8 +1584,8 @@ STATIC
 VOID
 EFIAPI
 NotifyEndOfDxeEvent (
-  IN EFI_EVENT    Event,
-  IN VOID         *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
   FvbFindBootDiskDevice ();
@@ -1469,9 +1597,9 @@ FvbInstallDiskNvDumpEventHandlers (
   VOID
   )
 {
-  EFI_STATUS Status;
-  EFI_RESET_NOTIFICATION_PROTOCOL *ResetNotify;
-  EFI_EVENT ReadyToBootEvent;
+  EFI_STATUS                       Status;
+  EFI_RESET_NOTIFICATION_PROTOCOL  *ResetNotify;
+  EFI_EVENT                        ReadyToBootEvent;
 
   Status = gBS->LocateProtocol (
                   &gEfiResetNotificationProtocolGuid,
@@ -1487,12 +1615,14 @@ FvbInstallDiskNvDumpEventHandlers (
     ASSERT_EFI_ERROR (Status);
   }
 
-  Status = gBS->CreateEventEx (EVT_NOTIFY_SIGNAL,
-                               TPL_CALLBACK,
-                               FvbReadyToBootEventHandler,
-                               NULL,
-                               &gEfiEventReadyToBootGuid,
-                               &ReadyToBootEvent);
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  FvbReadyToBootEventHandler,
+                  NULL,
+                  &gEfiEventReadyToBootGuid,
+                  &ReadyToBootEvent
+                  );
   ASSERT_EFI_ERROR (Status);
 }
 
@@ -1506,25 +1636,25 @@ FvbInstallDiskNotifyHandler (
   EFI_EVENT   Event;
 
   Status = gBS->CreateEventEx (
-                    EVT_NOTIFY_SIGNAL,                // Type
-                    TPL_CALLBACK,                     // NotifyTpl
-                    NotifyEndOfDxeEvent,              // NotifyFunction
-                    NULL,                             // NotifyContext
-                    &gEfiEndOfDxeEventGroupGuid,      // EventGroup
-                    &Event                            // Event
-                    );
+                  EVT_NOTIFY_SIGNAL,                  // Type
+                  TPL_CALLBACK,                       // NotifyTpl
+                  NotifyEndOfDxeEvent,                // NotifyFunction
+                  NULL,                               // NotifyContext
+                  &gEfiEndOfDxeEventGroupGuid,        // EventGroup
+                  &Event                              // Event
+                  );
   ASSERT_EFI_ERROR (Status);
 }
 
 EFI_STATUS
 EFIAPI
 RkFvbEntryPoint (
-  IN EFI_HANDLE       ImageHandle,
-  IN EFI_SYSTEM_TABLE *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_STATUS  Status = 0;
-  RKATAG_BOOTDEV *BootDevice;
+  EFI_STATUS      Status = 0;
+  RKATAG_BOOTDEV  *BootDevice;
 
   BootDevice = RkAtagsGetBootDev ();
   if (BootDevice != NULL) {
@@ -1538,8 +1668,10 @@ RkFvbEntryPoint (
   //
   // Create FVB flash device
   //
-  mFvbDevice = AllocateRuntimeCopyPool (sizeof (mRkFvbFlashInstanceTemplate),
-                 &mRkFvbFlashInstanceTemplate);
+  mFvbDevice = AllocateRuntimeCopyPool (
+                 sizeof (mRkFvbFlashInstanceTemplate),
+                 &mRkFvbFlashInstanceTemplate
+                 );
   if (mFvbDevice == NULL) {
     DEBUG ((DEBUG_ERROR, "%a: Cannot allocate memory\n", __FUNCTION__));
     return EFI_OUT_OF_RESOURCES;
@@ -1558,14 +1690,18 @@ RkFvbEntryPoint (
   // The driver implementing the variable read service can now be dispatched;
   // the varstore headers are in place.
   //
-  Status = gBS->InstallProtocolInterface (&gImageHandle,
+  Status = gBS->InstallProtocolInterface (
+                  &gImageHandle,
                   &gEdkiiNvVarStoreFormattedGuid,
                   EFI_NATIVE_INTERFACE,
-                  NULL);
+                  NULL
+                  );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR,
+    DEBUG ((
+      DEBUG_ERROR,
       "%a: Failed to install gEdkiiNvVarStoreFormattedGuid\n",
-      __FUNCTION__));
+      __FUNCTION__
+      ));
     goto ErrorInstallNvVarStoreFormatted;
   }
 
@@ -1573,12 +1709,14 @@ RkFvbEntryPoint (
   // Register for the virtual address change event
   //
 
-  Status = gBS->CreateEventEx (EVT_NOTIFY_SIGNAL,
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
                   TPL_NOTIFY,
                   FvbVirtualNotifyEvent,
                   NULL,
                   &gEfiEventVirtualAddressChangeGuid,
-                  &mFvbVirtualAddrChangeEvent);
+                  &mFvbVirtualAddrChangeEvent
+                  );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: Failed to register VA change event\n", __FUNCTION__));
     goto ErrorSetMemAttr;
@@ -1595,15 +1733,19 @@ RkFvbEntryPoint (
 
   return Status;
 ErrorSetMemAttr:
-  gBS->UninstallProtocolInterface (gImageHandle,
+  gBS->UninstallProtocolInterface (
+         gImageHandle,
          &gEdkiiNvVarStoreFormattedGuid,
-         NULL);
+         NULL
+         );
 
 ErrorInstallNvVarStoreFormatted:
-  gBS->UninstallMultipleProtocolInterfaces (&mFvbDevice->Handle,
+  gBS->UninstallMultipleProtocolInterfaces (
+         &mFvbDevice->Handle,
          &gEfiDevicePathProtocolGuid,
          &gEfiFirmwareVolumeBlockProtocolGuid,
-         NULL);
+         NULL
+         );
 
 ErrorConfigureFlash:
   FreePool (mFvbDevice);

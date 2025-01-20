@@ -8,11 +8,8 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
-
 #ifndef _OHCI_H
 #define _OHCI_H
-
 
 #include <Uefi.h>
 
@@ -47,50 +44,50 @@ extern EFI_DRIVER_BINDING_PROTOCOL   gOhciDriverBinding;
 extern EFI_COMPONENT_NAME_PROTOCOL   gOhciComponentName;
 extern EFI_COMPONENT_NAME2_PROTOCOL  gOhciComponentName2;
 
-#define USB_OHCI_HC_DEV_SIGNATURE     SIGNATURE_32('o','h','c','i')
+#define USB_OHCI_HC_DEV_SIGNATURE  SIGNATURE_32('o','h','c','i')
 
-typedef struct _HCCA_MEMORY_BLOCK{
-  UINT32                    HccaInterruptTable[32];    // 32-bit Physical Address to ED_DESCRIPTOR
-  UINT16                    HccaFrameNumber;
-  UINT16                    HccaPad;
-  UINT32                    HccaDoneHead;              // 32-bit Physical Address to TD_DESCRIPTOR
-  UINT8                     Reserved[116];
+typedef struct _HCCA_MEMORY_BLOCK {
+  UINT32    HccaInterruptTable[32];                    // 32-bit Physical Address to ED_DESCRIPTOR
+  UINT16    HccaFrameNumber;
+  UINT16    HccaPad;
+  UINT32    HccaDoneHead;                              // 32-bit Physical Address to TD_DESCRIPTOR
+  UINT8     Reserved[116];
 } HCCA_MEMORY_BLOCK;
 
 typedef struct {
-  VENDOR_DEVICE_PATH            Guid;
-  UINTN                         Instance;
-  EFI_DEVICE_PATH_PROTOCOL      End;
+  VENDOR_DEVICE_PATH          Guid;
+  UINTN                       Instance;
+  EFI_DEVICE_PATH_PROTOCOL    End;
 } OHCI_DEVICE_PATH;
 
 struct _USB_OHCI_HC_DEV {
-  UINTN                     Signature;
-  EFI_USB_HC_PROTOCOL       UsbHc;
-  EFI_USB2_HC_PROTOCOL      Usb2Hc;
-  UINT32                    UsbHcBaseAddress;
-  HCCA_MEMORY_BLOCK         *HccaMemoryBlock;
-  VOID                      *HccaMemoryBuf;
-  VOID                      *HccaMemoryMapping;
-  UINTN                     HccaMemoryPages;
-  ED_DESCRIPTOR             *IntervalList[6][32];
-  INTERRUPT_CONTEXT_ENTRY   *InterruptContextList;
-  VOID                      *MemPool;
+  UINTN                       Signature;
+  EFI_USB_HC_PROTOCOL         UsbHc;
+  EFI_USB2_HC_PROTOCOL        Usb2Hc;
+  UINT32                      UsbHcBaseAddress;
+  HCCA_MEMORY_BLOCK           *HccaMemoryBlock;
+  VOID                        *HccaMemoryBuf;
+  VOID                        *HccaMemoryMapping;
+  UINTN                       HccaMemoryPages;
+  ED_DESCRIPTOR               *IntervalList[6][32];
+  INTERRUPT_CONTEXT_ENTRY     *InterruptContextList;
+  VOID                        *MemPool;
 
-  UINT32                    ToggleFlag;
+  UINT32                      ToggleFlag;
 
-  EFI_EVENT                 HouseKeeperTimer;
+  EFI_EVENT                   HouseKeeperTimer;
   //
   // ExitBootServicesEvent is used to stop the OHC DMA operation
   // after exit boot service.
   //
-  EFI_EVENT                  ExitBootServiceEvent;
+  EFI_EVENT                   ExitBootServiceEvent;
 
-  EFI_UNICODE_STRING_TABLE  *ControllerNameTable;
+  EFI_UNICODE_STRING_TABLE    *ControllerNameTable;
 
-  OHCI_DEVICE_PROTOCOL      *Protocol;
+  OHCI_DEVICE_PROTOCOL        *Protocol;
 };
 
-#define USB_OHCI_HC_DEV_FROM_THIS(a)    CR(a, USB_OHCI_HC_DEV, UsbHc, USB_OHCI_HC_DEV_SIGNATURE)
+#define USB_OHCI_HC_DEV_FROM_THIS(a)  CR(a, USB_OHCI_HC_DEV, UsbHc, USB_OHCI_HC_DEV_SIGNATURE)
 
 //
 // Func List
@@ -115,6 +112,7 @@ OhciReset (
   IN EFI_USB_HC_PROTOCOL  *This,
   IN UINT16               Attributes
   );
+
 /**
   Retrieve the current state of the USB host controller.
 
@@ -135,6 +133,7 @@ OhciGetState (
   IN  EFI_USB_HC_PROTOCOL  *This,
   OUT EFI_USB_HC_STATE     *State
   );
+
 /**
   Sets the USB host controller to a specific state.
 
@@ -150,10 +149,11 @@ OhciGetState (
 
 EFI_STATUS
 EFIAPI
-OhciSetState(
+OhciSetState (
   IN EFI_USB_HC_PROTOCOL  *This,
   IN EFI_USB_HC_STATE     State
   );
+
 /**
 
   Submits control transfer to a target USB device.
@@ -189,7 +189,6 @@ OhciSetState(
 
 --*/
 
-
 EFI_STATUS
 EFIAPI
 OhciControlTransfer (
@@ -204,6 +203,7 @@ OhciControlTransfer (
   IN     UINTN                   TimeOut,
   OUT    UINT32                  *TransferResult
   );
+
 /**
 
   Submits bulk transfer to a bulk endpoint of a USB device.
@@ -243,10 +243,9 @@ OhciControlTransfer (
 
 **/
 
-
 EFI_STATUS
 EFIAPI
-OhciBulkTransfer(
+OhciBulkTransfer (
   IN     EFI_USB_HC_PROTOCOL  *This,
   IN     UINT8                DeviceAddress,
   IN     UINT8                EndPointAddress,
@@ -257,6 +256,7 @@ OhciBulkTransfer(
   IN     UINTN                TimeOut,
   OUT    UINT32               *TransferResult
   );
+
 /**
 
   Submits an interrupt transfer to an interrupt endpoint of a USB device.
@@ -328,6 +328,7 @@ OhciInterruptTransfer (
   OUT    ED_DESCRIPTOR                    **OutputED         OPTIONAL,
   OUT    TD_DESCRIPTOR                    **OutputTD         OPTIONAL
   );
+
 /**
 
   Submits an asynchronous interrupt transfer to an interrupt endpoint of a USB device.
@@ -376,7 +377,6 @@ OhciInterruptTransfer (
 
 **/
 
-
 EFI_STATUS
 EFIAPI
 OhciAsyncInterruptTransfer (
@@ -392,6 +392,7 @@ OhciAsyncInterruptTransfer (
   IN     EFI_ASYNC_USB_TRANSFER_CALLBACK  CallBackFunction   OPTIONAL,
   IN     VOID                             *Context           OPTIONAL
   );
+
 /**
 
   Submits synchronous interrupt transfer to an interrupt endpoint
@@ -430,7 +431,6 @@ OhciAsyncInterruptTransfer (
 
 **/
 
-
 EFI_STATUS
 EFIAPI
 OhciSyncInterruptTransfer (
@@ -445,6 +445,7 @@ OhciSyncInterruptTransfer (
   IN     UINTN                TimeOut,
   OUT    UINT32               *TransferResult
   );
+
 /**
 
   Submits isochronous transfer to a target USB device.
@@ -468,7 +469,6 @@ OhciSyncInterruptTransfer (
 
 **/
 
-
 EFI_STATUS
 EFIAPI
 OhciIsochronousTransfer (
@@ -480,6 +480,7 @@ OhciIsochronousTransfer (
   IN OUT UINTN                DataLength,
   OUT    UINT32               *TransferResult
   );
+
 /**
 
   Submits Async isochronous transfer to a target USB device.
@@ -504,14 +505,14 @@ OhciIsochronousTransfer (
 EFI_STATUS
 EFIAPI
 OhciAsyncIsochronousTransfer (
-  IN     EFI_USB_HC_PROTOCOL                *This,
-  IN     UINT8                              DeviceAddress,
-  IN     UINT8                              EndPointAddress,
-  IN     UINT8                              MaximumPacketLength,
-  IN OUT VOID                               *Data,
-  IN OUT UINTN                              DataLength,
-  IN     EFI_ASYNC_USB_TRANSFER_CALLBACK    IsochronousCallBack,
-  IN     VOID                               *Context OPTIONAL
+  IN     EFI_USB_HC_PROTOCOL              *This,
+  IN     UINT8                            DeviceAddress,
+  IN     UINT8                            EndPointAddress,
+  IN     UINT8                            MaximumPacketLength,
+  IN OUT VOID                             *Data,
+  IN OUT UINTN                            DataLength,
+  IN     EFI_ASYNC_USB_TRANSFER_CALLBACK  IsochronousCallBack,
+  IN     VOID                             *Context OPTIONAL
   );
 
 /**
@@ -529,6 +530,7 @@ OhciGetRootHubNumOfPorts (
   IN  EFI_USB_HC_PROTOCOL  *This,
   OUT UINT8                *NumOfPorts
   );
+
 /**
 
   Retrieves the current status of a USB root hub port.
@@ -545,7 +547,6 @@ OhciGetRootHubNumOfPorts (
                                 was returned in PortStatus.
   @retval EFI_INVALID_PARAMETER Port number not valid
 **/
-
 
 EFI_STATUS
 EFIAPI
@@ -577,6 +578,7 @@ OhciSetRootHubPortFeature (
   IN UINT8                 PortNumber,
   IN EFI_USB_PORT_FEATURE  PortFeature
   );
+
 /**
 
   Clears a feature for the specified root hub port.
@@ -599,7 +601,6 @@ OhciClearRootHubPortFeature (
   IN UINT8                 PortNumber,
   IN EFI_USB_PORT_FEATURE  PortFeature
   );
-
 
 /**
   Test to see if this driver supports ControllerHandle. Any

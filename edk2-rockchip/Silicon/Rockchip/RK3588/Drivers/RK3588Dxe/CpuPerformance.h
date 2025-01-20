@@ -5,6 +5,7 @@
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
 **/
+
 #ifndef __RK3588DXE_CPU_PERF_H__
 #define __RK3588DXE_CPU_PERF_H__
 
@@ -35,6 +36,7 @@ EFIAPI
 SetupCpuPerfVariables (
   VOID
   );
+
 #endif
 
 #endif // __RK3588DXE_CPU_PERF_H__

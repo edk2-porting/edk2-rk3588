@@ -48,68 +48,68 @@
 
  */
 
-#define HAL_SPI_FIFO_LENGTH 64
+#define HAL_SPI_FIFO_LENGTH  64
 /* Bit fields in SR */
-#define HAL_SPI_SR_BUSY     (0x1 << SPI_SR_BSF_SHIFT)
-#define HAL_SPI_SR_STB_BUSY (0x1 << SPI_SR_STB_SHIFT)
+#define HAL_SPI_SR_BUSY      (0x1 << SPI_SR_BSF_SHIFT)
+#define HAL_SPI_SR_STB_BUSY  (0x1 << SPI_SR_STB_SHIFT)
 
 /* Bit fields in ISR, IMR, RISR, 7 bits */
-#define SPI_INT_TXEI  (1 << SPI_IMR_TFEIM_SHIFT)
-#define SPI_INT_TXOI  (1 << SPI_IMR_TFOIM_SHIFT)
-#define SPI_INT_RXUI  (1 << SPI_IMR_RFUIM_SHIFT)
-#define SPI_INT_RXOI  (1 << SPI_IMR_RFOIM_SHIFT)
-#define SPI_INT_RXFI  (1 << SPI_IMR_RFFIM_SHIFT)
-#define SPI_INT_TOI   (1 << SPI_IMR_TOIM_SHIFT)
-#define SPI_INT_SSPI  (1 << SPI_IMR_SSPIM_SHIFT)
-#define SPI_INT_TXFIM (1 << SPI_IMR_TXFIM_SHIFT)
+#define SPI_INT_TXEI   (1 << SPI_IMR_TFEIM_SHIFT)
+#define SPI_INT_TXOI   (1 << SPI_IMR_TFOIM_SHIFT)
+#define SPI_INT_RXUI   (1 << SPI_IMR_RFUIM_SHIFT)
+#define SPI_INT_RXOI   (1 << SPI_IMR_RFOIM_SHIFT)
+#define SPI_INT_RXFI   (1 << SPI_IMR_RFFIM_SHIFT)
+#define SPI_INT_TOI    (1 << SPI_IMR_TOIM_SHIFT)
+#define SPI_INT_SSPI   (1 << SPI_IMR_SSPIM_SHIFT)
+#define SPI_INT_TXFIM  (1 << SPI_IMR_TXFIM_SHIFT)
 
 /* Bit fields in ICR */
-#define SPI_CLEAR_INT_ALL  (1 << SPI_ICR_CCI_SHIFT)
-#define SPI_CLEAR_INT_RXUI (1 << SPI_ICR_CRFUI_SHIFT)
-#define SPI_CLEAR_INT_RXOI (1 << SPI_ICR_CRFOI_SHIFT)
-#define SPI_CLEAR_INT_TXOI (1 << SPI_ICR_CTFOI_SHIFT)
-#define SPI_CLEAR_INT_TOI  (1 << SPI_ICR_CTOI_SHIFT)
-#define SPI_ICR_SSPI_SHIFT (1 << SPI_ICR_CSSPI_SHIFT)
-#define SPI_CLEAR_INT_TXFI (1 << SPI_ICR_CTXFI_SHIFT)
+#define SPI_CLEAR_INT_ALL   (1 << SPI_ICR_CCI_SHIFT)
+#define SPI_CLEAR_INT_RXUI  (1 << SPI_ICR_CRFUI_SHIFT)
+#define SPI_CLEAR_INT_RXOI  (1 << SPI_ICR_CRFOI_SHIFT)
+#define SPI_CLEAR_INT_TXOI  (1 << SPI_ICR_CTFOI_SHIFT)
+#define SPI_CLEAR_INT_TOI   (1 << SPI_ICR_CTOI_SHIFT)
+#define SPI_ICR_SSPI_SHIFT  (1 << SPI_ICR_CSSPI_SHIFT)
+#define SPI_CLEAR_INT_TXFI  (1 << SPI_ICR_CTXFI_SHIFT)
 
 /* Bit fields in DMACR */
-#define SPI_DMACR_TX_ENABLE (1 << SPI_DMACR_TDE_SHIFT)
-#define SPI_DMACR_RX_ENABLE (1 << SPI_DMACR_RDE_SHIFT)
+#define SPI_DMACR_TX_ENABLE  (1 << SPI_DMACR_TDE_SHIFT)
+#define SPI_DMACR_RX_ENABLE  (1 << SPI_DMACR_RDE_SHIFT)
 
 /* Bit fields in SPI TIMEOUT */
-#define SPI_TIMEOUT_ENABLE  (1 << SPI_TIMEOUT_TOE_SHIFT)
-#define SPI_TIMEOUT_DISABLE 0
+#define SPI_TIMEOUT_ENABLE   (1 << SPI_TIMEOUT_TOE_SHIFT)
+#define SPI_TIMEOUT_DISABLE  0
 
-#define IS_SPI_MODE(__MODE__) (((__MODE__) == CR0_OPM_SLAVE) || \
+#define IS_SPI_MODE(__MODE__)  (((__MODE__) == CR0_OPM_SLAVE) ||\
                                ((__MODE__) == CR0_OPM_MASTER))
 
-#define IS_SPI_DIRECTION(__MODE__) (((__MODE__) == CR0_XFM_TR)        || \
+#define IS_SPI_DIRECTION(__MODE__)  (((__MODE__) == CR0_XFM_TR)        ||\
                                     ((__MODE__) == CR0_XFM_TO) ||        \
                                     ((__MODE__) == CR0_XFM_RO))
 
-#define IS_SPI_DATASIZE(__DATASIZE__) (((__DATASIZE__) == CR0_DATA_FRAME_SIZE_4BIT) || \
+#define IS_SPI_DATASIZE(__DATASIZE__)  (((__DATASIZE__) == CR0_DATA_FRAME_SIZE_4BIT) ||\
                                        ((__DATASIZE__) == CR0_DATA_FRAME_SIZE_8BIT) || \
                                        ((__DATASIZE__) == CR0_DATA_FRAME_SIZE_16BIT))
 
-#define IS_SPI_CPOL(__CPOL__) (((__CPOL__) == CR0_POLARITY_LOW) || \
+#define IS_SPI_CPOL(__CPOL__)  (((__CPOL__) == CR0_POLARITY_LOW) ||\
                                ((__CPOL__) == CR0_POLARITY_HIGH))
 
-#define IS_SPI_CPHA(__CPHA__) (((__CPHA__) == CR0_PHASE_1EDGE) || \
+#define IS_SPI_CPHA(__CPHA__)  (((__CPHA__) == CR0_PHASE_1EDGE) ||\
                                ((__CPHA__) == CR0_PHASE_2EDGE))
 
-#define IS_SPI_FIRST_BIT(__BIT__) (((__BIT__) == CR0_FIRSTBIT_MSB) || \
+#define IS_SPI_FIRST_BIT(__BIT__)  (((__BIT__) == CR0_FIRSTBIT_MSB) ||\
                                    ((__BIT__) == CR0_FIRSTBIT_LSB))
 
-#define IS_SPI_APBTRANSFORM(__MODE__) (((__MODE__) == CR0_BHT_16BIT) || \
+#define IS_SPI_APBTRANSFORM(__MODE__)  (((__MODE__) == CR0_BHT_16BIT) ||\
                                       ((__MODE__) == CR0_BHT_8BIT))
 
-#define IS_SPI_ENDIAN_MODE(__MODE__) (((__MODE__) == CR0_EM_BIG) || \
+#define IS_SPI_ENDIAN_MODE(__MODE__)  (((__MODE__) == CR0_EM_BIG) ||\
                                       ((__MODE__) == CR0_EM_LITTLE))
 
-#define IS_SPI_SSD_BIT(__MODE__) (((__MODE__) == CR0_SSD_HALF) || \
+#define IS_SPI_SSD_BIT(__MODE__)  (((__MODE__) == CR0_SSD_HALF) ||\
                                   ((__MODE__) == CR0_SSD_ONE))
 
-#define IS_SPI_CSM(__NCYCLES__) (((__NCYCLES__) == CR0_CSM_0CYCLE) ||  \
+#define IS_SPI_CSM(__NCYCLES__)  (((__NCYCLES__) == CR0_CSM_0CYCLE) || \
                                  ((__NCYCLES__) == CR0_CSM_1CYCLE) ||  \
                                  ((__NCYCLES__) == CR0_CSM_2CYCLES) || \
                                  ((__NCYCLES__) == CR0_CSM_3CYCLES))
@@ -123,7 +123,10 @@
   */
 RETURN_STATUS
 EFIAPI
-SPI_Init(struct SPI_HANDLE *pSPI, UINT32 base)
+SPI_Init (
+  struct SPI_HANDLE  *pSPI,
+  UINT32             base
+  )
 {
   pSPI->pReg = (struct SPI_REG *)(long)base;
 
@@ -131,9 +134,9 @@ SPI_Init(struct SPI_HANDLE *pSPI, UINT32 base)
 
   /* Default config */
   pSPI->config.apbTransform = CR0_BHT_8BIT;
-  pSPI->config.endianMode = CR0_EM_BIG;
-  pSPI->config.ssd = CR0_SSD_ONE;
-  pSPI->config.csm = CR0_CSM_0CYCLE;
+  pSPI->config.endianMode   = CR0_EM_BIG;
+  pSPI->config.ssd          = CR0_SSD_ONE;
+  pSPI->config.csm          = CR0_CSM_0CYCLE;
 
   return RETURN_SUCCESS;
 }
@@ -145,9 +148,13 @@ SPI_Init(struct SPI_HANDLE *pSPI, UINT32 base)
   * @param  enable: start or stop the spi module.
   * @return status
   */
-static inline RETURN_STATUS SPI_EnableChip(struct SPI_HANDLE *pSPI, int enable)
+static inline RETURN_STATUS
+SPI_EnableChip (
+  struct SPI_HANDLE  *pSPI,
+  int                enable
+  )
 {
-  WRITE_REG(pSPI->pReg->ENR, (enable ? 1 : 0));
+  WRITE_REG (pSPI->pReg->ENR, (enable ? 1 : 0));
 
   return RETURN_SUCCESS;
 }
@@ -159,9 +166,13 @@ static inline RETURN_STATUS SPI_EnableChip(struct SPI_HANDLE *pSPI, int enable)
   * @param  div: clock division.
   * @return status
   */
-static inline RETURN_STATUS SPI_SetClock(struct SPI_HANDLE *pSPI, UINT16 div)
+static inline RETURN_STATUS
+SPI_SetClock (
+  struct SPI_HANDLE  *pSPI,
+  UINT16             div
+  )
 {
-  WRITE_REG(pSPI->pReg->BAUDR, div);
+  WRITE_REG (pSPI->pReg->BAUDR, div);
 
   return RETURN_SUCCESS;
 }
@@ -176,13 +187,17 @@ static inline RETURN_STATUS SPI_SetClock(struct SPI_HANDLE *pSPI, UINT16 div)
   */
 RETURN_STATUS
 EFIAPI
-SPI_SetCS(struct SPI_HANDLE *pSPI, UINT8 select, UINT8 enable)
+SPI_SetCS (
+  struct SPI_HANDLE  *pSPI,
+  UINT8              select,
+  UINT8              enable
+  )
 {
-  UINT32 ser;
+  UINT32  ser;
 
-  ASSERT(pSPI != NULL);
+  ASSERT (pSPI != NULL);
 
-  ser = READ_REG(pSPI->pReg->SER) & SPI_SER_SER_MASK;
+  ser = READ_REG (pSPI->pReg->SER) & SPI_SER_SER_MASK;
 
   if (enable) {
     ser |= 1 << select;
@@ -190,7 +205,7 @@ SPI_SetCS(struct SPI_HANDLE *pSPI, UINT8 select, UINT8 enable)
     ser &= ~(1 << select);
   }
 
-  WRITE_REG(pSPI->pReg->SER, ser);
+  WRITE_REG (pSPI->pReg->SER, ser);
 
   return RETURN_SUCCESS;
 }
@@ -203,12 +218,14 @@ SPI_SetCS(struct SPI_HANDLE *pSPI, UINT8 select, UINT8 enable)
   */
 RETURN_STATUS
 EFIAPI
-SPI_FlushFifo(struct SPI_HANDLE *pSPI)
+SPI_FlushFifo (
+  struct SPI_HANDLE  *pSPI
+  )
 {
-  ASSERT(pSPI != NULL);
+  ASSERT (pSPI != NULL);
 
-  while (READ_REG(pSPI->pReg->RXFLR)) {
-    READ_REG(pSPI->pReg->RXDR);
+  while (READ_REG (pSPI->pReg->RXFLR)) {
+    READ_REG (pSPI->pReg->RXDR);
   }
 
   return RETURN_SUCCESS;
@@ -220,14 +237,17 @@ SPI_FlushFifo(struct SPI_HANDLE *pSPI)
   *               the configuration information for SPI module.
   * @return Max bytes can xfer.
   */
-static inline UINT32 SPI_TxMax(struct SPI_HANDLE *pSPI)
+static inline UINT32
+SPI_TxMax (
+  struct SPI_HANDLE  *pSPI
+  )
 {
-  UINT32 txLeft, txRoom;
+  UINT32  txLeft, txRoom;
 
   txLeft = (pSPI->pTxBufferEnd - pSPI->pTxBuffer) / pSPI->config.nBytes;
-  txRoom = HAL_SPI_FIFO_LENGTH - READ_REG(pSPI->pReg->TXFLR);
+  txRoom = HAL_SPI_FIFO_LENGTH - READ_REG (pSPI->pReg->TXFLR);
 
-  return MIN(txLeft, txRoom);
+  return MIN (txLeft, txRoom);
 }
 
 /**
@@ -236,10 +256,13 @@ static inline UINT32 SPI_TxMax(struct SPI_HANDLE *pSPI)
   *               the configuration information for SPI module.
   * @return status
   */
-static RETURN_STATUS SPI_PioWrite(struct SPI_HANDLE *pSPI)
+static RETURN_STATUS
+SPI_PioWrite (
+  struct SPI_HANDLE  *pSPI
+  )
 {
-  UINT32 max = SPI_TxMax(pSPI);
-  UINT32 txw = 0;
+  UINT32  max = SPI_TxMax (pSPI);
+  UINT32  txw = 0;
 
   while (max--) {
     if (pSPI->config.nBytes == 1) {
@@ -248,7 +271,7 @@ static RETURN_STATUS SPI_PioWrite(struct SPI_HANDLE *pSPI)
       txw = *(const UINT16 *)(pSPI->pTxBuffer);
     }
 
-    WRITE_REG(pSPI->pReg->TXDR, txw);
+    WRITE_REG (pSPI->pReg->TXDR, txw);
     pSPI->pTxBuffer += pSPI->config.nBytes;
   }
 
@@ -261,27 +284,30 @@ static RETURN_STATUS SPI_PioWrite(struct SPI_HANDLE *pSPI)
   *               the configuration information for SPI module.
   * @return status
   */
-static RETURN_STATUS SPI_PioReadByte(struct SPI_HANDLE *pSPI)
+static RETURN_STATUS
+SPI_PioReadByte (
+  struct SPI_HANDLE  *pSPI
+  )
 {
-  UINT32 rxLeft = pSPI->pRxBufferEnd - pSPI->pRxBuffer;
-  UINT32 rxRoom = READ_REG(pSPI->pReg->RXFLR);
-  UINT32 max = MIN(rxLeft, rxRoom);
+  UINT32  rxLeft = pSPI->pRxBufferEnd - pSPI->pRxBuffer;
+  UINT32  rxRoom = READ_REG (pSPI->pReg->RXFLR);
+  UINT32  max    = MIN (rxLeft, rxRoom);
 
   while (max > 7) {
-    *(pSPI->pRxBuffer + 0) = (UINT8)READ_REG(pSPI->pReg->RXDR);
-    *(pSPI->pRxBuffer + 1) = (UINT8)READ_REG(pSPI->pReg->RXDR);
-    *(pSPI->pRxBuffer + 2) = (UINT8)READ_REG(pSPI->pReg->RXDR);
-    *(pSPI->pRxBuffer + 3) = (UINT8)READ_REG(pSPI->pReg->RXDR);
-    *(pSPI->pRxBuffer + 4) = (UINT8)READ_REG(pSPI->pReg->RXDR);
-    *(pSPI->pRxBuffer + 5) = (UINT8)READ_REG(pSPI->pReg->RXDR);
-    *(pSPI->pRxBuffer + 6) = (UINT8)READ_REG(pSPI->pReg->RXDR);
-    *(pSPI->pRxBuffer + 7) = (UINT8)READ_REG(pSPI->pReg->RXDR);
-    pSPI->pRxBuffer += 8;
-    max -= 8;
+    *(pSPI->pRxBuffer + 0) = (UINT8)READ_REG (pSPI->pReg->RXDR);
+    *(pSPI->pRxBuffer + 1) = (UINT8)READ_REG (pSPI->pReg->RXDR);
+    *(pSPI->pRxBuffer + 2) = (UINT8)READ_REG (pSPI->pReg->RXDR);
+    *(pSPI->pRxBuffer + 3) = (UINT8)READ_REG (pSPI->pReg->RXDR);
+    *(pSPI->pRxBuffer + 4) = (UINT8)READ_REG (pSPI->pReg->RXDR);
+    *(pSPI->pRxBuffer + 5) = (UINT8)READ_REG (pSPI->pReg->RXDR);
+    *(pSPI->pRxBuffer + 6) = (UINT8)READ_REG (pSPI->pReg->RXDR);
+    *(pSPI->pRxBuffer + 7) = (UINT8)READ_REG (pSPI->pReg->RXDR);
+    pSPI->pRxBuffer       += 8;
+    max                   -= 8;
   }
 
   while (max--) {
-    *pSPI->pRxBuffer = (UINT8)READ_REG(pSPI->pReg->RXDR);
+    *pSPI->pRxBuffer = (UINT8)READ_REG (pSPI->pReg->RXDR);
     pSPI->pRxBuffer++;
   }
 
@@ -294,28 +320,31 @@ static RETURN_STATUS SPI_PioReadByte(struct SPI_HANDLE *pSPI)
   *               the configuration information for SPI module.
   * @return status
   */
-static RETURN_STATUS SPI_PioReadShort(struct SPI_HANDLE *pSPI)
+static RETURN_STATUS
+SPI_PioReadShort (
+  struct SPI_HANDLE  *pSPI
+  )
 {
-  UINT32 rxLeft = (pSPI->pRxBufferEnd - pSPI->pRxBuffer) >> 1;
-  UINT32 rxRoom = READ_REG(pSPI->pReg->RXFLR);
-  UINT32 max = MIN(rxLeft, rxRoom);
+  UINT32  rxLeft = (pSPI->pRxBufferEnd - pSPI->pRxBuffer) >> 1;
+  UINT32  rxRoom = READ_REG (pSPI->pReg->RXFLR);
+  UINT32  max    = MIN (rxLeft, rxRoom);
 
   while (max > 7) {
-    *((UINT16 *)pSPI->pRxBuffer + 0) = (UINT16)READ_REG(pSPI->pReg->RXDR);
-    *((UINT16 *)pSPI->pRxBuffer + 1) = (UINT16)READ_REG(pSPI->pReg->RXDR);
-    *((UINT16 *)pSPI->pRxBuffer + 2) = (UINT16)READ_REG(pSPI->pReg->RXDR);
-    *((UINT16 *)pSPI->pRxBuffer + 3) = (UINT16)READ_REG(pSPI->pReg->RXDR);
-    *((UINT16 *)pSPI->pRxBuffer + 4) = (UINT16)READ_REG(pSPI->pReg->RXDR);
-    *((UINT16 *)pSPI->pRxBuffer + 5) = (UINT16)READ_REG(pSPI->pReg->RXDR);
-    *((UINT16 *)pSPI->pRxBuffer + 6) = (UINT16)READ_REG(pSPI->pReg->RXDR);
-    *((UINT16 *)pSPI->pRxBuffer + 7) = (UINT16)READ_REG(pSPI->pReg->RXDR);
-    pSPI->pRxBuffer += 16;
-    max -= 8;
+    *((UINT16 *)pSPI->pRxBuffer + 0) = (UINT16)READ_REG (pSPI->pReg->RXDR);
+    *((UINT16 *)pSPI->pRxBuffer + 1) = (UINT16)READ_REG (pSPI->pReg->RXDR);
+    *((UINT16 *)pSPI->pRxBuffer + 2) = (UINT16)READ_REG (pSPI->pReg->RXDR);
+    *((UINT16 *)pSPI->pRxBuffer + 3) = (UINT16)READ_REG (pSPI->pReg->RXDR);
+    *((UINT16 *)pSPI->pRxBuffer + 4) = (UINT16)READ_REG (pSPI->pReg->RXDR);
+    *((UINT16 *)pSPI->pRxBuffer + 5) = (UINT16)READ_REG (pSPI->pReg->RXDR);
+    *((UINT16 *)pSPI->pRxBuffer + 6) = (UINT16)READ_REG (pSPI->pReg->RXDR);
+    *((UINT16 *)pSPI->pRxBuffer + 7) = (UINT16)READ_REG (pSPI->pReg->RXDR);
+    pSPI->pRxBuffer                 += 16;
+    max                             -= 8;
   }
 
   while (max--) {
-    *((UINT16 *)pSPI->pRxBuffer) = (UINT16)READ_REG(pSPI->pReg->RXDR);
-    pSPI->pRxBuffer += 2;
+    *((UINT16 *)pSPI->pRxBuffer) = (UINT16)READ_REG (pSPI->pReg->RXDR);
+    pSPI->pRxBuffer             += 2;
   }
 
   return RETURN_SUCCESS;
@@ -329,28 +358,30 @@ static RETURN_STATUS SPI_PioReadShort(struct SPI_HANDLE *pSPI)
   */
 RETURN_STATUS
 EFIAPI
-SPI_PioTransfer(struct SPI_HANDLE *pSPI)
+SPI_PioTransfer (
+  struct SPI_HANDLE  *pSPI
+  )
 {
-  UINT32 remain = 0;
+  UINT32  remain = 0;
 
-  ASSERT(pSPI != NULL);
+  ASSERT (pSPI != NULL);
 
   pSPI->type = SPI_POLL;
-  SPI_EnableChip(pSPI, 1);
+  SPI_EnableChip (pSPI, 1);
 
   do {
     if (pSPI->pTxBuffer) {
       remain = pSPI->pTxBufferEnd - pSPI->pTxBuffer;
-      SPI_PioWrite(pSPI);
+      SPI_PioWrite (pSPI);
     }
 
     if (pSPI->pRxBuffer) {
       remain = pSPI->pRxBufferEnd - pSPI->pRxBuffer;
 
       if (pSPI->config.nBytes == 1) {
-        SPI_PioReadByte(pSPI);
+        SPI_PioReadByte (pSPI);
       } else {
-        SPI_PioReadShort(pSPI);
+        SPI_PioReadShort (pSPI);
       }
     }
   } while (remain);
@@ -364,10 +395,13 @@ SPI_PioTransfer(struct SPI_HANDLE *pSPI)
   *               the configuration information for SPI module.
   * @return HAL status
   */
-RETURN_STATUS SPI_QueryBusState(struct SPI_HANDLE *pSPI)
+RETURN_STATUS
+SPI_QueryBusState (
+  struct SPI_HANDLE  *pSPI
+  )
 {
-  HAL_ASSERT(pSPI != NULL);
-  if (!(READ_REG(pSPI->pReg->SR) & HAL_SPI_SR_BUSY)) {
+  HAL_ASSERT (pSPI != NULL);
+  if (!(READ_REG (pSPI->pReg->SR) & HAL_SPI_SR_BUSY)) {
     return RETURN_SUCCESS;
   }
 
@@ -382,19 +416,22 @@ RETURN_STATUS SPI_QueryBusState(struct SPI_HANDLE *pSPI)
   */
 RETURN_STATUS
 EFIAPI
-SPI_Stop(struct SPI_HANDLE *pSPI)
+SPI_Stop (
+  struct SPI_HANDLE  *pSPI
+  )
 {
-  UINT32 ret;
-  ASSERT(pSPI != NULL);
+  UINT32  ret;
 
-  do
-  {
-    ret = SPI_QueryBusState(pSPI);
-    if (ret == RETURN_SUCCESS)
+  ASSERT (pSPI != NULL);
+
+  do {
+    ret = SPI_QueryBusState (pSPI);
+    if (ret == RETURN_SUCCESS) {
       break;
-  } while(1);
+    }
+  } while (1);
 
-  SPI_EnableChip(pSPI, 0);
+  SPI_EnableChip (pSPI, 0);
 
   return RETURN_SUCCESS;
 }
@@ -405,26 +442,29 @@ SPI_Stop(struct SPI_HANDLE *pSPI)
   *               the configuration information for SPI module.
   * @return status
   */
-static RETURN_STATUS HAL_SPI_ConfigureTransferMode(struct SPI_HANDLE *pSPI)
+static RETURN_STATUS
+HAL_SPI_ConfigureTransferMode (
+  struct SPI_HANDLE  *pSPI
+  )
 {
-    UINT32 cr0;
+  UINT32  cr0;
 
-    if (pSPI->pTxBuffer && pSPI->pRxBuffer) {
-        pSPI->config.xfmMode = CR0_XFM_TR;
-    } else if (pSPI->pTxBuffer) {
-        pSPI->config.xfmMode = CR0_XFM_TO;
-    } else if (pSPI->pRxBuffer) {
-        pSPI->config.xfmMode = CR0_XFM_RO;
-    }
+  if (pSPI->pTxBuffer && pSPI->pRxBuffer) {
+    pSPI->config.xfmMode = CR0_XFM_TR;
+  } else if (pSPI->pTxBuffer) {
+    pSPI->config.xfmMode = CR0_XFM_TO;
+  } else if (pSPI->pRxBuffer) {
+    pSPI->config.xfmMode = CR0_XFM_RO;
+  }
 
-    cr0 = READ_REG(pSPI->pReg->CTRLR[0]);
-    cr0 &= ~SPI_CTRLR0_XFM_MASK;
-    cr0 |= pSPI->config.xfmMode;
+  cr0  = READ_REG (pSPI->pReg->CTRLR[0]);
+  cr0 &= ~SPI_CTRLR0_XFM_MASK;
+  cr0 |= pSPI->config.xfmMode;
 
-    WRITE_REG(pSPI->pReg->DMARDLR, pSPI->dmaBurstSize - 1);
-    WRITE_REG(pSPI->pReg->CTRLR[0], cr0);
+  WRITE_REG (pSPI->pReg->DMARDLR, pSPI->dmaBurstSize - 1);
+  WRITE_REG (pSPI->pReg->CTRLR[0], cr0);
 
-    return RETURN_SUCCESS;
+  return RETURN_SUCCESS;
 }
 
 /**
@@ -438,10 +478,15 @@ static RETURN_STATUS HAL_SPI_ConfigureTransferMode(struct SPI_HANDLE *pSPI)
   */
 RETURN_STATUS
 EFIAPI
-SPI_Configure(struct SPI_HANDLE *pSPI, const UINT8 *pTxData, UINT8 *pRxData, UINT32 size)
+SPI_Configure (
+  struct SPI_HANDLE  *pSPI,
+  const UINT8        *pTxData,
+  UINT8              *pRxData,
+  UINT32             size
+  )
 {
-  UINT32 cr0 = 0;
-  UINT32 div = 0;
+  UINT32  cr0 = 0;
+  UINT32  div = 0;
 
   cr0 |= pSPI->config.opMode;
 
@@ -456,34 +501,34 @@ SPI_Configure(struct SPI_HANDLE *pSPI, const UINT8 *pTxData, UINT8 *pRxData, UIN
   cr0 |= pSPI->config.csm;
 
   /* div doesn't support odd number */
-  div = DIV_ROUND_UP(pSPI->maxFreq, pSPI->config.speed);
+  div = DIV_ROUND_UP (pSPI->maxFreq, pSPI->config.speed);
   div = (div + 1) & 0xfffe;
 
-  WRITE_REG(pSPI->pReg->CTRLR[0], cr0);
+  WRITE_REG (pSPI->pReg->CTRLR[0], cr0);
 
-  WRITE_REG(pSPI->pReg->TXFTLR, HAL_SPI_FIFO_LENGTH / 2 - 1);
-  WRITE_REG(pSPI->pReg->RXFTLR, HAL_SPI_FIFO_LENGTH / 2 - 1);
+  WRITE_REG (pSPI->pReg->TXFTLR, HAL_SPI_FIFO_LENGTH / 2 - 1);
+  WRITE_REG (pSPI->pReg->RXFTLR, HAL_SPI_FIFO_LENGTH / 2 - 1);
 
-  WRITE_REG(pSPI->pReg->DMATDLR, HAL_SPI_FIFO_LENGTH / 2 - 1);
-  WRITE_REG(pSPI->pReg->DMARDLR, 0);
+  WRITE_REG (pSPI->pReg->DMATDLR, HAL_SPI_FIFO_LENGTH / 2 - 1);
+  WRITE_REG (pSPI->pReg->DMARDLR, 0);
 
-  SPI_SetClock(pSPI, div);
+  SPI_SetClock (pSPI, div);
 
-  pSPI->pTxBuffer = pTxData;
+  pSPI->pTxBuffer    = pTxData;
   pSPI->pTxBufferEnd = pTxData + size;
-  pSPI->pRxBuffer = pRxData;
+  pSPI->pRxBuffer    = pRxData;
   pSPI->pRxBufferEnd = pRxData + size;
-  pSPI->len = size;
+  pSPI->len          = size;
 
-  HAL_SPI_ConfigureTransferMode(pSPI);
+  HAL_SPI_ConfigureTransferMode (pSPI);
 
   if (pSPI->config.xfmMode == CR0_XFM_RO) {
     if (pSPI->config.nBytes == 1) {
-      WRITE_REG(pSPI->pReg->CTRLR[1], pSPI->len - 1);
+      WRITE_REG (pSPI->pReg->CTRLR[1], pSPI->len - 1);
     } else if (pSPI->config.nBytes == 2) {
-      WRITE_REG(pSPI->pReg->CTRLR[1], (pSPI->len / 2) - 1);
+      WRITE_REG (pSPI->pReg->CTRLR[1], (pSPI->len / 2) - 1);
     } else {
-      WRITE_REG(pSPI->pReg->CTRLR[1], (pSPI->len * 2) - 1);
+      WRITE_REG (pSPI->pReg->CTRLR[1], (pSPI->len * 2) - 1);
     }
   }
 

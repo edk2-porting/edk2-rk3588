@@ -8,8 +8,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
-
 /*++
 
 Routine Description:
@@ -25,10 +23,10 @@ Routine Description:
 **/
 EFI_STATUS
 OhciDumpEdTdInfo (
-  IN USB_OHCI_HC_DEV          *Ohc,
-  IN ED_DESCRIPTOR     *Ed,
-  IN TD_DESCRIPTOR     *Td,
-  BOOLEAN Stage
+  IN USB_OHCI_HC_DEV  *Ohc,
+  IN ED_DESCRIPTOR    *Ed,
+  IN TD_DESCRIPTOR    *Td,
+  BOOLEAN             Stage
   );
 
 /*++
@@ -41,6 +39,5 @@ OhciDumpEdTdInfo (
 
 VOID
 OhciDumpReg (
-  IN USB_OHCI_HC_DEV   *Ohc
+  IN USB_OHCI_HC_DEV  *Ohc
   );
-

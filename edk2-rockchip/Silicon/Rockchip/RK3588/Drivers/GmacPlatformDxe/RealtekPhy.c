@@ -14,14 +14,14 @@
 #include "EthernetPhy.h"
 
 /* Realtek RTL8211F PHY registers */
-#define PAGSR               0x1F
-#define LCR                 0x10
-#define LCR_VALUE           0x6940
+#define PAGSR      0x1F
+#define LCR        0x10
+#define LCR_VALUE  0x6940
 
 STATIC
 VOID
 RTL8211FPhyInit (
-  IN EFI_PHYSICAL_ADDRESS GmacBase
+  IN EFI_PHYSICAL_ADDRESS  GmacBase
   )
 {
   PhyWrite (GmacBase, 0, PAGSR, 0xD04);
@@ -50,5 +50,6 @@ RealtekPhyInit (
     default:
       return EFI_UNSUPPORTED;
   }
+
   return EFI_SUCCESS;
 }

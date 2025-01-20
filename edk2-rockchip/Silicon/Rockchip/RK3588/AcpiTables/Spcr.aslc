@@ -16,30 +16,31 @@
 
 #pragma pack(push, 1)
 
-STATIC EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE Spcr = {
+STATIC EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE  Spcr = {
   ACPI_HEADER (
     EFI_ACPI_6_0_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_SIGNATURE,
     EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE,
-    EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_REVISION),
+    EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_REVISION
+    ),
   EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERFACE_TYPE_16550_WITH_GAS,
-  { EFI_ACPI_RESERVED_BYTE, EFI_ACPI_RESERVED_BYTE, EFI_ACPI_RESERVED_BYTE },
+  { EFI_ACPI_RESERVED_BYTE,                                                    EFI_ACPI_RESERVED_BYTE,EFI_ACPI_RESERVED_BYTE },
   ARM_GAS32 (FixedPcdGet64 (PcdSerialRegisterBase)),
   EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_GIC,
-  0,                      /* Irq */
-  365,                    /* GlobalSystemInterrupt */
+  0,                                                                           /* Irq */
+  365,                                                                         /* GlobalSystemInterrupt */
   0,
   EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_PARITY_NO_PARITY,
   EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_STOP_BITS_1,
-  0,                      /* Flow Control */
+  0,                                                                           /* Flow Control */
   EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_TERMINAL_TYPE_VT_UTF8,
-  EFI_ACPI_RESERVED_BYTE, /* Language */
-  0xFFFF,                 /* PciDeviceId */
-  0xFFFF,                 /* PciVendorId */
-  0x00,                   /* PciBusNumber */
-  0x00,                   /* PciDeviceNumber */
-  0x00,                   /* PciFunctionNumber */
-  0,                      /* PciFlags */
-  0,                      /* PciSegment */
+  EFI_ACPI_RESERVED_BYTE,                                                      /* Language */
+  0xFFFF,                                                                      /* PciDeviceId */
+  0xFFFF,                                                                      /* PciVendorId */
+  0x00,                                                                        /* PciBusNumber */
+  0x00,                                                                        /* PciDeviceNumber */
+  0x00,                                                                        /* PciFunctionNumber */
+  0,                                                                           /* PciFlags */
+  0,                                                                           /* PciSegment */
   EFI_ACPI_RESERVED_DWORD
 };
 
@@ -47,4 +48,4 @@ STATIC EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE Spcr = {
 
 // Reference the table being generated to prevent the optimizer from removing
 // the data structure from the executable
-VOID* CONST ReferenceAcpiTable = &Spcr;
+VOID *CONST  ReferenceAcpiTable = &Spcr;

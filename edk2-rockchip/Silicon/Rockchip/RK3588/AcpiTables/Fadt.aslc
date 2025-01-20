@@ -16,12 +16,12 @@
 
 #include "AcpiTables.h"
 
-EFI_ACPI_6_3_FIXED_ACPI_DESCRIPTION_TABLE Fadt = {
+EFI_ACPI_6_3_FIXED_ACPI_DESCRIPTION_TABLE  Fadt = {
   ACPI_HEADER (
     EFI_ACPI_6_3_FIXED_ACPI_DESCRIPTION_TABLE_SIGNATURE,
     EFI_ACPI_6_3_FIXED_ACPI_DESCRIPTION_TABLE,
     EFI_ACPI_6_3_FIXED_ACPI_DESCRIPTION_TABLE_REVISION
-  ),
+    ),
   0,                                                                        // UINT32     FirmwareCtrl
   0,                                                                        // UINT32     Dsdt
   EFI_ACPI_RESERVED_BYTE,                                                   // UINT8      Reserved0
@@ -83,4 +83,4 @@ EFI_ACPI_6_3_FIXED_ACPI_DESCRIPTION_TABLE Fadt = {
 // Reference the table being generated to prevent the optimizer from removing the
 // data structure from the executable
 //
-VOID* CONST ReferenceAcpiTable = &Fadt;
+VOID *CONST  ReferenceAcpiTable = &Fadt;

@@ -16,15 +16,15 @@ typedef struct _KHADAS_MCU_PROTOCOL KHADAS_MCU_PROTOCOL;
 
 typedef
 EFI_STATUS
-(EFIAPI *KHADAS_MCU_SET_FAN_SPEED_PERCENTAGE) (
+(EFIAPI *KHADAS_MCU_SET_FAN_SPEED_PERCENTAGE)(
   IN KHADAS_MCU_PROTOCOL      *This,
   IN UINT8                    Percentage
   );
 
 struct _KHADAS_MCU_PROTOCOL {
-  KHADAS_MCU_SET_FAN_SPEED_PERCENTAGE   SetFanSpeedPercentage;
+  KHADAS_MCU_SET_FAN_SPEED_PERCENTAGE    SetFanSpeedPercentage;
 };
 
-extern EFI_GUID gKhadasMcuProtocolGuid;
+extern EFI_GUID  gKhadasMcuProtocolGuid;
 
 #endif // __KHADAS_MCU_H__

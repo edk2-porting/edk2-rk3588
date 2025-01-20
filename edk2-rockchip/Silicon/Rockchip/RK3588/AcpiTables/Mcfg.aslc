@@ -15,7 +15,7 @@
 // MCFG is patched by AcpiPlatformDxe.
 //
 
-RK3588_MCFG_TABLE Mcfg = {
+RK3588_MCFG_TABLE  Mcfg = {
   {
     ACPI_HEADER (
       EFI_ACPI_6_4_PCI_EXPRESS_MEMORY_MAPPED_CONFIGURATION_SPACE_BASE_ADDRESS_DESCRIPTION_TABLE_SIGNATURE,
@@ -99,4 +99,4 @@ RK3588_MCFG_TABLE Mcfg = {
   }
 };
 
-VOID* CONST ReferenceAcpiTable = &Mcfg;
+VOID *CONST  ReferenceAcpiTable = &Mcfg;

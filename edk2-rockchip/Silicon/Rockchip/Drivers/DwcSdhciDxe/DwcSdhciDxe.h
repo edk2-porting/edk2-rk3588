@@ -12,39 +12,39 @@
 #ifndef __DWCSDHCIDXE_H__
 #define __DWCSDHCIDXE_H__
 
-#define DWC_SDHCI_BASE          PcdGet32 (PcdDwcSdhciBaseAddress)
+#define DWC_SDHCI_BASE  PcdGet32 (PcdDwcSdhciBaseAddress)
 
-#define SD_MMC_HC_CLOCK_CTRL    (DWC_SDHCI_BASE + 0x2C)
-#define SD_MMC_HC_HOST_CTRL2    (DWC_SDHCI_BASE + 0x3E)
+#define SD_MMC_HC_CLOCK_CTRL  (DWC_SDHCI_BASE + 0x2C)
+#define SD_MMC_HC_HOST_CTRL2  (DWC_SDHCI_BASE + 0x3E)
 
 // eMMC Registers
-#define EMMC_HOST_CTRL3         (DWC_SDHCI_BASE + 0x508)
-#define EMMC_EMMC_CTRL          (DWC_SDHCI_BASE + 0x52C)
-#define EMMC_DLL_CTRL           (DWC_SDHCI_BASE + 0x800)
-#define EMMC_DLL_RXCLK          (DWC_SDHCI_BASE + 0x804)
-#define EMMC_DLL_TXCLK          (DWC_SDHCI_BASE + 0x808)
-#define EMMC_DLL_STRBIN         (DWC_SDHCI_BASE + 0x80C)
-#define EMMC_DLL_CMDOUT         (DWC_SDHCI_BASE + 0x810)
-#define EMMC_DLL_STATUS0        (DWC_SDHCI_BASE + 0x840)
-#define EMMC_DLL_STATUS1        (DWC_SDHCI_BASE + 0x844)
+#define EMMC_HOST_CTRL3   (DWC_SDHCI_BASE + 0x508)
+#define EMMC_EMMC_CTRL    (DWC_SDHCI_BASE + 0x52C)
+#define EMMC_DLL_CTRL     (DWC_SDHCI_BASE + 0x800)
+#define EMMC_DLL_RXCLK    (DWC_SDHCI_BASE + 0x804)
+#define EMMC_DLL_TXCLK    (DWC_SDHCI_BASE + 0x808)
+#define EMMC_DLL_STRBIN   (DWC_SDHCI_BASE + 0x80C)
+#define EMMC_DLL_CMDOUT   (DWC_SDHCI_BASE + 0x810)
+#define EMMC_DLL_STATUS0  (DWC_SDHCI_BASE + 0x840)
+#define EMMC_DLL_STATUS1  (DWC_SDHCI_BASE + 0x844)
 
-#define CLOCK_CTRL_SDCLK_ENABLE            BIT2
+#define CLOCK_CTRL_SDCLK_ENABLE  BIT2
 
-#define HOST_CTRL2_HS400                   (BIT2 | BIT1 | BIT0)
+#define HOST_CTRL2_HS400  (BIT2 | BIT1 | BIT0)
 
-#define EMMC_CTRL_CARD_IS_EMMC             BIT0
+#define EMMC_CTRL_CARD_IS_EMMC  BIT0
 
 #define EMMC_DLL_CTRL_SRST                 BIT1
 #define EMMC_DLL_CTRL_START                BIT0
 #define EMMC_DLL_CTRL_START_POINT_DEFAULT  (5 << 16)
 #define EMMC_DLL_CTRL_INCREMENT_DEFAULT    (2 << 8)
 
-#define EMMC_DLL_NO_INVERTER               BIT29
-#define EMMC_DLL_DLYENA                    BIT27
-#define EMMC_DLL_TAPNUM_FROM_SW            BIT24
+#define EMMC_DLL_NO_INVERTER     BIT29
+#define EMMC_DLL_DLYENA          BIT27
+#define EMMC_DLL_TAPNUM_FROM_SW  BIT24
 
-#define EMMC_DLL_TXCLK_TAPNUM_DEFAULT      (0x10 << 0)
-#define EMMC_DLL_TXCLK_TAPNUM_90_DEGREES   0x9
+#define EMMC_DLL_TXCLK_TAPNUM_DEFAULT     (0x10 << 0)
+#define EMMC_DLL_TXCLK_TAPNUM_90_DEGREES  0x9
 
 #define EMMC_DLL_STRBIN_TAPNUM_DEFAULT     (0x3 << 0)
 #define EMMC_DLL_STRBIN_DELAY_NUM_SEL      BIT26
@@ -55,8 +55,8 @@
 #define EMMC_DLL_CMDOUT_SRC_CLK_NEG        BIT28
 #define EMMC_DLL_CMDOUT_EN_SRC_CLK_NEG     BIT29
 
-#define EMMC_DLL_STATUS0_DLL_LOCK          BIT8
-#define EMMC_DLL_STATUS0_DLL_TIMEOUT       BIT9
+#define EMMC_DLL_STATUS0_DLL_LOCK     BIT8
+#define EMMC_DLL_STATUS0_DLL_TIMEOUT  BIT9
 
 typedef struct {
   UINT32    TimeoutFreq   : 6; // bit 0:5

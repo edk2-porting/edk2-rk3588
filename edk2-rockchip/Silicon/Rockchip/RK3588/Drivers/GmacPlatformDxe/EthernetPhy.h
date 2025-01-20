@@ -12,25 +12,25 @@
 
 typedef
 EFI_STATUS
-(EFIAPI *ETHERNET_PHY_INIT) (
+(EFIAPI *ETHERNET_PHY_INIT)(
   IN EFI_PHYSICAL_ADDRESS   GmacBase,
   IN UINT32                 PhyId
   );
 
 VOID
 PhyRead (
-  IN  EFI_PHYSICAL_ADDRESS   GmacBase,
-  IN  UINT8                  Phy,
-  IN  UINT16                 Reg,
-  OUT UINT16                 *Value
+  IN  EFI_PHYSICAL_ADDRESS  GmacBase,
+  IN  UINT8                 Phy,
+  IN  UINT16                Reg,
+  OUT UINT16                *Value
   );
 
 VOID
 PhyWrite (
-  IN EFI_PHYSICAL_ADDRESS   GmacBase,
-  IN UINT8                  Phy,
-  IN UINT16                 Reg,
-  IN UINT16                 Value
+  IN EFI_PHYSICAL_ADDRESS  GmacBase,
+  IN UINT8                 Phy,
+  IN UINT16                Reg,
+  IN UINT16                Value
   );
 
 EFI_STATUS

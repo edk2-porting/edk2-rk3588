@@ -11,7 +11,7 @@
 EFI_STATUS
 EFIAPI
 DwcSdhciSetClockRate (
-  IN UINTN Frequency
+  IN UINTN  Frequency
   );
 
 VOID

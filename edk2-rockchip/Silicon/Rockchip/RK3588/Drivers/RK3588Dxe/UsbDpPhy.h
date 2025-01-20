@@ -24,6 +24,7 @@ EFIAPI
 SetupUsbDpPhyVariables (
   VOID
   );
+
 #endif // VFR_FILE_INCLUDE
 
 #endif // __RK3588DXE_USBDP_PHY_H__

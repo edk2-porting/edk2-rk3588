@@ -5,7 +5,7 @@
  *  SPDX-License-Identifier: BSD-2-Clause-Patent
  *
  **/
- 
+
 GLOBAL_REMOVE_IF_UNREFERENCED CONST UINT32  mCrcTable[256] = {
   0x00000000,
   0x77073096,

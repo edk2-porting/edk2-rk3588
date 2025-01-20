@@ -14,41 +14,38 @@
 
 #pragma pack(1)
 
-typedef struct
-{
-  EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE       ItsNode;
-  UINT32                                   ItsIdentifiers;
+typedef struct {
+  EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE    ItsNode;
+  UINT32                                ItsIdentifiers;
 } ARM_EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE;
 
-typedef struct
-{
-  EFI_ACPI_6_0_IO_REMAPPING_RC_NODE        RcNode;
-  EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE       RcIdMap;
+typedef struct {
+  EFI_ACPI_6_0_IO_REMAPPING_RC_NODE     RcNode;
+  EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE    RcIdMap;
 } ARM_EFI_ACPI_6_0_IO_REMAPPING_RC_NODE;
 
-typedef struct
-{
-  EFI_ACPI_6_0_IO_REMAPPING_TABLE          Header;
-  ARM_EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE   Its0Node;
-  ARM_EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE   Its1Node;
-  ARM_EFI_ACPI_6_0_IO_REMAPPING_RC_NODE    Rc3x4Node;
+typedef struct {
+  EFI_ACPI_6_0_IO_REMAPPING_TABLE           Header;
+  ARM_EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE    Its0Node;
+  ARM_EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE    Its1Node;
+  ARM_EFI_ACPI_6_0_IO_REMAPPING_RC_NODE     Rc3x4Node;
 } ARM_EFI_ACPI_6_0_IO_REMAPPING_TABLE;
 
 #pragma pack (1)
 
-ARM_EFI_ACPI_6_0_IO_REMAPPING_TABLE Iort =
+ARM_EFI_ACPI_6_0_IO_REMAPPING_TABLE  Iort =
 {
   // EFI_ACPI_6_0_IO_REMAPPING_TABLE
   {
-     ACPI_HEADER  // EFI_ACPI_DESCRIPTION_HEADER
-     (
-       EFI_ACPI_6_2_IO_REMAPPING_TABLE_SIGNATURE,
-       ARM_EFI_ACPI_6_0_IO_REMAPPING_TABLE,
-       EFI_ACPI_IO_REMAPPING_TABLE_REVISION_00
-     ),
-     3,  // NumNodes
-     sizeof (EFI_ACPI_6_0_IO_REMAPPING_TABLE),  // NodeOffset
-     0,  // Reserved
+    ACPI_HEADER   // EFI_ACPI_DESCRIPTION_HEADER
+    (
+      EFI_ACPI_6_2_IO_REMAPPING_TABLE_SIGNATURE,
+      ARM_EFI_ACPI_6_0_IO_REMAPPING_TABLE,
+      EFI_ACPI_IO_REMAPPING_TABLE_REVISION_00
+    ),
+    3,                                        // NumNodes
+    sizeof (EFI_ACPI_6_0_IO_REMAPPING_TABLE), // NodeOffset
+    0,                                        // Reserved
   },
 
   // ARM_EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE
@@ -57,12 +54,12 @@ ARM_EFI_ACPI_6_0_IO_REMAPPING_TABLE Iort =
     {
       // EFI_ACPI_6_0_IO_REMAPPING_NODE
       {
-        EFI_ACPI_IORT_TYPE_ITS_GROUP,  // Type
+        EFI_ACPI_IORT_TYPE_ITS_GROUP,                    // Type
         sizeof (ARM_EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE), // Length
-        0,  // Revision
-        0,  // Reserved
-        0,  // NumIdMappings
-        0,  // IdReference
+        0,                                               // Revision
+        0,                                               // Reserved
+        0,                                               // NumIdMappings
+        0,                                               // IdReference
       },
       1,    // ITS count
     },
@@ -75,12 +72,12 @@ ARM_EFI_ACPI_6_0_IO_REMAPPING_TABLE Iort =
     {
       // EFI_ACPI_6_0_IO_REMAPPING_NODE
       {
-        EFI_ACPI_IORT_TYPE_ITS_GROUP,  // Type
+        EFI_ACPI_IORT_TYPE_ITS_GROUP,                    // Type
         sizeof (ARM_EFI_ACPI_6_0_IO_REMAPPING_ITS_NODE), // Length
-        0,  // Revision
-        0,  // Reserved
-        0,  // NumIdMappings
-        0,  // IdReference
+        0,                                               // Revision
+        0,                                               // Reserved
+        0,                                               // NumIdMappings
+        0,                                               // IdReference
       },
       1,    // ITS count
     },
@@ -92,30 +89,29 @@ ARM_EFI_ACPI_6_0_IO_REMAPPING_TABLE Iort =
     {
       // EFI_ACPI_6_0_IO_REMAPPING_NODE
       {
-        EFI_ACPI_IORT_TYPE_ROOT_COMPLEX,  // Type
-        sizeof (ARM_EFI_ACPI_6_0_IO_REMAPPING_RC_NODE),  // Length
-        0,  // Revision
-        0,  // Reserved
-        1,  // NumIdMappings
-        OFFSET_OF (ARM_EFI_ACPI_6_0_IO_REMAPPING_RC_NODE, RcIdMap)  // IdReference
+        EFI_ACPI_IORT_TYPE_ROOT_COMPLEX,                           // Type
+        sizeof (ARM_EFI_ACPI_6_0_IO_REMAPPING_RC_NODE),            // Length
+        0,                                                         // Revision
+        0,                                                         // Reserved
+        1,                                                         // NumIdMappings
+        OFFSET_OF (ARM_EFI_ACPI_6_0_IO_REMAPPING_RC_NODE, RcIdMap) // IdReference
       },
-      0,  // CacheCoherent
-      0,  // AllocationHints
-      0,  // Reserved
-      0,  // MemoryAccessFlags
-      EFI_ACPI_IORT_ROOT_COMPLEX_ATS_SUPPORTED,    // AtsAttribute
-      0x0,                                         // PciSegmentNumber
+      0,                                        // CacheCoherent
+      0,                                        // AllocationHints
+      0,                                        // Reserved
+      0,                                        // MemoryAccessFlags
+      EFI_ACPI_IORT_ROOT_COMPLEX_ATS_SUPPORTED, // AtsAttribute
+      0x0,                                      // PciSegmentNumber
     },
     // EFI_ACPI_6_0_IO_REMAPPING_ID_TABLE
     {
-      0x0000,  // InputBase
-      0xffff,  // NumIds
-      0x0000,  // OutputBase
-      OFFSET_OF (ARM_EFI_ACPI_6_0_IO_REMAPPING_TABLE, Its1Node),  // OutputReference
-      0,       // Flags
+      0x0000,                                                    // InputBase
+      0xffff,                                                    // NumIds
+      0x0000,                                                    // OutputBase
+      OFFSET_OF (ARM_EFI_ACPI_6_0_IO_REMAPPING_TABLE, Its1Node), // OutputReference
+      0,                                                         // Flags
     }
   }
 };
 
-VOID* CONST ReferenceAcpiTable = &Iort;
-
+VOID *CONST  ReferenceAcpiTable = &Iort;

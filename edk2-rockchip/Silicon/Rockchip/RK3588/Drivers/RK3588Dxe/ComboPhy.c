@@ -16,18 +16,18 @@
 #include "RK3588DxeFormSetGuid.h"
 #include "ComboPhy.h"
 
-#define COMBO_PIPE_PHY0         0xFEE00000
-#define COMBO_PIPE_PHY1         0xFEE10000
-#define COMBO_PIPE_PHY2         0xFEE20000
+#define COMBO_PIPE_PHY0  0xFEE00000
+#define COMBO_PIPE_PHY1  0xFEE10000
+#define COMBO_PIPE_PHY2  0xFEE20000
 
-#define PHP_GRF_BASE            0xFD5B0000
-#define PHP_GRF_PCIESEL_CON     0x100
+#define PHP_GRF_BASE         0xFD5B0000
+#define PHP_GRF_PCIESEL_CON  0x100
 
-#define PIPE_PHY0_GRF           0xFD5BC000
-#define PIPE_PHY1_GRF           0xFD5C0000
-#define PIPE_PHY2_GRF           0xFD5C4000
+#define PIPE_PHY0_GRF  0xFD5BC000
+#define PIPE_PHY1_GRF  0xFD5C0000
+#define PIPE_PHY2_GRF  0xFD5C4000
 
-static UINTN ComPhyReg[3][2] = {
+static UINTN  ComPhyReg[3][2] = {
   { COMBO_PIPE_PHY0, PIPE_PHY0_GRF },
   { COMBO_PIPE_PHY1, PIPE_PHY1_GRF },
   { COMBO_PIPE_PHY2, PIPE_PHY2_GRF },
@@ -37,12 +37,13 @@ STATIC
 VOID
 EFIAPI
 InitComPhyConfig (
-  UINTN PhyBaseAddr,
-  UINTN PhpBaseAddr,
-  UINT32 PhyMode
+  UINTN   PhyBaseAddr,
+  UINTN   PhpBaseAddr,
+  UINT32  PhyMode
   )
 {
-  UINT32 Val;
+  UINT32  Val;
+
   DEBUG ((DEBUG_INIT, "%a reg=%x %x mode = %d\n", __func__, PhyBaseAddr, PhpBaseAddr, PhyMode));
 
   switch (PhyMode) {
@@ -56,7 +57,7 @@ InitComPhyConfig (
       MmioWrite32 (PhyBaseAddr + 0x74, 0xc0);
 
       /* PLL KVCO tuning fine */
-      Val = MmioRead32 (PhyBaseAddr + (0x20 << 2));
+      Val  = MmioRead32 (PhyBaseAddr + (0x20 << 2));
       Val &= ~(0x7 << 2);
       Val |= 0x4 << 2;
       MmioWrite32 (PhyBaseAddr + (0x20 << 2), Val);
@@ -76,6 +77,7 @@ InitComPhyConfig (
       if (PhyBaseAddr == COMBO_PIPE_PHY1) {
         MmioWrite32 (PHP_GRF_BASE + PHP_GRF_PCIESEL_CON, BIT0 << 16);
       }
+
       break;
 
     case COMBO_PHY_MODE_SATA:
@@ -95,19 +97,19 @@ InitComPhyConfig (
 
     case COMBO_PHY_MODE_USB3:
       /* Set SSC downward spread spectrum */
-      Val = MmioRead32 (PhyBaseAddr + (0x1f << 2));
+      Val  = MmioRead32 (PhyBaseAddr + (0x1f << 2));
       Val &= ~(0x3 << 4);
       Val |= 0x01 << 4;
       MmioWrite32 (PhyBaseAddr + 0x7c, Val);
 
       /* Enable adaptive CTLE for USB3.0 Rx */
-      Val = MmioRead32 (PhyBaseAddr + (0x0e << 2));
+      Val  = MmioRead32 (PhyBaseAddr + (0x0e << 2));
       Val &= ~(0x1 << 0);
       Val |= 0x01;
       MmioWrite32 (PhyBaseAddr + (0x0e << 2), Val);
 
       /* Set PLL KVCO fine tuning signals */
-      Val = MmioRead32 (PhyBaseAddr + (0x20 << 2));
+      Val  = MmioRead32 (PhyBaseAddr + (0x20 << 2));
       Val &= ~(0x7 << 2);
       Val |= 0x2 << 2;
       MmioWrite32 (PhyBaseAddr + (0x20 << 2), Val);
@@ -116,7 +118,7 @@ InitComPhyConfig (
       MmioWrite32 (PhyBaseAddr + (0xb << 2), 0x4);
 
       /* Set PLL input clock divider 1/2 */
-      Val = MmioRead32 (PhyBaseAddr + (0x5 << 2));
+      Val  = MmioRead32 (PhyBaseAddr + (0x5 << 2));
       Val &= ~(0x3 << 6);
       Val |= 0x1 << 6;
       MmioWrite32 (PhyBaseAddr + (0x5 << 2), Val);
@@ -152,11 +154,13 @@ ApplyComboPhyVariables (
   VOID
   )
 {
-  UINTN Index;
+  UINTN  Index;
 
-  UINT32 ComPhyMode[] = { PcdGet32 (PcdComboPhy0Mode),
-                          PcdGet32 (PcdComboPhy1Mode),
-                          PcdGet32 (PcdComboPhy2Mode) };
+  UINT32  ComPhyMode[] = {
+    PcdGet32 (PcdComboPhy0Mode),
+    PcdGet32 (PcdComboPhy1Mode),
+    PcdGet32 (PcdComboPhy2Mode)
+  };
 
   /* config phy clock to 100Mhz */
   HAL_CRU_ClkSetFreq (PLL_PPLL, 100 * 1000000);
@@ -182,33 +186,45 @@ SetupComboPhyVariables (
   VOID
   )
 {
-  UINTN      Size;
-  UINT32     Var32;
-  EFI_STATUS Status;
+  UINTN       Size;
+  UINT32      Var32;
+  EFI_STATUS  Status;
 
   Size = sizeof (UINT32);
 
-  Status = gRT->GetVariable (L"ComboPhy0Mode",
-                            &gRK3588DxeFormSetGuid,
-                            NULL, &Size, &Var32);
+  Status = gRT->GetVariable (
+                  L"ComboPhy0Mode",
+                  &gRK3588DxeFormSetGuid,
+                  NULL,
+                  &Size,
+                  &Var32
+                  );
   if (EFI_ERROR (Status) || !FixedPcdGetBool (PcdComboPhy0Switchable)) {
     Status = PcdSet32S (PcdComboPhy0Mode, FixedPcdGet32 (PcdComboPhy0ModeDefault));
     ASSERT_EFI_ERROR (Status);
   }
 
-  Size = sizeof (UINT32);
-  Status = gRT->GetVariable (L"ComboPhy1Mode",
-                            &gRK3588DxeFormSetGuid,
-                            NULL, &Size, &Var32);
+  Size   = sizeof (UINT32);
+  Status = gRT->GetVariable (
+                  L"ComboPhy1Mode",
+                  &gRK3588DxeFormSetGuid,
+                  NULL,
+                  &Size,
+                  &Var32
+                  );
   if (EFI_ERROR (Status) || !FixedPcdGetBool (PcdComboPhy1Switchable)) {
     Status = PcdSet32S (PcdComboPhy1Mode, FixedPcdGet32 (PcdComboPhy1ModeDefault));
     ASSERT_EFI_ERROR (Status);
   }
 
-  Size = sizeof (UINT32);
-  Status = gRT->GetVariable (L"ComboPhy2Mode",
-                            &gRK3588DxeFormSetGuid,
-                            NULL, &Size, &Var32);
+  Size   = sizeof (UINT32);
+  Status = gRT->GetVariable (
+                  L"ComboPhy2Mode",
+                  &gRK3588DxeFormSetGuid,
+                  NULL,
+                  &Size,
+                  &Var32
+                  );
   if (EFI_ERROR (Status) || !FixedPcdGetBool (PcdComboPhy2Switchable)) {
     Status = PcdSet32S (PcdComboPhy2Mode, FixedPcdGet32 (PcdComboPhy2ModeDefault));
     ASSERT_EFI_ERROR (Status);

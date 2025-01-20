@@ -7,7 +7,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #include "Ohci.h"
 
 /**
@@ -38,6 +37,7 @@ OhciAddInterruptContextEntry (
     while (Entry->NextEntry != NULL) {
       Entry = Entry->NextEntry;
     }
+
     Entry->NextEntry = NewEntry;
   }
 
@@ -45,7 +45,6 @@ OhciAddInterruptContextEntry (
 
   return EFI_SUCCESS;
 }
-
 
 /**
 
@@ -64,26 +63,30 @@ OhciFreeInterruptContextEntry (
   IN INTERRUPT_CONTEXT_ENTRY  *Entry
   )
 {
-  TD_DESCRIPTOR           *Td;
+  TD_DESCRIPTOR  *Td;
+
   if (Entry == NULL) {
     return EFI_INVALID_PARAMETER;
   }
+
   if (Entry->UCBufferMapping != NULL) {
-    DmaUnmap(Entry->UCBufferMapping);
+    DmaUnmap (Entry->UCBufferMapping);
   }
+
   if (Entry->UCBuffer != NULL) {
-    UINTN Pages = EFI_SIZE_TO_PAGES (Entry->DataLength);
+    UINTN  Pages = EFI_SIZE_TO_PAGES (Entry->DataLength);
     DmaFreeBuffer (Pages, Entry->UCBuffer);
   }
+
   while (Entry->DataTd) {
-    Td = Entry->DataTd;
+    Td            = Entry->DataTd;
     Entry->DataTd = (TD_DESCRIPTOR *)(UINTN)(Entry->DataTd->NextTDPointer);
-    UsbHcFreeMem(Ohc->MemPool, Td, sizeof(TD_DESCRIPTOR));
+    UsbHcFreeMem (Ohc->MemPool, Td, sizeof (TD_DESCRIPTOR));
   }
-  FreePool(Entry);
+
+  FreePool (Entry);
   return EFI_SUCCESS;
 }
-
 
 /**
 
@@ -98,28 +101,29 @@ OhciFreeInterruptContextEntry (
 
 **/
 EFI_STATUS
-OhciFreeInterruptContext(
-  IN  USB_OHCI_HC_DEV     *Ohc,
-  IN  UINT8               DeviceAddress,
-  IN  UINT8               EndPointAddress,
-  OUT UINT8               *DataToggle
+OhciFreeInterruptContext (
+  IN  USB_OHCI_HC_DEV  *Ohc,
+  IN  UINT8            DeviceAddress,
+  IN  UINT8            EndPointAddress,
+  OUT UINT8            *DataToggle
   )
 {
   INTERRUPT_CONTEXT_ENTRY  *Entry;
   INTERRUPT_CONTEXT_ENTRY  *TempEntry;
   EFI_TPL                  OriginalTPL;
 
-
   OriginalTPL = gBS->RaiseTPL (TPL_NOTIFY);
 
   while (Ohc->InterruptContextList != NULL &&
-    Ohc->InterruptContextList->DeviceAddress == DeviceAddress &&
-    Ohc->InterruptContextList->EndPointAddress == EndPointAddress) {
-    TempEntry = Ohc->InterruptContextList;
+         Ohc->InterruptContextList->DeviceAddress == DeviceAddress &&
+         Ohc->InterruptContextList->EndPointAddress == EndPointAddress)
+  {
+    TempEntry                 = Ohc->InterruptContextList;
     Ohc->InterruptContextList = Ohc->InterruptContextList->NextEntry;
     if (DataToggle != NULL) {
-      *DataToggle = (UINT8) (TempEntry->DataTd->Word0.DataToggle & 0x1);
+      *DataToggle = (UINT8)(TempEntry->DataTd->Word0.DataToggle & 0x1);
     }
+
     OhciFreeInterruptContextEntry (Ohc, TempEntry);
   }
 
@@ -128,14 +132,17 @@ OhciFreeInterruptContext(
     gBS->RestoreTPL (OriginalTPL);
     return EFI_SUCCESS;
   }
+
   while (Entry->NextEntry != NULL) {
-    if (Entry->NextEntry->DeviceAddress == DeviceAddress &&
-      Entry->NextEntry->EndPointAddress == EndPointAddress) {
-      TempEntry = Entry->NextEntry;
+    if ((Entry->NextEntry->DeviceAddress == DeviceAddress) &&
+        (Entry->NextEntry->EndPointAddress == EndPointAddress))
+    {
+      TempEntry        = Entry->NextEntry;
       Entry->NextEntry = Entry->NextEntry->NextEntry;
       if (DataToggle != NULL) {
-        *DataToggle = (UINT8) (TempEntry->DataTd->Word0.DataToggle & 0x1);
+        *DataToggle = (UINT8)(TempEntry->DataTd->Word0.DataToggle & 0x1);
       }
+
       OhciFreeInterruptContextEntry (Ohc, TempEntry);
     } else {
       Entry = Entry->NextEntry;
@@ -146,7 +153,6 @@ OhciFreeInterruptContext(
 
   return EFI_SUCCESS;
 }
-
 
 /**
 
@@ -159,10 +165,10 @@ OhciFreeInterruptContext(
 **/
 UINT32
 ConvertErrorCode (
-  IN  UINT32              ErrorCode
+  IN  UINT32  ErrorCode
   )
 {
-  UINT32                  TransferResult;
+  UINT32  TransferResult;
 
   switch (ErrorCode) {
     case TD_NO_ERROR:
@@ -202,7 +208,6 @@ ConvertErrorCode (
   return TransferResult;
 }
 
-
 /**
 
   Check TDs Results
@@ -217,19 +222,19 @@ ConvertErrorCode (
 **/
 BOOLEAN
 OhciCheckTDsResults (
-  IN  USB_OHCI_HC_DEV     *Ohc,
-  IN  TD_DESCRIPTOR       *Td,
-  OUT UINT32              *Result
+  IN  USB_OHCI_HC_DEV  *Ohc,
+  IN  TD_DESCRIPTOR    *Td,
+  OUT UINT32           *Result
   )
 {
-  UINT32                  TdCompletionCode;
+  UINT32  TdCompletionCode;
 
-  *Result   = EFI_USB_NOERROR;
+  *Result = EFI_USB_NOERROR;
 
   while (Td) {
     TdCompletionCode = Td->Word0.ConditionCode;
 
-    *Result |= ConvertErrorCode(TdCompletionCode);
+    *Result |= ConvertErrorCode (TdCompletionCode);
     //
     // if any error encountered, stop processing the left TDs.
     //
@@ -239,10 +244,9 @@ OhciCheckTDsResults (
 
     Td = (TD_DESCRIPTOR *)(UINTN)(Td->NextTDPointer);
   }
+
   return TRUE;
-
 }
-
 
 /**
 
@@ -254,27 +258,30 @@ OhciCheckTDsResults (
   @retval                       Task Status Code
 
 **/
-
 UINT32
 CheckEDStatus (
-  IN  ED_DESCRIPTOR       *Ed,
-  IN  TD_DESCRIPTOR       *HeadTd,
-  OUT OHCI_ED_RESULT      *EdResult
+  IN  ED_DESCRIPTOR   *Ed,
+  IN  TD_DESCRIPTOR   *HeadTd,
+  OUT OHCI_ED_RESULT  *EdResult
   )
 {
-  while(HeadTd != NULL) {
+  while (HeadTd != NULL) {
     if (HeadTd->NextTDPointer == 0) {
       return TD_NO_ERROR;
     }
+
     if (HeadTd->Word0.ConditionCode != 0) {
       return HeadTd->Word0.ConditionCode;
     }
+
     EdResult->NextToggle = ((UINT8)(HeadTd->Word0.DataToggle) & BIT0) ^ BIT0;
-    HeadTd = (TD_DESCRIPTOR *)(UINTN)(HeadTd->NextTDPointer);
+    HeadTd               = (TD_DESCRIPTOR *)(UINTN)(HeadTd->NextTDPointer);
   }
+
   if (OhciGetEDField (Ed, ED_TDHEAD_PTR) != OhciGetEDField (Ed, ED_TDTAIL_PTR)) {
     return TD_TOBE_PROCESSED;
   }
+
   return TD_NO_ERROR;
 }
 
@@ -309,11 +316,13 @@ CheckIfDone (
       if (OhciGetHcCommandStatus (Ohc, CONTROL_LIST_FILLED) != 0) {
         return EFI_NOT_READY;
       }
+
       break;
     case BULK_LIST:
       if (OhciGetHcCommandStatus (Ohc, BULK_LIST_FILLED) != 0) {
         return EFI_NOT_READY;
       }
+
       break;
     default:
       break;
@@ -330,7 +339,6 @@ CheckIfDone (
   }
 }
 
-
 /**
 
   Convert TD condition code to Efi Status
@@ -342,10 +350,9 @@ CheckIfDone (
   @retval  EFI_DEVICE_ERROR     Error occured in processing TD
 
 **/
-
 EFI_STATUS
 OhciTDConditionCodeToStatus (
-  IN  UINT32              ConditionCode
+  IN  UINT32  ConditionCode
   )
 {
   if (ConditionCode == TD_NO_ERROR) {
@@ -367,16 +374,15 @@ OhciTDConditionCodeToStatus (
   @Param  Context               Ohc private data
 
 **/
-
 VOID
-OhciInvokeInterruptCallBack(
+OhciInvokeInterruptCallBack (
   IN  INTERRUPT_CONTEXT_ENTRY  *Entry,
   IN  UINT32                   Result
-)
+  )
 {
-  //Generally speaking, Keyboard driver should not
-  //check the Keyboard buffer if an error happens, it will be robust
-  //if we NULLed the buffer once error happens
+  // Generally speaking, Keyboard driver should not
+  // check the Keyboard buffer if an error happens, it will be robust
+  // if we NULLed the buffer once error happens
   if (Result) {
     Entry->CallBackFunction (
              NULL,
@@ -384,7 +390,7 @@ OhciInvokeInterruptCallBack(
              Entry->Context,
              Result
              );
-  }else{
+  } else {
     Entry->CallBackFunction (
              (VOID *)(UINTN)(Entry->DataTd->DataBuffer),
              Entry->DataTd->ActualSendLength,
@@ -394,7 +400,6 @@ OhciInvokeInterruptCallBack(
   }
 }
 
-
 /**
 
   Timer to submit periodic interrupt transfer, and invoke callbacks hooked on done TDs
@@ -403,15 +408,13 @@ OhciInvokeInterruptCallBack(
   @param  Context               Device private data
 
 **/
-
 VOID
 EFIAPI
 OhciHouseKeeper (
-  IN  EFI_EVENT           Event,
-  IN  VOID                *Context
+  IN  EFI_EVENT  Event,
+  IN  VOID       *Context
   )
 {
-
   USB_OHCI_HC_DEV          *Ohc;
   INTERRUPT_CONTEXT_ENTRY  *Entry;
   INTERRUPT_CONTEXT_ENTRY  *PreEntry;
@@ -419,23 +422,23 @@ OhciHouseKeeper (
   TD_DESCRIPTOR            *DataTd;
   TD_DESCRIPTOR            *HeadTd;
 
-  UINT8                    Toggle;
-  EFI_TPL                  OriginalTPL;
-  UINT32                   Result;
+  UINT8    Toggle;
+  EFI_TPL  OriginalTPL;
+  UINT32   Result;
 
-  Ohc = (USB_OHCI_HC_DEV *) Context;
-  OriginalTPL = gBS->RaiseTPL(TPL_NOTIFY);
+  Ohc         = (USB_OHCI_HC_DEV *)Context;
+  OriginalTPL = gBS->RaiseTPL (TPL_NOTIFY);
 
-  Entry = Ohc->InterruptContextList;
+  Entry    = Ohc->InterruptContextList;
   PreEntry = NULL;
 
-  while(Entry != NULL) {
-
-    OhciCheckTDsResults(Ohc, Entry->DataTd, &Result );
+  while (Entry != NULL) {
+    OhciCheckTDsResults (Ohc, Entry->DataTd, &Result);
     if (((Result & EFI_USB_ERR_STALL) == EFI_USB_ERR_STALL) ||
-      ((Result & EFI_USB_ERR_NOTEXECUTE) == EFI_USB_ERR_NOTEXECUTE)) {
+        ((Result & EFI_USB_ERR_NOTEXECUTE) == EFI_USB_ERR_NOTEXECUTE))
+    {
       PreEntry = Entry;
-      Entry = Entry->NextEntry;
+      Entry    = Entry->NextEntry;
       continue;
     }
 
@@ -446,9 +449,9 @@ OhciHouseKeeper (
         return;
       }
     }
-    if (Entry->IsPeriodic) {
 
-      Ed = Entry->Ed;
+    if (Entry->IsPeriodic) {
+      Ed     = Entry->Ed;
       HeadTd = Entry->DataTd;
       DataTd = HeadTd;
       Toggle = 0;
@@ -459,6 +462,7 @@ OhciHouseKeeper (
         if ((Ed != NULL) && (DataTd != NULL)) {
           Ed->Word0.Skip = 1;
         }
+
         //
         // From hcir1_0a.pdf 4.2.2
         // ToggleCarry:This bit is the data toggle carry bit,
@@ -470,17 +474,20 @@ OhciHouseKeeper (
         if (Ed == NULL) {
           return;
         }
-        Toggle = (UINT8) OhciGetEDField (Ed, ED_DTTOGGLE);
-        while(DataTd != NULL) {
+
+        Toggle = (UINT8)OhciGetEDField (Ed, ED_DTTOGGLE);
+        while (DataTd != NULL) {
           if (DataTd->NextTDPointer == 0) {
             DataTd->Word0.DataToggle = 0;
             break;
           } else {
             OhciSetTDField (DataTd, TD_DT_TOGGLE, Toggle);
           }
-          DataTd = (TD_DESCRIPTOR *)(UINTN)(DataTd->NextTDPointer);
+
+          DataTd  = (TD_DESCRIPTOR *)(UINTN)(DataTd->NextTDPointer);
           Toggle ^= 1;
         }
+
         //
         // HC will only update DataToggle, ErrorCount, ConditionCode
         // CurrentBufferPointer & NextTD, so we only need to update
@@ -492,12 +499,14 @@ OhciHouseKeeper (
             OhciSetTDField (DataTd, TD_ERROR_CNT | TD_COND_CODE | TD_CURR_BUFFER_PTR | TD_NEXT_PTR, 0);
             break;
           }
+
           OhciSetTDField (DataTd, TD_ERROR_CNT, 0);
           OhciSetTDField (DataTd, TD_COND_CODE, TD_TOBE_PROCESSED);
-          DataTd->NextTD = DataTd->NextTDPointer;
+          DataTd->NextTD            = DataTd->NextTDPointer;
           DataTd->CurrBufferPointer = DataTd->DataBuffer;
-          DataTd = (TD_DESCRIPTOR *)(UINTN)(DataTd->NextTDPointer);
+          DataTd                    = (TD_DESCRIPTOR *)(UINTN)(DataTd->NextTDPointer);
         }
+
         //
         // Active current Ed,Td
         //
@@ -516,16 +525,18 @@ OhciHouseKeeper (
       if (PreEntry == NULL) {
         Ohc->InterruptContextList = Entry->NextEntry;
       } else {
-        PreEntry = Entry;
+        PreEntry            = Entry;
         PreEntry->NextEntry = Entry->NextEntry;
       }
+
       OhciFreeInterruptContextEntry (Ohc, PreEntry);
       gBS->RestoreTPL (OriginalTPL);
       return;
     }
+
     PreEntry = Entry;
-    Entry = Entry->NextEntry;
+    Entry    = Entry->NextEntry;
   }
+
   gBS->RestoreTPL (OriginalTPL);
 }
-

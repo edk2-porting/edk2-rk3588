@@ -7,42 +7,39 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
-
 #ifndef _OHCI_SCHED_H
 #define _OHCI_SCHED_H
 
 #include "Descriptor.h"
 
-#define HCCA_MEM_SIZE     256
-#define GRID_SIZE         16
-#define GRID_SHIFT        4
+#define HCCA_MEM_SIZE  256
+#define GRID_SIZE      16
+#define GRID_SHIFT     4
 
 typedef struct _INTERRUPT_CONTEXT_ENTRY INTERRUPT_CONTEXT_ENTRY;
 
-struct _INTERRUPT_CONTEXT_ENTRY{
-  UINT8                               DeviceAddress;
-  UINT8                               EndPointAddress;
-  ED_DESCRIPTOR                       *Ed;
-  TD_DESCRIPTOR                       *DataTd;
-  BOOLEAN                             IsSlowDevice;
-  UINT8                               MaxPacketLength;
-  UINTN                               PollingInterval;
-  EFI_ASYNC_USB_TRANSFER_CALLBACK     CallBackFunction;
-  VOID                                *Context;
-  BOOLEAN                             IsPeriodic;
-  VOID                                *Buffer;
-  UINTN                               DataLength;
-  VOID                                *UCBuffer;
-  VOID                                *UCBufferMapping;
-  UINT8                               *Toggle;
-  INTERRUPT_CONTEXT_ENTRY      *NextEntry;
+struct _INTERRUPT_CONTEXT_ENTRY {
+  UINT8                              DeviceAddress;
+  UINT8                              EndPointAddress;
+  ED_DESCRIPTOR                      *Ed;
+  TD_DESCRIPTOR                      *DataTd;
+  BOOLEAN                            IsSlowDevice;
+  UINT8                              MaxPacketLength;
+  UINTN                              PollingInterval;
+  EFI_ASYNC_USB_TRANSFER_CALLBACK    CallBackFunction;
+  VOID                               *Context;
+  BOOLEAN                            IsPeriodic;
+  VOID                               *Buffer;
+  UINTN                              DataLength;
+  VOID                               *UCBuffer;
+  VOID                               *UCBufferMapping;
+  UINT8                              *Toggle;
+  INTERRUPT_CONTEXT_ENTRY            *NextEntry;
 };
 
-
 typedef struct {
-  UINT32                  ErrorCode;
-  UINT8                   NextToggle;
+  UINT32    ErrorCode;
+  UINT8     NextToggle;
 } OHCI_ED_RESULT;
 
 /**
@@ -91,13 +88,12 @@ OhciFreeInterruptContextEntry (
 
 **/
 EFI_STATUS
-OhciFreeInterruptContext(
-  IN  USB_OHCI_HC_DEV     *Ohc,
-  IN  UINT8               DeviceAddress,
-  IN  UINT8               EndPointAddress,
-  OUT UINT8               *DataToggle
+OhciFreeInterruptContext (
+  IN  USB_OHCI_HC_DEV  *Ohc,
+  IN  UINT8            DeviceAddress,
+  IN  UINT8            EndPointAddress,
+  OUT UINT8            *DataToggle
   );
-
 
 /**
 
@@ -110,9 +106,8 @@ OhciFreeInterruptContext(
 **/
 UINT32
 ConvertErrorCode (
-  IN  UINT32              ErrorCode
+  IN  UINT32  ErrorCode
   );
-
 
 /**
 
@@ -128,10 +123,11 @@ ConvertErrorCode (
 **/
 BOOLEAN
 OhciCheckTDsResults (
-  IN  USB_OHCI_HC_DEV     *Ohc,
-  IN  TD_DESCRIPTOR       *Td,
-  OUT UINT32              *Result
+  IN  USB_OHCI_HC_DEV  *Ohc,
+  IN  TD_DESCRIPTOR    *Td,
+  OUT UINT32           *Result
   );
+
 /**
 
   Check the task status on an ED
@@ -145,10 +141,11 @@ OhciCheckTDsResults (
 
 UINT32
 CheckEDStatus (
-  IN  ED_DESCRIPTOR       *Ed,
-  IN  TD_DESCRIPTOR       *HeadTd,
-  OUT OHCI_ED_RESULT      *EdResult
+  IN  ED_DESCRIPTOR   *Ed,
+  IN  TD_DESCRIPTOR   *HeadTd,
+  OUT OHCI_ED_RESULT  *EdResult
   );
+
 /**
 
   Check the task status
@@ -187,7 +184,7 @@ CheckIfDone (
 
 EFI_STATUS
 OhciTDConditionCodeToStatus (
-  IN  UINT32              ConditionCode
+  IN  UINT32  ConditionCode
   );
 
 /**
@@ -200,11 +197,10 @@ OhciTDConditionCodeToStatus (
 **/
 
 VOID
-OhciInvokeInterruptCallBack(
+OhciInvokeInterruptCallBack (
   IN  INTERRUPT_CONTEXT_ENTRY  *Entry,
   IN  UINT32                   Result
-);
-
+  );
 
 /**
 
@@ -218,8 +214,8 @@ OhciInvokeInterruptCallBack(
 VOID
 EFIAPI
 OhciHouseKeeper (
-  IN  EFI_EVENT           Event,
-  IN  VOID                *Context
+  IN  EFI_EVENT  Event,
+  IN  VOID       *Context
   );
 
 #endif

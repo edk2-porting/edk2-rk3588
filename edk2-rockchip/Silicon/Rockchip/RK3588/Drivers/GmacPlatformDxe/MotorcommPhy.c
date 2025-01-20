@@ -14,45 +14,50 @@
 #include "EthernetPhy.h"
 
 /* Motorcomm PHY registers */
-#define EXT_REG_ADDR                  0x1E
-#define EXT_REG_DATA                  0x1F
-#define PHY_CLOCK_GATING_REG          0x0C
-#define  RX_CLK_EN                    BIT12
-#define  TX_CLK_DELAY_SEL_SHIFT       4
-#define  TX_CLK_DELAY_SEL             (0xFU << TX_CLK_DELAY_SEL_SHIFT)
-#define  CLK_25M_SEL_SHIFT            1
-#define  CLK_25M_SEL_MASK             (0x3U << CLK_25M_SEL_SHIFT)
-#define  CLK_25M_SEL_125M             (3U << CLK_25M_SEL_SHIFT)
-#define  RX_CLK_DELAY_EN              BIT0
-#define PHY_SLEEP_CONTROL1_REG        0x27
-#define  SLEEP_SW                     BIT15
-#define  PLLON_IN_SLP                 BIT14
+#define EXT_REG_ADDR             0x1E
+#define EXT_REG_DATA             0x1F
+#define PHY_CLOCK_GATING_REG     0x0C
+#define  RX_CLK_EN               BIT12
+#define  TX_CLK_DELAY_SEL_SHIFT  4
+#define  TX_CLK_DELAY_SEL        (0xFU << TX_CLK_DELAY_SEL_SHIFT)
+#define  CLK_25M_SEL_SHIFT       1
+#define  CLK_25M_SEL_MASK        (0x3U << CLK_25M_SEL_SHIFT)
+#define  CLK_25M_SEL_125M        (3U << CLK_25M_SEL_SHIFT)
+#define  RX_CLK_DELAY_EN         BIT0
+#define PHY_SLEEP_CONTROL1_REG   0x27
+#define  SLEEP_SW                BIT15
+#define  PLLON_IN_SLP            BIT14
 
-#define YTPHY_SYNCE_CFG_REG                 0xA012
-#define  YT8531_SCR_SYNCE_ENABLE            BIT6
-#define  YT8531_SCR_CLK_FRE_SEL_125M        BIT4
-#define  YT8531_SCR_CLK_SRC_SEL_SHIFT       1
-#define  YT8531_SCR_CLK_SRC_SEL_PLL_125M    (0 << YT8531_SCR_CLK_SRC_SEL_SHIFT)
+#define YTPHY_SYNCE_CFG_REG               0xA012
+#define  YT8531_SCR_SYNCE_ENABLE          BIT6
+#define  YT8531_SCR_CLK_FRE_SEL_125M      BIT4
+#define  YT8531_SCR_CLK_SRC_SEL_SHIFT     1
+#define  YT8531_SCR_CLK_SRC_SEL_PLL_125M  (0 << YT8531_SCR_CLK_SRC_SEL_SHIFT)
 
-#define LED1_CFG_REG            0xA00D
-#define LED2_CFG_REG            0xA00E
-#define LED_BLINK_CFG_REG       0xA00F
+#define LED1_CFG_REG       0xA00D
+#define LED2_CFG_REG       0xA00E
+#define LED_BLINK_CFG_REG  0xA00F
 
 STATIC
 VOID
 YT8531PhyInit (
-  IN EFI_PHYSICAL_ADDRESS GmacBase
+  IN EFI_PHYSICAL_ADDRESS  GmacBase
   )
 {
-  UINT16 OldAddr;
-  UINT16 Data;
+  UINT16  OldAddr;
+  UINT16  Data;
 
   PhyRead (GmacBase, 0, EXT_REG_ADDR, &OldAddr);
 
   PhyWrite (GmacBase, 0, EXT_REG_ADDR, YTPHY_SYNCE_CFG_REG);
-  PhyWrite (GmacBase, 0, EXT_REG_DATA, YT8531_SCR_SYNCE_ENABLE |
-                                       YT8531_SCR_CLK_FRE_SEL_125M |
-                                       YT8531_SCR_CLK_SRC_SEL_PLL_125M);
+  PhyWrite (
+    GmacBase,
+    0,
+    EXT_REG_DATA,
+    YT8531_SCR_SYNCE_ENABLE |
+    YT8531_SCR_CLK_FRE_SEL_125M |
+    YT8531_SCR_CLK_SRC_SEL_PLL_125M
+    );
 
   PhyWrite (GmacBase, 0, EXT_REG_ADDR, PHY_CLOCK_GATING_REG);
   PhyRead (GmacBase, 0, EXT_REG_DATA, &Data);
@@ -93,5 +98,6 @@ MotorcommPhyInit (
     default:
       return EFI_UNSUPPORTED;
   }
+
   return EFI_SUCCESS;
 }

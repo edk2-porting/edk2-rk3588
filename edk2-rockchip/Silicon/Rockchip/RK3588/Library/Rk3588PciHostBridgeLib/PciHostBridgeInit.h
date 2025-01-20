@@ -12,7 +12,7 @@
 
 EFI_STATUS
 InitializePciHost (
-  UINT32 Segment
+  UINT32  Segment
   );
 
 #endif /* PCIHOSTBRIDGEINIT_H__ */

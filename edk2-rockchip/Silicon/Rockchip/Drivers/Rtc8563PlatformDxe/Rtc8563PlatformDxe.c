@@ -22,25 +22,30 @@ RockchipI2cMasterRegistrationEvent (
   IN  VOID       *Context
   )
 {
-  EFI_STATUS                     Status;
-  EFI_HANDLE                     *Handles;
-  UINTN                          NumHandles;
-  ROCKCHIP_I2C_MASTER_PROTOCOL   *RockchipI2cMaster;
-  UINTN                          Index;
+  EFI_STATUS                    Status;
+  EFI_HANDLE                    *Handles;
+  UINTN                         NumHandles;
+  ROCKCHIP_I2C_MASTER_PROTOCOL  *RockchipI2cMaster;
+  UINTN                         Index;
 
   Handles = NULL;
-  Status = gBS->LocateHandleBuffer (
-                  ByProtocol,
-                  &gRockchipI2cMasterProtocolGuid,
-                  NULL,
-                  &NumHandles,
-                  &Handles
-                  );
-  if (EFI_ERROR(Status)) {
+  Status  = gBS->LocateHandleBuffer (
+                   ByProtocol,
+                   &gRockchipI2cMasterProtocolGuid,
+                   NULL,
+                   &NumHandles,
+                   &Handles
+                   );
+  if (EFI_ERROR (Status)) {
     if (Status != EFI_NOT_FOUND) {
-        DEBUG((DEBUG_WARN, "%a: Failed to locate gRockchipI2cMasterProtocolGuid. Status=%r\n",
-               __FUNCTION__, Status));
+      DEBUG ((
+        DEBUG_WARN,
+        "%a: Failed to locate gRockchipI2cMasterProtocolGuid. Status=%r\n",
+        __FUNCTION__,
+        Status
+        ));
     }
+
     return;
   }
 
@@ -60,14 +65,18 @@ RockchipI2cMasterRegistrationEvent (
     }
 
     Status = gBS->InstallMultipleProtocolInterfaces (
-                &Handles[Index],
-                &gPcf8563RealTimeClockLibI2cMasterProtocolGuid,
-                NULL,
-                NULL
-                );
+                    &Handles[Index],
+                    &gPcf8563RealTimeClockLibI2cMasterProtocolGuid,
+                    NULL,
+                    NULL
+                    );
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: Failed to install gPcf8563RealTimeClockLibI2cMasterProtocolGuid: %r\n",
-              __FUNCTION__, Status));
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Failed to install gPcf8563RealTimeClockLibI2cMasterProtocolGuid: %r\n",
+        __FUNCTION__,
+        Status
+        ));
       continue;
     }
 
@@ -80,19 +89,19 @@ RockchipI2cMasterRegistrationEvent (
 EFI_STATUS
 EFIAPI
 Rtc8563PlatformDxeInitialize (
-  IN EFI_HANDLE          ImageHandle,
-  IN EFI_SYSTEM_TABLE    *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  VOID *Registration = NULL;
+  VOID  *Registration = NULL;
 
   EfiCreateProtocolNotifyEvent (
-      &gRockchipI2cMasterProtocolGuid,
-      TPL_CALLBACK,
-      RockchipI2cMasterRegistrationEvent,
-      NULL,
-      &Registration
-      );
+    &gRockchipI2cMasterProtocolGuid,
+    TPL_CALLBACK,
+    RockchipI2cMasterRegistrationEvent,
+    NULL,
+    &Registration
+    );
 
   return EFI_SUCCESS;
 }

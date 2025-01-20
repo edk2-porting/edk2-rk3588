@@ -17,7 +17,7 @@
 #include <Library/DevicePathLib.h>
 #include <Library/PrintLib.h>
 
-CHAR16               mBootDescFirmwareSuffix[]       = L" [Fw]";
+CHAR16  mBootDescFirmwareSuffix[] = L" [Fw]";
 
 STATIC
 BOOLEAN
@@ -59,7 +59,7 @@ PlatformBootDescriptionHandler (
   if (DevicePath->SubType == MSG_EMMC_DP) {
     DevicePath = NextDevicePathNode (DevicePath);
     if (DevicePath->SubType == HW_CONTROLLER_DP) {
-      if (((CONTROLLER_DEVICE_PATH *) DevicePath)->ControllerNumber != EmmcPartitionUserData) {
+      if (((CONTROLLER_DEVICE_PATH *)DevicePath)->ControllerNumber != EmmcPartitionUserData) {
         //
         // There can only be one boot device.
         // eMMC has multiple partitions, but I don't know if it's possible
@@ -77,8 +77,8 @@ PlatformBootDescriptionHandler (
   }
 
   DescSize = StrSize (DefaultDescription) - sizeof (CHAR16)           // "UEFI ..."
-              + StrSize (mBootDescFirmwareSuffix) - sizeof (CHAR16)   // " [Fw]"
-              + sizeof (CHAR16);                                      // '\0'
+             + StrSize (mBootDescFirmwareSuffix) - sizeof (CHAR16)    // " [Fw]"
+             + sizeof (CHAR16);                                       // '\0'
 
   Desc = AllocateCopyPool (DescSize, DefaultDescription);
   if (Desc == NULL) {

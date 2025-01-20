@@ -24,9 +24,9 @@
 
 #include "DwMmcHci.h"
 
-extern EFI_COMPONENT_NAME_PROTOCOL  gDwMmcHcComponentName;
-extern EFI_COMPONENT_NAME2_PROTOCOL gDwMmcHcComponentName2;
-extern EFI_DRIVER_BINDING_PROTOCOL  gDwMmcHcDriverBinding;
+extern EFI_COMPONENT_NAME_PROTOCOL   gDwMmcHcComponentName;
+extern EFI_COMPONENT_NAME2_PROTOCOL  gDwMmcHcComponentName2;
+extern EFI_DRIVER_BINDING_PROTOCOL   gDwMmcHcDriverBinding;
 
 #define DW_MMC_HC_PRIVATE_SIGNATURE  SIGNATURE_32 ('d', 'w', 's', 'd')
 
@@ -36,92 +36,92 @@ extern EFI_DRIVER_BINDING_PROTOCOL  gDwMmcHcDriverBinding;
 //
 // Generic time out value, 1 microsecond as unit.
 //
-#define DW_MMC_HC_GENERIC_TIMEOUT     (1 * 1000 * 1000)
+#define DW_MMC_HC_GENERIC_TIMEOUT  (1 * 1000 * 1000)
 
 //
 // SD/MMC async transfer timer interval, set by experience.
 // The unit is 100us, takes 1ms as interval.
 //
-#define DW_MMC_HC_ASYNC_TIMER         EFI_TIMER_PERIOD_MILLISECONDS(1)
+#define DW_MMC_HC_ASYNC_TIMER  EFI_TIMER_PERIOD_MILLISECONDS(1)
 //
 // SD/MMC removable device enumeration timer interval, set by experience.
 // The unit is 100us, takes 100ms as interval.
 //
-#define DW_MMC_HC_ENUM_TIMER          EFI_TIMER_PERIOD_MILLISECONDS(100)
+#define DW_MMC_HC_ENUM_TIMER  EFI_TIMER_PERIOD_MILLISECONDS(100)
 
 typedef struct {
-  BOOLEAN                             Enable;
-  EFI_SD_MMC_SLOT_TYPE                SlotType;
-  BOOLEAN                             MediaPresent;
-  BOOLEAN                             Initialized;
-  SD_MMC_CARD_TYPE                    CardType;
+  BOOLEAN                 Enable;
+  EFI_SD_MMC_SLOT_TYPE    SlotType;
+  BOOLEAN                 MediaPresent;
+  BOOLEAN                 Initialized;
+  SD_MMC_CARD_TYPE        CardType;
 } DW_MMC_HC_SLOT;
 
 typedef struct {
-  UINTN                               Signature;
+  UINTN                            Signature;
 
-  EFI_HANDLE                          ControllerHandle;
+  EFI_HANDLE                       ControllerHandle;
 
   // Mmio base address
-  UINTN                               DevBase;
+  UINTN                            DevBase;
 
-  EFI_SD_MMC_PASS_THRU_PROTOCOL       PassThru;
+  EFI_SD_MMC_PASS_THRU_PROTOCOL    PassThru;
 
-  PLATFORM_DW_MMC_PROTOCOL            *PlatformDwMmc;
+  PLATFORM_DW_MMC_PROTOCOL         *PlatformDwMmc;
   //
   // The field is used to record the previous slot in GetNextSlot().
   //
-  UINT8                               PreviousSlot;
+  UINT8                            PreviousSlot;
   //
   // For Non-blocking operation.
   //
-  EFI_EVENT                           TimerEvent;
+  EFI_EVENT                        TimerEvent;
   //
   // For Sd removable device enumeration.
   //
-  EFI_EVENT                           ConnectEvent;
-  LIST_ENTRY                          Queue;
+  EFI_EVENT                        ConnectEvent;
+  LIST_ENTRY                       Queue;
 
-  DW_MMC_HC_SLOT                      Slot[DW_MMC_HC_MAX_SLOT];
-  DW_MMC_HC_SLOT_CAP                  Capability[DW_MMC_HC_MAX_SLOT];
-  UINT64                              MaxCurrent[DW_MMC_HC_MAX_SLOT];
+  DW_MMC_HC_SLOT                   Slot[DW_MMC_HC_MAX_SLOT];
+  DW_MMC_HC_SLOT_CAP               Capability[DW_MMC_HC_MAX_SLOT];
+  UINT64                           MaxCurrent[DW_MMC_HC_MAX_SLOT];
 
-  UINT32                              ControllerVersion;
+  UINT32                           ControllerVersion;
 } DW_MMC_HC_PRIVATE_DATA;
 
-#define DW_MMC_HC_TRB_SIG             SIGNATURE_32 ('D', 'T', 'R', 'B')
+#define DW_MMC_HC_TRB_SIG  SIGNATURE_32 ('D', 'T', 'R', 'B')
 
 //
 // TRB (Transfer Request Block) contains information for the cmd request.
 //
 typedef struct {
-  UINT32                              Signature;
-  LIST_ENTRY                          TrbList;
+  UINT32                                 Signature;
+  LIST_ENTRY                             TrbList;
 
-  UINT8                               Slot;
-  UINT16                              BlockSize;
+  UINT8                                  Slot;
+  UINT16                                 BlockSize;
 
-  EFI_SD_MMC_PASS_THRU_COMMAND_PACKET *Packet;
-  VOID                                *Data;
-  UINT32                              DataLen;
-  BOOLEAN                             Read;
-  EFI_PHYSICAL_ADDRESS                DataPhy;
-  VOID                                *DataMap;
-  DW_MMC_HC_TRANSFER_MODE             Mode;
+  EFI_SD_MMC_PASS_THRU_COMMAND_PACKET    *Packet;
+  VOID                                   *Data;
+  UINT32                                 DataLen;
+  BOOLEAN                                Read;
+  EFI_PHYSICAL_ADDRESS                   DataPhy;
+  VOID                                   *DataMap;
+  DW_MMC_HC_TRANSFER_MODE                Mode;
 
-  EFI_EVENT                           Event;
-  BOOLEAN                             Started;
-  UINT64                              Timeout;
+  EFI_EVENT                              Event;
+  BOOLEAN                                Started;
+  UINT64                                 Timeout;
 
-  DW_MMC_HC_DMA_DESC_LINE             *DmaDesc;
-  EFI_PHYSICAL_ADDRESS                DmaDescPhy;
-  UINT32                              DmaDescPages;
-  VOID                                *DmaMap;
+  DW_MMC_HC_DMA_DESC_LINE                *DmaDesc;
+  EFI_PHYSICAL_ADDRESS                   DmaDescPhy;
+  UINT32                                 DmaDescPages;
+  VOID                                   *DmaMap;
 
-  BOOLEAN                             UseFifo;
-  BOOLEAN                             UseBE;                  // Big-endian
+  BOOLEAN                                UseFifo;
+  BOOLEAN                                UseBE;               // Big-endian
 
-  DW_MMC_HC_PRIVATE_DATA              *Private;
+  DW_MMC_HC_PRIVATE_DATA                 *Private;
 } DW_MMC_HC_TRB;
 
 #define DW_MMC_HC_TRB_FROM_THIS(a) \
@@ -131,22 +131,23 @@ typedef struct {
 // Task for Non-blocking mode.
 //
 typedef struct {
-  UINT32                              Signature;
-  LIST_ENTRY                          Link;
+  UINT32                                 Signature;
+  LIST_ENTRY                             Link;
 
-  UINT8                               Slot;
-  EFI_SD_MMC_PASS_THRU_COMMAND_PACKET *Packet;
-  BOOLEAN                             IsStart;
-  EFI_EVENT                           Event;
-  UINT64                              RetryTimes;
-  BOOLEAN                             InfiniteWait;
-  VOID                                *Map;
-  VOID                                *MapAddress;
+  UINT8                                  Slot;
+  EFI_SD_MMC_PASS_THRU_COMMAND_PACKET    *Packet;
+  BOOLEAN                                IsStart;
+  EFI_EVENT                              Event;
+  UINT64                                 RetryTimes;
+  BOOLEAN                                InfiniteWait;
+  VOID                                   *Map;
+  VOID                                   *MapAddress;
 } DW_MMC_HC_QUEUE;
 
 //
 // Prototypes
 //
+
 /**
   Execute card identification procedure.
 
@@ -159,7 +160,7 @@ typedef struct {
 typedef
 EFI_STATUS
 (*DWMMC_CARD_TYPE_DETECT_ROUTINE) (
-  IN DW_MMC_HC_PRIVATE_DATA             *Private
+  IN DW_MMC_HC_PRIVATE_DATA  *Private
   );
 
 /**
@@ -207,10 +208,10 @@ EFI_STATUS
 EFI_STATUS
 EFIAPI
 DwMmcPassThruPassThru (
-  IN     EFI_SD_MMC_PASS_THRU_PROTOCOL         *This,
-  IN     UINT8                                 Slot,
-  IN OUT EFI_SD_MMC_PASS_THRU_COMMAND_PACKET   *Packet,
-  IN     EFI_EVENT                             Event    OPTIONAL
+  IN     EFI_SD_MMC_PASS_THRU_PROTOCOL        *This,
+  IN     UINT8                                Slot,
+  IN OUT EFI_SD_MMC_PASS_THRU_COMMAND_PACKET  *Packet,
+  IN     EFI_EVENT                            Event    OPTIONAL
   );
 
 /**
@@ -251,8 +252,8 @@ DwMmcPassThruPassThru (
 EFI_STATUS
 EFIAPI
 DwMmcPassThruGetNextSlot (
-  IN     EFI_SD_MMC_PASS_THRU_PROTOCOL        *This,
-  IN OUT UINT8                                *Slot
+  IN     EFI_SD_MMC_PASS_THRU_PROTOCOL  *This,
+  IN OUT UINT8                          *Slot
   );
 
 /**
@@ -301,9 +302,9 @@ DwMmcPassThruGetNextSlot (
 EFI_STATUS
 EFIAPI
 DwMmcPassThruBuildDevicePath (
-  IN     EFI_SD_MMC_PASS_THRU_PROTOCOL       *This,
-  IN     UINT8                               Slot,
-  IN OUT EFI_DEVICE_PATH_PROTOCOL            **DevicePath
+  IN     EFI_SD_MMC_PASS_THRU_PROTOCOL  *This,
+  IN     UINT8                          Slot,
+  IN OUT EFI_DEVICE_PATH_PROTOCOL       **DevicePath
   );
 
 /**
@@ -332,9 +333,9 @@ DwMmcPassThruBuildDevicePath (
 EFI_STATUS
 EFIAPI
 DwMmcPassThruGetSlotNumber (
-  IN  EFI_SD_MMC_PASS_THRU_PROTOCOL          *This,
-  IN  EFI_DEVICE_PATH_PROTOCOL               *DevicePath,
-  OUT UINT8                                  *Slot
+  IN  EFI_SD_MMC_PASS_THRU_PROTOCOL  *This,
+  IN  EFI_DEVICE_PATH_PROTOCOL       *DevicePath,
+  OUT UINT8                          *Slot
   );
 
 /**
@@ -366,13 +367,14 @@ DwMmcPassThruGetSlotNumber (
 EFI_STATUS
 EFIAPI
 DwMmcPassThruResetDevice (
-  IN EFI_SD_MMC_PASS_THRU_PROTOCOL           *This,
-  IN UINT8                                   Slot
+  IN EFI_SD_MMC_PASS_THRU_PROTOCOL  *This,
+  IN UINT8                          Slot
   );
 
 //
 // Driver model protocol interfaces
 //
+
 /**
   Tests to see if this driver supports a given controller. If a child device is
   provided, it further tests to see if this driver supports creating a handle
@@ -428,9 +430,9 @@ DwMmcPassThruResetDevice (
 EFI_STATUS
 EFIAPI
 DwMmcHcDriverBindingSupported (
-  IN EFI_DRIVER_BINDING_PROTOCOL *This,
-  IN EFI_HANDLE                  Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL    *RemainingDevicePath
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   );
 
 /**
@@ -483,9 +485,9 @@ DwMmcHcDriverBindingSupported (
 EFI_STATUS
 EFIAPI
 DwMmcHcDriverBindingStart (
-  IN EFI_DRIVER_BINDING_PROTOCOL     *This,
-  IN EFI_HANDLE                      Controller,
-  IN EFI_DEVICE_PATH_PROTOCOL        *RemainingDevicePath
+  IN EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN EFI_HANDLE                   Controller,
+  IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath
   );
 
 /**
@@ -523,15 +525,16 @@ DwMmcHcDriverBindingStart (
 EFI_STATUS
 EFIAPI
 DwMmcHcDriverBindingStop (
-  IN  EFI_DRIVER_BINDING_PROTOCOL     *This,
-  IN  EFI_HANDLE                      Controller,
-  IN  UINTN                           NumberOfChildren,
-  IN  EFI_HANDLE                      *ChildHandleBuffer
+  IN  EFI_DRIVER_BINDING_PROTOCOL  *This,
+  IN  EFI_HANDLE                   Controller,
+  IN  UINTN                        NumberOfChildren,
+  IN  EFI_HANDLE                   *ChildHandleBuffer
   );
 
 //
 // EFI Component Name Functions
 //
+
 /**
   Retrieves a Unicode string that is the user readable name of the driver.
 
@@ -574,9 +577,9 @@ DwMmcHcDriverBindingStop (
 EFI_STATUS
 EFIAPI
 DwMmcHcComponentNameGetDriverName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL     *This,
-  IN  CHAR8                           *Language,
-  OUT CHAR16                          **DriverName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **DriverName
   );
 
 /**
@@ -650,9 +653,9 @@ DwMmcHcComponentNameGetDriverName (
 EFI_STATUS
 EFIAPI
 DwMmcHcComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL     *This,
-  IN  EFI_HANDLE                      ControllerHandle,
-  IN  EFI_HANDLE                      ChildHandle, OPTIONAL
+  IN  EFI_COMPONENT_NAME_PROTOCOL *This,
+  IN  EFI_HANDLE ControllerHandle,
+  IN  EFI_HANDLE ChildHandle, OPTIONAL
   IN  CHAR8                           *Language,
   OUT CHAR16                          **ControllerName
   );
@@ -674,10 +677,10 @@ DwMmcHcComponentNameGetControllerName (
 **/
 DW_MMC_HC_TRB *
 DwMmcCreateTrb (
-  IN DW_MMC_HC_PRIVATE_DATA              *Private,
-  IN UINT8                               Slot,
-  IN EFI_SD_MMC_PASS_THRU_COMMAND_PACKET *Packet,
-  IN EFI_EVENT                           Event
+  IN DW_MMC_HC_PRIVATE_DATA               *Private,
+  IN UINT8                                Slot,
+  IN EFI_SD_MMC_PASS_THRU_COMMAND_PACKET  *Packet,
+  IN EFI_EVENT                            Event
   );
 
 /**
@@ -688,7 +691,7 @@ DwMmcCreateTrb (
 **/
 VOID
 DwMmcFreeTrb (
-  IN DW_MMC_HC_TRB           *Trb
+  IN DW_MMC_HC_TRB  *Trb
   );
 
 /**
@@ -704,8 +707,8 @@ DwMmcFreeTrb (
 **/
 EFI_STATUS
 DwMmcCheckTrbEnv (
-  IN DW_MMC_HC_PRIVATE_DATA           *Private,
-  IN DW_MMC_HC_TRB                    *Trb
+  IN DW_MMC_HC_PRIVATE_DATA  *Private,
+  IN DW_MMC_HC_TRB           *Trb
   );
 
 /**
@@ -721,8 +724,8 @@ DwMmcCheckTrbEnv (
 **/
 EFI_STATUS
 DwMmcWaitTrbEnv (
-  IN DW_MMC_HC_PRIVATE_DATA           *Private,
-  IN DW_MMC_HC_TRB                    *Trb
+  IN DW_MMC_HC_PRIVATE_DATA  *Private,
+  IN DW_MMC_HC_TRB           *Trb
   );
 
 /**
@@ -738,8 +741,8 @@ DwMmcWaitTrbEnv (
 **/
 EFI_STATUS
 DwMmcExecTrb (
-  IN DW_MMC_HC_PRIVATE_DATA           *Private,
-  IN DW_MMC_HC_TRB                    *Trb
+  IN DW_MMC_HC_PRIVATE_DATA  *Private,
+  IN DW_MMC_HC_TRB           *Trb
   );
 
 /**
@@ -755,8 +758,8 @@ DwMmcExecTrb (
 **/
 EFI_STATUS
 DwMmcCheckTrbResult (
-  IN DW_MMC_HC_PRIVATE_DATA           *Private,
-  IN DW_MMC_HC_TRB                    *Trb
+  IN DW_MMC_HC_PRIVATE_DATA  *Private,
+  IN DW_MMC_HC_TRB           *Trb
   );
 
 /**
@@ -771,8 +774,8 @@ DwMmcCheckTrbResult (
 **/
 EFI_STATUS
 DwMmcWaitTrbResult (
-  IN DW_MMC_HC_PRIVATE_DATA           *Private,
-  IN DW_MMC_HC_TRB                    *Trb
+  IN DW_MMC_HC_PRIVATE_DATA  *Private,
+  IN DW_MMC_HC_TRB           *Trb
   );
 
 /**
@@ -788,7 +791,7 @@ DwMmcWaitTrbResult (
 **/
 EFI_STATUS
 EmmcIdentification (
-  IN DW_MMC_HC_PRIVATE_DATA             *Private
+  IN DW_MMC_HC_PRIVATE_DATA  *Private
   );
 
 /**
@@ -804,7 +807,7 @@ EmmcIdentification (
 **/
 EFI_STATUS
 SdCardIdentification (
-  IN DW_MMC_HC_PRIVATE_DATA             *Private
+  IN DW_MMC_HC_PRIVATE_DATA  *Private
   );
 
 #endif /* _DW_MMC_HC_DXE_H_ */

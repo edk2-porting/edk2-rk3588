@@ -14,7 +14,7 @@
 EFI_STATUS
 EFIAPI
 DwcSdhciSetClockRate (
-  IN UINTN Frequency
+  IN UINTN  Frequency
   )
 {
   return EFI_UNSUPPORTED;

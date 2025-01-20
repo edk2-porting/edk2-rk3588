@@ -7,17 +7,14 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 **/
 
-
 #ifndef _OHCI_URB_H
 #define _OHCI_URB_H
 
 #include "Descriptor.h"
 
-
 //
 // Func List
 //
-
 
 /**
 
@@ -30,7 +27,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 **/
 TD_DESCRIPTOR *
 OhciCreateTD (
-  IN USB_OHCI_HC_DEV      *Ohc
+  IN USB_OHCI_HC_DEV  *Ohc
   );
 
 /**
@@ -45,8 +42,8 @@ OhciCreateTD (
 **/
 EFI_STATUS
 OhciFreeTD (
-  IN USB_OHCI_HC_DEV      *Ohc,
-  IN TD_DESCRIPTOR        *Td
+  IN USB_OHCI_HC_DEV  *Ohc,
+  IN TD_DESCRIPTOR    *Td
   );
 
 /**
@@ -60,9 +57,8 @@ OhciFreeTD (
 **/
 ED_DESCRIPTOR *
 OhciCreateED (
-  USB_OHCI_HC_DEV          *Ohc
+  USB_OHCI_HC_DEV  *Ohc
   );
-
 
 /**
 
@@ -77,8 +73,8 @@ OhciCreateED (
 
 EFI_STATUS
 OhciFreeED (
-  IN USB_OHCI_HC_DEV      *Ohc,
-  IN ED_DESCRIPTOR        *Ed
+  IN USB_OHCI_HC_DEV  *Ohc,
+  IN ED_DESCRIPTOR    *Ed
   );
 
 /**
@@ -93,8 +89,8 @@ OhciFreeED (
 **/
 EFI_STATUS
 OhciFreeAllTDFromED (
-  IN USB_OHCI_HC_DEV      *Ohc,
-  IN ED_DESCRIPTOR        *Ed
+  IN USB_OHCI_HC_DEV  *Ohc,
+  IN ED_DESCRIPTOR    *Ed
   );
 
 /**
@@ -112,12 +108,11 @@ OhciFreeAllTDFromED (
 
 ED_DESCRIPTOR *
 OhciFindWorkingEd (
-  IN ED_DESCRIPTOR       *EdHead,
-  IN UINT8               DeviceAddress,
-  IN UINT8               EndPointNum,
-  IN UINT8               EdDir
+  IN ED_DESCRIPTOR  *EdHead,
+  IN UINT8          DeviceAddress,
+  IN UINT8          EndPointNum,
+  IN UINT8          EdDir
   );
-
 
 /**
 
@@ -130,7 +125,7 @@ OhciFindWorkingEd (
 **/
 EFI_STATUS
 OhciInitializeInterruptList (
-  USB_OHCI_HC_DEV          *Ohc
+  USB_OHCI_HC_DEV  *Ohc
   );
 
 /**
@@ -146,8 +141,8 @@ OhciInitializeInterruptList (
 **/
 EFI_STATUS
 OhciAttachED (
-  IN ED_DESCRIPTOR        *Ed,
-  IN ED_DESCRIPTOR        *NewEd
+  IN ED_DESCRIPTOR  *Ed,
+  IN ED_DESCRIPTOR  *NewEd
   );
 
 /**
@@ -162,7 +157,7 @@ OhciAttachED (
 
 UINTN
 CountEdNum (
-  IN ED_DESCRIPTOR      *Ed
+  IN ED_DESCRIPTOR  *Ed
   );
 
 /**
@@ -178,8 +173,8 @@ CountEdNum (
 
 ED_DESCRIPTOR *
 OhciFindMinInterruptEDList (
-  IN USB_OHCI_HC_DEV      *Ohc,
-  IN UINT32               Depth
+  IN USB_OHCI_HC_DEV  *Ohc,
+  IN UINT32           Depth
   );
 
 /**
@@ -215,8 +210,8 @@ OhciAttachEDToList (
 
 EFI_STATUS
 OhciFreeInterruptEdByEd (
-  IN USB_OHCI_HC_DEV      *Ohc,
-  IN ED_DESCRIPTOR        *IntEd
+  IN USB_OHCI_HC_DEV  *Ohc,
+  IN ED_DESCRIPTOR    *IntEd
   );
 
 /**
@@ -232,11 +227,10 @@ OhciFreeInterruptEdByEd (
 **/
 EFI_STATUS
 OhciFreeInterruptEdByAddr (
-  IN USB_OHCI_HC_DEV      *Ohc,
-  IN UINT8                FunctionAddress,
-  IN UINT8                EndPointNum
+  IN USB_OHCI_HC_DEV  *Ohc,
+  IN UINT8            FunctionAddress,
+  IN UINT8            EndPointNum
   );
-
 
 /**
 
@@ -251,10 +245,9 @@ OhciFreeInterruptEdByAddr (
 **/
 EFI_STATUS
 OhciLinkTD (
-  IN TD_DESCRIPTOR        *Td1,
-  IN TD_DESCRIPTOR        *Td2
+  IN TD_DESCRIPTOR  *Td1,
+  IN TD_DESCRIPTOR  *Td2
   );
-
 
 /**
 
@@ -268,10 +261,9 @@ OhciLinkTD (
 **/
 EFI_STATUS
 OhciAttachTDListToED (
-  IN ED_DESCRIPTOR        *Ed,
-  IN TD_DESCRIPTOR        *HeadTd
+  IN ED_DESCRIPTOR  *Ed,
+  IN TD_DESCRIPTOR  *HeadTd
   );
-
 
 /**
 
@@ -286,11 +278,10 @@ OhciAttachTDListToED (
 **/
 EFI_STATUS
 OhciSetEDField (
-  IN ED_DESCRIPTOR        *Ed,
-  IN UINT32               Field,
-  IN UINT32               Value
+  IN ED_DESCRIPTOR  *Ed,
+  IN UINT32         Field,
+  IN UINT32         Value
   );
-
 
 /**
 
@@ -304,10 +295,9 @@ OhciSetEDField (
 **/
 UINT32
 OhciGetEDField (
-  IN ED_DESCRIPTOR        *Ed,
-  IN UINT32               Field
+  IN ED_DESCRIPTOR  *Ed,
+  IN UINT32         Field
   );
-
 
 /**
 
@@ -322,11 +312,10 @@ OhciGetEDField (
 **/
 EFI_STATUS
 OhciSetTDField (
-  IN TD_DESCRIPTOR        *Td,
-  IN UINT32               Field,
-  IN UINT32               Value
+  IN TD_DESCRIPTOR  *Td,
+  IN UINT32         Field,
+  IN UINT32         Value
   );
-
 
 /**
 
@@ -341,9 +330,10 @@ OhciSetTDField (
 
 UINT32
 OhciGetTDField (
-  IN TD_DESCRIPTOR      *Td,
-  IN UINT32             Field
+  IN TD_DESCRIPTOR  *Td,
+  IN UINT32         Field
   );
+
 /**
 
   Free the Ed,Td,buffer that were created during transferring
@@ -352,8 +342,8 @@ OhciGetTDField (
 **/
 
 VOID
-OhciFreeDynamicIntMemory(
-  IN USB_OHCI_HC_DEV      *Ohc
+OhciFreeDynamicIntMemory (
+  IN USB_OHCI_HC_DEV  *Ohc
   );
 
 /**
@@ -367,8 +357,9 @@ OhciFreeDynamicIntMemory(
 **/
 VOID
 OhciFreeFixedIntMemory (
-  IN USB_OHCI_HC_DEV      *Ohc
+  IN USB_OHCI_HC_DEV  *Ohc
   );
+
 /**
 
   Release all OHCI used memory when OHCI going to quit
@@ -381,7 +372,7 @@ OhciFreeFixedIntMemory (
 
 EFI_STATUS
 OhciFreeIntTransferMemory (
-  IN USB_OHCI_HC_DEV           *Ohc
+  IN USB_OHCI_HC_DEV  *Ohc
   );
 
 #endif

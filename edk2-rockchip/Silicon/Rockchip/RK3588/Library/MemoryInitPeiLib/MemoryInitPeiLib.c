@@ -28,9 +28,9 @@ InitMmu (
   IN ARM_MEMORY_REGION_DESCRIPTOR  *MemoryTable
   )
 {
-  RETURN_STATUS Status;
+  RETURN_STATUS  Status;
 
-  //Note: Because we called PeiServicesInstallPeiMemory() before to call InitMmu() the MMU Page Table
+  // Note: Because we called PeiServicesInstallPeiMemory() before to call InitMmu() the MMU Page Table
   //      resides in DRAM (even at the top of DRAM as it is the first permanent memory allocation)
   Status = ArmConfigureMmu (MemoryTable, NULL, NULL);
   if (EFI_ERROR (Status)) {
@@ -41,8 +41,8 @@ InitMmu (
 STATIC
 VOID
 AddBasicMemoryRegion (
-  IN ARM_MEMORY_REGION_DESCRIPTOR *Desc
-)
+  IN ARM_MEMORY_REGION_DESCRIPTOR  *Desc
+  )
 {
   BuildResourceDescriptorHob (
     EFI_RESOURCE_SYSTEM_MEMORY,
@@ -54,14 +54,14 @@ AddBasicMemoryRegion (
     EFI_RESOURCE_ATTRIBUTE_TESTED,
     Desc->PhysicalBase,
     Desc->Length
-  );
+    );
 }
 
 STATIC
 VOID
 AddRuntimeServicesRegion (
-  IN ARM_MEMORY_REGION_DESCRIPTOR *Desc
-)
+  IN ARM_MEMORY_REGION_DESCRIPTOR  *Desc
+  )
 {
   AddBasicMemoryRegion (Desc);
 
@@ -69,13 +69,13 @@ AddRuntimeServicesRegion (
     Desc->PhysicalBase,
     Desc->Length,
     EfiRuntimeServicesData
-  );
+    );
 }
 
 STATIC
 VOID
 AddUnmappedMemoryRegion (
-  IN ARM_MEMORY_REGION_DESCRIPTOR *Desc
+  IN ARM_MEMORY_REGION_DESCRIPTOR  *Desc
   )
 {
   // Do nothing
@@ -84,7 +84,7 @@ AddUnmappedMemoryRegion (
 STATIC
 VOID
 AddReservedMemoryRegion (
-  IN ARM_MEMORY_REGION_DESCRIPTOR *Desc
+  IN ARM_MEMORY_REGION_DESCRIPTOR  *Desc
   )
 {
   AddBasicMemoryRegion (Desc);
@@ -93,15 +93,17 @@ AddReservedMemoryRegion (
     Desc->PhysicalBase,
     Desc->Length,
     EfiReservedMemoryType
-  );
+    );
 }
 
-void (*AddRegion[]) (IN ARM_MEMORY_REGION_DESCRIPTOR *Desc) = {
+void  (*AddRegion[]) (
+  IN ARM_MEMORY_REGION_DESCRIPTOR  *Desc
+  ) = {
   AddUnmappedMemoryRegion,
   AddBasicMemoryRegion,
   AddRuntimeServicesRegion,
   AddReservedMemoryRegion,
-  };
+};
 
 /*++
 
@@ -126,9 +128,9 @@ MemoryPeim (
   IN UINT64                UefiMemorySize
   )
 {
-  ARM_MEMORY_REGION_DESCRIPTOR *MemoryTable;
-  RK3588_MEMORY_REGION_INFO    *MemoryInfo;
-  UINTN                        Index;
+  ARM_MEMORY_REGION_DESCRIPTOR  *MemoryTable;
+  RK3588_MEMORY_REGION_INFO     *MemoryInfo;
+  UINTN                         Index;
 
   DEBUG ((DEBUG_INFO, "%s\n", __FUNCTION__));
 
@@ -141,15 +143,18 @@ MemoryPeim (
   // Register each memory region
   for (Index = 0; MemoryTable[Index].Length != 0; Index++) {
     ASSERT (MemoryInfo[Index].Type < ARRAY_SIZE (AddRegion));
-    DEBUG ((DEBUG_INFO, "%s:\n"
+    DEBUG ((
+      DEBUG_INFO,
+      "%s:\n"
       "\tPhysicalBase: 0x%lX\n"
       "\tVirtualBase: 0x%lX\n"
       "\tLength: 0x%lX\n",
       MemoryInfo[Index].Name,
       MemoryTable[Index].PhysicalBase,
       MemoryTable[Index].VirtualBase,
-      MemoryTable[Index].Length));
-    AddRegion[MemoryInfo[Index].Type] (&MemoryTable[Index]);
+      MemoryTable[Index].Length
+      ));
+    AddRegion[MemoryInfo[Index].Type](&MemoryTable[Index]);
   }
 
   // Build Memory Allocation Hob

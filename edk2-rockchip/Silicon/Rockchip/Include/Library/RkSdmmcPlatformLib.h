@@ -17,7 +17,7 @@ typedef enum {
 EFI_STATUS
 EFIAPI
 RkSdmmcSetClockRate (
-  IN UINTN Frequency
+  IN UINTN  Frequency
   );
 
 VOID

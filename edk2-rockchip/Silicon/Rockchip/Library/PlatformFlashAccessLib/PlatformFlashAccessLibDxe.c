@@ -18,10 +18,10 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Protocol/RockchipSpiFlashProtocol.h>
 
-STATIC EFI_PHYSICAL_ADDRESS     mInternalFdAddress;
-STATIC EFI_PHYSICAL_ADDRESS     mSFCMEM0BaseAddress;
+STATIC EFI_PHYSICAL_ADDRESS  mInternalFdAddress;
+STATIC EFI_PHYSICAL_ADDRESS  mSFCMEM0BaseAddress;
 
-STATIC UNI_NOR_FLASH_PROTOCOL   *mSpiProtocol;
+STATIC UNI_NOR_FLASH_PROTOCOL  *mSpiProtocol;
 
 /**
   Perform flash write operation with progress indicator.  The start and end
@@ -56,24 +56,26 @@ STATIC UNI_NOR_FLASH_PROTOCOL   *mSpiProtocol;
 EFI_STATUS
 EFIAPI
 PerformFlashWriteWithProgress (
-  IN PLATFORM_FIRMWARE_TYPE                         FirmwareType,
-  IN EFI_PHYSICAL_ADDRESS                           FlashAddress,
-  IN FLASH_ADDRESS_TYPE                             FlashAddressType,
-  IN VOID                                           *Buffer,
-  IN UINTN                                          Length,
-  IN EFI_FIRMWARE_MANAGEMENT_UPDATE_IMAGE_PROGRESS  Progress,        OPTIONAL
+  IN PLATFORM_FIRMWARE_TYPE FirmwareType,
+  IN EFI_PHYSICAL_ADDRESS FlashAddress,
+  IN FLASH_ADDRESS_TYPE FlashAddressType,
+  IN VOID *Buffer,
+  IN UINTN Length,
+  IN EFI_FIRMWARE_MANAGEMENT_UPDATE_IMAGE_PROGRESS Progress, OPTIONAL
   IN UINTN                                          StartPercentage,
   IN UINTN                                          EndPercentage
   )
 {
-  UINT32               RomAddress;
-  EFI_STATUS           Status;
+  UINT32      RomAddress;
+  EFI_STATUS  Status;
 
-  DEBUG ((DEBUG_INFO,
-          "PerformFlashWrite - 0x%x(%x) - 0x%x\n",
-          (UINTN)FlashAddress,
-          (UINTN)FlashAddressType,
-          Length));
+  DEBUG ((
+    DEBUG_INFO,
+    "PerformFlashWrite - 0x%x(%x) - 0x%x\n",
+    (UINTN)FlashAddress,
+    (UINTN)FlashAddressType,
+    Length
+    ));
 
   if (FlashAddressType == FlashAddressTypeAbsoluteAddress) {
     FlashAddress = FlashAddress - mInternalFdAddress;
@@ -85,9 +87,9 @@ PerformFlashWriteWithProgress (
 
   Status = mSpiProtocol->Update (
                            mSpiProtocol,
-                           (UINT32) RomAddress,
+                           (UINT32)RomAddress,
                            (UINT8 *)Buffer,
-                           (UINT32) Length
+                           (UINT32)Length
                            );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Erase and Write Status = %r \n", Status));
@@ -113,11 +115,11 @@ PerformFlashWriteWithProgress (
 EFI_STATUS
 EFIAPI
 PerformFlashWrite (
-  IN PLATFORM_FIRMWARE_TYPE       FirmwareType,
-  IN EFI_PHYSICAL_ADDRESS         FlashAddress,
-  IN FLASH_ADDRESS_TYPE           FlashAddressType,
-  IN VOID                         *Buffer,
-  IN UINTN                        Length
+  IN PLATFORM_FIRMWARE_TYPE  FirmwareType,
+  IN EFI_PHYSICAL_ADDRESS    FlashAddress,
+  IN FLASH_ADDRESS_TYPE      FlashAddressType,
+  IN VOID                    *Buffer,
+  IN UINTN                   Length
   )
 {
   return PerformFlashWriteWithProgress (
@@ -143,29 +145,34 @@ PerformFlashWrite (
 EFI_STATUS
 EFIAPI
 PerformFlashAccessLibConstructor (
-  IN EFI_HANDLE                         ImageHandle,
-  IN EFI_SYSTEM_TABLE                   *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS  Status;
 
-  mInternalFdAddress = (EFI_PHYSICAL_ADDRESS) PcdGet64 (PcdFdBaseAddress);
+  mInternalFdAddress = (EFI_PHYSICAL_ADDRESS)PcdGet64 (PcdFdBaseAddress);
 
-  mSFCMEM0BaseAddress = (EFI_PHYSICAL_ADDRESS) PcdGet64 (PcdSFCMEM0BaseAddress);
+  mSFCMEM0BaseAddress = (EFI_PHYSICAL_ADDRESS)PcdGet64 (PcdSFCMEM0BaseAddress);
 
-  DEBUG ((DEBUG_INFO,
-          "PcdFlashAreaBaseAddress - 0x%x, PcdSFCMEM0BaseAddress - 0x%x \n",
-          mInternalFdAddress,
-          mSFCMEM0BaseAddress));
+  DEBUG ((
+    DEBUG_INFO,
+    "PcdFlashAreaBaseAddress - 0x%x, PcdSFCMEM0BaseAddress - 0x%x \n",
+    mInternalFdAddress,
+    mSFCMEM0BaseAddress
+    ));
 
   Status = gBS->LocateProtocol (
                   &gUniNorFlashProtocolGuid,
                   NULL,
-                  (VOID **)&mSpiProtocol);
+                  (VOID **)&mSpiProtocol
+                  );
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR,
-            "LocateProtocol gUniNorFlashProtocolGuid Status = %r \n",
-            Status));
+    DEBUG ((
+      DEBUG_ERROR,
+      "LocateProtocol gUniNorFlashProtocolGuid Status = %r \n",
+      Status
+      ));
   }
 
   return Status;

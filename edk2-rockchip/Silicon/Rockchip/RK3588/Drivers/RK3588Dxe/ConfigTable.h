@@ -24,6 +24,7 @@ EFIAPI
 SetupConfigTableVariables (
   VOID
   );
+
 #endif // VFR_FILE_INCLUDE
 
 #endif // __RK3588DXE_CONFIG_TABLE_H__

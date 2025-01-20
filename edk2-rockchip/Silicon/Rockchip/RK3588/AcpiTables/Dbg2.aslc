@@ -16,28 +16,27 @@
 
 #pragma pack(1)
 
-#define UART_STR { '\\', '_', 'S', 'B', '.', 'U', 'A', 'R', '2', 0x00 }
+#define UART_STR  { '\\', '_', 'S', 'B', '.', 'U', 'A', 'R', '2', 0x00 }
 
 typedef struct {
-  EFI_ACPI_DBG2_DEBUG_DEVICE_INFORMATION_STRUCT Dbg2Device;
-  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE        BaseAddressRegister;
-  UINT32                                        AddressSize;
-  UINT8                                         NameSpaceString[10];
+  EFI_ACPI_DBG2_DEBUG_DEVICE_INFORMATION_STRUCT    Dbg2Device;
+  EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE           BaseAddressRegister;
+  UINT32                                           AddressSize;
+  UINT8                                            NameSpaceString[10];
 } DBG2_DEBUG_DEVICE_INFORMATION;
 
 typedef struct {
-  EFI_ACPI_DEBUG_PORT_2_DESCRIPTION_TABLE       Description;
-  DBG2_DEBUG_DEVICE_INFORMATION                 Dbg2DeviceInfo;
+  EFI_ACPI_DEBUG_PORT_2_DESCRIPTION_TABLE    Description;
+  DBG2_DEBUG_DEVICE_INFORMATION              Dbg2DeviceInfo;
 } DBG2_TABLE;
 
-
-STATIC DBG2_TABLE Dbg2 = {
+STATIC DBG2_TABLE  Dbg2 = {
   {
     ACPI_HEADER (
       EFI_ACPI_6_3_DEBUG_PORT_2_TABLE_SIGNATURE,
       DBG2_TABLE,
       EFI_ACPI_DBG2_DEBUG_DEVICE_INFORMATION_STRUCT_REVISION
-    ),
+      ),
     OFFSET_OF (DBG2_TABLE, Dbg2DeviceInfo),
     1                                      /* NumberOfDebugPorts */
   },
@@ -52,11 +51,11 @@ STATIC DBG2_TABLE Dbg2 = {
       0,                                   /* OemDataOffset */
       EFI_ACPI_DBG2_PORT_TYPE_SERIAL,
       EFI_ACPI_DBG2_PORT_SUBTYPE_SERIAL_16550_WITH_GAS,
-      {EFI_ACPI_RESERVED_BYTE, EFI_ACPI_RESERVED_BYTE},
+      { EFI_ACPI_RESERVED_BYTE, EFI_ACPI_RESERVED_BYTE },
       OFFSET_OF (DBG2_DEBUG_DEVICE_INFORMATION, BaseAddressRegister),
       OFFSET_OF (DBG2_DEBUG_DEVICE_INFORMATION, AddressSize)
     },
-    ARM_GAS32 (FixedPcdGet64(PcdSerialRegisterBase)),  /* BaseAddressRegister */
+    ARM_GAS32 (FixedPcdGet64 (PcdSerialRegisterBase)), /* BaseAddressRegister */
     0x1000,                                            /* AddressSize */
     UART_STR,                                          /* NameSpaceString */
   }
@@ -66,4 +65,4 @@ STATIC DBG2_TABLE Dbg2 = {
 
 // Reference the table being generated to prevent the optimizer from removing
 // the data structure from the executable
-VOID* CONST ReferenceAcpiTable = &Dbg2;
+VOID *CONST  ReferenceAcpiTable = &Dbg2;

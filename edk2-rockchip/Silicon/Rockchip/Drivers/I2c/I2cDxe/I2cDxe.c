@@ -30,30 +30,30 @@
 
 #include "I2cDxe.h"
 
-#define RK_I2C_DUMPREG 1
+#define RK_I2C_DUMPREG  1
 
-STATIC CONST I2C_SPEC_VALUES StandardModeSpec = {
-  .MinLowNs = 4700,
+STATIC CONST I2C_SPEC_VALUES  StandardModeSpec = {
+  .MinLowNs  = 4700,
   .MinHighNs = 4000,
   .MaxRiseNs = 1000,
   .MaxFallNs = 300,
 };
 
-STATIC CONST I2C_SPEC_VALUES FastModeSpec = {
-  .MinLowNs = 1300,
+STATIC CONST I2C_SPEC_VALUES  FastModeSpec = {
+  .MinLowNs  = 1300,
   .MinHighNs = 600,
   .MaxRiseNs = 300,
   .MaxFallNs = 300,
 };
 
-STATIC CONST I2C_SPEC_VALUES FastModeplusSpec = {
-  .MinLowNs = 500,
+STATIC CONST I2C_SPEC_VALUES  FastModeplusSpec = {
+  .MinLowNs  = 500,
   .MinHighNs = 260,
   .MaxRiseNs = 120,
   .MaxFallNs = 120,
 };
 
-STATIC I2C_DEVICE_PATH I2cDevicePathProtocol = {
+STATIC I2C_DEVICE_PATH  I2cDevicePathProtocol = {
   {
     {
       HARDWARE_DEVICE_PATH,
@@ -70,7 +70,7 @@ STATIC I2C_DEVICE_PATH I2cDevicePathProtocol = {
     END_DEVICE_PATH_TYPE,
     END_ENTIRE_DEVICE_PATH_SUBTYPE,
     {
-      sizeof(EFI_DEVICE_PATH_PROTOCOL),
+      sizeof (EFI_DEVICE_PATH_PROTOCOL),
       0
     }
   }
@@ -79,23 +79,24 @@ STATIC I2C_DEVICE_PATH I2cDevicePathProtocol = {
 STATIC
 CONST I2C_SPEC_VALUES *
 I2cGetSpec (
-  IN I2C_MASTER_CONTEXT *I2cMasterContext,
-  IN UINT32 Speed
+  IN I2C_MASTER_CONTEXT  *I2cMasterContext,
+  IN UINT32              Speed
   )
 {
-  if (Speed == 1000)
+  if (Speed == 1000) {
     return &FastModeplusSpec;
-  else if (Speed == 400)
+  } else if (Speed == 400) {
     return &FastModeSpec;
-  else
+  } else {
     return &StandardModeSpec;
+  }
 }
 
 STATIC
 UINT32
 I2cRead (
-  IN I2C_MASTER_CONTEXT *I2cMasterContext,
-  IN UINTN Off
+  IN I2C_MASTER_CONTEXT  *I2cMasterContext,
+  IN UINTN               Off
   )
 {
   ASSERT (I2cMasterContext != NULL);
@@ -105,9 +106,9 @@ I2cRead (
 STATIC
 EFI_STATUS
 I2cWrite (
-  IN I2C_MASTER_CONTEXT *I2cMasterContext,
-  IN UINTN Off,
-  IN UINT32 Value
+  IN I2C_MASTER_CONTEXT  *I2cMasterContext,
+  IN UINTN               Off,
+  IN UINT32              Value
   )
 {
   ASSERT (I2cMasterContext != NULL);
@@ -117,37 +118,41 @@ I2cWrite (
 STATIC
 VOID
 I2cShowRegs (
-  IN I2C_MASTER_CONTEXT *I2cMasterContex
+  IN I2C_MASTER_CONTEXT  *I2cMasterContex
   )
 {
-#if RK_I2C_DUMPREG
-  UINTN i;
+ #if RK_I2C_DUMPREG
+  UINTN  i;
 
-  DEBUG((DEBUG_INFO | DEBUG_LOAD, "i2c_con: 0x%08x\n", I2cRead(I2cMasterContex, I2C_CON)));
-  DEBUG((DEBUG_INFO | DEBUG_LOAD, "i2c_clkdiv: 0x%08x\n", I2cRead(I2cMasterContex, I2C_CLKDIV)));
-  DEBUG((DEBUG_INFO | DEBUG_LOAD, "i2c_mrxaddr: 0x%08x\n", I2cRead(I2cMasterContex, I2C_MRXADDR)));
-  DEBUG((DEBUG_INFO | DEBUG_LOAD, "i2c_mrxraddR: 0x%08x\n", I2cRead(I2cMasterContex, I2C_MRXRADDR)));
-  DEBUG((DEBUG_INFO | DEBUG_LOAD, "i2c_mtxcnt: 0x%08x\n", I2cRead(I2cMasterContex, I2C_MTXCNT)));
-  DEBUG((DEBUG_INFO | DEBUG_LOAD, "i2c_mrxcnt: 0x%08x\n", I2cRead(I2cMasterContex, I2C_MRXCNT)));
-  DEBUG((DEBUG_INFO | DEBUG_LOAD, "i2c_ien: 0x%08x\n", I2cRead(I2cMasterContex, I2C_IEN)));
-  DEBUG((DEBUG_INFO | DEBUG_LOAD, "i2c_ipd: 0x%08x\n", I2cRead(I2cMasterContex, I2C_IPD)));
-  DEBUG((DEBUG_INFO | DEBUG_LOAD, "i2c_fcnt: 0x%08x\n", I2cRead(I2cMasterContex, I2C_FCNT)));
-  for (i = 0; i < 8; i++)
-    DEBUG((DEBUG_INFO | DEBUG_LOAD, "i2c_txdata%d: 0x%08x\n", i, I2cRead(I2cMasterContex, I2C_TXDATA_BASE + 4 * i)));
-  for (i = 0; i < 8; i++)
-    DEBUG((DEBUG_INFO | DEBUG_LOAD, "i2c_rxdata%d: 0x%08x\n", i, I2cRead(I2cMasterContex,I2C_RXDATA_BASE + 4 * i)));
-#endif
+  DEBUG ((DEBUG_INFO | DEBUG_LOAD, "i2c_con: 0x%08x\n", I2cRead (I2cMasterContex, I2C_CON)));
+  DEBUG ((DEBUG_INFO | DEBUG_LOAD, "i2c_clkdiv: 0x%08x\n", I2cRead (I2cMasterContex, I2C_CLKDIV)));
+  DEBUG ((DEBUG_INFO | DEBUG_LOAD, "i2c_mrxaddr: 0x%08x\n", I2cRead (I2cMasterContex, I2C_MRXADDR)));
+  DEBUG ((DEBUG_INFO | DEBUG_LOAD, "i2c_mrxraddR: 0x%08x\n", I2cRead (I2cMasterContex, I2C_MRXRADDR)));
+  DEBUG ((DEBUG_INFO | DEBUG_LOAD, "i2c_mtxcnt: 0x%08x\n", I2cRead (I2cMasterContex, I2C_MTXCNT)));
+  DEBUG ((DEBUG_INFO | DEBUG_LOAD, "i2c_mrxcnt: 0x%08x\n", I2cRead (I2cMasterContex, I2C_MRXCNT)));
+  DEBUG ((DEBUG_INFO | DEBUG_LOAD, "i2c_ien: 0x%08x\n", I2cRead (I2cMasterContex, I2C_IEN)));
+  DEBUG ((DEBUG_INFO | DEBUG_LOAD, "i2c_ipd: 0x%08x\n", I2cRead (I2cMasterContex, I2C_IPD)));
+  DEBUG ((DEBUG_INFO | DEBUG_LOAD, "i2c_fcnt: 0x%08x\n", I2cRead (I2cMasterContex, I2C_FCNT)));
+  for (i = 0; i < 8; i++) {
+    DEBUG ((DEBUG_INFO | DEBUG_LOAD, "i2c_txdata%d: 0x%08x\n", i, I2cRead (I2cMasterContex, I2C_TXDATA_BASE + 4 * i)));
+  }
+
+  for (i = 0; i < 8; i++) {
+    DEBUG ((DEBUG_INFO | DEBUG_LOAD, "i2c_rxdata%d: 0x%08x\n", i, I2cRead (I2cMasterContex, I2C_RXDATA_BASE + 4 * i)));
+  }
+
+ #endif
 }
 
 STATIC
 I2C_VERSION
-I2cGetVersion(
-  IN I2C_MASTER_CONTEXT *I2cMasterContext
+I2cGetVersion (
+  IN I2C_MASTER_CONTEXT  *I2cMasterContext
   )
 {
-  I2C_VERSION Version;
+  I2C_VERSION  Version;
 
-  Version = I2cRead(I2cMasterContext, I2C_CON) & I2C_CON_VERSION;
+  Version          = I2cRead (I2cMasterContext, I2C_CON) & I2C_CON_VERSION;
   return Version >>= I2C_CON_VERSION_SHIFT;
 }
 
@@ -155,40 +160,43 @@ STATIC
 VOID
 EFIAPI
 I2cVirtualAddressChangeNotify (
-  IN EFI_EVENT   Event,
-  IN VOID        *Context
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
   )
 {
-  I2C_MASTER_CONTEXT *I2cMasterContext = Context;
+  I2C_MASTER_CONTEXT  *I2cMasterContext = Context;
 
-  EfiConvertPointer (0x0, (VOID **) &I2cMasterContext->BaseAddress);
-  EfiConvertPointer (0x0, (VOID **) &I2cMasterContext->I2cMaster.SetBusFrequency);
-  EfiConvertPointer (0x0, (VOID **) &I2cMasterContext->I2cMaster.Reset);
-  EfiConvertPointer (0x0, (VOID **) &I2cMasterContext->I2cMaster.StartRequest);
+  EfiConvertPointer (0x0, (VOID **)&I2cMasterContext->BaseAddress);
+  EfiConvertPointer (0x0, (VOID **)&I2cMasterContext->I2cMaster.SetBusFrequency);
+  EfiConvertPointer (0x0, (VOID **)&I2cMasterContext->I2cMaster.Reset);
+  EfiConvertPointer (0x0, (VOID **)&I2cMasterContext->I2cMaster.StartRequest);
 }
 
 EFI_STATUS
 EFIAPI
 I2cInitialiseController (
-  IN EFI_HANDLE  ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable,
-  IN EFI_PHYSICAL_ADDRESS BaseAddress,
-  IN UINT32 BusId,
-  IN BOOLEAN RuntimeSupport
+  IN EFI_HANDLE            ImageHandle,
+  IN EFI_SYSTEM_TABLE      *SystemTable,
+  IN EFI_PHYSICAL_ADDRESS  BaseAddress,
+  IN UINT32                BusId,
+  IN BOOLEAN               RuntimeSupport
   )
 {
-  EFI_STATUS Status;
-  I2C_MASTER_CONTEXT *I2cMasterContext;
-  I2C_DEVICE_PATH *DevicePath;
-  EFI_EVENT VirtualAddressChangeEvent = NULL;
+  EFI_STATUS          Status;
+  I2C_MASTER_CONTEXT  *I2cMasterContext;
+  I2C_DEVICE_PATH     *DevicePath;
+  EFI_EVENT           VirtualAddressChangeEvent = NULL;
 
   DEBUG ((DEBUG_VERBOSE, "I2cInitialiseController\n"));
-  DevicePath = AllocateCopyPool (sizeof(I2cDevicePathProtocol),
-                                 &I2cDevicePathProtocol);
+  DevicePath = AllocateCopyPool (
+                 sizeof (I2cDevicePathProtocol),
+                 &I2cDevicePathProtocol
+                 );
   if (DevicePath == NULL) {
-    DEBUG((DEBUG_ERROR, "I2cDxe: I2C device path allocation failed\n"));
+    DEBUG ((DEBUG_ERROR, "I2cDxe: I2C device path allocation failed\n"));
     return EFI_OUT_OF_RESOURCES;
   }
+
   DevicePath->Instance = BusId;
 
   if (RuntimeSupport) {
@@ -198,40 +206,51 @@ I2cInitialiseController (
   }
 
   if (I2cMasterContext == NULL) {
-    DEBUG((DEBUG_ERROR, "I2cDxe: I2C master context allocation failed\n"));
+    DEBUG ((DEBUG_ERROR, "I2cDxe: I2C master context allocation failed\n"));
     return EFI_OUT_OF_RESOURCES;
   }
-  I2cMasterContext->Signature = I2C_MASTER_SIGNATURE;
-  I2cMasterContext->I2cMaster.SetBusFrequency = I2cSetBusFrequency;
-  I2cMasterContext->I2cMaster.Reset = I2cReset;
-  I2cMasterContext->I2cMaster.StartRequest = I2cStartRequest;
-  I2cMasterContext->I2cEnumerate.Enumerate = I2cEnumerate;
+
+  I2cMasterContext->Signature                            = I2C_MASTER_SIGNATURE;
+  I2cMasterContext->I2cMaster.SetBusFrequency            = I2cSetBusFrequency;
+  I2cMasterContext->I2cMaster.Reset                      = I2cReset;
+  I2cMasterContext->I2cMaster.StartRequest               = I2cStartRequest;
+  I2cMasterContext->I2cEnumerate.Enumerate               = I2cEnumerate;
   I2cMasterContext->I2cBusConf.EnableI2cBusConfiguration = I2cEnableConf;
-  I2cMasterContext->RockchipI2cMaster.Bus = BusId;
-  I2cMasterContext->TclkFrequency = PcdGet32 (PcdI2cClockFrequency);
-  I2cMasterContext->BaseAddress = BaseAddress;
-  I2cMasterContext->Bus = BusId;
-  I2cMasterContext->RuntimeSupport = RuntimeSupport;
+  I2cMasterContext->RockchipI2cMaster.Bus                = BusId;
+  I2cMasterContext->TclkFrequency                        = PcdGet32 (PcdI2cClockFrequency);
+  I2cMasterContext->BaseAddress                          = BaseAddress;
+  I2cMasterContext->Bus                                  = BusId;
+  I2cMasterContext->RuntimeSupport                       = RuntimeSupport;
 
   if (RuntimeSupport) {
     Status = gDS->AddMemorySpace (
                     EfiGcdMemoryTypeMemoryMappedIo,
                     BaseAddress,
                     I2C_PERIPHERAL_SIZE,
-                    EFI_MEMORY_UC | EFI_MEMORY_RUNTIME);
+                    EFI_MEMORY_UC | EFI_MEMORY_RUNTIME
+                    );
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: AddMemorySpace failed. Status=%r\n",
-              __FUNCTION__, Status));
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: AddMemorySpace failed. Status=%r\n",
+        __FUNCTION__,
+        Status
+        ));
       goto fail;
     }
 
     Status = gDS->SetMemorySpaceAttributes (
                     BaseAddress,
                     I2C_PERIPHERAL_SIZE,
-                    EFI_MEMORY_UC | EFI_MEMORY_RUNTIME);
+                    EFI_MEMORY_UC | EFI_MEMORY_RUNTIME
+                    );
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: SetMemorySpaceAttributes failed. Status=%r\n",
-              __FUNCTION__, Status));
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: SetMemorySpaceAttributes failed. Status=%r\n",
+        __FUNCTION__,
+        Status
+        ));
       goto fail;
     }
 
@@ -241,42 +260,50 @@ I2cInitialiseController (
                     I2cVirtualAddressChangeNotify,
                     I2cMasterContext,
                     &gEfiEventVirtualAddressChangeGuid,
-                    &VirtualAddressChangeEvent);
+                    &VirtualAddressChangeEvent
+                    );
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: Failed to register for virtual address change. Status=%r\n",
-              __FUNCTION__, Status));
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Failed to register for virtual address change. Status=%r\n",
+        __FUNCTION__,
+        Status
+        ));
       goto fail;
     }
   }
 
-  if (I2cGetVersion(I2cMasterContext) >= RkI2cVersion1) {
-    I2cAdapterBaudRate(I2cMasterContext,
-                       PcdGet32 (PcdI2cBaudRate),
-		       I2cMasterContext->TclkFrequency
-		       );
+  if (I2cGetVersion (I2cMasterContext) >= RkI2cVersion1) {
+    I2cAdapterBaudRate (
+      I2cMasterContext,
+      PcdGet32 (PcdI2cBaudRate),
+      I2cMasterContext->TclkFrequency
+      );
   } else {
-    I2cCalBaudRate(I2cMasterContext,
-		   PcdGet32 (PcdI2cBaudRate),
-		   I2cMasterContext->TclkFrequency
-		   );
+    I2cCalBaudRate (
+      I2cMasterContext,
+      PcdGet32 (PcdI2cBaudRate),
+      I2cMasterContext->TclkFrequency
+      );
   }
 
-  Status = gBS->InstallMultipleProtocolInterfaces(
-    &I2cMasterContext->Controller,
-    &gEfiI2cMasterProtocolGuid,
-    &I2cMasterContext->I2cMaster,
-    &gEfiI2cEnumerateProtocolGuid,
-    &I2cMasterContext->I2cEnumerate,
-    &gEfiI2cBusConfigurationManagementProtocolGuid,
-    &I2cMasterContext->I2cBusConf,
-    &gRockchipI2cMasterProtocolGuid,
-    &I2cMasterContext->RockchipI2cMaster,
-    &gEfiDevicePathProtocolGuid,
-    (EFI_DEVICE_PATH_PROTOCOL *) DevicePath,
-    NULL);
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  &I2cMasterContext->Controller,
+                  &gEfiI2cMasterProtocolGuid,
+                  &I2cMasterContext->I2cMaster,
+                  &gEfiI2cEnumerateProtocolGuid,
+                  &I2cMasterContext->I2cEnumerate,
+                  &gEfiI2cBusConfigurationManagementProtocolGuid,
+                  &I2cMasterContext->I2cBusConf,
+                  &gRockchipI2cMasterProtocolGuid,
+                  &I2cMasterContext->RockchipI2cMaster,
+                  &gEfiDevicePathProtocolGuid,
+                  (EFI_DEVICE_PATH_PROTOCOL *)DevicePath,
+                  NULL
+                  );
 
-  if (EFI_ERROR(Status)) {
-    DEBUG((DEBUG_ERROR, "I2cDxe: Installing protocol interfaces failed!\n"));
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "I2cDxe: Installing protocol interfaces failed!\n"));
     goto fail;
   }
 
@@ -288,7 +315,7 @@ fail:
     gBS->CloseEvent (VirtualAddressChangeEvent);
   }
 
-  FreePool(I2cMasterContext);
+  FreePool (I2cMasterContext);
   return Status;
 }
 
@@ -300,10 +327,10 @@ OnEndOfDxe (
   IN VOID       *Context
   )
 {
-  EFI_STATUS    Status;
-  EFI_HANDLE    *Handles;
-  UINTN         HandleCount;
-  UINTN         Index;
+  EFI_STATUS  Status;
+  EFI_HANDLE  *Handles;
+  UINTN       HandleCount;
+  UINTN       Index;
 
   gBS->CloseEvent (Event);
 
@@ -314,17 +341,25 @@ OnEndOfDxe (
                   &HandleCount,
                   &Handles
                   );
-  if (EFI_ERROR(Status)) {
-    DEBUG((DEBUG_WARN, "%a: Couldn't locate gEfiI2cMasterProtocolGuid. Status=%r\n",
-            __func__, Status));
+  if (EFI_ERROR (Status)) {
+    DEBUG ((
+      DEBUG_WARN,
+      "%a: Couldn't locate gEfiI2cMasterProtocolGuid. Status=%r\n",
+      __func__,
+      Status
+      ));
     return;
   }
 
   for (Index = 0; Index < HandleCount; Index++) {
     Status = gBS->ConnectController (Handles[Index], NULL, NULL, TRUE);
-    if (EFI_ERROR(Status)) {
-      DEBUG ((DEBUG_ERROR, "%a: ConnectController () failed. Status=%r\n",
-              __func__, Status));
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: ConnectController () failed. Status=%r\n",
+        __func__,
+        Status
+        ));
     }
   }
 
@@ -334,28 +369,32 @@ OnEndOfDxe (
 EFI_STATUS
 EFIAPI
 I2cInitialise (
-  IN EFI_HANDLE  ImageHandle,
+  IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  EFI_PHYSICAL_ADDRESS BaseAddress;
-  EFI_EVENT EndOfDxeEvent;
-  UINT8 *DeviceBusPcd;
-  UINT32 DeviceBusCount;
-  UINT8 *BusRuntimeSupport;
-  EFI_STATUS Status;
-  UINTN Index;
-  BOOLEAN ConfiguredBuses[I2C_COUNT] = {0};
+  EFI_PHYSICAL_ADDRESS  BaseAddress;
+  EFI_EVENT             EndOfDxeEvent;
+  UINT8                 *DeviceBusPcd;
+  UINT32                DeviceBusCount;
+  UINT8                 *BusRuntimeSupport;
+  EFI_STATUS            Status;
+  UINTN                 Index;
+  BOOLEAN               ConfiguredBuses[I2C_COUNT] = { 0 };
 
-  DeviceBusPcd = PcdGetPtr (PcdI2cSlaveBuses);
-  DeviceBusCount = PcdGetSize (PcdI2cSlaveBuses);
+  DeviceBusPcd      = PcdGetPtr (PcdI2cSlaveBuses);
+  DeviceBusCount    = PcdGetSize (PcdI2cSlaveBuses);
   BusRuntimeSupport = PcdGetPtr (PcdI2cSlaveBusesRuntimeSupport);
 
   /* Initialize enabled chips */
   for (Index = 0; Index < DeviceBusCount; Index++) {
     if (DeviceBusPcd[Index] > I2C_COUNT - 1) {
-      DEBUG ((DEBUG_WARN, "I2cInitialise: invalid bus %d for DeviceBusPcd index %d. Skipping.\n",
-              DeviceBusPcd[Index], Index));
+      DEBUG ((
+        DEBUG_WARN,
+        "I2cInitialise: invalid bus %d for DeviceBusPcd index %d. Skipping.\n",
+        DeviceBusPcd[Index],
+        Index
+        ));
       continue;
     }
 
@@ -365,34 +404,42 @@ I2cInitialise (
     // more than one device on a bus. Don't reinitialize in this case.
     //
     if (ConfiguredBuses[DeviceBusPcd[Index]]) {
-      DEBUG ((DEBUG_VERBOSE, "%a: Bus %d already configured. Skipping.\n",
-              __FUNCTION__, DeviceBusPcd[Index]));
+      DEBUG ((
+        DEBUG_VERBOSE,
+        "%a: Bus %d already configured. Skipping.\n",
+        __FUNCTION__,
+        DeviceBusPcd[Index]
+        ));
       continue;
     }
+
     ConfiguredBuses[DeviceBusPcd[Index]] = TRUE;
 
     BaseAddress = I2C_BASE (DeviceBusPcd[Index]);
 
     I2cIomux (DeviceBusPcd[Index]);
 
-    Status = I2cInitialiseController(
-      ImageHandle,
-      SystemTable,
-      BaseAddress,
-      DeviceBusPcd[Index],
-      BusRuntimeSupport[Index]
-      );
+    Status = I2cInitialiseController (
+               ImageHandle,
+               SystemTable,
+               BaseAddress,
+               DeviceBusPcd[Index],
+               BusRuntimeSupport[Index]
+               );
 
-    if (EFI_ERROR(Status))
+    if (EFI_ERROR (Status)) {
       return Status;
+    }
   }
 
-  Status = gBS->CreateEventEx (EVT_NOTIFY_SIGNAL,
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
                   TPL_CALLBACK,
                   OnEndOfDxe,
                   NULL,
                   &gEfiEndOfDxeEventGroupGuid,
-                  &EndOfDxeEvent);
+                  &EndOfDxeEvent
+                  );
   ASSERT_EFI_ERROR (Status);
 
   return EFI_SUCCESS;
@@ -401,92 +448,96 @@ I2cInitialise (
 STATIC
 VOID
 I2cCalBaudRate (
-  IN I2C_MASTER_CONTEXT *I2cMasterContext,
-  IN UINT32 Target,
-  IN UINT32 ClkRate
+  IN I2C_MASTER_CONTEXT  *I2cMasterContext,
+  IN UINT32              Target,
+  IN UINT32              ClkRate
   )
 {
-  int Div, Divl, Divh;
+  int  Div, Divl, Divh;
 
-  Div = DIV_ROUND_UP(ClkRate, Target * 8) - 2;
+  Div  = DIV_ROUND_UP (ClkRate, Target * 8) - 2;
   Divh = 0;
   Divl = 0;
   if (Div >= 0) {
     Divl = Div / 2;
-    if (Div % 2 == 0)
+    if (Div % 2 == 0) {
       Divh = Div / 2;
-    else
-      Divh = DIV_ROUND_UP(Div, 2);
+    } else {
+      Divh = DIV_ROUND_UP (Div, 2);
+    }
   }
 
-  I2cWrite(I2cMasterContext, I2C_CLKDIV,  I2C_CLKDIV_VAL(Divl, Divh));
+  I2cWrite (I2cMasterContext, I2C_CLKDIV, I2C_CLKDIV_VAL (Divl, Divh));
 }
 
 STATIC
 EFI_STATUS
 I2cAdapterBaudRate (
-  IN I2C_MASTER_CONTEXT *I2cMasterContext,
-  IN UINT32 Target,
-  IN UINT32 ClkRate
+  IN I2C_MASTER_CONTEXT  *I2cMasterContext,
+  IN UINT32              Target,
+  IN UINT32              ClkRate
   )
 {
-  CONST I2C_SPEC_VALUES *Spec;
-  UINT32 MinTotalDiv, MinLowDiv, MinHighDiv, MinHoldDiv;
-  UINT32 LowDiv, HighDiv, ExtraDiv, ExtraLowDiv;
-  UINT32 MinLowNs, MinHighNs;
-  UINT32 StartSetup = 0;
-  UINT32 Speed;
+  CONST I2C_SPEC_VALUES  *Spec;
+  UINT32                 MinTotalDiv, MinLowDiv, MinHighDiv, MinHoldDiv;
+  UINT32                 LowDiv, HighDiv, ExtraDiv, ExtraLowDiv;
+  UINT32                 MinLowNs, MinHighNs;
+  UINT32                 StartSetup = 0;
+  UINT32                 Speed;
 
-  if (Target <= 100000 && Target >= 1000) {
+  if ((Target <= 100000) && (Target >= 1000)) {
     StartSetup = 1;
-    Speed = 100;
-  } else if (Target <= 400000 && Target >= 100000) {
+    Speed      = 100;
+  } else if ((Target <= 400000) && (Target >= 100000)) {
     Speed = 400;
-  } else if (Target <= 1000000 && Target > 400000) {
+  } else if ((Target <= 1000000) && (Target > 400000)) {
     Speed = 1000;
   } else {
     DEBUG ((DEBUG_ERROR, "invalid i2c speed : %d\n", Target));
     return EFI_INVALID_PARAMETER;
   }
 
-  Spec = I2cGetSpec(I2cMasterContext, Speed);
-  ClkRate = DIV_ROUND_UP(ClkRate, 1000);
-  Speed = DIV_ROUND_UP(Target, 1000);
+  Spec    = I2cGetSpec (I2cMasterContext, Speed);
+  ClkRate = DIV_ROUND_UP (ClkRate, 1000);
+  Speed   = DIV_ROUND_UP (Target, 1000);
 
-  MinTotalDiv = DIV_ROUND_UP(ClkRate, Speed * 8);
+  MinTotalDiv = DIV_ROUND_UP (ClkRate, Speed * 8);
 
-  MinHighNs = Spec->MaxRiseNs + Spec->MinHighNs;
-  MinHighDiv = DIV_ROUND_UP(ClkRate * MinHighNs, 8 * 1000000);
+  MinHighNs  = Spec->MaxRiseNs + Spec->MinHighNs;
+  MinHighDiv = DIV_ROUND_UP (ClkRate * MinHighNs, 8 * 1000000);
 
-  MinLowNs = Spec->MaxFallNs + Spec->MinLowNs;
-  MinLowDiv = DIV_ROUND_UP(ClkRate * MinLowNs, 8 * 1000000);
+  MinLowNs  = Spec->MaxFallNs + Spec->MinLowNs;
+  MinLowDiv = DIV_ROUND_UP (ClkRate * MinLowNs, 8 * 1000000);
 
   MinHighDiv = (MinHighDiv < 1) ? 2 : MinHighDiv;
-  MinLowDiv = (MinLowDiv < 1) ? 2 : MinLowDiv;
+  MinLowDiv  = (MinLowDiv < 1) ? 2 : MinLowDiv;
 
   MinHoldDiv = MinHighDiv + MinLowDiv;
 
   if (MinHoldDiv >= MinTotalDiv) {
     HighDiv = MinHighDiv;
-    LowDiv = MinLowDiv;
+    LowDiv  = MinLowDiv;
   } else {
-    ExtraDiv = MinTotalDiv - MinHoldDiv;
-    ExtraLowDiv = DIV_ROUND_UP(MinLowDiv * ExtraDiv,
-                              MinHoldDiv);
+    ExtraDiv    = MinTotalDiv - MinHoldDiv;
+    ExtraLowDiv = DIV_ROUND_UP (
+                    MinLowDiv * ExtraDiv,
+                    MinHoldDiv
+                    );
 
-    LowDiv = MinLowDiv + ExtraLowDiv;
+    LowDiv  = MinLowDiv + ExtraLowDiv;
     HighDiv = MinHighDiv + (ExtraDiv - ExtraLowDiv);
   }
 
   HighDiv--;
   LowDiv--;
 
-  if (HighDiv > 0xffff || LowDiv > 0xffff)
+  if ((HighDiv > 0xffff) || (LowDiv > 0xffff)) {
     return EFI_UNSUPPORTED;
+  }
 
   /* 1 for data hold/setup time is enough */
-  I2cMasterContext->Config = I2C_CON_SDA_CFG(1) | I2C_CON_STA_CFG(StartSetup);
-  I2cWrite(I2cMasterContext, I2C_CLKDIV, (HighDiv << I2C_CLK_DIV_HIGH_SHIFT) | LowDiv);
+  I2cMasterContext->Config = I2C_CON_SDA_CFG (1) | I2C_CON_STA_CFG (StartSetup);
+  I2cWrite (I2cMasterContext, I2C_CLKDIV, (HighDiv << I2C_CLK_DIV_HIGH_SHIFT) | LowDiv);
 
   return EFI_SUCCESS;
 }
@@ -495,9 +546,9 @@ STATIC
 EFI_STATUS
 EFIAPI
 I2cSetBusFrequency (
-  IN CONST EFI_I2C_MASTER_PROTOCOL   *This,
-  IN OUT UINTN                       *BusClockHertz
- )
+  IN CONST EFI_I2C_MASTER_PROTOCOL  *This,
+  IN OUT UINTN                      *BusClockHertz
+  )
 {
   //
   // Bus frequency is already set in the entry point.
@@ -512,24 +563,24 @@ I2cSetBusFrequency (
 EFI_STATUS
 EFIAPI
 I2cReset (
-  IN CONST EFI_I2C_MASTER_PROTOCOL *This
+  IN CONST EFI_I2C_MASTER_PROTOCOL  *This
   )
 {
-  DEBUG((DEBUG_VERBOSE, "I2cReset\n"));
+  DEBUG ((DEBUG_VERBOSE, "I2cReset\n"));
   return EFI_SUCCESS;
 }
 
 STATIC
 VOID
 I2cDisable (
-  IN I2C_MASTER_CONTEXT *I2cMasterContext
+  IN I2C_MASTER_CONTEXT  *I2cMasterContext
   )
 {
   DEBUG ((DEBUG_VERBOSE, "I2c I2cDisable.\n"));
 
-  I2cWrite(I2cMasterContext, I2C_IEN, 0);
-  I2cWrite(I2cMasterContext, I2C_IPD, I2C_IPD_ALL_CLEAN);
-  I2cWrite(I2cMasterContext, I2C_CON, 0);
+  I2cWrite (I2cMasterContext, I2C_IEN, 0);
+  I2cWrite (I2cMasterContext, I2C_IPD, I2C_IPD_ALL_CLEAN);
+  I2cWrite (I2cMasterContext, I2C_CON, 0);
 }
 
 /*
@@ -538,27 +589,29 @@ I2cDisable (
 STATIC
 EFI_STATUS
 I2cStartEnable (
-  IN I2C_MASTER_CONTEXT *I2cMasterContext,
-  IN UINT32 Con,
-  IN UINTN Timeout
+  IN I2C_MASTER_CONTEXT  *I2cMasterContext,
+  IN UINT32              Con,
+  IN UINTN               Timeout
   )
 {
   DEBUG ((DEBUG_VERBOSE, "I2cStartEnable\n"));
 
-  I2cWrite(I2cMasterContext, I2C_IPD, I2C_IPD_ALL_CLEAN);
-  I2cWrite(I2cMasterContext, I2C_IEN, I2C_STARTIEN);
-  I2cWrite(I2cMasterContext, I2C_CON, I2C_CON_EN | I2C_CON_START | Con |I2cMasterContext->Config);
+  I2cWrite (I2cMasterContext, I2C_IPD, I2C_IPD_ALL_CLEAN);
+  I2cWrite (I2cMasterContext, I2C_IEN, I2C_STARTIEN);
+  I2cWrite (I2cMasterContext, I2C_CON, I2C_CON_EN | I2C_CON_START | Con |I2cMasterContext->Config);
 
   while (Timeout--) {
-    if (I2cRead(I2cMasterContext, I2C_IPD) & I2C_STARTIPD) {
-        I2cWrite(I2cMasterContext, I2C_IPD, I2C_STARTIPD);
-        break;
+    if (I2cRead (I2cMasterContext, I2C_IPD) & I2C_STARTIPD) {
+      I2cWrite (I2cMasterContext, I2C_IPD, I2C_STARTIPD);
+      break;
     }
-    MicroSecondDelay(1);
+
+    MicroSecondDelay (1);
   }
+
   if (Timeout <= 0) {
     DEBUG ((DEBUG_ERROR, "I2C Send Start Bit Timeout\n"));
-    I2cShowRegs(I2cMasterContext);
+    I2cShowRegs (I2cMasterContext);
     return EFI_TIMEOUT;
   }
 
@@ -568,28 +621,29 @@ I2cStartEnable (
 STATIC
 EFI_STATUS
 I2cStop (
-  IN I2C_MASTER_CONTEXT *I2cMasterContext
+  IN I2C_MASTER_CONTEXT  *I2cMasterContext
   )
 {
-  int TimeOut = I2C_READY_TIMEOUT;
+  int  TimeOut = I2C_READY_TIMEOUT;
 
   DEBUG ((DEBUG_VERBOSE, "I2c Send Stop bit.\n"));
 
-  I2cWrite(I2cMasterContext, I2C_IPD, I2C_IPD_ALL_CLEAN);
-  I2cWrite(I2cMasterContext, I2C_CON, I2C_CON_EN | I2C_CON_STOP |I2cMasterContext->Config);
-  I2cWrite(I2cMasterContext, I2C_IEN, I2C_CON_STOP);
+  I2cWrite (I2cMasterContext, I2C_IPD, I2C_IPD_ALL_CLEAN);
+  I2cWrite (I2cMasterContext, I2C_CON, I2C_CON_EN | I2C_CON_STOP |I2cMasterContext->Config);
+  I2cWrite (I2cMasterContext, I2C_IEN, I2C_CON_STOP);
 
   while (TimeOut--) {
-    if (I2cRead(I2cMasterContext, I2C_IPD) & I2C_STOPIPD) {
-      I2cWrite(I2cMasterContext, I2C_IPD, I2C_STOPIPD);
+    if (I2cRead (I2cMasterContext, I2C_IPD) & I2C_STOPIPD) {
+      I2cWrite (I2cMasterContext, I2C_IPD, I2C_STOPIPD);
       break;
     }
-    MicroSecondDelay(1);
+
+    MicroSecondDelay (1);
   }
 
   if (TimeOut <= 0) {
     DEBUG ((DEBUG_ERROR, "I2C Send Stop Bit Timeout\n"));
-    I2cShowRegs(I2cMasterContext);
+    I2cShowRegs (I2cMasterContext);
     return EFI_TIMEOUT;
   }
 
@@ -599,105 +653,115 @@ I2cStop (
 STATIC
 EFI_STATUS
 I2cReadOperation (
-  IN I2C_MASTER_CONTEXT *I2cMasterContext,
-  IN UINTN SlaveAddress,
-  IN OUT UINT8 *Buf,
-  IN UINTN Length,
-  IN OUT UINTN *Read,
-  IN UINTN Snd,
-  IN UINTN Timeout
+  IN I2C_MASTER_CONTEXT  *I2cMasterContext,
+  IN UINTN               SlaveAddress,
+  IN OUT UINT8           *Buf,
+  IN UINTN               Length,
+  IN OUT UINTN           *Read,
+  IN UINTN               Snd,
+  IN UINTN               Timeout
   )
 {
-  EFI_STATUS Status = EFI_SUCCESS;
-  int TimeOut = I2C_TIMEOUT_US;
-  UINT8 *PBuf = Buf;
-  UINT32 BytesRemainLen = Length;
-  UINT32 BytesTranferedLen = 0;
-  UINT32 WordsTranferedLen = 0;
-  UINT32 Con = 0;
-  UINT32 RxData;
-  UINT32 i, j;
-  UINTN SndChunk = 0;
+  EFI_STATUS  Status            = EFI_SUCCESS;
+  int         TimeOut           = I2C_TIMEOUT_US;
+  UINT8       *PBuf             = Buf;
+  UINT32      BytesRemainLen    = Length;
+  UINT32      BytesTranferedLen = 0;
+  UINT32      WordsTranferedLen = 0;
+  UINT32      Con               = 0;
+  UINT32      RxData;
+  UINT32      i, j;
+  UINTN       SndChunk = 0;
 
-  DEBUG ((DEBUG_VERBOSE, "I2cRead: base_addr = 0x%x buf = %p, Length = %d\n",
-  	         I2cMasterContext->BaseAddress, Buf, Length));
+  DEBUG ((
+    DEBUG_VERBOSE,
+    "I2cRead: base_addr = 0x%x buf = %p, Length = %d\n",
+    I2cMasterContext->BaseAddress,
+    Buf,
+    Length
+    ));
 
   /* If the second message for TRX read, resetting internal state. */
   if (Snd) {
-    I2cWrite(I2cMasterContext, I2C_CON, 0);
+    I2cWrite (I2cMasterContext, I2C_CON, 0);
   }
 
- I2cWrite(I2cMasterContext, I2C_MRXADDR, I2C_MRXADDR_SET(1, SlaveAddress << 1 | 1));
+  I2cWrite (I2cMasterContext, I2C_MRXADDR, I2C_MRXADDR_SET (1, SlaveAddress << 1 | 1));
 
- (*Read) = 0;
+  (*Read) = 0;
   while (BytesRemainLen) {
-  if (BytesRemainLen > RK_I2C_FIFO_SIZE) {
-    Con = I2C_CON_EN;
-    BytesTranferedLen = 32;
-  } else {
-    /*
-      * The hw can read up to 32 bytes at a time. If we need
-      * more than one chunk, send an ACK after the last byte.
-      */
-    Con = I2C_CON_EN | I2C_CON_LASTACK;
-    BytesTranferedLen = BytesRemainLen;
-  }
-  WordsTranferedLen = DIV_ROUND_UP(BytesTranferedLen, 4);
-
-  /*
-    * make sure we are in plain RX mode if we read a second chunk;
-    * and first rx read need to send start bit.
-    */
-  if (SndChunk) {
-    Con |= I2C_CON_MOD(I2C_MODE_RX);
-    I2cWrite(I2cMasterContext, I2C_CON, Con | I2cMasterContext->Config);
-  } else {
-    Con |= I2C_CON_MOD(I2C_MODE_TRX);
-    Status = I2cStartEnable(I2cMasterContext, Con, I2C_TIMEOUT_US);
-    if (EFI_ERROR(Status))
-      goto out;
+    if (BytesRemainLen > RK_I2C_FIFO_SIZE) {
+      Con               = I2C_CON_EN;
+      BytesTranferedLen = 32;
+    } else {
+      /*
+        * The hw can read up to 32 bytes at a time. If we need
+        * more than one chunk, send an ACK after the last byte.
+        */
+      Con               = I2C_CON_EN | I2C_CON_LASTACK;
+      BytesTranferedLen = BytesRemainLen;
     }
 
-    I2cWrite(I2cMasterContext, I2C_IEN, I2C_MBRFIEN | I2C_NAKRCVIEN);
-    I2cWrite(I2cMasterContext, I2C_MRXCNT, BytesTranferedLen);
+    WordsTranferedLen = DIV_ROUND_UP (BytesTranferedLen, 4);
+
+    /*
+      * make sure we are in plain RX mode if we read a second chunk;
+      * and first rx read need to send start bit.
+      */
+    if (SndChunk) {
+      Con |= I2C_CON_MOD (I2C_MODE_RX);
+      I2cWrite (I2cMasterContext, I2C_CON, Con | I2cMasterContext->Config);
+    } else {
+      Con   |= I2C_CON_MOD (I2C_MODE_TRX);
+      Status = I2cStartEnable (I2cMasterContext, Con, I2C_TIMEOUT_US);
+      if (EFI_ERROR (Status)) {
+        goto out;
+      }
+    }
+
+    I2cWrite (I2cMasterContext, I2C_IEN, I2C_MBRFIEN | I2C_NAKRCVIEN);
+    I2cWrite (I2cMasterContext, I2C_MRXCNT, BytesTranferedLen);
 
     while (TimeOut--) {
-      if (I2cRead(I2cMasterContext, I2C_IPD) & I2C_NAKRCVIPD) {
-        I2cWrite(I2cMasterContext, I2C_IPD, I2C_NAKRCVIPD);
+      if (I2cRead (I2cMasterContext, I2C_IPD) & I2C_NAKRCVIPD) {
+        I2cWrite (I2cMasterContext, I2C_IPD, I2C_NAKRCVIPD);
         Status = EFI_NO_RESPONSE;
         goto out;
       }
 
-      if (I2cRead(I2cMasterContext, I2C_IPD) & I2C_MBRFIPD) {
-        I2cWrite(I2cMasterContext, I2C_IPD, I2C_MBRFIPD);
+      if (I2cRead (I2cMasterContext, I2C_IPD) & I2C_MBRFIPD) {
+        I2cWrite (I2cMasterContext, I2C_IPD, I2C_MBRFIPD);
         break;
       }
-      MicroSecondDelay(1);
+
+      MicroSecondDelay (1);
     }
 
     if (TimeOut <= 0) {
       DEBUG ((DEBUG_ERROR, "I2C Read Data Timeout\n"));
-      I2cShowRegs(I2cMasterContext);
+      I2cShowRegs (I2cMasterContext);
       Status = EFI_TIMEOUT;
       goto out;
     }
 
     for (i = 0; i < WordsTranferedLen; i++) {
-      RxData = I2cRead(I2cMasterContext, I2C_RXDATA_BASE + i * 4);
+      RxData = I2cRead (I2cMasterContext, I2C_RXDATA_BASE + i * 4);
       DEBUG ((DEBUG_VERBOSE, "I2c Read RXDATA[%d] = 0x%x\n", i, RxData));
       for (j = 0; j < 4; j++) {
         if ((i * 4 + j) == BytesTranferedLen) {
-        break;
+          break;
+        }
+
+        *PBuf++ = (RxData >> (j * 8)) & 0xff;
       }
-      *PBuf++ = (RxData >> (j * 8)) & 0xff;
     }
-  }
-  BytesRemainLen -= BytesTranferedLen;
-  SndChunk = 1;
-  (*Read) = BytesTranferedLen;
+
+    BytesRemainLen -= BytesTranferedLen;
+    SndChunk        = 1;
+    (*Read)         = BytesTranferedLen;
   }
 
-  Status = EFI_SUCCESS;
+  Status  = EFI_SUCCESS;
   (*Read) = Length;
 
 out:
@@ -707,26 +771,31 @@ out:
 STATIC
 EFI_STATUS
 I2cWriteOperation (
-  IN I2C_MASTER_CONTEXT *I2cMasterContext,
-  IN UINTN SlaveAddress,
-  IN OUT CONST UINT8 *Buf,
-  IN UINTN Length,
-  IN OUT UINTN *Sent,
-  IN UINTN Timeout
+  IN I2C_MASTER_CONTEXT  *I2cMasterContext,
+  IN UINTN               SlaveAddress,
+  IN OUT CONST UINT8     *Buf,
+  IN UINTN               Length,
+  IN OUT UINTN           *Sent,
+  IN UINTN               Timeout
   )
 {
-  EFI_STATUS Status = EFI_SUCCESS;
-  int TimeOut = I2C_TIMEOUT_US;
-  CONST UINT8 *PBuf = Buf;
-  UINT32 BytesRemainLen = Length + 1;
-  UINT32 BytesTranferedLen = 0;
-  UINT32 WordsTranferedLen = 0;
-  UINT32 TxData;
-  UINT32 i, j;
-  UINTN Next = 0;
+  EFI_STATUS   Status            = EFI_SUCCESS;
+  int          TimeOut           = I2C_TIMEOUT_US;
+  CONST UINT8  *PBuf             = Buf;
+  UINT32       BytesRemainLen    = Length + 1;
+  UINT32       BytesTranferedLen = 0;
+  UINT32       WordsTranferedLen = 0;
+  UINT32       TxData;
+  UINT32       i, j;
+  UINTN        Next = 0;
 
-  DEBUG ((DEBUG_VERBOSE, "I2cWrite: base_addr = 0x%x buf = %p, Length = %d\n",
-                 I2cMasterContext->BaseAddress, Buf, Length));
+  DEBUG ((
+    DEBUG_VERBOSE,
+    "I2cWrite: base_addr = 0x%x buf = %p, Length = %d\n",
+    I2cMasterContext->BaseAddress,
+    Buf,
+    Length
+    ));
 
   (*Sent) = 0;
 
@@ -736,7 +805,8 @@ I2cWriteOperation (
     } else {
       BytesTranferedLen = BytesRemainLen;
     }
-    WordsTranferedLen = DIV_ROUND_UP(BytesTranferedLen, 4);
+
+    WordsTranferedLen = DIV_ROUND_UP (BytesTranferedLen, 4);
 
     for (i = 0; i < WordsTranferedLen; i++) {
       TxData = 0;
@@ -745,62 +815,73 @@ I2cWriteOperation (
           break;
         }
 
-        if (i == 0 && j == 0 && PBuf == Buf) {
+        if ((i == 0) && (j == 0) && (PBuf == Buf)) {
           TxData |= (SlaveAddress << 1);
         } else {
           TxData |= (*PBuf++)<<(j * 8);
         }
       }
-      I2cWrite(I2cMasterContext, I2C_TXDATA_BASE + i * 4, TxData);
+
+      I2cWrite (I2cMasterContext, I2C_TXDATA_BASE + i * 4, TxData);
       DEBUG ((DEBUG_VERBOSE, "I2c Write TXDATA[%d] = 0x%x\n", i, TxData));
     }
 
     /* If the write is the first, need to send start bit */
     if (!Next) {
-      Status = I2cStartEnable(I2cMasterContext, I2C_CON_EN |
-                 I2C_CON_MOD(I2C_MODE_TX), I2C_TIMEOUT_US);
-      if (EFI_ERROR(Status)) {
+      Status = I2cStartEnable (
+                 I2cMasterContext,
+                 I2C_CON_EN |
+                 I2C_CON_MOD (I2C_MODE_TX),
+                 I2C_TIMEOUT_US
+                 );
+      if (EFI_ERROR (Status)) {
         goto out;
       }
-       Next = 1;
+
+      Next = 1;
     } else {
-      I2cWrite(I2cMasterContext, I2C_CON, I2C_CON_EN |
-               I2C_CON_MOD(I2C_MODE_TX) | I2cMasterContext->Config);
+      I2cWrite (
+        I2cMasterContext,
+        I2C_CON,
+        I2C_CON_EN |
+        I2C_CON_MOD (I2C_MODE_TX) | I2cMasterContext->Config
+        );
     }
 
-    I2cWrite(I2cMasterContext, I2C_IEN, I2C_MBTFIEN | I2C_NAKRCVIEN);
-    I2cWrite(I2cMasterContext, I2C_MTXCNT, BytesTranferedLen);
+    I2cWrite (I2cMasterContext, I2C_IEN, I2C_MBTFIEN | I2C_NAKRCVIEN);
+    I2cWrite (I2cMasterContext, I2C_MTXCNT, BytesTranferedLen);
 
     while (TimeOut--) {
-      if (I2cRead(I2cMasterContext, I2C_IPD) & I2C_NAKRCVIPD) {
-        I2cWrite(I2cMasterContext, I2C_IPD, I2C_NAKRCVIPD);
+      if (I2cRead (I2cMasterContext, I2C_IPD) & I2C_NAKRCVIPD) {
+        I2cWrite (I2cMasterContext, I2C_IPD, I2C_NAKRCVIPD);
         Status = EFI_NO_RESPONSE;
         goto out;
       }
-      if (I2cRead(I2cMasterContext, I2C_IPD) & I2C_MBTFIPD) {
-        I2cWrite(I2cMasterContext, I2C_IPD, I2C_MBTFIPD);
+
+      if (I2cRead (I2cMasterContext, I2C_IPD) & I2C_MBTFIPD) {
+        I2cWrite (I2cMasterContext, I2C_IPD, I2C_MBTFIPD);
         break;
       }
-      MicroSecondDelay(1);
+
+      MicroSecondDelay (1);
     }
 
     if (TimeOut <= 0) {
       DEBUG ((DEBUG_ERROR, "I2C Write Data Timeout\n"));
-      I2cShowRegs(I2cMasterContext);
+      I2cShowRegs (I2cMasterContext);
       Status = EFI_TIMEOUT;
       goto out;
     }
 
     BytesRemainLen -= BytesTranferedLen;
-    (*Sent) = BytesTranferedLen;
+    (*Sent)         = BytesTranferedLen;
   }
 
   (*Sent) = Length;
-  Status = EFI_SUCCESS;
+  Status  = EFI_SUCCESS;
 out:
   return (Status);
 }
-
 
 /*
  * I2cStartRequest should be called only by I2cHost.
@@ -809,22 +890,22 @@ out:
 STATIC
 EFI_STATUS
 I2cStartRequest (
-  IN CONST EFI_I2C_MASTER_PROTOCOL *This,
-  IN UINTN                         SlaveAddress,
-  IN EFI_I2C_REQUEST_PACKET        *RequestPacket,
-  IN EFI_EVENT                     Event      OPTIONAL,
-  OUT EFI_STATUS                   *I2cStatus OPTIONAL
+  IN CONST EFI_I2C_MASTER_PROTOCOL  *This,
+  IN UINTN                          SlaveAddress,
+  IN EFI_I2C_REQUEST_PACKET         *RequestPacket,
+  IN EFI_EVENT                      Event      OPTIONAL,
+  OUT EFI_STATUS                    *I2cStatus OPTIONAL
   )
 {
-  UINTN Count = RequestPacket->OperationCount;
-  UINTN ReadMode;
-  UINTN Transmitted;
-  I2C_MASTER_CONTEXT *I2cMasterContext = I2C_SC_FROM_MASTER(This);
-  EFI_I2C_OPERATION *Operation;
-  EFI_STATUS Status = EFI_SUCCESS;
-  UINTN i;
-  BOOLEAN AtRuntime;
-  EFI_TPL Tpl;
+  UINTN               Count = RequestPacket->OperationCount;
+  UINTN               ReadMode;
+  UINTN               Transmitted;
+  I2C_MASTER_CONTEXT  *I2cMasterContext = I2C_SC_FROM_MASTER (This);
+  EFI_I2C_OPERATION   *Operation;
+  EFI_STATUS          Status = EFI_SUCCESS;
+  UINTN               i;
+  BOOLEAN             AtRuntime;
+  EFI_TPL             Tpl;
 
   ASSERT (RequestPacket != NULL);
   ASSERT (I2cMasterContext != NULL);
@@ -832,7 +913,7 @@ I2cStartRequest (
   AtRuntime = EfiAtRuntime ();
 
   // Events do not fire at runtime, so we can't support asynchronous requests.
-  if (AtRuntime && Event != NULL) {
+  if (AtRuntime && (Event != NULL)) {
     return EFI_UNSUPPORTED;
   }
 
@@ -851,32 +932,36 @@ I2cStartRequest (
     //
   }
 
-  if (Count > 2 || ((Count == 2) && (RequestPacket->Operation->Flags & I2C_FLAG_READ))) {
+  if ((Count > 2) || ((Count == 2) && (RequestPacket->Operation->Flags & I2C_FLAG_READ))) {
     DEBUG ((DEBUG_VERBOSE, "Not support more messages now, split them\n"));
     return EFI_INVALID_PARAMETER;
   }
 
   for (i = 0; i < Count; i++) {
     Operation = &RequestPacket->Operation[i];
-    ReadMode = Operation->Flags & I2C_FLAG_READ;
+    ReadMode  = Operation->Flags & I2C_FLAG_READ;
 
     if (Operation->Flags & I2C_FLAG_READ) {
       /* If snd is true, it is TRX mode. */
-      Status = I2cReadOperation ( I2cMasterContext,
-                                  SlaveAddress,
-                                  Operation->Buffer,
-                                  Operation->LengthInBytes,
-                                  &Transmitted,
-                                  i == 1,
-                                  I2C_TRANSFER_TIMEOUT);
-                                  Operation->LengthInBytes = Transmitted;
+      Status = I2cReadOperation (
+                 I2cMasterContext,
+                 SlaveAddress,
+                 Operation->Buffer,
+                 Operation->LengthInBytes,
+                 &Transmitted,
+                 i == 1,
+                 I2C_TRANSFER_TIMEOUT
+                 );
+      Operation->LengthInBytes = Transmitted;
     } else {
-      Status = I2cWriteOperation ( I2cMasterContext,
-                                   SlaveAddress,
-                                   Operation->Buffer,
-                                   Operation->LengthInBytes,
-                                   &Transmitted,
-                                   I2C_TRANSFER_TIMEOUT);
+      Status = I2cWriteOperation (
+                 I2cMasterContext,
+                 SlaveAddress,
+                 Operation->Buffer,
+                 Operation->LengthInBytes,
+                 &Transmitted,
+                 I2C_TRANSFER_TIMEOUT
+                 );
       Operation->LengthInBytes = Transmitted;
     }
 
@@ -896,64 +981,77 @@ I2cStartRequest (
     // TO-DO: See above.
   }
 
-  if (I2cStatus != NULL)
+  if (I2cStatus != NULL) {
     *I2cStatus = EFI_SUCCESS;
-  if (Event != NULL)
-    gBS->SignalEvent(Event);
+  }
+
+  if (Event != NULL) {
+    gBS->SignalEvent (Event);
+  }
+
   return EFI_SUCCESS;
 }
 
-STATIC CONST EFI_GUID DevGuid = I2C_GUID;
+STATIC CONST EFI_GUID  DevGuid = I2C_GUID;
 
 STATIC
 EFI_STATUS
 I2cAllocDevice (
-  IN UINT8 SlaveAddress,
-  IN UINT8 Bus,
-  IN OUT CONST EFI_I2C_DEVICE **Device
+  IN UINT8                     SlaveAddress,
+  IN UINT8                     Bus,
+  IN OUT CONST EFI_I2C_DEVICE  **Device
   )
 {
-  EFI_STATUS Status;
-  EFI_I2C_DEVICE *Dev;
-  UINT32 *TmpSlaveArray;
-  EFI_GUID *TmpGuidP;
+  EFI_STATUS      Status;
+  EFI_I2C_DEVICE  *Dev;
+  UINT32          *TmpSlaveArray;
+  EFI_GUID        *TmpGuidP;
 
-  Status = gBS->AllocatePool ( EfiBootServicesData,
-             sizeof(EFI_I2C_DEVICE),
-             (VOID **) &Dev );
-  if (EFI_ERROR(Status)) {
-    DEBUG((DEBUG_ERROR, "I2cDxe: I2C device memory allocation failed\n"));
+  Status = gBS->AllocatePool (
+                  EfiBootServicesData,
+                  sizeof (EFI_I2C_DEVICE),
+                  (VOID **)&Dev
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "I2cDxe: I2C device memory allocation failed\n"));
     return Status;
   }
-  *Device = Dev;
-  Dev->DeviceIndex = SlaveAddress;
-  Dev->DeviceIndex = I2C_DEVICE_INDEX(Bus, SlaveAddress);
-  Dev->SlaveAddressCount = 1;
+
+  *Device                  = Dev;
+  Dev->DeviceIndex         = SlaveAddress;
+  Dev->DeviceIndex         = I2C_DEVICE_INDEX (Bus, SlaveAddress);
+  Dev->SlaveAddressCount   = 1;
   Dev->I2cBusConfiguration = 0;
-  Status = gBS->AllocatePool ( EfiBootServicesData,
-             sizeof(UINT32),
-             (VOID **) &TmpSlaveArray);
-  if (EFI_ERROR(Status)) {
+  Status                   = gBS->AllocatePool (
+                                    EfiBootServicesData,
+                                    sizeof (UINT32),
+                                    (VOID **)&TmpSlaveArray
+                                    );
+  if (EFI_ERROR (Status)) {
     goto fail1;
   }
-  TmpSlaveArray[0] = SlaveAddress;
+
+  TmpSlaveArray[0]       = SlaveAddress;
   Dev->SlaveAddressArray = TmpSlaveArray;
 
-  Status = gBS->AllocatePool ( EfiBootServicesData,
-             sizeof(EFI_GUID),
-             (VOID **) &TmpGuidP);
-  if (EFI_ERROR(Status)) {
+  Status = gBS->AllocatePool (
+                  EfiBootServicesData,
+                  sizeof (EFI_GUID),
+                  (VOID **)&TmpGuidP
+                  );
+  if (EFI_ERROR (Status)) {
     goto fail2;
   }
-  *TmpGuidP = DevGuid;
+
+  *TmpGuidP       = DevGuid;
   Dev->DeviceGuid = TmpGuidP;
 
   return EFI_SUCCESS;
 
 fail2:
-  FreePool(TmpSlaveArray);
+  FreePool (TmpSlaveArray);
 fail1:
-  FreePool(Dev);
+  FreePool (Dev);
 
   return Status;
 }
@@ -970,45 +1068,54 @@ STATIC
 EFI_STATUS
 EFIAPI
 I2cEnumerate (
-  IN CONST EFI_I2C_ENUMERATE_PROTOCOL *This,
-  IN OUT CONST EFI_I2C_DEVICE         **Device
+  IN CONST EFI_I2C_ENUMERATE_PROTOCOL  *This,
+  IN OUT CONST EFI_I2C_DEVICE          **Device
   )
 {
-  UINT8 *DevicesPcd;
-  UINT8 *DeviceBusPcd;
-  UINTN Index, NextIndex, DevCount;
-  UINT8 NextDeviceAddress;
-  I2C_MASTER_CONTEXT *I2cMasterContext = I2C_SC_FROM_ENUMERATE(This);
+  UINT8               *DevicesPcd;
+  UINT8               *DeviceBusPcd;
+  UINTN               Index, NextIndex, DevCount;
+  UINT8               NextDeviceAddress;
+  I2C_MASTER_CONTEXT  *I2cMasterContext = I2C_SC_FROM_ENUMERATE (This);
 
-  DevCount = PcdGetSize (PcdI2cSlaveAddresses);
-  DevicesPcd = PcdGetPtr (PcdI2cSlaveAddresses);
+  DevCount     = PcdGetSize (PcdI2cSlaveAddresses);
+  DevicesPcd   = PcdGetPtr (PcdI2cSlaveAddresses);
   DeviceBusPcd = PcdGetPtr (PcdI2cSlaveBuses);
   if (*Device == NULL) {
-    for (Index = 0; Index < DevCount ; Index++) {
-      if (DeviceBusPcd[Index] != I2cMasterContext->Bus)
+    for (Index = 0; Index < DevCount; Index++) {
+      if (DeviceBusPcd[Index] != I2cMasterContext->Bus) {
         continue;
-      if (Index < DevCount)
+      }
+
+      if (Index < DevCount) {
         I2cAllocDevice (DevicesPcd[Index], I2cMasterContext->Bus, Device);
+      }
 
       return EFI_SUCCESS;
     }
   } else {
     /* Device is not NULL, so something was already allocated */
     for (Index = 0; Index < DevCount; Index++) {
-      if (DeviceBusPcd[Index] != I2cMasterContext->Bus)
+      if (DeviceBusPcd[Index] != I2cMasterContext->Bus) {
         continue;
-      if (DevicesPcd[Index] == I2C_DEVICE_ADDRESS((*Device)->DeviceIndex)) {
+      }
+
+      if (DevicesPcd[Index] == I2C_DEVICE_ADDRESS ((*Device)->DeviceIndex)) {
         for (NextIndex = Index + 1; NextIndex < DevCount; NextIndex++) {
-          if (DeviceBusPcd[NextIndex] != I2cMasterContext->Bus)
+          if (DeviceBusPcd[NextIndex] != I2cMasterContext->Bus) {
             continue;
+          }
+
           NextDeviceAddress = DevicesPcd[NextIndex];
-          if (NextIndex < DevCount)
-            I2cAllocDevice(NextDeviceAddress, I2cMasterContext->Bus, Device);
+          if (NextIndex < DevCount) {
+            I2cAllocDevice (NextDeviceAddress, I2cMasterContext->Bus, Device);
+          }
 
           return EFI_SUCCESS;
         }
       }
     }
+
     *Device = NULL;
     return EFI_SUCCESS;
   }
@@ -1020,17 +1127,20 @@ STATIC
 EFI_STATUS
 EFIAPI
 I2cEnableConf (
-  IN CONST EFI_I2C_BUS_CONFIGURATION_MANAGEMENT_PROTOCOL *This,
-  IN UINTN                                               I2cBusConfiguration,
-  IN EFI_EVENT                                           Event      OPTIONAL,
-  IN EFI_STATUS                                          *I2cStatus OPTIONAL
+  IN CONST EFI_I2C_BUS_CONFIGURATION_MANAGEMENT_PROTOCOL  *This,
+  IN UINTN                                                I2cBusConfiguration,
+  IN EFI_EVENT                                            Event      OPTIONAL,
+  IN EFI_STATUS                                           *I2cStatus OPTIONAL
   )
 {
   /* do nothing */
-  if (I2cStatus != NULL)
+  if (I2cStatus != NULL) {
     I2cStatus = EFI_SUCCESS;
-  if (Event != NULL)
-    gBS->SignalEvent(Event);
+  }
+
+  if (Event != NULL) {
+    gBS->SignalEvent (Event);
+  }
 
   return EFI_SUCCESS;
 }

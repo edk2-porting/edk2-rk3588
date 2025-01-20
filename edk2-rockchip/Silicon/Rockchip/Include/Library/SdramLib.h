@@ -11,7 +11,7 @@
 
 UINT64
 SdramGetMemorySize (
-    VOID
-    );
+  VOID
+  );
 
 #endif /* SDRAMLIB_H__ */

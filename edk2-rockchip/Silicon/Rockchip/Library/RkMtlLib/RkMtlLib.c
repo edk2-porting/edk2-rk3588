@@ -24,12 +24,12 @@
 #include "RkMtlPrivateLib.h"
 
 // Shared mailbox
-STATIC CONST MTL_CHANNEL Channels[NUM_CHANNELS] = {
-    {
-      MTL_CHANNEL_TYPE_LOW,
-      (MTL_MAILBOX*)(MTL_MAILBOX_BASE)
-    },
-  };
+STATIC CONST MTL_CHANNEL  Channels[NUM_CHANNELS] = {
+  {
+    MTL_CHANNEL_TYPE_LOW,
+    (MTL_MAILBOX *)(MTL_MAILBOX_BASE)
+  },
+};
 
 /** Wait until channel is free.
 
@@ -52,10 +52,12 @@ MtlWaitUntilChannelFree (
     if (Channel->MailBox->ChannelStatus == MTL_CHANNEL_FREE) {
       return EFI_SUCCESS;
     }
+
     if (TimeOutInMicroSeconds < MTL_POLL_WAIT_TIME) {
       gBS->Stall (TimeOutInMicroSeconds);
       break;
     }
+
     // Wait for some arbitrary time.
     gBS->Stall (MTL_POLL_WAIT_TIME);
     TimeOutInMicroSeconds -= MTL_POLL_WAIT_TIME;
@@ -76,7 +78,7 @@ MtlWaitUntilChannelFree (
 
   @retval UINT32*      Pointer to the payload.
 **/
-UINT32*
+UINT32 *
 MtlGetChannelPayload (
   IN  MTL_CHANNEL  *Channel
   )
@@ -104,7 +106,7 @@ MtlGetChannel (
     return EFI_UNSUPPORTED;
   }
 
-  *Channel = (MTL_CHANNEL*)&Channels[ChannelType];
+  *Channel = (MTL_CHANNEL *)&Channels[ChannelType];
 
   return EFI_SUCCESS;
 }
@@ -126,8 +128,8 @@ MtlSendMessage (
   OUT UINT32       PayloadLength
   )
 {
-  MTL_MAILBOX *MailBox = Channel->MailBox;
-  ARM_SMC_ARGS SmcRegs = {0};
+  MTL_MAILBOX   *MailBox = Channel->MailBox;
+  ARM_SMC_ARGS  SmcRegs  = { 0 };
 
   ArmDataSynchronizationBarrier ();
   if (Channel->MailBox->ChannelStatus != MTL_CHANNEL_FREE) {
@@ -147,8 +149,13 @@ MtlSendMessage (
 
   ArmDataSynchronizationBarrier ();
 
-  DEBUG ((DEBUG_INFO, "MtlSendMessage ringing doorbell 0x%08X with message header 0x%08X length 0x%08X\n",
-          FixedPcdGet32 (PcdRkMtlMailBoxSmcId), MailBox->MessageHeader, MailBox->Length));
+  DEBUG ((
+    DEBUG_INFO,
+    "MtlSendMessage ringing doorbell 0x%08X with message header 0x%08X length 0x%08X\n",
+    FixedPcdGet32 (PcdRkMtlMailBoxSmcId),
+    MailBox->MessageHeader,
+    MailBox->Length
+    ));
 
   // Ring the doorbell.
   SmcRegs.Arg0 = FixedPcdGet32 (PcdRkMtlMailBoxSmcId);
@@ -179,9 +186,9 @@ MtlReceiveMessage (
   OUT UINT32       *PayloadLength
   )
 {
-  EFI_STATUS Status;
+  EFI_STATUS  Status;
 
-  MTL_MAILBOX *MailBox = Channel->MailBox;
+  MTL_MAILBOX  *MailBox = Channel->MailBox;
 
   Status = MtlWaitUntilChannelFree (Channel, RESPONSE_TIMEOUT);
   if (EFI_ERROR (Status)) {

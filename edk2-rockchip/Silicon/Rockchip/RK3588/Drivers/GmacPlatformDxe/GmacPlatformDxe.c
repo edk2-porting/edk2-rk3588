@@ -19,47 +19,47 @@
 
 #include <EthernetPhy.h>
 
-#define CRU_SOFTRST_CON32       (CRU_BASE + 0x0A80)
+#define CRU_SOFTRST_CON32  (CRU_BASE + 0x0A80)
 
-#define PHP_GRF_BASE            0xFD5B0000
-#define PHP_GRF_CLK_CON1        (PHP_GRF_BASE + 0x0070)
-#define PHP_GRF_GMAC_CON0       (PHP_GRF_BASE + 0x0008)
+#define PHP_GRF_BASE       0xFD5B0000
+#define PHP_GRF_CLK_CON1   (PHP_GRF_BASE + 0x0070)
+#define PHP_GRF_GMAC_CON0  (PHP_GRF_BASE + 0x0008)
 
-#define SYS_GRF_BASE            0xFD58C000
-#define SYS_GRF_SOC_CON7        (SYS_GRF_BASE + 0x031C)
-#define SYS_GRF_SOC_CON8        (SYS_GRF_BASE + 0x0320)
-#define SYS_GRF_SOC_CON9        (SYS_GRF_BASE + 0x0324)
-#define  CLK_RX_DL_CFG_SHIFT    8
-#define  CLK_TX_DL_CFG_SHIFT    0
+#define SYS_GRF_BASE          0xFD58C000
+#define SYS_GRF_SOC_CON7      (SYS_GRF_BASE + 0x031C)
+#define SYS_GRF_SOC_CON8      (SYS_GRF_BASE + 0x0320)
+#define SYS_GRF_SOC_CON9      (SYS_GRF_BASE + 0x0324)
+#define  CLK_RX_DL_CFG_SHIFT  8
+#define  CLK_TX_DL_CFG_SHIFT  0
 
-#define TX_DELAY_GMAC0          FixedPcdGet8 (PcdGmac0TxDelay)
-#define RX_DELAY_GMAC0          FixedPcdGet8 (PcdGmac0RxDelay)
-#define TX_DELAY_GMAC1          FixedPcdGet8 (PcdGmac1TxDelay)
-#define RX_DELAY_GMAC1          FixedPcdGet8 (PcdGmac1RxDelay)
+#define TX_DELAY_GMAC0  FixedPcdGet8 (PcdGmac0TxDelay)
+#define RX_DELAY_GMAC0  FixedPcdGet8 (PcdGmac0RxDelay)
+#define TX_DELAY_GMAC1  FixedPcdGet8 (PcdGmac1TxDelay)
+#define RX_DELAY_GMAC1  FixedPcdGet8 (PcdGmac1RxDelay)
 
-#define GMAC0_BASE                         0xfe1b0000
-#define GMAC1_BASE                         0xfe1c0000
+#define GMAC0_BASE  0xfe1b0000
+#define GMAC1_BASE  0xfe1c0000
 
 /* GMAC registers */
-#define  GMAC_MAC_MDIO_ADDRESS               0x0200
-#define   GMAC_MAC_MDIO_ADDRESS_PA_SHIFT     21
-#define   GMAC_MAC_MDIO_ADDRESS_RDA_SHIFT    16
-#define   GMAC_MAC_MDIO_ADDRESS_CR_SHIFT     8
-#define   GMAC_MAC_MDIO_ADDRESS_CR_100_150   (1U << GMAC_MAC_MDIO_ADDRESS_CR_SHIFT)
-#define   GMAC_MAC_MDIO_ADDRESS_GOC_SHIFT    2
-#define   GMAC_MAC_MDIO_ADDRESS_GOC_READ     (3U << GMAC_MAC_MDIO_ADDRESS_GOC_SHIFT)
-#define   GMAC_MAC_MDIO_ADDRESS_GOC_WRITE    (1U << GMAC_MAC_MDIO_ADDRESS_GOC_SHIFT)
-#define   GMAC_MAC_MDIO_ADDRESS_GB           BIT0
-#define  GMAC_MAC_MDIO_DATA                  0x0204
+#define  GMAC_MAC_MDIO_ADDRESS              0x0200
+#define   GMAC_MAC_MDIO_ADDRESS_PA_SHIFT    21
+#define   GMAC_MAC_MDIO_ADDRESS_RDA_SHIFT   16
+#define   GMAC_MAC_MDIO_ADDRESS_CR_SHIFT    8
+#define   GMAC_MAC_MDIO_ADDRESS_CR_100_150  (1U << GMAC_MAC_MDIO_ADDRESS_CR_SHIFT)
+#define   GMAC_MAC_MDIO_ADDRESS_GOC_SHIFT   2
+#define   GMAC_MAC_MDIO_ADDRESS_GOC_READ    (3U << GMAC_MAC_MDIO_ADDRESS_GOC_SHIFT)
+#define   GMAC_MAC_MDIO_ADDRESS_GOC_WRITE   (1U << GMAC_MAC_MDIO_ADDRESS_GOC_SHIFT)
+#define   GMAC_MAC_MDIO_ADDRESS_GB          BIT0
+#define  GMAC_MAC_MDIO_DATA                 0x0204
 
-#define GMAC_MAC_ADDRESS0_LOW               0x0304
-#define GMAC_MAC_ADDRESS0_HIGH              0x0300
+#define GMAC_MAC_ADDRESS0_LOW   0x0304
+#define GMAC_MAC_ADDRESS0_HIGH  0x0300
 
 /* MII registers */
-#define MII_PHYIDR1                         0x02
-#define MII_PHYIDR2                         0x03
+#define MII_PHYIDR1  0x02
+#define MII_PHYIDR2  0x03
 
-STATIC ETHERNET_PHY_INIT mPhyInitList[] = {
+STATIC ETHERNET_PHY_INIT  mPhyInitList[] = {
   RealtekPhyInit,
   MotorcommPhyInit
 };
@@ -72,14 +72,14 @@ PhyRead (
   OUT UINT16                *Value
   )
 {
-  UINT32 Addr;
-  UINTN Retry;
+  UINT32  Addr;
+  UINTN   Retry;
 
   Addr = GMAC_MAC_MDIO_ADDRESS_CR_100_150 |
-          (Phy << GMAC_MAC_MDIO_ADDRESS_PA_SHIFT) |
-          (Reg << GMAC_MAC_MDIO_ADDRESS_RDA_SHIFT) |
-          GMAC_MAC_MDIO_ADDRESS_GOC_READ |
-          GMAC_MAC_MDIO_ADDRESS_GB;
+         (Phy << GMAC_MAC_MDIO_ADDRESS_PA_SHIFT) |
+         (Reg << GMAC_MAC_MDIO_ADDRESS_RDA_SHIFT) |
+         GMAC_MAC_MDIO_ADDRESS_GOC_READ |
+         GMAC_MAC_MDIO_ADDRESS_GB;
   MmioWrite32 (GmacBase + GMAC_MAC_MDIO_ADDRESS, Addr);
 
   MicroSecondDelay (10000);
@@ -90,8 +90,10 @@ PhyRead (
       *Value = MmioRead32 (GmacBase + GMAC_MAC_MDIO_DATA) & 0xFFFFu;
       break;
     }
+
     MicroSecondDelay (10);
   }
+
   if (Retry == 0) {
     DEBUG ((DEBUG_WARN, "MDIO: PHY read timeout!\n"));
     *Value = 0xFFFFU;
@@ -101,22 +103,22 @@ PhyRead (
 
 VOID
 PhyWrite (
-  IN EFI_PHYSICAL_ADDRESS   GmacBase,
-  IN UINT8                  Phy,
-  IN UINT16                 Reg,
-  IN UINT16                 Value
+  IN EFI_PHYSICAL_ADDRESS  GmacBase,
+  IN UINT8                 Phy,
+  IN UINT16                Reg,
+  IN UINT16                Value
   )
 {
-  UINT32 Addr;
-  UINTN Retry;
+  UINT32  Addr;
+  UINTN   Retry;
 
   MmioWrite32 (GmacBase + GMAC_MAC_MDIO_DATA, Value);
 
   Addr = GMAC_MAC_MDIO_ADDRESS_CR_100_150 |
-          (Phy << GMAC_MAC_MDIO_ADDRESS_PA_SHIFT) |
-          (Reg << GMAC_MAC_MDIO_ADDRESS_RDA_SHIFT) |
-          GMAC_MAC_MDIO_ADDRESS_GOC_WRITE |
-          GMAC_MAC_MDIO_ADDRESS_GB;
+         (Phy << GMAC_MAC_MDIO_ADDRESS_PA_SHIFT) |
+         (Reg << GMAC_MAC_MDIO_ADDRESS_RDA_SHIFT) |
+         GMAC_MAC_MDIO_ADDRESS_GOC_WRITE |
+         GMAC_MAC_MDIO_ADDRESS_GB;
   MmioWrite32 (GmacBase + GMAC_MAC_MDIO_ADDRESS, Addr);
 
   MicroSecondDelay (10000);
@@ -126,8 +128,10 @@ PhyWrite (
     if ((Addr & GMAC_MAC_MDIO_ADDRESS_GB) == 0) {
       break;
     }
+
     MicroSecondDelay (10);
   }
+
   if (Retry == 0) {
     DEBUG ((DEBUG_WARN, "MDIO: PHY write timeout!\n"));
     ASSERT (FALSE);
@@ -138,13 +142,13 @@ STATIC
 VOID
 EFIAPI
 PhyInit (
-  IN EFI_PHYSICAL_ADDRESS GmacBase
+  IN EFI_PHYSICAL_ADDRESS  GmacBase
   )
 {
-  EFI_STATUS Status;
-  UINT16 PhyIdReg;
-  UINT32 PhyId;
-  UINT32 Index;
+  EFI_STATUS  Status;
+  UINT16      PhyIdReg;
+  UINT32      PhyId;
+  UINT32      Index;
 
   PhyRead (GmacBase, 0, MII_PHYIDR1, &PhyIdReg);
   PhyId = PhyIdReg << 16;
@@ -152,12 +156,13 @@ PhyInit (
   PhyId |= PhyIdReg;
 
   for (Index = 0; Index < ARRAY_SIZE (mPhyInitList); Index++) {
-    Status = mPhyInitList[Index] (GmacBase, PhyId);
+    Status = mPhyInitList[Index](GmacBase, PhyId);
     if (Status == EFI_UNSUPPORTED) {
       continue;
     } else if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "%a: mPhyInitList[%d]() failed: %r\n", __func__, Index, Status));
     }
+
     return;
   }
 
@@ -187,14 +192,20 @@ InitGmac0 (
   /* Setup DLLs */
   if (TX_DELAY_GMAC0) {
     MmioWrite32 (SYS_GRF_SOC_CON7, 0x00040004); // gmac0_txclk_dly_ena = 1
-    MmioWrite32 (SYS_GRF_SOC_CON8, 0x007F0000U |
-                  (TX_DELAY_GMAC0 << CLK_TX_DL_CFG_SHIFT));
+    MmioWrite32 (
+      SYS_GRF_SOC_CON8,
+      0x007F0000U |
+      (TX_DELAY_GMAC0 << CLK_TX_DL_CFG_SHIFT)
+      );
   }
 
   if (RX_DELAY_GMAC0) {
     MmioWrite32 (SYS_GRF_SOC_CON7, 0x00080008); // gmac0_rxclk_dly_ena = 1
-    MmioWrite32 (SYS_GRF_SOC_CON8, 0x7F000000U |
-                  (RX_DELAY_GMAC0 << CLK_RX_DL_CFG_SHIFT));
+    MmioWrite32 (
+      SYS_GRF_SOC_CON8,
+      0x7F000000U |
+      (RX_DELAY_GMAC0 << CLK_RX_DL_CFG_SHIFT)
+      );
   }
 
   /* Reset PHY */
@@ -232,14 +243,20 @@ InitGmac1 (
   /* Setup DLLs */
   if (TX_DELAY_GMAC1) {
     MmioWrite32 (SYS_GRF_SOC_CON7, 0x00100010); // gmac1_txclk_dly_ena = 1
-    MmioWrite32 (SYS_GRF_SOC_CON9, 0x007F0000U |
-                  (TX_DELAY_GMAC1 << CLK_TX_DL_CFG_SHIFT));
+    MmioWrite32 (
+      SYS_GRF_SOC_CON9,
+      0x007F0000U |
+      (TX_DELAY_GMAC1 << CLK_TX_DL_CFG_SHIFT)
+      );
   }
 
   if (RX_DELAY_GMAC1) {
     MmioWrite32 (SYS_GRF_SOC_CON7, 0x00200020); // gmac1_rxclk_dly_ena = 1
-    MmioWrite32 (SYS_GRF_SOC_CON9, 0x7F000000U |
-                  (RX_DELAY_GMAC1 << CLK_RX_DL_CFG_SHIFT));
+    MmioWrite32 (
+      SYS_GRF_SOC_CON9,
+      0x7F000000U |
+      (RX_DELAY_GMAC1 << CLK_RX_DL_CFG_SHIFT)
+      );
   }
 
   /* Reset PHY */
@@ -257,16 +274,17 @@ InitGmac1 (
 EFI_STATUS
 EFIAPI
 GmacPlatformDxeInitialize (
-  IN EFI_HANDLE          ImageHandle,
-  IN EFI_SYSTEM_TABLE    *SystemTable
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  UINT8 OtpData[32];
-  UINT8 Hash[SHA256_DIGEST_SIZE];
-  UINT32 MacLo, MacHi;
+  UINT8   OtpData[32];
+  UINT8   Hash[SHA256_DIGEST_SIZE];
+  UINT32  MacLo, MacHi;
 
-  if (!FixedPcdGetBool (PcdGmac0Supported)
-      && !FixedPcdGetBool (PcdGmac1Supported)) {
+  if (  !FixedPcdGetBool (PcdGmac0Supported)
+     && !FixedPcdGetBool (PcdGmac1Supported))
+  {
     return EFI_SUCCESS;
   }
 
@@ -281,10 +299,17 @@ GmacPlatformDxeInitialize (
     InitGmac0 ();
 
     Hash[5] &= ~1;
-    DEBUG ((DEBUG_INFO, "%a: GMAC0 MAC address: %02X:%02X:%02X:%02X:%02X:%02X\n",
-            __func__,
-            Hash[0], Hash[1], Hash[2],
-            Hash[3], Hash[4], Hash[5]));
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: GMAC0 MAC address: %02X:%02X:%02X:%02X:%02X:%02X\n",
+      __func__,
+      Hash[0],
+      Hash[1],
+      Hash[2],
+      Hash[3],
+      Hash[4],
+      Hash[5]
+      ));
     MacLo = Hash[3] | (Hash[2] << 8) | (Hash[1] << 16) | (Hash[0] << 24);
     MacHi = Hash[5] | (Hash[4] << 8);
     MmioWrite32 (GMAC0_BASE + GMAC_MAC_ADDRESS0_LOW, MacLo);
@@ -295,10 +320,17 @@ GmacPlatformDxeInitialize (
     InitGmac1 ();
 
     Hash[5] |= 1;
-    DEBUG ((DEBUG_INFO, "%a: GMAC1 MAC address: %02X:%02X:%02X:%02X:%02X:%02X\n",
-            __func__,
-            Hash[0], Hash[1], Hash[2],
-            Hash[3], Hash[4], Hash[5]));
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: GMAC1 MAC address: %02X:%02X:%02X:%02X:%02X:%02X\n",
+      __func__,
+      Hash[0],
+      Hash[1],
+      Hash[2],
+      Hash[3],
+      Hash[4],
+      Hash[5]
+      ));
     MacLo = Hash[3] | (Hash[2] << 8) | (Hash[1] << 16) | (Hash[0] << 24);
     MacHi = Hash[5] | (Hash[4] << 8);
     MmioWrite32 (GMAC1_BASE + GMAC_MAC_ADDRESS0_LOW, MacLo);

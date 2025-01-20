@@ -39,7 +39,7 @@
 
 #include "PlatformBm.h"
 
-#define BOOT_PROMPT   L"Setup (ESC/F2)   Shell (F1)   Reset to MaskROM (F4)   Continue (Enter)"
+#define BOOT_PROMPT  L"Setup (ESC/F2)   Shell (F1)   Reset to MaskROM (F4)   Continue (Enter)"
 
 #define DP_NODE_LEN(Type)  { (UINT8)sizeof (Type), (UINT8)(sizeof (Type) >> 8) }
 
@@ -610,27 +610,30 @@ RemoveStaleFvFileOptions (
   VOID
   )
 {
-  EFI_BOOT_MANAGER_LOAD_OPTION *BootOptions;
-  UINTN                        BootOptionCount;
-  UINTN                        Index;
+  EFI_BOOT_MANAGER_LOAD_OPTION  *BootOptions;
+  UINTN                         BootOptionCount;
+  UINTN                         Index;
 
-  BootOptions = EfiBootManagerGetLoadOptions (&BootOptionCount,
-                  LoadOptionTypeBoot);
+  BootOptions = EfiBootManagerGetLoadOptions (
+                  &BootOptionCount,
+                  LoadOptionTypeBoot
+                  );
 
   for (Index = 0; Index < BootOptionCount; ++Index) {
-    EFI_DEVICE_PATH_PROTOCOL *Node1, *Node2, *SearchNode;
-    EFI_STATUS               Status;
-    EFI_HANDLE               FvHandle;
+    EFI_DEVICE_PATH_PROTOCOL  *Node1, *Node2, *SearchNode;
+    EFI_STATUS                Status;
+    EFI_HANDLE                FvHandle;
 
     //
     // If the device path starts with neither MemoryMapped(...) nor Fv(...),
     // then keep the boot option.
     //
     Node1 = BootOptions[Index].FilePath;
-    if (!(DevicePathType (Node1) == HARDWARE_DEVICE_PATH &&
-          DevicePathSubType (Node1) == HW_MEMMAP_DP) &&
-        !(DevicePathType (Node1) == MEDIA_DEVICE_PATH &&
-          DevicePathSubType (Node1) == MEDIA_PIWG_FW_VOL_DP)) {
+    if (!((DevicePathType (Node1) == HARDWARE_DEVICE_PATH) &&
+          (DevicePathSubType (Node1) == HW_MEMMAP_DP)) &&
+        !((DevicePathType (Node1) == MEDIA_DEVICE_PATH) &&
+          (DevicePathSubType (Node1) == MEDIA_PIWG_FW_VOL_DP)))
+    {
       continue;
     }
 
@@ -639,8 +642,9 @@ RemoveStaleFvFileOptions (
     // option.
     //
     Node2 = NextDevicePathNode (Node1);
-    if (DevicePathType (Node2) != MEDIA_DEVICE_PATH ||
-        DevicePathSubType (Node2) != MEDIA_PIWG_FW_FILE_DP) {
+    if ((DevicePathType (Node2) != MEDIA_DEVICE_PATH) ||
+        (DevicePathSubType (Node2) != MEDIA_PIWG_FW_FILE_DP))
+    {
       continue;
     }
 
@@ -651,23 +655,29 @@ RemoveStaleFvFileOptions (
     // boot option.
     //
     SearchNode = Node1;
-    Status = gBS->LocateDevicePath (&gEfiFirmwareVolume2ProtocolGuid,
-                    &SearchNode, &FvHandle);
+    Status     = gBS->LocateDevicePath (
+                        &gEfiFirmwareVolume2ProtocolGuid,
+                        &SearchNode,
+                        &FvHandle
+                        );
 
     if (!EFI_ERROR (Status)) {
       //
       // The firmware volume was found; now let's see if it contains the FvFile
       // identified by GUID.
       //
-      EFI_FIRMWARE_VOLUME2_PROTOCOL     *FvProtocol;
-      MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *FvFileNode;
-      UINTN                             BufferSize;
-      EFI_FV_FILETYPE                   FoundType;
-      EFI_FV_FILE_ATTRIBUTES            FileAttributes;
-      UINT32                            AuthenticationStatus;
+      EFI_FIRMWARE_VOLUME2_PROTOCOL      *FvProtocol;
+      MEDIA_FW_VOL_FILEPATH_DEVICE_PATH  *FvFileNode;
+      UINTN                              BufferSize;
+      EFI_FV_FILETYPE                    FoundType;
+      EFI_FV_FILE_ATTRIBUTES             FileAttributes;
+      UINT32                             AuthenticationStatus;
 
-      Status = gBS->HandleProtocol (FvHandle, &gEfiFirmwareVolume2ProtocolGuid,
-                      (VOID **)&FvProtocol);
+      Status = gBS->HandleProtocol (
+                      FvHandle,
+                      &gEfiFirmwareVolume2ProtocolGuid,
+                      (VOID **)&FvProtocol
+                      );
       ASSERT_EFI_ERROR (Status);
 
       FvFileNode = (MEDIA_FW_VOL_FILEPATH_DEVICE_PATH *)Node2;
@@ -696,12 +706,17 @@ RemoveStaleFvFileOptions (
     // Delete the boot option.
     //
     Status = EfiBootManagerDeleteLoadOptionVariable (
-               BootOptions[Index].OptionNumber, LoadOptionTypeBoot);
+               BootOptions[Index].OptionNumber,
+               LoadOptionTypeBoot
+               );
     DEBUG_CODE (
       CHAR16 *DevicePathString;
 
-      DevicePathString = ConvertDevicePathToText(BootOptions[Index].FilePath,
-                           FALSE, FALSE);
+      DevicePathString = ConvertDevicePathToText (
+                           BootOptions[Index].FilePath,
+                           FALSE,
+                           FALSE
+                           );
       DEBUG ((
         EFI_ERROR (Status) ? DEBUG_WARN : DEBUG_VERBOSE,
         "%a: removing stale Boot#%04x %s: %r\n",
@@ -711,8 +726,9 @@ RemoveStaleFvFileOptions (
         Status
         ));
       if (DevicePathString != NULL) {
-        FreePool (DevicePathString);
-      }
+      FreePool (DevicePathString);
+    }
+
       );
   }
 
@@ -779,8 +795,8 @@ PlatformRegisterOptionsAndKeys (
   //
   // Register Maskrom Reset
   //
-  F4.ScanCode     = SCAN_F4;
-  F4.UnicodeChar  = CHAR_NULL;
+  F4.ScanCode    = SCAN_F4;
+  F4.UnicodeChar = CHAR_NULL;
   PlatformRegisterFvBootOption (&gRockchipMaskromResetFileGuid, L"Reset to MaskROM", 0, &F4);
 
   RemoveStaleFvFileOptions ();
@@ -883,7 +899,7 @@ PlatformBootManagerBeforeConsole (
 
   mSerialConsole.Uart.BaudRate = PcdGet64 (PcdUartDefaultBaudRate);
   mSerialConsole.Uart.DataBits = PcdGet8 (PcdUartDefaultDataBits);
-  mSerialConsole.Uart.Parity = PcdGet8 (PcdUartDefaultParity);
+  mSerialConsole.Uart.Parity   = PcdGet8 (PcdUartDefaultParity);
   mSerialConsole.Uart.StopBits = PcdGet8 (PcdUartDefaultStopBits);
 
   CopyGuid (&mSerialConsole.TermType.Guid, &gEfiTtyTermGuid);
@@ -1124,6 +1140,7 @@ PlatformBootManagerAfterConsole (
         PcdGetPtr (PcdFirmwareVersionString)
         );
     }
+
     Print (BOOT_PROMPT);
   } else if (FirmwareVerLength > 0) {
     Status = gBS->HandleProtocol (

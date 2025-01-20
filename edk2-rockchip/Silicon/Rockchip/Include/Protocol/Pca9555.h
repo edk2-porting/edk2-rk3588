@@ -20,9 +20,9 @@
 typedef struct _PCA95XX_PROTOCOL PCA95XX_PROTOCOL;
 
 struct _PCA95XX_PROTOCOL {
-  EMBEDDED_GPIO			GpioProtocol;
+  EMBEDDED_GPIO    GpioProtocol;
 };
 
-extern EFI_GUID gPca95xxProtocolGuid;
+extern EFI_GUID  gPca95xxProtocolGuid;
 
 #endif // __PCA9555_H__

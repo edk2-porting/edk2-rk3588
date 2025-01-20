@@ -48,82 +48,87 @@
  *  @{
  */
 /********************* Private MACRO Definition ******************************/
-#define PWRDOWN_SHIT       13
-#define PWRDOWN_MASK       1 << PWRDOWN_SHIT
-#define PLL_POSTDIV1_SHIFT 12
-#define PLL_POSTDIV1_MASK  0x7 << PLL_POSTDIV1_SHIFT
-#define PLL_FBDIV_SHIFT    0
-#define PLL_FBDIV_MASK     0xfff << PLL_FBDIV_SHIFT
-#define PLL_POSTDIV2_SHIFT 6
-#define PLL_POSTDIV2_MASK  0x7 << PLL_POSTDIV2_SHIFT
-#define PLL_REFDIV_SHIFT   0
-#define PLL_REFDIV_MASK    0x3f << PLL_REFDIV_SHIFT
-#define PLL_DSMPD_SHIFT    12
-#define PLL_DSMPD_MASK     1 << PLL_DSMPD_SHIFT
-#define PLL_FRAC_SHIFT     0
-#define PLL_FRAC_MASK      0xffffff << PLL_FRAC_SHIFT
+#define PWRDOWN_SHIT        13
+#define PWRDOWN_MASK        1 << PWRDOWN_SHIT
+#define PLL_POSTDIV1_SHIFT  12
+#define PLL_POSTDIV1_MASK   0x7 << PLL_POSTDIV1_SHIFT
+#define PLL_FBDIV_SHIFT     0
+#define PLL_FBDIV_MASK      0xfff << PLL_FBDIV_SHIFT
+#define PLL_POSTDIV2_SHIFT  6
+#define PLL_POSTDIV2_MASK   0x7 << PLL_POSTDIV2_SHIFT
+#define PLL_REFDIV_SHIFT    0
+#define PLL_REFDIV_MASK     0x3f << PLL_REFDIV_SHIFT
+#define PLL_DSMPD_SHIFT     12
+#define PLL_DSMPD_MASK      1 << PLL_DSMPD_SHIFT
+#define PLL_FRAC_SHIFT      0
+#define PLL_FRAC_MASK       0xffffff << PLL_FRAC_SHIFT
 
-#define PLLCON0_M_SHIFT		0
-#define PLLCON0_M_MASK		0x3ff << PLLCON0_M_SHIFT
-#define PLLCON1_P_SHIFT		0
-#define PLLCON1_P_MASK		0x3f << PLLCON1_P_SHIFT
-#define PLLCON1_S_SHIFT		6
-#define PLLCON1_S_MASK		0x7 << PLLCON1_S_SHIFT
-#define PLLCON2_K_SHIFT		0
-#define PLLCON2_K_MASK		0xffff << PLLCON2_K_SHIFT
-#define PLLCON1_PWRDOWN		BIT(13)
-#define PLLCON6_LOCK_STATUS	BIT(15)
+#define PLLCON0_M_SHIFT      0
+#define PLLCON0_M_MASK       0x3ff << PLLCON0_M_SHIFT
+#define PLLCON1_P_SHIFT      0
+#define PLLCON1_P_MASK       0x3f << PLLCON1_P_SHIFT
+#define PLLCON1_S_SHIFT      6
+#define PLLCON1_S_MASK       0x7 << PLLCON1_S_SHIFT
+#define PLLCON2_K_SHIFT      0
+#define PLLCON2_K_MASK       0xffff << PLLCON2_K_SHIFT
+#define PLLCON1_PWRDOWN      BIT(13)
+#define PLLCON6_LOCK_STATUS  BIT(15)
 
-#define MIN_FOUTVCO_FREQ (800 * MHZ)
-#define MAX_FOUTVCO_FREQ (2000 * MHZ)
-#define MIN_FOUT_FREQ    (24 * MHZ)
-#define MAX_FOUT_FREQ    (1600 * MHZ)
+#define MIN_FOUTVCO_FREQ  (800 * MHZ)
+#define MAX_FOUTVCO_FREQ  (2000 * MHZ)
+#define MIN_FOUT_FREQ     (24 * MHZ)
+#define MAX_FOUT_FREQ     (1600 * MHZ)
 
 #define RK3588_VCO_MIN_HZ   (2250UL * MHZ)
 #define RK3588_VCO_MAX_HZ   (4500UL * MHZ)
 #define RK3588_FOUT_MIN_HZ  (37UL * MHZ)
 #define RK3588_FOUT_MAX_HZ  (4500UL * MHZ)
 
-#define EXPONENT_OF_FRAC_PLL              24
-#define RK_PLL_MODE_SLOW                  0
-#define RK_PLL_MODE_NORMAL                1
-#define RK_PLL_MODE_DEEP                  2
-#define PLL_GET_PLLMODE(val, shift, mask) (((uint32_t)(val) & mask) >> shift)
+#define EXPONENT_OF_FRAC_PLL  24
+#define RK_PLL_MODE_SLOW      0
+#define RK_PLL_MODE_NORMAL    1
+#define RK_PLL_MODE_DEEP      2
+#define PLL_GET_PLLMODE(val, shift, mask)  (((uint32_t)(val) & mask) >> shift)
 
-#define PLL_GET_FBDIV(x) (((uint32_t)(x) & (PLL_FBDIV_MASK)) >> PLL_FBDIV_SHIFT)
+#define PLL_GET_FBDIV(x)  (((uint32_t)(x) & (PLL_FBDIV_MASK)) >> PLL_FBDIV_SHIFT)
 #define PLL_GET_REFDIV(x) \
     (((uint32_t)(x) & (PLL_REFDIV_MASK)) >> PLL_REFDIV_SHIFT)
 #define PLL_GET_POSTDIV1(x) \
     (((uint32_t)(x) & (PLL_POSTDIV1_MASK)) >> PLL_POSTDIV1_SHIFT)
 #define PLL_GET_POSTDIV2(x) \
     (((uint32_t)(x) & (PLL_POSTDIV2_MASK)) >> PLL_POSTDIV2_SHIFT)
-#define PLL_GET_DSMPD(x) (((uint32_t)(x) & (PLL_DSMPD_MASK)) >> PLL_DSMPD_SHIFT)
-#define PLL_GET_FRAC(x)  (((uint32_t)(x) & (PLL_FRAC_MASK)) >> PLL_FRAC_SHIFT)
+#define PLL_GET_DSMPD(x)  (((uint32_t)(x) & (PLL_DSMPD_MASK)) >> PLL_DSMPD_SHIFT)
+#define PLL_GET_FRAC(x)   (((uint32_t)(x) & (PLL_FRAC_MASK)) >> PLL_FRAC_SHIFT)
 
-#define CRU_PLL_ROUND_UP_TO_KHZ(x) (HAL_DIV_ROUND_UP((x), KHZ) * KHZ)
+#define CRU_PLL_ROUND_UP_TO_KHZ(x)  (HAL_DIV_ROUND_UP((x), KHZ) * KHZ)
 
 /********************* Private Structure Definition **************************/
-static struct PLL_CONFIG g_rockchipAutoTable;
+static struct PLL_CONFIG  g_rockchipAutoTable;
 
 /********************* Private Variable Definition ***************************/
 
 /********************* Private Function Definition ***************************/
 
 /** Calculate the greatest common divisor */
-static uint32_t CRU_Gcd(uint32_t m, uint32_t n)
+static uint32_t
+CRU_Gcd (
+  uint32_t  m,
+  uint32_t  n
+  )
 {
-    int t;
+  int  t;
 
-    while (m > 0) {
-        if (n > m) {
-            t = m;
-            m = n;
-            n = t;
-        }
-        m -= n;
+  while (m > 0) {
+    if (n > m) {
+      t = m;
+      m = n;
+      n = t;
     }
 
-    return n;
+    m -= n;
+  }
+
+  return n;
 }
 
 /**
@@ -143,30 +148,35 @@ static uint32_t CRU_Gcd(uint32_t m, uint32_t n)
  *     FOUTPOSTDIV = fractional PLL divided output frequency
  *               (output of second post divider)
  */
-static HAL_Status CRU_PllSetPostDiv(uint32_t foutHz, uint32_t *postDiv1,
-                                    uint32_t *postDiv2, uint32_t *foutVco)
+static HAL_Status
+CRU_PllSetPostDiv (
+  uint32_t  foutHz,
+  uint32_t  *postDiv1,
+  uint32_t  *postDiv2,
+  uint32_t  *foutVco
+  )
 {
-    uint32_t freq;
+  uint32_t  freq;
 
-    if (foutHz < MIN_FOUTVCO_FREQ) {
-        for (*postDiv1 = 1; *postDiv1 <= 7; (*postDiv1)++) {
-            for (*postDiv2 = 1; *postDiv2 <= 7; (*postDiv2)++) {
-                freq = foutHz * (*postDiv1) * (*postDiv2);
-                if (freq >= MIN_FOUTVCO_FREQ && freq <= MAX_FOUTVCO_FREQ) {
-                    *foutVco = freq;
+  if (foutHz < MIN_FOUTVCO_FREQ) {
+    for (*postDiv1 = 1; *postDiv1 <= 7; (*postDiv1)++) {
+      for (*postDiv2 = 1; *postDiv2 <= 7; (*postDiv2)++) {
+        freq = foutHz * (*postDiv1) * (*postDiv2);
+        if ((freq >= MIN_FOUTVCO_FREQ) && (freq <= MAX_FOUTVCO_FREQ)) {
+          *foutVco = freq;
 
-                    return HAL_OK;
-                }
-            }
+          return HAL_OK;
         }
-
-        return HAL_ERROR;
-    } else {
-        *postDiv1 = 1;
-        *postDiv2 = 1;
-
-        return HAL_OK;
+      }
     }
+
+    return HAL_ERROR;
+  } else {
+    *postDiv1 = 1;
+    *postDiv2 = 1;
+
+    return HAL_OK;
+  }
 }
 
 /**
@@ -187,69 +197,73 @@ static HAL_Status CRU_PllSetPostDiv(uint32_t foutHz, uint32_t *postDiv1,
  *     REFDIV = fractional PLL input reference clock divider
  *     FBDIV = Integer value programmed into feedback divide
  */
-static const struct PLL_CONFIG *CRU_PllSetByAuto(uint32_t finHz,
-                                                 uint32_t foutHz)
+static const struct PLL_CONFIG *
+CRU_PllSetByAuto (
+  uint32_t  finHz,
+  uint32_t  foutHz
+  )
 {
-    struct PLL_CONFIG *rateTable = &g_rockchipAutoTable;
-    uint32_t foutVco = foutHz;
-    uint64_t fin64, frac64;
-    uint32_t postDiv1, postDiv2;
-    uint32_t clkGcd = 0;
-    HAL_Status error;
+  struct PLL_CONFIG  *rateTable = &g_rockchipAutoTable;
+  uint32_t           foutVco = foutHz;
+  uint64_t           fin64, frac64;
+  uint32_t           postDiv1, postDiv2;
+  uint32_t           clkGcd = 0;
+  HAL_Status         error;
 
-    if (finHz == 0 || foutHz == 0 || foutHz == finHz) {
-        return NULL;
+  if ((finHz == 0) || (foutHz == 0) || (foutHz == finHz)) {
+    return NULL;
+  }
+
+  error = CRU_PllSetPostDiv (foutHz, &postDiv1, &postDiv2, &foutVco);
+  if (error) {
+    return NULL;
+  }
+
+  rateTable->postDiv1 = postDiv1;
+  rateTable->postDiv2 = postDiv2;
+  rateTable->dsmpd    = 1;
+
+  if ((finHz / MHZ * MHZ == finHz) && (foutHz / MHZ * MHZ == foutHz)) {
+    finHz            /= MHZ;
+    foutVco          /= MHZ;
+    clkGcd            = CRU_Gcd (finHz, foutVco);
+    rateTable->refDiv = finHz / clkGcd;
+    rateTable->fbDiv  = foutVco / clkGcd;
+
+    rateTable->frac = 0;
+  } else if (finHz / MHZ * MHZ != finHz) {
+    clkGcd              = foutHz / finHz;
+    rateTable->fbDiv    = clkGcd;
+    rateTable->refDiv   = 1;
+    rateTable->postDiv1 = 1;
+    rateTable->postDiv2 = 1;
+
+    fin64           = foutHz * rateTable->refDiv;
+    fin64           = HAL_DivU64 (fin64 << EXPONENT_OF_FRAC_PLL, finHz);
+    frac64          = rateTable->fbDiv;
+    frac64          = rateTable->fbDiv << EXPONENT_OF_FRAC_PLL;
+    frac64          = fin64 - frac64;
+    rateTable->frac = frac64;
+    if (rateTable->frac > 0) {
+      rateTable->dsmpd = 0;
     }
+  } else {
+    clkGcd            = CRU_Gcd (finHz / MHZ, foutVco / MHZ);
+    rateTable->refDiv = finHz / MHZ / clkGcd;
+    rateTable->fbDiv  = foutVco / MHZ / clkGcd;
+    rateTable->frac   = 0;
 
-    error = CRU_PllSetPostDiv(foutHz, &postDiv1, &postDiv2, &foutVco);
-    if (error) {
-        return NULL;
+    frac64          = (foutVco % MHZ);
+    fin64           = finHz;
+    frac64          = frac64 * rateTable->refDiv;
+    frac64          = HAL_DivU64 (frac64 << EXPONENT_OF_FRAC_PLL, fin64);
+    rateTable->frac = frac64;
+    if (rateTable->frac > 0) {
+      rateTable->dsmpd = 0;
     }
-    rateTable->postDiv1 = postDiv1;
-    rateTable->postDiv2 = postDiv2;
-    rateTable->dsmpd = 1;
+  }
 
-    if (finHz / MHZ * MHZ == finHz && foutHz / MHZ * MHZ == foutHz) {
-        finHz /= MHZ;
-        foutVco /= MHZ;
-        clkGcd = CRU_Gcd(finHz, foutVco);
-        rateTable->refDiv = finHz / clkGcd;
-        rateTable->fbDiv = foutVco / clkGcd;
-
-        rateTable->frac = 0;
-    } else if (finHz / MHZ * MHZ != finHz) {
-        clkGcd = foutHz / finHz;
-        rateTable->fbDiv = clkGcd;
-        rateTable->refDiv = 1;
-        rateTable->postDiv1 = 1;
-        rateTable->postDiv2 = 1;
-
-        fin64 = foutHz * rateTable->refDiv;
-        fin64 = HAL_DivU64(fin64 << EXPONENT_OF_FRAC_PLL, finHz);
-        frac64 = rateTable->fbDiv;
-        frac64 = rateTable->fbDiv << EXPONENT_OF_FRAC_PLL;
-        frac64 = fin64 - frac64;
-        rateTable->frac = frac64;
-        if (rateTable->frac > 0) {
-            rateTable->dsmpd = 0;
-        }
-    } else {
-        clkGcd = CRU_Gcd(finHz / MHZ, foutVco / MHZ);
-        rateTable->refDiv = finHz / MHZ / clkGcd;
-        rateTable->fbDiv = foutVco / MHZ / clkGcd;
-        rateTable->frac = 0;
-
-        frac64 = (foutVco % MHZ);
-        fin64 = finHz;
-        frac64 = frac64 * rateTable->refDiv;
-        frac64 = HAL_DivU64(frac64 << EXPONENT_OF_FRAC_PLL, fin64);
-        rateTable->frac = frac64;
-        if (rateTable->frac > 0) {
-            rateTable->dsmpd = 0;
-        }
-    }
-
-    return rateTable;
+  return rateTable;
 }
 
 /**
@@ -260,64 +274,77 @@ static const struct PLL_CONFIG *CRU_PllSetByAuto(uint32_t finHz,
  * How to calculate the PLL:
  *     Look up the rateTable to get the PLL config parameter
  */
-static const struct PLL_CONFIG *CRU_PllGetSettings(struct PLL_SETUP *pSetup,
-                                                   uint32_t rate)
+static const struct PLL_CONFIG *
+CRU_PllGetSettings (
+  struct PLL_SETUP  *pSetup,
+  uint32_t          rate
+  )
 {
-    const struct PLL_CONFIG *rateTable = pSetup->rateTable;
+  const struct PLL_CONFIG  *rateTable = pSetup->rateTable;
 
-    if (rateTable == NULL) {
-        return CRU_PllSetByAuto(PLL_INPUT_OSC_RATE, rate);
+  if (rateTable == NULL) {
+    return CRU_PllSetByAuto (PLL_INPUT_OSC_RATE, rate);
+  }
+
+  while (rateTable->rate) {
+    if (rateTable->rate == rate) {
+      break;
     }
 
-    while (rateTable->rate) {
-        if (rateTable->rate == rate) {
-            break;
-        }
-        rateTable++;
-    }
-    if (rateTable->rate != rate) {
-        return CRU_PllSetByAuto(PLL_INPUT_OSC_RATE, rate);
-    } else {
-        return rateTable;
-    }
+    rateTable++;
+  }
+
+  if (rateTable->rate != rate) {
+    return CRU_PllSetByAuto (PLL_INPUT_OSC_RATE, rate);
+  } else {
+    return rateTable;
+  }
 }
 
-static const struct PLL_CONFIG *CRU_PllV1SetByAuto(uint32_t fin_hz,
-                                                   uint32_t fout_hz)
+static const struct PLL_CONFIG *
+CRU_PllV1SetByAuto (
+  uint32_t  fin_hz,
+  uint32_t  fout_hz
+  )
 {
-    struct PLL_CONFIG *rate_table = &g_rockchipAutoTable;
-    uint32_t p, m, s;
-    uint64_t fvco, fref, fout, ffrac;
+  struct PLL_CONFIG  *rate_table = &g_rockchipAutoTable;
+  uint32_t           p, m, s;
+  uint64_t           fvco, fref, fout, ffrac;
 
-    if (fin_hz == 0 || fout_hz == 0 || fout_hz == fin_hz)
-        return NULL;
+  if ((fin_hz == 0) || (fout_hz == 0) || (fout_hz == fin_hz)) {
+    return NULL;
+  }
 
-    if (fout_hz > RK3588_FOUT_MAX_HZ || fout_hz < RK3588_FOUT_MIN_HZ)
-        return NULL;
+  if ((fout_hz > RK3588_FOUT_MAX_HZ) || (fout_hz < RK3588_FOUT_MIN_HZ)) {
+    return NULL;
+  }
 
-    for (s = 0; s <= 6; s++) {
-        fvco = fout_hz << s;
-        if (fvco < RK3588_VCO_MIN_HZ ||
-            fvco > RK3588_VCO_MAX_HZ)
-            continue;
-        for (p = 1; p <= 4; p++) {
-            for (m = 64; m <= 1023; m++) {
-                if ((fvco >= m * fin_hz / p) && (fvco < (m + 1) * fin_hz / p)) {
-                    rate_table->p = p;
-                    rate_table->m = m;
-                    rate_table->s = s;
-                    fref = fin_hz / p;
-                    ffrac = fvco - (m * fref);
-                    fout = ffrac * 65536;
-                    rate_table->k = fout / fref;
-                    return rate_table;
-                }
-            }
-        }
+  for (s = 0; s <= 6; s++) {
+    fvco = fout_hz << s;
+    if ((fvco < RK3588_VCO_MIN_HZ) ||
+        (fvco > RK3588_VCO_MAX_HZ))
+    {
+      continue;
     }
 
-    DEBUG((DEBUG_ERROR, "%a: CANNOT FIND Fout by auto,fout = %lu\n", __func__, fout_hz));
-    return NULL;
+    for (p = 1; p <= 4; p++) {
+      for (m = 64; m <= 1023; m++) {
+        if ((fvco >= m * fin_hz / p) && (fvco < (m + 1) * fin_hz / p)) {
+          rate_table->p = p;
+          rate_table->m = m;
+          rate_table->s = s;
+          fref          = fin_hz / p;
+          ffrac         = fvco - (m * fref);
+          fout          = ffrac * 65536;
+          rate_table->k = fout / fref;
+          return rate_table;
+        }
+      }
+    }
+  }
+
+  DEBUG ((DEBUG_ERROR, "%a: CANNOT FIND Fout by auto,fout = %lu\n", __func__, fout_hz));
+  return NULL;
 }
 
 /**
@@ -328,26 +355,31 @@ static const struct PLL_CONFIG *CRU_PllV1SetByAuto(uint32_t fin_hz,
  * How to calculate the PLL:
  *     Look up the rateTable to get the PLL config parameter
  */
-static const struct PLL_CONFIG *CRU_PllV1GetSettings(struct PLL_SETUP *pSetup,
-                                                     uint32_t rate)
+static const struct PLL_CONFIG *
+CRU_PllV1GetSettings (
+  struct PLL_SETUP  *pSetup,
+  uint32_t          rate
+  )
 {
-    const struct PLL_CONFIG *rateTable = pSetup->rateTable;
+  const struct PLL_CONFIG  *rateTable = pSetup->rateTable;
 
-    if (rateTable == NULL) {
-        return CRU_PllV1SetByAuto(PLL_INPUT_OSC_RATE, rate);
+  if (rateTable == NULL) {
+    return CRU_PllV1SetByAuto (PLL_INPUT_OSC_RATE, rate);
+  }
+
+  while (rateTable->rate) {
+    if (rateTable->rate == rate) {
+      break;
     }
 
-    while (rateTable->rate) {
-        if (rateTable->rate == rate) {
-            break;
-        }
-        rateTable++;
-    }
-    if (rateTable->rate != rate) {
-        return CRU_PllV1SetByAuto(PLL_INPUT_OSC_RATE, rate);
-    } else {
-        return rateTable;
-    }
+    rateTable++;
+  }
+
+  if (rateTable->rate != rate) {
+    return CRU_PllV1SetByAuto (PLL_INPUT_OSC_RATE, rate);
+  } else {
+    return rateTable;
+  }
 }
 
 /** @} */
@@ -372,44 +404,51 @@ static const struct PLL_CONFIG *CRU_PllV1GetSettings(struct PLL_SETUP *pSetup,
  *     FOUTPOSTDIV = FOUTVCO / (POSTDIV1*POSTDIV2)
  *     FOUT = FOUTVCO / POSTDIV1 / POSTDIV2
  */
-uint32_t HAL_CRU_GetPllFreq(struct PLL_SETUP *pSetup)
+uint32_t
+HAL_CRU_GetPllFreq (
+  struct PLL_SETUP  *pSetup
+  )
 {
-    uint32_t refDiv, fbDiv, postdDv1, postDiv2, frac, dsmpd;
-    uint32_t mode = 0, rate = PLL_INPUT_OSC_RATE;
+  uint32_t  refDiv, fbDiv, postdDv1, postDiv2, frac, dsmpd;
+  uint32_t  mode = 0, rate = PLL_INPUT_OSC_RATE;
 
-    mode = PLL_GET_PLLMODE(READ_REG(*(pSetup->modeOffset)), pSetup->modeShift,
-                           pSetup->modeMask);
+  mode = PLL_GET_PLLMODE (
+           READ_REG (*(pSetup->modeOffset)),
+           pSetup->modeShift,
+           pSetup->modeMask
+           );
 
-    switch (mode) {
+  switch (mode) {
     case RK_PLL_MODE_SLOW:
-        rate = PLL_INPUT_OSC_RATE;
-        break;
+      rate = PLL_INPUT_OSC_RATE;
+      break;
     case RK_PLL_MODE_NORMAL:
-        postdDv1 = PLL_GET_POSTDIV1(READ_REG(*(pSetup->conOffset0)));
-        fbDiv = PLL_GET_FBDIV(READ_REG(*(pSetup->conOffset0)));
-        postDiv2 = PLL_GET_POSTDIV2(READ_REG(*(pSetup->conOffset1)));
-        refDiv = PLL_GET_REFDIV(READ_REG(*(pSetup->conOffset1)));
-        dsmpd = PLL_GET_DSMPD(READ_REG(*(pSetup->conOffset1)));
-        frac = PLL_GET_FRAC(READ_REG(*(pSetup->conOffset2)));
-        rate = (rate / refDiv) * fbDiv;
-        if (dsmpd == 0) {
-            uint64_t fracRate = PLL_INPUT_OSC_RATE;
+      postdDv1 = PLL_GET_POSTDIV1 (READ_REG (*(pSetup->conOffset0)));
+      fbDiv    = PLL_GET_FBDIV (READ_REG (*(pSetup->conOffset0)));
+      postDiv2 = PLL_GET_POSTDIV2 (READ_REG (*(pSetup->conOffset1)));
+      refDiv   = PLL_GET_REFDIV (READ_REG (*(pSetup->conOffset1)));
+      dsmpd    = PLL_GET_DSMPD (READ_REG (*(pSetup->conOffset1)));
+      frac     = PLL_GET_FRAC (READ_REG (*(pSetup->conOffset2)));
+      rate     = (rate / refDiv) * fbDiv;
+      if (dsmpd == 0) {
+        uint64_t  fracRate = PLL_INPUT_OSC_RATE;
 
-            fracRate *= frac;
-            fracRate = fracRate >> EXPONENT_OF_FRAC_PLL;
-            fracRate = fracRate / refDiv;
-            rate += fracRate;
-        }
-        rate = rate / (postdDv1 * postDiv2);
-        rate = CRU_PLL_ROUND_UP_TO_KHZ(rate);
-        break;
+        fracRate *= frac;
+        fracRate  = fracRate >> EXPONENT_OF_FRAC_PLL;
+        fracRate  = fracRate / refDiv;
+        rate     += fracRate;
+      }
+
+      rate = rate / (postdDv1 * postDiv2);
+      rate = CRU_PLL_ROUND_UP_TO_KHZ (rate);
+      break;
     case RK_PLL_MODE_DEEP:
     default:
-        rate = 32768;
-        break;
-    }
+      rate = 32768;
+      break;
+  }
 
-    return rate;
+  return rate;
 }
 
 /**
@@ -425,66 +464,72 @@ uint32_t HAL_CRU_GetPllFreq(struct PLL_SETUP *pSetup)
  *     Waiting for pll lock
  *     Force PLL into normal mode
  */
-HAL_Status HAL_CRU_SetPllFreq(struct PLL_SETUP *pSetup, uint32_t rate)
+HAL_Status
+HAL_CRU_SetPllFreq (
+  struct PLL_SETUP  *pSetup,
+  uint32_t          rate
+  )
 {
-    const struct PLL_CONFIG *pConfig;
-    int delay = 2400;
+  const struct PLL_CONFIG  *pConfig;
+  int                      delay = 2400;
 
-    if (rate == HAL_CRU_GetPllFreq(pSetup)) {
-        return HAL_OK;
-    } else if (rate < MIN_FOUT_FREQ) {
-        return HAL_INVAL;
-    } else if (rate > MAX_FOUT_FREQ) {
-        return HAL_INVAL;
-    }
-
-    pConfig = CRU_PllGetSettings(pSetup, rate);
-    if (!pConfig) {
-        return HAL_ERROR;
-    }
-
-    /* Force PLL into slow mode to ensure output stable clock */
-    WRITE_REG_MASK_WE(*(pSetup->modeOffset), pSetup->modeMask, RK_PLL_MODE_SLOW << pSetup->modeShift);
-
-    /* Pll Power down */
-    WRITE_REG_MASK_WE(*(pSetup->conOffset1), PWRDOWN_MASK, 1 << PWRDOWN_SHIT);
-
-    /* Pll Config */
-    WRITE_REG_MASK_WE(*(pSetup->conOffset1), PLL_POSTDIV2_MASK, pConfig->postDiv2 << PLL_POSTDIV2_SHIFT);
-    WRITE_REG_MASK_WE(*(pSetup->conOffset1), PLL_REFDIV_MASK, pConfig->refDiv << PLL_REFDIV_SHIFT);
-    WRITE_REG_MASK_WE(*(pSetup->conOffset0), PLL_POSTDIV1_MASK, pConfig->postDiv1 << PLL_POSTDIV1_SHIFT);
-    WRITE_REG_MASK_WE(*(pSetup->conOffset0), PLL_FBDIV_MASK, pConfig->fbDiv << PLL_FBDIV_SHIFT);
-    WRITE_REG_MASK_WE(*(pSetup->conOffset1), PLL_DSMPD_MASK, pConfig->dsmpd << PLL_DSMPD_SHIFT);
-
-    if (pConfig->frac) {
-        WRITE_REG(*(pSetup->conOffset2), (READ_REG(*(pSetup->conOffset2)) & 0xff000000) | pConfig->frac);
-    }
-
-    /* Pll Power up */
-    WRITE_REG_MASK_WE(*(pSetup->conOffset1), PWRDOWN_MASK, 0 << PWRDOWN_SHIT);
-
-    /* Waiting for pll lock */
-    while (delay > 0) {
-        if (pSetup->stat0) {
-            if (READ_REG(*(pSetup->stat0)) & (1 << pSetup->lockShift)) {
-                break;
-            }
-        } else {
-            if (READ_REG(*(pSetup->conOffset1)) & (1 << pSetup->lockShift)) {
-                break;
-            }
-        }
-        HAL_CPUDelayUs(1000);
-        delay--;
-    }
-    if (delay == 0) {
-        return HAL_TIMEOUT;
-    }
-
-    /* Force PLL into normal mode */
-    WRITE_REG_MASK_WE(*(pSetup->modeOffset), pSetup->modeMask, RK_PLL_MODE_NORMAL << pSetup->modeShift);
-
+  if (rate == HAL_CRU_GetPllFreq (pSetup)) {
     return HAL_OK;
+  } else if (rate < MIN_FOUT_FREQ) {
+    return HAL_INVAL;
+  } else if (rate > MAX_FOUT_FREQ) {
+    return HAL_INVAL;
+  }
+
+  pConfig = CRU_PllGetSettings (pSetup, rate);
+  if (!pConfig) {
+    return HAL_ERROR;
+  }
+
+  /* Force PLL into slow mode to ensure output stable clock */
+  WRITE_REG_MASK_WE (*(pSetup->modeOffset), pSetup->modeMask, RK_PLL_MODE_SLOW << pSetup->modeShift);
+
+  /* Pll Power down */
+  WRITE_REG_MASK_WE (*(pSetup->conOffset1), PWRDOWN_MASK, 1 << PWRDOWN_SHIT);
+
+  /* Pll Config */
+  WRITE_REG_MASK_WE (*(pSetup->conOffset1), PLL_POSTDIV2_MASK, pConfig->postDiv2 << PLL_POSTDIV2_SHIFT);
+  WRITE_REG_MASK_WE (*(pSetup->conOffset1), PLL_REFDIV_MASK, pConfig->refDiv << PLL_REFDIV_SHIFT);
+  WRITE_REG_MASK_WE (*(pSetup->conOffset0), PLL_POSTDIV1_MASK, pConfig->postDiv1 << PLL_POSTDIV1_SHIFT);
+  WRITE_REG_MASK_WE (*(pSetup->conOffset0), PLL_FBDIV_MASK, pConfig->fbDiv << PLL_FBDIV_SHIFT);
+  WRITE_REG_MASK_WE (*(pSetup->conOffset1), PLL_DSMPD_MASK, pConfig->dsmpd << PLL_DSMPD_SHIFT);
+
+  if (pConfig->frac) {
+    WRITE_REG (*(pSetup->conOffset2), (READ_REG (*(pSetup->conOffset2)) & 0xff000000) | pConfig->frac);
+  }
+
+  /* Pll Power up */
+  WRITE_REG_MASK_WE (*(pSetup->conOffset1), PWRDOWN_MASK, 0 << PWRDOWN_SHIT);
+
+  /* Waiting for pll lock */
+  while (delay > 0) {
+    if (pSetup->stat0) {
+      if (READ_REG (*(pSetup->stat0)) & (1 << pSetup->lockShift)) {
+        break;
+      }
+    } else {
+      if (READ_REG (*(pSetup->conOffset1)) & (1 << pSetup->lockShift)) {
+        break;
+      }
+    }
+
+    HAL_CPUDelayUs (1000);
+    delay--;
+  }
+
+  if (delay == 0) {
+    return HAL_TIMEOUT;
+  }
+
+  /* Force PLL into normal mode */
+  WRITE_REG_MASK_WE (*(pSetup->modeOffset), pSetup->modeMask, RK_PLL_MODE_NORMAL << pSetup->modeShift);
+
+  return HAL_OK;
 }
 
 /**
@@ -500,48 +545,56 @@ HAL_Status HAL_CRU_SetPllFreq(struct PLL_SETUP *pSetup, uint32_t rate)
  *     FOUTVCO = (FREF / P) * (M + K / 65536)
  *     FOUT = FOUTVCO / 2^S
  */
-uint32_t HAL_CRU_GetPllV1Freq(struct PLL_SETUP *pSetup)
+uint32_t
+HAL_CRU_GetPllV1Freq (
+  struct PLL_SETUP  *pSetup
+  )
 {
-    uint32_t m, p, s, k;
-    uint64_t rate = PLL_INPUT_OSC_RATE;
-    uint32_t mode = 0;
+  uint32_t  m, p, s, k;
+  uint64_t  rate = PLL_INPUT_OSC_RATE;
+  uint32_t  mode = 0;
 
-    if (pSetup->modeMask)
-        mode = PLL_GET_PLLMODE(READ_REG(*(pSetup->modeOffset)), pSetup->modeShift,
-                           pSetup->modeMask);
-    else
-        mode = RK_PLL_MODE_NORMAL;
+  if (pSetup->modeMask) {
+    mode = PLL_GET_PLLMODE (
+             READ_REG (*(pSetup->modeOffset)),
+             pSetup->modeShift,
+             pSetup->modeMask
+             );
+  } else {
+    mode = RK_PLL_MODE_NORMAL;
+  }
 
-    switch (mode) {
+  switch (mode) {
     case RK_PLL_MODE_SLOW:
-        rate = PLL_INPUT_OSC_RATE;
-        break;
+      rate = PLL_INPUT_OSC_RATE;
+      break;
     case RK_PLL_MODE_NORMAL:
-        m = (READ_REG(*(pSetup->conOffset0)) & PLLCON0_M_MASK) >> PLLCON0_M_SHIFT;
-        p = (READ_REG(*(pSetup->conOffset1)) & PLLCON1_P_MASK) >> PLLCON1_P_SHIFT;
-        s = (READ_REG(*(pSetup->conOffset1)) & PLLCON1_S_MASK) >> PLLCON1_S_SHIFT;
-        k = (READ_REG(*(pSetup->conOffset2)) & PLLCON2_K_MASK) >> PLLCON2_K_SHIFT;
+      m = (READ_REG (*(pSetup->conOffset0)) & PLLCON0_M_MASK) >> PLLCON0_M_SHIFT;
+      p = (READ_REG (*(pSetup->conOffset1)) & PLLCON1_P_MASK) >> PLLCON1_P_SHIFT;
+      s = (READ_REG (*(pSetup->conOffset1)) & PLLCON1_S_MASK) >> PLLCON1_S_SHIFT;
+      k = (READ_REG (*(pSetup->conOffset2)) & PLLCON2_K_MASK) >> PLLCON2_K_SHIFT;
 
-        rate *= m;
-        rate = rate / p;
-        if (k) {
-            /* fractional mode */
-            uint64_t frac = PLL_INPUT_OSC_RATE / p;
+      rate *= m;
+      rate  = rate / p;
+      if (k) {
+        /* fractional mode */
+        uint64_t  frac = PLL_INPUT_OSC_RATE / p;
 
-            frac *= k;
-            frac = frac / 65536;
-            rate += frac;
-        }
-	rate = rate >> s;
+        frac *= k;
+        frac  = frac / 65536;
+        rate += frac;
+      }
 
-        break;
+      rate = rate >> s;
+
+      break;
     case RK_PLL_MODE_DEEP:
     default:
-        rate = 32768;
-        break;
-    }
+      rate = 32768;
+      break;
+  }
 
-    return rate;
+  return rate;
 }
 
 /**
@@ -557,57 +610,66 @@ uint32_t HAL_CRU_GetPllV1Freq(struct PLL_SETUP *pSetup)
  *     Waiting for pll lock
  *     Force PLL into normal mode
  */
-HAL_Status HAL_CRU_SetPllV1Freq(struct PLL_SETUP *pSetup, uint32_t rate)
+HAL_Status
+HAL_CRU_SetPllV1Freq (
+  struct PLL_SETUP  *pSetup,
+  uint32_t          rate
+  )
 {
-    const struct PLL_CONFIG *pConfig;
-    int delay = 24000000;
+  const struct PLL_CONFIG  *pConfig;
+  int                      delay = 24000000;
 
-    if (rate == HAL_CRU_GetPllV1Freq(pSetup)) {
-        return HAL_OK;
-    } else if (rate < RK3588_FOUT_MIN_HZ) {
-        return HAL_INVAL;
-    } else if (rate > RK3588_FOUT_MAX_HZ) {
-        return HAL_INVAL;
-    }
-
-    pConfig = CRU_PllV1GetSettings(pSetup, rate);
-    if (!pConfig) {
-        return HAL_ERROR;
-    }
-
-    /* Force PLL into slow mode to ensure output stable clock */
-    if (pSetup->modeMask)
-        WRITE_REG_MASK_WE(*(pSetup->modeOffset), pSetup->modeMask, RK_PLL_MODE_SLOW << pSetup->modeShift);
-
-    /* Pll Power down */
-    WRITE_REG_MASK_WE(*(pSetup->conOffset1), PWRDOWN_MASK, 1 << PWRDOWN_SHIT);
-
-    /* Pll Config */
-    WRITE_REG_MASK_WE(*(pSetup->conOffset0), PLLCON0_M_MASK, pConfig->m << PLLCON0_M_SHIFT);
-    WRITE_REG_MASK_WE(*(pSetup->conOffset1), PLLCON1_P_MASK, pConfig->p << PLLCON1_P_SHIFT);
-    WRITE_REG_MASK_WE(*(pSetup->conOffset1), PLLCON1_S_MASK, pConfig->s << PLLCON1_S_SHIFT);
-    if (pConfig->k)
-        WRITE_REG_MASK_WE(*(pSetup->conOffset2), PLLCON2_K_MASK, pConfig->k << PLLCON2_K_SHIFT);
-
-    /* Pll Power up */
-    WRITE_REG_MASK_WE(*(pSetup->conOffset1), PWRDOWN_MASK, 0 << PWRDOWN_SHIT);
-
-    /* Waiting for pll lock */
-    while (delay > 0) {
-        if (READ_REG(*(pSetup->conOffset6)) & (1 << pSetup->lockShift)) {
-            break;
-        }
-        delay--;
-    }
-    if (delay == 0) {
-        return HAL_TIMEOUT;
-    }
-
-    /* Force PLL into normal mode */
-    if (pSetup->modeMask)
-        WRITE_REG_MASK_WE(*(pSetup->modeOffset), pSetup->modeMask, RK_PLL_MODE_NORMAL << pSetup->modeShift);
-
+  if (rate == HAL_CRU_GetPllV1Freq (pSetup)) {
     return HAL_OK;
+  } else if (rate < RK3588_FOUT_MIN_HZ) {
+    return HAL_INVAL;
+  } else if (rate > RK3588_FOUT_MAX_HZ) {
+    return HAL_INVAL;
+  }
+
+  pConfig = CRU_PllV1GetSettings (pSetup, rate);
+  if (!pConfig) {
+    return HAL_ERROR;
+  }
+
+  /* Force PLL into slow mode to ensure output stable clock */
+  if (pSetup->modeMask) {
+    WRITE_REG_MASK_WE (*(pSetup->modeOffset), pSetup->modeMask, RK_PLL_MODE_SLOW << pSetup->modeShift);
+  }
+
+  /* Pll Power down */
+  WRITE_REG_MASK_WE (*(pSetup->conOffset1), PWRDOWN_MASK, 1 << PWRDOWN_SHIT);
+
+  /* Pll Config */
+  WRITE_REG_MASK_WE (*(pSetup->conOffset0), PLLCON0_M_MASK, pConfig->m << PLLCON0_M_SHIFT);
+  WRITE_REG_MASK_WE (*(pSetup->conOffset1), PLLCON1_P_MASK, pConfig->p << PLLCON1_P_SHIFT);
+  WRITE_REG_MASK_WE (*(pSetup->conOffset1), PLLCON1_S_MASK, pConfig->s << PLLCON1_S_SHIFT);
+  if (pConfig->k) {
+    WRITE_REG_MASK_WE (*(pSetup->conOffset2), PLLCON2_K_MASK, pConfig->k << PLLCON2_K_SHIFT);
+  }
+
+  /* Pll Power up */
+  WRITE_REG_MASK_WE (*(pSetup->conOffset1), PWRDOWN_MASK, 0 << PWRDOWN_SHIT);
+
+  /* Waiting for pll lock */
+  while (delay > 0) {
+    if (READ_REG (*(pSetup->conOffset6)) & (1 << pSetup->lockShift)) {
+      break;
+    }
+
+    delay--;
+  }
+
+  if (delay == 0) {
+    return HAL_TIMEOUT;
+  }
+
+  /* Force PLL into normal mode */
+  if (pSetup->modeMask) {
+    WRITE_REG_MASK_WE (*(pSetup->modeOffset), pSetup->modeMask, RK_PLL_MODE_NORMAL << pSetup->modeShift);
+  }
+
+  return HAL_OK;
 }
 
 /**
@@ -615,32 +677,37 @@ HAL_Status HAL_CRU_SetPllV1Freq(struct PLL_SETUP *pSetup, uint32_t rate)
  * @param  *pSetup: struct PLL_SETUP struct,Contains PLL register parameters
  * @return HAL_Status.
  */
-HAL_Status HAL_CRU_SetPllPowerUp(struct PLL_SETUP *pSetup)
+HAL_Status
+HAL_CRU_SetPllPowerUp (
+  struct PLL_SETUP  *pSetup
+  )
 {
-    int delay = 2400;
+  int  delay = 2400;
 
-    /* Pll Power up */
-    WRITE_REG_MASK_WE(*(pSetup->conOffset1), PWRDOWN_MASK, 0 << PWRDOWN_SHIT);
+  /* Pll Power up */
+  WRITE_REG_MASK_WE (*(pSetup->conOffset1), PWRDOWN_MASK, 0 << PWRDOWN_SHIT);
 
-    /* Waiting for pll lock */
-    while (delay > 0) {
-        if (pSetup->stat0) {
-            if (READ_REG(*(pSetup->stat0)) & (1 << pSetup->lockShift)) {
-                break;
-            }
-        } else {
-            if (READ_REG(*(pSetup->conOffset1)) & (1 << pSetup->lockShift)) {
-                break;
-            }
-        }
-        HAL_CPUDelayUs(1000);
-        delay--;
-    }
-    if (delay == 0) {
-        return HAL_TIMEOUT;
+  /* Waiting for pll lock */
+  while (delay > 0) {
+    if (pSetup->stat0) {
+      if (READ_REG (*(pSetup->stat0)) & (1 << pSetup->lockShift)) {
+        break;
+      }
+    } else {
+      if (READ_REG (*(pSetup->conOffset1)) & (1 << pSetup->lockShift)) {
+        break;
+      }
     }
 
-    return HAL_OK;
+    HAL_CPUDelayUs (1000);
+    delay--;
+  }
+
+  if (delay == 0) {
+    return HAL_TIMEOUT;
+  }
+
+  return HAL_OK;
 }
 
 /**
@@ -648,12 +715,15 @@ HAL_Status HAL_CRU_SetPllPowerUp(struct PLL_SETUP *pSetup)
  * @param  *pSetup: struct PLL_SETUP struct,Contains PLL register parameters
  * @return HAL_Status.
  */
-HAL_Status HAL_CRU_SetPllPowerDown(struct PLL_SETUP *pSetup)
+HAL_Status
+HAL_CRU_SetPllPowerDown (
+  struct PLL_SETUP  *pSetup
+  )
 {
-    /* Pll Power down */
-    WRITE_REG_MASK_WE(*(pSetup->conOffset1), PWRDOWN_MASK, 1 << PWRDOWN_SHIT);
+  /* Pll Power down */
+  WRITE_REG_MASK_WE (*(pSetup->conOffset1), PWRDOWN_MASK, 1 << PWRDOWN_SHIT);
 
-    return HAL_OK;
+  return HAL_OK;
 }
 
 /**
@@ -661,27 +731,30 @@ HAL_Status HAL_CRU_SetPllPowerDown(struct PLL_SETUP *pSetup)
  * @param  clk: clk gate id
  * @return HAL_Check
  */
-HAL_Check HAL_CRU_ClkIsEnabled(uint32_t clockId)
+HAL_Check
+HAL_CRU_ClkIsEnabled (
+  uint32_t  clockId
+  )
 {
-    CRU_CLOCK *clk;
-    uint32_t index, shift, address;
-    HAL_Check ret;
+  CRU_CLOCK  *clk;
+  uint32_t   index, shift, address;
+  HAL_Check  ret;
 
-    clk = HAL_CRU_ClkGetById(clockId);
-    if (clk == NULL) {
-        ASSERT (FALSE);
-        return HAL_FALSE;
-    } else if ((clk->flags & CLOCK_SUPPORT_GATE) == 0) {
-        return HAL_TRUE;
-    }
+  clk = HAL_CRU_ClkGetById (clockId);
+  if (clk == NULL) {
+    ASSERT (FALSE);
+    return HAL_FALSE;
+  } else if ((clk->flags & CLOCK_SUPPORT_GATE) == 0) {
+    return HAL_TRUE;
+  }
 
-    index = CLK_GATE_GET_REG_OFFSET(clk->gate);
-    shift = CLK_GATE_GET_BITS_SHIFT(clk->gate);
-    address = CRU_CON_REG_ADDRESS(clk->regBase, clk->gateOffset, index);
+  index   = CLK_GATE_GET_REG_OFFSET (clk->gate);
+  shift   = CLK_GATE_GET_BITS_SHIFT (clk->gate);
+  address = CRU_CON_REG_ADDRESS (clk->regBase, clk->gateOffset, index);
 
-    ret = (HAL_Check)(!((MmioRead32(address) & (1 << shift)) >> shift));
+  ret = (HAL_Check)(!((MmioRead32 (address) & (1 << shift)) >> shift));
 
-    return ret;
+  return ret;
 }
 
 /**
@@ -689,24 +762,27 @@ HAL_Check HAL_CRU_ClkIsEnabled(uint32_t clockId)
  * @param  clk: clk gate id
  * @return NONE
  */
-HAL_Status HAL_CRU_ClkEnable(uint32_t clockId)
+HAL_Status
+HAL_CRU_ClkEnable (
+  uint32_t  clockId
+  )
 {
-    CRU_CLOCK *clk;
-    uint32_t index, shift, address;
+  CRU_CLOCK  *clk;
+  uint32_t   index, shift, address;
 
-    clk = HAL_CRU_ClkGetById(clockId);
-    if (clk == NULL || (clk->flags & CLOCK_SUPPORT_GATE) == 0) {
-        ASSERT (FALSE);
-        return HAL_ERROR;
-    }
+  clk = HAL_CRU_ClkGetById (clockId);
+  if ((clk == NULL) || ((clk->flags & CLOCK_SUPPORT_GATE) == 0)) {
+    ASSERT (FALSE);
+    return HAL_ERROR;
+  }
 
-    index = CLK_GATE_GET_REG_OFFSET(clk->gate);
-    shift = CLK_GATE_GET_BITS_SHIFT(clk->gate);
-    address = CRU_CON_REG_ADDRESS(clk->regBase, clk->gateOffset, index);
+  index   = CLK_GATE_GET_REG_OFFSET (clk->gate);
+  shift   = CLK_GATE_GET_BITS_SHIFT (clk->gate);
+  address = CRU_CON_REG_ADDRESS (clk->regBase, clk->gateOffset, index);
 
-    MmioWrite32(address, VAL_MASK_WE(1U << shift, 0U << shift));
+  MmioWrite32 (address, VAL_MASK_WE (1U << shift, 0U << shift));
 
-    return HAL_OK;
+  return HAL_OK;
 }
 
 /**
@@ -714,24 +790,27 @@ HAL_Status HAL_CRU_ClkEnable(uint32_t clockId)
  * @param  clk: clk gate id
  * @return NONE
  */
-HAL_Status HAL_CRU_ClkDisable(uint32_t clockId)
+HAL_Status
+HAL_CRU_ClkDisable (
+  uint32_t  clockId
+  )
 {
-    CRU_CLOCK *clk;
-    uint32_t index, shift, address;
+  CRU_CLOCK  *clk;
+  uint32_t   index, shift, address;
 
-    clk = HAL_CRU_ClkGetById(clockId);
-    if (clk == NULL || (clk->flags & CLOCK_SUPPORT_GATE) == 0) {
-        ASSERT (FALSE);
-        return HAL_ERROR;
-    }
+  clk = HAL_CRU_ClkGetById (clockId);
+  if ((clk == NULL) || ((clk->flags & CLOCK_SUPPORT_GATE) == 0)) {
+    ASSERT (FALSE);
+    return HAL_ERROR;
+  }
 
-    index = CLK_GATE_GET_REG_OFFSET(clk->gate);
-    shift = CLK_GATE_GET_BITS_SHIFT(clk->gate);
-    address = CRU_CON_REG_ADDRESS(clk->regBase, clk->gateOffset, index);
+  index   = CLK_GATE_GET_REG_OFFSET (clk->gate);
+  shift   = CLK_GATE_GET_BITS_SHIFT (clk->gate);
+  address = CRU_CON_REG_ADDRESS (clk->regBase, clk->gateOffset, index);
 
-    MmioWrite32(address, VAL_MASK_WE(1U << shift, 1U << shift));
+  MmioWrite32 (address, VAL_MASK_WE (1U << shift, 1U << shift));
 
-    return HAL_OK;
+  return HAL_OK;
 }
 
 /**
@@ -740,30 +819,34 @@ HAL_Status HAL_CRU_ClkDisable(uint32_t clockId)
  * @param  divValue: div value
  * @return NONE
  */
-HAL_Status HAL_CRU_ClkSetDiv(uint32_t clockId, uint32_t divValue)
+HAL_Status
+HAL_CRU_ClkSetDiv (
+  uint32_t  clockId,
+  uint32_t  divValue
+  )
 {
-    CRU_CLOCK *clk;
-    uint32_t shift, mask, index, address;
+  CRU_CLOCK  *clk;
+  uint32_t   shift, mask, index, address;
 
-    clk = HAL_CRU_ClkGetById(clockId);
-    if (clk == NULL || (clk->flags & CLOCK_SUPPORT_DIV) == 0) {
-        ASSERT (FALSE);
-        return HAL_ERROR;
-    }
+  clk = HAL_CRU_ClkGetById (clockId);
+  if ((clk == NULL) || ((clk->flags & CLOCK_SUPPORT_DIV) == 0)) {
+    ASSERT (FALSE);
+    return HAL_ERROR;
+  }
 
-    index = CLK_DIV_GET_REG_OFFSET(clk->div);
-    shift = CLK_DIV_GET_BITS_SHIFT(clk->div);
-    HAL_ASSERT(shift < 16);
-    mask = CLK_DIV_GET_MASK(clk->div);
-    address = CRU_CON_REG_ADDRESS(clk->regBase, clk->divOffset, index);
+  index = CLK_DIV_GET_REG_OFFSET (clk->div);
+  shift = CLK_DIV_GET_BITS_SHIFT (clk->div);
+  HAL_ASSERT (shift < 16);
+  mask    = CLK_DIV_GET_MASK (clk->div);
+  address = CRU_CON_REG_ADDRESS (clk->regBase, clk->divOffset, index);
 
-    if (divValue > mask) {
-        divValue = mask;
-    }
+  if (divValue > mask) {
+    divValue = mask;
+  }
 
-    MmioWrite32(address, VAL_MASK_WE(mask, (divValue - 1U) << shift));
+  MmioWrite32 (address, VAL_MASK_WE (mask, (divValue - 1U) << shift));
 
-    return HAL_OK;
+  return HAL_OK;
 }
 
 /**
@@ -771,26 +854,29 @@ HAL_Status HAL_CRU_ClkSetDiv(uint32_t clockId, uint32_t divValue)
  * @param  clockId: div id(Contains div offset, shift, mask information)
  * @return div value
  */
-uint32_t HAL_CRU_ClkGetDiv(uint32_t clockId)
+uint32_t
+HAL_CRU_ClkGetDiv (
+  uint32_t  clockId
+  )
 {
-    CRU_CLOCK *clk;
-    uint32_t shift, mask, index, divValue, address;
+  CRU_CLOCK  *clk;
+  uint32_t   shift, mask, index, divValue, address;
 
-    clk = HAL_CRU_ClkGetById(clockId);
-    if (clk == NULL || (clk->flags & CLOCK_SUPPORT_DIV) == 0) {
-        ASSERT (clk != NULL);
-        return 1;
-    }
+  clk = HAL_CRU_ClkGetById (clockId);
+  if ((clk == NULL) || ((clk->flags & CLOCK_SUPPORT_DIV) == 0)) {
+    ASSERT (clk != NULL);
+    return 1;
+  }
 
-    index = CLK_DIV_GET_REG_OFFSET(clk->div);
-    shift = CLK_DIV_GET_BITS_SHIFT(clk->div);
-    HAL_ASSERT(shift < 16);
-    mask = CLK_DIV_GET_MASK(clk->div);
-    address = CRU_CON_REG_ADDRESS(clk->regBase, clk->divOffset, index);
+  index = CLK_DIV_GET_REG_OFFSET (clk->div);
+  shift = CLK_DIV_GET_BITS_SHIFT (clk->div);
+  HAL_ASSERT (shift < 16);
+  mask    = CLK_DIV_GET_MASK (clk->div);
+  address = CRU_CON_REG_ADDRESS (clk->regBase, clk->divOffset, index);
 
-    divValue = ((MmioRead32(address) & mask) >> shift) + 1;
+  divValue = ((MmioRead32 (address) & mask) >> shift) + 1;
 
-    return divValue;
+  return divValue;
 }
 
 /**
@@ -800,26 +886,30 @@ uint32_t HAL_CRU_ClkGetDiv(uint32_t clockId)
  * @return NONE
  */
 HAL_SECTION_SRAM_CODE
-HAL_Status HAL_CRU_ClkSetMux(uint32_t clockId, uint32_t muxValue)
+HAL_Status
+HAL_CRU_ClkSetMux (
+  uint32_t  clockId,
+  uint32_t  muxValue
+  )
 {
-    CRU_CLOCK *clk;
-    uint32_t shift, mask, index, address;
+  CRU_CLOCK  *clk;
+  uint32_t   shift, mask, index, address;
 
-    clk = HAL_CRU_ClkGetById(clockId);
-    if (clk == NULL || (clk->flags & CLOCK_SUPPORT_MUX) == 0) {
-        ASSERT (FALSE);
-        return HAL_ERROR;
-    }
+  clk = HAL_CRU_ClkGetById (clockId);
+  if ((clk == NULL) || ((clk->flags & CLOCK_SUPPORT_MUX) == 0)) {
+    ASSERT (FALSE);
+    return HAL_ERROR;
+  }
 
-    index = CLK_MUX_GET_REG_OFFSET(clk->mux);
-    shift = CLK_MUX_GET_BITS_SHIFT(clk->mux);
-    HAL_ASSERT(shift < 16);
-    mask = CLK_MUX_GET_MASK(clk->mux);
-    address = CRU_CON_REG_ADDRESS(clk->regBase, clk->muxOffset, index);
+  index = CLK_MUX_GET_REG_OFFSET (clk->mux);
+  shift = CLK_MUX_GET_BITS_SHIFT (clk->mux);
+  HAL_ASSERT (shift < 16);
+  mask    = CLK_MUX_GET_MASK (clk->mux);
+  address = CRU_CON_REG_ADDRESS (clk->regBase, clk->muxOffset, index);
 
-    MmioWrite32(address, VAL_MASK_WE(mask, muxValue << shift));
+  MmioWrite32 (address, VAL_MASK_WE (mask, muxValue << shift));
 
-    return HAL_OK;
+  return HAL_OK;
 }
 
 /**
@@ -828,26 +918,29 @@ HAL_Status HAL_CRU_ClkSetMux(uint32_t clockId, uint32_t muxValue)
  * @return mux value
  */
 HAL_SECTION_SRAM_CODE
-uint32_t HAL_CRU_ClkGetMux(uint32_t clockId)
+uint32_t
+HAL_CRU_ClkGetMux (
+  uint32_t  clockId
+  )
 {
-    CRU_CLOCK *clk;
-    uint32_t shift, mask, index, muxValue, address;
+  CRU_CLOCK  *clk;
+  uint32_t   shift, mask, index, muxValue, address;
 
-    clk = HAL_CRU_ClkGetById(clockId);
-    if (clk == NULL || (clk->flags & CLOCK_SUPPORT_MUX) == 0) {
-        ASSERT (FALSE);
-        return 0;
-    }
+  clk = HAL_CRU_ClkGetById (clockId);
+  if ((clk == NULL) || ((clk->flags & CLOCK_SUPPORT_MUX) == 0)) {
+    ASSERT (FALSE);
+    return 0;
+  }
 
-    index = CLK_MUX_GET_REG_OFFSET(clk->mux);
-    shift = CLK_MUX_GET_BITS_SHIFT(clk->mux);
-    HAL_ASSERT(shift < 16);
-    mask = CLK_MUX_GET_MASK(clk->mux);
-    address = CRU_CON_REG_ADDRESS(clk->regBase, clk->muxOffset, index);
+  index = CLK_MUX_GET_REG_OFFSET (clk->mux);
+  shift = CLK_MUX_GET_BITS_SHIFT (clk->mux);
+  HAL_ASSERT (shift < 16);
+  mask    = CLK_MUX_GET_MASK (clk->mux);
+  address = CRU_CON_REG_ADDRESS (clk->regBase, clk->muxOffset, index);
 
-    muxValue = ((MmioRead32(address) & mask) >> shift);
+  muxValue = ((MmioRead32 (address) & mask) >> shift);
 
-    return muxValue;
+  return muxValue;
 }
 
 /**
@@ -858,29 +951,34 @@ uint32_t HAL_CRU_ClkGetMux(uint32_t clockId)
  * @param  denominator: the returned denominator.
  * @return HAL_Status.
  */
-HAL_Status HAL_CRU_FracdivGetConfig(uint32_t rateOut, uint32_t rate,
-                                    uint32_t *numerator,
-                                    uint32_t *denominator)
+HAL_Status
+HAL_CRU_FracdivGetConfig (
+  uint32_t  rateOut,
+  uint32_t  rate,
+  uint32_t  *numerator,
+  uint32_t  *denominator
+  )
 {
-    uint32_t gcdVal;
+  uint32_t  gcdVal;
 
-    gcdVal = CRU_Gcd(rate, rateOut);
-    if (!gcdVal) {
-        return HAL_ERROR;
-    }
+  gcdVal = CRU_Gcd (rate, rateOut);
+  if (!gcdVal) {
+    return HAL_ERROR;
+  }
 
-    *numerator = rateOut / gcdVal;
-    *denominator = rate / gcdVal;
+  *numerator   = rateOut / gcdVal;
+  *denominator = rate / gcdVal;
 
-    if (*numerator < 4) {
-        *numerator *= 4;
-        *denominator *= 4;
-    }
-    if (*numerator > 0xffff || *denominator > 0xffff) {
-        return HAL_INVAL;
-    }
+  if (*numerator < 4) {
+    *numerator   *= 4;
+    *denominator *= 4;
+  }
 
-    return HAL_OK;
+  if ((*numerator > 0xffff) || (*denominator > 0xffff)) {
+    return HAL_INVAL;
+  }
+
+  return HAL_OK;
 }
 
 /**
@@ -891,28 +989,34 @@ HAL_Status HAL_CRU_FracdivGetConfig(uint32_t rateOut, uint32_t rate,
  * @param  bestdiv: the returned bestdiv.
  * @return HAL_Status.
  */
-HAL_Status HAL_CRU_ClkNp5BestDiv(uint32_t clockId, uint32_t rate, uint32_t pRate, uint32_t *bestdiv)
+HAL_Status
+HAL_CRU_ClkNp5BestDiv (
+  uint32_t  clockId,
+  uint32_t  rate,
+  uint32_t  pRate,
+  uint32_t  *bestdiv
+  )
 {
-    CRU_CLOCK *clk;
-    uint32_t maxDiv;
-    uint32_t i;
+  CRU_CLOCK  *clk;
+  uint32_t   maxDiv;
+  uint32_t   i;
 
-    clk = HAL_CRU_ClkGetById(clockId);
-    if (clk == NULL) {
-        return HAL_ERROR;
-    }
-
-    maxDiv = CLK_DIV_GET_MASK(clk->div);
-
-    for (i = 0; i < maxDiv; i++) {
-        if (((pRate * 2) == (rate * (i * 2 + 3)))) {
-            *bestdiv = i;
-
-            return HAL_OK;
-        }
-    }
-
+  clk = HAL_CRU_ClkGetById (clockId);
+  if (clk == NULL) {
     return HAL_ERROR;
+  }
+
+  maxDiv = CLK_DIV_GET_MASK (clk->div);
+
+  for (i = 0; i < maxDiv; i++) {
+    if (((pRate * 2) == (rate * (i * 2 + 3)))) {
+      *bestdiv = i;
+
+      return HAL_OK;
+    }
+  }
+
+  return HAL_ERROR;
 }
 
 /**
@@ -921,11 +1025,14 @@ HAL_Status HAL_CRU_ClkNp5BestDiv(uint32_t clockId, uint32_t rate, uint32_t pRate
  * @return HAL_Status.
  * @attention these APIs allow direct use in the HAL layer.
  */
-__WEAK HAL_Status HAL_CRU_VopDclkEnable(uint32_t gateId)
+__WEAK HAL_Status
+HAL_CRU_VopDclkEnable (
+  uint32_t  gateId
+  )
 {
-    HAL_CRU_ClkEnable(gateId);
+  HAL_CRU_ClkEnable (gateId);
 
-    return HAL_OK;
+  return HAL_OK;
 }
 
 /**
@@ -934,11 +1041,14 @@ __WEAK HAL_Status HAL_CRU_VopDclkEnable(uint32_t gateId)
  * @return HAL_Status.
  * @attention these APIs allow direct use in the HAL layer.
  */
-__WEAK HAL_Status HAL_CRU_VopDclkDisable(uint32_t gateId)
+__WEAK HAL_Status
+HAL_CRU_VopDclkDisable (
+  uint32_t  gateId
+  )
 {
-    HAL_CRU_ClkDisable(gateId);
+  HAL_CRU_ClkDisable (gateId);
 
-    return HAL_OK;
+  return HAL_OK;
 }
 
 /**
@@ -946,20 +1056,25 @@ __WEAK HAL_Status HAL_CRU_VopDclkDisable(uint32_t gateId)
  * @param  type: global software reset type.
  * @return HAL_INVAL if the SoC does not support.
  */
-HAL_Status HAL_CRU_SetGlbSrst(eCRU_GlbSrstType type)
+HAL_Status
+HAL_CRU_SetGlbSrst (
+  eCRU_GlbSrstType  type
+  )
 {
-#ifdef CRU_GLB_SRST_FST_VALUE_OFFSET
-    if (type == GLB_SRST_FST) {
-        CRU->GLB_SRST_FST_VALUE = GLB_SRST_FST;
-    }
-#endif
-#ifdef CRU_GLB_SRST_SND_VALUE_OFFSET
-    if (type == GLB_SRST_SND) {
-        CRU->GLB_SRST_SND_VALUE = GLB_SRST_SND;
-    }
-#endif
+ #ifdef CRU_GLB_SRST_FST_VALUE_OFFSET
+  if (type == GLB_SRST_FST) {
+    CRU->GLB_SRST_FST_VALUE = GLB_SRST_FST;
+  }
 
-    return HAL_INVAL;
+ #endif
+ #ifdef CRU_GLB_SRST_SND_VALUE_OFFSET
+  if (type == GLB_SRST_SND) {
+    CRU->GLB_SRST_SND_VALUE = GLB_SRST_SND;
+  }
+
+ #endif
+
+  return HAL_INVAL;
 }
 
 /**
@@ -967,26 +1082,29 @@ HAL_Status HAL_CRU_SetGlbSrst(eCRU_GlbSrstType type)
  * @param  clk: clk reset id
  * @return HAL_Check
  */
-HAL_Check HAL_CRU_RstIsAsserted(uint32_t resetId)
+HAL_Check
+HAL_CRU_RstIsAsserted (
+  uint32_t  resetId
+  )
 {
-    CRU_RESET *rst;
-    uint32_t index, shift, address;
-    HAL_Check ret;
+  CRU_RESET  *rst;
+  uint32_t   index, shift, address;
+  HAL_Check  ret;
 
-    rst = HAL_CRU_RstGetById(resetId);
-    if (rst == NULL) {
-        ASSERT (FALSE);
-        return HAL_FALSE;
-    }
+  rst = HAL_CRU_RstGetById (resetId);
+  if (rst == NULL) {
+    ASSERT (FALSE);
+    return HAL_FALSE;
+  }
 
-    index = CLK_RESET_GET_REG_OFFSET(rst->srst);
-    shift = CLK_RESET_GET_BITS_SHIFT(rst->srst);
-    HAL_ASSERT(shift < 16);
-    address = CRU_CON_REG_ADDRESS(rst->regBase, rst->srstOffset, index);
+  index = CLK_RESET_GET_REG_OFFSET (rst->srst);
+  shift = CLK_RESET_GET_BITS_SHIFT (rst->srst);
+  HAL_ASSERT (shift < 16);
+  address = CRU_CON_REG_ADDRESS (rst->regBase, rst->srstOffset, index);
 
-    ret = (HAL_Check)((MmioRead32(address) & (1 << shift)) >> shift);
+  ret = (HAL_Check)((MmioRead32 (address) & (1 << shift)) >> shift);
 
-    return ret;
+  return ret;
 }
 
 /**
@@ -994,25 +1112,28 @@ HAL_Check HAL_CRU_RstIsAsserted(uint32_t resetId)
  * @param  clk: clk reset id
  * @return NONE
  */
-HAL_Status HAL_CRU_RstAssert(uint32_t resetId)
+HAL_Status
+HAL_CRU_RstAssert (
+  uint32_t  resetId
+  )
 {
-    CRU_RESET *rst;
-    uint32_t index, shift, address;
+  CRU_RESET  *rst;
+  uint32_t   index, shift, address;
 
-    rst = HAL_CRU_RstGetById(resetId);
-    if (rst == NULL) {
-        ASSERT (FALSE);
-        return HAL_ERROR;
-    }
+  rst = HAL_CRU_RstGetById (resetId);
+  if (rst == NULL) {
+    ASSERT (FALSE);
+    return HAL_ERROR;
+  }
 
-    index = CLK_RESET_GET_REG_OFFSET(rst->srst);
-    shift = CLK_RESET_GET_BITS_SHIFT(rst->srst);
-    HAL_ASSERT(shift < 16);
-    address = CRU_CON_REG_ADDRESS(rst->regBase, rst->srstOffset, index);
+  index = CLK_RESET_GET_REG_OFFSET (rst->srst);
+  shift = CLK_RESET_GET_BITS_SHIFT (rst->srst);
+  HAL_ASSERT (shift < 16);
+  address = CRU_CON_REG_ADDRESS (rst->regBase, rst->srstOffset, index);
 
-    MmioWrite32(address, VAL_MASK_WE(1U << shift, 1U << shift));
+  MmioWrite32 (address, VAL_MASK_WE (1U << shift, 1U << shift));
 
-    return HAL_OK;
+  return HAL_OK;
 }
 
 /**
@@ -1020,25 +1141,28 @@ HAL_Status HAL_CRU_RstAssert(uint32_t resetId)
  * @param  clk: clk reset id
  * @return NONE
  */
-HAL_Status HAL_CRU_RstDeassert(uint32_t resetId)
+HAL_Status
+HAL_CRU_RstDeassert (
+  uint32_t  resetId
+  )
 {
-    CRU_RESET *rst;
-    uint32_t index, shift, address;
+  CRU_RESET  *rst;
+  uint32_t   index, shift, address;
 
-    rst = HAL_CRU_RstGetById(resetId);
-    if (rst == NULL) {
-        ASSERT (FALSE);
-        return HAL_ERROR;
-    }
+  rst = HAL_CRU_RstGetById (resetId);
+  if (rst == NULL) {
+    ASSERT (FALSE);
+    return HAL_ERROR;
+  }
 
-    index = CLK_RESET_GET_REG_OFFSET(rst->srst);
-    shift = CLK_RESET_GET_BITS_SHIFT(rst->srst);
-    HAL_ASSERT(shift < 16);
-    address = CRU_CON_REG_ADDRESS(rst->regBase, rst->srstOffset, index);
+  index = CLK_RESET_GET_REG_OFFSET (rst->srst);
+  shift = CLK_RESET_GET_BITS_SHIFT (rst->srst);
+  HAL_ASSERT (shift < 16);
+  address = CRU_CON_REG_ADDRESS (rst->regBase, rst->srstOffset, index);
 
-    MmioWrite32(address, VAL_MASK_WE(1U << shift, 0U << shift));
+  MmioWrite32 (address, VAL_MASK_WE (1U << shift, 0U << shift));
 
-    return HAL_OK;
+  return HAL_OK;
 }
 
 /** @} */

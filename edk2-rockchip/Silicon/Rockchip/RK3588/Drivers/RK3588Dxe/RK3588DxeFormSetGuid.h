@@ -12,6 +12,6 @@
 #define RK3588DXE_FORMSET_GUID \
  { 0x10f41c33, 0xa468, 0x42cd, { 0x85, 0xee, 0x70, 0x43, 0x21, 0x3f, 0x73, 0xa3 } }
 
-extern EFI_GUID gRK3588DxeFormSetGuid;
+extern EFI_GUID  gRK3588DxeFormSetGuid;
 
 #endif // __RK3588DXE_FORMSET_GUID_H__

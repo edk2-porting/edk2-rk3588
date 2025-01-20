@@ -13,7 +13,7 @@
 
 #include <Uefi.h>
 
-#define KHADAS_MCU_SIGNATURE          SIGNATURE_32 ('K', 'M', 'C', 'U')
+#define KHADAS_MCU_SIGNATURE  SIGNATURE_32 ('K', 'M', 'C', 'U')
 
 #define I2C_GUID \
   { \
@@ -21,20 +21,20 @@
   }
 
 typedef struct {
-  UINT32                      Signature;
-  EFI_HANDLE                  ControllerHandle;
-  EFI_I2C_IO_PROTOCOL         *I2cIo;
-  KHADAS_MCU_PROTOCOL         KhadasMcuProtocol;
+  UINT32                 Signature;
+  EFI_HANDLE             ControllerHandle;
+  EFI_I2C_IO_PROTOCOL    *I2cIo;
+  KHADAS_MCU_PROTOCOL    KhadasMcuProtocol;
 } KHADAS_MCU_CONTEXT;
 
-#define KHADAS_MCU_FROM_IO(a) CR (a, KHADAS_MCU_CONTEXT, I2cIo, KHADAS_MCU_SIGNATURE)
-#define KHADAS_MCU_FROM_PROTOCOL(a) CR (a, KHADAS_MCU_CONTEXT, KhadasMcuProtocol, KHADAS_MCU_SIGNATURE)
+#define KHADAS_MCU_FROM_IO(a)        CR (a, KHADAS_MCU_CONTEXT, I2cIo, KHADAS_MCU_SIGNATURE)
+#define KHADAS_MCU_FROM_PROTOCOL(a)  CR (a, KHADAS_MCU_CONTEXT, KhadasMcuProtocol, KHADAS_MCU_SIGNATURE)
 
 //
 // Registers & fields
 // https://docs.khadas.com/products/sbc/edge2/hardware/edge2-boot-flow
 //
-#define MCU_CMD_FAN_STATUS_CTRL_REGv2   0x8A
+#define MCU_CMD_FAN_STATUS_CTRL_REGv2  0x8A
 
 EFI_STATUS
 EFIAPI

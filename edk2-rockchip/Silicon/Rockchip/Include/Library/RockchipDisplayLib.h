@@ -6,7 +6,6 @@
 
 **/
 
-
 #ifndef __ROCKCHIP_DISPLAY_H__
 #define __ROCKCHIP_DISPLAY_H__
 
@@ -14,19 +13,19 @@
 #include <Library/uboot-env.h>
 #include <Library/drm_dsc.h>
 
-#define LIST_FOR_EACH_ENTRY(Pos, Head, Member)				\
-	for (Pos = BASE_CR((Head)->ForwardLink, typeof(*Pos), Member);	\
-	     &Pos->Member != (Head);					\
-	     Pos = BASE_CR(Pos->Member.ForwardLink, typeof(*Pos), Member))
+#define LIST_FOR_EACH_ENTRY(Pos, Head, Member)                          \
+        for (Pos = BASE_CR((Head)->ForwardLink, typeof(*Pos), Member);  \
+             &Pos->Member != (Head);                                    \
+             Pos = BASE_CR(Pos->Member.ForwardLink, typeof(*Pos), Member))
 
-#define __ROUND_MASK(x, y) ((__typeof__(x))((y)-1))
-#define ROUNDUP(x, y) ((((x)-1) | __ROUND_MASK(x, y))+1)
-#define ROUNDDOWN(x, y) ((x) & ~__ROUND_MASK(x, y))
-#define ALIGN(x, a) (((x) + (a) - 1) & ~((a) - 1))
+#define __ROUND_MASK(x, y)  ((__typeof__(x))((y)-1))
+#define ROUNDUP(x, y)       ((((x)-1) | __ROUND_MASK(x, y))+1)
+#define ROUNDDOWN(x, y)     ((x) & ~__ROUND_MASK(x, y))
+#define ALIGN(x, a)         (((x) + (a) - 1) & ~((a) - 1))
 
-#define INLINE static inline
+#define INLINE  static inline
 
-#define EDID_SIZE             128
+#define EDID_SIZE  128
 
 typedef enum {
   ROCKCHIP_DISPLAY_FULLSCREEN,
@@ -42,151 +41,151 @@ typedef enum {
   ROCKCHIP_FMT_YUV444SP,
 } DATA_FORMAT;
 
-#define ROCKCHIP_OUTPUT_DUAL_CHANNEL_LEFT_RIGHT_MODE    BIT(0)
-#define ROCKCHIP_OUTPUT_DUAL_CHANNEL_ODD_EVEN_MODE      BIT(1)
-#define ROCKCHIP_OUTPUT_DATA_SWAP                       BIT(2)
-#define ROCKCHIP_OUTPUT_MIPI_DS_MODE                    BIT(3)
+#define ROCKCHIP_OUTPUT_DUAL_CHANNEL_LEFT_RIGHT_MODE  BIT(0)
+#define ROCKCHIP_OUTPUT_DUAL_CHANNEL_ODD_EVEN_MODE    BIT(1)
+#define ROCKCHIP_OUTPUT_DATA_SWAP                     BIT(2)
+#define ROCKCHIP_OUTPUT_MIPI_DS_MODE                  BIT(3)
 
-#define ROCKCHIP_DSC_PPS_SIZE_BYTE			88
+#define ROCKCHIP_DSC_PPS_SIZE_BYTE  88
 
 /*
  * display output interface supported by rockchip lcdc
  */
-#define ROCKCHIP_OUT_MODE_P888          0
-#define ROCKCHIP_OUT_MODE_BT1120        0
-#define ROCKCHIP_OUT_MODE_P666          1
-#define ROCKCHIP_OUT_MODE_P565          2
-#define ROCKCHIP_OUT_MODE_BT656         5
-#define ROCKCHIP_OUT_MODE_S888          8
-#define ROCKCHIP_OUT_MODE_S888_DUMMY    12
-#define ROCKCHIP_OUT_MODE_YUV420        14
+#define ROCKCHIP_OUT_MODE_P888        0
+#define ROCKCHIP_OUT_MODE_BT1120      0
+#define ROCKCHIP_OUT_MODE_P666        1
+#define ROCKCHIP_OUT_MODE_P565        2
+#define ROCKCHIP_OUT_MODE_BT656       5
+#define ROCKCHIP_OUT_MODE_S888        8
+#define ROCKCHIP_OUT_MODE_S888_DUMMY  12
+#define ROCKCHIP_OUT_MODE_YUV420      14
 /* for use special outface */
-#define ROCKCHIP_OUT_MODE_AAAA          15
+#define ROCKCHIP_OUT_MODE_AAAA  15
 
-#define VOP_OUTPUT_IF_RGB               BIT(0)
-#define VOP_OUTPUT_IF_BT1120            BIT(1)
-#define VOP_OUTPUT_IF_BT656             BIT(2)
-#define VOP_OUTPUT_IF_LVDS0             BIT(3)
-#define VOP_OUTPUT_IF_LVDS1             BIT(4)
-#define VOP_OUTPUT_IF_MIPI0             BIT(5)
-#define VOP_OUTPUT_IF_MIPI1             BIT(6)
-#define VOP_OUTPUT_IF_eDP0              BIT(7)
-#define VOP_OUTPUT_IF_eDP1              BIT(8)
-#define VOP_OUTPUT_IF_DP0               BIT(9)
-#define VOP_OUTPUT_IF_DP1               BIT(10)
-#define VOP_OUTPUT_IF_HDMI0             BIT(11)
-#define VOP_OUTPUT_IF_HDMI1             BIT(12)
+#define VOP_OUTPUT_IF_RGB     BIT(0)
+#define VOP_OUTPUT_IF_BT1120  BIT(1)
+#define VOP_OUTPUT_IF_BT656   BIT(2)
+#define VOP_OUTPUT_IF_LVDS0   BIT(3)
+#define VOP_OUTPUT_IF_LVDS1   BIT(4)
+#define VOP_OUTPUT_IF_MIPI0   BIT(5)
+#define VOP_OUTPUT_IF_MIPI1   BIT(6)
+#define VOP_OUTPUT_IF_eDP0    BIT(7)
+#define VOP_OUTPUT_IF_eDP1    BIT(8)
+#define VOP_OUTPUT_IF_DP0     BIT(9)
+#define VOP_OUTPUT_IF_DP1     BIT(10)
+#define VOP_OUTPUT_IF_HDMI0   BIT(11)
+#define VOP_OUTPUT_IF_HDMI1   BIT(12)
 
 typedef struct {
-  UINT32                      Mode;
-  UINT32                      Offset;
-  UINT32                      Width;
-  UINT32                      Height;
-  UINT32                      Bpp;
-  CHAR8                       *Memory;
-  BOOLEAN                     YMirror;
+  UINT32     Mode;
+  UINT32     Offset;
+  UINT32     Width;
+  UINT32     Height;
+  UINT32     Bpp;
+  CHAR8      *Memory;
+  BOOLEAN    YMirror;
 } LOGO_INFO;
 
 typedef struct {
-  UINT32                      Width;
-  UINT32                      Height;
+  UINT32    Width;
+  UINT32    Height;
 } VOP_RECT;
 
 struct rockchip_dsc_sink_cap {
-	/**
-	 * @slice_width: the number of pixel columns that comprise the slice width
-	 * @slice_height: the number of pixel rows that comprise the slice height
-	 * @block_pred: Does block prediction
-	 * @native_420: Does sink support DSC with 4:2:0 compression
-	 * @bpc_supported: compressed bpc supported by sink : 10, 12 or 16 bpc
-	 * @version_major: DSC major version
-	 * @version_minor: DSC minor version
-	 * @target_bits_per_pixel_x16: bits num after compress and multiply 16
-	 */
-	UINT16 slice_width;
-	UINT16 slice_height;
-	BOOLEAN block_pred;
-	BOOLEAN native_420;
-	UINT8 bpc_supported;
-	UINT8 version_major;
-	UINT8 version_minor;
-	UINT16 target_bits_per_pixel_x16;
+  /**
+   * @slice_width: the number of pixel columns that comprise the slice width
+   * @slice_height: the number of pixel rows that comprise the slice height
+   * @block_pred: Does block prediction
+   * @native_420: Does sink support DSC with 4:2:0 compression
+   * @bpc_supported: compressed bpc supported by sink : 10, 12 or 16 bpc
+   * @version_major: DSC major version
+   * @version_minor: DSC minor version
+   * @target_bits_per_pixel_x16: bits num after compress and multiply 16
+   */
+  UINT16     slice_width;
+  UINT16     slice_height;
+  BOOLEAN    block_pred;
+  BOOLEAN    native_420;
+  UINT8      bpc_supported;
+  UINT8      version_major;
+  UINT8      version_minor;
+  UINT16     target_bits_per_pixel_x16;
 };
 
 typedef struct {
-  UINT32                      LeftMargin;
-  UINT32                      RightMargin;
-  UINT32                      TopMargin;
-  UINT32                      BottomMargin;
+  UINT32    LeftMargin;
+  UINT32    RightMargin;
+  UINT32    TopMargin;
+  UINT32    BottomMargin;
 } OVER_SCAN;
 
 typedef struct {
   /* Proposed mode values */
-  UINT32                      Clock;		/* in kHz */
-  UINT32                      HDisplay;
-  UINT32                      HSyncStart;
-  UINT32                      HSyncEnd;
-  UINT32                      HTotal;
-  UINT32                      VDisplay;
-  UINT32                      VSyncStart;
-  UINT32                      VSyncEnd;
-  UINT32                      VTotal;
-  UINT32                      VRefresh;
-  UINT32                      VScan;
-  UINT32                      Flags;
-  UINT32                      PictureAspectRatio;
-  UINT32                      HSkew;
-  UINT32                      Type;
+  UINT32     Clock;                             /* in kHz */
+  UINT32     HDisplay;
+  UINT32     HSyncStart;
+  UINT32     HSyncEnd;
+  UINT32     HTotal;
+  UINT32     VDisplay;
+  UINT32     VSyncStart;
+  UINT32     VSyncEnd;
+  UINT32     VTotal;
+  UINT32     VRefresh;
+  UINT32     VScan;
+  UINT32     Flags;
+  UINT32     PictureAspectRatio;
+  UINT32     HSkew;
+  UINT32     Type;
   /* Actual mode we give to hw */
-  UINT32                      CrtcClock;         /* in KHz */
-  UINT32                      CrtcHDisplay;
-  UINT32                      CrtcHBlankStart;
-  UINT32                      CrtcHBblankEnd;
-  UINT32                      CrtcHSyncStart;
-  UINT32                      CrtcHSyncEnd;
-  UINT32                      CrtcHTotal;
-  UINT32                      CrtcHSkew;
-  UINT32                      CrtcVDisplay;
-  UINT32                      CrtcVBlankStart;
-  UINT32                      CrtcVBlankEnd;
-  UINT32                      CrtcVSyncStart;
-  UINT32                      CrtcVSyncEnd;
-  UINT32                      CrtcVTotal;
-  BOOLEAN                     Invalid;
+  UINT32     CrtcClock;                          /* in KHz */
+  UINT32     CrtcHDisplay;
+  UINT32     CrtcHBlankStart;
+  UINT32     CrtcHBblankEnd;
+  UINT32     CrtcHSyncStart;
+  UINT32     CrtcHSyncEnd;
+  UINT32     CrtcHTotal;
+  UINT32     CrtcHSkew;
+  UINT32     CrtcVDisplay;
+  UINT32     CrtcVBlankStart;
+  UINT32     CrtcVBlankEnd;
+  UINT32     CrtcVSyncStart;
+  UINT32     CrtcVSyncEnd;
+  UINT32     CrtcVTotal;
+  BOOLEAN    Invalid;
 } DRM_DISPLAY_MODE;
 
 typedef struct {
-  UINT16 Brightness;
-  UINT16 Contrast;
-  UINT16 Saturation;
-  UINT16 Hue;
+  UINT16    Brightness;
+  UINT16    Contrast;
+  UINT16    Saturation;
+  UINT16    Hue;
 } BASE_BCSH_INFO;
 
 typedef struct {
-  INT8 DispHeadFlag[6];
+  INT8              DispHeadFlag[6];
   /* struct base2_screen_info screen_info[4]; --- todo */
-  BASE_BCSH_INFO BCSHInfo;
+  BASE_BCSH_INFO    BCSHInfo;
   /* struct base_overscan overscan_info; --- todo */
   /* struct base2_gamma_lut_data gamma_lut_data; --- todo */
   /* struct base2_cubic_lut_data cubic_lut_data; --- todo */
   /* struct framebuffer_info framebuffer_info; --- todo */
-  UINT32 Reserved[244];
-  UINT32 CRC;
+  UINT32            Reserved[244];
+  UINT32            CRC;
 } BASE2_DISP_INFO;
 
 typedef struct {
-  VOID                        *Connector;
-  OVER_SCAN                   OverScan;
-  DRM_DISPLAY_MODE            DisplayMode;
-  BASE2_DISP_INFO             *DispInfo; /* disp_info from baseparameter 2.0 */
-  UINT8                       EDID[EDID_SIZE * 4];
-  UINT32                      BusFormat;
-  UINT32                      OutputMode;
-  UINT32                      Type;
-  UINT32                      OutputInterface;
-  UINT32                      OutputFlags;
-  UINT32                      ColorSpace;
-  UINT32                      BPC;
+  VOID                *Connector;
+  OVER_SCAN           OverScan;
+  DRM_DISPLAY_MODE    DisplayMode;
+  BASE2_DISP_INFO     *DispInfo;         /* disp_info from baseparameter 2.0 */
+  UINT8               EDID[EDID_SIZE * 4];
+  UINT32              BusFormat;
+  UINT32              OutputMode;
+  UINT32              Type;
+  UINT32              OutputInterface;
+  UINT32              OutputFlags;
+  UINT32              ColorSpace;
+  UINT32              BPC;
 
   /**
    * @hold_mode: enabled when it's:
@@ -194,92 +193,92 @@ typedef struct {
    * (2) mipi dsi cmd mode
    * (3) edp psr mode
    */
-  BOOLEAN                     hold_mode;
+  BOOLEAN             hold_mode;
 } CONNECTOR_STATE;
 
 typedef struct {
-  VOID                        *Crtc;
-  VOID                        *Private;
-  UINT32                      CrtcID;
-  UINT32                      Format;
-  UINT32                      YMirror;
-  UINT32                      RBSwap;
-  UINT32                      XVirtual;
-  UINT32                      SrcX;
-  UINT32                      SrcY;
-  UINT32                      SrcW;
-  UINT32                      SrcH;
-  UINT32                      CrtcX;
-  UINT32                      CrtcY;
-  UINT32                      CrtcW;
-  UINT32                      CrtcH;
-  UINT32                      Feature;
-  UINT32                      DMAAddress;
-  BOOLEAN                     YUVOverlay;
-  VOP_RECT                    MaxOutput;
+  VOID                                    *Crtc;
+  VOID                                    *Private;
+  UINT32                                  CrtcID;
+  UINT32                                  Format;
+  UINT32                                  YMirror;
+  UINT32                                  RBSwap;
+  UINT32                                  XVirtual;
+  UINT32                                  SrcX;
+  UINT32                                  SrcY;
+  UINT32                                  SrcW;
+  UINT32                                  SrcH;
+  UINT32                                  CrtcX;
+  UINT32                                  CrtcY;
+  UINT32                                  CrtcW;
+  UINT32                                  CrtcH;
+  UINT32                                  Feature;
+  UINT32                                  DMAAddress;
+  BOOLEAN                                 YUVOverlay;
+  VOP_RECT                                MaxOutput;
 
-  UINT32                      DclkCoreDiv;
-  UINT32                      DclkOutDiv;
+  UINT32                                  DclkCoreDiv;
+  UINT32                                  DclkOutDiv;
 
-  UINT8 dsc_id;
-  UINT8 dsc_enable;
-  UINT8 dsc_slice_num;
-  UINT8 dsc_pixel_num;
-  UINT64 dsc_txp_clk_rate;
-  UINT64 dsc_pxl_clk_rate;
-  UINT64 dsc_cds_clk_rate;
-  struct drm_dsc_picture_parameter_set pps;
-  struct rockchip_dsc_sink_cap dsc_sink_cap;
+  UINT8                                   dsc_id;
+  UINT8                                   dsc_enable;
+  UINT8                                   dsc_slice_num;
+  UINT8                                   dsc_pixel_num;
+  UINT64                                  dsc_txp_clk_rate;
+  UINT64                                  dsc_pxl_clk_rate;
+  UINT64                                  dsc_cds_clk_rate;
+  struct drm_dsc_picture_parameter_set    pps;
+  struct rockchip_dsc_sink_cap            dsc_sink_cap;
 } CRTC_STATE;
 
 typedef struct {
-  LIST_ENTRY                  ListHead;
-  CRTC_STATE                  CrtcState;
-  CONNECTOR_STATE             ConnectorState;
+  LIST_ENTRY         ListHead;
+  CRTC_STATE         CrtcState;
+  CONNECTOR_STATE    ConnectorState;
 
-  UINT32                      ModeNumber;
-  INT32                       VpsConfigModeID;
+  UINT32             ModeNumber;
+  INT32              VpsConfigModeID;
 
-  VOID                        *MemoryBase;
-  UINT32                      MemorySize;
+  VOID               *MemoryBase;
+  UINT32             MemorySize;
 
-  BOOLEAN                     IsInit;
-  BOOLEAN                     IsEnable;
+  BOOLEAN            IsInit;
+  BOOLEAN            IsEnable;
 
-  BOOLEAN                     IsForceOutput;
-  UINT32                      ForceOutputFormat;
+  BOOLEAN            IsForceOutput;
+  UINT32             ForceOutputFormat;
 } DISPLAY_STATE;
 
 typedef struct {
-  UINT32                      Resolution;
-  UINT32                      Sync;
-  UINT32                      BackPorch;
-  UINT32                      FrontPorch;
+  UINT32    Resolution;
+  UINT32    Sync;
+  UINT32    BackPorch;
+  UINT32    FrontPorch;
 } SCAN_TIMINGS;
 
 typedef struct {
-  UINT32                      CrtcId;
-  UINT32                      OscFreq;
-  SCAN_TIMINGS                Horizontal;
-  SCAN_TIMINGS                Vertical;
-  UINT32                      HsyncActive;
-  UINT32                      VsyncActive;
-  UINT32                      DenActive;
-  UINT32                      ClkActive;
-  UINT32                      VpsConfigModeID;
+  UINT32          CrtcId;
+  UINT32          OscFreq;
+  SCAN_TIMINGS    Horizontal;
+  SCAN_TIMINGS    Vertical;
+  UINT32          HsyncActive;
+  UINT32          VsyncActive;
+  UINT32          DenActive;
+  UINT32          ClkActive;
+  UINT32          VpsConfigModeID;
 } DISPLAY_MODE;
 
 EFIAPI
 EFI_STATUS
 DisplaySetCrtcInfo (
-  OUT DRM_DISPLAY_MODE                     *Mode,
-  IN  UINT32                               AdjustFlags
+  OUT DRM_DISPLAY_MODE  *Mode,
+  IN  UINT32            AdjustFlags
   );
 
 UINT32
 EFIAPI
 DrmModeVRefresh (
-  DRM_DISPLAY_MODE *Mode
+  DRM_DISPLAY_MODE  *Mode
   );
 
 #endif

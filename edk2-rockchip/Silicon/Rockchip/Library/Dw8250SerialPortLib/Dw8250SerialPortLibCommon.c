@@ -38,9 +38,9 @@
 UINTN
 EFIAPI
 SerialPortWrite (
-  IN UINT8     *Buffer,
-  IN UINTN     NumberOfBytes
-)
+  IN UINT8  *Buffer,
+  IN UINTN  NumberOfBytes
+  )
 {
   UINTN  Result;
 
@@ -51,14 +51,12 @@ SerialPortWrite (
   Result = NumberOfBytes;
 
   while (NumberOfBytes--) {
-
-    SerialPortWriteChar(*Buffer);
+    SerialPortWriteChar (*Buffer);
     Buffer++;
   }
 
   return Result;
 }
-
 
 /**
   Reads data from a serial device into a buffer.
@@ -74,9 +72,9 @@ SerialPortWrite (
 UINTN
 EFIAPI
 SerialPortRead (
-  OUT UINT8     *Buffer,
-  IN  UINTN     NumberOfBytes
-)
+  OUT UINT8  *Buffer,
+  IN  UINTN  NumberOfBytes
+  )
 {
   UINTN  Result;
 
@@ -90,8 +88,8 @@ SerialPortRead (
     //
     // Wait for the serail port to be ready.
     //
-    *Buffer=SerialPortReadChar();
-    Buffer++ ;
+    *Buffer = SerialPortReadChar ();
+    Buffer++;
     Result++;
   }
 
@@ -115,57 +113,54 @@ SerialPortPoll (
   VOID
   )
 {
-
-  return (BOOLEAN) ((MmioRead8 (UART_LSR_REG) & UART_LSR_DR) == UART_LSR_DR);
-
+  return (BOOLEAN)((MmioRead8 (UART_LSR_REG) & UART_LSR_DR) == UART_LSR_DR);
 }
 
-
-VOID SerialPortWriteChar(UINT8 scShowChar)
+VOID
+SerialPortWriteChar (
+  UINT8  scShowChar
+  )
 {
-    UINT32 ulLoop = 0;
+  UINT32  ulLoop = 0;
 
-    while(ulLoop < (UINT32)UART_SEND_DELAY)
-    {
-
-        if ((MmioRead8 (UART_USR_REG) & 0x02) == 0x02)
-        {
-            break;
-        }
-
-        ulLoop++;
-    }
-    MmioWrite8 (UART_THR_REG, (UINT8)scShowChar);
-
-    ulLoop = 0;
-    while(ulLoop < (UINT32)UART_SEND_DELAY)
-    {
-        if ((MmioRead8 (UART_USR_REG) & 0x04) == 0x04)
-        {
-            break;
-        }
-        ulLoop++;
+  while (ulLoop < (UINT32)UART_SEND_DELAY) {
+    if ((MmioRead8 (UART_USR_REG) & 0x02) == 0x02) {
+      break;
     }
 
-    return;
+    ulLoop++;
+  }
+
+  MmioWrite8 (UART_THR_REG, (UINT8)scShowChar);
+
+  ulLoop = 0;
+  while (ulLoop < (UINT32)UART_SEND_DELAY) {
+    if ((MmioRead8 (UART_USR_REG) & 0x04) == 0x04) {
+      break;
+    }
+
+    ulLoop++;
+  }
+
+  return;
 }
 
-
-UINT8 SerialPortReadChar(VOID)
+UINT8
+SerialPortReadChar (
+  VOID
+  )
 {
-    UINT8 recvchar = 0;
+  UINT8  recvchar = 0;
 
-    while(1)
-    {
-        if ((MmioRead8 (UART_LSR_REG) & UART_LSR_DR) == UART_LSR_DR)
-        {
-            break;
-        }
+  while (1) {
+    if ((MmioRead8 (UART_LSR_REG) & UART_LSR_DR) == UART_LSR_DR) {
+      break;
     }
+  }
 
-    recvchar = MmioRead8 (UART_RBR_REG);
+  recvchar = MmioRead8 (UART_RBR_REG);
 
-    return recvchar;
+  return recvchar;
 }
 
 /**
@@ -204,12 +199,12 @@ UINT8 SerialPortReadChar(VOID)
 RETURN_STATUS
 EFIAPI
 SerialPortSetAttributes (
-  IN OUT UINT64             *BaudRate,
-  IN OUT UINT32             *ReceiveFifoDepth,
-  IN OUT UINT32             *Timeout,
-  IN OUT EFI_PARITY_TYPE    *Parity,
-  IN OUT UINT8              *DataBits,
-  IN OUT EFI_STOP_BITS_TYPE *StopBits
+  IN OUT UINT64              *BaudRate,
+  IN OUT UINT32              *ReceiveFifoDepth,
+  IN OUT UINT32              *Timeout,
+  IN OUT EFI_PARITY_TYPE     *Parity,
+  IN OUT UINT8               *DataBits,
+  IN OUT EFI_STOP_BITS_TYPE  *StopBits
   )
 {
   return RETURN_UNSUPPORTED;
@@ -228,7 +223,7 @@ SerialPortSetAttributes (
 RETURN_STATUS
 EFIAPI
 SerialPortSetControl (
-  IN UINT32                  Control
+  IN UINT32  Control
   )
 {
   return EFI_UNSUPPORTED;
@@ -246,15 +241,15 @@ SerialPortSetControl (
 RETURN_STATUS
 EFIAPI
 SerialPortGetControl (
-  OUT UINT32                  *Control
+  OUT UINT32  *Control
   )
 {
+  if (SerialPortPoll ()) {
+    // If a character is pending don't set EFI_SERIAL_INPUT_BUFFER_EMPTY
+    *Control = EFI_SERIAL_OUTPUT_BUFFER_EMPTY;
+  } else {
+    *Control = EFI_SERIAL_INPUT_BUFFER_EMPTY | EFI_SERIAL_OUTPUT_BUFFER_EMPTY;
+  }
 
-    if (SerialPortPoll ()) {
-        // If a character is pending don't set EFI_SERIAL_INPUT_BUFFER_EMPTY
-        *Control = EFI_SERIAL_OUTPUT_BUFFER_EMPTY;
-    } else {
-        *Control = EFI_SERIAL_INPUT_BUFFER_EMPTY | EFI_SERIAL_OUTPUT_BUFFER_EMPTY;
-    }
-    return EFI_SUCCESS;
+  return EFI_SUCCESS;
 }

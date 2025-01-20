@@ -33,18 +33,18 @@ SerialPortInitialize (
   VOID
   )
 {
-    UINT32 ulUartClkFreq;
+  UINT32  ulUartClkFreq;
 
-    MmioWrite8 (UART_LCR_REG, UART_LCR_DLS8);
-    MmioWrite8 (UART_FCR_REG, UART_FCR_EN | UART_FCR_RXCLR | UART_FCR_TXCLR);
-    MmioWrite8 (UART_LCR_REG, UART_LCR_DLAB | UART_LCR_DLS8);
+  MmioWrite8 (UART_LCR_REG, UART_LCR_DLS8);
+  MmioWrite8 (UART_FCR_REG, UART_FCR_EN | UART_FCR_RXCLR | UART_FCR_TXCLR);
+  MmioWrite8 (UART_LCR_REG, UART_LCR_DLAB | UART_LCR_DLS8);
 
-    ulUartClkFreq = PcdGet32(PcdUartClkInHz);
+  ulUartClkFreq = PcdGet32 (PcdUartClkInHz);
 
-    MmioWrite8 (UART_DLL_REG, (ulUartClkFreq / (16 * (UINT32)BAUDRATE) ) & 0xff);
-    MmioWrite8 (UART_DLH_REG, ((ulUartClkFreq/ (16 * (UINT32)BAUDRATE) ) >> 8 ) & 0xff);
-    MmioWrite8 (UART_LCR_REG, UART_LCR_DLS8);
-    MmioWrite8 (UART_IEL_REG, 0x00);
+  MmioWrite8 (UART_DLL_REG, (ulUartClkFreq / (16 * (UINT32)BAUDRATE)) & 0xff);
+  MmioWrite8 (UART_DLH_REG, ((ulUartClkFreq/ (16 * (UINT32)BAUDRATE)) >> 8) & 0xff);
+  MmioWrite8 (UART_LCR_REG, UART_LCR_DLS8);
+  MmioWrite8 (UART_IEL_REG, 0x00);
 
-    return RETURN_SUCCESS;
+  return RETURN_SUCCESS;
 }

@@ -13,7 +13,7 @@
 //
 // EFI Component Name Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL gDwMmcHcComponentName = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL  gDwMmcHcComponentName = {
   DwMmcHcComponentNameGetDriverName,
   DwMmcHcComponentNameGetControllerName,
   "eng"
@@ -22,20 +22,20 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME_PROTOCOL gDwMmcHcComponentName 
 //
 // EFI Component Name 2 Protocol
 //
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL gDwMmcHcComponentName2 = {
-  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)     DwMmcHcComponentNameGetDriverName,
-  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME) DwMmcHcComponentNameGetControllerName,
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_COMPONENT_NAME2_PROTOCOL  gDwMmcHcComponentName2 = {
+  (EFI_COMPONENT_NAME2_GET_DRIVER_NAME)DwMmcHcComponentNameGetDriverName,
+  (EFI_COMPONENT_NAME2_GET_CONTROLLER_NAME)DwMmcHcComponentNameGetControllerName,
   "en"
 };
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mDwMmcHcDriverNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mDwMmcHcDriverNameTable[] = {
   { "eng;en", L"Designware Sd/Mmc Host Controller Driver" },
-  { NULL , NULL }
+  { NULL,     NULL                                        }
 };
 
-GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mDwMmcHcControllerNameTable[] = {
+GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE  mDwMmcHcControllerNameTable[] = {
   { "eng;en", L"Designware Sd/Mmc Host Controller" },
-  { NULL , NULL }
+  { NULL,     NULL                                 }
 };
 
 /**
@@ -80,9 +80,9 @@ GLOBAL_REMOVE_IF_UNREFERENCED EFI_UNICODE_STRING_TABLE mDwMmcHcControllerNameTab
 EFI_STATUS
 EFIAPI
 DwMmcHcComponentNameGetDriverName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL     *This,
-  IN  CHAR8                           *Language,
-  OUT CHAR16                          **DriverName
+  IN  EFI_COMPONENT_NAME_PROTOCOL  *This,
+  IN  CHAR8                        *Language,
+  OUT CHAR16                       **DriverName
   )
 {
   return LookupUnicodeString2 (
@@ -165,16 +165,16 @@ DwMmcHcComponentNameGetDriverName (
 EFI_STATUS
 EFIAPI
 DwMmcHcComponentNameGetControllerName (
-  IN  EFI_COMPONENT_NAME_PROTOCOL     *This,
-  IN  EFI_HANDLE                      ControllerHandle,
-  IN  EFI_HANDLE                      ChildHandle, OPTIONAL
+  IN  EFI_COMPONENT_NAME_PROTOCOL *This,
+  IN  EFI_HANDLE ControllerHandle,
+  IN  EFI_HANDLE ChildHandle, OPTIONAL
   IN  CHAR8                           *Language,
   OUT CHAR16                          **ControllerName
   )
 {
-  EFI_STATUS         Status;
+  EFI_STATUS  Status;
 
-  if (Language == NULL || ControllerName == NULL) {
+  if ((Language == NULL) || (ControllerName == NULL)) {
     return EFI_INVALID_PARAMETER;
   }
 

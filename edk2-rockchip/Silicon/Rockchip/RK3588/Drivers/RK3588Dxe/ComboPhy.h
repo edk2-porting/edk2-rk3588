@@ -24,6 +24,7 @@ EFIAPI
 SetupComboPhyVariables (
   VOID
   );
+
 #endif // VFR_FILE_INCLUDE
 
 #endif // __RK3588DXE_COMBO_PHY_H__

@@ -17,48 +17,48 @@ typedef struct _DP_PHY_PROTOCOL DP_PHY_PROTOCOL;
 #define DP_PHY_MAX_LANES  4
 
 typedef struct {
-  UINT32    LinkRate;
-  UINT32    LaneCount;
-  UINT32    LaneVoltageSwingLevels[DP_PHY_MAX_LANES];
-  UINT32    LanePreEmphasisLevels[DP_PHY_MAX_LANES];
-  BOOLEAN   EnableSpreadSpectrum;
-  BOOLEAN   SetLinkRateAndSpreadSpectrum;
-  BOOLEAN   SetLaneCount;
-  BOOLEAN   SetVoltageSwingAndPreEmphasisLevels;
+  UINT32     LinkRate;
+  UINT32     LaneCount;
+  UINT32     LaneVoltageSwingLevels[DP_PHY_MAX_LANES];
+  UINT32     LanePreEmphasisLevels[DP_PHY_MAX_LANES];
+  BOOLEAN    EnableSpreadSpectrum;
+  BOOLEAN    SetLinkRateAndSpreadSpectrum;
+  BOOLEAN    SetLaneCount;
+  BOOLEAN    SetVoltageSwingAndPreEmphasisLevels;
 } DP_PHY_CONFIGURATION;
 
 typedef struct {
-  UINT32  BusWidth;
-  UINT32  MaximumLinkRate;
+  UINT32    BusWidth;
+  UINT32    MaximumLinkRate;
 } DP_PHY_CAPABILITIES;
 
 typedef
 EFI_STATUS
-(EFIAPI *DP_PHY_POWER_ON) (
+(EFIAPI *DP_PHY_POWER_ON)(
   IN DP_PHY_PROTOCOL          *This
   );
 
 typedef
 EFI_STATUS
-(EFIAPI *DP_PHY_POWER_OFF) (
+(EFIAPI *DP_PHY_POWER_OFF)(
   IN DP_PHY_PROTOCOL          *This
   );
 
 typedef
 EFI_STATUS
-(EFIAPI *DP_PHY_CONFIGURE) (
+(EFIAPI *DP_PHY_CONFIGURE)(
   IN DP_PHY_PROTOCOL          *This,
   IN DP_PHY_CONFIGURATION     *Config
   );
 
 struct _DP_PHY_PROTOCOL {
-  DP_PHY_POWER_ON           PowerOn;
-  DP_PHY_POWER_OFF          PowerOff;
-  DP_PHY_CONFIGURE          Configure;
-  DP_PHY_CAPABILITIES       Capabilities;
-  UINT32                    Id;
+  DP_PHY_POWER_ON        PowerOn;
+  DP_PHY_POWER_OFF       PowerOff;
+  DP_PHY_CONFIGURE       Configure;
+  DP_PHY_CAPABILITIES    Capabilities;
+  UINT32                 Id;
 };
 
-extern EFI_GUID gDpPhyProtocolGuid;
+extern EFI_GUID  gDpPhyProtocolGuid;
 
 #endif // _DP_PHY_PROTOCOL_H_

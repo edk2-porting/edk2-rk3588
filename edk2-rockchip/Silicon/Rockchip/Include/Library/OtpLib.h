@@ -12,24 +12,24 @@
 
 VOID
 OtpRead (
-    IN UINT16 Offset,
-    IN UINT16 Length,
-    OUT UINT8 *Data
-    );
+  IN UINT16  Offset,
+  IN UINT16  Length,
+  OUT UINT8  *Data
+  );
 
 VOID
 OtpReadCpuCode (
-    OUT UINT16 *CpuCode
-    );
+  OUT UINT16  *CpuCode
+  );
 
 VOID
 OtpReadId (
-    OUT UINT8 Id[16]
-    );
+  OUT UINT8  Id[16]
+  );
 
 VOID
 OtpReadCpuVersion (
-    OUT UINT8 *Version
-    );
+  OUT UINT8  *Version
+  );
 
 #endif /* OTPLIB_H__ */
