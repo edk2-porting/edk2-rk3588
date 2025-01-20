@@ -9,29 +9,6 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include "Ohci.h"
 
-STATIC OHCI_DEVICE_PATH  OhciDevicePathProtocol = {
-  {
-    {
-      HARDWARE_DEVICE_PATH,
-      HW_VENDOR_DP,
-      {
-        (UINT8)(OFFSET_OF (OHCI_DEVICE_PATH, End)),
-        (UINT8)(OFFSET_OF (OHCI_DEVICE_PATH, End) >> 8),
-      },
-    },
-    EFI_CALLER_ID_GUID
-  },
-  0,  // Instance
-  {
-    END_DEVICE_PATH_TYPE,
-    END_ENTIRE_DEVICE_PATH_SUBTYPE,
-    {
-      sizeof (EFI_DEVICE_PATH_PROTOCOL),
-      0
-    }
-  }
-};
-
 /**
   Provides software reset for the USB host controller.
 

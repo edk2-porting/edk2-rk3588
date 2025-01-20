@@ -595,8 +595,6 @@ DwMmcHcStartDma (
   UINTN       DevBase;
   UINT32      Ctrl;
   UINT32      Bmod;
-  UINT32      Timeout;
-  UINT32      Data;
 
   //  DevIo  = Trb->Private->DevIo;
   DevBase = Trb->Private->DevBase;

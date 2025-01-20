@@ -1406,7 +1406,7 @@ static int dw_dp_connector_init(ROCKCHIP_CONNECTOR_PROTOCOL *conn, DISPLAY_STATE
 {
 	CONNECTOR_STATE *conn_state = &state->ConnectorState;
 	struct dw_dp *dp = DW_DP_FROM_CONNECTOR_PROTOCOL (conn);
-	int ret;
+	int ret = 0;
 
 	conn_state->OutputInterface |= dp->id ? VOP_OUTPUT_IF_DP1 : VOP_OUTPUT_IF_DP0;
 	conn_state->OutputMode = ROCKCHIP_OUT_MODE_AAAA;

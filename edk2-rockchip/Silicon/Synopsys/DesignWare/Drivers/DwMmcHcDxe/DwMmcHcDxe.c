@@ -609,7 +609,6 @@ DwMmcHcDriverBindingStart (
 
   NON_DISCOVERABLE_DEVICE  *Dev;
 
-  BOOLEAN                         MediaPresent;
   DWMMC_CARD_TYPE_DETECT_ROUTINE  *Routine;
   UINT8                           Index;
   UINT32                          RoutineNum;

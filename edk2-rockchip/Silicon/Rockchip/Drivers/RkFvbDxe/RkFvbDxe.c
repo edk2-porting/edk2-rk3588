@@ -1055,7 +1055,7 @@ FvbConfigureFlashInstance (
 {
   EFI_STATUS  Status;
   UINTN       DataOffset;
-  UINTN       VariableSize, FtwWorkingSize, FtwSpareSize, MemorySize;
+  UINTN       VariableSize, FtwWorkingSize, FtwSpareSize;
 
   // Locate SPI protocols
   Status = gBS->LocateProtocol (

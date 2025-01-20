@@ -266,8 +266,6 @@ LcdGraphicsOutputInit (
   UINTN                   ConnectorCount;
   EFI_HANDLE              *ConnectorHandles;
   UINTN                   Index;
-  UINT32                  HorizontalResolution;
-  UINT32                  VerticalResolution;
 
   Status = LcdInstanceContructor (&Instance);
   if (EFI_ERROR (Status)) {

@@ -538,7 +538,7 @@ static int udphy_disable(struct rockchip_udphy *udphy)
 
 static int udphy_parse_lane_mux_data(struct rockchip_udphy *udphy, UINT8 *prop, UINTN num_lanes)
 {
-	int ret, i;
+	int i;
 
 	if (!prop) {
 		dev_dbg(udphy->dev,

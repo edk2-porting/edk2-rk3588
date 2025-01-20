@@ -356,9 +356,7 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
 ###################################################################################################
 
 [BuildOptions]
-#  RVCT:RELEASE_*_*_CC_FLAGS  = -DMDEPKG_NDEBUG
-  *_*_*_CC_FLAGS = -DDEFAULT_DARK
-  GCC:*_*_AARCH64_CC_FLAGS  = -Wno-error=uninitialized -Wno-error=stringop-overflow -Wno-error=unused-function -Wno-error=unused-variable
+  GCC:*_*_AARCH64_CC_FLAGS  = -Wno-error=unused-function
 
   # Compile with symbols to support overlays.
   *_*_*_DTC_FLAGS = -@

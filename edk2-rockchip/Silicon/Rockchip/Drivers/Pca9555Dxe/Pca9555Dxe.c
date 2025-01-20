@@ -465,8 +465,6 @@ Pca9555ValidatePin (
   IN UINTN  GpioPin
   )
 {
-  UINTN  ControllerId;
-
   if (GpioPin >= PCA9555_NUM_GPIO) {
     DEBUG ((
       DEBUG_ERROR,
@@ -510,8 +508,6 @@ Pca9555Get (
   EFI_I2C_IO_PROTOCOL  *I2cIo;
   EFI_STATUS           Status;
   UINTN                GpioPin;
-  UINT8                RegVal;
-  UINTN                Bank;
 
   GpioPin = GPIO_PIN (Gpio);
 
@@ -747,7 +743,6 @@ Pca9555Supported (
   EFI_I2C_IO_PROTOCOL  *TmpI2cIo;
   UINT8                Pca9555Address = 0x00;
   UINT8                Pca9555Bus     = 0x00;
-  UINTN                i;
 
   Status = gBS->OpenProtocol (
                   ControllerHandle,
@@ -850,7 +845,7 @@ Pca9555Stop (
   IN EFI_HANDLE                   *ChildHandleBuffer OPTIONAL
   )
 {
-  EFI_STATUS  Status = EFI_SUCCESS;
+  // EFI_STATUS  Status = EFI_SUCCESS;
 
   gBS->UninstallMultipleProtocolInterfaces (
          &ControllerHandle,

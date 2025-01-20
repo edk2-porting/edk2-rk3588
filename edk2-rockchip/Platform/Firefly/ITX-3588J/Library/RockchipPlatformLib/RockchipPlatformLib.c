@@ -56,7 +56,6 @@ GetPca9555Protocol (
   EFI_HANDLE  *HandleBuffer;
   EFI_STATUS  Status;
   UINTN       HandleCount;
-  UINTN       Index;
 
   /* Locate Handles of all PCA95XX_PROTOCOL producers */
   Status = gBS->LocateHandleBuffer (
