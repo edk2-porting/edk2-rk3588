@@ -28,6 +28,9 @@
   FLASH_DEFINITION               = Silicon/Rockchip/RK3588/RK3588.fdf
   RK_PLATFORM_FVMAIN_MODULES     = $(PLATFORM_DIRECTORY)/$(PLATFORM_NAME).Modules.fdf.inc
 
+  # GMAC is not exposed
+  DEFINE RK3588_GMAC_ENABLE = FALSE
+
   #
   # HYM8563 RTC support
   # I2C location configured by PCDs below.

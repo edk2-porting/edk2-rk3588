@@ -12,7 +12,7 @@ Platinum devices are considered to have the best overall support, based on facto
 - Device Tree and peripherals compatible with mainline Linux. [**Required**]
 - Active interest from the vendor in supporting their hardware.
 - Hardware design choices:
-  - If an Ethernet port is present, Realtek PCIe NIC (for netboot) or RK GMAC. [**Required**]
+  - If an Ethernet port is present, Realtek PCIe NIC or integrated GMAC. [**Required**]
   - SPI NOR flash for dedicated firmware storage. [Preferred]
 
 Bronze devices may have limitations such as:
@@ -91,7 +91,7 @@ Note that this list is subject to change at any time as devices gain better supp
 | DisplayPort output (USB-C)            | 🟡 Partial     | Mode fixed at 1080p 60 Hz, only works in one orientation of the Type-C port. Some displays may not work regardless. |
 | eDP output                            | 🟡 Partial     | Disabled, requires manual configuration depending on the platform and panel. |
 | DSI output                            | 🟢 Working     | Only enabled on Fydetab Duo. Requires manual configuration depending on the platform and panel. |
-| GMAC Ethernet                         | 🔴 Not working | Only brought-up for OS usage |
+| GMAC Ethernet                         | 🟢 Working     | |
 | Realtek PCIe Ethernet                 | 🟢 Working     | Some platforms don't have MAC addresses set, networking may not work in that case. |
 | Low-speed (GPIO/UART/I2C/SPI/PWM)     | 🟢 Working     | UART2 console available at 1500000 baud rate |
 | SPI NOR Flash                         | 🟢 Working     | |
@@ -275,7 +275,7 @@ This has been observed in cases where firmware was present on more than one devi
 * Make sure the power supply and cable are good.
 
 ### Networking does not work
-* Only Realtek PCIe and USB controllers are supported. Native Gigabit provided by RK3588 isn't.
+* Only integrated Gigabit Ethernet (GMAC), Realtek PCIe and USB controllers are supported.
 
 * Some boards with Realtek NICs do not have a MAC address set at factory and will show-up as being all zeros in UEFI, possibly preventing the adapter from obtaining an IP address.
 

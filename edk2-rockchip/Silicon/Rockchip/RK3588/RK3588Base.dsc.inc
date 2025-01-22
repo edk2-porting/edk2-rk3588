@@ -99,6 +99,9 @@
 !ifndef RK3588_PCIE_ENABLE
   DEFINE RK3588_PCIE_ENABLE         = TRUE
 !endif
+!ifndef RK3588_GMAC_ENABLE
+  DEFINE RK3588_GMAC_ENABLE         = TRUE
+!endif
 
   #
   # Base platform description
@@ -378,9 +381,17 @@
   Silicon/Rockchip/RK3588/Drivers/UsbDpPhyDxe/UsbDpPhyDxe.inf
 
   #
-  # GMAC Init Driver
+  # Rockchip GMAC Support
   #
+!if $(RK3588_GMAC_ENABLE) == TRUE
   Silicon/Rockchip/RK3588/Drivers/GmacPlatformDxe/GmacPlatformDxe.inf
+  Silicon/Synopsys/DesignWare/Drivers/DwcEqosSnpDxe/DwcEqosSnpDxe.inf {
+    <PcdsFixedAtBuild>
+      # 32-bit DMA limit
+      gEmbeddedTokenSpaceGuid.PcdDmaDeviceOffset|0x00000000
+      gEmbeddedTokenSpaceGuid.PcdDmaDeviceLimit|0xffffffff
+  }
+!endif
 
   #
   # ACPI Support

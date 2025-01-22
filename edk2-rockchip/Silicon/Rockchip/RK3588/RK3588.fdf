@@ -127,9 +127,12 @@ READ_LOCK_STATUS   = TRUE
   INF Silicon/Rockchip/RK3588/Drivers/UsbDpPhyDxe/UsbDpPhyDxe.inf
 
   #
-  # GMAC Init Driver
+  # Rockchip GMAC Support
   #
+!if $(RK3588_GMAC_ENABLE) == TRUE
   INF Silicon/Rockchip/RK3588/Drivers/GmacPlatformDxe/GmacPlatformDxe.inf
+  INF Silicon/Synopsys/DesignWare/Drivers/DwcEqosSnpDxe/DwcEqosSnpDxe.inf
+!endif
 
   #
   # ACPI Support

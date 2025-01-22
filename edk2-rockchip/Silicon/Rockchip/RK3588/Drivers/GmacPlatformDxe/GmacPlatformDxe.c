@@ -3,42 +3,73 @@
  *  RK3588 GMAC initializer
  *
  *  Copyright (c) 2021-2022, Jared McNeill <jmcneill@invisible.ca>
- *  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+ *  Copyright (c) 2023-2025, Mario Bălănică <mariobalanica02@gmail.com>
  *
  *  SPDX-License-Identifier: BSD-2-Clause-Patent
  *
  **/
 
-#include <Library/DebugLib.h>
-#include <Library/IoLib.h>
-#include <Library/TimerLib.h>
 #include <Library/BaseCryptLib.h>
+#include <Library/DebugLib.h>
+#include <Library/DevicePathLib.h>
+#include <Library/IoLib.h>
+#include <Library/NetLib.h>
 #include <Library/OtpLib.h>
 #include <Library/RockchipPlatformLib.h>
-#include <Soc.h>
+#include <Library/TimerLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Protocol/DwcEqosPlatformDevice.h>
 
-#include <EthernetPhy.h>
+#include "EthernetPhy.h"
 
-#define CRU_SOFTRST_CON32  (CRU_BASE + 0x0A80)
+#define GRF_BIT(nr)      (1 << (nr) | 1 << (nr + 16))
+#define GRF_CLR_BIT(nr)  (1 << (nr + 16))
+#define HIWORD_UPDATE(val, mask, shift) \
+        ((val) << (shift) | (mask) << ((shift) + 16))
 
-#define PHP_GRF_BASE       0xFD5B0000
-#define PHP_GRF_CLK_CON1   (PHP_GRF_BASE + 0x0070)
-#define PHP_GRF_GMAC_CON0  (PHP_GRF_BASE + 0x0008)
+/* PHP_GRF registers */
+#define RK3588_PHP_GRF_BASE  0xFD5B0000
 
-#define SYS_GRF_BASE          0xFD58C000
-#define SYS_GRF_SOC_CON7      (SYS_GRF_BASE + 0x031C)
-#define SYS_GRF_SOC_CON8      (SYS_GRF_BASE + 0x0320)
-#define SYS_GRF_SOC_CON9      (SYS_GRF_BASE + 0x0324)
-#define  CLK_RX_DL_CFG_SHIFT  8
-#define  CLK_TX_DL_CFG_SHIFT  0
+#define RK3588_PHP_GRF_GMAC_CON0  (RK3588_PHP_GRF_BASE + 0x0008)
 
-#define TX_DELAY_GMAC0  FixedPcdGet8 (PcdGmac0TxDelay)
-#define RX_DELAY_GMAC0  FixedPcdGet8 (PcdGmac0RxDelay)
-#define TX_DELAY_GMAC1  FixedPcdGet8 (PcdGmac1TxDelay)
-#define RX_DELAY_GMAC1  FixedPcdGet8 (PcdGmac1RxDelay)
+#define RK3588_GMAC_PHY_INTF_SEL_RGMII(id)      \
+        (GRF_BIT(3 + (id) * 6) | GRF_CLR_BIT(4 + (id) * 6) | GRF_CLR_BIT(5 + (id) * 6))
+#define RK3588_GMAC_PHY_INTF_SEL_RMII(id)       \
+        (GRF_CLR_BIT(3 + (id) * 6) | GRF_CLR_BIT(4 + (id) * 6) | GRF_BIT(5 + (id) * 6))
 
-#define GMAC0_BASE  0xfe1b0000
-#define GMAC1_BASE  0xfe1c0000
+#define RK3588_PHP_GRF_CLK_CON1  (RK3588_PHP_GRF_BASE + 0x0070)
+
+#define RK3588_GMAC_CLK_RMII_MODE(id)   GRF_BIT(5 * (id))
+#define RK3588_GMAC_CLK_RGMII_MODE(id)  GRF_CLR_BIT(5 * (id))
+
+#define RK3588_GMAC_CLK_SELECT_CRU(id)  GRF_BIT(5 * (id) + 4)
+#define RK3588_GMAC_CLK_SELECT_IO(id)   GRF_CLR_BIT(5 * (id) + 4)
+
+#define RK3588_GMAC_CLK_SEL_RMII_2_5(id)  GRF_BIT(5 * (id) + 2)
+#define RK3588_GMAC_CLK_SEL_RMII_25(id)   GRF_CLR_BIT(5 * (id) + 2)
+
+#define RK3588_GMAC_CLK_SEL_RGMII_2_5(id)         \
+                        (GRF_CLR_BIT(5 * (id) + 2) | GRF_BIT(5 * (id) + 3))
+#define RK3588_GMAC_CLK_SEL_RGMII_25(id)          \
+                        (GRF_BIT(5 * (id) + 2) | GRF_BIT(5 * (id) + 3))
+#define RK3588_GMAC_CLK_SEL_RGMII_125(id)          \
+                        (GRF_CLR_BIT(5 * (id) + 2) | GRF_CLR_BIT(5 * (id) + 3))
+
+/* SYS_GRF registers */
+#define RK3588_SYS_GRF_BASE  0xFD58C000
+
+#define RK3588_SYS_GRF_SOC_CON7  (RK3588_SYS_GRF_BASE + 0x031C)
+
+#define RK3588_GMAC_RXCLK_DLY_ENABLE(id)   GRF_BIT(2 * (id) + 3)
+#define RK3588_GMAC_RXCLK_DLY_DISABLE(id)  GRF_CLR_BIT(2 * (id) + 3)
+#define RK3588_GMAC_TXCLK_DLY_ENABLE(id)   GRF_BIT(2 * (id) + 2)
+#define RK3588_GMAC_TXCLK_DLY_DISABLE(id)  GRF_CLR_BIT(2 * (id) + 2)
+
+#define RK3588_SYS_GRF_SOC_CON8  (RK3588_SYS_GRF_BASE + 0x0320)
+#define RK3588_SYS_GRF_SOC_CON9  (RK3588_SYS_GRF_BASE + 0x0324)
+
+#define RK3588_GMAC_CLK_RX_DL_CFG(val)  HIWORD_UPDATE(val, 0xFF, 8)
+#define RK3588_GMAC_CLK_TX_DL_CFG(val)  HIWORD_UPDATE(val, 0xFF, 0)
 
 /* GMAC registers */
 #define  GMAC_MAC_MDIO_ADDRESS              0x0200
@@ -52,13 +83,104 @@
 #define   GMAC_MAC_MDIO_ADDRESS_GB          BIT0
 #define  GMAC_MAC_MDIO_DATA                 0x0204
 
-#define GMAC_MAC_ADDRESS0_LOW   0x0304
-#define GMAC_MAC_ADDRESS0_HIGH  0x0300
-
 /* MII registers */
 #define MII_PHYIDR1  0x02
 #define MII_PHYIDR2  0x03
 
+#pragma pack (1)
+typedef struct {
+  VENDOR_DEVICE_PATH          VendorDP;
+  UINT8                       ControllerId;
+  MAC_ADDR_DEVICE_PATH        MacAddrDP;
+  EFI_DEVICE_PATH_PROTOCOL    End;
+} GMAC_DEVICE_PATH;
+#pragma pack ()
+
+typedef struct {
+  UINT32                               Signature;
+  UINT8                                Id;
+  EFI_PHYSICAL_ADDRESS                 BaseAddress;
+
+  BOOLEAN                              Supported;
+  UINT8                                TxDelay;
+  UINT8                                RxDelay;
+
+  DWC_EQOS_PLATFORM_DEVICE_PROTOCOL    EqosPlatform;
+  GMAC_DEVICE_PATH                     DevicePath;
+} GMAC_DEVICE;
+
+#define GMAC_DEVICE_SIGNATURE  SIGNATURE_32 ('G', 'M', 'a', 'C')
+
+#define GMAC_DEVICE_FROM_EQOS_PLATFORM(a) \
+  CR (a, GMAC_DEVICE, EqosPlatform, GMAC_DEVICE_SIGNATURE)
+
+#define GMAC_DEVICE_INIT(_Id, _BaseAddress)                     \
+  {                                                             \
+    .Signature    = GMAC_DEVICE_SIGNATURE,                      \
+    .Id           = _Id,                                        \
+    .BaseAddress  = _BaseAddress,                               \
+    .Supported    = FixedPcdGetBool(PcdGmac##_Id##Supported),   \
+    .TxDelay      = FixedPcdGet8(PcdGmac##_Id##TxDelay),        \
+    .RxDelay      = FixedPcdGet8(PcdGmac##_Id##RxDelay)         \
+  }
+
+STATIC GMAC_DEVICE_PATH  mGmacDevicePathTemplate = {
+  {
+    {
+      HARDWARE_DEVICE_PATH,
+      HW_VENDOR_DP,
+      {
+        (UINT8)(OFFSET_OF (GMAC_DEVICE_PATH, MacAddrDP)),
+        (UINT8)((OFFSET_OF (GMAC_DEVICE_PATH, MacAddrDP)) >> 8)
+      }
+    },
+    EFI_CALLER_ID_GUID
+  },
+  0,
+  {
+    {
+      MESSAGING_DEVICE_PATH,
+      MSG_MAC_ADDR_DP,
+      {
+        (UINT8)(sizeof (MAC_ADDR_DEVICE_PATH)),
+        (UINT8)((sizeof (MAC_ADDR_DEVICE_PATH)) >> 8)
+      }
+    },
+    {
+      { 0 }
+    },
+    NET_IFTYPE_ETHERNET
+  },
+  {
+    END_DEVICE_PATH_TYPE,
+    END_ENTIRE_DEVICE_PATH_SUBTYPE,
+    {
+      sizeof (EFI_DEVICE_PATH_PROTOCOL),
+      0
+    }
+  }
+};
+
+STATIC GMAC_DEVICE  mGmacDevices[] = {
+  GMAC_DEVICE_INIT (0, 0xfe1b0000),
+  GMAC_DEVICE_INIT (1, 0xfe1c0000),
+};
+
+//
+// XXX: It may be tempting to move all this PHY code to the MAC driver,
+// however it is too platform specific and would make the driver less
+// generic, as it does not currently need to touch any MII registers in
+// order to work -- assuming the PHY has been previously initialized or
+// is already usable in its default state.
+//
+// The proper way to fix this would be to have an MDIO bus/device protocol
+// and separate PHY device drivers, including support for additional platform
+// data.
+//
+// It is also important to leave the PHY configured for ACPI OSes that don't
+// support initializing it (ESXi, Windows), regardless of whether UEFI uses
+// the network interface (see how the MAC address is programmed in this case).
+//
 STATIC ETHERNET_PHY_INIT  mPhyInitList[] = {
   RealtekPhyInit,
   MotorcommPhyInit
@@ -171,104 +293,165 @@ PhyInit (
 
 STATIC
 VOID
-EFIAPI
-InitGmac0 (
-  VOID
+GmacSetToRgmii (
+  IN UINT32  Id,
+  IN UINT8   TxDelay,
+  IN UINT8   RxDelay
   )
 {
-  /* Assert reset */
-  MmioWrite32 (CRU_SOFTRST_CON32, 0x04000400); // aresetn_gmac0 = 1
+  UINT32  ConDlyReg;
 
-  /* Configure pins */
-  GmacIomux (0);
+  ConDlyReg = (Id == 1) ? RK3588_SYS_GRF_SOC_CON9
+                        : RK3588_SYS_GRF_SOC_CON8;
 
-  /* Setup clocks */
-  MmioWrite32 (PHP_GRF_CLK_CON1, 0x001d0000);  // io_clksel_gmac0 = io
-                                               // mii_tx_clk_sel_gamc0 = 125 MHz
-                                               // rmii_mode_gmac0 = RGMII mode
+  MmioWrite32 (RK3588_PHP_GRF_GMAC_CON0, RK3588_GMAC_PHY_INTF_SEL_RGMII (Id));
 
-  MmioWrite32 (PHP_GRF_GMAC_CON0, 0x00380008);  // gmac0_phy_intf_sel = RGMII
+  MmioWrite32 (RK3588_PHP_GRF_CLK_CON1, RK3588_GMAC_CLK_RGMII_MODE (Id));
 
-  /* Setup DLLs */
-  if (TX_DELAY_GMAC0) {
-    MmioWrite32 (SYS_GRF_SOC_CON7, 0x00040004); // gmac0_txclk_dly_ena = 1
-    MmioWrite32 (
-      SYS_GRF_SOC_CON8,
-      0x007F0000U |
-      (TX_DELAY_GMAC0 << CLK_TX_DL_CFG_SHIFT)
-      );
+  if (TxDelay) {
+    MmioWrite32 (RK3588_SYS_GRF_SOC_CON7, RK3588_GMAC_TXCLK_DLY_ENABLE (Id));
+    MmioWrite32 (ConDlyReg, RK3588_GMAC_CLK_TX_DL_CFG (TxDelay));
+  } else {
+    MmioWrite32 (RK3588_SYS_GRF_SOC_CON7, RK3588_GMAC_TXCLK_DLY_DISABLE (Id));
   }
 
-  if (RX_DELAY_GMAC0) {
-    MmioWrite32 (SYS_GRF_SOC_CON7, 0x00080008); // gmac0_rxclk_dly_ena = 1
-    MmioWrite32 (
-      SYS_GRF_SOC_CON8,
-      0x7F000000U |
-      (RX_DELAY_GMAC0 << CLK_RX_DL_CFG_SHIFT)
-      );
+  if (RxDelay) {
+    MmioWrite32 (RK3588_SYS_GRF_SOC_CON7, RK3588_GMAC_RXCLK_DLY_ENABLE (Id));
+    MmioWrite32 (ConDlyReg, RK3588_GMAC_CLK_RX_DL_CFG (RxDelay));
+  } else {
+    MmioWrite32 (RK3588_SYS_GRF_SOC_CON7, RK3588_GMAC_RXCLK_DLY_DISABLE (Id));
+  }
+}
+
+STATIC
+VOID
+GmacSetToRmii (
+  IN UINT32  Id
+  )
+{
+  MmioWrite32 (RK3588_PHP_GRF_GMAC_CON0, RK3588_GMAC_PHY_INTF_SEL_RMII (Id));
+
+  MmioWrite32 (RK3588_PHP_GRF_CLK_CON1, RK3588_GMAC_CLK_RMII_MODE (Id));
+}
+
+STATIC
+VOID
+GmacSetClockSelectFromIo (
+  IN UINT32   Id,
+  IN BOOLEAN  Enable
+  )
+{
+  UINT32  Value;
+
+  Value = Enable ? RK3588_GMAC_CLK_SELECT_IO (Id)
+                 : RK3588_GMAC_CLK_SELECT_CRU (Id);
+
+  MmioWrite32 (RK3588_PHP_GRF_CLK_CON1, Value);
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+GmacSetTxClockSpeed (
+  IN UINT32   Id,
+  IN BOOLEAN  RgmiiMode,
+  IN UINT32   Speed
+  )
+{
+  UINT32  Value;
+
+  switch (Speed) {
+    case 10:
+      if (RgmiiMode) {
+        Value = RK3588_GMAC_CLK_SEL_RGMII_2_5 (Id);
+      } else {
+        Value = RK3588_GMAC_CLK_SEL_RMII_2_5 (Id);
+      }
+
+      break;
+
+    case 100:
+      if (RgmiiMode) {
+        Value = RK3588_GMAC_CLK_SEL_RGMII_25 (Id);
+      } else {
+        Value = RK3588_GMAC_CLK_SEL_RMII_25 (Id);
+      }
+
+      break;
+
+    case 1000:
+      if (RgmiiMode) {
+        Value = RK3588_GMAC_CLK_SEL_RGMII_125 (Id);
+      } else {
+        ASSERT (FALSE);
+        return EFI_UNSUPPORTED;
+      }
+
+      break;
+
+    default:
+      ASSERT (FALSE);
+      return EFI_UNSUPPORTED;
   }
 
-  /* Reset PHY */
-  GmacIoPhyReset (0, TRUE);
-  MicroSecondDelay (20000);
-  GmacIoPhyReset (0, FALSE);
-  MicroSecondDelay (200000);
+  MmioWrite32 (RK3588_PHP_GRF_CLK_CON1, Value);
 
-  /* Deassert reset */
-  MmioWrite32 (CRU_SOFTRST_CON32, 0x04000000); // aresetn_gmac0 = 0
-
-  PhyInit (GMAC0_BASE);
+  return EFI_SUCCESS;
 }
 
 STATIC
 VOID
 EFIAPI
-InitGmac1 (
-  VOID
+GmacPlatformGetConfig (
+  IN DWC_EQOS_PLATFORM_DEVICE_PROTOCOL  *This,
+  IN DWC_EQOS_CONFIG                    *Config
   )
 {
-  /* Assert reset */
-  MmioWrite32 (CRU_SOFTRST_CON32, 0x08000800); // aresetn_gmac1 = 1
+  Config->CsrClockRate  = 125000000;
+  Config->AxiBusWidth   = EqosAxiBusWidth64;
+  Config->AxiFixedBurst = FALSE;
+  Config->AxiMixedBurst = TRUE;
+  Config->AxiWrOsrLmt   = 4;
+  Config->AxiRdOsrLmt   = 8;
+  Config->AxiBlen       = EqosAxiBlen16 | EqosAxiBlen8 | EqosAxiBlen4;
+}
 
-  /* Configure pins */
-  GmacIomux (1);
+STATIC
+EFI_STATUS
+EFIAPI
+GmacPlatformSetInterfaceSpeed (
+  IN DWC_EQOS_PLATFORM_DEVICE_PROTOCOL  *This,
+  IN UINT32                             Speed
+  )
+{
+  GMAC_DEVICE  *Gmac = GMAC_DEVICE_FROM_EQOS_PLATFORM (This);
 
-  /* Setup clocks */
-  MmioWrite32 (PHP_GRF_CLK_CON1, 0x03a00000);  // io_clksel_gmac1 = io
-                                               // mii_tx_clk_sel_gamc1 = 125 MHz
-                                               // rmii_mode_gmac1 = RGMII mode
+  return GmacSetTxClockSpeed (Gmac->Id, TRUE, Speed);
+}
 
-  MmioWrite32 (PHP_GRF_GMAC_CON0, 0x0e000200);  // gmac1_phy_intf_sel = RGMII
+STATIC
+VOID
+GmacGetOtpMacAddress (
+  OUT EFI_MAC_ADDRESS  *MacAddress
+  )
+{
+  UINT8  OtpData[32];
+  UINT8  Hash[SHA256_DIGEST_SIZE];
 
-  /* Setup DLLs */
-  if (TX_DELAY_GMAC1) {
-    MmioWrite32 (SYS_GRF_SOC_CON7, 0x00100010); // gmac1_txclk_dly_ena = 1
-    MmioWrite32 (
-      SYS_GRF_SOC_CON9,
-      0x007F0000U |
-      (TX_DELAY_GMAC1 << CLK_TX_DL_CFG_SHIFT)
-      );
-  }
+  /* Generate MAC addresses from the first 32 bytes in the OTP */
+  OtpRead (0x00, sizeof (OtpData), OtpData);
+  Sha256HashAll (OtpData, sizeof (OtpData), Hash);
 
-  if (RX_DELAY_GMAC1) {
-    MmioWrite32 (SYS_GRF_SOC_CON7, 0x00200020); // gmac1_rxclk_dly_ena = 1
-    MmioWrite32 (
-      SYS_GRF_SOC_CON9,
-      0x7F000000U |
-      (RX_DELAY_GMAC1 << CLK_RX_DL_CFG_SHIFT)
-      );
-  }
+  /* Clear multicast bit, set locally administered bit. */
+  Hash[0] &= 0xFE;
+  Hash[0] |= 0x02;
 
-  /* Reset PHY */
-  GmacIoPhyReset (1, TRUE);
-  MicroSecondDelay (20000);
-  GmacIoPhyReset (1, FALSE);
-  MicroSecondDelay (200000);
+  /* ... and for compatibility with old drivers (see https://github.com/jaredmcneill/quartz64_uefi/pull/68) */
+  Hash[3] &= 0xFE;
+  Hash[3] |= 0x02;
 
-  /* Deassert reset */
-  MmioWrite32 (CRU_SOFTRST_CON32, 0x08000000); // aresetn_gmac1 = 0
-
-  PhyInit (GMAC1_BASE);
+  ZeroMem (MacAddress, sizeof (EFI_MAC_ADDRESS));
+  CopyMem (MacAddress, Hash, NET_ETHER_ADDR_LEN);
 }
 
 EFI_STATUS
@@ -278,63 +461,77 @@ GmacPlatformDxeInitialize (
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
-  UINT8   OtpData[32];
-  UINT8   Hash[SHA256_DIGEST_SIZE];
-  UINT32  MacLo, MacHi;
+  EFI_STATUS       Status;
+  EFI_MAC_ADDRESS  MacAddress;
+  UINT32           Index;
+  GMAC_DEVICE      *Gmac;
+  EFI_HANDLE       Handle;
 
-  if (  !FixedPcdGetBool (PcdGmac0Supported)
-     && !FixedPcdGetBool (PcdGmac1Supported))
-  {
-    return EFI_SUCCESS;
-  }
+  GmacGetOtpMacAddress (&MacAddress);
 
-  /* Generate MAC addresses from the first 32 bytes in the OTP and write it to GMAC0 and GMAC1 */
-  /* Use sequential MAC addresses. Last byte is even for GMAC0, and odd for GMAC1. */
-  OtpRead (0x00, sizeof (OtpData), OtpData);
-  Sha256HashAll (OtpData, sizeof (OtpData), Hash);
-  Hash[0] &= 0xFE;
-  Hash[0] |= 0x02;
+  for (Index = 0; Index < ARRAY_SIZE (mGmacDevices); Index++) {
+    Gmac = &mGmacDevices[Index];
+    if (!Gmac->Supported) {
+      continue;
+    }
 
-  if (FixedPcdGetBool (PcdGmac0Supported)) {
-    InitGmac0 ();
+    /* Configure pins */
+    GmacIomux (Gmac->Id);
 
-    Hash[5] &= ~1;
+    /* Setup clocks and delays */
+    GmacSetClockSelectFromIo (Gmac->Id, FALSE);
+    GmacSetToRgmii (Gmac->Id, Gmac->TxDelay, Gmac->RxDelay);
+
+    /* Reset PHY */
+    GmacIoPhyReset (Gmac->Id, TRUE);
+    MicroSecondDelay (20000);
+    GmacIoPhyReset (Gmac->Id, FALSE);
+    MicroSecondDelay (200000);
+
+    PhyInit (Gmac->BaseAddress);
+
+    Gmac->EqosPlatform.BaseAddress       = Gmac->BaseAddress;
+    Gmac->EqosPlatform.GetConfig         = GmacPlatformGetConfig;
+    Gmac->EqosPlatform.SetInterfaceSpeed = GmacPlatformSetInterfaceSpeed;
+
+    CopyMem (&Gmac->EqosPlatform.MacAddress, &MacAddress, NET_ETHER_ADDR_LEN);
+    Gmac->EqosPlatform.MacAddress.Addr[5] += Gmac->Id;
+
     DEBUG ((
       DEBUG_INFO,
-      "%a: GMAC0 MAC address: %02X:%02X:%02X:%02X:%02X:%02X\n",
+      "%a: GMAC%u MAC address: %02X:%02X:%02X:%02X:%02X:%02X\n",
       __func__,
-      Hash[0],
-      Hash[1],
-      Hash[2],
-      Hash[3],
-      Hash[4],
-      Hash[5]
+      Gmac->Id,
+      Gmac->EqosPlatform.MacAddress.Addr[0],
+      Gmac->EqosPlatform.MacAddress.Addr[1],
+      Gmac->EqosPlatform.MacAddress.Addr[2],
+      Gmac->EqosPlatform.MacAddress.Addr[3],
+      Gmac->EqosPlatform.MacAddress.Addr[4],
+      Gmac->EqosPlatform.MacAddress.Addr[5]
       ));
-    MacLo = Hash[3] | (Hash[2] << 8) | (Hash[1] << 16) | (Hash[0] << 24);
-    MacHi = Hash[5] | (Hash[4] << 8);
-    MmioWrite32 (GMAC0_BASE + GMAC_MAC_ADDRESS0_LOW, MacLo);
-    MmioWrite32 (GMAC0_BASE + GMAC_MAC_ADDRESS0_HIGH, MacHi);
-  }
 
-  if (FixedPcdGetBool (PcdGmac1Supported)) {
-    InitGmac1 ();
+    CopyMem (&Gmac->DevicePath, &mGmacDevicePathTemplate, sizeof (GMAC_DEVICE_PATH));
+    CopyMem (&Gmac->DevicePath.MacAddrDP.MacAddress, &Gmac->EqosPlatform.MacAddress, NET_ETHER_ADDR_LEN);
+    Gmac->DevicePath.ControllerId = Gmac->Id;
 
-    Hash[5] |= 1;
-    DEBUG ((
-      DEBUG_INFO,
-      "%a: GMAC1 MAC address: %02X:%02X:%02X:%02X:%02X:%02X\n",
-      __func__,
-      Hash[0],
-      Hash[1],
-      Hash[2],
-      Hash[3],
-      Hash[4],
-      Hash[5]
-      ));
-    MacLo = Hash[3] | (Hash[2] << 8) | (Hash[1] << 16) | (Hash[0] << 24);
-    MacHi = Hash[5] | (Hash[4] << 8);
-    MmioWrite32 (GMAC1_BASE + GMAC_MAC_ADDRESS0_LOW, MacLo);
-    MmioWrite32 (GMAC1_BASE + GMAC_MAC_ADDRESS0_HIGH, MacHi);
+    Handle = NULL;
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &Handle,
+                    &gDwcEqosPlatformDeviceProtocolGuid,
+                    &Gmac->EqosPlatform,
+                    &gEfiDevicePathProtocolGuid,
+                    &Gmac->DevicePath,
+                    NULL
+                    );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Failed to install GMAC%u EQOS device. Status=%r",
+        __func__,
+        Gmac->Id,
+        Status
+        ));
+    }
   }
 
   return EFI_SUCCESS;

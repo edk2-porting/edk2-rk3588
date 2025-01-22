@@ -27,6 +27,9 @@
   FLASH_DEFINITION               = Silicon/Rockchip/RK3588/RK3588.fdf
   RK_PLATFORM_FVMAIN_MODULES     = $(PLATFORM_DIRECTORY)/$(PLATFORM_NAME).Modules.fdf.inc
 
+  # GMAC is not exposed
+  DEFINE RK3588_GMAC_ENABLE = FALSE
+
   # No status LED on this platform.
   DEFINE RK_STATUS_LED_ENABLE = FALSE
 

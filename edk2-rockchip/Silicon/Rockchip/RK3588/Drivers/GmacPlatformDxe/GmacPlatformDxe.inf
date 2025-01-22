@@ -2,7 +2,7 @@
 #
 #  RK3588 GMAC initializer
 #
-#  Copyright (c) 2023, Mario Bălănică <mariobalanica02@gmail.com>
+#  Copyright (c) 2023-2025, Mario Bălănică <mariobalanica02@gmail.com>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -22,22 +22,29 @@
   MotorcommPhy.c
 
 [Packages]
+  CryptoPkg/CryptoPkg.dec
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
-  CryptoPkg/CryptoPkg.dec
+  NetworkPkg/NetworkPkg.dec
   Silicon/Rockchip/RockchipPkg.dec
   Silicon/Rockchip/RK3588/RK3588.dec
+  Silicon/Synopsys/DesignWare/DesignWarePkg.dec
 
 [LibraryClasses]
-  UefiDriverEntryPoint
-  DebugLib
-  IoLib
-  TimerLib
   BaseCryptLib
+  DebugLib
+  DevicePathLib
+  IoLib
+  NetLib
   OtpLib
   RockchipPlatformLib
+  TimerLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
 
 [Protocols]
+  gDwcEqosPlatformDeviceProtocolGuid
+  gEfiDevicePathProtocolGuid
 
 [Pcd]
   gRK3588TokenSpaceGuid.PcdGmac0Supported
