@@ -151,6 +151,9 @@ function _build(){
         -p "${ROOTDIR}/${DSC_FILE}" \
         -b "${RELEASE_TYPE}" \
         -D FIRMWARE_VER="${GIT_COMMIT}" \
+        -D NETWORK_ALLOW_HTTP_CONNECTIONS=TRUE \
+        -D NETWORK_ISCSI_ENABLE=TRUE \
+        -D INCLUDE_TFTP_COMMAND=TRUE \
         --pcd gRockchipTokenSpaceGuid.PcdFitImageFlashAddress=0x100000 \
         ${EDK2_FLAGS}
 
