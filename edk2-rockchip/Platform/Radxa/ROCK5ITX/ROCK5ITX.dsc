@@ -81,13 +81,6 @@
   gRockchipTokenSpaceGuid.PcdHdmiId|0x00000001 #hdmi1
 
   #
-  # CPU Performance default values
-  #
-  gRK3588TokenSpaceGuid.PcdCPULClusterClockPresetDefault|$(CPU_PERF_CLUSTER_CLOCK_PRESET_BOOTDEFAULT)
-  gRK3588TokenSpaceGuid.PcdCPUB01ClusterClockPresetDefault|$(CPU_PERF_CLUSTER_CLOCK_PRESET_BOOTDEFAULT)
-  gRK3588TokenSpaceGuid.PcdCPUB23ClusterClockPresetDefault|$(CPU_PERF_CLUSTER_CLOCK_PRESET_BOOTDEFAULT)
-
-  #
   # PCIe/SATA/USB Combo PIPE PHY support flags and default values
   #
   gRK3588TokenSpaceGuid.PcdPcie30PhyModeDefault|$(PCIE30_PHY_MODE_NANBNB)

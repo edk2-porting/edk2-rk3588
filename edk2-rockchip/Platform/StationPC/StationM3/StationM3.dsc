@@ -43,10 +43,3 @@
   gRockchipTokenSpaceGuid.PcdFamilyName|"Station M"
   gRockchipTokenSpaceGuid.PcdProductUrl|"https://www.stationpc.com/product/stationm3"
   gRockchipTokenSpaceGuid.PcdDeviceTreeName|"roc-rk3588s-pc"
-
-  #
-  # CPU Performance default values
-  #
-  gRK3588TokenSpaceGuid.PcdCPULClusterClockPresetDefault|$(CPU_PERF_CLUSTER_CLOCK_PRESET_MAX)
-  gRK3588TokenSpaceGuid.PcdCPUB01ClusterClockPresetDefault|$(CPU_PERF_CLUSTER_CLOCK_PRESET_MAX)
-  gRK3588TokenSpaceGuid.PcdCPUB23ClusterClockPresetDefault|$(CPU_PERF_CLUSTER_CLOCK_PRESET_MAX)
