@@ -226,6 +226,20 @@ dd if=FIRMWARE.img of=DESTINATION bs=512 skip=64 seek=64 conv=notrunc
 
 Here we skip the GPT and copy the firmware starting at offset 0x8000 (`64` blocks * `512` bytes block size) until its end. See [Flash layout](#flash-layout) for more details.
 
+## Flash SPI NOR from the UEFI Shell
+1) Copy the firmware image to a FAT32 partition on a storage drive and connect it to the device.
+
+2) Launch the UEFI Shell (press <kbd>F1</kbd> during boot or go to `Boot Manager`->`UEFI Shell`).
+
+3) Navigate to the partition / file system containing the firmware image:
+   * Use the `map` command to list all mounted file systems, e.g. `fs0:`, `fs1:`, etc. Type the file system name and press <kbd>Enter</kbd> to change directory to it.
+
+   * If you're unsure which file system to use, run `ls fsX:` (replace `X` with the actual number) to list its contents.
+
+4) Run `sf updatefile FIRMWARE.img 0x0` and wait for the update process to complete.
+
+5) Reboot the device.
+
 # Troubleshooting
 
 > [!IMPORTANT]
