@@ -309,6 +309,36 @@ PciePeReset (
   }
 }
 
+VOID
+EFIAPI
+HdmiTxIomux (
+  IN UINT32  Id
+  )
+{
+  switch (Id) {
+    case 0:
+      GpioPinSetFunction (4, GPIO_PIN_PC1, 5); // hdmim0_tx0_cec
+      GpioPinSetPull (4, GPIO_PIN_PC1, GPIO_PIN_PULL_NONE);
+      GpioPinSetFunction (1, GPIO_PIN_PA5, 5); // hdmim0_tx0_hpd
+      GpioPinSetPull (1, GPIO_PIN_PA5, GPIO_PIN_PULL_NONE);
+      GpioPinSetFunction (4, GPIO_PIN_PB7, 5); // hdmim0_tx0_scl
+      GpioPinSetPull (4, GPIO_PIN_PB7, GPIO_PIN_PULL_NONE);
+      GpioPinSetFunction (4, GPIO_PIN_PC0, 5); // hdmim0_tx0_sda
+      GpioPinSetPull (4, GPIO_PIN_PC0, GPIO_PIN_PULL_NONE);
+      break;
+    case 1:
+      GpioPinSetFunction (2, GPIO_PIN_PC4, 4); // hdmim0_tx1_cec
+      GpioPinSetPull (2, GPIO_PIN_PC4, GPIO_PIN_PULL_NONE);
+      GpioPinSetFunction (1, GPIO_PIN_PA6, 5); // hdmim0_tx1_hpd
+      GpioPinSetPull (1, GPIO_PIN_PA6, GPIO_PIN_PULL_NONE);
+      GpioPinSetFunction (3, GPIO_PIN_PC6, 5); // hdmim1_tx1_scl
+      GpioPinSetPull (3, GPIO_PIN_PC6, GPIO_PIN_PULL_NONE);
+      GpioPinSetFunction (3, GPIO_PIN_PC5, 5); // hdmim1_tx1_sda
+      GpioPinSetPull (3, GPIO_PIN_PC5, GPIO_PIN_PULL_NONE);
+      break;
+  }
+}
+
 PWM_DATA  pwm_data = {
   .ControllerID = PWM_CONTROLLER0,
   .ChannelID    = PWM_CHANNEL1,

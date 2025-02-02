@@ -89,6 +89,9 @@
 !ifndef RK_AHCI_ENABLE
   DEFINE RK_AHCI_ENABLE             = TRUE
 !endif
+!ifndef RK_ANALOGIX_DP_ENABLE
+  DEFINE RK_ANALOGIX_DP_ENABLE      = FALSE
+!endif
 !ifndef RK_DW_HDMI_QP_ENABLE
   DEFINE RK_DW_HDMI_QP_ENABLE       = TRUE
 !endif
@@ -245,11 +248,6 @@
   # Display
   #
   gRockchipTokenSpaceGuid.PcdLcdPixelFormat|0x00000001
-  gRockchipTokenSpaceGuid.PcdEdpId|0x00000000 #edp0
-  #gRockchipTokenSpaceGuid.PcdEdpId|0x00000001 #edp1
-  gRockchipTokenSpaceGuid.PcdHdmiId|0x00000000 #hdmi0
-  #gRockchipTokenSpaceGuid.PcdHdmiId|0x00000001 #hdmi1
-  gRockchipTokenSpaceGuid.PcdHdmiDDCI2CPinMux|0x00000000 #hdmitx_i2c_m0
 
   #
   # CPU Performance default values
@@ -289,6 +287,11 @@
   gRK3588TokenSpaceGuid.PcdFdtCompatModeDefault|$(FDT_COMPAT_MODE_MAINLINE)
   gRK3588TokenSpaceGuid.PcdFdtForceGopDefault|FALSE
   gRK3588TokenSpaceGuid.PcdFdtSupportOverridesDefault|FALSE
+
+  #
+  # Display support flags and default values
+  #
+  gRK3588TokenSpaceGuid.PcdDisplayConnectors|{ 0x0 }
 
 [PcdsPatchableInModule]
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|1500000
@@ -354,6 +357,11 @@
   #
   gRK3588TokenSpaceGuid.PcdUsbDpPhy0Usb3State|L"UsbDpPhy0Usb3State"|gRK3588DxeFormSetGuid|0x0|$(USBDP_PHY_USB3_STATE_ENABLED)
   gRK3588TokenSpaceGuid.PcdUsbDpPhy1Usb3State|L"UsbDpPhy1Usb3State"|gRK3588DxeFormSetGuid|0x0|$(USBDP_PHY_USB3_STATE_ENABLED)
+
+  #
+  # Display
+  #
+  gRK3588TokenSpaceGuid.PcdDisplayConnectorsMask|L"DisplayConnectorsMask"|gRK3588DxeFormSetGuid|0x0|0|BS
 
 ################################################################################
 #

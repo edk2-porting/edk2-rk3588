@@ -69,6 +69,13 @@
   gRK3588TokenSpaceGuid.PcdI2S0Supported|FALSE|BOOLEAN|0x00010701
   gRK3588TokenSpaceGuid.PcdI2S1Supported|FALSE|BOOLEAN|0x00010702
 
+  gRK3588TokenSpaceGuid.PcdDisplayConnectors|{ 0x0 }|UINT32[]|0x00010801 {
+    <Packages>
+      Silicon/Rockchip/RockchipPkg.dec
+    <HeaderFiles>
+      RockchipDisplay.h
+  }
+
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   gRK3588TokenSpaceGuid.PcdCPULClusterClockPreset|0|UINT32|0x00000001
   gRK3588TokenSpaceGuid.PcdCPULClusterClockCustom|0|UINT32|0x00000002
@@ -101,6 +108,8 @@
 
   gRK3588TokenSpaceGuid.PcdUsbDpPhy0Usb3State|0|UINT32|0x00000501
   gRK3588TokenSpaceGuid.PcdUsbDpPhy1Usb3State|0|UINT32|0x00000502
+
+  gRK3588TokenSpaceGuid.PcdDisplayConnectorsMask|0|UINT32|0x00000801
 
 [PcdsDynamicEx]
   gRK3588TokenSpaceGuid.PcdPcieEcamCompliantSegmentsMask|0|UINT32|0x20000001

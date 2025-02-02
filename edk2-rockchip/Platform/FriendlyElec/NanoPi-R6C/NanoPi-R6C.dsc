@@ -93,6 +93,13 @@
   gRK3588TokenSpaceGuid.PcdGmac1Supported|TRUE
   gRK3588TokenSpaceGuid.PcdGmac1TxDelay|0x42
 
+  #
+  # Display support flags and default values
+  #
+  gRK3588TokenSpaceGuid.PcdDisplayConnectors|{CODE({
+    VOP_OUTPUT_IF_HDMI0
+  })}
+
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform.

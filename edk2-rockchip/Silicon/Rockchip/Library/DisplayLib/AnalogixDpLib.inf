@@ -35,7 +35,6 @@
   BaseMemoryLib
   RockchipDisplayLib
   MemoryAllocationLib
-  PWMLib
   RockchipPlatformLib
   UefiLib
   UefiDriverEntryPoint
@@ -47,17 +46,11 @@
   Silicon/Rockchip/RockchipPkg.dec
   Silicon/Rockchip/RK3588/RK3588.dec
 
-[BuildOptions]
-
 [Pcd]
-  gRockchipTokenSpaceGuid.PcdLcdPixelFormat
-  gRockchipTokenSpaceGuid.PcdEdpId
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoHorizontalResolution
-  gEfiMdeModulePkgTokenSpaceGuid.PcdVideoVerticalResolution
+  gRK3588TokenSpaceGuid.PcdDisplayConnectorsMask
 
 [Protocols]
   gRockchipConnectorProtocolGuid
 
 [Depex]
-  TRUE
-
+  gRockchipPlatformConfigAppliedProtocolGuid

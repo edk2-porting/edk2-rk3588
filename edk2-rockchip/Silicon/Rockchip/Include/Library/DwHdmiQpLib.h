@@ -898,9 +898,6 @@
 #define SCDC_MANUFACTURER_SPECIFIC       0xde
 #define SCDC_MANUFACTURER_SPECIFIC_SIZE  34
 
-#define HDMI0_BASE  0xFDE80000
-#define HDMI1_BASE  0xFDEA0000
-
 #define HDMI0TX_PHY_BASE  0xFED60000
 #define HDMI1TX_PHY_BASE  0xFED70000
 
@@ -910,10 +907,15 @@
 #define PMU1CRU_SOFTRST_CON03  0xA0C
 #define PMU1CRU_SOFTRST_CON04  0xA10
 
+/* Rockchip Htx Phy */
+
+struct RockchipHdptxPhyHdmi {
+  UINT32    Id;
+};
+
 struct DwHdmiQpI2c {
   BOOLEAN    Cmp;
   UINT32     Stat;
-  UINT32     PinMux;
 
   UINT8      SlaveReg;
   BOOLEAN    IsSegment;
@@ -921,15 +923,26 @@ struct DwHdmiQpI2c {
 };
 
 struct DwHdmiQpDevice {
-  UINT32                Id;
-  BOOLEAN               ForceHpd;
-  struct DwHdmiQpI2c    I2c;
-  UINT32                ScdcIntr;
-  UINT32                FltIntr;
-  UINT32                EarcIntr;
+  UINT32                         Signature;
+  ROCKCHIP_CONNECTOR_PROTOCOL    Connector;
+  UINT32                         Id;
+  UINTN                          Base;
+  UINT32                         OutputInterface;
+  BOOLEAN                        ForceHpd;
+  struct DwHdmiQpI2c             I2c;
+  UINT32                         ScdcIntr;
+  UINT32                         FltIntr;
+  UINT32                         EarcIntr;
 
-  BOOLEAN               FltCmp;
+  BOOLEAN                        FltCmp;
+
+  struct RockchipHdptxPhyHdmi    HdptxPhy;
 };
+
+#define DW_HDMI_QP_SIGNATURE  SIGNATURE_32 ('D', 'W', 'h', 'D')
+
+#define DW_HDMI_QP_FROM_CONNECTOR_PROTOCOL(a) \
+  CR (a, struct DwHdmiQpDevice, Connector, DW_HDMI_QP_SIGNATURE)
 
 struct i2c_msg {
   UINT16    addr;
@@ -945,12 +958,6 @@ struct i2c_msg {
   #define I2C_M_STOP          0x8000    /* use only if I2C_FUNC_PROTOCOL_MANGLING */
   UINT16    len;
   UINT8     *buf;
-};
-
-/* Rockchip Htx Phy */
-
-struct RockchipHdptxPhyHdmi {
-  UINT32    Id;
 };
 
 EFI_STATUS

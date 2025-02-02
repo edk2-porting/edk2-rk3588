@@ -289,6 +289,26 @@ PciePeReset (
 
 VOID
 EFIAPI
+HdmiTxIomux (
+  IN UINT32  Id
+  )
+{
+  switch (Id) {
+    case 0:
+      GpioPinSetFunction (4, GPIO_PIN_PC1, 5); // hdmim0_tx0_cec
+      GpioPinSetPull (4, GPIO_PIN_PC1, GPIO_PIN_PULL_NONE);
+      GpioPinSetFunction (1, GPIO_PIN_PA5, 5); // hdmim0_tx0_hpd
+      GpioPinSetPull (1, GPIO_PIN_PA5, GPIO_PIN_PULL_NONE);
+      GpioPinSetFunction (4, GPIO_PIN_PB7, 5); // hdmim0_tx0_scl
+      GpioPinSetPull (4, GPIO_PIN_PB7, GPIO_PIN_PULL_NONE);
+      GpioPinSetFunction (4, GPIO_PIN_PC0, 5); // hdmim0_tx0_sda
+      GpioPinSetPull (4, GPIO_PIN_PC0, GPIO_PIN_PULL_NONE);
+      break;
+  }
+}
+
+VOID
+EFIAPI
 PwmFanIoSetup (
   VOID
   )

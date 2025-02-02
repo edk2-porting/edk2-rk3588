@@ -248,6 +248,14 @@ PciePeReset (
 
 VOID
 EFIAPI
+HdmiTxIomux (
+  IN UINT32  Id
+  )
+{
+}
+
+VOID
+EFIAPI
 PwmFanIoSetup (
   VOID
   )

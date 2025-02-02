@@ -24,9 +24,6 @@
 #define EINVAL     22           /* Invalid argument */
 #define ETIMEDOUT  110          /* Connection timed out */
 
-#define ANALOGIX_DP0_REG_BASE  0xFDEC0000
-#define ANALOGIX_DP1_REG_BASE  0xFDED0000
-
 #define ANALOGIX_DP_TX_SW_RESET  0x14
 #define ANALOGIX_DP_FUNC_EN_1    0x18
 #define ANALOGIX_DP_FUNC_EN_2    0x1C
@@ -704,24 +701,35 @@ struct LinkTrain {
   enum LinkTrainingState    LtState;
 };
 
-struct AnalogixDpDevice {
-  UINT32                   Id;
-  BOOLEAN                  ForceHpd;
-  struct VideoInfo         VideoInfo;
-  struct LinkTrain         LinkTrain;
-  struct DrmDisplayMode    *MODE;
-  unsigned char            EDID[EDID_BLOCK_LENGTH * 2];
-  UINT8                    Dpcd[DP_RECEIVER_CAP_SIZE];
-  UINT8                    Edid[EDID_BLOCK_LENGTH * 2];
-  UINT32                   LaneMap[4];
-};
-
 /* Rockchip Htx Phy */
 
 struct RockchipHdptxPhy {
   UINT32    Id;
   UINT32    LANE_POLARITY_INVERT[4];
 };
+
+struct AnalogixDpDevice {
+  UINT32                         Signature;
+  ROCKCHIP_CONNECTOR_PROTOCOL    Connector;
+  UINT32                         Id;
+  UINTN                          Base;
+  UINT32                         OutputInterface;
+  BOOLEAN                        ForceHpd;
+  struct VideoInfo               VideoInfo;
+  struct LinkTrain               LinkTrain;
+  struct DrmDisplayMode          *MODE;
+  unsigned char                  EDID[EDID_BLOCK_LENGTH * 2];
+  UINT8                          Dpcd[DP_RECEIVER_CAP_SIZE];
+  UINT8                          Edid[EDID_BLOCK_LENGTH * 2];
+  UINT32                         LaneMap[4];
+
+  struct RockchipHdptxPhy        HdptxPhy;
+};
+
+#define ANALOGIX_DP_SIGNATURE  SIGNATURE_32 ('A', 'n', 'D', 'P')
+
+#define ANALOGIX_DP_FROM_CONNECTOR_PROTOCOL(a) \
+  CR (a, struct AnalogixDpDevice, Connector, ANALOGIX_DP_SIGNATURE)
 
 struct PhyConfigureOptsDp {
   UINTN    LINKRATE;

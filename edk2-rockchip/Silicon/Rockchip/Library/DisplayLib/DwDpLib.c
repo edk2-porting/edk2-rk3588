@@ -232,6 +232,7 @@ struct dw_dp_sdp {
 struct dw_dp {
 	UINT32 Signature;
 	ROCKCHIP_CONNECTOR_PROTOCOL connector;
+	UINT32 output_if;
 	UINTN regmap;
 	DP_PHY_PROTOCOL *phy;
 	struct reset_ctl reset;
@@ -1408,7 +1409,7 @@ static int dw_dp_connector_init(ROCKCHIP_CONNECTOR_PROTOCOL *conn, DISPLAY_STATE
 	struct dw_dp *dp = DW_DP_FROM_CONNECTOR_PROTOCOL (conn);
 	int ret = 0;
 
-	conn_state->OutputInterface |= dp->id ? VOP_OUTPUT_IF_DP1 : VOP_OUTPUT_IF_DP0;
+	conn_state->OutputInterface |= dp->output_if;
 	conn_state->OutputMode = ROCKCHIP_OUT_MODE_AAAA;
 	conn_state->ColorSpace = V4L2_COLORSPACE_DEFAULT;
 
@@ -1623,11 +1624,13 @@ static struct dw_dp mRk3588Dp[] = {
 		.regmap		= 0xfde50000,
 		.reset		= { 0xAE0, 8 },
 		.id		= 0,
+		.output_if      = VOP_OUTPUT_IF_DP0,
 	},
 	{
 		.regmap		= 0xfde60000,
 		.reset		= { 0xAE0, 9 },
 		.id		= 1,
+		.output_if      = VOP_OUTPUT_IF_DP1,
 	},
 };
 
@@ -1667,7 +1670,7 @@ DpPhyRegistrationEventHandler (
 
 		for (Index = 0; Index < ARRAY_SIZE (mRk3588Dp); Index++) {
 			DwDp = &mRk3588Dp[Index];
-			if (DwDp->id == DpPhy->Id) {
+			if (DwDp->id == DpPhy->Id && (PcdGet32 (PcdDisplayConnectorsMask) & DwDp->output_if)) {
 				DwDp->Signature = DW_DP_SIGNATURE;
 				DwDp->phy = DpPhy;
 				DwDp->force_output = TRUE;

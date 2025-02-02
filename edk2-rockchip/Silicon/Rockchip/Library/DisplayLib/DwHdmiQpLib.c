@@ -14,18 +14,12 @@
 #include <Library/BaseLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/DwHdmiQpLib.h>
-#include <Library/PWMLib.h>
 #include <Library/DrmModes.h>
 #include <Library/RockchipPlatformLib.h>
 #include <Library/MediaBusFormat.h>
-#include <Library/DrmModes.h>
-#include <Library/GpioLib.h>
+#include <Library/uboot-env.h>
 
 #include <Protocol/RockchipConnectorProtocol.h>
-
-#include <Uefi/UefiBaseType.h>
-
-#include <Library/uboot-env.h>
 
 #define HIWORD_UPDATE(val, mask)  (val | (mask) << 16)
 
@@ -100,15 +94,7 @@ DwHdmiQpRegWrite (
   IN  UINT32                  Offset
   )
 {
-  UINT32  BASE;
-
-  if (!Hdmi->Id) {
-    BASE = HDMI0_BASE;
-  } else {
-    BASE = HDMI1_BASE;
-  }
-
-  MmioWrite32 (BASE + Offset, Value);
+  MmioWrite32 (Hdmi->Base + Offset, Value);
 }
 
 UINT32
@@ -117,17 +103,7 @@ DwHdmiQpRegRead (
   IN  UINT32                  Offset
   )
 {
-  UINT32  Value;
-  UINT32  BASE;
-
-  if (!Hdmi->Id) {
-    BASE = HDMI0_BASE;
-  } else {
-    BASE = HDMI1_BASE;
-  }
-
-  Value = MmioRead32 (BASE + Offset);
-  return Value;
+  return MmioRead32 (Hdmi->Base + Offset);
 }
 
 VOID
@@ -139,19 +115,12 @@ DwHdmiQpRegMod (
   )
 {
   UINT32  Val;
-  UINT32  BASE;
 
-  if (!Hdmi->Id) {
-    BASE = HDMI0_BASE;
-  } else {
-    BASE = HDMI1_BASE;
-  }
-
-  Val  = MmioRead32 (BASE + Offset);
+  Val  = MmioRead32 (Hdmi->Base + Offset);
   Val &= ~Mask;
   Val |= Value;
 
-  MmioWrite32 (BASE + Offset, Val);
+  MmioWrite32 (Hdmi->Base + Offset, Val);
 }
 
 VOID
@@ -539,14 +508,6 @@ DwHdmiI2cInit (
   OUT struct DwHdmiQpDevice  *Hdmi
   )
 {
-  UINT32  BaseAddr;
-
-  if (Hdmi->Id) {
-    BaseAddr = HDMI1_BASE;
-  } else {
-    BaseAddr = HDMI0_BASE;
-  }
-
   /* Software reset */
   DwHdmiQpRegWrite (Hdmi, 0x01, I2CM_CONTROL0);
 
@@ -595,48 +556,6 @@ DumpEdid (
   }
 }
 
-VOID
-DwHdmiQpI2cSetIomux (
-  OUT struct  DwHdmiQpDevice  *Hdmi
-  )
-{
-  if (!Hdmi->Id) {
-    switch (Hdmi->I2c.PinMux) {
-      case 0:
-        GpioPinSetFunction (4, GPIO_PIN_PB7, 0x5);
-        GpioPinSetFunction (4, GPIO_PIN_PC0, 0x5);
-        break;
-      case 1:
-        GpioPinSetFunction (0, GPIO_PIN_PD5, 0xb);
-        GpioPinSetFunction (0, GPIO_PIN_PD4, 0xb);
-        break;
-      case 2:
-        GpioPinSetFunction (3, GPIO_PIN_PC7, 0x5);
-        GpioPinSetFunction (3, GPIO_PIN_PD0, 0x5);
-        break;
-      default:
-        break;
-    }
-  } else {
-    switch (Hdmi->I2c.PinMux) {
-      case 0:
-        GpioPinSetFunction (2, GPIO_PIN_PB4, 0x4);
-        GpioPinSetFunction (2, GPIO_PIN_PB5, 0x4);
-        break;
-      case 1:
-        GpioPinSetFunction (3, GPIO_PIN_PC5, 0x5);
-        GpioPinSetFunction (3, GPIO_PIN_PC6, 0x5);
-        break;
-      case 2:
-        GpioPinSetFunction (1, GPIO_PIN_PA3, 0x5);
-        GpioPinSetFunction (1, GPIO_PIN_PA4, 0x5);
-        break;
-      default:
-        break;
-    }
-  }
-}
-
 EFI_STATUS
 DwHdmiQpConnectorPreInit (
   OUT ROCKCHIP_CONNECTOR_PROTOCOL  *This,
@@ -644,27 +563,22 @@ DwHdmiQpConnectorPreInit (
   )
 {
   CONNECTOR_STATE              *ConnectorState = &DisplayState->ConnectorState;
-  struct RockchipHdptxPhyHdmi  Hdptx;
+  struct RockchipHdptxPhyHdmi  *Hdptx;
   struct DwHdmiQpDevice        *Hdmi;
 
-  Hdmi = AllocateZeroPool (sizeof (*Hdmi));
+  Hdmi  = DW_HDMI_QP_FROM_CONNECTOR_PROTOCOL (This);
+  Hdptx = &Hdmi->HdptxPhy;
 
   DEBUG ((DEBUG_INIT, "DwHdmiQpConnectorPreInit"));
-  ConnectorState->Type = DRM_MODE_CONNECTOR_HDMIA;
-  Hdmi->Id             = Hdptx.Id = PcdGet32 (PcdHdmiId);
-  Hdmi->I2c.PinMux     = PcdGet32 (PcdHdmiDDCI2CPinMux);
+  ConnectorState->Type            = DRM_MODE_CONNECTOR_HDMIA;
+  ConnectorState->OutputInterface = Hdmi->OutputInterface;
 
-  if (Hdmi->Id) {
-    ConnectorState->OutputInterface = VOP_OUTPUT_IF_HDMI1;
-  } else {
-    ConnectorState->OutputInterface = VOP_OUTPUT_IF_HDMI0;
-  }
+  HdmiTxIomux (Hdmi->Id);
 
   DwHdmiQpSetIomux (Hdmi);
-  DwHdmiQpI2cSetIomux (Hdmi);
   DwHdmiI2cInit (Hdmi);
 
-  HdptxRopllCmnConfig (&Hdptx);
+  HdptxRopllCmnConfig (Hdptx);
   DEBUG ((DEBUG_INFO, "%a hdmi pre init success\n", __func__));
   return 0;
 }
@@ -756,15 +670,15 @@ DwHdmiQpSetup (
   OUT DISPLAY_STATE          *DisplayState
   )
 {
-  struct RockchipHdptxPhyHdmi  Hdptx;
+  struct RockchipHdptxPhyHdmi  *Hdptx;
   CONNECTOR_STATE              *ConnectorState = &DisplayState->ConnectorState;
   UINT32                       Val             = 0;
 
   ConnectorState->Type = DRM_MODE_CONNECTOR_HDMIA;
-  Hdptx.Id             = PcdGet32 (PcdHdmiId);
+  Hdptx                = &Hdmi->HdptxPhy;
 
   Val = DwHdmiQpRegRead (Hdmi, 0xb0);
-  DEBUG ((DEBUG_INIT, "%a Hdptx.Id :%d\n", __func__, Hdptx.Id));
+  DEBUG ((DEBUG_INIT, "%a Hdptx->Id :%d\n", __func__, Hdptx->Id));
   DEBUG ((DEBUG_INIT, "%a 0xb0:%d\n", __func__, Val));
   Rk3588SetColorFormat (Hdmi, MEDIA_BUS_FMT_RGB888_1X24, 8);
   HdmiConfigAvi (Hdmi);
@@ -777,7 +691,7 @@ DwHdmiQpSetup (
   DumpEdid (Hdmi);
 
   // enable phy output
-  HdptxRopllTmdsModeConfig (&Hdptx);
+  HdptxRopllTmdsModeConfig (Hdptx);
   MicroSecondDelay (50);
   DwHdmiQpRegWrite (Hdmi, 2, PKTSCHED_PKT_CONTROL0);
   DwHdmiQpRegMod (Hdmi, PKTSCHED_GCP_TX_EN, PKTSCHED_GCP_TX_EN, PKTSCHED_PKT_EN);
@@ -791,9 +705,8 @@ DwHdmiQpConnectorEnable (
 {
   struct DwHdmiQpDevice  *Hdmi;
 
-  Hdmi = AllocatePool (sizeof (*Hdmi));
+  Hdmi = DW_HDMI_QP_FROM_CONNECTOR_PROTOCOL (This);
   DEBUG ((DEBUG_INIT, "DwHdmiQpConnectorEnable\n"));
-  Hdmi->Id = PcdGet32 (PcdHdmiId);
 
   DwHdmiQpSetup (Hdmi, DisplayState);
 
@@ -820,7 +733,7 @@ DwHdmiQpConnectorDetect (
   return 0;
 }
 
-ROCKCHIP_CONNECTOR_PROTOCOL  mHdmi = {
+ROCKCHIP_CONNECTOR_PROTOCOL  mHdmiConnectorOps = {
   NULL,
   DwHdmiQpConnectorPreInit,
   DwHdmiQpConnectorInit,
@@ -834,6 +747,19 @@ ROCKCHIP_CONNECTOR_PROTOCOL  mHdmi = {
   NULL
 };
 
+STATIC struct DwHdmiQpDevice  mRk3588DwHdmiQpDevices[] = {
+  {
+    .Id              = 0,
+    .Base            = 0xFDE80000,
+    .OutputInterface = VOP_OUTPUT_IF_HDMI0,
+  },
+  {
+    .Id              = 1,
+    .Base            = 0xFDEA0000,
+    .OutputInterface = VOP_OUTPUT_IF_HDMI1,
+  },
+};
+
 EFI_STATUS
 EFIAPI
 DwHdmiQpInitHdmi (
@@ -842,18 +768,29 @@ DwHdmiQpInitHdmi (
   )
 {
   EFI_STATUS  Status;
+  UINT32      Index;
   EFI_HANDLE  Handle;
 
-  DEBUG ((DEBUG_INIT, "hdmi init start\n"));
-  Handle = NULL;
+  for (Index = 0; Index < ARRAY_SIZE (mRk3588DwHdmiQpDevices); Index++) {
+    struct DwHdmiQpDevice  *Hdmi = &mRk3588DwHdmiQpDevices[Index];
 
-  Status = gBS->InstallMultipleProtocolInterfaces (
-                  &Handle,
-                  &gRockchipConnectorProtocolGuid,
-                  &mHdmi,
-                  NULL
-                  );
-  ASSERT_EFI_ERROR (Status);
-  DEBUG ((DEBUG_INIT, "hdmi init success\n"));
+    if (!(PcdGet32 (PcdDisplayConnectorsMask) & Hdmi->OutputInterface)) {
+      continue;
+    }
+
+    Hdmi->Signature   = DW_HDMI_QP_SIGNATURE;
+    Hdmi->HdptxPhy.Id = Hdmi->Id;
+    CopyMem (&Hdmi->Connector, &mHdmiConnectorOps, sizeof (ROCKCHIP_CONNECTOR_PROTOCOL));
+
+    Handle = NULL;
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &Handle,
+                    &gRockchipConnectorProtocolGuid,
+                    &Hdmi->Connector,
+                    NULL
+                    );
+    ASSERT_EFI_ERROR (Status);
+  }
+
   return EFI_SUCCESS;
 }

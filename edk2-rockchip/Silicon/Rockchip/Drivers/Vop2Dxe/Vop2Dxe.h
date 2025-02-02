@@ -11,6 +11,7 @@
 #define __VOP2_H__
 
 #include <Library/Vop2Regs.h>
+#include <Library/RockchipDisplayLib.h>
 
 /*
  * major: IP major vertion, used for IP structure
@@ -22,36 +23,6 @@
 
 #define VOP_VERSION_RK3568  VOP_VERSION(0x40, 0x15)
 #define VOP_VERSION_RK3588  VOP_VERSION(0x40, 0x17)
-
-/*
- * display output interface supported by rockchip lcdc
- */
-#define ROCKCHIP_OUT_MODE_P888        0
-#define ROCKCHIP_OUT_MODE_BT1120      0
-#define ROCKCHIP_OUT_MODE_P666        1
-#define ROCKCHIP_OUT_MODE_P565        2
-#define ROCKCHIP_OUT_MODE_BT656       5
-#define ROCKCHIP_OUT_MODE_S888        8
-#define ROCKCHIP_OUT_MODE_S888_DUMMY  12
-#define ROCKCHIP_OUT_MODE_YUV420      14
-/* for use special outface */
-#define ROCKCHIP_OUT_MODE_AAAA  15
-
-#define VOP_OUTPUT_IF_RGB     BIT(0)
-#define VOP_OUTPUT_IF_BT1120  BIT(1)
-#define VOP_OUTPUT_IF_BT656   BIT(2)
-#define VOP_OUTPUT_IF_LVDS0   BIT(3)
-#define VOP_OUTPUT_IF_LVDS1   BIT(4)
-#define VOP_OUTPUT_IF_MIPI0   BIT(5)
-#define VOP_OUTPUT_IF_MIPI1   BIT(6)
-#define VOP_OUTPUT_IF_eDP0    BIT(7)
-#define VOP_OUTPUT_IF_eDP1    BIT(8)
-#define VOP_OUTPUT_IF_DP0     BIT(9)
-#define VOP_OUTPUT_IF_DP1     BIT(10)
-#define VOP_OUTPUT_IF_HDMI0   BIT(11)
-#define VOP_OUTPUT_IF_HDMI1   BIT(12)
-
-#define VOP_OUTPUT_IF_NUMS  13
 
 #define VOP2_LAYER_MAX  8
 

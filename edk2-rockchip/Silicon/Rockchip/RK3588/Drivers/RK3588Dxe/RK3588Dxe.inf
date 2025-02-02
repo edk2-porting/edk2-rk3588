@@ -25,6 +25,7 @@
   FanControl.c
   UsbDpPhy.c
   DebugSerialPort.c
+  Display.c
 
 [Packages]
   ArmPkg/ArmPkg.dec
@@ -118,6 +119,9 @@
 
   gRK3588TokenSpaceGuid.PcdI2S0Supported
   gRK3588TokenSpaceGuid.PcdI2S1Supported
+
+  gRK3588TokenSpaceGuid.PcdDisplayConnectors
+  gRK3588TokenSpaceGuid.PcdDisplayConnectorsMask
 
 [Guids]
   gRK3588DxeFormSetGuid

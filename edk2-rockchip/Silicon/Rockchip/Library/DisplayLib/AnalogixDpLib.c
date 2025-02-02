@@ -14,17 +14,12 @@
 #include <Library/BaseLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/AnalogixDpLib.h>
-#include <Library/PWMLib.h>
 #include <Library/DrmModes.h>
 #include <Library/RockchipPlatformLib.h>
 #include <Library/MediaBusFormat.h>
-#include <Library/DrmModes.h>
+#include <Library/uboot-env.h>
 
 #include <Protocol/RockchipConnectorProtocol.h>
-
-#include <Uefi/UefiBaseType.h>
-
-#include <Library/uboot-env.h>
 
 #define DP_MAX_LINK_RATE   0x001
 #define DP_MAX_LANE_COUNT  0x002
@@ -407,9 +402,9 @@ AnalogixDpSetLinkBandwidth (
   UINTN                          i;
   UINT32                         Reg;
   OUT struct PhyConfigureOptsDp  OPTS_DP;
-  OUT struct RockchipHdptxPhy    Hdptx;
+  OUT struct RockchipHdptxPhy    *Hdptx;
 
-  Dp->Id = Hdptx.Id = PcdGet32 (PcdEdpId);
+  Hdptx = &Dp->HdptxPhy;
 
   OPTS_DP.LANES       = Dp->LinkTrain.LaneCount;
   OPTS_DP.LINKRATE    = DrmDpBwCodeToLinkRate (Dp->LinkTrain.LinkRate) / 100;
@@ -418,7 +413,7 @@ AnalogixDpSetLinkBandwidth (
   OPTS_DP.SETRATE     = TRUE;
   OPTS_DP.SETVOLTAGES = FALSE;
 
-  RockchipHdptxPhyConfigure (&Hdptx, &OPTS_DP);
+  RockchipHdptxPhyConfigure (Hdptx, &OPTS_DP);
   AnalogixDpRegWrite (Dp, ANALOGIX_DP_LINK_BW_SET, BwType);
 
   Reg = AnalogixDpGetPllLockStatus (Dp);
@@ -441,9 +436,9 @@ AnalogixDpSetLaneCount (
 {
   UINTN                          Reg;
   OUT struct PhyConfigureOptsDp  OPTS_DP;
-  OUT struct RockchipHdptxPhy    Hdptx;
+  OUT struct RockchipHdptxPhy    *Hdptx;
 
-  Dp->Id = Hdptx.Id = PcdGet32 (PcdEdpId);
+  Hdptx = &Dp->HdptxPhy;
 
   Reg = Count;
   AnalogixDpRegWrite (Dp, ANALOGIX_DP_LANE_COUNT_SET, Reg);
@@ -454,7 +449,7 @@ AnalogixDpSetLaneCount (
   OPTS_DP.SETLANES    = TRUE;
   OPTS_DP.SETRATE     = FALSE;
   OPTS_DP.SETVOLTAGES = FALSE;
-  RockchipHdptxPhyConfigure (&Hdptx, &OPTS_DP);
+  RockchipHdptxPhyConfigure (Hdptx, &OPTS_DP);
 
   return 0;
 }
@@ -660,9 +655,9 @@ AnalogixDpSetLaneLinkTraining (
 {
   UINT8                          Lane;
   OUT struct PhyConfigureOptsDp  OPTS_DP;
-  OUT struct RockchipHdptxPhy    Hdptx;
+  OUT struct RockchipHdptxPhy    *Hdptx;
 
-  Dp->Id = Hdptx.Id = PcdGet32 (PcdEdpId);
+  Hdptx = &Dp->HdptxPhy;
 
   for (Lane = 0; Lane < Dp->LinkTrain.LaneCount; Lane++) {
     UINT8  TrainingLane = Dp->LinkTrain.TrainingLane[Lane];
@@ -687,7 +682,7 @@ AnalogixDpSetLaneLinkTraining (
   OPTS_DP.SETLANES    = FALSE;
   OPTS_DP.SETRATE     = FALSE;
   OPTS_DP.SETVOLTAGES = TRUE;
-  RockchipHdptxPhyConfigure (&Hdptx, &OPTS_DP);
+  RockchipHdptxPhyConfigure (Hdptx, &OPTS_DP);
 }
 
 STATIC
@@ -1229,31 +1224,24 @@ AnalogixDpConnectorPreInit (
   )
 {
   CONNECTOR_STATE          *ConnectorState = &DisplayState->ConnectorState;
-  struct RockchipHdptxPhy  Hdptx;
+  struct RockchipHdptxPhy  *Hdptx;
   struct AnalogixDpDevice  *Dp;
 
-  Dp = AllocateZeroPool (sizeof (*Dp));
+  Dp    = ANALOGIX_DP_FROM_CONNECTOR_PROTOCOL (This);
+  Hdptx = &Dp->HdptxPhy;
 
   ConnectorState->Type            = DRM_MODE_CONNECTOR_eDP;
-  ConnectorState->OutputInterface = VOP_OUTPUT_IF_eDP1;
-  Dp->Id                          = Hdptx.Id = PcdGet32 (PcdEdpId);
+  ConnectorState->OutputInterface = Dp->OutputInterface;
 
-  if (Dp->Id) {
-    ConnectorState->OutputInterface = VOP_OUTPUT_IF_eDP1;
-  } else {
-    ConnectorState->OutputInterface = VOP_OUTPUT_IF_eDP0;
-  }
-
-  if (ConnectorState->OutputInterface == VOP_OUTPUT_IF_eDP0) {
+  if (ConnectorState->OutputInterface == VOP_OUTPUT_IF_EDP0) {
     MmioWrite32 (0xFD5A8000, 0xFFFF0001);
   } else {
     MmioWrite32 (0xFD5A8004, 0xFFFF0001);
   }
 
-  RockchipHdptxPhyInit (&Hdptx);
+  RockchipHdptxPhyInit (Hdptx);
   MicroSecondDelay (10);
-  EnableBacklight (TRUE);
-  EnablePWM (TRUE);
+  EdpEnableBacklight (Dp->Id, TRUE);
   AnalogixDpReset (Dp);
   AnalogixDpSwreset (Dp);
   AnalogixDpInitAnalogParam (Dp);
@@ -1331,7 +1319,7 @@ AnalogixDpConnectorEnable (
   CONNECTOR_STATE          *ConnectorState = &DisplayState->ConnectorState;
   struct AnalogixDpDevice  *Dp;
 
-  Dp = AllocatePool (sizeof (*Dp));
+  Dp = ANALOGIX_DP_FROM_CONNECTOR_PROTOCOL (This);
   struct VideoInfo  *Video = &Dp->VideoInfo;
   UINTN             Ret;
 
@@ -1356,7 +1344,6 @@ AnalogixDpConnectorEnable (
   Dp->VideoInfo.MaxLinkRate  = DP_LINK_BW_5_4;
   Dp->VideoInfo.MaxLaneCount = LANE_COUNT4;
   Dp->LinkTrain.SSC          = TRUE;
-  Dp->Id                     = PcdGet32 (PcdEdpId);
 
   Ret = AnalogixDpReadBytesFromDpcd (
           Dp,
@@ -1421,7 +1408,7 @@ AnalogixDpConnectorDetect (
   return 0;
 }
 
-ROCKCHIP_CONNECTOR_PROTOCOL  mDp = {
+ROCKCHIP_CONNECTOR_PROTOCOL  mDpConnectorOps = {
   NULL,
   AnalogixDpConnectorPreInit,
   AnalogixDpConnectorInit,
@@ -1435,6 +1422,19 @@ ROCKCHIP_CONNECTOR_PROTOCOL  mDp = {
   NULL
 };
 
+STATIC struct AnalogixDpDevice  mRk3588AnalogixDpDevices[] = {
+  {
+    .Id              = 0,
+    .Base            = 0xFDEC0000,
+    .OutputInterface = VOP_OUTPUT_IF_EDP0,
+  },
+  {
+    .Id              = 1,
+    .Base            = 0xFDED0000,
+    .OutputInterface = VOP_OUTPUT_IF_EDP1,
+  },
+};
+
 EFI_STATUS
 EFIAPI
 AnalogixDpInitDp (
@@ -1443,17 +1443,29 @@ AnalogixDpInitDp (
   )
 {
   EFI_STATUS  Status;
+  UINT32      Index;
   EFI_HANDLE  Handle;
 
-  Handle = NULL;
+  for (Index = 0; Index < ARRAY_SIZE (mRk3588AnalogixDpDevices); Index++) {
+    struct AnalogixDpDevice  *Dp = &mRk3588AnalogixDpDevices[Index];
 
-  Status = gBS->InstallMultipleProtocolInterfaces (
-                  &Handle,
-                  &gRockchipConnectorProtocolGuid,
-                  &mDp,
-                  NULL
-                  );
-  ASSERT_EFI_ERROR (Status);
+    if (!(PcdGet32 (PcdDisplayConnectorsMask) & Dp->OutputInterface)) {
+      continue;
+    }
+
+    Dp->Signature   = ANALOGIX_DP_SIGNATURE;
+    Dp->HdptxPhy.Id = Dp->Id;
+    CopyMem (&Dp->Connector, &mDpConnectorOps, sizeof (ROCKCHIP_CONNECTOR_PROTOCOL));
+
+    Handle = NULL;
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &Handle,
+                    &gRockchipConnectorProtocolGuid,
+                    &Dp->Connector,
+                    NULL
+                    );
+    ASSERT_EFI_ERROR (Status);
+  }
 
   return EFI_SUCCESS;
 }

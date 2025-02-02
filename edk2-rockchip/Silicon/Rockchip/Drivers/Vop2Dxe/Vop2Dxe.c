@@ -1357,7 +1357,7 @@ Vop2IfConfig (
     }
   }
 
-  if (OutputIf & VOP_OUTPUT_IF_eDP0) {
+  if (OutputIf & VOP_OUTPUT_IF_EDP0) {
     Vop2MaskWrite (
       Vop2->BaseAddress,
       RK3568_DSP_IF_EN,
@@ -1400,7 +1400,7 @@ Vop2IfConfig (
       );
   }
 
-  if (OutputIf & VOP_OUTPUT_IF_eDP1) {
+  if (OutputIf & VOP_OUTPUT_IF_EDP1) {
     Vop2MaskWrite (
       Vop2->BaseAddress,
       RK3568_DSP_IF_EN,

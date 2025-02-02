@@ -28,15 +28,7 @@ AnalogixDpRegWrite (
   IN  UINT32                    Value
   )
 {
-  UINT32  BASE;
-
-  if (!Dp->Id) {
-    BASE = ANALOGIX_DP0_REG_BASE;
-  } else {
-    BASE = ANALOGIX_DP1_REG_BASE;
-  }
-
-  MmioWrite32 (BASE + Offset, Value);
+  MmioWrite32 (Dp->Base + Offset, Value);
 }
 
 UINT32
@@ -45,17 +37,7 @@ AnalogixDpRegRead (
   IN  UINT32                    Offset
   )
 {
-  UINT32  Reg;
-  UINT32  BASE;
-
-  if (!Dp->Id) {
-    BASE = ANALOGIX_DP0_REG_BASE;
-  } else {
-    BASE = ANALOGIX_DP1_REG_BASE;
-  }
-
-  Reg = MmioRead32 (BASE + Offset);
-  return Reg;
+  return MmioRead32 (Dp->Base + Offset);
 }
 
 VOID
@@ -1326,11 +1308,7 @@ DumpDpRegisters (
   UINT32  Ret;
   UINT32  Shift;
 
-  if (!Dp->Id) {
-    Shift = ANALOGIX_DP0_REG_BASE;
-  } else {
-    Shift = ANALOGIX_DP1_REG_BASE;
-  }
+  Shift = Dp->Base;
 
   DEBUG ((DEBUG_WARN, "\n%.8x ", Shift));
   for (i = 0; i < 800; i++) {

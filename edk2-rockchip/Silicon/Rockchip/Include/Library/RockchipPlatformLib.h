@@ -1,7 +1,7 @@
 /** @file
 *
 *  Copyright (c) 2021, Rockchip Limited. All rights reserved.
-*  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
+*  Copyright (c) 2023-2025, Mario Bălănică <mariobalanica02@gmail.com>
 *
 *  SPDX-License-Identifier: BSD-2-Clause-Patent
 *
@@ -26,14 +26,9 @@ SdhciEmmcIoMux (
 
 VOID
 EFIAPI
-EnableBacklight (
-  IN BOOLEAN  en
-  );
-
-VOID
-EFIAPI
-EnablePWM (
-  IN BOOLEAN  en
+EdpEnableBacklight (
+  IN UINT32   Id,
+  IN BOOLEAN  Enable
   );
 
 VOID
@@ -115,6 +110,12 @@ EFIAPI
 PciePeReset (
   UINT32   Segment,
   BOOLEAN  Enable
+  );
+
+VOID
+EFIAPI
+HdmiTxIomux (
+  IN UINT32  Id
   );
 
 VOID

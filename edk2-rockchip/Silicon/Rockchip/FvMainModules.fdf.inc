@@ -118,7 +118,9 @@
   # Display Support
   #
   INF Silicon/Rockchip/Drivers/Vop2Dxe/Vop2Dxe.inf
-  # INF Silicon/Rockchip/Library/DisplayLib/AnalogixDpLib.inf
+!if $(RK_ANALOGIX_DP_ENABLE) == TRUE
+  INF Silicon/Rockchip/Library/DisplayLib/AnalogixDpLib.inf
+!endif
 !if $(RK_DW_HDMI_QP_ENABLE) == TRUE
   INF Silicon/Rockchip/Library/DisplayLib/DwHdmiQpLib.inf
 !endif

@@ -39,6 +39,7 @@
 #include "FanControl.h"
 #include "UsbDpPhy.h"
 #include "DebugSerialPort.h"
+#include "Display.h"
 
 extern UINT8  RK3588DxeHiiBin[];
 extern UINT8  RK3588DxeStrings[];
@@ -197,6 +198,7 @@ SetupVariables (
   SetupCoolingFanVariables ();
   SetupUsbDpPhyVariables ();
   SetupDebugSerialPortVariables ();
+  SetupDisplayVariables ();
 
   return EFI_SUCCESS;
 }
@@ -244,6 +246,7 @@ ApplyVariables (
   ApplyCoolingFanVariables ();
   ApplyUsbDpPhyVariables ();
   ApplyDebugSerialPortVariables ();
+  ApplyDisplayVariables ();
 
   InstallConfigAppliedProtocol ();
 

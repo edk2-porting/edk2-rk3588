@@ -91,9 +91,6 @@
   gRockchipTokenSpaceGuid.PcdNvStoragePreferSpiFlash|FALSE|BOOLEAN|0x21200009
 
   gRockchipTokenSpaceGuid.PcdLcdPixelFormat|0|UINT32|0x32000001
-  gRockchipTokenSpaceGuid.PcdEdpId|0|UINT32|0x32000003
-  gRockchipTokenSpaceGuid.PcdHdmiId|0|UINT32|0x32000004
-  gRockchipTokenSpaceGuid.PcdHdmiDDCI2CPinMux|0|UINT32|0x32000005
 
   gRockchipTokenSpaceGuid.PcdRkMtlMailBoxBase|0x0010f000|UINT64|0x00001000
   gRockchipTokenSpaceGuid.PcdRkMtlMailBoxSize|0x100|UINT32|0x00001001

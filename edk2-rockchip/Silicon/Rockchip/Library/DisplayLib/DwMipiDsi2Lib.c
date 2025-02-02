@@ -288,6 +288,7 @@ struct mipi_dphy_configure {
 struct dw_mipi_dsi2 {
 	UINT32 Signature;
 	ROCKCHIP_CONNECTOR_PROTOCOL connector;
+	UINT32 output_if;
 	UINTN base;
 	UINTN grf;
 	int id;
@@ -984,8 +985,7 @@ static int dw_mipi_dsi2_connector_init(ROCKCHIP_CONNECTOR_PROTOCOL *conn, DISPLA
 
 	conn_state->OutputMode = ROCKCHIP_OUT_MODE_P888;
 	conn_state->ColorSpace = V4L2_COLORSPACE_DEFAULT;
-	conn_state->OutputInterface |=
-		dsi2->id ? VOP_OUTPUT_IF_MIPI1 : VOP_OUTPUT_IF_MIPI0;
+	conn_state->OutputInterface |= dsi2->output_if;
 
 	if (!(dsi2->mode_flags & MIPI_DSI_MODE_VIDEO)) {
 		conn_state->OutputFlags |= ROCKCHIP_OUTPUT_MIPI_DS_MODE;
@@ -1538,12 +1538,14 @@ struct dw_mipi_dsi2 mRk3588MipiDsi[] = {
 		.base = 0xfde20000,
 		.grf = RK3588_VOP_GRF_BASE,
 		.id = 0,
+		.output_if = VOP_OUTPUT_IF_MIPI0,
 		.pdata = &rk3588_mipi_dsi2_plat_data,
 	},
 	{
 		.base = 0xfde30000,
 		.grf = RK3588_VOP_GRF_BASE,
 		.id = 1,
+		.output_if = VOP_OUTPUT_IF_MIPI1,
 		.pdata = &rk3588_mipi_dsi2_plat_data,
 	},
 };
@@ -1584,7 +1586,7 @@ DsiPanelRegistrationEventHandler (
 
 		for (Index = 0; Index < ARRAY_SIZE (mRk3588MipiDsi); Index++) {
 			dsi2 = &mRk3588MipiDsi[Index];
-			if (dsi2->id == DsiPanel->DsiId) {
+			if (dsi2->id == DsiPanel->DsiId && (PcdGet32 (PcdDisplayConnectorsMask) & dsi2->output_if)) {
 				dsi2->Signature = DW_MIPI_DSI2_SIGNATURE;
 				dsi2->dcphy.phy = rockchip_phy_by_id(dsi2->id);
 				dsi2->RockchipDsiPanel = DsiPanel;
