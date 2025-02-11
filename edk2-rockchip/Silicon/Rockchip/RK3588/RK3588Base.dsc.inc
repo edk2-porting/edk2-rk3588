@@ -2,7 +2,7 @@
 #
 #  Copyright (c) 2014-2018, Linaro Limited. All rights reserved.
 #  Copyright (c) 2021-2022, Rockchip Limited. All rights reserved.
-#  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
+#  Copyright (c) 2023-2025, Mario Bălănică <mariobalanica02@gmail.com>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -245,11 +245,6 @@
   gRockchipTokenSpaceGuid.PcdDwc3Size|0x400000
 
   #
-  # Display
-  #
-  gRockchipTokenSpaceGuid.PcdLcdPixelFormat|0x00000001
-
-  #
   # CPU Performance default values
   #
   gRK3588TokenSpaceGuid.PcdCPULClusterClockPresetDefault|$(CPU_PERF_CLUSTER_CLOCK_PRESET_MAX)
@@ -292,6 +287,22 @@
   # Display support flags and default values
   #
   gRK3588TokenSpaceGuid.PcdDisplayConnectors|{ 0x0 }
+  gRK3588TokenSpaceGuid.PcdDisplayModePresetDefault|{CODE({
+    DISPLAY_MODE_NATIVE
+  })}
+  gRK3588TokenSpaceGuid.PcdDisplayModeCustomDefault|{CODE({
+    .OscFreq     = 25175,
+    .HActive     = 640,
+    .HFrontPorch = 16,
+    .HSync       = 96,
+    .HBackPorch  = 48,
+    .HSyncActive = 0,
+    .VActive     = 480,
+    .VFrontPorch = 10,
+    .VSync       = 2,
+    .VBackPorch  = 33,
+    .VSyncActive = 0,
+  })}
 
 [PcdsPatchableInModule]
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|1500000
@@ -362,6 +373,8 @@
   # Display
   #
   gRK3588TokenSpaceGuid.PcdDisplayConnectorsMask|L"DisplayConnectorsMask"|gRK3588DxeFormSetGuid|0x0|0|BS
+  gRK3588TokenSpaceGuid.PcdDisplayModePreset|L"DisplayModePreset"|gRK3588DxeFormSetGuid|0x0|{ 0x0 }
+  gRK3588TokenSpaceGuid.PcdDisplayModeCustom|L"DisplayModeCustom"|gRK3588DxeFormSetGuid|0x0|{ 0x0 }
 
 ################################################################################
 #

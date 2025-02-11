@@ -1,7 +1,7 @@
 #
 #  Copyright (c) 2013 - 2014, ARM Ltd. All rights reserved.
 #  Copyright (c) 2018, Linaro Ltd. All rights reserved.
-#  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
+#  Copyright (c) 2023-2025, Mario Bălănică <mariobalanica02@gmail.com>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -58,6 +58,7 @@
 [Protocols]
   gEfiVariableWriteArchProtocolGuid               ## CONSUMES
   gEfiMemoryAttributeProtocolGuid                 ## CONSUMES
+  gEfiSimpleTextInputExProtocolGuid               ## CONSUMES
   gRk860xRegulatorProtocolGuid                    ## CONSUMES
   gRockchipPlatformConfigAppliedProtocolGuid      ## PRODUCES
 
@@ -122,6 +123,10 @@
 
   gRK3588TokenSpaceGuid.PcdDisplayConnectors
   gRK3588TokenSpaceGuid.PcdDisplayConnectorsMask
+  gRK3588TokenSpaceGuid.PcdDisplayModePresetDefault
+  gRK3588TokenSpaceGuid.PcdDisplayModePreset
+  gRK3588TokenSpaceGuid.PcdDisplayModeCustomDefault
+  gRK3588TokenSpaceGuid.PcdDisplayModeCustom
 
 [Guids]
   gRK3588DxeFormSetGuid

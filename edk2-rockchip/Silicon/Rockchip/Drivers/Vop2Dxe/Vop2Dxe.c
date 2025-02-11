@@ -2607,7 +2607,7 @@ Vop2Init (
     Mode->HDisplay,
     Mode->VDisplay,
     Mode->Flags & DRM_MODE_FLAG_INTERLACE ? "i" : "p",
-    Mode->VScan,
+    Mode->VRefresh,
     GetOutputIfName (ConnectorState->OutputInterface),
     CrtcState->CrtcID
     ));

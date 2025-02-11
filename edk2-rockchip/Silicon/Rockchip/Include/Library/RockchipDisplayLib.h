@@ -19,6 +19,12 @@
              &Pos->Member != (Head);                                    \
              Pos = BASE_CR(Pos->Member.ForwardLink, typeof(*Pos), Member))
 
+#define LIST_FOR_EACH_ENTRY_SAFE(Pos, Next, Head, Member)                                 \
+        for (Pos = BASE_CR((Head)->ForwardLink, typeof(*Pos), Member),                    \
+             Next = BASE_CR(Pos->Member.ForwardLink, typeof(*Pos), Member);               \
+             &Pos->Member != (Head);                                                      \
+             Pos = Next, Next = BASE_CR(Next->Member.ForwardLink, typeof(*Next), Member))
+
 #define __ROUND_MASK(x, y)  ((__typeof__(x))((y)-1))
 #define ROUNDUP(x, y)       ((((x)-1) | __ROUND_MASK(x, y))+1)
 #define ROUNDDOWN(x, y)     ((x) & ~__ROUND_MASK(x, y))
@@ -161,18 +167,23 @@ typedef struct {
 } BASE2_DISP_INFO;
 
 typedef struct {
-  VOID                *Connector;
-  OVER_SCAN           OverScan;
-  DRM_DISPLAY_MODE    DisplayMode;
-  BASE2_DISP_INFO     *DispInfo;         /* disp_info from baseparameter 2.0 */
-  UINT8               EDID[EDID_SIZE * 4];
-  UINT32              BusFormat;
-  UINT32              OutputMode;
-  UINT32              Type;
-  UINT32              OutputInterface;
-  UINT32              OutputFlags;
-  UINT32              ColorSpace;
-  UINT32              BPC;
+  DISPLAY_MODE    PreferredMode;
+} DISPLAY_SINK_INFO;
+
+typedef struct {
+  VOID                 *Connector;
+  OVER_SCAN            OverScan;
+  DRM_DISPLAY_MODE     DisplayMode;
+  UINT32               DisplayModeVic;
+  BASE2_DISP_INFO      *DispInfo;        /* disp_info from baseparameter 2.0 */
+  UINT8                EDID[EDID_SIZE * 4];
+  UINT32               BusFormat;
+  UINT32               OutputMode;
+  UINT32               Type;
+  UINT32               OutputInterface;
+  UINT32               OutputFlags;
+  UINT32               ColorSpace;
+  UINT32               BPC;
 
   /**
    * @hold_mode: enabled when it's:
@@ -180,7 +191,9 @@ typedef struct {
    * (2) mipi dsi cmd mode
    * (3) edp psr mode
    */
-  BOOLEAN             hold_mode;
+  BOOLEAN              hold_mode;
+
+  DISPLAY_SINK_INFO    SinkInfo;
 } CONNECTOR_STATE;
 
 typedef struct {
@@ -223,11 +236,7 @@ typedef struct {
   CRTC_STATE         CrtcState;
   CONNECTOR_STATE    ConnectorState;
 
-  UINT32             ModeNumber;
   INT32              VpsConfigModeID;
-
-  VOID               *MemoryBase;
-  UINT32             MemorySize;
 
   BOOLEAN            IsInit;
   BOOLEAN            IsEnable;
@@ -235,25 +244,6 @@ typedef struct {
   BOOLEAN            IsForceOutput;
   UINT32             ForceOutputFormat;
 } DISPLAY_STATE;
-
-typedef struct {
-  UINT32    Resolution;
-  UINT32    Sync;
-  UINT32    BackPorch;
-  UINT32    FrontPorch;
-} SCAN_TIMINGS;
-
-typedef struct {
-  UINT32          CrtcId;
-  UINT32          OscFreq;
-  SCAN_TIMINGS    Horizontal;
-  SCAN_TIMINGS    Vertical;
-  UINT32          HsyncActive;
-  UINT32          VsyncActive;
-  UINT32          DenActive;
-  UINT32          ClkActive;
-  UINT32          VpsConfigModeID;
-} DISPLAY_MODE;
 
 EFIAPI
 EFI_STATUS
@@ -266,6 +256,12 @@ UINT32
 EFIAPI
 DrmModeVRefresh (
   DRM_DISPLAY_MODE  *Mode
+  );
+
+VOID
+DisplayModeToDrm (
+  IN  CONST DISPLAY_MODE  *DisplayMode,
+  OUT DRM_DISPLAY_MODE    *DrmDisplayMode
   );
 
 #endif

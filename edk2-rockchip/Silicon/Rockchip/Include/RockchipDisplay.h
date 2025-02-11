@@ -24,4 +24,33 @@
 #define VOP_OUTPUT_IF_HDMI1   0x00001000
 #define VOP_OUTPUT_IF_NUMS    13
 
+#define VOP_PIXEL_CLOCK_MIN  25175
+#define VOP_PIXEL_CLOCK_MAX  600000
+
+#define VOP_HORIZONTAL_RES_MIN  640
+#define VOP_HORIZONTAL_RES_MAX  4096
+#define VOP_VERTICAL_RES_MIN    480
+#define VOP_VERTICAL_RES_MAX    4320
+
+#pragma pack (1)
+
+typedef struct {
+  UINT32    Vic;
+  UINT32    OscFreq;
+  UINT32    HActive;
+  UINT32    HFrontPorch;
+  UINT32    HSync;
+  UINT32    HBackPorch;
+  UINT32    HSyncActive;
+  UINT32    VActive;
+  UINT32    VFrontPorch;
+  UINT32    VSync;
+  UINT32    VBackPorch;
+  UINT32    VSyncActive;
+  UINT32    DenActive;
+  UINT32    ClkActive;
+} DISPLAY_MODE;
+
+#pragma pack ()
+
 #endif

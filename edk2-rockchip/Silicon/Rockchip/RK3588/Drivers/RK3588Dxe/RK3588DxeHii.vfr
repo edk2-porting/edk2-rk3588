@@ -2,7 +2,7 @@
  *
  *  Copyright (c) 2018 Andrei Warkentin <andrey.warkentin@gmail.com>
  *  Copyright (c) 2020, ARM Limited. All rights reserved.
- *  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
+ *  Copyright (c) 2023-2025, Mario Bălănică <mariobalanica02@gmail.com>
  *
  *  SPDX-License-Identifier: BSD-2-Clause-Patent
  *
@@ -17,6 +17,7 @@
 #include "CpuPerformance.h"
 #include "FanControl.h"
 #include "DebugSerialPort.h"
+#include "Display.h"
 
 //
 // EFI Variable attributes
@@ -31,6 +32,31 @@ formset
     title     = STRING_TOKEN(STR_FORM_SET_TITLE),
     help      = STRING_TOKEN(STR_FORM_SET_TITLE_HELP),
     classguid = EFI_HII_PLATFORM_SETUP_FORMSET_GUID,
+
+    efivarstore UINT32,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS,
+      name  = DisplayConnectorsMask,
+      guid  = RK3588DXE_FORMSET_GUID;
+
+    efivarstore DISPLAY_MODE_PRESET_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS,
+      name  = DisplayModePresetDefault,
+      guid  = RK3588DXE_FORMSET_GUID;
+
+    efivarstore DISPLAY_MODE_PRESET_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = DisplayModePreset,
+      guid  = RK3588DXE_FORMSET_GUID;
+
+    efivarstore DISPLAY_MODE,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS,
+      name  = DisplayModeCustomDefault,
+      guid  = RK3588DXE_FORMSET_GUID;
+
+    efivarstore DISPLAY_MODE,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = DisplayModeCustom,
+      guid  = RK3588DXE_FORMSET_GUID;
 
     efivarstore CPU_PERF_CLUSTER_CLOCK_PRESET_VARSTORE_DATA,
       attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
@@ -183,42 +209,190 @@ formset
 
       subtitle text = STRING_TOKEN(STR_NULL_STRING);
 
+    suppressif ideqval DisplayConnectorsMask == 0;
       goto 0x1000,
+        prompt = STRING_TOKEN(STR_DISPLAY_FORM_TITLE),
+        help = STRING_TOKEN(STR_DISPLAY_FORM_HELP);
+    endif;
+
+      goto 0x1001,
         prompt = STRING_TOKEN(STR_CPU_PERF_FORM_TITLE),
         help = STRING_TOKEN(STR_CPU_PERF_FORM_HELP);
 
-      goto 0x1001,
+      goto 0x1002,
         prompt = STRING_TOKEN(STR_COMBO_PHY_FORM_TITLE),
         help = STRING_TOKEN(STR_COMBO_PHY_FORM_HELP);
 
 #if FixedPcdGetBool (PcdUsbDpPhy0Supported) || FixedPcdGetBool (PcdUsbDpPhy1Supported)
-      goto 0x1002,
+      goto 0x1003,
         prompt = STRING_TOKEN(STR_USBDP_PHY_FORM_TITLE),
         help = STRING_TOKEN(STR_USBDP_PHY_FORM_HELP);
 #endif
 
 #if FixedPcdGetBool (PcdPcie30Supported)
-      goto 0x1003,
+      goto 0x1004,
         prompt = STRING_TOKEN(STR_PCIE30_FORM_TITLE),
         help = STRING_TOKEN(STR_PCIE30_FORM_HELP);
 #endif
 
-      goto 0x1004,
+      goto 0x1005,
         prompt = STRING_TOKEN(STR_CONFIG_TABLE_FORM_TITLE),
         help = STRING_TOKEN(STR_CONFIG_TABLE_FORM_HELP);
 
 #if FixedPcdGetBool (PcdHasOnBoardFanOutput)
-      goto 0x1005,
+      goto 0x1006,
         prompt = STRING_TOKEN(STR_COOLING_FAN_FORM_TITLE),
         help = STRING_TOKEN(STR_COOLING_FAN_FORM_HELP);
 #endif
 
-      goto 0x1006,
+      goto 0x1007,
         prompt = STRING_TOKEN(STR_DEBUG_SERIAL_PORT_FORM_TITLE),
         help = STRING_TOKEN(STR_DEBUG_SERIAL_PORT_FORM_HELP);
     endform;
 
     form formid = 0x1000,
+        title  = STRING_TOKEN(STR_DISPLAY_FORM_TITLE);
+        subtitle text = STRING_TOKEN(STR_DISPLAY_FORM_SUBTITLE);
+
+        subtitle text = STRING_TOKEN(STR_NULL_STRING);
+
+        oneof varid = DisplayModePreset.Preset,
+          prompt        = STRING_TOKEN(STR_DISPLAY_MODE_PRESET_PROMPT),
+          help          = STRING_TOKEN(STR_DISPLAY_MODE_PRESET_HELP),
+          flags         = NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+          default value = get(DisplayModePresetDefault.Preset),
+          option text   = STRING_TOKEN(STR_DISPLAY_MODE_NATIVE), value = DISPLAY_MODE_NATIVE, flags = 0;
+          option text   = STRING_TOKEN(STR_DISPLAY_MODE_CUSTOM), value = DISPLAY_MODE_CUSTOM, flags = 0;
+          option text   = STRING_TOKEN(STR_DISPLAY_MODE_640_480_60), value = DISPLAY_MODE_640_480_60, flags = 0;
+          option text   = STRING_TOKEN(STR_DISPLAY_MODE_800_600_60), value = DISPLAY_MODE_800_600_60, flags = 0;
+          option text   = STRING_TOKEN(STR_DISPLAY_MODE_1024_768_60), value = DISPLAY_MODE_1024_768_60, flags = 0;
+          option text   = STRING_TOKEN(STR_DISPLAY_MODE_1152_864_60), value = DISPLAY_MODE_1152_864_60, flags = 0;
+          option text   = STRING_TOKEN(STR_DISPLAY_MODE_1280_720_60), value = DISPLAY_MODE_1280_720_60, flags = 0;
+          option text   = STRING_TOKEN(STR_DISPLAY_MODE_1280_768_60), value = DISPLAY_MODE_1280_768_60, flags = 0;
+          option text   = STRING_TOKEN(STR_DISPLAY_MODE_1280_800_60), value = DISPLAY_MODE_1280_800_60, flags = 0;
+          option text   = STRING_TOKEN(STR_DISPLAY_MODE_1280_960_60), value = DISPLAY_MODE_1280_960_60, flags = 0;
+          option text   = STRING_TOKEN(STR_DISPLAY_MODE_1280_1024_60), value = DISPLAY_MODE_1280_1024_60, flags = 0;
+          option text   = STRING_TOKEN(STR_DISPLAY_MODE_1360_768_60), value = DISPLAY_MODE_1360_768_60, flags = 0;
+          option text   = STRING_TOKEN(STR_DISPLAY_MODE_1400_1050_60), value = DISPLAY_MODE_1400_1050_60, flags = 0;
+          option text   = STRING_TOKEN(STR_DISPLAY_MODE_1440_900_60), value = DISPLAY_MODE_1440_900_60, flags = 0;
+          option text   = STRING_TOKEN(STR_DISPLAY_MODE_1600_900_60), value = DISPLAY_MODE_1600_900_60, flags = 0;
+          option text   = STRING_TOKEN(STR_DISPLAY_MODE_1600_1200_60), value = DISPLAY_MODE_1600_1200_60, flags = 0;
+          option text   = STRING_TOKEN(STR_DISPLAY_MODE_1680_1050_60), value = DISPLAY_MODE_1680_1050_60, flags = 0;
+          option text   = STRING_TOKEN(STR_DISPLAY_MODE_1920_1080_60), value = DISPLAY_MODE_1920_1080_60, flags = 0;
+          option text   = STRING_TOKEN(STR_DISPLAY_MODE_1920_1200_60), value = DISPLAY_MODE_1920_1200_60, flags = 0;
+          option text   = STRING_TOKEN(STR_DISPLAY_MODE_2048_1152_60), value = DISPLAY_MODE_2048_1152_60, flags = 0;
+          option text   = STRING_TOKEN(STR_DISPLAY_MODE_2560_1080_60), value = DISPLAY_MODE_2560_1080_60, flags = 0;
+          option text   = STRING_TOKEN(STR_DISPLAY_MODE_2560_1440_60), value = DISPLAY_MODE_2560_1440_60, flags = 0;
+          option text   = STRING_TOKEN(STR_DISPLAY_MODE_2560_1600_60), value = DISPLAY_MODE_2560_1600_60, flags = 0;
+          option text   = STRING_TOKEN(STR_DISPLAY_MODE_3440_1440_60), value = DISPLAY_MODE_3440_1440_60, flags = 0;
+          option text   = STRING_TOKEN(STR_DISPLAY_MODE_3840_2160_30), value = DISPLAY_MODE_3840_2160_30, flags = 0;
+          option text   = STRING_TOKEN(STR_DISPLAY_MODE_3840_2160_60), value = DISPLAY_MODE_3840_2160_60, flags = 0;
+          option text   = STRING_TOKEN(STR_DISPLAY_MODE_4096_2160_30), value = DISPLAY_MODE_4096_2160_30, flags = 0;
+          option text   = STRING_TOKEN(STR_DISPLAY_MODE_4096_2160_60), value = DISPLAY_MODE_4096_2160_60, flags = 0;
+        endoneof;
+
+        suppressif (get(DisplayModePreset.Preset) != DISPLAY_MODE_CUSTOM);
+          numeric varid = DisplayModeCustom.OscFreq,
+            prompt        = STRING_TOKEN(STR_DISPLAY_MODE_CUSTOM_PIXEL_CLOCK),
+            help          = STRING_TOKEN(STR_NULL_STRING),
+            flags         = DISPLAY_UINT_DEC | NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+            minimum       = VOP_PIXEL_CLOCK_MIN,
+            maximum       = VOP_PIXEL_CLOCK_MAX,
+            step          = 0,
+            default value = get(DisplayModeCustomDefault.OscFreq),
+          endnumeric;
+          numeric varid = DisplayModeCustom.HActive,
+            prompt        = STRING_TOKEN(STR_DISPLAY_MODE_CUSTOM_HORIZONTAL_ACTIVE),
+            help          = STRING_TOKEN(STR_NULL_STRING),
+            flags         = DISPLAY_UINT_DEC | NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+            minimum       = VOP_HORIZONTAL_RES_MIN,
+            maximum       = VOP_HORIZONTAL_RES_MAX,
+            step          = 0,
+            default value = get(DisplayModeCustomDefault.HActive),
+          endnumeric;
+          numeric varid = DisplayModeCustom.HFrontPorch,
+            prompt        = STRING_TOKEN(STR_DISPLAY_MODE_CUSTOM_HORIZONTAL_FRONT_PORCH),
+            help          = STRING_TOKEN(STR_NULL_STRING),
+            flags         = DISPLAY_UINT_DEC | NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+            minimum       = VOP_HORIZONTAL_RES_MIN,
+            maximum       = VOP_HORIZONTAL_RES_MAX,
+            step          = 0,
+            default value = get(DisplayModeCustomDefault.HFrontPorch),
+          endnumeric;
+          numeric varid = DisplayModeCustom.HSync,
+            prompt        = STRING_TOKEN(STR_DISPLAY_MODE_CUSTOM_HORIZONTAL_SYNC_WIDTH),
+            help          = STRING_TOKEN(STR_NULL_STRING),
+            flags         = DISPLAY_UINT_DEC | NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+            minimum       = VOP_HORIZONTAL_RES_MIN,
+            maximum       = VOP_HORIZONTAL_RES_MAX,
+            step          = 0,
+            default value = get(DisplayModeCustomDefault.HSync),
+          endnumeric;
+          numeric varid = DisplayModeCustom.HBackPorch,
+            prompt        = STRING_TOKEN(STR_DISPLAY_MODE_CUSTOM_HORIZONTAL_BACK_PORCH),
+            help          = STRING_TOKEN(STR_NULL_STRING),
+            flags         = DISPLAY_UINT_DEC | NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+            minimum       = VOP_HORIZONTAL_RES_MIN,
+            maximum       = VOP_HORIZONTAL_RES_MAX,
+            step          = 0,
+            default value = get(DisplayModeCustomDefault.HBackPorch),
+          endnumeric;
+          oneof varid = DisplayModeCustom.HSyncActive,
+            prompt        = STRING_TOKEN(STR_DISPLAY_MODE_CUSTOM_HORIZONTAL_SYNC_POLARITY),
+            help          = STRING_TOKEN(STR_NULL_STRING),
+            flags         = NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+            default value = get(DisplayModeCustomDefault.HSyncActive),
+            option text   = STRING_TOKEN(STR_MINUS_SIGN), value = 0, flags = 0;
+            option text   = STRING_TOKEN(STR_PLUS_SIGN), value = 1, flags = 0;
+          endoneof;
+          numeric varid = DisplayModeCustom.VActive,
+            prompt        = STRING_TOKEN(STR_DISPLAY_MODE_CUSTOM_VERTICAL_ACTIVE),
+            help          = STRING_TOKEN(STR_NULL_STRING),
+            flags         = DISPLAY_UINT_DEC | NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+            minimum       = VOP_VERTICAL_RES_MIN,
+            maximum       = VOP_VERTICAL_RES_MAX,
+            step          = 0,
+            default value = get(DisplayModeCustomDefault.VActive),
+          endnumeric;
+          numeric varid = DisplayModeCustom.VFrontPorch,
+            prompt        = STRING_TOKEN(STR_DISPLAY_MODE_CUSTOM_VERTICAL_FRONT_PORCH),
+            help          = STRING_TOKEN(STR_NULL_STRING),
+            flags         = DISPLAY_UINT_DEC | NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+            minimum       = VOP_VERTICAL_RES_MIN,
+            maximum       = VOP_VERTICAL_RES_MAX,
+            step          = 0,
+            default value = get(DisplayModeCustomDefault.VFrontPorch),
+          endnumeric;
+          numeric varid = DisplayModeCustom.VSync,
+            prompt        = STRING_TOKEN(STR_DISPLAY_MODE_CUSTOM_VERTICAL_SYNC_WIDTH),
+            help          = STRING_TOKEN(STR_NULL_STRING),
+            flags         = DISPLAY_UINT_DEC | NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+            minimum       = VOP_VERTICAL_RES_MIN,
+            maximum       = VOP_VERTICAL_RES_MAX,
+            step          = 0,
+            default value = get(DisplayModeCustomDefault.VSync),
+          endnumeric;
+          numeric varid = DisplayModeCustom.VBackPorch,
+            prompt        = STRING_TOKEN(STR_DISPLAY_MODE_CUSTOM_VERTICAL_BACK_PORCH),
+            help          = STRING_TOKEN(STR_NULL_STRING),
+            flags         = DISPLAY_UINT_DEC | NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+            minimum       = VOP_VERTICAL_RES_MIN,
+            maximum       = VOP_VERTICAL_RES_MAX,
+            step          = 0,
+            default value = get(DisplayModeCustomDefault.VBackPorch),
+          endnumeric;
+          oneof varid = DisplayModeCustom.VSyncActive,
+            prompt        = STRING_TOKEN(STR_DISPLAY_MODE_CUSTOM_VERTICAL_SYNC_POLARITY),
+            help          = STRING_TOKEN(STR_NULL_STRING),
+            flags         = NUMERIC_SIZE_4 | INTERACTIVE | RESET_REQUIRED,
+            default value = get(DisplayModeCustomDefault.VSyncActive),
+            option text   = STRING_TOKEN(STR_MINUS_SIGN), value = 0, flags = 0;
+            option text   = STRING_TOKEN(STR_PLUS_SIGN), value = 1, flags = 0;
+          endoneof;
+        endif;
+    endform;
+
+    form formid = 0x1001,
         title  = STRING_TOKEN(STR_CPU_PERF_FORM_TITLE);
         subtitle text = STRING_TOKEN(STR_CPU_PERF_CLUSTER_CLOCKS_SUBTITLE);
 
@@ -382,7 +556,7 @@ formset
         subtitle text = STRING_TOKEN(STR_CPU_PERF_FORM_SUBTITLE);
     endform;
 
-    form formid = 0x1001,
+    form formid = 0x1002,
         title  = STRING_TOKEN(STR_COMBO_PHY_FORM_TITLE);
 
         grayoutif FixedPcdGetBool (PcdComboPhy0Switchable) == 0;
@@ -450,7 +624,7 @@ formset
         subtitle text = STRING_TOKEN(STR_COMBO_PHY_FORM_SUBTITLE);
     endform;
 
-    form formid = 0x1002,
+    form formid = 0x1003,
         title  = STRING_TOKEN(STR_USBDP_PHY_FORM_TITLE);
 
 #if FixedPcdGetBool (PcdUsbDpPhy0Supported)
@@ -477,7 +651,7 @@ formset
     endform;
 
 #if FixedPcdGetBool (PcdPcie30Supported)
-    form formid = 0x1003,
+    form formid = 0x1004,
         title  = STRING_TOKEN(STR_PCIE30_FORM_TITLE);
 
         oneof varid = Pcie30State.State,
@@ -505,7 +679,7 @@ formset
     endform;
 #endif
 
-    form formid = 0x1004,
+    form formid = 0x1005,
         title  = STRING_TOKEN(STR_CONFIG_TABLE_FORM_TITLE);
 
         oneof varid = ConfigTableMode.Mode,
@@ -577,7 +751,7 @@ formset
     endform;
 
 #if FixedPcdGetBool (PcdHasOnBoardFanOutput)
-    form formid = 0x1005,
+    form formid = 0x1006,
         title  = STRING_TOKEN(STR_COOLING_FAN_FORM_TITLE);
 
         oneof varid = CoolingFanState.State,
@@ -603,7 +777,7 @@ formset
     endform;
 #endif
 
-    form formid = 0x1006,
+    form formid = 0x1007,
         title  = STRING_TOKEN(STR_DEBUG_SERIAL_PORT_FORM_TITLE);
 
         numeric varid = DebugSerialPortBaudRate.Value,

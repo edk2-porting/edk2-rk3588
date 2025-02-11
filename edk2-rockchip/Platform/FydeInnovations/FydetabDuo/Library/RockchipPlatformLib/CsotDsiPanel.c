@@ -1,6 +1,6 @@
 /** @file
  *
- *  Copyright (c) 2024, Mario Bălănică <mariobalanica02@gmail.com>
+ *  Copyright (c) 2024-2025, Mario Bălănică <mariobalanica02@gmail.com>
  *
  *  SPDX-License-Identifier: BSD-2-Clause-Patent
  *
@@ -130,25 +130,17 @@ STATIC ROCKCHIP_DSI_PANEL_PROTOCOL  mCsotDsiPanel = {
   .InitSequenceLength = ARRAY_SIZE (mCsotDsiInitSequence),
 
   .NativeMode         = {
-    .CrtcId     = 2,
-    .OscFreq    = 275000000,
-    .Horizontal = {
-      .Resolution = 1600,
-      .Sync       = 20,
-      .BackPorch  = 40,
-      .FrontPorch = 60
-    },
-    .Vertical         = {
-      .Resolution = 2560,
-      .Sync       = 4,
-      .BackPorch  = 18,
-      .FrontPorch = 112
-    },
-    .HsyncActive     = 0,
-    .VsyncActive     = 0,
-    .DenActive       = 0,
-    .ClkActive       = 0,
-    .VpsConfigModeID = 1
+    .OscFreq     = 275000,
+    .HActive     = 1600,
+    .HFrontPorch = 60,
+    .HSync       = 20,
+    .HBackPorch  = 40,
+    .HSyncActive = 0,
+    .VActive     = 2560,
+    .VFrontPorch = 112,
+    .VSync       = 4,
+    .VBackPorch  = 18,
+    .VSyncActive = 0,
   },
 
   .Prepare            = CsotDsiPanelPrepare,

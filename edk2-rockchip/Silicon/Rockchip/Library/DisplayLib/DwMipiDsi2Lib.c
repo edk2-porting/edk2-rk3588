@@ -1407,6 +1407,22 @@ DwMipiDsi2ConnectorInit (
 }
 
 EFI_STATUS
+DwMipiDsi2ConnectorGetTiming (
+	OUT ROCKCHIP_CONNECTOR_PROTOCOL          *This,
+	OUT DISPLAY_STATE                        *DisplayState
+	)
+{
+	struct dw_mipi_dsi2 *dsi2 = DW_MIPI_DSI2_FROM_CONNECTOR_PROTOCOL(This);
+	CONNECTOR_STATE *ConnectorState = &DisplayState->ConnectorState;
+
+	CopyMem(&ConnectorState->SinkInfo.PreferredMode,
+		&dsi2->RockchipDsiPanel->NativeMode,
+		sizeof (ConnectorState->SinkInfo.PreferredMode));
+
+	return EFI_SUCCESS;
+}
+
+EFI_STATUS
 DwMipiDsi2ConnectorEnable (
 	OUT ROCKCHIP_CONNECTOR_PROTOCOL          *This,
 	OUT DISPLAY_STATE                        *DisplayState
@@ -1445,7 +1461,7 @@ ROCKCHIP_CONNECTOR_PROTOCOL mDwMipiDsi2ConnectorOps = {
   DwMipiDsi2ConnectorInit,
   NULL,
   NULL,
-  NULL,
+  DwMipiDsi2ConnectorGetTiming,
   NULL,
   NULL,
   DwMipiDsi2ConnectorEnable,

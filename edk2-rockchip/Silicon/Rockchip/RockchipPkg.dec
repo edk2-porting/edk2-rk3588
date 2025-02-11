@@ -1,7 +1,7 @@
 ## @file
 #
 #  Copyright (c) 2021-2022, Rockchip Limited. All rights reserved.
-#  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
+#  Copyright (c) 2023-2025, Mario Bălănică <mariobalanica02@gmail.com>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -89,8 +89,6 @@
   gRockchipTokenSpaceGuid.CruBaseAddr|0|UINT64|0x21200008
 
   gRockchipTokenSpaceGuid.PcdNvStoragePreferSpiFlash|FALSE|BOOLEAN|0x21200009
-
-  gRockchipTokenSpaceGuid.PcdLcdPixelFormat|0|UINT32|0x32000001
 
   gRockchipTokenSpaceGuid.PcdRkMtlMailBoxBase|0x0010f000|UINT64|0x00001000
   gRockchipTokenSpaceGuid.PcdRkMtlMailBoxSize|0x100|UINT32|0x00001001

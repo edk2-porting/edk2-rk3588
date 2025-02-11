@@ -2,6 +2,7 @@
 
   Copyright (c) 2011-2018, ARM Ltd. All rights reserved.<BR>
   Copyright (c) 2022 Rockchip Electronics Co. Ltd.
+  Copyright (c) 2023-2025, Mario Bălănică <mariobalanica02@gmail.com>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -21,6 +22,8 @@
 #include <Protocol/DevicePath.h>
 #include <Protocol/RockchipCrtcProtocol.h>
 #include <Protocol/RockchipConnectorProtocol.h>
+
+#include <VarStoreData.h>
 
 /** The enumeration maps the PL111 LcdBpp values used in the LCD Control
   Register
@@ -52,22 +55,13 @@ typedef struct {
   EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE       Mode;
   EFI_GRAPHICS_OUTPUT_PROTOCOL            Gop;
   LCD_GRAPHICS_DEVICE_PATH                DevicePath;
-  EFI_EVENT                               ExitBootServicesEvent;
+  LIST_ENTRY                              DisplayStateList;
+  DISPLAY_MODE                            *DisplayModes;
 } LCD_INSTANCE;
 
 #define LCD_INSTANCE_SIGNATURE  SIGNATURE_32('l', 'c', 'd', '0')
 
 #define LCD_INSTANCE_FROM_GOP_THIS(a)  CR (a, LCD_INSTANCE, Gop, LCD_INSTANCE_SIGNATURE)
-
-//
-// Function Prototypes
-//
-
-VOID
-LcdGraphicsExitBootServicesEvent (
-  IN EFI_EVENT  Event,
-  IN VOID       *Context
-  );
 
 EFI_STATUS
 EFIAPI
@@ -112,11 +106,14 @@ GetBytesPerPixel (
   IN  LCD_BPP  Bpp
   );
 
-EFI_STATUS
-EFIAPI
-GraphicsOutputDxeInitialize (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
+UINT32
+GetPredefinedDisplayModesCount (
+  VOID
+  );
+
+CONST DISPLAY_MODE *
+GetPredefinedDisplayMode (
+  IN UINT32  Index
   );
 
 #endif /* LCD_GRAPHICS_OUTPUT_DXE_H_ */

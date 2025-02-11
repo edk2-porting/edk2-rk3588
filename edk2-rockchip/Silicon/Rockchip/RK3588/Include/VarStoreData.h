@@ -1,6 +1,6 @@
 /** @file
  *
- *  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
+ *  Copyright (c) 2023-2025, Mario Bălănică <mariobalanica02@gmail.com>
  *
  *  SPDX-License-Identifier: BSD-2-Clause-Patent
  *
@@ -8,6 +8,10 @@
 
 #ifndef __VARSTORE_DATA_H__
 #define __VARSTORE_DATA_H__
+
+#include <RockchipDisplay.h>
+
+#pragma pack (1)
 
 #define CPU_PERF_CLUSTER_CLOCK_PRESET_BOOTDEFAULT  0
 #define CPU_PERF_CLUSTER_CLOCK_PRESET_MIN          1
@@ -104,5 +108,42 @@ typedef struct {
 typedef struct {
   UINT64    Value;
 } DEBUG_SERIAL_PORT_BAUD_RATE_VARSTORE_DATA;
+
+#define DISPLAY_MODE_NATIVE  0x80000000
+#define DISPLAY_MODE_CUSTOM  0x80000001
+//
+// Keep in sync with LcdGraphicsOutputDxe/DisplayModes.c table.
+//
+#define DISPLAY_MODE_640_480_60    0
+#define DISPLAY_MODE_800_600_60    1
+#define DISPLAY_MODE_1024_768_60   2
+#define DISPLAY_MODE_1152_864_60   3
+#define DISPLAY_MODE_1280_720_60   4
+#define DISPLAY_MODE_1280_768_60   5
+#define DISPLAY_MODE_1280_800_60   6
+#define DISPLAY_MODE_1280_960_60   7
+#define DISPLAY_MODE_1280_1024_60  8
+#define DISPLAY_MODE_1360_768_60   9
+#define DISPLAY_MODE_1400_1050_60  10
+#define DISPLAY_MODE_1440_900_60   11
+#define DISPLAY_MODE_1600_900_60   12
+#define DISPLAY_MODE_1600_1200_60  13
+#define DISPLAY_MODE_1680_1050_60  14
+#define DISPLAY_MODE_1920_1080_60  15
+#define DISPLAY_MODE_1920_1200_60  16
+#define DISPLAY_MODE_2048_1152_60  17
+#define DISPLAY_MODE_2560_1080_60  18
+#define DISPLAY_MODE_2560_1440_60  19
+#define DISPLAY_MODE_2560_1600_60  20
+#define DISPLAY_MODE_3440_1440_60  21
+#define DISPLAY_MODE_3840_2160_30  22
+#define DISPLAY_MODE_3840_2160_60  23
+#define DISPLAY_MODE_4096_2160_30  24
+#define DISPLAY_MODE_4096_2160_60  25
+typedef struct {
+  UINT32    Preset;
+} DISPLAY_MODE_PRESET_VARSTORE_DATA;
+
+#pragma pack ()
 
 #endif // __VARSTORE_DATA_H__

@@ -113,3 +113,30 @@ DrmModeVRefresh (
 
   return Refresh;
 }
+
+VOID
+DisplayModeToDrm (
+  IN  CONST DISPLAY_MODE  *DisplayMode,
+  OUT DRM_DISPLAY_MODE    *DrmDisplayMode
+  )
+{
+  if ((DisplayMode == NULL) || (DrmDisplayMode == NULL)) {
+    ASSERT (FALSE);
+    return;
+  }
+
+  DrmDisplayMode->Flags |= DisplayMode->HSyncActive ? DRM_MODE_FLAG_PHSYNC : DRM_MODE_FLAG_NHSYNC;
+  DrmDisplayMode->Flags |= DisplayMode->VSyncActive ? DRM_MODE_FLAG_PVSYNC : DRM_MODE_FLAG_NVSYNC;
+  DrmDisplayMode->Flags |= DisplayMode->ClkActive ? DRM_MODE_FLAG_PPIXDATA : 0;
+
+  DrmDisplayMode->Clock      = DisplayMode->OscFreq;
+  DrmDisplayMode->HDisplay   = DisplayMode->HActive;
+  DrmDisplayMode->HSyncStart = DrmDisplayMode->HDisplay + DisplayMode->HFrontPorch;
+  DrmDisplayMode->HSyncEnd   = DrmDisplayMode->HSyncStart + DisplayMode->HSync;
+  DrmDisplayMode->HTotal     = DrmDisplayMode->HSyncEnd + DisplayMode->HBackPorch;
+  DrmDisplayMode->VDisplay   = DisplayMode->VActive;
+  DrmDisplayMode->VSyncStart = DrmDisplayMode->VDisplay + DisplayMode->VFrontPorch;
+  DrmDisplayMode->VSyncEnd   = DrmDisplayMode->VSyncStart + DisplayMode->VSync;
+  DrmDisplayMode->VTotal     = DrmDisplayMode->VSyncEnd + DisplayMode->VBackPorch;
+  DrmDisplayMode->VRefresh   = DrmModeVRefresh (DrmDisplayMode);
+}

@@ -1,6 +1,6 @@
 /** @file
  *
- *  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
+ *  Copyright (c) 2023-2025, Mario Bălănică <mariobalanica02@gmail.com>
  *
  *  SPDX-License-Identifier: BSD-2-Clause-Patent
  *
@@ -19,6 +19,58 @@
  */
 #string STR_DISABLED                                       #language en-US "Disabled"
 #string STR_ENABLED                                        #language en-US "Enabled"
+#string STR_PLUS_SIGN                                      #language en-US "+"
+#string STR_MINUS_SIGN                                     #language en-US "-"
+
+/*
+ * Display configuration
+ */
+#string STR_DISPLAY_FORM_TITLE                             #language en-US "Display"
+#string STR_DISPLAY_FORM_HELP                              #language en-US "Configure the display output."
+#string STR_DISPLAY_FORM_SUBTITLE                          #language en-US "Note: Press LCtrl+LShift+F6 at any time to reboot with default display settings."
+
+#string STR_DISPLAY_MODE_PRESET_PROMPT                     #language en-US "Preferred Mode"
+#string STR_DISPLAY_MODE_PRESET_HELP                       #language en-US "Choose the preferred display mode."
+#string STR_DISPLAY_MODE_NATIVE                            #language en-US "Native"
+#string STR_DISPLAY_MODE_CUSTOM                            #language en-US "Custom"
+#string STR_DISPLAY_MODE_640_480_60                        #language en-US "640 x 480 @ 60 Hz"
+#string STR_DISPLAY_MODE_800_600_60                        #language en-US "800 x 600 @ 60 Hz"
+#string STR_DISPLAY_MODE_1024_768_60                       #language en-US "1024 x 768 @ 60 Hz"
+#string STR_DISPLAY_MODE_1152_864_60                       #language en-US "1152 x 864 @ 60 Hz"
+#string STR_DISPLAY_MODE_1280_720_60                       #language en-US "1280 x 720 @ 60 Hz"
+#string STR_DISPLAY_MODE_1280_768_60                       #language en-US "1280 x 768 @ 60 Hz"
+#string STR_DISPLAY_MODE_1280_800_60                       #language en-US "1280 x 800 @ 60 Hz"
+#string STR_DISPLAY_MODE_1280_960_60                       #language en-US "1280 x 960 @ 60 Hz"
+#string STR_DISPLAY_MODE_1280_1024_60                      #language en-US "1280 x 1024 @ 60 Hz"
+#string STR_DISPLAY_MODE_1360_768_60                       #language en-US "1360 x 768 @ 60 Hz"
+#string STR_DISPLAY_MODE_1400_1050_60                      #language en-US "1400 x 1050 @ 60 Hz"
+#string STR_DISPLAY_MODE_1440_900_60                       #language en-US "1440 x 900 @ 60 Hz"
+#string STR_DISPLAY_MODE_1600_900_60                       #language en-US "1600 x 900 @ 60 Hz"
+#string STR_DISPLAY_MODE_1600_1200_60                      #language en-US "1600 x 1200 @ 60 Hz"
+#string STR_DISPLAY_MODE_1680_1050_60                      #language en-US "1680 x 1050 @ 60 Hz"
+#string STR_DISPLAY_MODE_1920_1080_60                      #language en-US "1920 x 1080 @ 60 Hz"
+#string STR_DISPLAY_MODE_1920_1200_60                      #language en-US "1920 x 1200 @ 60 Hz"
+#string STR_DISPLAY_MODE_2048_1152_60                      #language en-US "2048 x 1152 @ 60 Hz"
+#string STR_DISPLAY_MODE_2560_1080_60                      #language en-US "2560 x 1080 @ 60 Hz"
+#string STR_DISPLAY_MODE_2560_1440_60                      #language en-US "2560 x 1440 @ 60 Hz"
+#string STR_DISPLAY_MODE_2560_1600_60                      #language en-US "2560 x 1600 @ 60 Hz"
+#string STR_DISPLAY_MODE_3440_1440_60                      #language en-US "3440 x 1440 @ 60 Hz"
+#string STR_DISPLAY_MODE_3840_2160_30                      #language en-US "3840 x 2160 @ 30 Hz"
+#string STR_DISPLAY_MODE_3840_2160_60                      #language en-US "3840 x 2160 @ 60 Hz"
+#string STR_DISPLAY_MODE_4096_2160_30                      #language en-US "4096 x 2160 @ 30 Hz"
+#string STR_DISPLAY_MODE_4096_2160_60                      #language en-US "4096 x 2160 @ 60 Hz"
+
+#string STR_DISPLAY_MODE_CUSTOM_PIXEL_CLOCK                #language en-US "Pixel Clock (kHz)"
+#string STR_DISPLAY_MODE_CUSTOM_HORIZONTAL_ACTIVE          #language en-US "Horizontal Active"
+#string STR_DISPLAY_MODE_CUSTOM_HORIZONTAL_FRONT_PORCH     #language en-US "Horizontal Front Porch"
+#string STR_DISPLAY_MODE_CUSTOM_HORIZONTAL_SYNC_WIDTH      #language en-US "Horizontal Sync Width"
+#string STR_DISPLAY_MODE_CUSTOM_HORIZONTAL_BACK_PORCH      #language en-US "Horizontal Back Porch"
+#string STR_DISPLAY_MODE_CUSTOM_HORIZONTAL_SYNC_POLARITY   #language en-US "Horizontal Sync Polarity"
+#string STR_DISPLAY_MODE_CUSTOM_VERTICAL_ACTIVE            #language en-US "Vertical Active"
+#string STR_DISPLAY_MODE_CUSTOM_VERTICAL_FRONT_PORCH       #language en-US "Vertical Front Porch"
+#string STR_DISPLAY_MODE_CUSTOM_VERTICAL_SYNC_WIDTH        #language en-US "Vertical Sync Width"
+#string STR_DISPLAY_MODE_CUSTOM_VERTICAL_BACK_PORCH        #language en-US "Vertical Back Porch"
+#string STR_DISPLAY_MODE_CUSTOM_VERTICAL_SYNC_POLARITY     #language en-US "Vertical Sync Polarity"
 
 /*
  * CPU Performance configuration
