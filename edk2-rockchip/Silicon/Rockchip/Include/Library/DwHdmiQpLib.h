@@ -907,6 +907,9 @@
 #define PMU1CRU_SOFTRST_CON03  0xA0C
 #define PMU1CRU_SOFTRST_CON04  0xA10
 
+#define RK3588_SYS_GRF_BASE  0xFD58C000
+#define RK3588_VO1_GRF_BASE  0xFD5A8000
+
 /* Rockchip Htx Phy */
 
 struct RockchipHdptxPhyHdmi {
@@ -914,9 +917,6 @@ struct RockchipHdptxPhyHdmi {
 };
 
 struct DwHdmiQpI2c {
-  BOOLEAN    Cmp;
-  UINT32     Stat;
-
   UINT8      SlaveReg;
   BOOLEAN    IsSegment;
   BOOLEAN    IsRegAddr;
@@ -929,12 +929,8 @@ struct DwHdmiQpDevice {
   UINTN                          Base;
   UINT32                         OutputInterface;
   BOOLEAN                        ForceHpd;
+  UINT8                          SignalingMode;
   struct DwHdmiQpI2c             I2c;
-  UINT32                         ScdcIntr;
-  UINT32                         FltIntr;
-  UINT32                         EarcIntr;
-
-  BOOLEAN                        FltCmp;
 
   struct RockchipHdptxPhyHdmi    HdptxPhy;
 };
@@ -996,14 +992,16 @@ DwHdmiQpConnectorDetect (
   OUT DISPLAY_STATE                *DisplayState
   );
 
-UINT32
+EFI_STATUS
 HdptxRopllTmdsModeConfig (
-  OUT struct RockchipHdptxPhyHdmi  *Hdptx
+  OUT struct RockchipHdptxPhyHdmi  *Hdptx,
+  IN  UINT32                       BitRate
   );
 
-UINT32
+EFI_STATUS
 HdptxRopllCmnConfig (
-  OUT struct RockchipHdptxPhyHdmi  *Hdptx
+  OUT struct RockchipHdptxPhyHdmi  *Hdptx,
+  IN  UINT32                       BitRate
   );
 
 #endif

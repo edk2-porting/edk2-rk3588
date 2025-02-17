@@ -58,6 +58,11 @@ formset
       name  = DisplayModeCustom,
       guid  = RK3588DXE_FORMSET_GUID;
 
+    efivarstore UINT8,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = HdmiSignalingMode,
+      guid  = RK3588DXE_FORMSET_GUID;
+
     efivarstore CPU_PERF_CLUSTER_CLOCK_PRESET_VARSTORE_DATA,
       attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
       name  = CpuPerf_CPULClusterClockPreset,
@@ -388,6 +393,21 @@ formset
             default value = get(DisplayModeCustomDefault.VSyncActive),
             option text   = STRING_TOKEN(STR_MINUS_SIGN), value = 0, flags = 0;
             option text   = STRING_TOKEN(STR_PLUS_SIGN), value = 1, flags = 0;
+          endoneof;
+        endif;
+
+        suppressif (get(DisplayConnectorsMask) & (VOP_OUTPUT_IF_HDMI0 | VOP_OUTPUT_IF_HDMI1)) == 0;
+          subtitle text = STRING_TOKEN(STR_NULL_STRING);
+          subtitle text = STRING_TOKEN(STR_DISPLAY_CONNECTOR_TYPE_HDMI);
+
+          oneof varid = HdmiSignalingMode,
+            prompt      = STRING_TOKEN(STR_HDMI_SIGNALING_MODE_PROMPT),
+            help        = STRING_TOKEN(STR_HDMI_SIGNALING_MODE_HELP),
+            flags       = NUMERIC_SIZE_1 | INTERACTIVE | RESET_REQUIRED,
+            default     = FixedPcdGet8 (PcdHdmiSignalingModeDefault),
+            option text = STRING_TOKEN(STR_HDMI_SIGNALING_MODE_AUTO), value = HDMI_SIGNALING_MODE_AUTO, flags = 0;
+            option text = STRING_TOKEN(STR_HDMI_SIGNALING_MODE_DVI), value = HDMI_SIGNALING_MODE_DVI, flags = 0;
+            option text = STRING_TOKEN(STR_HDMI_SIGNALING_MODE_HDMI), value = HDMI_SIGNALING_MODE_HDMI, flags = 0;
           endoneof;
         endif;
     endform;

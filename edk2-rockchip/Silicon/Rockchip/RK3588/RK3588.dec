@@ -89,6 +89,7 @@
     <HeaderFiles>
       VarStoreData.h
   }
+  gRK3588TokenSpaceGuid.PcdHdmiSignalingModeDefault|0|UINT8|0x00010804
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   gRK3588TokenSpaceGuid.PcdCPULClusterClockPreset|0|UINT32|0x00000001
@@ -138,6 +139,7 @@
     <HeaderFiles>
       VarStoreData.h
   }
+  gRK3588TokenSpaceGuid.PcdHdmiSignalingMode|0|UINT8|0x00000804
 
 [PcdsDynamicEx]
   gRK3588TokenSpaceGuid.PcdPcieEcamCompliantSegmentsMask|0|UINT32|0x20000001

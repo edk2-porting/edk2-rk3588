@@ -48,6 +48,7 @@
 
 [Pcd]
   gRK3588TokenSpaceGuid.PcdDisplayConnectorsMask
+  gRK3588TokenSpaceGuid.PcdHdmiSignalingMode
 
 [Protocols]
   gRockchipConnectorProtocolGuid

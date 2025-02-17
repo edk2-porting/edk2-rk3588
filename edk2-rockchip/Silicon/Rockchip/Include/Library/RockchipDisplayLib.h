@@ -1,6 +1,7 @@
 /** @file
 
   Copyright (c) 2022 Rockchip Electronics Co. Ltd.
+  Copyright (c) 2024-2025, Mario Bălănică <mariobalanica02@gmail.com>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -167,7 +168,17 @@ typedef struct {
 } BASE2_DISP_INFO;
 
 typedef struct {
-  DISPLAY_MODE    PreferredMode;
+  BOOLEAN    Hdmi20Supported;
+  BOOLEAN    ScdcSupported;
+} HDMI_SINK_INFO;
+
+typedef struct {
+  BOOLEAN           IsHdmi;
+  HDMI_SINK_INFO    HdmiInfo;
+
+  BOOLEAN           SelectableRgbRange;
+
+  DISPLAY_MODE      PreferredMode;
 } DISPLAY_SINK_INFO;
 
 typedef struct {
@@ -262,6 +273,16 @@ VOID
 DisplayModeToDrm (
   IN  CONST DISPLAY_MODE  *DisplayMode,
   OUT DRM_DISPLAY_MODE    *DrmDisplayMode
+  );
+
+UINT8
+ConvertCeaToHdmiVic (
+  IN UINT8  CeaVic
+  );
+
+UINT8
+ConvertHdmiToCeaVic (
+  IN UINT8  CeaVic
   );
 
 #endif

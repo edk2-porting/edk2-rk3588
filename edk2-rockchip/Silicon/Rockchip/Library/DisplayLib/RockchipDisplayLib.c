@@ -140,3 +140,31 @@ DisplayModeToDrm (
   DrmDisplayMode->VTotal     = DrmDisplayMode->VSyncEnd + DisplayMode->VBackPorch;
   DrmDisplayMode->VRefresh   = DrmModeVRefresh (DrmDisplayMode);
 }
+
+UINT8
+ConvertCeaToHdmiVic (
+  IN UINT8  CeaVic
+  )
+{
+  switch (CeaVic) {
+    case 95: return 1;
+    case 94: return 2;
+    case 93: return 3;
+    case 98: return 4;
+    default: return 0;
+  }
+}
+
+UINT8
+ConvertHdmiToCeaVic (
+  IN UINT8  CeaVic
+  )
+{
+  switch (CeaVic) {
+    case 1: return 95;
+    case 2: return 94;
+    case 3: return 93;
+    case 4: return 98;
+    default: return 0;
+  }
+}

@@ -2837,7 +2837,21 @@ Vop2Init (
     }
   }
 
-  Vop2SetClk (CrtcState->CrtcID, DclkRate * 1000);
+  /*
+   * Switch VP DCLK source to the HDMI PHY PLL when HDMI output is enabled,
+   * as it's more accurate and necessary for most modes up to 4K @ 60 Hz.
+   */
+  /* todo: only support VP2 for now */
+  ASSERT (CrtcState->CrtcID == 2);
+  if (HAL_CRU_ClkGetMux (DCLK_VOP2) == DCLK_VOP2_SEL_DCLK_VOP2_SRC) {
+    if (ConnectorState->OutputInterface & VOP_OUTPUT_IF_HDMI0) {
+      HAL_CRU_ClkSetMux (DCLK_VOP2, DCLK_VOP2_SEL_CLK_HDMIPHY_PIXEL0_O);
+    } else if (ConnectorState->OutputInterface & VOP_OUTPUT_IF_HDMI1) {
+      HAL_CRU_ClkSetMux (DCLK_VOP2, DCLK_VOP2_SEL_CLK_HDMIPHY_PIXEL1_O);
+    } else {
+      Vop2SetClk (CrtcState->CrtcID, DclkRate * 1000);
+    }
+  }
 
   Vop2MaskWrite (
     Vop2->BaseAddress,

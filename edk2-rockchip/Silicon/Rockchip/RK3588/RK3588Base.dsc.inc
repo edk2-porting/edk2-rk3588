@@ -61,6 +61,10 @@
   DEFINE FDT_COMPAT_MODE_VENDOR         = 1
   DEFINE FDT_COMPAT_MODE_MAINLINE       = 2
 
+  DEFINE HDMI_SIGNALING_MODE_AUTO  = 0
+  DEFINE HDMI_SIGNALING_MODE_DVI   = 1
+  DEFINE HDMI_SIGNALING_MODE_HDMI  = 2
+
   #
   # Silicon/Rockchip/RK3588/Drivers/RK3588Dxe/CpuPerformance.h
   #
@@ -303,6 +307,7 @@
     .VBackPorch  = 33,
     .VSyncActive = 0,
   })}
+  gRK3588TokenSpaceGuid.PcdHdmiSignalingModeDefault|$(HDMI_SIGNALING_MODE_AUTO)
 
 [PcdsPatchableInModule]
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|1500000
@@ -375,6 +380,7 @@
   gRK3588TokenSpaceGuid.PcdDisplayConnectorsMask|L"DisplayConnectorsMask"|gRK3588DxeFormSetGuid|0x0|0|BS
   gRK3588TokenSpaceGuid.PcdDisplayModePreset|L"DisplayModePreset"|gRK3588DxeFormSetGuid|0x0|{ 0x0 }
   gRK3588TokenSpaceGuid.PcdDisplayModeCustom|L"DisplayModeCustom"|gRK3588DxeFormSetGuid|0x0|{ 0x0 }
+  gRK3588TokenSpaceGuid.PcdHdmiSignalingMode|L"HdmiSignalingMode"|gRK3588DxeFormSetGuid|0x0|gRK3588TokenSpaceGuid.PcdHdmiSignalingModeDefault
 
 ################################################################################
 #

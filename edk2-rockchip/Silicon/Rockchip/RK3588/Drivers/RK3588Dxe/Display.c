@@ -32,6 +32,7 @@ InitializeDisplayVariables (
   UINTN                              ConnectorsCount;
   UINT32                             ConnectorsMask;
   UINTN                              Size;
+  UINT8                              Var8;
   VOID                               *PcdData;
   DISPLAY_MODE_PRESET_VARSTORE_DATA  ModePreset;
   DISPLAY_MODE                       ModeCustom;
@@ -118,6 +119,19 @@ InitializeDisplayVariables (
       Status = PcdSetPtrS (PcdDisplayModeCustom, &Size, PcdData);
       ASSERT_EFI_ERROR (Status);
     }
+  }
+
+  Size   = sizeof (Var8);
+  Status = !Reset ? gRT->GetVariable (
+                           L"HdmiSignalingMode",
+                           &gRK3588DxeFormSetGuid,
+                           NULL,
+                           &Size,
+                           &Var8
+                           ) : EFI_NOT_FOUND;
+  if (EFI_ERROR (Status)) {
+    Status = PcdSet8S (PcdHdmiSignalingMode, FixedPcdGet8 (PcdHdmiSignalingModeDefault));
+    ASSERT_EFI_ERROR (Status);
   }
 
   return EFI_SUCCESS;

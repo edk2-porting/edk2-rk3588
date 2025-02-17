@@ -670,15 +670,19 @@ STATIC CONST struct RoPllConfig  ROPLL_TMDS_CONFIG[] = {
     1, 0, 0x20, 0x0c, 1, 0x0e, 0, 0, },
   { 1856250, 155,  155,  1, 1, 3,   1, 1, 1, 1, 1, 1, 1, 62,  1, 16,   5, 0,
     1, 1, 0, 0x20, 0x0c, 1, 0x0e, 0, 0, },
+  { 1540000, 193,  193,  1, 1, 5,   1, 1, 1, 1, 1, 1, 1, 193, 1, 32,   2, 1,
+    1, 1, 0, 0x20, 0x0c, 1, 0x0e, 0, 0, },
   { 1485000, 0x7b, 0x7b, 1, 1, 3,   1, 1, 1, 1, 1, 1, 1, 4,   0, 3,    5, 5,   0x10,
     1, 0, 0x20, 0x0c, 1, 0x0e, 0, 0, },
-  { 1462500, 122,  122,  1, 1, 4,   1, 1, 1, 1, 1, 1, 1, 244, 1, 16,   1, 0,   1,
+  { 1462500, 122,  122,  1, 1, 3,   1, 1, 1, 1, 1, 1, 1, 244, 1, 16,   2, 1,   1,
+    1, 0, 0x20, 0x0c, 1, 0x0e, 0, 0, },
+  { 1190000, 149,  149,  1, 1, 5,   1, 1, 1, 1, 1, 1, 1, 149, 1, 16,   2, 1,   1,
     1, 0, 0x20, 0x0c, 1, 0x0e, 0, 0, },
   { 1065000, 89,   89,   1, 1, 3,   1, 1, 1, 1, 1, 1, 1, 89,  1, 16,   1, 0,   1,
     1, 0, 0x20, 0x0c, 1, 0x0e, 0, 0, },
   { 1080000, 135,  135,  1, 1, 5,   1, 1, 0, 1, 0, 1, 1, 0x9, 0, 0x05, 0, 0x14,
     0x18, 1, 0, 0x20, 0x0c, 1, 0x0e, 0, 0, },
-  { 855000,  125,  125,  1, 1, 6,   1, 1, 1, 1, 1, 1, 1, 80,  1, 16,   2, 0,
+  { 855000,  214,  214,  1, 1, 11,  1, 1, 1, 1, 1, 1, 1, 214, 1, 16,   2, 1,
     1, 1, 0, 0x20, 0x0c, 1, 0x0e, 0, 0, },
   { 835000,  105,  105,  1, 1, 5,   1, 1, 1, 1, 1, 1, 1, 42,  1, 16,   1, 0,
     1, 1, 0, 0x20, 0x0c, 1, 0x0e, 0, 0, },
@@ -808,6 +812,7 @@ CruWrite (
   MmioWrite32 (PMU1CRU_BASE + Reg, TempVal);
 }
 
+STATIC
 VOID
 HdptxPrePowerUp (
   OUT struct RockchipHdptxPhyHdmi  *Hdptx
@@ -828,7 +833,7 @@ HdptxPrePowerUp (
 }
 
 STATIC
-UINT32
+EFI_STATUS
 HdptxPostEnablePll (
   OUT struct RockchipHdptxPhyHdmi  *Hdptx
   )
@@ -870,24 +875,206 @@ HdptxPostEnablePll (
 
   if (i == 50) {
     DEBUG ((DEBUG_INIT, "%a hdptx phy pll can't lock!\n", __func__));
-    return -EINVAL;
+    return EFI_TIMEOUT;
   }
 
   DEBUG ((DEBUG_INIT, "%a hdptx phy pll locked!\n", __func__));
 
-  return 0;
+  return EFI_SUCCESS;
 }
 
-UINT32
+STATIC
+VOID
+RationalBestApproximation (
+  UINT32  given_numerator,
+  UINT32  given_denominator,
+  UINT32  max_numerator,
+  UINT32  max_denominator,
+  UINT32  *best_numerator,
+  UINT32  *best_denominator
+  )
+{
+  /* n/d is the starting rational, which is continually
+   * decreased each iteration using the Euclidean algorithm.
+   *
+   * dp is the value of d from the prior iteration.
+   *
+   * n2/d2, n1/d1, and n0/d0 are our successively more accurate
+   * approximations of the rational.  They are, respectively,
+   * the current, previous, and two prior iterations of it.
+   *
+   * a is current term of the continued fraction.
+   */
+  UINT32  n, d, n0, d0, n1, d1, n2, d2;
+
+  n  = given_numerator;
+  d  = given_denominator;
+  n0 = d1 = 0;
+  n1 = d0 = 1;
+
+  for ( ; ;) {
+    UINT32  dp, a;
+
+    if (d == 0) {
+      break;
+    }
+
+    /* Find next term in continued fraction, 'a', via
+     * Euclidean algorithm.
+     */
+    dp = d;
+    a  = n / d;
+    d  = n % d;
+    n  = dp;
+
+    /* Calculate the current rational approximation (aka
+     * convergent), n2/d2, using the term just found and
+     * the two prior approximations.
+     */
+    n2 = n0 + a * n1;
+    d2 = d0 + a * d1;
+
+    /* If the current convergent exceeds the maxes, then
+     * return either the previous convergent or the
+     * largest semi-convergent, the final term of which is
+     * found below as 't'.
+     */
+    if ((n2 > max_numerator) || (d2 > max_denominator)) {
+      UINT32  t = min (
+                    (max_numerator - n0) / n1,
+                    (max_denominator - d0) / d1
+                    );
+
+      /* This tests if the semi-convergent is closer
+       * than the previous convergent.
+       */
+      if ((2u * t > a) || ((2u * t == a) && (d0 * dp > d1 * d))) {
+        n1 = n0 + t * n1;
+        d1 = d0 + t * d1;
+      }
+
+      break;
+    }
+
+    n0 = n1;
+    n1 = n2;
+    d0 = d1;
+    d1 = d2;
+  }
+
+  *best_numerator   = n1;
+  *best_denominator = d1;
+}
+
+STATIC
+BOOLEAN
+HdptxPhyClkPllCalc (
+  IN  UINT32              DataRate,
+  OUT struct RoPllConfig  *Cfg
+  )
+{
+  UINT32  Fref = 24000;
+  UINT32  Sdc;
+  UINT32  Fout = DataRate / 2;
+  UINT32  Fvco;
+  UINT32  Mdiv, Sdiv, N = 8;
+  UINT32  K = 0, Lc, K_Sub, Lc_Sub;
+
+  for (Sdiv = 1; Sdiv <= 16; Sdiv++) {
+    if (Sdiv % 2 && (Sdiv != 1)) {
+      continue;
+    }
+
+    Fvco = Fout * Sdiv;
+
+    if ((Fvco < 2000000) || (Fvco > 4000000)) {
+      continue;
+    }
+
+    Mdiv = DIV_ROUND_UP (Fvco, Fref);
+    if ((Mdiv < 20) || (Mdiv > 255)) {
+      continue;
+    }
+
+    if (Fref * Mdiv - Fvco) {
+      for (Sdc = 264000; Sdc <= 750000; Sdc += Fref) {
+        if (Sdc * N > Fref * Mdiv) {
+          break;
+        }
+      }
+
+      if (Sdc > 750000) {
+        continue;
+      }
+
+      RationalBestApproximation (
+        Fref * Mdiv - Fvco,
+        Sdc / 16,
+        GENMASK (6, 0),
+        GENMASK (7, 0),
+        &K,
+        &Lc
+        );
+
+      RationalBestApproximation (
+        Sdc * N - Fref * Mdiv,
+        Sdc,
+        GENMASK (6, 0),
+        GENMASK (7, 0),
+        &K_Sub,
+        &Lc_Sub
+        );
+    }
+
+    break;
+  }
+
+  if (Sdiv > 16) {
+    return FALSE;
+  }
+
+  if (Cfg) {
+    Cfg->Pms_Mdiv     = Mdiv;
+    Cfg->Pms_Mdiv_Afc = Mdiv;
+    Cfg->Pms_Pdiv     = 1;
+    Cfg->Pms_Refdiv   = 1;
+    Cfg->Pms_Sdiv     = Sdiv - 1;
+
+    Cfg->Sdm_En = K > 0 ? 1 : 0;
+    if (Cfg->Sdm_En) {
+      Cfg->Sdm_Deno     = Lc;
+      Cfg->Sdm_Num_Sign = 1;
+      Cfg->Sdm_Num      = K;
+      Cfg->Sdc_N        = N - 3;
+      Cfg->Sdc_Num      = K_Sub;
+      Cfg->Sdc_Deno     = Lc_Sub;
+    }
+  }
+
+  return TRUE;
+}
+
+EFI_STATUS
 HdptxRopllCmnConfig (
-  OUT struct RockchipHdptxPhyHdmi  *Hdptx
+  OUT struct RockchipHdptxPhyHdmi  *Hdptx,
+  IN  UINT32                       BitRate
   )
 {
   CONST struct RoPllConfig  *Cfg = ROPLL_TMDS_CONFIG;
+  struct RoPllConfig        Rc   = { 0 };
 
   for ( ; Cfg->Bit_Rate != ~0; Cfg++) {
-    if (Cfg->Bit_Rate == 1485000) {
+    if (Cfg->Bit_Rate == BitRate) {
       break;
+    }
+  }
+
+  if (Cfg->Bit_Rate == ~0) {
+    if (HdptxPhyClkPllCalc (BitRate, &Rc)) {
+      Cfg = &Rc;
+    } else {
+      DEBUG ((DEBUG_ERROR, "%a: Couldn't find RoPllConfig!\n", __func__));
+      return EFI_INVALID_PARAMETER;
     }
   }
 
@@ -1067,7 +1254,8 @@ HdptxRopllCmnConfig (
   return HdptxPostEnablePll (Hdptx);
 }
 
-UINT32
+STATIC
+EFI_STATUS
 HdptxPostEnableLane (
   OUT struct RockchipHdptxPhyHdmi  *Hdptx
   )
@@ -1101,17 +1289,18 @@ HdptxPostEnableLane (
 
   if (i == 50) {
     DEBUG ((DEBUG_INIT, "%a hdptx phy lane can't ready!\n", __func__));
-    return -EINVAL;
+    return EFI_TIMEOUT;
   }
 
   DEBUG ((DEBUG_INIT, "%a hdptx phy lane locked!\n", __func__));
 
-  return 0;
+  return EFI_SUCCESS;
 }
 
-UINT32
+EFI_STATUS
 HdptxRopllTmdsModeConfig (
-  OUT struct RockchipHdptxPhyHdmi  *Hdptx
+  OUT struct RockchipHdptxPhyHdmi  *Hdptx,
+  IN  UINT32                       BitRate
   )
 {
   PhyWrite (Hdptx, SB_REG0114, 0x00);
@@ -1120,12 +1309,21 @@ HdptxRopllTmdsModeConfig (
   PhyWrite (Hdptx, SB_REG0117, 0x00);
   PhyWrite (Hdptx, LNTOP_REG0200, 0x06);
 
-  /* For 1/10 bitrate clk */
-  PhyWrite (Hdptx, LNTOP_REG0201, 0x07);
-  PhyWrite (Hdptx, LNTOP_REG0202, 0xc1);
-  PhyWrite (Hdptx, LNTOP_REG0203, 0xf0);
-  PhyWrite (Hdptx, LNTOP_REG0204, 0x7c);
-  PhyWrite (Hdptx, LNTOP_REG0205, 0x1f);
+  if (BitRate >= 3400000) {
+    /* For 1/40 bitrate clk */
+    PhyWrite (Hdptx, LNTOP_REG0201, 0x00);
+    PhyWrite (Hdptx, LNTOP_REG0202, 0x00);
+    PhyWrite (Hdptx, LNTOP_REG0203, 0x0f);
+    PhyWrite (Hdptx, LNTOP_REG0204, 0xff);
+    PhyWrite (Hdptx, LNTOP_REG0205, 0xff);
+  } else {
+    /* For 1/10 bitrate clk */
+    PhyWrite (Hdptx, LNTOP_REG0201, 0x07);
+    PhyWrite (Hdptx, LNTOP_REG0202, 0xc1);
+    PhyWrite (Hdptx, LNTOP_REG0203, 0xf0);
+    PhyWrite (Hdptx, LNTOP_REG0204, 0x7c);
+    PhyWrite (Hdptx, LNTOP_REG0205, 0x1f);
+  }
 
   PhyWrite (Hdptx, LNTOP_REG0206, 0x07);
   PhyWrite (Hdptx, LANE_REG0303, 0x0c);

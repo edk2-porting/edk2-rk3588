@@ -144,6 +144,10 @@ typedef struct {
   UINT32    Preset;
 } DISPLAY_MODE_PRESET_VARSTORE_DATA;
 
+#define HDMI_SIGNALING_MODE_AUTO  0
+#define HDMI_SIGNALING_MODE_DVI   1
+#define HDMI_SIGNALING_MODE_HDMI  2
+
 #pragma pack ()
 
 #endif // __VARSTORE_DATA_H__

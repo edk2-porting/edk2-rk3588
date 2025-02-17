@@ -72,6 +72,17 @@
 #string STR_DISPLAY_MODE_CUSTOM_VERTICAL_BACK_PORCH        #language en-US "Vertical Back Porch"
 #string STR_DISPLAY_MODE_CUSTOM_VERTICAL_SYNC_POLARITY     #language en-US "Vertical Sync Polarity"
 
+#string STR_DISPLAY_CONNECTOR_TYPE_HDMI                    #language en-US "HDMI"
+
+#string STR_HDMI_SIGNALING_MODE_PROMPT                     #language en-US "Signaling Mode"
+#string STR_HDMI_SIGNALING_MODE_HELP                       #language en-US "Choose the preferred HDMI signaling mode.\n\n"
+                                                                           "Auto - determines mode from the connected display, otherwise falls back to DVI.\n\n"
+                                                                           "DVI - disables all data packets. This option may help the display use full range RGB and disable overscan to match the firmware output.\n\n"
+                                                                           "HDMI - allows transmission of data packets."
+#string STR_HDMI_SIGNALING_MODE_AUTO                       #language en-US "Auto"
+#string STR_HDMI_SIGNALING_MODE_DVI                        #language en-US "DVI"
+#string STR_HDMI_SIGNALING_MODE_HDMI                       #language en-US "HDMI"
+
 /*
  * CPU Performance configuration
  */

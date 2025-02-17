@@ -127,6 +127,8 @@
   gRK3588TokenSpaceGuid.PcdDisplayModePreset
   gRK3588TokenSpaceGuid.PcdDisplayModeCustomDefault
   gRK3588TokenSpaceGuid.PcdDisplayModeCustom
+  gRK3588TokenSpaceGuid.PcdHdmiSignalingModeDefault
+  gRK3588TokenSpaceGuid.PcdHdmiSignalingMode
 
 [Guids]
   gRK3588DxeFormSetGuid
