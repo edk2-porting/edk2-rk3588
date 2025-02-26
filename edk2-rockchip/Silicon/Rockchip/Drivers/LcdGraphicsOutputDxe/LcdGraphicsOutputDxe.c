@@ -71,7 +71,8 @@ STATIC LCD_INSTANCE  mLcdTemplate = {
       }
     }
   },
-  { 0 },                                       // DisplayStateList
+  { 0 },                                       // DisplayStates
+  0,                                           // DisplayStatesCount
   NULL,                                        // DisplayModes
 };
 
@@ -97,62 +98,21 @@ DisplayBppConvert (
 
 STATIC
 EFI_STATUS
-DisplayPreInit (
+PrepareDisplays (
   IN LCD_INSTANCE  *Instance
   )
 {
-  EFI_STATUS                   Status;
-  DISPLAY_STATE                *StateInterate;
-  ROCKCHIP_CRTC_PROTOCOL       *Crtc;
-  ROCKCHIP_CONNECTOR_PROTOCOL  *Connector;
-
-  LIST_FOR_EACH_ENTRY (StateInterate, &Instance->DisplayStateList, ListHead) {
-    if (StateInterate->IsEnable) {
-      CRTC_STATE       *CrtcState      = &StateInterate->CrtcState;
-      CONNECTOR_STATE  *ConnectorState = &StateInterate->ConnectorState;
-      Crtc      = (ROCKCHIP_CRTC_PROTOCOL *)StateInterate->CrtcState.Crtc;
-      Connector = (ROCKCHIP_CONNECTOR_PROTOCOL *)StateInterate->ConnectorState.Connector;
-
-      if (Connector && Connector->Preinit) {
-        Status = Connector->Preinit (Connector, StateInterate);
-      }
-
-      Crtc->Vps[CrtcState->CrtcID].OutputType = ConnectorState->Type;
-
-      if (Crtc && Crtc->Preinit) {
-        Status = Crtc->Preinit (Crtc, StateInterate);
-        if (EFI_ERROR (Status)) {
-          goto EXIT;
-        }
-      }
-    }
-  }
-
-EXIT:
-  return Status;
-}
-
-STATIC
-EFI_STATUS
-EFIAPI
-LcdGraphicsOutputInit (
-  VOID
-  )
-{
-  EFI_STATUS                         Status;
-  LCD_INSTANCE                       *Instance = NULL;
-  ROCKCHIP_CRTC_PROTOCOL             *Crtc;
-  ROCKCHIP_CONNECTOR_PROTOCOL        *Connector;
-  UINTN                              ConnectorCount;
-  EFI_HANDLE                         *ConnectorHandles = NULL;
-  UINTN                              Index;
-  DISPLAY_STATE                      *DisplayState;
-  DISPLAY_STATE                      *NextDisplayState;
-  CRTC_STATE                         *CrtcState;
-  CONNECTOR_STATE                    *ConnectorState;
-  DISPLAY_MODE_PRESET_VARSTORE_DATA  *ModePreset;
-  CONST DISPLAY_MODE                 *Mode;
-  CONST DISPLAY_MODE                 *PreferredMode;
+  EFI_STATUS                                 Status;
+  ROCKCHIP_CRTC_PROTOCOL                     *Crtc;
+  UINTN                                      ConnectorCount;
+  EFI_HANDLE                                 *ConnectorHandles = NULL;
+  DISPLAY_CONNECTORS_PRIORITY_VARSTORE_DATA  *ConnectorsPriority;
+  ROCKCHIP_CONNECTOR_PROTOCOL                *Connector;
+  UINTN                                      ConnectorIndex;
+  UINTN                                      Index;
+  DISPLAY_STATE                              *DisplayState;
+  CONNECTOR_STATE                            *ConnectorState;
+  CRTC_STATE                                 *CrtcState;
 
   Status = gBS->LocateProtocol (
                   &gRockchipCrtcProtocolGuid,
@@ -186,21 +146,19 @@ LcdGraphicsOutputInit (
     return Status;
   }
 
-  Instance = AllocateCopyPool (sizeof (LCD_INSTANCE), &mLcdTemplate);
-  if (Instance == NULL) {
+  ConnectorsPriority = PcdGetPtr (PcdDisplayConnectorsPriority);
+  if (ConnectorsPriority == NULL) {
     ASSERT (FALSE);
-    Status = EFI_OUT_OF_RESOURCES;
+    Status = EFI_INVALID_PARAMETER;
     goto Exit;
   }
 
-  InitializeListHead (&Instance->DisplayStateList);
+  Instance->DisplayStatesCount = PcdGetSize (PcdDisplayConnectors) / sizeof (UINT32);
+  ASSERT (Instance->DisplayStatesCount <= VOP_OUTPUT_IF_NUMS);
 
-  ModePreset    = PcdGetPtr (PcdDisplayModePreset);
-  PreferredMode = NULL;
-
-  for (Index = 0; Index < ConnectorCount; Index++) {
+  for (ConnectorIndex = 0; ConnectorIndex < ConnectorCount; ConnectorIndex++) {
     Status = gBS->HandleProtocol (
-                    ConnectorHandles[Index],
+                    ConnectorHandles[ConnectorIndex],
                     &gRockchipConnectorProtocolGuid,
                     (VOID **)&Connector
                     );
@@ -216,71 +174,275 @@ LcdGraphicsOutputInit (
       goto Exit;
     }
 
-    InitializeListHead (&DisplayState->ListHead);
-
-    CrtcState      = &DisplayState->CrtcState;
     ConnectorState = &DisplayState->ConnectorState;
+    CrtcState      = &DisplayState->CrtcState;
 
     ConnectorState->Connector = (VOID *)Connector;
+    CrtcState->Crtc           = (VOID *)Crtc;
 
-    if ((ModePreset->Preset == DISPLAY_MODE_NATIVE) && (PreferredMode == NULL)) {
-      //
-      // Get predefined native mode.
-      //
-      if (Connector->GetTiming != NULL) {
-        Status = Connector->GetTiming (Connector, DisplayState);
-        if (Status != EFI_UNSUPPORTED) {
-          ASSERT_EFI_ERROR (Status);
-        }
-      } else {
-        Status = EFI_UNSUPPORTED;
-      }
-
-      // if (EFI_ERROR (Status)) {
-      //   TODO: Read EDID here.
-      // }
-
-      if (!EFI_ERROR (Status)) {
-        PreferredMode = &ConnectorState->SinkInfo.PreferredMode;
+    if (Connector->Preinit != NULL) {
+      Status = Connector->Preinit (Connector, DisplayState);
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        goto DiscardState;
       }
     }
 
-    /* adapt to UEFI architecture */
-    CrtcState->Crtc               = (VOID *)Crtc;
-    CrtcState->CrtcID             = 2;
-    DisplayState->VpsConfigModeID = 1;
+    if (Connector->Init != NULL) {
+      Status = Connector->Init (Connector, DisplayState);
+      if (EFI_ERROR (Status)) {
+        ASSERT_EFI_ERROR (Status);
+        goto DiscardState;
+      }
+    } else if (Connector->Preinit == NULL) {
+      ASSERT (FALSE);
+      goto DiscardState;
+    }
 
-    /* set MEDIA_BUS_FMT_RGB888_1X24 by default when using panel */
-    /* move to panel driver later -- todo*/
-    ConnectorState->BusFormat = MEDIA_BUS_FMT_RGB888_1X24;
+    for (Index = 0; Index < Instance->DisplayStatesCount; Index++) {
+      if (ConnectorsPriority->Order[Index] == ConnectorState->OutputInterface) {
+        Instance->DisplayStates[Index] = DisplayState;
+        break;
+      }
+    }
 
-    /* add BCSH data if needed --- todo */
-    ConnectorState->DispInfo = NULL;
+    if (Index == Instance->DisplayStatesCount) {
+      ASSERT (FALSE);
+      goto DiscardState;
+    }
 
-    Crtc->Vps[CrtcState->CrtcID].Enable = TRUE;
-    DisplayState->IsEnable              = TRUE;
+    continue;
 
-    InsertTailList (&Instance->DisplayStateList, &DisplayState->ListHead);
+DiscardState:
+    FreePool (DisplayState);
   }
 
-  if (IsListEmpty (&Instance->DisplayStateList)) {
-    Status = EFI_NOT_FOUND;
-    goto Exit;
-  }
+  Status = EFI_SUCCESS;
 
-  Status = DisplayPreInit (Instance);
+Exit:
   if (EFI_ERROR (Status)) {
+    for (Index = 0; Index < Instance->DisplayStatesCount; Index++) {
+      if (Instance->DisplayStates[Index] != NULL) {
+        FreePool (Instance->DisplayStates[Index]);
+        Instance->DisplayStates[Index] = NULL;
+      }
+    }
+  }
+
+  if (ConnectorHandles != NULL) {
+    FreePool (ConnectorHandles);
+  }
+
+  return Status;
+}
+
+STATIC
+EFI_STATUS
+DetectDisplays (
+  IN  LCD_INSTANCE   *Instance,
+  IN  BOOLEAN        ForceDetect,
+  IN  BOOLEAN        DetectAll,
+  OUT DISPLAY_STATE  **PrimaryDisplayState
+  )
+{
+  EFI_STATUS                   Status;
+  UINTN                        Index;
+  UINTN                        NewCount;
+  DISPLAY_STATE                *DisplayState;
+  CONNECTOR_STATE              *ConnectorState;
+  ROCKCHIP_CONNECTOR_PROTOCOL  *Connector;
+
+  for (Index = 0, NewCount = 0; Index < Instance->DisplayStatesCount; Index++) {
+    DisplayState = Instance->DisplayStates[Index];
+    if (DisplayState == NULL) {
+      continue;
+    }
+
+    ConnectorState = &DisplayState->ConnectorState;
+    Connector      = (ROCKCHIP_CONNECTOR_PROTOCOL *)ConnectorState->Connector;
+
+    if (Connector->Detect != NULL) {
+      Status = Connector->Detect (Connector, DisplayState);
+    } else {
+      Status = EFI_SUCCESS; // Assume always connected.
+    }
+
     DEBUG ((
-      DEBUG_ERROR,
-      "%a: DisplayPreInit fail. Exit Status=%r\n",
+      DEBUG_INFO,
+      "%a: %a status: %r\n",
       __func__,
+      GetVopOutputIfName (ConnectorState->OutputInterface),
       Status
       ));
-    goto Exit;
+
+    if (!EFI_ERROR (Status)) {
+      if (*PrimaryDisplayState == NULL) {
+        *PrimaryDisplayState = DisplayState;
+      }
+    } else if (!ForceDetect) {
+      FreePool (DisplayState);
+      Instance->DisplayStates[Index] = NULL;
+      continue;
+    }
+
+    Instance->DisplayStates[NewCount++] = DisplayState;
+
+    if ((*PrimaryDisplayState != NULL) && !DetectAll) {
+      break;
+    }
   }
 
-  Instance->Gop.Mode  = &Instance->Mode;
-  Instance->Mode.Info = &Instance->ModeInfo;
+  Instance->DisplayStatesCount = NewCount;
+
+  if (Instance->DisplayStatesCount == 0) {
+    DEBUG ((DEBUG_ERROR, "%a: No displays found!\n", __func__));
+    return EFI_NOT_FOUND;
+  }
+
+  if (*PrimaryDisplayState != NULL) {
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: Primary: %a\n",
+      __func__,
+      GetVopOutputIfName ((*PrimaryDisplayState)->ConnectorState.OutputInterface)
+      ));
+  }
+
+  return EFI_SUCCESS;
+}
+
+STATIC
+EFI_STATUS
+IdentifyDisplay (
+  IN DISPLAY_STATE  *DisplayState
+  )
+{
+  EFI_STATUS                   Status;
+  CONNECTOR_STATE              *ConnectorState;
+  ROCKCHIP_CONNECTOR_PROTOCOL  *Connector;
+
+  ConnectorState = &DisplayState->ConnectorState;
+  Connector      = (ROCKCHIP_CONNECTOR_PROTOCOL *)ConnectorState->Connector;
+
+  Status = EFI_UNSUPPORTED;
+
+  //
+  // Get predefined native mode.
+  //
+  if (Connector->GetTiming != NULL) {
+    Status = Connector->GetTiming (Connector, DisplayState);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Failed to get predefined native mode. Status=%r\n",
+        __func__,
+        Status
+        ));
+    }
+
+    return Status;
+  }
+
+  //
+  // TODO: Read EDID here.
+  //
+
+  return Status;
+}
+
+STATIC
+EFI_STATUS
+SetupDisplay (
+  IN DISPLAY_STATE  *DisplayState
+  )
+{
+  EFI_STATUS              Status;
+  CRTC_STATE              *CrtcState;
+  ROCKCHIP_CRTC_PROTOCOL  *Crtc;
+  CONNECTOR_STATE         *ConnectorState;
+
+  CrtcState      = &DisplayState->CrtcState;
+  Crtc           = (ROCKCHIP_CRTC_PROTOCOL *)CrtcState->Crtc;
+  ConnectorState = &DisplayState->ConnectorState;
+
+  //
+  // Only support CRTC port 2.
+  //
+  CrtcState->CrtcID             = 2;
+  DisplayState->VpsConfigModeID = 1;
+
+  //
+  // Use RGB888_1X24 by default as it's the most compatible.
+  // The connector could override this, but it may break other
+  // sinks if the output is shared between multiple connectors.
+  //
+  ConnectorState->BusFormat = MEDIA_BUS_FMT_RGB888_1X24;
+
+  Crtc->Vps[CrtcState->CrtcID].Enable     = TRUE;
+  Crtc->Vps[CrtcState->CrtcID].OutputType = ConnectorState->Type;
+
+  if (Crtc->Preinit != NULL) {
+    Status = Crtc->Preinit (Crtc, DisplayState);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+  }
+
+  DisplayState->IsEnable = TRUE;
+
+  return EFI_SUCCESS;
+}
+
+STATIC
+EFI_STATUS
+SetupAllDisplays (
+  IN LCD_INSTANCE   *Instance,
+  IN DISPLAY_STATE  *PrimaryDisplayState
+  )
+{
+  EFI_STATUS     Status;
+  UINTN          Index;
+  DISPLAY_STATE  *DisplayState;
+
+  for (Index = 0; Index < Instance->DisplayStatesCount; Index++) {
+    DisplayState = Instance->DisplayStates[Index];
+    if ((DisplayState == NULL) || DisplayState->IsEnable) {
+      continue;
+    }
+
+    if (PrimaryDisplayState != NULL) {
+      //
+      // Clone primary display sink info.
+      // This is a best effort to support multiple outputs on
+      // a single CRTC port. All sinks are assumed to have more
+      // or less the same capabilities.
+      //
+      CopyMem (
+        &DisplayState->ConnectorState.SinkInfo,
+        &PrimaryDisplayState->ConnectorState.SinkInfo,
+        sizeof (DisplayState->ConnectorState.SinkInfo)
+        );
+    }
+
+    Status = SetupDisplay (DisplayState);
+    if (EFI_ERROR (Status)) {
+      continue;
+    }
+  }
+
+  return EFI_SUCCESS;
+}
+
+STATIC
+EFI_STATUS
+GetSupportedDisplayModes (
+  IN LCD_INSTANCE   *Instance,
+  IN DISPLAY_STATE  *PrimaryDisplayState
+  )
+{
+  CONST DISPLAY_MODE                 *Mode;
+  DISPLAY_MODE_PRESET_VARSTORE_DATA  *ModePreset;
+  DISPLAY_SINK_INFO                  *SinkInfo;
 
   //
   // Only expose a single mode to GOP.
@@ -297,47 +459,56 @@ LcdGraphicsOutputInit (
                              );
   if (Instance->DisplayModes == NULL) {
     ASSERT (FALSE);
-    Status = EFI_OUT_OF_RESOURCES;
-    goto Exit;
+    return EFI_OUT_OF_RESOURCES;
   }
 
   Mode = NULL;
 
-  if (ModePreset->Preset == DISPLAY_MODE_NATIVE) {
-    Mode = PreferredMode;
-  } else if (ModePreset->Preset == DISPLAY_MODE_CUSTOM) {
-    Mode = PcdGetPtr (PcdDisplayModeCustom);
-    ASSERT (Mode != NULL);
-    if (Mode != NULL) {
-      if ((Mode->OscFreq < VOP_PIXEL_CLOCK_MIN) ||
-          (Mode->OscFreq > VOP_PIXEL_CLOCK_MAX) ||
-          (Mode->HActive < VOP_HORIZONTAL_RES_MIN) ||
-          (Mode->HActive > VOP_HORIZONTAL_RES_MAX) ||
-          (Mode->VActive < VOP_VERTICAL_RES_MIN) ||
-          (Mode->VActive > VOP_VERTICAL_RES_MAX))
-      {
-        Mode = NULL;
-        DEBUG ((
-          DEBUG_ERROR,
-          "%a: Custom mode unsupported! (OscFreq=%u, HActive=%u, VActive=%u)\n",
-          __func__,
-          Mode->OscFreq,
-          Mode->HActive,
-          Mode->VActive
-          ));
-        ASSERT (FALSE);
+  ModePreset = PcdGetPtr (PcdDisplayModePreset);
+  ASSERT (ModePreset != NULL);
+
+  if (ModePreset != NULL) {
+    if (ModePreset->Preset == DISPLAY_MODE_NATIVE) {
+      if (PrimaryDisplayState != NULL) {
+        SinkInfo = &PrimaryDisplayState->ConnectorState.SinkInfo;
+        if (SinkInfo->PreferredMode.OscFreq != 0) {
+          Mode = &SinkInfo->PreferredMode;
+        }
       }
+    } else if (ModePreset->Preset == DISPLAY_MODE_CUSTOM) {
+      Mode = PcdGetPtr (PcdDisplayModeCustom);
+      ASSERT (Mode != NULL);
+      if (Mode != NULL) {
+        if ((Mode->OscFreq < VOP_PIXEL_CLOCK_MIN) ||
+            (Mode->OscFreq > VOP_PIXEL_CLOCK_MAX) ||
+            (Mode->HActive < VOP_HORIZONTAL_RES_MIN) ||
+            (Mode->HActive > VOP_HORIZONTAL_RES_MAX) ||
+            (Mode->VActive < VOP_VERTICAL_RES_MIN) ||
+            (Mode->VActive > VOP_VERTICAL_RES_MAX))
+        {
+          Mode = NULL;
+          DEBUG ((
+            DEBUG_ERROR,
+            "%a: Custom mode unsupported! (OscFreq=%u, HActive=%u, VActive=%u)\n",
+            __func__,
+            Mode->OscFreq,
+            Mode->HActive,
+            Mode->VActive
+            ));
+          ASSERT (FALSE);
+        }
+      }
+    } else if (ModePreset->Preset < GetPredefinedDisplayModesCount ()) {
+      Mode = GetPredefinedDisplayMode (ModePreset->Preset);
+    } else {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Invalid preferred mode: %u\n",
+        __func__,
+        ModePreset->Preset
+        ));
+      ASSERT (FALSE);
     }
-  } else if (ModePreset->Preset < GetPredefinedDisplayModesCount ()) {
-    Mode = GetPredefinedDisplayMode (ModePreset->Preset);
-  } else {
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a: Invalid preferred mode: %u\n",
-      __func__,
-      ModePreset->Preset
-      ));
-    ASSERT (FALSE);
   }
 
   if (Mode == NULL) {
@@ -350,6 +521,119 @@ LcdGraphicsOutputInit (
   }
 
   CopyMem (&Instance->DisplayModes[0], Mode, sizeof (*Mode));
+
+  return EFI_SUCCESS;
+}
+
+STATIC
+VOID
+LcdGraphicsOutputDestroy (
+  IN LCD_INSTANCE  *Instance
+  )
+{
+  UINTN  Index;
+
+  if (Instance == NULL) {
+    return;
+  }
+
+  if (Instance->Handle != NULL) {
+    gBS->UninstallMultipleProtocolInterfaces (
+           Instance->Handle,
+           &gEfiGraphicsOutputProtocolGuid,
+           &Instance->Gop,
+           &gEfiDevicePathProtocolGuid,
+           &Instance->DevicePath,
+           NULL
+           );
+  }
+
+  if (Instance->DisplayModes != NULL) {
+    FreePool (Instance->DisplayModes);
+  }
+
+  for (Index = 0; Index < Instance->DisplayStatesCount; Index++) {
+    if (Instance->DisplayStates[Index] != NULL) {
+      FreePool (Instance->DisplayStates[Index]);
+    }
+  }
+
+  FreePool (Instance);
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+LcdGraphicsOutputInit (
+  VOID
+  )
+{
+  EFI_STATUS     Status;
+  LCD_INSTANCE   *Instance = NULL;
+  DISPLAY_STATE  *DisplayState;
+  DISPLAY_STATE  *PrimaryDisplayState;
+  BOOLEAN        ForceOutput;
+  BOOLEAN        DuplicateOutput;
+
+  Instance = AllocateCopyPool (sizeof (LCD_INSTANCE), &mLcdTemplate);
+  if (Instance == NULL) {
+    ASSERT (FALSE);
+    return EFI_OUT_OF_RESOURCES;
+  }
+
+  Status = PrepareDisplays (Instance);
+  if (EFI_ERROR (Status)) {
+    goto Exit;
+  }
+
+  ForceOutput     = PcdGetBool (PcdDisplayForceOutput);
+  DuplicateOutput = PcdGetBool (PcdDisplayDuplicateOutput);
+
+  PrimaryDisplayState = NULL;
+
+  Status = DetectDisplays (
+             Instance,
+             ForceOutput,
+             DuplicateOutput,
+             &PrimaryDisplayState
+             );
+  if (EFI_ERROR (Status)) {
+    goto Exit;
+  }
+
+  DisplayState = NULL;
+
+  if (PrimaryDisplayState != NULL) {
+    DisplayState = PrimaryDisplayState;
+
+    IdentifyDisplay (PrimaryDisplayState);
+  } else if (ForceOutput) {
+    DisplayState = Instance->DisplayStates[0];
+
+    DuplicateOutput = TRUE;
+  }
+
+  if (DisplayState == NULL) {
+    ASSERT (FALSE);
+    goto Exit;
+  }
+
+  Status = SetupDisplay (DisplayState);
+  if (EFI_ERROR (Status)) {
+    goto Exit;
+  }
+
+  if (DuplicateOutput) {
+    SetupAllDisplays (Instance, PrimaryDisplayState);
+  }
+
+  Instance->Gop.Mode  = &Instance->Mode;
+  Instance->Mode.Info = &Instance->ModeInfo;
+
+  Status = GetSupportedDisplayModes (Instance, PrimaryDisplayState);
+  if (EFI_ERROR (Status)) {
+    goto Exit;
+  }
 
   Status = gBS->InstallMultipleProtocolInterfaces (
                   &Instance->Handle,
@@ -371,37 +655,7 @@ LcdGraphicsOutputInit (
 
 Exit:
   if (EFI_ERROR (Status)) {
-    if (Instance->Handle != NULL) {
-      gBS->UninstallMultipleProtocolInterfaces (
-             Instance->Handle,
-             &gEfiGraphicsOutputProtocolGuid,
-             &Instance->Gop,
-             &gEfiDevicePathProtocolGuid,
-             &Instance->DevicePath,
-             NULL
-             );
-    }
-
-    if (Instance->DisplayModes != NULL) {
-      FreePool (Instance->DisplayModes);
-    }
-
-    LIST_FOR_EACH_ENTRY_SAFE (
-      DisplayState,
-      NextDisplayState,
-      &Instance->DisplayStateList,
-      ListHead
-      ) {
-      FreePool (DisplayState);
-    }
-
-    if (Instance != NULL) {
-      FreePool (Instance);
-    }
-  }
-
-  if (ConnectorHandles != NULL) {
-    FreePool (ConnectorHandles);
+    LcdGraphicsOutputDestroy (Instance);
   }
 
   return Status;
@@ -515,11 +769,12 @@ LcdGraphicsSetMode (
   UINTN                          NumPreviousVramPages;
   DISPLAY_MODE                   *Mode;
   DRM_DISPLAY_MODE               *DrmMode;
-  DISPLAY_STATE                  *StateInterate;
+  DISPLAY_STATE                  *DisplayState;
   ROCKCHIP_CRTC_PROTOCOL         *Crtc;
   CRTC_STATE                     *CrtcState;
   ROCKCHIP_CONNECTOR_PROTOCOL    *Connector;
   CONNECTOR_STATE                *ConnectorState;
+  UINTN                          Index;
 
   Instance = LCD_INSTANCE_FROM_GOP_THIS (This);
 
@@ -633,80 +888,79 @@ LcdGraphicsSetMode (
                    0
                    );
 
-  LIST_FOR_EACH_ENTRY (StateInterate, &Instance->DisplayStateList, ListHead) {
-    if (StateInterate->IsEnable) {
-      Crtc           = (ROCKCHIP_CRTC_PROTOCOL *)StateInterate->CrtcState.Crtc;
-      Connector      = (ROCKCHIP_CONNECTOR_PROTOCOL *)StateInterate->ConnectorState.Connector;
-      CrtcState      = &StateInterate->CrtcState;
-      ConnectorState = &StateInterate->ConnectorState;
-      DrmMode        = &StateInterate->ConnectorState.DisplayMode;
+  for (Index = 0; Index < Instance->DisplayStatesCount; Index++) {
+    DisplayState = Instance->DisplayStates[Index];
+    if ((DisplayState == NULL) || !DisplayState->IsEnable) {
+      continue;
+    }
 
-      if (Connector && Connector->Init) {
-        Status = Connector->Init (Connector, StateInterate);
-      }
+    Crtc           = (ROCKCHIP_CRTC_PROTOCOL *)DisplayState->CrtcState.Crtc;
+    Connector      = (ROCKCHIP_CONNECTOR_PROTOCOL *)DisplayState->ConnectorState.Connector;
+    CrtcState      = &DisplayState->CrtcState;
+    ConnectorState = &DisplayState->ConnectorState;
+    DrmMode        = &DisplayState->ConnectorState.DisplayMode;
 
-      DisplayModeToDrm (Mode, DrmMode);
-      ConnectorState->DisplayModeVic = Mode->Vic;
+    DisplayModeToDrm (Mode, DrmMode);
+    ConnectorState->DisplayModeVic = Mode->Vic;
 
-      DEBUG ((
-        DEBUG_INFO,
-        "%a: detailed mode clock %u kHz, flags[%x]\n"
-        "          H: %04d %04d %04d %04d\n"
-        "          V: %04d %04d %04d %04d\n"
-        "      bus_format: %x\n",
-        __func__,
-        DrmMode->Clock,
-        DrmMode->Flags,
-        DrmMode->HDisplay,
-        DrmMode->HSyncStart,
-        DrmMode->HSyncEnd,
-        DrmMode->HTotal,
-        DrmMode->VDisplay,
-        DrmMode->VSyncStart,
-        DrmMode->VSyncEnd,
-        DrmMode->VTotal,
-        ConnectorState->BusFormat
-        ));
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: detailed mode clock %u kHz, flags[%x]\n"
+      "          H: %04d %04d %04d %04d\n"
+      "          V: %04d %04d %04d %04d\n"
+      "      bus_format: %x\n",
+      __func__,
+      DrmMode->Clock,
+      DrmMode->Flags,
+      DrmMode->HDisplay,
+      DrmMode->HSyncStart,
+      DrmMode->HSyncEnd,
+      DrmMode->HTotal,
+      DrmMode->VDisplay,
+      DrmMode->VSyncStart,
+      DrmMode->VSyncEnd,
+      DrmMode->VTotal,
+      ConnectorState->BusFormat
+      ));
 
-      Status = DisplaySetCrtcInfo (DrmMode, CRTC_INTERLACE_HALVE_V);
+    Status = DisplaySetCrtcInfo (DrmMode, CRTC_INTERLACE_HALVE_V);
+    if (EFI_ERROR (Status)) {
+      goto EXIT;
+    }
+
+    if (Crtc->Init != NULL) {
+      Status = Crtc->Init (Crtc, DisplayState);
       if (EFI_ERROR (Status)) {
         goto EXIT;
       }
+    }
 
-      if (Crtc && Crtc->Init) {
-        Status = Crtc->Init (Crtc, StateInterate);
-        if (EFI_ERROR (Status)) {
-          goto EXIT;
-        }
-      }
+    /* adapt to uefi display architecture */
+    CrtcState->Format  = ROCKCHIP_FMT_ARGB8888;
+    CrtcState->SrcW    = ConnectorState->DisplayMode.HDisplay;
+    CrtcState->SrcH    = ConnectorState->DisplayMode.VDisplay;
+    CrtcState->SrcX    = 0;
+    CrtcState->SrcY    = 0;
+    CrtcState->CrtcW   = ConnectorState->DisplayMode.HDisplay;
+    CrtcState->CrtcH   = ConnectorState->DisplayMode.VDisplay;
+    CrtcState->CrtcX   = 0;
+    CrtcState->CrtcY   = 0;
+    CrtcState->YMirror = 0;
+    CrtcState->RBSwap  = 0;
 
-      /* adapt to uefi display architecture */
-      CrtcState->Format  = ROCKCHIP_FMT_ARGB8888;
-      CrtcState->SrcW    = ConnectorState->DisplayMode.HDisplay;
-      CrtcState->SrcH    = ConnectorState->DisplayMode.VDisplay;
-      CrtcState->SrcX    = 0;
-      CrtcState->SrcY    = 0;
-      CrtcState->CrtcW   = ConnectorState->DisplayMode.HDisplay;
-      CrtcState->CrtcH   = ConnectorState->DisplayMode.VDisplay;
-      CrtcState->CrtcX   = 0;
-      CrtcState->CrtcY   = 0;
-      CrtcState->YMirror = 0;
-      CrtcState->RBSwap  = 0;
+    CrtcState->XVirtual   = ALIGN (CrtcState->SrcW * DisplayBppConvert (Bpp), 32) >> 5;
+    CrtcState->DMAAddress = (UINT32)VramBaseAddress;
 
-      CrtcState->XVirtual   = ALIGN (CrtcState->SrcW * DisplayBppConvert (Bpp), 32) >> 5;
-      CrtcState->DMAAddress = (UINT32)VramBaseAddress;
+    if (Crtc->SetPlane != NULL) {
+      Crtc->SetPlane (Crtc, DisplayState);
+    }
 
-      if (Crtc && Crtc->SetPlane) {
-        Crtc->SetPlane (Crtc, StateInterate);
-      }
+    if (Crtc->Enable != NULL) {
+      Crtc->Enable (Crtc, DisplayState);
+    }
 
-      if (Crtc && Crtc->Enable) {
-        Crtc->Enable (Crtc, StateInterate);
-      }
-
-      if (Connector && Connector->Enable) {
-        Connector->Enable (Connector, StateInterate);
-      }
+    if (Connector->Enable != NULL) {
+      Connector->Enable (Connector, DisplayState);
     }
   }
 

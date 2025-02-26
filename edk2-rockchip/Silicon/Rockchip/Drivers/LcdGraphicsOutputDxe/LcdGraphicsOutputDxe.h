@@ -55,7 +55,8 @@ typedef struct {
   EFI_GRAPHICS_OUTPUT_PROTOCOL_MODE       Mode;
   EFI_GRAPHICS_OUTPUT_PROTOCOL            Gop;
   LCD_GRAPHICS_DEVICE_PATH                DevicePath;
-  LIST_ENTRY                              DisplayStateList;
+  DISPLAY_STATE                           *DisplayStates[VOP_OUTPUT_IF_NUMS];
+  UINT32                                  DisplayStatesCount;
   DISPLAY_MODE                            *DisplayModes;
 } LCD_INSTANCE;
 

@@ -1503,7 +1503,8 @@ static int dw_dp_connector_disable(ROCKCHIP_CONNECTOR_PROTOCOL *conn, DISPLAY_ST
 
 static int dw_dp_connector_detect(ROCKCHIP_CONNECTOR_PROTOCOL *conn, DISPLAY_STATE *state)
 {
-	return 0;
+	/* TODO */
+	return -ENODEV;
 }
 
 static int dw_dp_ddc_init(struct dw_dp *dp)
@@ -1552,7 +1553,7 @@ DwDpConnectorDetect (
 
 	ret = dw_dp_connector_detect(This, DisplayState);
 	if (ret)
-		return EFI_DEVICE_ERROR;
+		return EFI_NOT_FOUND;
 
 	return EFI_SUCCESS;
 }

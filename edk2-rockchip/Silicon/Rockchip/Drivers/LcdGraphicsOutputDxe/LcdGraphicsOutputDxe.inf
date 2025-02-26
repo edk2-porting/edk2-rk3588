@@ -56,6 +56,10 @@
 [Pcd]
   gRK3588TokenSpaceGuid.PcdDisplayModePreset
   gRK3588TokenSpaceGuid.PcdDisplayModeCustom
+  gRK3588TokenSpaceGuid.PcdDisplayConnectors
+  gRK3588TokenSpaceGuid.PcdDisplayConnectorsPriority
+  gRK3588TokenSpaceGuid.PcdDisplayForceOutput
+  gRK3588TokenSpaceGuid.PcdDisplayDuplicateOutput
 
 [Depex]
   gEfiCpuArchProtocolGuid AND

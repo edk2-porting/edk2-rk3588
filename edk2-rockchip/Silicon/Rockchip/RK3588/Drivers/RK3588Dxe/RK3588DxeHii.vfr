@@ -58,6 +58,21 @@ formset
       name  = DisplayModeCustom,
       guid  = RK3588DXE_FORMSET_GUID;
 
+    efivarstore DISPLAY_CONNECTORS_PRIORITY_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = DisplayConnectorsPriority,
+      guid  = RK3588DXE_FORMSET_GUID;
+
+    efivarstore UINT8,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = DisplayForceOutput,
+      guid  = RK3588DXE_FORMSET_GUID;
+
+    efivarstore UINT8,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = DisplayDuplicateOutput,
+      guid  = RK3588DXE_FORMSET_GUID;
+
     efivarstore UINT8,
       attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
       name  = HdmiSignalingMode,
@@ -395,6 +410,60 @@ formset
             option text   = STRING_TOKEN(STR_PLUS_SIGN), value = 1, flags = 0;
           endoneof;
         endif;
+
+        subtitle text = STRING_TOKEN(STR_NULL_STRING);
+
+        orderedlist varid = DisplayConnectorsPriority.Order,
+          prompt      = STRING_TOKEN(STR_DISPLAY_CONNECTORS_PRIORITY_PROMPT),
+          help        = STRING_TOKEN(STR_DISPLAY_CONNECTORS_PRIORITY_HELP),
+          flags       = RESET_REQUIRED,
+        suppressif (get(DisplayConnectorsMask) & VOP_OUTPUT_IF_HDMI0) == 0;
+          option text	= STRING_TOKEN(STR_DISPLAY_CONNECTOR_HDMI0), value = VOP_OUTPUT_IF_HDMI0, flags = 0;
+        endif;
+        suppressif (get(DisplayConnectorsMask) & VOP_OUTPUT_IF_HDMI1) == 0;
+          option text	= STRING_TOKEN(STR_DISPLAY_CONNECTOR_HDMI1), value = VOP_OUTPUT_IF_HDMI1, flags = 0;
+        endif;
+        suppressif (get(DisplayConnectorsMask) & VOP_OUTPUT_IF_EDP0) == 0;
+          option text	= STRING_TOKEN(STR_DISPLAY_CONNECTOR_EDP0), value = VOP_OUTPUT_IF_EDP0, flags = 0;
+        endif;
+        suppressif (get(DisplayConnectorsMask) & VOP_OUTPUT_IF_EDP1) == 0;
+          option text	= STRING_TOKEN(STR_DISPLAY_CONNECTOR_EDP1), value = VOP_OUTPUT_IF_EDP1, flags = 0;
+        endif;
+        suppressif (get(DisplayConnectorsMask) & VOP_OUTPUT_IF_DP0) == 0;
+          option text	= STRING_TOKEN(STR_DISPLAY_CONNECTOR_DP0), value = VOP_OUTPUT_IF_DP0, flags = 0;
+        endif;
+        suppressif (get(DisplayConnectorsMask) & VOP_OUTPUT_IF_DP1) == 0;
+          option text	= STRING_TOKEN(STR_DISPLAY_CONNECTOR_DP1), value = VOP_OUTPUT_IF_DP1, flags = 0;
+        endif;
+        suppressif (get(DisplayConnectorsMask) & VOP_OUTPUT_IF_MIPI0) == 0;
+          option text	= STRING_TOKEN(STR_DISPLAY_CONNECTOR_MIPI0), value = VOP_OUTPUT_IF_MIPI0, flags = 0;
+        endif;
+        suppressif (get(DisplayConnectorsMask) & VOP_OUTPUT_IF_MIPI1) == 0;
+          option text	= STRING_TOKEN(STR_DISPLAY_CONNECTOR_MIPI1), value = VOP_OUTPUT_IF_MIPI1, flags = 0;
+        endif;
+        endlist;
+
+        subtitle text = STRING_TOKEN(STR_NULL_STRING);
+
+        oneof varid = DisplayForceOutput,
+          prompt      = STRING_TOKEN(STR_DISPLAY_FORCE_OUTPUT_PROMPT),
+          help        = STRING_TOKEN(STR_DISPLAY_FORCE_OUTPUT_HELP),
+          flags       = NUMERIC_SIZE_1 | INTERACTIVE | RESET_REQUIRED,
+          default     = FixedPcdGetBool (PcdDisplayForceOutputDefault),
+          option text = STRING_TOKEN(STR_DISABLED), value = FALSE, flags = 0;
+          option text = STRING_TOKEN(STR_ENABLED), value = TRUE, flags = 0;
+        endoneof;
+
+        subtitle text = STRING_TOKEN(STR_NULL_STRING);
+
+        oneof varid = DisplayDuplicateOutput,
+          prompt      = STRING_TOKEN(STR_DISPLAY_DUPLICATE_OUTPUT_PROMPT),
+          help        = STRING_TOKEN(STR_DISPLAY_DUPLICATE_OUTPUT_HELP),
+          flags       = NUMERIC_SIZE_1 | INTERACTIVE | RESET_REQUIRED,
+          default     = FixedPcdGetBool (PcdDisplayDuplicateOutputDefault),
+          option text = STRING_TOKEN(STR_DISABLED), value = FALSE, flags = 0;
+          option text = STRING_TOKEN(STR_ENABLED), value = TRUE, flags = 0;
+        endoneof;
 
         suppressif (get(DisplayConnectorsMask) & (VOP_OUTPUT_IF_HDMI0 | VOP_OUTPUT_IF_HDMI1)) == 0;
           subtitle text = STRING_TOKEN(STR_NULL_STRING);

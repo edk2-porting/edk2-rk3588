@@ -127,6 +127,11 @@
   gRK3588TokenSpaceGuid.PcdDisplayModePreset
   gRK3588TokenSpaceGuid.PcdDisplayModeCustomDefault
   gRK3588TokenSpaceGuid.PcdDisplayModeCustom
+  gRK3588TokenSpaceGuid.PcdDisplayConnectorsPriority
+  gRK3588TokenSpaceGuid.PcdDisplayForceOutputDefault
+  gRK3588TokenSpaceGuid.PcdDisplayForceOutput
+  gRK3588TokenSpaceGuid.PcdDisplayDuplicateOutputDefault
+  gRK3588TokenSpaceGuid.PcdDisplayDuplicateOutput
   gRK3588TokenSpaceGuid.PcdHdmiSignalingModeDefault
   gRK3588TokenSpaceGuid.PcdHdmiSignalingMode
 

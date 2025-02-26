@@ -1405,7 +1405,7 @@ AnalogixDpConnectorDetect (
   )
 {
   // Todo
-  return 0;
+  return EFI_NOT_FOUND;
 }
 
 ROCKCHIP_CONNECTOR_PROTOCOL  mDpConnectorOps = {

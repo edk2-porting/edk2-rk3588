@@ -399,22 +399,6 @@ STATIC UINT8  RK3568Vop2VpPrimaryPlaneOrder[VOP2_VP_MAX] = {
 
 STATIC UINT32  mRegsBackup[RK3568_MAX_REG] = { 0 };
 
-STATIC CHAR8  *mDisplayIfName[] = {
-  " RGB",
-  " BT1120",
-  " BT656",
-  " LVDS0",
-  " LVDS1",
-  " MIPI0",
-  " MIPI1",
-  " eDP0",
-  " eDP1",
-  " DP0",
-  " DP1",
-  " HDMI0",
-  " HDMI1"
-};
-
 STATIC VOP2  *RockchipVop2;
 
 INLINE
@@ -2107,25 +2091,6 @@ Vop2SetClk (
   return EFI_SUCCESS;
 }
 
-STATIC
-CHAR8 *
-GetOutputIfName (
-  IN UINT32  OutputIf
-  )
-{
-  INT32  i     = 0;
-  INT32  Shift = 0;
-
-  for (i = 0; i < VOP_OUTPUT_IF_NUMS; i++) {
-    Shift = 1 << i;
-    if (OutputIf & Shift) {
-      return mDisplayIfName[i];
-    }
-  }
-
-  return mDisplayIfName[0];
-}
-
 EFI_STATUS
 Vop2PreInit (
   IN  ROCKCHIP_CRTC_PROTOCOL  *This,
@@ -2603,12 +2568,12 @@ Vop2Init (
 
   DEBUG ((
     DEBUG_INIT,
-    "[INIT]VOP update mode to: %dx%d%a%d, type:%a for VP%d\n",
+    "[INIT]VOP update mode to: %dx%d%a%d, type: %a for VP%d\n",
     Mode->HDisplay,
     Mode->VDisplay,
     Mode->Flags & DRM_MODE_FLAG_INTERLACE ? "i" : "p",
     Mode->VRefresh,
-    GetOutputIfName (ConnectorState->OutputInterface),
+    GetVopOutputIfName (ConnectorState->OutputInterface),
     CrtcState->CrtcID
     ));
 

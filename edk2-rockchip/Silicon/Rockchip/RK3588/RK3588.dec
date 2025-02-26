@@ -89,7 +89,9 @@
     <HeaderFiles>
       VarStoreData.h
   }
-  gRK3588TokenSpaceGuid.PcdHdmiSignalingModeDefault|0|UINT8|0x00010804
+  gRK3588TokenSpaceGuid.PcdDisplayForceOutputDefault|FALSE|BOOLEAN|0x00010805
+  gRK3588TokenSpaceGuid.PcdDisplayDuplicateOutputDefault|FALSE|BOOLEAN|0x00010806
+  gRK3588TokenSpaceGuid.PcdHdmiSignalingModeDefault|0|UINT8|0x00010807
 
 [PcdsFixedAtBuild, PcdsPatchableInModule, PcdsDynamic, PcdsDynamicEx]
   gRK3588TokenSpaceGuid.PcdCPULClusterClockPreset|0|UINT32|0x00000001
@@ -139,7 +141,16 @@
     <HeaderFiles>
       VarStoreData.h
   }
-  gRK3588TokenSpaceGuid.PcdHdmiSignalingMode|0|UINT8|0x00000804
+  gRK3588TokenSpaceGuid.PcdDisplayConnectorsPriority|{ 0x0 }|DISPLAY_CONNECTORS_PRIORITY_VARSTORE_DATA|0x00000804 {
+    <Packages>
+      Silicon/Rockchip/RockchipPkg.dec
+      Silicon/Rockchip/RK3588/RK3588.dec
+    <HeaderFiles>
+      VarStoreData.h
+  }
+  gRK3588TokenSpaceGuid.PcdDisplayForceOutput|FALSE|BOOLEAN|0x00000805
+  gRK3588TokenSpaceGuid.PcdDisplayDuplicateOutput|FALSE|BOOLEAN|0x00000806
+  gRK3588TokenSpaceGuid.PcdHdmiSignalingMode|0|UINT8|0x00000807
 
 [PcdsDynamicEx]
   gRK3588TokenSpaceGuid.PcdPcieEcamCompliantSegmentsMask|0|UINT32|0x20000001

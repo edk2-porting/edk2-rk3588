@@ -168,3 +168,26 @@ ConvertHdmiToCeaVic (
     default: return 0;
   }
 }
+
+CHAR8 *
+GetVopOutputIfName (
+  IN UINT32  OutputInterface
+  )
+{
+  switch (OutputInterface) {
+    case VOP_OUTPUT_IF_RGB:    return "RGB";
+    case VOP_OUTPUT_IF_BT1120: return "BT1120";
+    case VOP_OUTPUT_IF_BT656:  return "BT656";
+    case VOP_OUTPUT_IF_LVDS0:  return "LVDS0";
+    case VOP_OUTPUT_IF_LVDS1:  return "LVDS1";
+    case VOP_OUTPUT_IF_MIPI0:  return "MIPI0";
+    case VOP_OUTPUT_IF_MIPI1:  return "MIPI1";
+    case VOP_OUTPUT_IF_EDP0:   return "EDP0";
+    case VOP_OUTPUT_IF_EDP1:   return "EDP1";
+    case VOP_OUTPUT_IF_DP0:    return "DP0";
+    case VOP_OUTPUT_IF_DP1:    return "DP1";
+    case VOP_OUTPUT_IF_HDMI0:  return "HDMI0";
+    case VOP_OUTPUT_IF_HDMI1:  return "HDMI1";
+    default:                   return "Unknown";
+  }
+}

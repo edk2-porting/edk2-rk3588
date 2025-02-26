@@ -26,16 +26,17 @@ InitializeDisplayVariables (
   IN BOOLEAN  Reset
   )
 {
-  EFI_STATUS                         Status;
-  UINTN                              Index;
-  UINT32                             *Connectors;
-  UINTN                              ConnectorsCount;
-  UINT32                             ConnectorsMask;
-  UINTN                              Size;
-  UINT8                              Var8;
-  VOID                               *PcdData;
-  DISPLAY_MODE_PRESET_VARSTORE_DATA  ModePreset;
-  DISPLAY_MODE                       ModeCustom;
+  EFI_STATUS                                 Status;
+  UINTN                                      Index;
+  UINT32                                     *Connectors;
+  UINTN                                      ConnectorsCount;
+  UINT32                                     ConnectorsMask;
+  UINTN                                      Size;
+  UINT8                                      Var8;
+  VOID                                       *PcdData;
+  DISPLAY_MODE_PRESET_VARSTORE_DATA          ModePreset;
+  DISPLAY_MODE                               ModeCustom;
+  DISPLAY_CONNECTORS_PRIORITY_VARSTORE_DATA  ConnectorsPriority;
 
   Connectors      = PcdGetPtr (PcdDisplayConnectors);
   ConnectorsCount = PcdGetSize (PcdDisplayConnectors) / sizeof (*Connectors);
@@ -119,6 +120,48 @@ InitializeDisplayVariables (
       Status = PcdSetPtrS (PcdDisplayModeCustom, &Size, PcdData);
       ASSERT_EFI_ERROR (Status);
     }
+  }
+
+  Size   = sizeof (ConnectorsPriority);
+  Status = !Reset ? gRT->GetVariable (
+                           L"DisplayConnectorsPriority",
+                           &gRK3588DxeFormSetGuid,
+                           NULL,
+                           &Size,
+                           &ConnectorsPriority
+                           ) : EFI_NOT_FOUND;
+  if (EFI_ERROR (Status)) {
+    ZeroMem (&ConnectorsPriority, sizeof (ConnectorsPriority));
+    CopyMem (&ConnectorsPriority.Order, Connectors, ConnectorsCount * sizeof (*Connectors));
+
+    Status = PcdSetPtrS (PcdDisplayConnectorsPriority, &Size, &ConnectorsPriority);
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  Size   = sizeof (Var8);
+  Status = !Reset ? gRT->GetVariable (
+                           L"DisplayForceOutput",
+                           &gRK3588DxeFormSetGuid,
+                           NULL,
+                           &Size,
+                           &Var8
+                           ) : EFI_NOT_FOUND;
+  if (EFI_ERROR (Status)) {
+    Status = PcdSetBoolS (PcdDisplayForceOutput, FixedPcdGetBool (PcdDisplayForceOutputDefault));
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  Size   = sizeof (Var8);
+  Status = !Reset ? gRT->GetVariable (
+                           L"DisplayDuplicateOutput",
+                           &gRK3588DxeFormSetGuid,
+                           NULL,
+                           &Size,
+                           &Var8
+                           ) : EFI_NOT_FOUND;
+  if (EFI_ERROR (Status)) {
+    Status = PcdSetBoolS (PcdDisplayDuplicateOutput, FixedPcdGetBool (PcdDisplayDuplicateOutputDefault));
+    ASSERT_EFI_ERROR (Status);
   }
 
   Size   = sizeof (Var8);

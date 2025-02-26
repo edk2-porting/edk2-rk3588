@@ -15,17 +15,6 @@
 #include <Library/drm_dsc.h>
 #include <RockchipDisplay.h>
 
-#define LIST_FOR_EACH_ENTRY(Pos, Head, Member)                          \
-        for (Pos = BASE_CR((Head)->ForwardLink, typeof(*Pos), Member);  \
-             &Pos->Member != (Head);                                    \
-             Pos = BASE_CR(Pos->Member.ForwardLink, typeof(*Pos), Member))
-
-#define LIST_FOR_EACH_ENTRY_SAFE(Pos, Next, Head, Member)                                 \
-        for (Pos = BASE_CR((Head)->ForwardLink, typeof(*Pos), Member),                    \
-             Next = BASE_CR(Pos->Member.ForwardLink, typeof(*Pos), Member);               \
-             &Pos->Member != (Head);                                                      \
-             Pos = Next, Next = BASE_CR(Next->Member.ForwardLink, typeof(*Next), Member))
-
 #define __ROUND_MASK(x, y)  ((__typeof__(x))((y)-1))
 #define ROUNDUP(x, y)       ((((x)-1) | __ROUND_MASK(x, y))+1)
 #define ROUNDDOWN(x, y)     ((x) & ~__ROUND_MASK(x, y))
@@ -243,17 +232,12 @@ typedef struct {
 } CRTC_STATE;
 
 typedef struct {
-  LIST_ENTRY         ListHead;
   CRTC_STATE         CrtcState;
   CONNECTOR_STATE    ConnectorState;
 
   INT32              VpsConfigModeID;
 
-  BOOLEAN            IsInit;
   BOOLEAN            IsEnable;
-
-  BOOLEAN            IsForceOutput;
-  UINT32             ForceOutputFormat;
 } DISPLAY_STATE;
 
 EFIAPI
@@ -283,6 +267,11 @@ ConvertCeaToHdmiVic (
 UINT8
 ConvertHdmiToCeaVic (
   IN UINT8  CeaVic
+  );
+
+CHAR8 *
+GetVopOutputIfName (
+  IN UINT32  OutputInterface
   );
 
 #endif

@@ -72,6 +72,25 @@
 #string STR_DISPLAY_MODE_CUSTOM_VERTICAL_BACK_PORCH        #language en-US "Vertical Back Porch"
 #string STR_DISPLAY_MODE_CUSTOM_VERTICAL_SYNC_POLARITY     #language en-US "Vertical Sync Polarity"
 
+#string STR_DISPLAY_CONNECTORS_PRIORITY_PROMPT             #language en-US "Connector Priority"
+#string STR_DISPLAY_CONNECTORS_PRIORITY_HELP               #language en-US "Choose the order in which display connectors are probed. The first display detected will be used as the primary output."
+#string STR_DISPLAY_CONNECTOR_HDMI0                        #language en-US "HDMI 0"
+#string STR_DISPLAY_CONNECTOR_HDMI1                        #language en-US "HDMI 1"
+#string STR_DISPLAY_CONNECTOR_EDP0                         #language en-US "eDP 0"
+#string STR_DISPLAY_CONNECTOR_EDP1                         #language en-US "eDP 1"
+#string STR_DISPLAY_CONNECTOR_DP0                          #language en-US "DP 0"
+#string STR_DISPLAY_CONNECTOR_DP1                          #language en-US "DP 1"
+#string STR_DISPLAY_CONNECTOR_MIPI0                        #language en-US "DSI 0"
+#string STR_DISPLAY_CONNECTOR_MIPI1                        #language en-US "DSI 1"
+
+#string STR_DISPLAY_FORCE_OUTPUT_PROMPT                    #language en-US "Force Output"
+#string STR_DISPLAY_FORCE_OUTPUT_HELP                      #language en-US "Enable or disable the display output even when none is connected.\n\n"
+                                                                           "If the serial console is used instead, this option can be disabled to allow OSes to prefer it when possible."
+
+#string STR_DISPLAY_DUPLICATE_OUTPUT_PROMPT                #language en-US "Duplicate Primary Display"
+#string STR_DISPLAY_DUPLICATE_OUTPUT_HELP                  #language en-US "Enable or disable duplication of the primary display output on other connected displays.\n"
+                                                                           "Note that this will use the same mode/resolution everywhere, even if it is not supported by the other displays."
+
 #string STR_DISPLAY_CONNECTOR_TYPE_HDMI                    #language en-US "HDMI"
 
 #string STR_HDMI_SIGNALING_MODE_PROMPT                     #language en-US "Signaling Mode"

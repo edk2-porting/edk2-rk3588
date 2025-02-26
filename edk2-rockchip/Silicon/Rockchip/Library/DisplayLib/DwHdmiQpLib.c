@@ -1015,8 +1015,11 @@ DwHdmiQpConnectorDetect (
   OUT DISPLAY_STATE                *DisplayState
   )
 {
-  // Todo
-  return EFI_SUCCESS;
+  struct DwHdmiQpDevice  *Hdmi;
+
+  Hdmi = DW_HDMI_QP_FROM_CONNECTOR_PROTOCOL (This);
+
+  return DwHdmiReadHpd (Hdmi) ? EFI_SUCCESS : EFI_NOT_FOUND;
 }
 
 ROCKCHIP_CONNECTOR_PROTOCOL  mHdmiConnectorOps = {
