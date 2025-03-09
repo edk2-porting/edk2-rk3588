@@ -38,6 +38,7 @@ Note that this list is subject to change at any time as devices gain better supp
 
 ## Bronze
 - [Radxa ROCK 5B+](https://radxa.com/products/rock5/5bp)
+- [Orange Pi 5 Max](http://www.orangepi.org/html/hardWare/computerAndMicrocontrollers/details/Orange-Pi-5-Max.html)
 - [Fydetab Duo](https://fydetabduo.com/)
 - [Firefly AIO-3588Q](https://en.t-firefly.com/product/industry/aio3588q)
 - [Firefly ITX-3588J](https://en.t-firefly.com/product/industry/itx3588j)
@@ -184,6 +185,7 @@ The firmware will now look for overrides in the partition of a selected boot opt
 | `rk3588s-rock-5a`                       | ROCK 5A                       |
 | `rk3588-rock-5-itx`                     | ROCK 5 ITX                    |
 | `rk3588s-orangepi-5`                    | Orange Pi 5                   |
+| `rk3588-orangepi-5-max`                 | Orange Pi 5 Max               |
 | `rk3588-orangepi-5-plus`                | Orange Pi 5 Plus              |
 | `rk3588s-9tripod-linux`                 | Indiedroid Nova               |
 | `rk3588s-fydetab-duo`                   | Fydetab Duo                   |

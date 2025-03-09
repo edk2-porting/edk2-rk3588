@@ -36,6 +36,7 @@ jobs:
           - nanopi-r6c
           - nanopi-r6s
           - orangepi-5
+          - orangepi-5-max
           - orangepi-5plus
           - powerstation-6
           - r58-mini

@@ -1,0 +1,21 @@
+#/** @file
+#
+#  Copyright (c) 2024, Mario Bălănică <mariobalanica02@gmail.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = DeviceTree-Mainline
+  FILE_GUID                      = 84492e97-a10f-49a7-85e9-025d1966b343
+  MODULE_TYPE                    = USER_DEFINED
+  VERSION_STRING                 = 1.0
+
+[Sources]
+  devicetree/mainline/upstream/src/arm64/rockchip/rk3588-orangepi-5-max.dts
+
+[Packages]
+  MdePkg/MdePkg.dec
+  Silicon/Rockchip/RockchipPkg.dec
