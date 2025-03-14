@@ -338,14 +338,46 @@ IdentifyDisplay (
         __func__,
         Status
         ));
+      return Status;
     }
-
-    return Status;
   }
 
   //
-  // TODO: Read EDID here.
+  // Get sink info from EDID.
   //
+  if (Connector->GetEdid != NULL) {
+    Status = Connector->GetEdid (Connector, DisplayState);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Failed to get EDID. Status=%r\n",
+        __func__,
+        Status
+        ));
+      if (Status == EFI_CRC_ERROR) {
+        DEBUG ((DEBUG_INFO, "%a: ", __func__));
+        DebugPrintEdid (ConnectorState->Edid);
+      }
+
+      return Status;
+    }
+
+    DEBUG ((DEBUG_INFO, "%a: ", __func__));
+    DebugPrintEdid (ConnectorState->Edid);
+
+    Status = EdidGetDisplaySinkInfo (ConnectorState);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "%a: Failed to get sink info from EDID. Status=%r\n",
+        __func__,
+        Status
+        ));
+    }
+  }
+
+  DEBUG ((DEBUG_INFO, "%a: Sink Info:\n", __func__));
+  DebugPrintDisplaySinkInfo (&ConnectorState->SinkInfo, 2);
 
   return Status;
 }
@@ -469,6 +501,7 @@ GetSupportedDisplayModes (
 
   if (ModePreset != NULL) {
     if (ModePreset->Preset == DISPLAY_MODE_NATIVE) {
+      DEBUG ((DEBUG_INFO, "%a: Native\n", __func__));
       if (PrimaryDisplayState != NULL) {
         SinkInfo = &PrimaryDisplayState->ConnectorState.SinkInfo;
         if (SinkInfo->PreferredMode.OscFreq != 0) {
@@ -476,9 +509,12 @@ GetSupportedDisplayModes (
         }
       }
     } else if (ModePreset->Preset == DISPLAY_MODE_CUSTOM) {
+      DEBUG ((DEBUG_INFO, "%a: Custom:\n", __func__));
       Mode = PcdGetPtr (PcdDisplayModeCustom);
       ASSERT (Mode != NULL);
       if (Mode != NULL) {
+        DebugPrintDisplayMode (Mode, 2, TRUE, TRUE);
+
         if ((Mode->OscFreq < VOP_PIXEL_CLOCK_MIN) ||
             (Mode->OscFreq > VOP_PIXEL_CLOCK_MAX) ||
             (Mode->HActive < VOP_HORIZONTAL_RES_MIN) ||
@@ -487,18 +523,12 @@ GetSupportedDisplayModes (
             (Mode->VActive > VOP_VERTICAL_RES_MAX))
         {
           Mode = NULL;
-          DEBUG ((
-            DEBUG_ERROR,
-            "%a: Custom mode unsupported! (OscFreq=%u, HActive=%u, VActive=%u)\n",
-            __func__,
-            Mode->OscFreq,
-            Mode->HActive,
-            Mode->VActive
-            ));
+          DEBUG ((DEBUG_ERROR, "%a: Custom mode unsupported!\n", __func__));
           ASSERT (FALSE);
         }
       }
     } else if (ModePreset->Preset < GetPredefinedDisplayModesCount ()) {
+      DEBUG ((DEBUG_INFO, "%a: Preset %u\n", __func__, ModePreset->Preset));
       Mode = GetPredefinedDisplayMode (ModePreset->Preset);
     } else {
       DEBUG ((
@@ -1003,4 +1033,39 @@ GetBytesPerPixel (
     default:
       return 0;
   }
+}
+
+BOOLEAN
+IsDisplayModeSupported (
+  IN CONNECTOR_STATE     *ConnectorState,
+  IN CONST DISPLAY_MODE  *DisplayMode
+  )
+{
+  DISPLAY_SINK_INFO  *SinkInfo;
+
+  SinkInfo = &ConnectorState->SinkInfo;
+
+  // TODO: should query CRTC and connector instead.
+
+  if ((DisplayMode->OscFreq < VOP_PIXEL_CLOCK_MIN) ||
+      (DisplayMode->OscFreq > VOP_PIXEL_CLOCK_MAX) ||
+      (DisplayMode->HActive < VOP_HORIZONTAL_RES_MIN) ||
+      (DisplayMode->HActive > VOP_HORIZONTAL_RES_MAX) ||
+      (DisplayMode->VActive < VOP_VERTICAL_RES_MIN) ||
+      (DisplayMode->VActive > VOP_VERTICAL_RES_MAX))
+  {
+    return FALSE;
+  }
+
+  if (ConnectorState->Type == DRM_MODE_CONNECTOR_HDMIA) {
+    if ((DisplayMode->OscFreq > 340000) &&
+        (!SinkInfo->HdmiInfo.Hdmi20Supported ||
+         SinkInfo->HdmiInfo.Hdmi20SpeedLimited ||
+         !SinkInfo->HdmiInfo.ScdcSupported))
+    {
+      return FALSE;
+    }
+  }
+
+  return TRUE;
 }

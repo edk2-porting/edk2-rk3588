@@ -87,8 +87,7 @@
 #define DDC_ADDR          0x50
 #define SCDC_ADDR         0x54
 
-#define HDMI_EDID_LEN        512
-#define HDMI_EDID_BLOCK_LEN  128
+#define HDMI_EDID_BLOCK_RETRIES  4
 
 /* DW-HDMI Controller >= 0x200a are at least compliant with SCDC version 1 */
 #define SCDC_MIN_SOURCE_VERSION  0x1
@@ -590,16 +589,24 @@ DwHdmiScdcWrite (
 }
 
 STATIC
-VOID
-DumpEdid (
-  IN struct DwHdmiQpDevice  *Hdmi
+EFI_STATUS
+DwHdmiReadEdidBlock (
+  IN  struct DwHdmiQpDevice  *Hdmi,
+  IN  UINT8                  BlockIndex,
+  OUT UINT8                  *Buffer,
+  IN  UINTN                  Length
   )
 {
-  DEBUG ((DEBUG_INIT, "DwHdmiQpLib.c: Dumping EDID: \n"));
-  UINT8           EDID[EDID_SIZE];
-  UINT8           BaseAddr = 0x0;
-  struct i2c_msg  msgs[]   = {
+  UINT8  BaseAddr = BlockIndex * EDID_BLOCK_SIZE;
+  UINT8  Segment  = BlockIndex >> 1;
+
+  struct i2c_msg  Msgs[] = {
     {
+      .addr  = DDC_SEGMENT_ADDR,
+      .flags = 0,
+      .len   = 1,
+      .buf   = &Segment,
+    },{
       .addr  = DDC_ADDR,
       .flags = 0,
       .len   = 1,
@@ -607,21 +614,14 @@ DumpEdid (
     },{
       .addr  = DDC_ADDR,
       .flags = I2C_M_RD,
-      .len   = EDID_SIZE,
-      .buf   = EDID,
+      .len   = Length,
+      .buf   = Buffer,
     }
   };
 
-  if (DwHdmiQpI2cXfer (Hdmi, msgs, 2)) {
-    return;
-  }
+  UINT8  SkipMsg = (Segment > 0) ? 0 : 1;
 
-  for (int i = 0; i < EDID_SIZE; i++) {
-    DEBUG ((DEBUG_INIT, "%02x ", EDID[i]));
-    if (!((i + 1) % 8)) {
-      DEBUG ((DEBUG_INIT, "\n"));
-    }
-  }
+  return DwHdmiQpI2cXfer (Hdmi, Msgs + SkipMsg, ARRAY_SIZE (Msgs) - SkipMsg);
 }
 
 EFI_STATUS
@@ -666,7 +666,61 @@ DwHdmiQpConnectorGetEdid (
   OUT DISPLAY_STATE                *DisplayState
   )
 {
-  // Todo
+  struct DwHdmiQpDevice  *Hdmi;
+  CONNECTOR_STATE        *ConnectorState;
+  EFI_STATUS             Status;
+  UINT32                 Retry;
+  UINT32                 BlockIndex;
+  UINT32                 Extensions;
+  UINT8                  *Buffer;
+
+  Hdmi           = DW_HDMI_QP_FROM_CONNECTOR_PROTOCOL (This);
+  ConnectorState = &DisplayState->ConnectorState;
+
+  for (BlockIndex = 0, Extensions = 0; BlockIndex <= Extensions; BlockIndex++) {
+    Buffer = EDID_BLOCK (ConnectorState->Edid, BlockIndex);
+
+    for (Retry = HDMI_EDID_BLOCK_RETRIES; Retry > 0; Retry--) {
+      Status = DwHdmiReadEdidBlock (Hdmi, BlockIndex, Buffer, EDID_BLOCK_SIZE);
+      if (EFI_ERROR (Status)) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "%a: Failed to read EDID block %u. Status=%r\n",
+          __func__,
+          BlockIndex,
+          Status
+          ));
+        return Status;
+      }
+
+      Status = CheckEdidBlock (Buffer, BlockIndex);
+      if (EFI_ERROR (Status)) {
+        /* Might be corrupted due to a bus condition, try again. */
+        continue;
+      }
+
+      break;
+    }
+
+    if (Retry == 0) {
+      return Status;
+    }
+
+    if (BlockIndex == 0) {
+      Extensions = ((EDID_BASE *)ConnectorState->Edid)->ExtensionFlag;
+      if (Extensions > EDID_MAX_EXTENSION_BLOCKS) {
+        DEBUG ((
+          DEBUG_WARN,
+          "%a: Reading only %u extensions out of %u reported.\n",
+          __func__,
+          EDID_MAX_EXTENSION_BLOCKS,
+          Extensions
+          ));
+        Extensions = EDID_MAX_EXTENSION_BLOCKS;
+      }
+    }
+  }
+
   return EFI_SUCCESS;
 }
 

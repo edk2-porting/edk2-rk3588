@@ -11,6 +11,7 @@
 #define __ROCKCHIP_DISPLAY_LIB_H__
 
 #include <Uefi/UefiBaseType.h>
+#include <IndustryStandard/Edid.h>
 #include <Library/uboot-env.h>
 #include <Library/drm_dsc.h>
 #include <RockchipDisplay.h>
@@ -22,7 +23,19 @@
 
 #define INLINE  static inline
 
-#define EDID_SIZE  128
+#define EDID_MAX_EXTENSION_BLOCKS  4
+
+#define EDID_MAX_SIZE  ((1 + EDID_MAX_EXTENSION_BLOCKS) * EDID_BLOCK_SIZE)
+
+#define EDID_GET_BLOCK_COUNT(base)            \
+  (1 + MIN (                                  \
+         EDID_MAX_EXTENSION_BLOCKS,           \
+         ((EDID_BASE *)(base))->ExtensionFlag \
+         ))
+
+#define EDID_GET_SIZE(base)  (EDID_GET_BLOCK_COUNT(base) * EDID_BLOCK_SIZE)
+
+#define EDID_BLOCK(base, idx)  ((UINT8 *)(base) + ((idx) * EDID_BLOCK_SIZE))
 
 typedef enum {
   ROCKCHIP_DISPLAY_FULLSCREEN,
@@ -158,6 +171,7 @@ typedef struct {
 
 typedef struct {
   BOOLEAN    Hdmi20Supported;
+  BOOLEAN    Hdmi20SpeedLimited;
   BOOLEAN    ScdcSupported;
 } HDMI_SINK_INFO;
 
@@ -176,7 +190,7 @@ typedef struct {
   DRM_DISPLAY_MODE     DisplayMode;
   UINT32               DisplayModeVic;
   BASE2_DISP_INFO      *DispInfo;        /* disp_info from baseparameter 2.0 */
-  UINT8                EDID[EDID_SIZE * 4];
+  UINT8                Edid[EDID_MAX_SIZE];
   UINT32               BusFormat;
   UINT32               OutputMode;
   UINT32               Type;
@@ -259,6 +273,11 @@ DisplayModeToDrm (
   OUT DRM_DISPLAY_MODE    *DrmDisplayMode
   );
 
+UINT32
+DisplayModeVRefresh (
+  IN CONST DISPLAY_MODE  *DisplayMode
+  );
+
 UINT8
 ConvertCeaToHdmiVic (
   IN UINT8  CeaVic
@@ -272,6 +291,31 @@ ConvertHdmiToCeaVic (
 CHAR8 *
 GetVopOutputIfName (
   IN UINT32  OutputInterface
+  );
+
+EFI_STATUS
+CheckEdidBlock (
+  IN UINT8  *EdidBlock,
+  IN UINT8  BlockIndex
+  );
+
+VOID
+DebugPrintEdid (
+  IN UINT8  *Edid
+  );
+
+VOID
+DebugPrintDisplayMode (
+  IN CONST DISPLAY_MODE  *DisplayMode,
+  IN UINT32              Indent,
+  IN BOOLEAN             PrintVic,
+  IN BOOLEAN             PrintTimings
+  );
+
+VOID
+DebugPrintDisplaySinkInfo (
+  IN CONST DISPLAY_SINK_INFO  *SinkInfo,
+  IN UINT32                   Indent
   );
 
 #endif

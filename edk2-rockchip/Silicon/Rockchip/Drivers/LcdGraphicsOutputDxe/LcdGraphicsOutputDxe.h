@@ -107,6 +107,12 @@ GetBytesPerPixel (
   IN  LCD_BPP  Bpp
   );
 
+BOOLEAN
+IsDisplayModeSupported (
+  IN CONNECTOR_STATE     *ConnectorState,
+  IN CONST DISPLAY_MODE  *DisplayMode
+  );
+
 UINT32
 GetPredefinedDisplayModesCount (
   VOID
@@ -115,6 +121,29 @@ GetPredefinedDisplayModesCount (
 CONST DISPLAY_MODE *
 GetPredefinedDisplayMode (
   IN UINT32  Index
+  );
+
+CONST DISPLAY_MODE *
+GetPredefinedDisplayModeByVic (
+  IN UINT8  Vic
+  );
+
+CONST DISPLAY_MODE *
+GetPredefinedDisplayModeByResolution (
+  IN UINT32  HorizontalResolution,
+  IN UINT32  VerticalResolution,
+  IN UINT32  RefreshRate
+  );
+
+CONST DISPLAY_MODE *
+MatchPredefinedDisplayMode (
+  IN CONST DISPLAY_MODE  *DisplayMode,
+  IN UINT32              ClockTolerance
+  );
+
+EFI_STATUS
+EdidGetDisplaySinkInfo (
+  IN CONNECTOR_STATE  *ConnectorState
   );
 
 #endif /* LCD_GRAPHICS_OUTPUT_DXE_H_ */

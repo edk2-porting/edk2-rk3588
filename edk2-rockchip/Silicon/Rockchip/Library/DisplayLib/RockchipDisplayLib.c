@@ -1,6 +1,7 @@
 /** @file
 
   Copyright (c) 2022 Rockchip Electronics Co. Ltd.
+  Copyright (c) 2024-2025, Mario Bălănică <mariobalanica02@gmail.com>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -141,6 +142,18 @@ DisplayModeToDrm (
   DrmDisplayMode->VRefresh   = DrmModeVRefresh (DrmDisplayMode);
 }
 
+UINT32
+DisplayModeVRefresh (
+  IN CONST DISPLAY_MODE  *DisplayMode
+  )
+{
+  DRM_DISPLAY_MODE  DrmDisplayMode = { 0 };
+
+  DisplayModeToDrm (DisplayMode, &DrmDisplayMode);
+
+  return DrmDisplayMode.VRefresh;
+}
+
 UINT8
 ConvertCeaToHdmiVic (
   IN UINT8  CeaVic
@@ -190,4 +203,179 @@ GetVopOutputIfName (
     case VOP_OUTPUT_IF_HDMI1:  return "HDMI1";
     default:                   return "Unknown";
   }
+}
+
+STATIC
+BOOLEAN
+IsEdidBlockChecksumValid (
+  IN UINT8  *EdidBlock
+  )
+{
+  UINT8   Checksum = 0;
+  UINT32  Index;
+
+  for (Index = 0; Index < EDID_BLOCK_SIZE; Index++) {
+    Checksum += EdidBlock[Index];
+  }
+
+  return (Checksum == 0);
+}
+
+EFI_STATUS
+CheckEdidBlock (
+  IN UINT8  *EdidBlock,
+  IN UINT8  BlockIndex
+  )
+{
+  STATIC CONST UINT8  ExpectedEdidHeader[EDID_HEADER_SIZE] = {
+    0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0x00
+  };
+
+  if ((BlockIndex == 0) &&
+      (CompareMem (EdidBlock, ExpectedEdidHeader, EDID_HEADER_SIZE) != 0))
+  {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Invalid header for EDID block %u\n",
+      __func__,
+      BlockIndex
+      ));
+    return EFI_CRC_ERROR;
+  }
+
+  if (!IsEdidBlockChecksumValid (EdidBlock)) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "%a: Invalid checksum for EDID block %u\n",
+      __func__,
+      BlockIndex
+      ));
+
+    //
+    // Workaround for some KVM switches which update the
+    // CEA-861 extension block without fixing its checksum.
+    //
+    if ((BlockIndex > 0) && (EdidBlock[0] == EDID_EXTENSION_CEA_861)) {
+      DEBUG ((
+        DEBUG_WARN,
+        "%a:  (ignoring for CEA-861 extension block)\n",
+        __func__
+        ));
+    } else {
+      return EFI_CRC_ERROR;
+    }
+  }
+
+  return EFI_SUCCESS;
+}
+
+VOID
+DebugPrintEdid (
+  IN UINT8  *Edid
+  )
+{
+  UINT32  BlockCount;
+  UINT32  BlockIndex;
+  UINT32  Index;
+
+  if (!DebugPrintEnabled () || !DebugPrintLevelEnabled (DEBUG_INFO)) {
+    return;
+  }
+
+  BlockCount = EDID_GET_BLOCK_COUNT (Edid);
+
+  DEBUG ((DEBUG_INFO, "EDID with %u blocks:\n", BlockCount));
+
+  for (BlockIndex = 0; BlockIndex < BlockCount; BlockIndex++) {
+    for (Index = 0; Index < EDID_BLOCK_SIZE; Index++) {
+      DEBUG ((DEBUG_INFO, "%02x ", Edid[(BlockIndex * EDID_BLOCK_SIZE) + Index]));
+
+      if ((Index + 1) % 16 == 0) {
+        DEBUG ((DEBUG_INFO, "\n"));
+      }
+    }
+
+    DEBUG ((DEBUG_INFO, "\n"));
+  }
+}
+
+VOID
+DebugPrintDisplayMode (
+  IN CONST DISPLAY_MODE  *DisplayMode,
+  IN UINT32              Indent,
+  IN BOOLEAN             PrintVic,
+  IN BOOLEAN             PrintTimings
+  )
+{
+  if (!DebugPrintEnabled () || !DebugPrintLevelEnabled (DEBUG_INFO)) {
+    return;
+  }
+
+  DEBUG ((
+    DEBUG_INFO,
+    "%*a%u x %u @ %u Hz",
+    Indent,
+    "",
+    DisplayMode->HActive,
+    DisplayMode->VActive,
+    DisplayModeVRefresh (DisplayMode)
+    ));
+
+  if (PrintVic && (DisplayMode->Vic != 0)) {
+    DEBUG ((DEBUG_INFO, " (VIC %u)", DisplayMode->Vic));
+  }
+
+  if (PrintTimings) {
+    DEBUG ((DEBUG_INFO, "\n"));
+
+    DEBUG ((
+      DEBUG_INFO,
+      "%*aOscFreq: %u  ClkActive: %u  DenActive: %u\n",
+      Indent,
+      "",
+      DisplayMode->OscFreq,
+      DisplayMode->ClkActive,
+      DisplayMode->DenActive
+      ));
+    DEBUG ((
+      DEBUG_INFO,
+      "%*aHFrontPorch: %4u  HSync: %4u  HBackPorch: %4u  HSyncActive: %u\n",
+      Indent,
+      "",
+      DisplayMode->HFrontPorch,
+      DisplayMode->HSync,
+      DisplayMode->HBackPorch,
+      DisplayMode->HSyncActive
+      ));
+    DEBUG ((
+      DEBUG_INFO,
+      "%*aVFrontPorch: %4u  VSync: %4u  VBackPorch: %4u  VSyncActive: %u\n",
+      Indent,
+      "",
+      DisplayMode->VFrontPorch,
+      DisplayMode->VSync,
+      DisplayMode->VBackPorch,
+      DisplayMode->VSyncActive
+      ));
+  }
+}
+
+VOID
+DebugPrintDisplaySinkInfo (
+  IN CONST DISPLAY_SINK_INFO  *SinkInfo,
+  IN UINT32                   Indent
+  )
+{
+  if (!DebugPrintEnabled () || !DebugPrintLevelEnabled (DEBUG_INFO)) {
+    return;
+  }
+
+  DEBUG ((DEBUG_INFO, "%*aIsHdmi:                  %a\n", Indent, "", SinkInfo->IsHdmi ? "TRUE" : "FALSE"));
+  DEBUG ((DEBUG_INFO, "%*aHdmiInfo:\n", Indent, ""));
+  DEBUG ((DEBUG_INFO, "%*a  Hdmi20Supported:       %a\n", Indent, "", SinkInfo->HdmiInfo.Hdmi20Supported ? "TRUE" : "FALSE"));
+  DEBUG ((DEBUG_INFO, "%*a  Hdmi20SpeedLimited:    %a\n", Indent, "", SinkInfo->HdmiInfo.Hdmi20SpeedLimited ? "TRUE" : "FALSE"));
+  DEBUG ((DEBUG_INFO, "%*a  ScdcSupported:         %a\n", Indent, "", SinkInfo->HdmiInfo.ScdcSupported ? "TRUE" : "FALSE"));
+  DEBUG ((DEBUG_INFO, "%*aSelectableRgbRange:      %a\n", Indent, "", SinkInfo->SelectableRgbRange ? "TRUE" : "FALSE"));
+  DEBUG ((DEBUG_INFO, "%*aPreferredMode:\n", Indent, ""));
+  DebugPrintDisplayMode (&SinkInfo->PreferredMode, 4, TRUE, TRUE);
 }

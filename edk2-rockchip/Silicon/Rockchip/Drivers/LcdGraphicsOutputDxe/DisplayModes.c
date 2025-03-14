@@ -402,3 +402,84 @@ GetPredefinedDisplayMode (
 
   return &mDisplayModes[Index];
 }
+
+CONST DISPLAY_MODE *
+GetPredefinedDisplayModeByVic (
+  IN UINT8  Vic
+  )
+{
+  UINT32              Index;
+  CONST DISPLAY_MODE  *PredefinedMode;
+
+  for (Index = 0; Index < mDisplayModesCount; Index++) {
+    PredefinedMode = &mDisplayModes[Index];
+
+    if (PredefinedMode->Vic == Vic) {
+      return PredefinedMode;
+    }
+  }
+
+  return NULL;
+}
+
+CONST DISPLAY_MODE *
+GetPredefinedDisplayModeByResolution (
+  IN UINT32  HorizontalResolution,
+  IN UINT32  VerticalResolution,
+  IN UINT32  RefreshRate
+  )
+{
+  UINT32              Index;
+  CONST DISPLAY_MODE  *PredefinedMode;
+
+  for (Index = 0; Index < mDisplayModesCount; Index++) {
+    PredefinedMode = &mDisplayModes[Index];
+
+    if ((PredefinedMode->HActive == HorizontalResolution) &&
+        (PredefinedMode->VActive == VerticalResolution) &&
+        (DisplayModeVRefresh (PredefinedMode) == RefreshRate))
+    {
+      return PredefinedMode;
+    }
+  }
+
+  return NULL;
+}
+
+CONST DISPLAY_MODE *
+MatchPredefinedDisplayMode (
+  IN CONST DISPLAY_MODE  *DisplayMode,
+  IN UINT32              ClockTolerance
+  )
+{
+  UINT32              Index;
+  CONST DISPLAY_MODE  *PredefinedMode;
+
+  for (Index = 0; Index < mDisplayModesCount; Index++) {
+    PredefinedMode = &mDisplayModes[Index];
+
+    if ((DisplayMode->HActive != PredefinedMode->HActive) ||
+        (DisplayMode->HFrontPorch != PredefinedMode->HFrontPorch) ||
+        (DisplayMode->HSync != PredefinedMode->HSync) ||
+        (DisplayMode->HBackPorch != PredefinedMode->HBackPorch) ||
+        (DisplayMode->HSyncActive != PredefinedMode->HSyncActive) ||
+        (DisplayMode->VActive != PredefinedMode->VActive) ||
+        (DisplayMode->VFrontPorch != PredefinedMode->VFrontPorch) ||
+        (DisplayMode->VSync != PredefinedMode->VSync) ||
+        (DisplayMode->VBackPorch != PredefinedMode->VBackPorch) ||
+        (DisplayMode->VSyncActive != PredefinedMode->VSyncActive) ||
+        (DisplayMode->DenActive != PredefinedMode->DenActive) ||
+        (DisplayMode->ClkActive != PredefinedMode->ClkActive))
+    {
+      continue;
+    }
+
+    if (ABS ((INT32)(DisplayMode->OscFreq - PredefinedMode->OscFreq)) > ClockTolerance) {
+      continue;
+    }
+
+    return PredefinedMode;
+  }
+
+  return NULL;
+}
