@@ -33,6 +33,7 @@ InitializeDisplayVariables (
   UINT32                                     ConnectorsMask;
   UINTN                                      Size;
   UINT8                                      Var8;
+  UINT16                                     Var16;
   VOID                                       *PcdData;
   DISPLAY_MODE_PRESET_VARSTORE_DATA          ModePreset;
   DISPLAY_MODE                               ModeCustom;
@@ -161,6 +162,19 @@ InitializeDisplayVariables (
                            ) : EFI_NOT_FOUND;
   if (EFI_ERROR (Status)) {
     Status = PcdSetBoolS (PcdDisplayDuplicateOutput, FixedPcdGetBool (PcdDisplayDuplicateOutputDefault));
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  Size   = sizeof (Var16);
+  Status = !Reset ? gRT->GetVariable (
+                           L"DisplayRotation",
+                           &gRK3588DxeFormSetGuid,
+                           NULL,
+                           &Size,
+                           &Var16
+                           ) : EFI_NOT_FOUND;
+  if (EFI_ERROR (Status)) {
+    Status = PcdSet16S (PcdDisplayRotation, FixedPcdGet16 (PcdDisplayRotationDefault));
     ASSERT_EFI_ERROR (Status);
   }
 

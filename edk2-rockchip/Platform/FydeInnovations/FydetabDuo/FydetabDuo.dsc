@@ -103,6 +103,7 @@
     VOP_OUTPUT_IF_DP0,
     VOP_OUTPUT_IF_MIPI0
   })}
+  gRK3588TokenSpaceGuid.PcdDisplayRotationDefault|90
 
 ################################################################################
 #

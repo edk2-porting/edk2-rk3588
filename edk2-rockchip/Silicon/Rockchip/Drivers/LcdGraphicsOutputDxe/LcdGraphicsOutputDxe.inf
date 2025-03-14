@@ -59,6 +59,7 @@
   gRK3588TokenSpaceGuid.PcdDisplayConnectorsPriority
   gRK3588TokenSpaceGuid.PcdDisplayForceOutput
   gRK3588TokenSpaceGuid.PcdDisplayDuplicateOutput
+  gRK3588TokenSpaceGuid.PcdDisplayRotation
 
 [Depex]
   gEfiCpuArchProtocolGuid AND

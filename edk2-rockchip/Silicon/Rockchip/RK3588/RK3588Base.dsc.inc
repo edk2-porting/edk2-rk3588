@@ -309,6 +309,7 @@
   })}
   gRK3588TokenSpaceGuid.PcdDisplayForceOutputDefault|TRUE
   gRK3588TokenSpaceGuid.PcdDisplayDuplicateOutputDefault|FALSE
+  gRK3588TokenSpaceGuid.PcdDisplayRotationDefault|0
   gRK3588TokenSpaceGuid.PcdHdmiSignalingModeDefault|$(HDMI_SIGNALING_MODE_AUTO)
 
 [PcdsPatchableInModule]
@@ -385,6 +386,7 @@
   gRK3588TokenSpaceGuid.PcdDisplayConnectorsPriority|L"DisplayConnectorsPriority"|gRK3588DxeFormSetGuid|0x0|{ 0x0 }
   gRK3588TokenSpaceGuid.PcdDisplayForceOutput|L"DisplayForceOutput"|gRK3588DxeFormSetGuid|0x0|gRK3588TokenSpaceGuid.PcdDisplayForceOutputDefault
   gRK3588TokenSpaceGuid.PcdDisplayDuplicateOutput|L"DisplayDuplicateOutput"|gRK3588DxeFormSetGuid|0x0|gRK3588TokenSpaceGuid.PcdDisplayDuplicateOutputDefault
+  gRK3588TokenSpaceGuid.PcdDisplayRotation|L"DisplayRotation"|gRK3588DxeFormSetGuid|0x0|gRK3588TokenSpaceGuid.PcdDisplayRotationDefault
   gRK3588TokenSpaceGuid.PcdHdmiSignalingMode|L"HdmiSignalingMode"|gRK3588DxeFormSetGuid|0x0|gRK3588TokenSpaceGuid.PcdHdmiSignalingModeDefault
 
 ################################################################################

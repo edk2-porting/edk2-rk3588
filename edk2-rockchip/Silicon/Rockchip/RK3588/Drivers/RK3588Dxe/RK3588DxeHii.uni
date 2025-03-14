@@ -91,6 +91,14 @@
 #string STR_DISPLAY_DUPLICATE_OUTPUT_HELP                  #language en-US "Enable or disable duplication of the primary display output on other connected displays.\n"
                                                                            "Note that this will use the same mode/resolution everywhere, even if it is not supported by the other displays."
 
+#string STR_DISPLAY_ROTATION_PROMPT                        #language en-US "Rotation"
+#string STR_DISPLAY_ROTATION_HELP                          #language en-US "Choose the display output rotation in degrees.\n\n"
+                                                                           "Note: This option only takes effect in the boot environment. If set to a value other than 0, the OS will be unable to use the UEFI GOP service and will require a native display driver."
+#string STR_DISPLAY_ROTATION_0                             #language en-US "0"
+#string STR_DISPLAY_ROTATION_90                            #language en-US "90"
+#string STR_DISPLAY_ROTATION_180                           #language en-US "180"
+#string STR_DISPLAY_ROTATION_270                           #language en-US "270"
+
 #string STR_DISPLAY_CONNECTOR_TYPE_HDMI                    #language en-US "HDMI"
 
 #string STR_HDMI_SIGNALING_MODE_PROMPT                     #language en-US "Signaling Mode"

@@ -82,6 +82,21 @@ LcdGraphicsBlt (
   IN UINTN                              Delta       OPTIONAL
   );
 
+EFI_STATUS
+EFIAPI
+LcdGraphicsBlt90 (
+  IN EFI_GRAPHICS_OUTPUT_PROTOCOL       *This,
+  IN OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *BltBuffer  OPTIONAL,
+  IN EFI_GRAPHICS_OUTPUT_BLT_OPERATION  BltOperation,
+  IN UINTN                              SourceX,
+  IN UINTN                              SourceY,
+  IN UINTN                              DestinationX,
+  IN UINTN                              DestinationY,
+  IN UINTN                              Width,
+  IN UINTN                              Height,
+  IN UINTN                              Delta       OPTIONAL
+  );
+
 BOOLEAN
 IsDisplayModeSupported (
   IN CONNECTOR_STATE     *ConnectorState,

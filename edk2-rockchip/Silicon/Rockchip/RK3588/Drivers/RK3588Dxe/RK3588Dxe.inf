@@ -132,6 +132,8 @@
   gRK3588TokenSpaceGuid.PcdDisplayForceOutput
   gRK3588TokenSpaceGuid.PcdDisplayDuplicateOutputDefault
   gRK3588TokenSpaceGuid.PcdDisplayDuplicateOutput
+  gRK3588TokenSpaceGuid.PcdDisplayRotationDefault
+  gRK3588TokenSpaceGuid.PcdDisplayRotation
   gRK3588TokenSpaceGuid.PcdHdmiSignalingModeDefault
   gRK3588TokenSpaceGuid.PcdHdmiSignalingMode
 

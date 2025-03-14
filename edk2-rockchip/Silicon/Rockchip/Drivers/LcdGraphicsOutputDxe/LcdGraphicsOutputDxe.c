@@ -463,8 +463,6 @@ GetSupportedDisplayModes (
 
   Instance->Gop.Mode->Mode = MAX_UINT32;
 
-  Instance->Mode.Info->PixelFormat = PixelBlueGreenRedReserved8BitPerColor;
-
   Instance->DisplayModes = AllocateZeroPool (
                              sizeof (DISPLAY_MODE) *
                              Instance->Gop.Mode->MaxMode
@@ -716,6 +714,53 @@ LcdGraphicsOutputDxeInitialize (
   return Status;
 }
 
+STATIC
+VOID
+LcdGraphicsSetModeInfo (
+  IN  EFI_GRAPHICS_OUTPUT_PROTOCOL          *This,
+  OUT EFI_GRAPHICS_OUTPUT_MODE_INFORMATION  *Info,
+  IN  CONST DISPLAY_MODE                    *DisplayMode,
+  IN  BOOLEAN                               Update
+  )
+{
+  UINT16  Rotation = PcdGet16 (PcdDisplayRotation);
+
+  This->Mode->Info->Version = 0;
+
+  if ((Rotation == 90)) {
+    //
+    // Swap the reported resolution and only allow Blt operations.
+    //
+    Info->HorizontalResolution = DisplayMode->VActive;
+    Info->VerticalResolution   = DisplayMode->HActive;
+    Info->PixelFormat          = PixelBltOnly;
+  } else {
+    Info->HorizontalResolution = DisplayMode->HActive;
+    Info->VerticalResolution   = DisplayMode->VActive;
+    Info->PixelFormat          = PixelBlueGreenRedReserved8BitPerColor;
+  }
+
+  Info->PixelsPerScanLine = Info->HorizontalResolution;
+
+  if (Update) {
+    switch (Rotation) {
+      case 90:
+        This->Blt = LcdGraphicsBlt90;
+        break;
+
+      default:
+        This->Blt = LcdGraphicsBlt;
+
+        if (Rotation != 0) {
+          DEBUG ((DEBUG_ERROR, "%a: Unsupported rotation %u\n", __func__, Rotation));
+          ASSERT (FALSE);
+        }
+
+        break;
+    }
+  }
+}
+
 EFI_STATUS
 EFIAPI
 LcdGraphicsQueryMode (
@@ -753,11 +798,7 @@ LcdGraphicsQueryMode (
 
   *SizeOfInfo = sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
 
-  (*Info)->Version              = 0;
-  (*Info)->HorizontalResolution = Mode->HActive;
-  (*Info)->VerticalResolution   = Mode->VActive;
-  (*Info)->PixelsPerScanLine    = Mode->HActive;
-  (*Info)->PixelFormat          = This->Mode->Info->PixelFormat;
+  LcdGraphicsSetModeInfo (This, *Info, Mode, FALSE);
 
   return EFI_SUCCESS;
 }
@@ -857,11 +898,9 @@ LcdGraphicsSetMode (
   // Update the UEFI mode information
   This->Mode->Mode = ModeNumber;
 
-  This->Mode->Info->Version              = 0;
-  This->Mode->Info->HorizontalResolution = Mode->HActive;
-  This->Mode->Info->VerticalResolution   = Mode->VActive;
-  This->Mode->Info->PixelsPerScanLine    = Mode->HActive;
-  Instance->Mode.SizeOfInfo              = sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
+  LcdGraphicsSetModeInfo (This, This->Mode->Info, Mode, TRUE);
+
+  Instance->Mode.SizeOfInfo = sizeof (EFI_GRAPHICS_OUTPUT_MODE_INFORMATION);
 
   This->Mode->FrameBufferBase = VramBaseAddress;
   This->Mode->FrameBufferSize = VramSize;
