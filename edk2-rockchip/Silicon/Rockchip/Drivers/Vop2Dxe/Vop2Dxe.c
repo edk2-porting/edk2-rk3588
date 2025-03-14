@@ -2534,6 +2534,38 @@ Vop2DscEnable (
     ));
 }
 
+STATIC
+VOID
+Vop2ModeFixup (
+  OUT DISPLAY_STATE  *DisplayState
+  )
+{
+  CONNECTOR_STATE   *ConnectorState = &DisplayState->ConnectorState;
+  CRTC_STATE        *CrtcState      = &DisplayState->CrtcState;
+  DRM_DISPLAY_MODE  *Mode           = &ConnectorState->DisplayMode;
+
+  /*
+   * HActive of the video timing must be 4-pixel aligned.
+   */
+  if (Mode->CrtcHDisplay % 4 != 0) {
+    UINT32  OldHDisplay = Mode->CrtcHDisplay;
+    UINT32  AlignOffset = 4 - (Mode->CrtcHDisplay % 4);
+
+    Mode->CrtcHDisplay   += AlignOffset;
+    Mode->CrtcHSyncStart += AlignOffset;
+    Mode->CrtcHSyncEnd   += AlignOffset;
+    Mode->CrtcHTotal     += AlignOffset;
+
+    DEBUG ((
+      DEBUG_WARN,
+      "WARN: VP%d: HActive must be 4-pixel aligned: %u -> %u\n",
+      CrtcState->CrtcID,
+      OldHDisplay,
+      Mode->CrtcHDisplay
+      ));
+  }
+}
+
 EFI_STATUS
 Vop2Init (
   IN  ROCKCHIP_CRTC_PROTOCOL  *This,
@@ -2553,6 +2585,8 @@ Vop2Init (
   UINT8             PreDitherDownEn;
   BOOLEAN           YUVOverlay;
   UINT64            DclkRate;
+
+  Vop2ModeFixup (DisplayState);
 
   HSyncLen  = Mode->CrtcHSyncEnd - Mode->CrtcHSyncStart;
   HDisplay  = Mode->CrtcHDisplay;
