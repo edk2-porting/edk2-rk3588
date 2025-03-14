@@ -77,26 +77,6 @@ STATIC LCD_INSTANCE  mLcdTemplate = {
 };
 
 STATIC
-UINT32
-DisplayBppConvert (
-  IN LCD_BPP  LcdBpp
-  )
-{
-  UINT32  DisplayBpp;
-
-  switch (LcdBpp) {
-    case LcdBitsPerPixel_24:
-      DisplayBpp = 32;
-      break;
-    default:
-      DisplayBpp = 32;
-      break;
-  }
-
-  return DisplayBpp;
-}
-
-STATIC
 EFI_STATUS
 PrepareDisplays (
   IN LCD_INSTANCE  *Instance
@@ -792,7 +772,6 @@ LcdGraphicsSetMode (
   EFI_STATUS                     Status;
   EFI_GRAPHICS_OUTPUT_BLT_PIXEL  FillColour;
   LCD_INSTANCE                   *Instance;
-  LCD_BPP                        Bpp;
   EFI_PHYSICAL_ADDRESS           VramBaseAddress;
   UINTN                          VramSize;
   UINTN                          NumVramPages;
@@ -826,20 +805,9 @@ LcdGraphicsSetMode (
 
   Mode = &Instance->DisplayModes[ModeNumber];
 
-  Status = LcdGraphicsGetBpp (ModeNumber, &Bpp);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "%a: Couldn't get bytes per pixel, status: %r\n",
-      __func__,
-      Status
-      ));
-    goto EXIT;
-  }
-
   VramBaseAddress = This->Mode->FrameBufferBase;
 
-  VramSize = Mode->HActive * Mode->VActive * GetBytesPerPixel (Bpp);
+  VramSize = Mode->HActive * Mode->VActive * RK_BYTES_PER_PIXEL;
 
   NumVramPages         = EFI_SIZE_TO_PAGES (VramSize);
   NumPreviousVramPages = EFI_SIZE_TO_PAGES (This->Mode->FrameBufferSize);
@@ -978,7 +946,7 @@ LcdGraphicsSetMode (
     CrtcState->YMirror = 0;
     CrtcState->RBSwap  = 0;
 
-    CrtcState->XVirtual   = ALIGN (CrtcState->SrcW * DisplayBppConvert (Bpp), 32) >> 5;
+    CrtcState->XVirtual   = ALIGN (CrtcState->SrcW * RK_BYTES_PER_PIXEL * 8, 32) >> 5;
     CrtcState->DMAAddress = (UINT32)VramBaseAddress;
 
     if (Crtc->SetPlane != NULL) {
@@ -996,43 +964,6 @@ LcdGraphicsSetMode (
 
 EXIT:
   return Status;
-}
-
-EFI_STATUS
-EFIAPI
-LcdGraphicsGetBpp (
-  IN  UINT32   ModeNumber,
-  OUT LCD_BPP  *Bpp
-  )
-{
-  *Bpp = LcdBitsPerPixel_24;
-
-  return EFI_SUCCESS;
-}
-
-UINTN
-GetBytesPerPixel (
-  IN  LCD_BPP  Bpp
-  )
-{
-  switch (Bpp) {
-    case LcdBitsPerPixel_24:
-      return 4;
-
-    case LcdBitsPerPixel_16_565:
-    case LcdBitsPerPixel_16_555:
-    case LcdBitsPerPixel_12_444:
-      return 2;
-
-    case LcdBitsPerPixel_8:
-    case LcdBitsPerPixel_4:
-    case LcdBitsPerPixel_2:
-    case LcdBitsPerPixel_1:
-      return 1;
-
-    default:
-      return 0;
-  }
 }
 
 BOOLEAN

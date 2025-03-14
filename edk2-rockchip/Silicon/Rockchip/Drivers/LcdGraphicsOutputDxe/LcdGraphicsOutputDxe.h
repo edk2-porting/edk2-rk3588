@@ -25,20 +25,7 @@
 
 #include <VarStoreData.h>
 
-/** The enumeration maps the PL111 LcdBpp values used in the LCD Control
-  Register
-**/
-typedef enum {
-  LcdBitsPerPixel_1 = 0,
-  LcdBitsPerPixel_2,
-  LcdBitsPerPixel_4,
-  LcdBitsPerPixel_8,
-  LcdBitsPerPixel_16_555,
-  LcdBitsPerPixel_24,
-  LcdBitsPerPixel_16_565,
-  LcdBitsPerPixel_12_444,
-  LcdBitsPerPixel_Max
-} LCD_BPP;
+#define RK_BYTES_PER_PIXEL  (sizeof (UINT32))
 
 //
 // Device structures
@@ -83,8 +70,8 @@ LcdGraphicsSetMode (
 EFI_STATUS
 EFIAPI
 LcdGraphicsBlt (
-  IN EFI_GRAPHICS_OUTPUT_PROTOCOL *This,
-  IN OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL *BltBuffer, OPTIONAL
+  IN EFI_GRAPHICS_OUTPUT_PROTOCOL       *This,
+  IN OUT EFI_GRAPHICS_OUTPUT_BLT_PIXEL  *BltBuffer  OPTIONAL,
   IN EFI_GRAPHICS_OUTPUT_BLT_OPERATION  BltOperation,
   IN UINTN                              SourceX,
   IN UINTN                              SourceY,
@@ -92,19 +79,7 @@ LcdGraphicsBlt (
   IN UINTN                              DestinationY,
   IN UINTN                              Width,
   IN UINTN                              Height,
-  IN UINTN                              Delta           OPTIONAL
-  );
-
-EFI_STATUS
-EFIAPI
-LcdGraphicsGetBpp (
-  IN  UINT32   ModeNumber,
-  OUT LCD_BPP  *Bpp
-  );
-
-UINTN
-GetBytesPerPixel (
-  IN  LCD_BPP  Bpp
+  IN UINTN                              Delta       OPTIONAL
   );
 
 BOOLEAN
