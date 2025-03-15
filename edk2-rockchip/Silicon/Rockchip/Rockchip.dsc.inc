@@ -622,7 +622,6 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
 !if $(RK_PCA9555_ENABLE) == TRUE
   Silicon/Rockchip/Drivers/Pca9555Dxe/Pca9555Dxe.inf
 !endif
-  # Silicon/Rockchip/Drivers/I2c/I2cDemoDxe/I2cDemoDxe.inf
 
   #
   # Display Support
@@ -787,7 +786,6 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
       NULL|ShellPkg/Library/UefiShellDriver1CommandsLib/UefiShellDriver1CommandsLib.inf
       NULL|ShellPkg/Library/UefiShellDebug1CommandsLib/UefiShellDebug1CommandsLib.inf
       NULL|ShellPkg/Library/UefiShellInstall1CommandsLib/UefiShellInstall1CommandsLib.inf
-      NULL|Silicon/Rockchip/Applications/I2cDemoTest/I2cDemoTest.inf
       NULL|Silicon/Rockchip/Applications/SpiTool/SpiFlashCmd.inf
       NULL|ShellPkg/Library/UefiShellNetwork1CommandsLib/UefiShellNetwork1CommandsLib.inf
       NULL|ShellPkg/Library/UefiShellAcpiViewCommandLib/UefiShellAcpiViewCommandLib.inf
@@ -803,12 +801,6 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
 !ifdef $(INCLUDE_TFTP_COMMAND)
   ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf
 !endif #$(INCLUDE_TFTP_COMMAND)
-
-  # I2C Demo application
-  # Silicon/Rockchip/Applications/I2cDemoTest/I2cDemoTest.inf
-
-  # SPI Flash Cmd application
-  # Silicon/Rockchip/Applications/SpiTool/SpiFlashCmd.inf
 
   # Maskrom Reset application
   Silicon/Rockchip/Applications/MaskromReset/MaskromReset.inf

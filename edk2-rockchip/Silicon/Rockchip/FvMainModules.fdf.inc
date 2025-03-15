@@ -112,7 +112,6 @@
 !if $(RK_PCA9555_ENABLE) == TRUE
   INF Silicon/Rockchip/Drivers/Pca9555Dxe/Pca9555Dxe.inf
 !endif
-  # INF Silicon/Rockchip/Drivers/I2c/I2cDemoDxe/I2cDemoDxe.inf
 
   #
   # Display Support
@@ -238,12 +237,6 @@
 !ifdef $(INCLUDE_TFTP_COMMAND)
   INF ShellPkg/DynamicCommand/TftpDynamicCommand/TftpDynamicCommand.inf
 !endif #$(INCLUDE_TFTP_COMMAND)
-
-  # I2C Demo application
-  # INF Silicon/Rockchip/Applications/I2cDemoTest/I2cDemoTest.inf
-
-  # SPI Flash Cmd application
-  # INF Silicon/Rockchip/Applications/SpiTool/SpiFlashCmd.inf
 
   # Maskrom Reset application
   INF Silicon/Rockchip/Applications/MaskromReset/MaskromReset.inf
