@@ -55,3 +55,6 @@
   gRK3588TokenSpaceGuid.PcdPcie30PhyMode
 
   gRK3588TokenSpaceGuid.PcdPcieEcamCompliantSegmentsMask
+
+[Depex]
+  gRockchipPlatformConfigAppliedProtocolGuid

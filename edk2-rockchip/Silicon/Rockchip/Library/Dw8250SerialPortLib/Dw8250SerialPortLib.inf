@@ -24,7 +24,7 @@
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
-  Silicon/Hisilicon/HisiPkg.dec
+  Silicon/Rockchip/RockchipPkg.dec
 
 [LibraryClasses]
   BaseLib
@@ -33,5 +33,5 @@
 [Pcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate
-  gHisiTokenSpaceGuid.PcdSerialPortSendDelay
-  gHisiTokenSpaceGuid.PcdUartClkInHz
+  gRockchipTokenSpaceGuid.PcdSerialPortSendDelay
+  gRockchipTokenSpaceGuid.PcdUartClkInHz

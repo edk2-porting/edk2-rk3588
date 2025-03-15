@@ -22,7 +22,7 @@
 [Packages]
   MdePkg/MdePkg.dec
   Silicon/Rockchip/RockchipPkg.dec
-  Silicon/NXP/Library/Pcf8563RealTimeClockLib/Pcf8563RealTimeClockLib.dec
+  Silicon/Rockchip/Library/Pcf8563RealTimeClockLib/Pcf8563RealTimeClockLib.dec
 
 [LibraryClasses]
   UefiDriverEntryPoint

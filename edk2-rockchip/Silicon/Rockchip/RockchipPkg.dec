@@ -96,3 +96,6 @@
 
   gRockchipTokenSpaceGuid.PcdPca9555Address|0|UINT8|0x03000001
   gRockchipTokenSpaceGuid.PcdPca9555Bus|0|UINT8|0x03000002
+
+  gRockchipTokenSpaceGuid.PcdUartClkInHz|0|UINT32|0x04000001
+  gRockchipTokenSpaceGuid.PcdSerialPortSendDelay|0|UINT32|0x04000002

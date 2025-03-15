@@ -73,7 +73,7 @@
   #
   # Arm GIC
   #
-  INF ArmPkg/Drivers/ArmGic/ArmGicDxe.inf
+  INF ArmPkg/Drivers/ArmGicDxe/ArmGicV3Dxe.inf
 
   #
   # Timer
