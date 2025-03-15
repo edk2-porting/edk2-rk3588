@@ -10,6 +10,7 @@
 #include <Library/DebugLib.h>
 #include <Library/IoLib.h>
 #include <Library/RealTimeClockLib.h>
+#include <Library/TimeBaseLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
 #include <Library/UefiRuntimeLib.h>
@@ -126,12 +127,9 @@ LibGetTime (
   Time->Nanosecond = 0;
 
   if ((DateTime.VL_seconds & PCF8563_CLOCK_INVALID) != 0) {
-    Time->Second = 0;
-    Time->Minute = 0;
-    Time->Hour   = 0;
-    Time->Day    = 1;
-    Time->Month  = 1;
-    Time->Year   = EPOCH_BASE;
+    DEBUG ((DEBUG_INFO, "%a: Invalid clock. Resetting to build time.\n", __func__));
+    EpochToEfiTime (BUILD_EPOCH, Time);
+    LibSetTime (Time);
   } else {
     Time->Second = BcdToDecimal8 (DateTime.VL_seconds & PCF8563_SECONDS_MASK);
     Time->Minute = BcdToDecimal8 (DateTime.Minutes & PCF8563_MINUTES_MASK);
