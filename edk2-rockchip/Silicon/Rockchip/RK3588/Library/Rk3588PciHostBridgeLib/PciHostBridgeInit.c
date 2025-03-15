@@ -672,7 +672,7 @@ InitializePciHost (
 
   /* Wait for link up */
   DEBUG ((DEBUG_INIT, "PCIe: Waiting for link up...\n"));
-  for (Retry = 20; Retry != 0; Retry--) {
+  for (Retry = 10; Retry != 0; Retry--) {
     if (PciIsLinkUp (ApbBase)) {
       break;
     }
