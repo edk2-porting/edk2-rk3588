@@ -138,7 +138,7 @@ function _build(){
 
     export GCC_AARCH64_PREFIX="${CROSS_COMPILE}"
     export CLANG38_AARCH64_PREFIX="${CROSS_COMPILE}"
-    export PACKAGES_PATH="${ROOTDIR}/edk2:${ROOTDIR}/edk2-platforms:${ROOTDIR}/edk2-rockchip:${ROOTDIR}/devicetree:${ROOTDIR}/edk2-non-osi:${ROOTDIR}"
+    export PACKAGES_PATH="${ROOTDIR}/edk2:${ROOTDIR}/edk2-rockchip:${ROOTDIR}/devicetree:${ROOTDIR}/edk2-non-osi:${ROOTDIR}"
 
     make -C "${ROOTDIR}/edk2/BaseTools"
     source "${ROOTDIR}/edk2/edksetup.sh"

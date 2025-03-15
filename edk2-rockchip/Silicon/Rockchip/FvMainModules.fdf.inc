@@ -209,11 +209,6 @@
   # Realtek USB UNDI Driver
   #
   INF Drivers/Realtek/Bus/Usb/UsbNetworking/RtkUsbUndiDxe.inf
-
-  #
-  # AX88772 Ethernet Driver for Apple Ethernet Adapter
-  #
-  INF Drivers/ASIX/Bus/Usb/UsbNetworking/Ax88772c/Ax88772c.inf
 !endif
 
   #

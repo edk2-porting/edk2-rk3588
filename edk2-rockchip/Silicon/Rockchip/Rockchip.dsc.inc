@@ -737,11 +737,6 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
   # Realtek USB UNDI Driver
   #
   Drivers/Realtek/Bus/Usb/UsbNetworking/RtkUsbUndiDxe.inf
-
-  #
-  # AX88772 Ethernet Driver for Apple Ethernet Adapter
-  #
-  Drivers/ASIX/Bus/Usb/UsbNetworking/Ax88772c/Ax88772c.inf
 !endif
 
   #
