@@ -470,7 +470,7 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
   gEfiMdePkgTokenSpaceGuid.PcdUefiVariableDefaultPlatformLangCodes|"en-US"
 
 [PcdsDynamicHii.common.DEFAULT]
-  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|L"Timeout"|gEfiGlobalVariableGuid|0x0|10 # Variable: L"Timeout"
+  gEfiMdePkgTokenSpaceGuid.PcdPlatformBootTimeOut|L"Timeout"|gEfiGlobalVariableGuid|0x0|5 # Variable: L"Timeout"
 
 ################################################################################
 #
