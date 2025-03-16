@@ -1,0 +1,25 @@
+/** @file
+
+  Copyright (c) 2025, Mario Bălănică <mariobalanica02@gmail.com>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#langdef en-US  "English"
+
+#string STR_NULL                                           #language en-US ""
+
+#string STR_FORM_SET_TITLE                                 #language en-US "Network Stack Configuration"
+#string STR_FORM_SET_TITLE_HELP                            #language en-US "Configure the network stack support."
+
+#string STR_NETWORK_STACK_STATE_PROMPT                     #language en-US "Network Stack"
+#string STR_NETWORK_STACK_STATE_HELP                       #language en-US "Enable or disable the UEFI network stack."
+#string STR_NETWORK_STACK_IPV4_STATE_PROMPT                #language en-US " IPv4 Stack"
+#string STR_NETWORK_STACK_IPV4_STATE_HELP                  #language en-US "Enable or disable the UEFI IPv4 network stack."
+#string STR_NETWORK_STACK_IPV6_STATE_PROMPT                #language en-US " IPv6 Stack"
+#string STR_NETWORK_STACK_IPV6_STATE_HELP                  #language en-US "Enable or disable the UEFI IPv6 network stack."
+#string STR_NETWORK_STACK_PXE_BOOT_STATE_PROMPT            #language en-US " PXE Boot"
+#string STR_NETWORK_STACK_PXE_BOOT_STATE_HELP              #language en-US "Enable or disable the UEFI PXE boot support."
+#string STR_NETWORK_STACK_HTTP_BOOT_STATE_PROMPT           #language en-US " HTTP Boot"
+#string STR_NETWORK_STACK_HTTP_BOOT_STATE_HELP             #language en-US "Enable or disable the UEFI HTTP boot support."

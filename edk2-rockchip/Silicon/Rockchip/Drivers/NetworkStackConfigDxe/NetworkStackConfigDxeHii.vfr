@@ -1,0 +1,61 @@
+/** @file
+
+  Copyright (c) 2025, Mario Bălănică <mariobalanica02@gmail.com>
+
+  SPDX-License-Identifier: BSD-2-Clause-Patent
+
+**/
+
+#include <Uefi/UefiMultiPhase.h>
+#include <Guid/HiiPlatformSetupFormset.h>
+
+#include "NetworkStackConfigDxe.h"
+
+formset
+  guid      = NETWORK_STACK_CONFIG_FORMSET_GUID,
+  title     = STRING_TOKEN(STR_FORM_SET_TITLE),
+  help      = STRING_TOKEN(STR_FORM_SET_TITLE_HELP),
+  classguid = EFI_HII_PLATFORM_SETUP_FORMSET_GUID,
+
+  efivarstore NETWORK_STACK_CONFIG_VARSTORE_DATA,
+  attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+  name  = NetworkStackConfigData,
+  guid  = NETWORK_STACK_CONFIG_FORMSET_GUID;
+
+  form formid = 1,
+    title  = STRING_TOKEN(STR_FORM_SET_TITLE);
+
+    checkbox varid = NetworkStackConfigData.Enabled,
+      prompt      = STRING_TOKEN(STR_NETWORK_STACK_STATE_PROMPT),
+      help        = STRING_TOKEN(STR_NETWORK_STACK_STATE_HELP),
+      flags       = RESET_REQUIRED,
+      default     = NETWORK_STACK_ENABLED_DEFAULT,
+    endcheckbox;
+    grayoutif ideqval NetworkStackConfigData.Enabled == 0;
+      checkbox varid = NetworkStackConfigData.Ipv4Enabled,
+        prompt      = STRING_TOKEN(STR_NETWORK_STACK_IPV4_STATE_PROMPT),
+        help        = STRING_TOKEN(STR_NETWORK_STACK_IPV4_STATE_HELP),
+        flags       = RESET_REQUIRED,
+        default     = NETWORK_STACK_IPV4_ENABLED_DEFAULT,
+      endcheckbox;
+      checkbox varid = NetworkStackConfigData.Ipv6Enabled,
+        prompt      = STRING_TOKEN(STR_NETWORK_STACK_IPV6_STATE_PROMPT),
+        help        = STRING_TOKEN(STR_NETWORK_STACK_IPV6_STATE_HELP),
+        flags       = RESET_REQUIRED,
+        default     = NETWORK_STACK_IPV6_ENABLED_DEFAULT,
+      endcheckbox;
+      checkbox varid = NetworkStackConfigData.PxeBootEnabled,
+        prompt      = STRING_TOKEN(STR_NETWORK_STACK_PXE_BOOT_STATE_PROMPT),
+        help        = STRING_TOKEN(STR_NETWORK_STACK_PXE_BOOT_STATE_HELP),
+        flags       = RESET_REQUIRED,
+        default     = NETWORK_STACK_PXE_BOOT_ENABLED_DEFAULT,
+      endcheckbox;
+      checkbox varid = NetworkStackConfigData.HttpBootEnabled,
+        prompt      = STRING_TOKEN(STR_NETWORK_STACK_HTTP_BOOT_STATE_PROMPT),
+        help        = STRING_TOKEN(STR_NETWORK_STACK_HTTP_BOOT_STATE_HELP),
+        flags       = RESET_REQUIRED,
+        default     = NETWORK_STACK_HTTP_BOOT_ENABLED_DEFAULT,
+      endcheckbox;
+    endif;
+  endform;
+endformset;

@@ -1,7 +1,7 @@
 ## @file
 #
 #  Copyright (c) 2021-2022, Rockchip Limited. All rights reserved.
-#  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
+#  Copyright (c) 2023-2025, Mario Bălănică <mariobalanica02@gmail.com>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -200,6 +200,11 @@
 !include NetworkPkg/Network.fdf.inc
 
 !if $(NETWORK_ENABLE) == TRUE
+  #
+  # Network Stack Configuration Driver
+  #
+  INF Silicon/Rockchip/Drivers/NetworkStackConfigDxe/NetworkStackConfigDxe.inf
+
   #
   # Realtek PCIe UNDI Driver
   #

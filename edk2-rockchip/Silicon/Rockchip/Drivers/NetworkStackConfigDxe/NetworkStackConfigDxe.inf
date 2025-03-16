@@ -1,0 +1,55 @@
+## @file
+#
+#  Copyright (c) 2025, Mario Bălănică <mariobalanica02@gmail.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = NetworkStackConfigDxe
+  FILE_GUID                      = e82260af-0b20-43ab-8a33-7fd0c0937656
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = NetworkStackConfigInitialize
+
+[Sources]
+  NetworkStackConfigDxe.c
+  NetworkStackConfigDxe.h
+  NetworkStackConfigDxeHii.uni
+  NetworkStackConfigDxeHii.vfr
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+  Silicon/Rockchip/RockchipPkg.dec
+
+[LibraryClasses]
+  DebugLib
+  DevicePathLib
+  HiiLib
+  UefiBootServicesTableLib
+  UefiRuntimeServicesTableLib
+  UefiDriverEntryPoint
+
+[Guids]
+  gNetworkStackConfigFormSetGuid
+
+[Protocols]
+  gNetworkStackEnabledProtocolGuid
+  gNetworkStackIpv4EnabledProtocolGuid
+  gNetworkStackIpv6EnabledProtocolGuid
+  gNetworkStackPxeBootEnabledProtocolGuid
+  gNetworkStackHttpBootEnabledProtocolGuid
+
+[Pcd]
+  gRockchipTokenSpaceGuid.PcdNetworkStackEnabledDefault
+  gRockchipTokenSpaceGuid.PcdNetworkStackIpv4EnabledDefault
+  gRockchipTokenSpaceGuid.PcdNetworkStackIpv6EnabledDefault
+  gRockchipTokenSpaceGuid.PcdNetworkStackPxeBootEnabledDefault
+  gRockchipTokenSpaceGuid.PcdNetworkStackHttpBootEnabledDefault
+
+[Depex]
+  gEfiVariableArchProtocolGuid        AND
+  gEfiVariableWriteArchProtocolGuid

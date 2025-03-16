@@ -2,7 +2,7 @@
 #
 #  Copyright (c) 2011-2012, ARM Limited. All rights reserved.
 #  Copyright (c) 2021-2022, Rockchip Limited. All rights reserved.
-#  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
+#  Copyright (c) 2023-2025, Mario Bălănică <mariobalanica02@gmail.com>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -712,9 +712,15 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
 !include NetworkPkg/Network.dsc.inc
 
 !if $(NETWORK_ENABLE) == TRUE
+  #
+  # Network Stack Configuration Driver
+  #
+  Silicon/Rockchip/Drivers/NetworkStackConfigDxe/NetworkStackConfigDxe.inf
 
 !if $(NETWORK_SNP_ENABLE) == TRUE
   NetworkPkg/SnpDxe/SnpDxe.inf {
+    <LibraryClasses>
+      NULL|Silicon/Rockchip/Drivers/NetworkStackConfigDxe/NetworkStackEnabledLib.inf
     <PcdsFixedAtBuild>
 !if $(DEBUG_PRINT_INFO_MODULE_EXCLUDE) & $(DEBUG_MODULE_SNPDXE)
       gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|$(DEBUG_PRINT_ERROR_LEVEL_NO_INFO)
@@ -723,11 +729,41 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
 !endif
 
   NetworkPkg/MnpDxe/MnpDxe.inf {
+    <LibraryClasses>
+      NULL|Silicon/Rockchip/Drivers/NetworkStackConfigDxe/NetworkStackEnabledLib.inf
     <PcdsFixedAtBuild>
 !if $(DEBUG_PRINT_INFO_MODULE_EXCLUDE) & $(DEBUG_MODULE_MNPDXE)
       gEfiMdePkgTokenSpaceGuid.PcdDebugPrintErrorLevel|$(DEBUG_PRINT_ERROR_LEVEL_NO_INFO)
 !endif
   }
+
+!if $(NETWORK_IP4_ENABLE) == TRUE
+  NetworkPkg/Ip4Dxe/Ip4Dxe.inf {
+    <LibraryClasses>
+      NULL|Silicon/Rockchip/Drivers/NetworkStackConfigDxe/NetworkStackIpv4EnabledLib.inf
+  }
+!endif
+
+!if $(NETWORK_IP6_ENABLE) == TRUE
+  NetworkPkg/Ip6Dxe/Ip6Dxe.inf {
+    <LibraryClasses>
+      NULL|Silicon/Rockchip/Drivers/NetworkStackConfigDxe/NetworkStackIpv6EnabledLib.inf
+  }
+!endif
+
+!if $(NETWORK_PXE_BOOT_ENABLE) == TRUE
+  NetworkPkg/UefiPxeBcDxe/UefiPxeBcDxe.inf {
+    <LibraryClasses>
+      NULL|Silicon/Rockchip/Drivers/NetworkStackConfigDxe/NetworkStackPxeBootEnabledLib.inf
+  }
+!endif
+
+!if $(NETWORK_HTTP_BOOT_ENABLE) == TRUE
+  NetworkPkg/HttpBootDxe/HttpBootDxe.inf {
+    <LibraryClasses>
+      NULL|Silicon/Rockchip/Drivers/NetworkStackConfigDxe/NetworkStackHttpBootEnabledLib.inf
+  }
+!endif
 
   #
   # Realtek PCIe UNDI Driver

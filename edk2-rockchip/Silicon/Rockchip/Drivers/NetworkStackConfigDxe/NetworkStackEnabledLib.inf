@@ -1,0 +1,26 @@
+## @file
+#
+#  Copyright (c) 2025, Mario Bălănică <mariobalanica02@gmail.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+##
+
+[Defines]
+  INF_VERSION                    = 0x0001001B
+  BASE_NAME                      = NetworkStackEnabledLib
+  FILE_GUID                      = 5c8672a9-aa5e-48e7-8337-8c69d8cadb82
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = NetworkStackEnabledLib|DXE_DRIVER
+  CONSTRUCTOR                    = NetworkStackEnabledLibInitialize
+
+[Sources]
+  NetworkStackEnabledLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  Silicon/Rockchip/RockchipPkg.dec
+
+[Depex]
+  gNetworkStackEnabledProtocolGuid
