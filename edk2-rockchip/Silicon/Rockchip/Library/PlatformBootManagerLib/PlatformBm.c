@@ -751,6 +751,8 @@ PlatformRegisterOptionsAndKeys (
 
   GetPlatformOptions ();
 
+  RemoveStaleFvFileOptions ();
+
   //
   // Register ENTER as CONTINUE key
   //
@@ -798,8 +800,6 @@ PlatformRegisterOptionsAndKeys (
   F4.ScanCode    = SCAN_F4;
   F4.UnicodeChar = CHAR_NULL;
   PlatformRegisterFvBootOption (&gRockchipMaskromResetFileGuid, L"Reset to MaskROM", 0, &F4);
-
-  RemoveStaleFvFileOptions ();
 }
 
 //
