@@ -217,10 +217,6 @@ UsbPortPowerEnable (
 {
   DEBUG ((DEBUG_INFO, "UsbPortPowerEnable called\n"));
 
-  /* Set VCC_5V0_PWREN_H */
-  GpioPinWrite (4, GPIO_PIN_PA2, TRUE);
-  GpioPinSetDirection (4, GPIO_PIN_PA2, GPIO_PIN_OUTPUT);
-
   /* Set USB_HOST_PWREN_H */
   GpioPinWrite (1, GPIO_PIN_PB1, TRUE);
   GpioPinSetDirection (1, GPIO_PIN_PB1, GPIO_PIN_OUTPUT);
@@ -438,6 +434,11 @@ PlatformEarlyInit (
   )
 {
   // Configure various things specific to this platform
+
+  /* Set VCC_5V0_PWREN_H */
+  GpioPinWrite (4, GPIO_PIN_PA2, TRUE);
+  GpioPinSetDirection (4, GPIO_PIN_PA2, GPIO_PIN_OUTPUT);
+
   GpioPinSetFunction (1, GPIO_PIN_PD3, 0); // jdet
   GpioPinSetFunction (1, GPIO_PIN_PD0, 0); // spk_con
 }
