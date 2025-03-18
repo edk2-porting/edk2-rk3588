@@ -1032,7 +1032,7 @@ EqosUpdateLink (
     Eqos->SnpMode.MediaPresent = LinkUp;
   }
 
-  return LinkUp ? EFI_SUCCESS : EFI_NOT_READY;
+  return LinkUp ? EFI_SUCCESS : EFI_NO_MEDIA;
 }
 
 EFI_STATUS
