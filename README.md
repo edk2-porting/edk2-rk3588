@@ -87,8 +87,8 @@ Note that this list is subject to change at any time as devices gain better supp
 | PCIe 3.0 / 2.1                        | 🟢 Working     | |
 | SATA                                  | 🟢 Working     | |
 | SD/eMMC                               | 🟢 Working     | |
-| HDMI output                           | 🟡 Partial     | Single display with mode limited at 1080p 60 Hz |
-| DisplayPort output (USB-C)            | 🟡 Partial     | Mode fixed at 1080p 60 Hz, only works in one orientation of the Type-C port. Some displays may not work regardless. |
+| HDMI output                           | 🟢 Working     | |
+| DisplayPort output (USB-C)            | 🟡 Partial     | No hot-plug detect & EDID. Only works in one orientation of the Type-C port. Some displays may not work regardless. |
 | eDP output                            | 🟡 Partial     | Disabled, requires manual configuration depending on the platform and panel. |
 | DSI output                            | 🟢 Working     | Only enabled on Fydetab Duo. Requires manual configuration depending on the platform and panel. |
 | GMAC Ethernet                         | 🟢 Working     | |
@@ -109,7 +109,7 @@ Note that this list is subject to change at any time as devices gain better supp
 * Quality power supply that can provide at least 15 W. Depending on the peripherals you use, more may be needed.
 
   Note: on Mixtile Blade 3, a fixed voltage *higher than* 5V must be supplied. The board cannot power any external peripherals if the input voltage is just 5V. USB-PD negotiation is not supported by firmware.
-* HDMI or DisplayPort (USB-C) screen capable of at least 1080p 60Hz.
+* HDMI (preferred) or DisplayPort (USB-C) screen.
 * Optionally, if display is not available or for debugging purposes, an UART adapter capable of 1500000 baud rate (e.g. USB CH340, CP2104).
 
 ## 2. Download the firmware image
@@ -142,15 +142,27 @@ Also check the configuration options described below, some of which may need to 
 If you experience any issues, please see the [Troubleshooting](#troubleshooting) section.
 
 # Configuration settings
-The UEFI provides a few configuration options, like CPU frequency, PCIe/SATA selection for an M.2 port, fan control, etc. These can be viewed and changed using the UI configuration menu (under `Device Manager` -> `Rockchip Platform Configuration`).
+The UEFI provides a few configuration options, like CPU frequency, PCIe/SATA selection for an M.2 port, fan control, etc. These can be viewed and changed using the UI configuration menu (under `Device Manager`->`Rockchip Platform Configuration`).
 
 Configuration through the user interface is fairly straightforward and help/navigation information is provided around the menus.
 
 ## Tips
-* CPU clocks are set to 816 MHz (boot default) on platforms without a cooling fan included. If you have adequate cooling, go to the configuration menu -> `CPU Performance` and set all Cluster Presets to `Maximum`.
+### Boot time optimization
+* If there are unused M.2/PCIe slots, you can disable them to skip initialization: `Device Manager`->`Rockchip Platform Configuration`->`PCIe/SATA/USB Combo PIPE PHY` and set the relevant PHYs to `Unconnected`. Do the same for `PCI Express 3.0` by setting `Support State` to `Disabled`.
+
+* Auto boot time-out can be decreased from `Boot Maintenance Manager`.
+
+* If network boot is not used, it can be disabled: `Device Manager`->`Network Stack Configuration` then uncheck `Network Stack`.
+
+* If you do not need the ability to hot-plug displays or use DisplayPort while in the firmware: `Device Manager`->`Rockchip Platform Configuration`->`Display` and set `Force Output` to `Disabled`. This will skip display initialization when none is connected.
+
+* By default, the firmware connects all boot devices regardless of whether they are needed for the current boot. This is done to address potential compatibility issues and generally takes a negligible amount of time, thus it is recommended to not change it. However, it is still possible to do so: `Boot Maintenance Manager`->`Boot Discovery Policy`.
+
+### Linux boot
+* If you're getting a Synchronous Exception when booting certain distros, go to `Device Manager`->`EFI Memory Attribute Protocol` and uncheck `Enable Protocol`.
 
 ## Device Tree configuration
-For rich Linux support, it is recommended to enable Device Tree mode. You can do so by going to the configuration menu -> `ACPI / Device Tree` and setting `Config Table Mode` to `Device Tree`.
+For rich Linux support, it is recommended to enable Device Tree mode. You can do so by going to `Device Manager`->`Rockchip Platform Configuration`->`ACPI / Device Tree` and setting `Config Table Mode` to `Device Tree`.
 
 The firmware provides two compatibility modes:
 * `Vendor` - compatible with Rockchip SDK Linux 5.10/6.1 kernel only.
@@ -159,10 +171,10 @@ The firmware provides two compatibility modes:
 [Platinum](#platinum) platforms will have the `Mainline` option enabled by default, while [Bronze](#bronze) ones will fall back to `Vendor`.
 
 > [!TIP]
-> In `Mainline` mode with generic Linux kernels older than 6.13, the HDMI output will not be usable. To use the UEFI-initialized display instead, go to the configuration menu -> `ACPI / Device Tree` and enable `Force UEFI GOP Display`. Note that GPU acceleration cannot work in this mode.
+> In `Mainline` mode with generic Linux kernels older than 6.13, the HDMI output will not be usable. To use the UEFI-initialized display instead, go to `Device Manager`->`Rockchip Platform Configuration`->`ACPI / Device Tree` and enable `Force UEFI GOP Display`. Note that GPU acceleration cannot work in this mode.
 
 ### Custom Device Tree Blob (DTB) override and overlays
-It is also possible to provide a custom DTB and overlays. To enable this, go to the configuration menu -> `ACPI / Device Tree` and set `Support DTB override & overlays` to `Enabled`.
+It is also possible to provide a custom DTB and overlays. To enable this, go to `Device Manager`->`Rockchip Platform Configuration`->`ACPI / Device Tree` and set `Support DTB override & overlays` to `Enabled`.
 
 The firmware will now look for overrides in the partition of a selected boot option / OS loader. In most cases, this will be the first FAT32 EFI System Partition.
 
@@ -274,11 +286,13 @@ Additionally, holding the Recovery (or volume up) button while powering on the d
 Make sure you've flashed the firmware correctly and that it is the version designed for your device. In most cases this is the culprit.
 
 Assuming the firmware loads fine:
-* The display must support a resolution of at least 1080p at 60 Hz.
-* If you're using HDMI and the system has two ports, only one will work. Try both.
+* The display must support a resolution of at least 640 x 480 at 60 Hz.
+
+* Try booting without any display connected, then plug it in after a couple of seconds (when the status LED pattern changes). This will force the firmware to output at the minimum supported resolution. You can then increase the resolution by going to `Device Manager`->`Rockchip Platform Configuration`->`Display`.
+
 * If you're using USB-C to DisplayPort, only one orientation of the USB-C connector will work. Check both.
 
-If you are not able to get any display output, the only way to interact with UEFI is via the [serial console](#advanced-troubleshooting).
+If you are still not able to get any display output, the only way to interact with UEFI is via the [serial console](#advanced-troubleshooting).
 
 ### Configuration settings do not get saved
 This has been observed in cases where firmware was present on more than one device (SPI NOR, eMMC or SD). This is not a supported scenario, because UEFI will be unable to accurately determine the boot device it belongs to. The solution is to unplug or erase devices that may have other firmware on them.
