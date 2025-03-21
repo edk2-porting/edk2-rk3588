@@ -27,6 +27,7 @@
   RK806.c
 
 [LibraryClasses]
+  BaseLib
   DebugLib
   IoLib
   SpiLib

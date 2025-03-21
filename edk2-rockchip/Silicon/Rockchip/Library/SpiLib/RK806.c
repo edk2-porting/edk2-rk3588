@@ -1,5 +1,6 @@
 #include <Library/RockchipPlatformLib.h>
 #include "Soc.h"
+#include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
 #include <Library/IoLib.h>
 #include <Library/PcdLib.h>
@@ -253,6 +254,30 @@ static const struct rk8xx_reg_info  rk806_pldo[] = {
   { 3400000, 0,     RK806_PLDO_ON_VSEL (6), RK806_PLDO_SLP_VSEL (6), NA, RK806_PLDO_VSEL_MASK, 0xE8, },
 };
 
+static const struct rk806_pin_config  rk806_gpio_cfgs[] = {
+  {
+    .fun_reg = RK806_SLEEP_CONFIG0,
+    .fun_msk = RK806_PWRCTRL1_FUN,
+    .reg     = RK806_SLEEP_GPIO,
+    .val_msk = RK806_PWRCTRL1_DATA,
+    .dir_msk = RK806_PWRCTRL1_DR,
+  },
+  {
+    .fun_reg = RK806_SLEEP_CONFIG0,
+    .fun_msk = RK806_PWRCTRL2_FUN,
+    .reg     = RK806_SLEEP_GPIO,
+    .val_msk = RK806_PWRCTRL2_DATA,
+    .dir_msk = RK806_PWRCTRL2_DR,
+  },
+  {
+    .fun_reg = RK806_SLEEP_CONFIG1,
+    .fun_msk = RK806_PWRCTRL3_FUN,
+    .reg     = RK806_SLEEP_GPIO,
+    .val_msk = RK806_PWRCTRL3_DATA,
+    .dir_msk = RK806_PWRCTRL3_DR,
+  }
+};
+
 #if 0
 static void
 io_mem_show (
@@ -399,11 +424,11 @@ pmic_clrsetbits (
   RETURN_STATUS  ret;
 
   ret = pmic_reg_read (cs_id, reg, &byte, 0x01);
-  if (ret < 0) {
+  if (ret) {
     return ret;
   }
 
-  byte = (ret & ~clr) | set;
+  byte = (byte & ~clr) | set;
 
   pmic_reg_write (cs_id, reg, &byte, 1);
   ret = pmic_reg_read (cs_id, reg, &byte, 0x01);
@@ -751,4 +776,35 @@ RK806Init (
   SpiCongig (&gSPI);
 
   return RETURN_SUCCESS;
+}
+
+RETURN_STATUS
+RK806PinSetFunction (
+  IN UINT8  RegId,
+  IN UINT8  Pin,
+  IN UINT8  Function
+  )
+{
+  if ((Pin < 1) || (Pin > 3) || (Function > 5)) {
+    ASSERT (FALSE);
+    return RETURN_INVALID_PARAMETER;
+  }
+
+  const struct rk806_pin_config  *conf = &rk806_gpio_cfgs[Pin - 1];
+  UINT8                          mask  = conf->fun_msk;
+  UINT8                          cs_id = (RegId & 0xf00) >> 8;
+  UINT8                          val;
+
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: RegId=0x%x, Pin=%u, Function=%u\n",
+    __func__,
+    RegId,
+    Pin,
+    Function
+    ));
+
+  val = Function << LowBitSet32 (mask);
+
+  return pmic_clrsetbits (cs_id, conf->fun_reg, mask, val);
 }

@@ -75,6 +75,20 @@
 #define RK806_RST_MODE2           0x02
 #define VERSION_AB                0x01
 
+#define RK806_SLEEP_CONFIG0  0x62
+#define RK806_SLEEP_CONFIG1  0x63
+#define RK806_SLEEP_GPIO     0x71
+
+#define RK806_PWRCTRL1_DR    BIT(0)
+#define RK806_PWRCTRL2_DR    BIT(1)
+#define RK806_PWRCTRL3_DR    BIT(2)
+#define RK806_PWRCTRL1_DATA  BIT(4)
+#define RK806_PWRCTRL2_DATA  BIT(5)
+#define RK806_PWRCTRL3_DATA  BIT(6)
+#define RK806_PWRCTRL1_FUN   0x07
+#define RK806_PWRCTRL2_FUN   0x70
+#define RK806_PWRCTRL3_FUN   0x07
+
 struct regulator_init_data {
   const char    *supply_regulator;           /* or NULL for system supply */
   INT32         reg_id;
@@ -92,6 +106,14 @@ struct rk8xx_reg_info {
   /* only for buck now */
   UINT8     max_sel;
   UINT8     range_num;
+};
+
+struct rk806_pin_config {
+  UINT8    fun_reg;
+  UINT8    fun_msk;
+  UINT8    reg;
+  UINT8    dir_msk;
+  UINT8    val_msk;
 };
 
 #define RK8XX_DESC_COM(_name, _reg_info, _ops) \
@@ -178,6 +200,13 @@ RK806Init (
 extern void
 RK806RegulatorInit (
   struct regulator_init_data  init_data
+  );
+
+RETURN_STATUS
+RK806PinSetFunction (
+  IN UINT8  RegId,
+  IN UINT8  Pin,
+  IN UINT8  Function
   );
 
 #endif
