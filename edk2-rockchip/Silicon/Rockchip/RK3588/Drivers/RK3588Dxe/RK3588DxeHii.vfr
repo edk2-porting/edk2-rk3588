@@ -213,6 +213,11 @@ formset
       name  = FdtSupportOverrides,
       guid  = RK3588DXE_FORMSET_GUID;
 
+    efivarstore UINT8,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = FdtOverrideFixup,
+      guid  = RK3588DXE_FORMSET_GUID;
+
     efivarstore COOLING_FAN_STATE_VARSTORE_DATA,
       attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
       name  = CoolingFanState,
@@ -852,6 +857,17 @@ formset
             option text = STRING_TOKEN(STR_DISABLED), value = FALSE, flags = 0;
             option text = STRING_TOKEN(STR_ENABLED), value = TRUE, flags = 0;
           endoneof;
+
+          suppressif ideqval FdtSupportOverrides.State == 0;
+            oneof varid = FdtOverrideFixup,
+              prompt      = STRING_TOKEN(STR_FDT_OVERRIDE_FIXUP_PROMPT),
+              help        = STRING_TOKEN(STR_FDT_OVERRIDE_FIXUP_HELP),
+              flags       = NUMERIC_SIZE_1 | INTERACTIVE | RESET_REQUIRED,
+              default     = FixedPcdGet8 (PcdFdtOverrideFixupDefault),
+              option text = STRING_TOKEN(STR_DISABLED), value = FALSE, flags = 0;
+              option text = STRING_TOKEN(STR_ENABLED), value = TRUE, flags = 0;
+            endoneof;
+          endif;
         endif;
     endform;
 

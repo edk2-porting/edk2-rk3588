@@ -108,6 +108,8 @@
   gRK3588TokenSpaceGuid.PcdFdtForceGop
   gRK3588TokenSpaceGuid.PcdFdtSupportOverridesDefault
   gRK3588TokenSpaceGuid.PcdFdtSupportOverrides
+  gRK3588TokenSpaceGuid.PcdFdtOverrideFixupDefault
+  gRK3588TokenSpaceGuid.PcdFdtOverrideFixup
 
   gRK3588TokenSpaceGuid.PcdHasOnBoardFanOutput
   gRK3588TokenSpaceGuid.PcdCoolingFanState

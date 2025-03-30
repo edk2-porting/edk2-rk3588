@@ -1,7 +1,7 @@
 /** @file
  *
  *  Copyright (c) 2020, Jeremy Linton
- *  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
+ *  Copyright (c) 2023-2025, Mario Bălănică <mariobalanica02@gmail.com>
  *
  *  SPDX-License-Identifier: BSD-2-Clause-Patent
  *
@@ -145,6 +145,19 @@ SetupConfigTableVariables (
                   );
   if (EFI_ERROR (Status)) {
     Status = PcdSet8S (PcdFdtSupportOverrides, FixedPcdGet8 (PcdFdtSupportOverridesDefault));
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  Size   = sizeof (UINT8);
+  Status = gRT->GetVariable (
+                  L"FdtOverrideFixup",
+                  &gRK3588DxeFormSetGuid,
+                  NULL,
+                  &Size,
+                  &Var8
+                  );
+  if (EFI_ERROR (Status)) {
+    Status = PcdSet8S (PcdFdtOverrideFixup, FixedPcdGet8 (PcdFdtOverrideFixupDefault));
     ASSERT_EFI_ERROR (Status);
   }
 }

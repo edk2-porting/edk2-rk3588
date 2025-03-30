@@ -263,6 +263,9 @@
 #string STR_FDT_SUPPORT_OVERRIDES_PROMPT                   #language en-US "Support DTB override & overlays"
 #string STR_FDT_SUPPORT_OVERRIDES_HELP                     #language en-US "Enable or disable support for overriding the firmware-provided DTB and installing overlays.\n\nCheck firmware documentation for more details."
 
+#string STR_FDT_OVERRIDE_FIXUP_PROMPT                      #language en-US "Fix-up DTB override"
+#string STR_FDT_OVERRIDE_FIXUP_HELP                        #language en-US "Enable or disable firmware fix-ups for the DTB override."
+
 /*
  * Cooling fan configuration
  */

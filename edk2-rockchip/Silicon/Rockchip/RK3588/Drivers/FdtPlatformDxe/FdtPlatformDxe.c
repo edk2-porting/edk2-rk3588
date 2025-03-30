@@ -2,7 +2,7 @@
  *
  *  Flattened Device Tree platform driver
  *
- *  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
+ *  Copyright (c) 2023-2025, Mario Bălănică <mariobalanica02@gmail.com>
  *
  *  SPDX-License-Identifier: BSD-2-Clause-Patent
  *
@@ -109,6 +109,306 @@ FdtOpenIntoAlloc (
     FreePool (*Fdt);
     *Fdt = NewFdt;
   }
+
+  return EFI_SUCCESS;
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+FdtEnableNode (
+  IN         VOID     *Fdt,
+  IN CONST   CHAR8    *NodePath,
+  IN         BOOLEAN  Enable
+  )
+{
+  INT32  Node;
+  INT32  Ret;
+  CHAR8  *NodeStatus;
+
+  Node = fdt_path_offset (Fdt, NodePath);
+  if (Node < 0) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "FdtPlatform: Couldn't locate FDT node path '%a'. Ret=%a\n",
+      NodePath,
+      fdt_strerror (Node)
+      ));
+    return EFI_NOT_FOUND;
+  }
+
+  NodeStatus = Enable ? "okay" : "disabled";
+  Ret        = fdt_setprop_string (Fdt, Node, "status", NodeStatus);
+  if (Ret) {
+    DEBUG ((
+      DEBUG_ERROR,
+      "FdtPlatform: Failed to set '%a' status to '%a'. Ret=%a\n",
+      NodePath,
+      NodeStatus,
+      fdt_strerror (Ret)
+      ));
+    return EFI_UNSUPPORTED;
+  }
+
+  return EFI_SUCCESS;
+}
+
+STATIC
+VOID
+EFIAPI
+FdtFixupComboPhyDevices (
+  IN VOID  *Fdt
+  )
+{
+  EFI_STATUS  Status;
+
+  DEBUG ((DEBUG_INFO, "FdtPlatform: Fixing up Combo PHY devices (PCIe, SATA, USB)\n"));
+
+  FdtEnableNode (
+    Fdt,
+    "/pcie@fe170000",
+    PcdGet32 (PcdComboPhy1Mode) == COMBO_PHY_MODE_PCIE
+    );
+  FdtEnableNode (
+    Fdt,
+    "/pcie@fe180000",
+    PcdGet32 (PcdComboPhy2Mode) == COMBO_PHY_MODE_PCIE
+    );
+  FdtEnableNode (
+    Fdt,
+    "/pcie@fe190000",
+    PcdGet32 (PcdComboPhy0Mode) == COMBO_PHY_MODE_PCIE
+    );
+
+  FdtEnableNode (
+    Fdt,
+    "/sata@fe210000",
+    PcdGet32 (PcdComboPhy0Mode) == COMBO_PHY_MODE_SATA
+    );
+  FdtEnableNode (
+    Fdt,
+    "/sata@fe220000",
+    PcdGet32 (PcdComboPhy1Mode) == COMBO_PHY_MODE_SATA
+    );
+  FdtEnableNode (
+    Fdt,
+    "/sata@fe230000",
+    PcdGet32 (PcdComboPhy2Mode) == COMBO_PHY_MODE_SATA
+    );
+
+  Status = FdtEnableNode (
+             Fdt,
+             "/usb@fcd00000",
+             PcdGet32 (PcdComboPhy2Mode) == COMBO_PHY_MODE_USB3
+             );
+  if (EFI_ERROR (Status)) {
+    FdtEnableNode (
+      Fdt,
+      "/usbhost3_0",
+      PcdGet32 (PcdComboPhy2Mode) == COMBO_PHY_MODE_USB3
+      );
+    FdtEnableNode (
+      Fdt,
+      "/usbhost3_0/usb@fcd00000",
+      PcdGet32 (PcdComboPhy2Mode) == COMBO_PHY_MODE_USB3
+      );
+  }
+}
+
+STATIC
+VOID
+EFIAPI
+FdtFixupPcie3Devices (
+  IN VOID  *Fdt
+  )
+{
+  if (!FixedPcdGetBool (PcdPcie30Supported)) {
+    return;
+  }
+
+  DEBUG ((DEBUG_INFO, "FdtPlatform: Fixing up PCIe 3 devices\n"));
+
+  FdtEnableNode (
+    Fdt,
+    "/pcie@fe150000",
+    PcdGet32 (PcdPcie30State) == PCIE30_STATE_ENABLED
+    );
+
+  FdtEnableNode (
+    Fdt,
+    "/pcie@fe160000",
+    PcdGet32 (PcdPcie30State) == PCIE30_STATE_ENABLED &&
+    FixedPcdGetBool (PcdPcie30x2Supported) &&
+    PcdGet8 (PcdPcie30PhyMode) != PCIE30_PHY_MODE_AGGREGATION
+    );
+}
+
+STATIC
+VOID
+EFIAPI
+FdtFixupVopDevices (
+  IN VOID  *Fdt
+  )
+{
+  //
+  // This fixup allows Linux to reuse the UEFI GOP framebuffer in cases
+  // where the kernel lacks native support for display output.
+  //
+  // It works by:
+  // 1) disabling VOP device nodes to prevent any existing drivers from
+  //    resetting the hardware.
+  // 2) disabling related power domain nodes to prevent the kernel from
+  //    turning them off for being otherwise unused.
+  // 3) creating fake "regulator-fixed-clock" nodes whose sole purpose is
+  //    to reference and keep the required clocks enabled - again, to
+  //    prevent the kernel from gating them.
+  //
+
+  STATIC CHAR8  *VopNodesToDisable[] = {
+    "/vop@fdd90000",
+    "/iommu@fdd97e00",
+    "/hdmi@fde80000",
+    "/hdmi@fdea0000",
+    "/phy@fed60000",
+    "/phy@fed70000",
+    "/dp@fde50000",
+    "/dp@fde60000",
+    "/edp@fdec0000",
+    "/edp@fded0000",
+    "/dsi@fde20000",
+    "/dsi@fde30000",
+    "/display-subsystem",
+    "/power-management@fd8d8000/power-controller/power-domain@"XS (RK3588_PD_VOP),
+    "/power-management@fd8d8000/power-controller/power-domain@"XS (RK3588_PD_VO1),
+  };
+
+  STATIC UINT32  VopRequiredCruClocks[] = {
+    ACLK_VOP,
+    HCLK_VOP,
+    DCLK_VOP0,
+    DCLK_VOP1,
+    DCLK_VOP2,
+    DCLK_VOP3,
+    PCLK_VOP_ROOT,
+  };
+
+  UINTN  Index;
+  INT32  Root;
+  INT32  Node;
+  INT32  Ret;
+  INT32  CruPhandle;
+
+  if (!PcdGet8 (PcdFdtForceGop)) {
+    return;
+  }
+
+  DEBUG ((DEBUG_INFO, "FdtPlatform: Fixing up VOP devices (force GOP)\n"));
+
+  for (Index = 0; Index < ARRAY_SIZE (VopNodesToDisable); Index++) {
+    FdtEnableNode (Fdt, VopNodesToDisable[Index], FALSE);
+  }
+
+  Root = fdt_path_offset (Fdt, "/");
+  ASSERT (Root >= 0);
+  if (Root < 0) {
+    DEBUG ((DEBUG_ERROR, "FdtPlatform: Couldn't locate FDT root. Ret=%a\n", fdt_strerror (Root)));
+    return;
+  }
+
+  Node = fdt_path_offset (Fdt, "/clock-controller@fd7c0000");
+  if (Node < 0) {
+    DEBUG ((DEBUG_ERROR, "FdtPlatform: Couldn't locate CRU node. Ret=%a\n", fdt_strerror (Node)));
+    return;
+  }
+
+  CruPhandle = fdt_get_phandle (Fdt, Node);
+  if (CruPhandle <= 0) {
+    DEBUG ((DEBUG_ERROR, "FdtPlatform: Failed to get CRU phandle.\n"));
+    return;
+  }
+
+  for (Index = 0; Index < ARRAY_SIZE (VopRequiredCruClocks); Index++) {
+    UINT32  ClockId = VopRequiredCruClocks[Index];
+
+    CHAR8  NodeName[34];
+    AsciiSPrint (NodeName, sizeof (NodeName), "clk-cru-%d-keep-alive-reg", ClockId);
+
+    Node = fdt_add_subnode (Fdt, Root, NodeName);
+    if (Node < 0) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "FdtPlatform: Couldn't create FDT node '%a'. Ret=%a\n",
+        NodeName,
+        fdt_strerror (Node)
+        ));
+      return;
+    }
+
+    Ret = fdt_setprop_string (Fdt, Node, "compatible", "regulator-fixed-clock");
+    if (Ret < 0) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "FdtPlatform: Failed to set 'compatible' property for '%a'. Ret=%a\n",
+        NodeName,
+        fdt_strerror (Ret)
+        ));
+      return;
+    }
+
+    Ret = fdt_setprop_string (Fdt, Node, "regulator-name", NodeName);
+    if (Ret < 0) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "FdtPlatform: Failed to set 'regulator-name' property for '%a'. Ret=%a\n",
+        NodeName,
+        fdt_strerror (Ret)
+        ));
+      return;
+    }
+
+    Ret = fdt_setprop_empty (Fdt, Node, "regulator-always-on");
+    if (Ret < 0) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "FdtPlatform: Failed to set 'regulator-always-on' property for '%a'. Ret=%a\n",
+        NodeName,
+        fdt_strerror (Ret)
+        ));
+      return;
+    }
+
+    UINT32  ClockPair[] = { cpu_to_fdt32 (CruPhandle), cpu_to_fdt32 (ClockId) };
+    Ret = fdt_setprop (Fdt, Node, "clocks", ClockPair, sizeof (ClockPair));
+    if (Ret < 0) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "FdtPlatform: Failed to set 'clocks' property for '%a'. Ret=%a\n",
+        NodeName,
+        fdt_strerror (Ret)
+        ));
+      return;
+    }
+  }
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+ApplyPlatformFdtFixups (
+  IN OUT VOID  **Fdt
+  )
+{
+  EFI_STATUS  Status;
+
+  // Expand the FDT a bit to give room for any additions.
+  Status = FdtOpenIntoAlloc (Fdt, NULL, fdt_totalsize (*Fdt) + SIZE_4KB);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  FdtFixupComboPhyDevices (*Fdt);
+  FdtFixupPcie3Devices (*Fdt);
+  FdtFixupVopDevices (*Fdt);
 
   return EFI_SUCCESS;
 }
@@ -451,6 +751,10 @@ FdtPlatformProcessFileSystem (
     goto Exit;
   }
 
+  if (PcdGet8 (PcdFdtOverrideFixup)) {
+    ApplyPlatformFdtFixups (&NewFdt);
+  }
+
   //
   // Process the overlays common to all platforms.
   //
@@ -629,302 +933,6 @@ NotifyExitBootServices (
 STATIC
 EFI_STATUS
 EFIAPI
-FdtEnableNode (
-  IN         VOID     *Fdt,
-  IN CONST   CHAR8    *NodePath,
-  IN         BOOLEAN  Enable
-  )
-{
-  INT32  Node;
-  INT32  Ret;
-  CHAR8  *NodeStatus;
-
-  Node = fdt_path_offset (Fdt, NodePath);
-  if (Node < 0) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "FdtPlatform: Couldn't locate FDT node path '%a'. Ret=%a\n",
-      NodePath,
-      fdt_strerror (Node)
-      ));
-    return EFI_NOT_FOUND;
-  }
-
-  NodeStatus = Enable ? "okay" : "disabled";
-  Ret        = fdt_setprop_string (Fdt, Node, "status", NodeStatus);
-  if (Ret) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "FdtPlatform: Failed to set '%a' status to '%a'. Ret=%a\n",
-      NodePath,
-      NodeStatus,
-      fdt_strerror (Ret)
-      ));
-    return EFI_UNSUPPORTED;
-  }
-
-  return EFI_SUCCESS;
-}
-
-STATIC
-VOID
-EFIAPI
-FdtFixupComboPhyDevices (
-  IN VOID    *Fdt,
-  IN UINT32  CompatMode
-  )
-{
-  DEBUG ((DEBUG_INFO, "FdtPlatform: Fixing up Combo PHY devices (PCIe, SATA, USB)\n"));
-
-  FdtEnableNode (
-    Fdt,
-    "/pcie@fe170000",
-    PcdGet32 (PcdComboPhy1Mode) == COMBO_PHY_MODE_PCIE
-    );
-  FdtEnableNode (
-    Fdt,
-    "/pcie@fe180000",
-    PcdGet32 (PcdComboPhy2Mode) == COMBO_PHY_MODE_PCIE
-    );
-  FdtEnableNode (
-    Fdt,
-    "/pcie@fe190000",
-    PcdGet32 (PcdComboPhy0Mode) == COMBO_PHY_MODE_PCIE
-    );
-
-  FdtEnableNode (
-    Fdt,
-    "/sata@fe210000",
-    PcdGet32 (PcdComboPhy0Mode) == COMBO_PHY_MODE_SATA
-    );
-  FdtEnableNode (
-    Fdt,
-    "/sata@fe220000",
-    PcdGet32 (PcdComboPhy1Mode) == COMBO_PHY_MODE_SATA
-    );
-  FdtEnableNode (
-    Fdt,
-    "/sata@fe230000",
-    PcdGet32 (PcdComboPhy2Mode) == COMBO_PHY_MODE_SATA
-    );
-
-  switch (CompatMode) {
-    case FDT_COMPAT_MODE_VENDOR:
-      FdtEnableNode (
-        Fdt,
-        "/usbhost3_0",
-        PcdGet32 (PcdComboPhy2Mode) == COMBO_PHY_MODE_USB3
-        );
-      FdtEnableNode (
-        Fdt,
-        "/usbhost3_0/usb@fcd00000",
-        PcdGet32 (PcdComboPhy2Mode) == COMBO_PHY_MODE_USB3
-        );
-      break;
-    case FDT_COMPAT_MODE_MAINLINE:
-      FdtEnableNode (
-        Fdt,
-        "/usb@fcd00000",
-        PcdGet32 (PcdComboPhy2Mode) == COMBO_PHY_MODE_USB3
-        );
-      break;
-  }
-}
-
-STATIC
-VOID
-EFIAPI
-FdtFixupPcie3Devices (
-  IN VOID    *Fdt,
-  IN UINT32  CompatMode
-  )
-{
-  if (!FixedPcdGetBool (PcdPcie30Supported)) {
-    return;
-  }
-
-  DEBUG ((DEBUG_INFO, "FdtPlatform: Fixing up PCIe 3 devices\n"));
-
-  FdtEnableNode (
-    Fdt,
-    "/pcie@fe150000",
-    PcdGet32 (PcdPcie30State) == PCIE30_STATE_ENABLED
-    );
-
-  FdtEnableNode (
-    Fdt,
-    "/pcie@fe160000",
-    PcdGet32 (PcdPcie30State) == PCIE30_STATE_ENABLED &&
-    FixedPcdGetBool (PcdPcie30x2Supported) &&
-    PcdGet8 (PcdPcie30PhyMode) != PCIE30_PHY_MODE_AGGREGATION
-    );
-}
-
-STATIC
-VOID
-EFIAPI
-FdtFixupVopDevices (
-  IN VOID    *Fdt,
-  IN UINT32  CompatMode
-  )
-{
-  //
-  // This fixup allows Linux to reuse the UEFI GOP framebuffer in cases
-  // where the kernel lacks native support for display output.
-  //
-  // It works by:
-  // 1) disabling VOP device nodes to prevent any existing drivers from
-  //    resetting the hardware.
-  // 2) disabling related power domain nodes to prevent the kernel from
-  //    turning them off for being otherwise unused.
-  // 3) creating fake "regulator-fixed-clock" nodes whose sole purpose is
-  //    to reference and keep the required clocks enabled - again, to
-  //    prevent the kernel from gating them.
-  //
-
-  STATIC CHAR8  *VopNodesToDisable[] = {
-    "/vop@fdd90000",
-    "/iommu@fdd97e00",
-    "/hdmi@fde80000",
-    "/hdmi@fdea0000",
-    "/phy@fed60000",
-    "/phy@fed70000",
-    "/dp@fde50000",
-    "/dp@fde60000",
-    "/edp@fdec0000",
-    "/edp@fded0000",
-    "/dsi@fde20000",
-    "/dsi@fde30000",
-    "/display-subsystem",
-    "/power-management@fd8d8000/power-controller/power-domain@"XS (RK3588_PD_VOP),
-    "/power-management@fd8d8000/power-controller/power-domain@"XS (RK3588_PD_VO1),
-  };
-
-  STATIC UINT32  VopRequiredCruClocks[] = {
-    ACLK_VOP,
-    HCLK_VOP,
-    DCLK_VOP0,
-    DCLK_VOP1,
-    DCLK_VOP2,
-    DCLK_VOP3,
-    PCLK_VOP_ROOT,
-  };
-
-  UINTN  Index;
-  INT32  Root;
-  INT32  Node;
-  INT32  Ret;
-  INT32  CruPhandle;
-
-  if ((CompatMode != FDT_COMPAT_MODE_MAINLINE) || !PcdGet8 (PcdFdtForceGop)) {
-    return;
-  }
-
-  DEBUG ((DEBUG_INFO, "FdtPlatform: Fixing up VOP devices (force GOP)\n"));
-
-  for (Index = 0; Index < ARRAY_SIZE (VopNodesToDisable); Index++) {
-    FdtEnableNode (Fdt, VopNodesToDisable[Index], FALSE);
-  }
-
-  Root = fdt_path_offset (Fdt, "/");
-  ASSERT (Root >= 0);
-  if (Root < 0) {
-    DEBUG ((DEBUG_ERROR, "FdtPlatform: Couldn't locate FDT root. Ret=%a\n", fdt_strerror (Root)));
-    return;
-  }
-
-  Node = fdt_path_offset (Fdt, "/clock-controller@fd7c0000");
-  if (Node < 0) {
-    DEBUG ((DEBUG_ERROR, "FdtPlatform: Couldn't locate CRU node. Ret=%a\n", fdt_strerror (Node)));
-    return;
-  }
-
-  CruPhandle = fdt_get_phandle (Fdt, Node);
-  if (CruPhandle <= 0) {
-    DEBUG ((DEBUG_ERROR, "FdtPlatform: Failed to get CRU phandle.\n"));
-    return;
-  }
-
-  for (Index = 0; Index < ARRAY_SIZE (VopRequiredCruClocks); Index++) {
-    UINT32  ClockId = VopRequiredCruClocks[Index];
-
-    CHAR8  NodeName[34];
-    AsciiSPrint (NodeName, sizeof (NodeName), "clk-cru-%d-keep-alive-reg", ClockId);
-
-    Node = fdt_add_subnode (Fdt, Root, NodeName);
-    if (Node < 0) {
-      DEBUG ((
-        DEBUG_ERROR,
-        "FdtPlatform: Couldn't create FDT node '%a'. Ret=%a\n",
-        NodeName,
-        fdt_strerror (Node)
-        ));
-      return;
-    }
-
-    Ret = fdt_setprop_string (Fdt, Node, "compatible", "regulator-fixed-clock");
-    if (Ret < 0) {
-      DEBUG ((
-        DEBUG_ERROR,
-        "FdtPlatform: Failed to set 'compatible' property for '%a'. Ret=%a\n",
-        NodeName,
-        fdt_strerror (Ret)
-        ));
-      return;
-    }
-
-    Ret = fdt_setprop_string (Fdt, Node, "regulator-name", NodeName);
-    if (Ret < 0) {
-      DEBUG ((
-        DEBUG_ERROR,
-        "FdtPlatform: Failed to set 'regulator-name' property for '%a'. Ret=%a\n",
-        NodeName,
-        fdt_strerror (Ret)
-        ));
-      return;
-    }
-
-    Ret = fdt_setprop_empty (Fdt, Node, "regulator-always-on");
-    if (Ret < 0) {
-      DEBUG ((
-        DEBUG_ERROR,
-        "FdtPlatform: Failed to set 'regulator-always-on' property for '%a'. Ret=%a\n",
-        NodeName,
-        fdt_strerror (Ret)
-        ));
-      return;
-    }
-
-    UINT32  ClockPair[] = { cpu_to_fdt32 (CruPhandle), cpu_to_fdt32 (ClockId) };
-    Ret = fdt_setprop (Fdt, Node, "clocks", ClockPair, sizeof (ClockPair));
-    if (Ret < 0) {
-      DEBUG ((
-        DEBUG_ERROR,
-        "FdtPlatform: Failed to set 'clocks' property for '%a'. Ret=%a\n",
-        NodeName,
-        fdt_strerror (Ret)
-        ));
-      return;
-    }
-  }
-}
-
-STATIC
-VOID
-EFIAPI
-ApplyPlatformFdtFixups (
-  IN VOID    *Fdt,
-  IN UINT32  CompatMode
-  )
-{
-  FdtFixupComboPhyDevices (Fdt, CompatMode);
-  FdtFixupPcie3Devices (Fdt, CompatMode);
-  FdtFixupVopDevices (Fdt, CompatMode);
-}
-
-STATIC
-EFI_STATUS
-EFIAPI
 LoadPlatformFdt (
   OUT   VOID    **PlatformFdt,
   IN    UINT32  CompatMode
@@ -980,12 +988,6 @@ LoadPlatformFdt (
     return EFI_NOT_FOUND;
   }
 
-  // Expand the FDT a bit to give room for any additions.
-  Status = FdtOpenIntoAlloc (&Fdt, NULL, fdt_totalsize (Fdt) + SIZE_4KB);
-  if (EFI_ERROR (Status)) {
-    return Status;
-  }
-
   *PlatformFdt = Fdt;
 
   return EFI_SUCCESS;
@@ -1037,7 +1039,7 @@ FdtPlatformDxeInitialize (
     return EFI_SUCCESS;
   }
 
-  ApplyPlatformFdtFixups (mPlatformFdt, CompatMode);
+  ApplyPlatformFdtFixups (&mPlatformFdt);
 
   Status = gBS->InstallConfigurationTable (&gFdtTableGuid, mPlatformFdt);
   if (EFI_ERROR (Status)) {

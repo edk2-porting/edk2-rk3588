@@ -2,7 +2,7 @@
 #
 #  Flattened Device Tree platform driver
 #
-#  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
+#  Copyright (c) 2023-2025, Mario Bălănică <mariobalanica02@gmail.com>
 #
 #  SPDX-License-Identifier: BSD-2-Clause-Patent
 #
@@ -53,6 +53,7 @@
   gRK3588TokenSpaceGuid.PcdFdtCompatMode
   gRK3588TokenSpaceGuid.PcdFdtForceGop
   gRK3588TokenSpaceGuid.PcdFdtSupportOverrides
+  gRK3588TokenSpaceGuid.PcdFdtOverrideFixup
   gRK3588TokenSpaceGuid.PcdComboPhy0Mode
   gRK3588TokenSpaceGuid.PcdComboPhy1Mode
   gRK3588TokenSpaceGuid.PcdComboPhy2Mode

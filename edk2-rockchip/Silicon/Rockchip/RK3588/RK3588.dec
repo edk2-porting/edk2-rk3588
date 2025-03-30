@@ -51,6 +51,7 @@
   gRK3588TokenSpaceGuid.PcdFdtCompatModeDefault|0|UINT32|0x00010351
   gRK3588TokenSpaceGuid.PcdFdtForceGopDefault|0|UINT8|0x00010352
   gRK3588TokenSpaceGuid.PcdFdtSupportOverridesDefault|0|UINT8|0x00010353
+  gRK3588TokenSpaceGuid.PcdFdtOverrideFixupDefault|0|UINT8|0x00010354
 
   gRK3588TokenSpaceGuid.PcdHasOnBoardFanOutput|FALSE|BOOLEAN|0x10401
 
@@ -120,6 +121,7 @@
   gRK3588TokenSpaceGuid.PcdFdtCompatMode|0|UINT32|0x00000351
   gRK3588TokenSpaceGuid.PcdFdtForceGop|0|UINT8|0x00000352
   gRK3588TokenSpaceGuid.PcdFdtSupportOverrides|0|UINT8|0x00000353
+  gRK3588TokenSpaceGuid.PcdFdtOverrideFixup|0|UINT8|0x00000354
 
   gRK3588TokenSpaceGuid.PcdCoolingFanState|0|UINT32|0x00000401
   gRK3588TokenSpaceGuid.PcdCoolingFanSpeed|0|UINT32|0x00000402
