@@ -161,57 +161,92 @@ FdtFixupComboPhyDevices (
   )
 {
   EFI_STATUS  Status;
+  UINT32      Index;
+  INT32       Node;
+  INT32       Ret;
+  CONST VOID  *Property;
+  INT32       Length;
 
   DEBUG ((DEBUG_INFO, "FdtPlatform: Fixing up Combo PHY devices (PCIe, SATA, USB)\n"));
 
-  FdtEnableNode (
-    Fdt,
-    "/pcie@fe170000",
-    PcdGet32 (PcdComboPhy1Mode) == COMBO_PHY_MODE_PCIE
-    );
-  FdtEnableNode (
-    Fdt,
-    "/pcie@fe180000",
-    PcdGet32 (PcdComboPhy2Mode) == COMBO_PHY_MODE_PCIE
-    );
-  FdtEnableNode (
-    Fdt,
-    "/pcie@fe190000",
-    PcdGet32 (PcdComboPhy0Mode) == COMBO_PHY_MODE_PCIE
-    );
+  struct {
+    UINT32    Mode;
+    CHAR8     *PcieNodePath;
+    CHAR8     *SataNodePath;
+    CHAR8     *UsbNodePath;
+  } Phys[] = {
+    { PcdGet32 (PcdComboPhy0Mode), "/pcie@fe190000", "/sata@fe210000", NULL            },
+    { PcdGet32 (PcdComboPhy1Mode), "/pcie@fe170000", "/sata@fe220000", NULL            },
+    { PcdGet32 (PcdComboPhy2Mode), "/pcie@fe180000", "/sata@fe230000", "/usb@fcd00000" },
+  };
 
-  FdtEnableNode (
-    Fdt,
-    "/sata@fe210000",
-    PcdGet32 (PcdComboPhy0Mode) == COMBO_PHY_MODE_SATA
-    );
-  FdtEnableNode (
-    Fdt,
-    "/sata@fe220000",
-    PcdGet32 (PcdComboPhy1Mode) == COMBO_PHY_MODE_SATA
-    );
-  FdtEnableNode (
-    Fdt,
-    "/sata@fe230000",
-    PcdGet32 (PcdComboPhy2Mode) == COMBO_PHY_MODE_SATA
-    );
-
-  Status = FdtEnableNode (
-             Fdt,
-             "/usb@fcd00000",
-             PcdGet32 (PcdComboPhy2Mode) == COMBO_PHY_MODE_USB3
-             );
-  if (EFI_ERROR (Status)) {
+  for (Index = 0; Index < ARRAY_SIZE (Phys); Index++) {
     FdtEnableNode (
       Fdt,
-      "/usbhost3_0",
-      PcdGet32 (PcdComboPhy2Mode) == COMBO_PHY_MODE_USB3
+      Phys[Index].PcieNodePath,
+      Phys[Index].Mode == COMBO_PHY_MODE_PCIE
       );
+
     FdtEnableNode (
       Fdt,
-      "/usbhost3_0/usb@fcd00000",
-      PcdGet32 (PcdComboPhy2Mode) == COMBO_PHY_MODE_USB3
+      Phys[Index].SataNodePath,
+      Phys[Index].Mode == COMBO_PHY_MODE_SATA
       );
+
+    if (Phys[Index].UsbNodePath != NULL) {
+      Status = FdtEnableNode (
+                 Fdt,
+                 Phys[Index].UsbNodePath,
+                 Phys[Index].Mode == COMBO_PHY_MODE_USB3
+                 );
+      if (EFI_ERROR (Status)) {
+        FdtEnableNode (
+          Fdt,
+          "/usbhost3_0",
+          Phys[Index].Mode == COMBO_PHY_MODE_USB3
+          );
+        FdtEnableNode (
+          Fdt,
+          "/usbhost3_0/usb@fcd00000",
+          Phys[Index].Mode == COMBO_PHY_MODE_USB3
+          );
+      }
+    }
+
+    //
+    // For M.2 slots supporting both PCIe and SATA, we must reference
+    // the 3V3 supply in SATA mode as well, to prevent the kernel from
+    // turning it off.
+    //
+    if (Phys[Index].Mode == COMBO_PHY_MODE_SATA) {
+      Node = fdt_path_offset (Fdt, Phys[Index].PcieNodePath);
+      if (Node < 0) {
+        continue;
+      }
+
+      Property = fdt_getprop (Fdt, Node, "vpcie3v3-supply", &Length);
+      if (Property == NULL) {
+        continue;
+      }
+
+      ASSERT (Length == sizeof (UINT32));
+
+      Node = fdt_path_offset (Fdt, Phys[Index].SataNodePath);
+      if (Node < 0) {
+        continue;
+      }
+
+      Ret = fdt_setprop (Fdt, Node, "phy-supply", Property, Length);
+      if (Ret < 0) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "FdtPlatform: Failed to set 'phy-supply' property for '%a'. Ret=%a\n",
+          Phys[Index].SataNodePath,
+          fdt_strerror (Ret)
+          ));
+        continue;
+      }
+    }
   }
 }
 
