@@ -3,7 +3,7 @@
   Copyright 2017, 2020 NXP
   Copyright 2021-2023, Jared McNeill <jmcneill@invisible.ca>
   Copyright 2023, Molly Sophia <mollysophia379@gmail.com>
-  Copyright (c) 2023-2024, Mario Bălănică <mariobalanica02@gmail.com>
+  Copyright (c) 2023-2025, Mario Bălănică <mariobalanica02@gmail.com>
 
   SPDX-License-Identifier: BSD-2-Clause-Patent
 
@@ -577,6 +577,7 @@ InitializePciHost (
   EFI_PHYSICAL_ADDRESS  ApbBase  = PCIE_APB_BASE (Segment);
   EFI_PHYSICAL_ADDRESS  DbiBase  = PCIE_DBI_BASE (Segment);
   EFI_PHYSICAL_ADDRESS  PcieBase = PCIE_CFG_BASE (Segment);
+  EFI_STATUS            Status;
   UINTN                 Retry;
   UINT32                LinkSpeed;
   UINT32                LinkWidth;
@@ -622,7 +623,10 @@ InitializePciHost (
 
   if ((Segment == PCIE_SEGMENT_PCIE30X4) || (Segment == PCIE_SEGMENT_PCIE30X2)) {
     /* Configure PCIe 3.0 PHY */
-    Pcie30PhyInit ();
+    Status = Pcie30PhyInit ();
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
   }
 
   /* Combo PHY for PCIe 2.0 is configured earlier by RK3588Dxe */
