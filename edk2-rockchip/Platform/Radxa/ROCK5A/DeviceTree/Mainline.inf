@@ -14,7 +14,7 @@
   VERSION_STRING                 = 1.0
 
 [Sources]
-  devicetree/mainline/upstream/src/arm64/rockchip/rk3588s-rock-5a.dts
+  devicetree/mainline/rk3588s-rock-5a-fixup.dts
 
 [Packages]
   MdePkg/MdePkg.dec

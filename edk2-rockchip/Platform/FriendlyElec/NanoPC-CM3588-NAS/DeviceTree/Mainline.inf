@@ -14,7 +14,7 @@
   VERSION_STRING                 = 1.0
 
 [Sources]
-  devicetree/mainline/upstream/src/arm64/rockchip/rk3588-friendlyelec-cm3588-nas.dts
+  devicetree/mainline/rk3588-friendlyelec-cm3588-nas-fixup.dts
 
 [Packages]
   MdePkg/MdePkg.dec

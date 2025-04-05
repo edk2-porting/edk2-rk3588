@@ -1,0 +1,11 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+
+#include "rk3588s-nanopi-r6s.dts"
+
+&hdmi0_sound {
+ 	status = "okay";
+};
+
+&i2s5_8ch {
+ 	status = "okay";
+};

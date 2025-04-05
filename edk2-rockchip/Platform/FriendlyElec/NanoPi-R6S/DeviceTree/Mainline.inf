@@ -14,7 +14,7 @@
   VERSION_STRING                 = 1.0
 
 [Sources]
-  devicetree/mainline/upstream/src/arm64/rockchip/rk3588s-nanopi-r6s.dts
+  devicetree/mainline/rk3588s-nanopi-r6s-fixup.dts
 
 [Packages]
   MdePkg/MdePkg.dec

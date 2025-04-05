@@ -6,6 +6,14 @@
 	/delete-node/ pcie-oscillator;
 };
 
+&hdmi1_sound {
+	status = "okay";
+};
+
+&i2s6_8ch {
+	status = "okay";
+};
+
 /*
  * Remove the "pcie30_refclk" gated-fixed-clock to maintain compatibility
  * with kernels older than v6.13-rc1. It is backed by a GPIO regulator

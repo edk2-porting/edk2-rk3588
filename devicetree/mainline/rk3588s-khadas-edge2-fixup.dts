@@ -251,8 +251,16 @@
 	};
 };
 
-&hdptxphy_hdmi0 {
+&hdmi0_sound {
+ 	status = "okay";
+};
+
+&hdptxphy0 {
 	status = "okay";
+};
+
+&i2s5_8ch {
+ 	status = "okay";
 };
 
 &vop_mmu {
