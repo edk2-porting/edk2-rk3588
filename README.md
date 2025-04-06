@@ -120,7 +120,7 @@ If your platform is not yet supported, using an image meant for another device i
 ## 3. Flash the firmware
 UEFI can be flashed to either an SPI NOR flash, SD card or eMMC module:
 * For removable SD or eMMC (easiest), you can simply use balenaEtcher, RPi Imager or dd.
-* For SPI NOR or soldered eMMC, instructions can be found at: <https://wiki.radxa.com/Rock5/install/spi>.
+* For SPI NOR or soldered eMMC, instructions can be found at: <https://docs.radxa.com/en/rock5/lowlevel-development/bootloader_spi_flash>.
 
   In short, you can flash the image from Linux booted on the device or by using RKDevTool on another computer. The latter requires entering Maskrom mode on the device. The way to do this slightly varies across platforms, refer to your vendor documentation.
 
