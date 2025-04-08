@@ -699,6 +699,7 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
 !endif
   }
   FatPkg/EnhancedFatDxe/Fat.inf
+!include Features/Ext4Pkg/Ext4.dsc.inc
   MdeModulePkg/Universal/Disk/UnicodeCollation/EnglishDxe/EnglishDxe.inf
 
   #
