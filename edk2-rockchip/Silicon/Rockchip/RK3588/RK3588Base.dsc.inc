@@ -287,6 +287,8 @@
   gRK3588TokenSpaceGuid.PcdFdtForceGopDefault|FALSE
   gRK3588TokenSpaceGuid.PcdFdtSupportOverridesDefault|FALSE
   gRK3588TokenSpaceGuid.PcdFdtOverrideFixupDefault|TRUE
+  gRK3588TokenSpaceGuid.PcdFdtOverrideBasePathDefault|L""
+  gRK3588TokenSpaceGuid.PcdFdtOverrideOverlayPathDefault|L""
 
   #
   # Display support flags and default values
@@ -375,6 +377,8 @@
   gRK3588TokenSpaceGuid.PcdFdtForceGop|L"FdtForceGop"|gRK3588DxeFormSetGuid|0x0|gRK3588TokenSpaceGuid.PcdFdtForceGopDefault
   gRK3588TokenSpaceGuid.PcdFdtSupportOverrides|L"FdtSupportOverrides"|gRK3588DxeFormSetGuid|0x0|gRK3588TokenSpaceGuid.PcdFdtSupportOverridesDefault
   gRK3588TokenSpaceGuid.PcdFdtOverrideFixup|L"FdtOverrideFixup"|gRK3588DxeFormSetGuid|0x0|gRK3588TokenSpaceGuid.PcdFdtOverrideFixupDefault
+  gRK3588TokenSpaceGuid.PcdFdtOverrideBasePath|L"FdtOverrideBasePath"|gRK3588DxeFormSetGuid|0x0|{ 0x0 }
+  gRK3588TokenSpaceGuid.PcdFdtOverrideOverlayPath|L"FdtOverrideOverlayPath"|gRK3588DxeFormSetGuid|0x0|{ 0x0 }
 
   #
   # Cooling Fan

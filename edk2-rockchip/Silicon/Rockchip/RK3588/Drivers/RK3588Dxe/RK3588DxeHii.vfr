@@ -218,6 +218,16 @@ formset
       name  = FdtOverrideFixup,
       guid  = RK3588DXE_FORMSET_GUID;
 
+    efivarstore FDT_OVERRIDE_PATH_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = FdtOverrideBasePath,
+      guid  = RK3588DXE_FORMSET_GUID;
+
+    efivarstore FDT_OVERRIDE_PATH_VARSTORE_DATA,
+      attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
+      name  = FdtOverrideOverlayPath,
+      guid  = RK3588DXE_FORMSET_GUID;
+
     efivarstore COOLING_FAN_STATE_VARSTORE_DATA,
       attribute = EFI_VARIABLE_BOOTSERVICE_ACCESS | EFI_VARIABLE_RUNTIME_ACCESS | EFI_VARIABLE_NON_VOLATILE,
       name  = CoolingFanState,
@@ -859,6 +869,9 @@ formset
           endoneof;
 
           suppressif ideqval FdtSupportOverrides.State == 0;
+            subtitle text = STRING_TOKEN(STR_NULL_STRING);
+            subtitle text = STRING_TOKEN(STR_FDT_OVERRIDE_SUBTITLE);
+
             oneof varid = FdtOverrideFixup,
               prompt      = STRING_TOKEN(STR_FDT_OVERRIDE_FIXUP_PROMPT),
               help        = STRING_TOKEN(STR_FDT_OVERRIDE_FIXUP_HELP),
@@ -867,6 +880,24 @@ formset
               option text = STRING_TOKEN(STR_DISABLED), value = FALSE, flags = 0;
               option text = STRING_TOKEN(STR_ENABLED), value = TRUE, flags = 0;
             endoneof;
+
+            subtitle text = STRING_TOKEN(STR_NULL_STRING);
+
+            string varid = FdtOverrideBasePath.Path,
+              prompt  = STRING_TOKEN(STR_FDT_OVERRIDE_BASE_PATH_PROMPT),
+              help    = STRING_TOKEN(STR_FDT_OVERRIDE_BASE_PATH_HELP),
+              flags   = INTERACTIVE | RESET_REQUIRED,
+              minsize = 0,
+              maxsize = FDT_OVERRIDE_PATH_MAX_LEN,
+            endstring;
+
+            string varid = FdtOverrideOverlayPath.Path,
+              prompt  = STRING_TOKEN(STR_FDT_OVERRIDE_OVERLAY_PATH_PROMPT),
+              help    = STRING_TOKEN(STR_FDT_OVERRIDE_OVERLAY_PATH_HELP),
+              flags   = INTERACTIVE | RESET_REQUIRED,
+              minsize = 0,
+              maxsize = FDT_OVERRIDE_PATH_MAX_LEN,
+            endstring;
           endif;
         endif;
     endform;

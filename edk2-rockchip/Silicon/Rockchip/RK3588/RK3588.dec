@@ -52,6 +52,8 @@
   gRK3588TokenSpaceGuid.PcdFdtForceGopDefault|0|UINT8|0x00010352
   gRK3588TokenSpaceGuid.PcdFdtSupportOverridesDefault|0|UINT8|0x00010353
   gRK3588TokenSpaceGuid.PcdFdtOverrideFixupDefault|0|UINT8|0x00010354
+  gRK3588TokenSpaceGuid.PcdFdtOverrideBasePathDefault|L""|VOID*|0x00010355
+  gRK3588TokenSpaceGuid.PcdFdtOverrideOverlayPathDefault|L""|VOID*|0x00010356
 
   gRK3588TokenSpaceGuid.PcdHasOnBoardFanOutput|FALSE|BOOLEAN|0x10401
 
@@ -122,6 +124,18 @@
   gRK3588TokenSpaceGuid.PcdFdtForceGop|0|UINT8|0x00000352
   gRK3588TokenSpaceGuid.PcdFdtSupportOverrides|0|UINT8|0x00000353
   gRK3588TokenSpaceGuid.PcdFdtOverrideFixup|0|UINT8|0x00000354
+  gRK3588TokenSpaceGuid.PcdFdtOverrideBasePath|{ 0x0 }|FDT_OVERRIDE_PATH_VARSTORE_DATA|0x00000355 {
+    <Packages>
+      Silicon/Rockchip/RK3588/RK3588.dec
+    <HeaderFiles>
+      VarStoreData.h
+  }
+  gRK3588TokenSpaceGuid.PcdFdtOverrideOverlayPath|{ 0x0 }|FDT_OVERRIDE_PATH_VARSTORE_DATA|0x00000356 {
+    <Packages>
+      Silicon/Rockchip/RK3588/RK3588.dec
+    <HeaderFiles>
+      VarStoreData.h
+  }
 
   gRK3588TokenSpaceGuid.PcdCoolingFanState|0|UINT32|0x00000401
   gRK3588TokenSpaceGuid.PcdCoolingFanSpeed|0|UINT32|0x00000402

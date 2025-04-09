@@ -29,6 +29,7 @@
 [LibraryClasses]
   BaseLib
   DebugLib
+  DevicePathLib
   PrintLib
   DxeServicesLib
   MemoryAllocationLib
@@ -54,6 +55,8 @@
   gRK3588TokenSpaceGuid.PcdFdtForceGop
   gRK3588TokenSpaceGuid.PcdFdtSupportOverrides
   gRK3588TokenSpaceGuid.PcdFdtOverrideFixup
+  gRK3588TokenSpaceGuid.PcdFdtOverrideBasePath
+  gRK3588TokenSpaceGuid.PcdFdtOverrideOverlayPath
   gRK3588TokenSpaceGuid.PcdComboPhy0Mode
   gRK3588TokenSpaceGuid.PcdComboPhy1Mode
   gRK3588TokenSpaceGuid.PcdComboPhy2Mode

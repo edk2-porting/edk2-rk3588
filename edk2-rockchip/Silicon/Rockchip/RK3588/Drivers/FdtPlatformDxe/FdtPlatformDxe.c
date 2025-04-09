@@ -13,6 +13,7 @@
 
 #include <Library/BaseLib.h>
 #include <Library/DebugLib.h>
+#include <Library/DevicePathLib.h>
 #include <Library/PrintLib.h>
 #include <Library/DxeServicesLib.h>
 #include <Library/MemoryAllocationLib.h>
@@ -467,7 +468,12 @@ ReadFdtFromFilePath (
 
   Status = Root->Open (Root, &File, Path, EFI_FILE_MODE_READ, 0);
   if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_ERROR, "FdtPlatform: Couldn't open '%s'. Status=%r\n", Path, Status));
+    DEBUG ((
+      Status == EFI_NOT_FOUND ? DEBUG_VERBOSE : DEBUG_ERROR,
+      "FdtPlatform: Couldn't open '%s'. Status=%r\n",
+      Path,
+      Status
+      ));
     return Status;
   }
 
@@ -548,7 +554,7 @@ ReadFdtFromFilePath (
       Path,
       fdt_strerror (Ret)
       ));
-    Status = EFI_NOT_FOUND;
+    Status = EFI_LOAD_ERROR;
     goto Exit;
   }
 
@@ -592,7 +598,7 @@ InstallOverlaysFromDirectoryPath (
   Status = Root->Open (Root, &Dir, Path, EFI_FILE_MODE_READ, 0);
   if (EFI_ERROR (Status)) {
     DEBUG ((
-      DEBUG_ERROR,
+      Status == EFI_NOT_FOUND ? DEBUG_VERBOSE : DEBUG_ERROR,
       "FdtPlatform: Couldn't open directory '%s'. Status=%r\n",
       Path,
       Status
@@ -702,7 +708,107 @@ InstallOverlaysFromDirectoryPath (
   return Status;
 }
 
-STATIC  CHAR16  mDtbOverrideRootPath[] = L"\\dtb";
+STATIC CHAR16  *mDtbOverrideBasePaths[] = {
+  NULL,
+  L"\\dtb",
+  L"\\dtb\\base",
+  L"\\dtb\\rockchip",
+};
+
+STATIC CHAR16  *mDtbOverrideOverlayPaths[] = {
+  NULL,
+  L"\\dtb\\overlays",
+  L"\\dtb\\overlays\\!",
+};
+
+STATIC
+EFI_STATUS
+FdtPlatformBuildOverridePaths (
+  VOID
+  )
+{
+  UINTN        Index;
+  CONST CHAR8  *FdtName;
+  UINTN        FdtNameLen;
+  CHAR16       *OriginalPath;
+  CHAR16       *Path;
+  UINTN        PathSize;
+  UINTN        BasePathLen;
+
+  FdtName    = (CONST CHAR8 *)PcdGetPtr (PcdDeviceTreeName);
+  FdtNameLen = AsciiStrLen (FdtName);
+
+  //
+  // Build base FDT override file paths.
+  // If a directory is provided, the platform FDT file name
+  // will be appended to it.
+  //
+  mDtbOverrideBasePaths[0] = PcdGetPtr (PcdFdtOverrideBasePath);
+
+  for (Index = 0; Index < ARRAY_SIZE (mDtbOverrideBasePaths); Index++) {
+    OriginalPath = mDtbOverrideBasePaths[Index];
+    if (OriginalPath == NULL) {
+      continue;
+    } else if (OriginalPath[0] == CHAR_NULL) {
+      mDtbOverrideBasePaths[Index] = NULL;
+      continue;
+    }
+
+    if (!StrEndsWith (OriginalPath, L".dtb")) {
+      BasePathLen = StrLen (OriginalPath);
+      PathSize    = sizeof (CHAR16) *
+                    (BasePathLen +
+                     StrLen (L"\\") +
+                     FdtNameLen +
+                     StrLen (L".dtb") + 1);
+
+      Path = AllocatePool (PathSize);
+      if (Path == NULL) {
+        ASSERT (FALSE);
+        return EFI_OUT_OF_RESOURCES;
+      }
+
+      UnicodeSPrint (Path, PathSize, L"%s\\%a.dtb", OriginalPath, FdtName);
+
+      mDtbOverrideBasePaths[Index] = Path;
+    }
+  }
+
+  //
+  // Build FDT overlay directory paths.
+  // If ending in "!", the platform FDT base name will be appended.
+  //
+  mDtbOverrideOverlayPaths[0] = PcdGetPtr (PcdFdtOverrideOverlayPath);
+
+  for (Index = 0; Index < ARRAY_SIZE (mDtbOverrideOverlayPaths); Index++) {
+    OriginalPath = mDtbOverrideOverlayPaths[Index];
+    if (OriginalPath == NULL) {
+      continue;
+    } else if (OriginalPath[0] == CHAR_NULL) {
+      mDtbOverrideOverlayPaths[Index] = NULL;
+      continue;
+    }
+
+    if (StrEndsWith (OriginalPath, L"!")) {
+      BasePathLen = StrLen (OriginalPath) - StrLen (L"!");
+      PathSize    = sizeof (CHAR16) *
+                    (BasePathLen +
+                     FdtNameLen + 1);
+
+      Path = AllocatePool (PathSize);
+      if (Path == NULL) {
+        ASSERT (FALSE);
+        return EFI_OUT_OF_RESOURCES;
+      }
+
+      UnicodeSPrint (Path, PathSize, L"%.*s%a", BasePathLen, OriginalPath, FdtName);
+
+      mDtbOverrideOverlayPaths[Index] = Path;
+    }
+  }
+
+  return EFI_SUCCESS;
+}
 
 STATIC
 EFI_STATUS
@@ -713,14 +819,13 @@ FdtPlatformProcessFileSystem (
 {
   EFI_STATUS         Status;
   EFI_FILE_PROTOCOL  *Root;
-  EFI_FILE_PROTOCOL  *DtbDir;
-  UINTN              PathSize;
+  UINTN              Index;
   CHAR16             *Path;
-  CHAR8              *FdtName;
   VOID               *Fdt          = NULL;
   VOID               *NewFdt       = NULL;
   VOID               *FdtToInstall = NULL;
   UINTN              OverlaysCount = 0;
+  INT32              Ret;
 
   Status = FileSystem->OpenVolume (FileSystem, &Root);
   if (EFI_ERROR (Status)) {
@@ -728,53 +833,29 @@ FdtPlatformProcessFileSystem (
     return Status;
   }
 
-  Status = Root->Open (Root, &DtbDir, mDtbOverrideRootPath, EFI_FILE_MODE_READ, 0);
-  if (EFI_ERROR (Status)) {
-    if (Status != EFI_NOT_FOUND) {
-      DEBUG ((
-        DEBUG_ERROR,
-        "FdtPlatform: Failed to open directory '%s'. Status=%r\n",
-        mDtbOverrideRootPath,
-        Status
-        ));
+  //
+  // Look for a base FDT override.
+  //
+  for (Index = 0; Index < ARRAY_SIZE (mDtbOverrideBasePaths); Index++) {
+    Path = mDtbOverrideBasePaths[Index];
+    if (Path == NULL) {
+      continue;
     }
 
-    return Status;
-  } else {
-    DEBUG ((
-      DEBUG_INFO,
-      "FdtPlatform: Found override directory '%s'.\n",
-      mDtbOverrideRootPath
-      ));
+    Status = ReadFdtFromFilePath (Root, Path, NULL, &Fdt);
+    if (!EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_INFO, "FdtPlatform: Loaded FDT override '%s'.\n", Path));
+      break;
+    }
   }
 
-  PathSize = MAX_PATH_LENGTH * sizeof (CHAR16);
-  Path     = AllocatePool (PathSize);
-  if (Path == NULL) {
-    DEBUG ((
-      DEBUG_ERROR,
-      "FdtPlatform: Not enough resources for '%s' access path.\n",
-      mDtbOverrideRootPath
-      ));
-    Root->Close (DtbDir);
-    return EFI_OUT_OF_RESOURCES;
-  }
-
-  FdtName = FixedPcdGetPtr (PcdDeviceTreeName);
-
-  //
-  // Try to open the FDT override.
-  //
-  UnicodeSPrint (Path, PathSize, L"base\\%a.dtb", FdtName);
-  Status = ReadFdtFromFilePath (DtbDir, Path, NULL, &Fdt);
-  if (EFI_ERROR (Status)) {
+  if (Fdt == NULL) {
     if (mPlatformFdt == NULL) {
-      goto Exit;
+      return Status;
     }
 
+    // Not found - use the platform FDT instead.
     Fdt = mPlatformFdt;
-  } else {
-    DEBUG ((DEBUG_INFO, "FdtPlatform: Loaded FDT override '%s'.\n", Path));
   }
 
   //
@@ -783,45 +864,64 @@ FdtPlatformProcessFileSystem (
   //
   Status = FdtOpenIntoAlloc (&Fdt, &NewFdt, fdt_totalsize (Fdt));
   if (EFI_ERROR (Status)) {
-    goto Exit;
+    return Status;
   }
 
-  if (PcdGet8 (PcdFdtOverrideFixup)) {
+  //
+  // Apply platform fix-ups to the base FDT override.
+  //
+  if (PcdGet8 (PcdFdtOverrideFixup) && (Fdt != mPlatformFdt)) {
     ApplyPlatformFdtFixups (&NewFdt);
   }
 
   //
-  // Process the overlays common to all platforms.
+  // Process the overlays.
   //
-  Status = InstallOverlaysFromDirectoryPath (DtbDir, L"overlays", &NewFdt, &OverlaysCount);
-  if ((Status == EFI_LOAD_ERROR) || (Status == EFI_OUT_OF_RESOURCES)) {
-    goto Exit;
-  }
+  for (Index = 0; Index < ARRAY_SIZE (mDtbOverrideOverlayPaths); Index++) {
+    Path = mDtbOverrideOverlayPaths[Index];
+    if (Path == NULL) {
+      continue;
+    }
 
-  //
-  // Process the platform-specific overlays.
-  //
-  UnicodeSPrint (Path, PathSize, L"overlays\\%a", FdtName);
-  Status = InstallOverlaysFromDirectoryPath (DtbDir, Path, &NewFdt, &OverlaysCount);
-  if ((Status == EFI_LOAD_ERROR) || (Status == EFI_OUT_OF_RESOURCES)) {
-    goto Exit;
-  }
-
-Exit:
-  Root->Close (DtbDir);
-  FreePool (Path);
-
-  if (NewFdt != NULL) {
-    if (fdt_check_header (NewFdt) == 0) {
-      FdtToInstall = NewFdt;
-      DEBUG ((DEBUG_INFO, "FdtPlatform: Using FDT with %d overlays merged.\n", OverlaysCount));
+    Status = InstallOverlaysFromDirectoryPath (Root, Path, &NewFdt, &OverlaysCount);
+    if ((Status == EFI_LOAD_ERROR) || (Status == EFI_OUT_OF_RESOURCES)) {
+      break;
     } else {
-      FreePool (NewFdt);
+      // Ignore non-fatal errors.
+      Status = EFI_SUCCESS;
     }
   }
 
-  if ((Fdt != NULL) && (Fdt != mPlatformFdt)) {
-    if ((FdtToInstall == NULL) && (fdt_check_header (Fdt) == 0)) {
+  //
+  // Use the new FDT if it overrides the platform default and/or has
+  // overlays installed.
+  //
+  if (!EFI_ERROR (Status)) {
+    Ret = fdt_check_header (NewFdt);
+    if (Ret == 0) {
+      if ((Fdt != mPlatformFdt) || (OverlaysCount > 0)) {
+        FdtToInstall = NewFdt;
+        DEBUG ((DEBUG_INFO, "FdtPlatform: Using FDT with %d overlays merged.\n", OverlaysCount));
+      }
+    } else {
+      DEBUG ((
+        DEBUG_ERROR,
+        "FdtPlatform: New FDT has an invalid header! Ret=%a\n",
+        fdt_strerror (Ret)
+        ));
+    }
+  }
+
+  if (FdtToInstall != NewFdt) {
+    FreePool (NewFdt);
+  }
+
+  //
+  // In case the new FDT was unsuitable, fall back to the original if that
+  // still overrides the platform default.
+  //
+  if (Fdt != mPlatformFdt) {
+    if (FdtToInstall == NULL) {
       FdtToInstall = Fdt;
       DEBUG ((DEBUG_INFO, "FdtPlatform: Using original FDT without overlays.\n"));
     } else {
@@ -837,8 +937,121 @@ Exit:
         "FdtPlatform: Failed to install the new FDT as config table. Status=%r\n",
         Status
         ));
+
+      if (FdtToInstall != mPlatformFdt) {
+        FreePool (FdtToInstall);
+      }
     }
+  } else if (!EFI_ERROR (Status)) {
+    Status = EFI_NOT_FOUND;
   }
+
+  return Status;
+}
+
+STATIC
+UINTN
+GetParentDevicePathSize (
+  IN CONST EFI_DEVICE_PATH_PROTOCOL  *DevicePath
+  )
+{
+  CONST EFI_DEVICE_PATH_PROTOCOL  *Node;
+
+  if ((DevicePath == NULL) || IsDevicePathEnd (DevicePath)) {
+    return 0;
+  }
+
+  Node = DevicePath;
+
+  while (!IsDevicePathEnd (NextDevicePathNode (Node))) {
+    Node = NextDevicePathNode (Node);
+  }
+
+  return (UINTN)((UINT8 *)Node - (UINT8 *)DevicePath);
+}
+
+STATIC
+EFI_STATUS
+FdtPlatformProcessLoadedImage (
+  IN EFI_LOADED_IMAGE_PROTOCOL  *LoadedImage
+  )
+{
+  EFI_STATUS                       Status;
+  EFI_DEVICE_PATH_PROTOCOL         *ImageDevicePath;
+  UINTN                            DevicePathSize;
+  EFI_DEVICE_PATH_PROTOCOL         *DevicePath;
+  CHAR16                           *DevicePathText;
+  EFI_HANDLE                       *Handles;
+  UINTN                            HandleCount;
+  UINTN                            Index;
+  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL  *FileSystem;
+
+  if ((LoadedImage == NULL) || (LoadedImage->DeviceHandle == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  ImageDevicePath = DevicePathFromHandle (LoadedImage->DeviceHandle);
+  if (ImageDevicePath == NULL) {
+    return EFI_NOT_FOUND;
+  }
+
+  DevicePathSize = GetParentDevicePathSize (ImageDevicePath);
+  if (DevicePathSize == 0) {
+    DevicePathSize = GetDevicePathSize (ImageDevicePath);
+  }
+
+  Status = gBS->LocateHandleBuffer (
+                  ByProtocol,
+                  &gEfiSimpleFileSystemProtocolGuid,
+                  NULL,
+                  &HandleCount,
+                  &Handles
+                  );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = EFI_NOT_FOUND;
+
+  for (Index = 0; Index < HandleCount; Index++) {
+    DevicePath = DevicePathFromHandle (Handles[Index]);
+    if (DevicePath == NULL) {
+      continue;
+    }
+
+    if (CompareMem (DevicePath, ImageDevicePath, DevicePathSize) != 0) {
+      continue;
+    }
+
+    Status = gBS->HandleProtocol (
+                    Handles[Index],
+                    &gEfiSimpleFileSystemProtocolGuid,
+                    (VOID **)&FileSystem
+                    );
+    if (EFI_ERROR (Status)) {
+      ASSERT_EFI_ERROR (Status);
+      continue;
+    }
+
+    DevicePathText = ConvertDevicePathToText (DevicePath, FALSE, FALSE);
+    DEBUG ((DEBUG_INFO, "FdtPlatform: Processing '%s'\n", DevicePathText));
+    if (DevicePathText != NULL) {
+      FreePool (DevicePathText);
+    }
+
+    Status = FdtPlatformProcessFileSystem (FileSystem);
+    if (EFI_ERROR (Status)) {
+      if (Status != EFI_NOT_FOUND) {
+        DEBUG ((DEBUG_ERROR, "FdtPlatform: Failed to process the file system. Status=%r\n", Status));
+      }
+
+      continue;
+    }
+
+    break;
+  }
+
+  FreePool (Handles);
 
   return Status;
 }
@@ -851,11 +1064,10 @@ NotifyLoadedImage (
   IN VOID       *Context
   )
 {
-  EFI_STATUS                       Status;
-  EFI_HANDLE                       *Handles;
-  UINTN                            HandleCount;
-  EFI_LOADED_IMAGE_PROTOCOL        *LoadedImage;
-  EFI_SIMPLE_FILE_SYSTEM_PROTOCOL  *FileSystem;
+  EFI_STATUS                 Status;
+  EFI_HANDLE                 *Handles;
+  UINTN                      HandleCount;
+  EFI_LOADED_IMAGE_PROTOCOL  *LoadedImage;
 
   while (TRUE) {
     Status = gBS->LocateHandleBuffer (
@@ -894,33 +1106,8 @@ NotifyLoadedImage (
       break;
     }
 
-    if (LoadedImage->DeviceHandle == NULL) {
-      continue;
-    }
-
-    Status = gBS->HandleProtocol (
-                    LoadedImage->DeviceHandle,
-                    &gEfiSimpleFileSystemProtocolGuid,
-                    (VOID **)&FileSystem
-                    );
+    Status = FdtPlatformProcessLoadedImage (LoadedImage);
     if (EFI_ERROR (Status)) {
-      if (Status != EFI_UNSUPPORTED) {
-        DEBUG ((
-          DEBUG_ERROR,
-          "FdtPlatform: Failed to get gEfiSimpleFileSystemProtocolGuid. Status=%r\n",
-          Status
-          ));
-      }
-
-      continue;
-    }
-
-    Status = FdtPlatformProcessFileSystem (FileSystem);
-    if (EFI_ERROR (Status)) {
-      if (Status != EFI_NOT_FOUND) {
-        DEBUG ((DEBUG_ERROR, "FdtPlatform: Failed to process the file system. Status=%r\n", Status));
-      }
-
       continue;
     }
   }
@@ -934,7 +1121,15 @@ NotifyReadyToBoot (
   IN VOID       *Context
   )
 {
+  EFI_STATUS  Status;
+
   gBS->CloseEvent (Event);
+
+  Status = FdtPlatformBuildOverridePaths ();
+  if (EFI_ERROR (Status)) {
+    ASSERT_EFI_ERROR (Status);
+    return;
+  }
 
   EfiCreateProtocolNotifyEvent (
     &gEfiLoadedImageProtocolGuid,

@@ -110,6 +110,10 @@
   gRK3588TokenSpaceGuid.PcdFdtSupportOverrides
   gRK3588TokenSpaceGuid.PcdFdtOverrideFixupDefault
   gRK3588TokenSpaceGuid.PcdFdtOverrideFixup
+  gRK3588TokenSpaceGuid.PcdFdtOverrideBasePathDefault
+  gRK3588TokenSpaceGuid.PcdFdtOverrideBasePath
+  gRK3588TokenSpaceGuid.PcdFdtOverrideOverlayPathDefault
+  gRK3588TokenSpaceGuid.PcdFdtOverrideOverlayPath
 
   gRK3588TokenSpaceGuid.PcdHasOnBoardFanOutput
   gRK3588TokenSpaceGuid.PcdCoolingFanState

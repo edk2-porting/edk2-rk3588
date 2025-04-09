@@ -263,8 +263,37 @@
 #string STR_FDT_SUPPORT_OVERRIDES_PROMPT                   #language en-US "Support DTB override & overlays"
 #string STR_FDT_SUPPORT_OVERRIDES_HELP                     #language en-US "Enable or disable support for overriding the firmware-provided DTB and installing overlays.\n\nCheck firmware documentation for more details."
 
-#string STR_FDT_OVERRIDE_FIXUP_PROMPT                      #language en-US "Fix-up DTB override"
+#string STR_FDT_OVERRIDE_SUBTITLE                          #language en-US "DTB Override"
+
+#string STR_FDT_OVERRIDE_FIXUP_PROMPT                      #language en-US "Firmware Fix-ups"
 #string STR_FDT_OVERRIDE_FIXUP_HELP                        #language en-US "Enable or disable firmware fix-ups for the DTB override."
+
+#string STR_FDT_OVERRIDE_BASE_PATH_PROMPT                  #language en-US "Preferred Base DTB Path"
+#string STR_FDT_OVERRIDE_BASE_PATH_HELP                    #language en-US "Enter the preferred file or directory path for the base DTB override, relative to the file system root.\n\n"
+                                                                           "Once a boot device is selected, the firmware will scan all the supported file systems on it (FAT, ext4) and try to load the specified override.\n\n"
+                                                                           "- If a directory path is specified, the platform FDT file name will be appended to it (<PLATFORM-DT-NAME>).\n"
+                                                                           "- If a file path is specified, it will be used as is.\n"
+                                                                           "- If no override exists, the firmware-provided DTB will be used instead.\n\n"
+                                                                           "Examples:\n"
+                                                                           " \\dtbs\n"
+                                                                           " \\dtbs\\my-board.dtb\n\n"
+                                                                           "Default alternative paths:\n"
+                                                                           " \\dtb\n"
+                                                                           " \\dtb\\base\n"
+                                                                           " \\dtb\\rockchip\n\n"
+                                                                           "To reset this option to the default value, set it to a space character, save and reboot."
+
+#string STR_FDT_OVERRIDE_OVERLAY_PATH_PROMPT               #language en-US "Preferred Overlays Path"
+#string STR_FDT_OVERRIDE_OVERLAY_PATH_HELP                 #language en-US "Enter the preferred directory path for the DTB overlays, relative to the file system root.\n\n"
+                                                                           "Once a boot device is selected, the firmware will scan all the supported file systems on it (FAT, ext4) and try to load all overlays in the specified directory.\n\n"
+                                                                           "- If the installation of an overlay fails, all other overlays will be discarded.\n\n"
+                                                                           "Examples:\n"
+                                                                           " \\my-overlays\n"
+                                                                           " \\dtbs\\overlays\n\n"
+                                                                           "Default alternative paths:\n"
+                                                                           " \\dtb\\overlays\n"
+                                                                           " \\dtb\\overlays\\<PLATFORM-DT-NAME>\n\n"
+                                                                           "To reset this option to the default value, set it to a space character, save and reboot."
 
 /*
  * Cooling fan configuration
