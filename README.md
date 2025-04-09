@@ -174,19 +174,28 @@ The firmware provides two compatibility modes:
 > In `Mainline` mode with generic Linux kernels older than 6.15, the HDMI output will not be usable. To use the UEFI-initialized display instead, go to `Device Manager`->`Rockchip Platform Configuration`->`ACPI / Device Tree` and enable `Force UEFI GOP Display`. Note that GPU acceleration cannot work in this mode.
 
 ### Custom Device Tree Blob (DTB) override and overlays
-It is also possible to provide a custom DTB and overlays. To enable this, go to `Device Manager`->`Rockchip Platform Configuration`->`ACPI / Device Tree` and set `Support DTB override & overlays` to `Enabled`.
+It is also possible to provide a custom DTB and overlays. This is useful in cases where the firmware DTB is outdated, does not match the kernel used or for testing purposes. To enable overrides, go to `Device Manager`->`Rockchip Platform Configuration`->`ACPI / Device Tree` and set `Support DTB override & overlays` to `Enabled`.
 
-The firmware will now look for overrides in the partition of a selected boot option / OS loader. In most cases, this will be the first FAT32 EFI System Partition.
+The firmware will now look for overrides in all supported file systems / partitions (FAT, ext4) on the selected boot device.
 
-**Important:** The `dtb` directory must be placed at the root of the partition. It should not be inside any sub-directory.
+**Important:**
+* The paths below are relative to the root of the partition. They must not be inside any sub-directory.
+* All overrides (base DTB and overlays) must be stored within a single partition. Using a base DTB from one partition and overlays from another is not allowed.
 
-* The base DTB must be located at `\dtb\base\<PLATFORM-DT-NAME>.dtb`.
+The base DTB can be placed in:
+* `\dtb`
+* `\dtb\base`
+* `\dtb\rockchip` - Fedora images have the kernel DTBs in this location on the second ext4 boot partition.
 
-* The overlays can be placed in:
-  * `\dtb\overlays` - will be applied first, regardless of the platform.
-  * `\dtb\overlays\<PLATFORM-DT-NAME>` - will be applied only to the specified platform.
+and must have the `<PLATFORM-DT-NAME>.dtb` file name.
 
-  and must have the `.dtbo` extension.
+The overlays can be placed in:
+* `\dtb\overlays` - will be applied first, regardless of the platform.
+* `\dtb\overlays\<PLATFORM-DT-NAME>` - will be applied only to the specified platform.
+
+and must have the `.dtbo` extension.
+
+In addition to the default paths above, it is possible to specify custom ones via the `Preferred Base DTB Path` and `Preferred Overlays Path` setup options in the menu described above.
 
 `<PLATFORM-DT-NAME>` can be:
 | Name                                    | Platform                      |
@@ -214,15 +223,16 @@ The firmware will now look for overrides in the partition of a selected boot opt
 | `rk3588s-nanopi-m6`                     | NanoPi M6                     |
 | `rk3588-hinlink-h88k`                   | H88K                          |
 
-In the absence of a custom base DTB override, the overlays are applied on top of the firmware-provided DTB.
+**Notes:**
+* The firmware applies some fix-ups to the DTB depending on the user settings (e.g. PCIe/SATA/USB selection, making SATA overlays redundant). These fix-ups are not applied when providing overrides by other means, such as the Grub `devicetree` command.
 
-The firmware applies some fix-ups to its own DTB depending on the user settings (e.g. PCIe/SATA/USB selection, making SATA overlays redundant). These fix-ups are not applied to a custom base DTB - overlays must be used instead.
+* In the absence of a base DTB override, the overlays are applied on top of the firmware-provided DTB.
 
-If the application of an overlay fails (e.g. due to it being invalid in regard to the base DTB), all overlays are discarded, including those that got applied up to that point.
+* If the application of an overlay fails (e.g. due to incompatibility with the base DTB), all other overlays are discarded.
 
-If the custom base DTB is invalid, the firmware-provided one will be passed to the OS instead.
+* If the base DTB override is invalid, the firmware-provided one will be passed to the OS instead.
 
-This entire process is logged to the [serial console](#advanced-troubleshooting). There's currently no other way to see potential errors.
+* This process is logged to the [serial console](#advanced-troubleshooting). It is the only way to see potential errors.
 
 # Updating the firmware
 If the storage is only used for UEFI and nothing else, simply download the latest image and flash it as described in the [Getting started](#getting-started) section.
