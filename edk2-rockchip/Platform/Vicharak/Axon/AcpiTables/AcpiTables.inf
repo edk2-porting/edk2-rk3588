@@ -32,15 +32,6 @@
   $(RK_COMMON_ACPI_DIR)/Mcfg.aslc
   $(RK_COMMON_ACPI_DIR)/Dbg2.aslc
   $(RK_COMMON_ACPI_DIR)/Pptt.aslc
-  $(RK_COMMON_ACPI_DIR)/Pcie3x4.asl
-  $(RK_COMMON_ACPI_DIR)/Pcie3x2.asl
-  $(RK_COMMON_ACPI_DIR)/Pcie2x1l0.asl
-  $(RK_COMMON_ACPI_DIR)/Pcie2x1l1.asl
-  $(RK_COMMON_ACPI_DIR)/Pcie2x1l2.asl
-  $(RK_COMMON_ACPI_DIR)/Sata0.asl
-  $(RK_COMMON_ACPI_DIR)/Sata1.asl
-  $(RK_COMMON_ACPI_DIR)/Sata2.asl
-  $(RK_COMMON_ACPI_DIR)/Usb2Host.asl
 
 [Packages]
   ArmPkg/ArmPkg.dec
@@ -49,6 +40,7 @@
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
   Silicon/Rockchip/RockchipPkg.dec
+  Silicon/Rockchip/RK3588/RK3588.dec
 
 [FixedPcd]
   gArmTokenSpaceGuid.PcdArmArchTimerIntrNum
@@ -59,3 +51,8 @@
   gArmTokenSpaceGuid.PcdGicDistributorBase
   gArmTokenSpaceGuid.PcdGicRedistributorsBase
   gEfiMdeModulePkgTokenSpaceGuid.PcdSerialRegisterBase
+  gRK3588TokenSpaceGuid.PcdI2S0Supported
+  gRK3588TokenSpaceGuid.PcdI2S1Supported
+  gRockchipTokenSpaceGuid.PcdRkMtlMailBoxBase
+  gRockchipTokenSpaceGuid.PcdRkMtlMailBoxSize
+  gRockchipTokenSpaceGuid.PcdRkSdmmcCardDetectBroken

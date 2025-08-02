@@ -11,7 +11,9 @@
 #include <Library/GpioLib.h>
 #include <Library/RK806.h>
 #include <Library/Rk3588Pcie.h>
+#include <Library/PWMLib.h>
 #include <Soc.h>
+#include <VarStoreData.h>
 
 static struct regulator_init_data rk806_init_data[] = {
 	/* Master PMIC */
@@ -289,17 +291,13 @@ VOID EFIAPI PcieIoInit(UINT32 Segment)
 	/* Set reset and power IO to gpio output mode */
 	switch (Segment) {
 	case PCIE_SEGMENT_PCIE30X4: // U.2
-		/* reset */
 		GpioPinSetDirection(4, GPIO_PIN_PB6, GPIO_PIN_OUTPUT);
-		/* vcc3v3_pcie30 */
-		// IO Expander
+		GpioPinSetDirection(0, GPIO_PIN_PB2, GPIO_PIN_OUTPUT);
 		break;
 	case PCIE_SEGMENT_PCIE20L0:
-		/* reset */
 		GpioPinSetDirection(4, GPIO_PIN_PA5, GPIO_PIN_OUTPUT);
 		break;
 	case PCIE_SEGMENT_PCIE20L1:
-		/* reset */
 		GpioPinSetDirection(4, GPIO_PIN_PA2, GPIO_PIN_OUTPUT);
 		break;
 	}
@@ -307,6 +305,11 @@ VOID EFIAPI PcieIoInit(UINT32 Segment)
 
 VOID EFIAPI PciePowerEn(UINT32 Segment, BOOLEAN Enable)
 {
+	switch (Segment) {
+	case PCIE_SEGMENT_PCIE30X4:
+		GpioPinWrite(0, GPIO_PIN_PB2, Enable);
+		break;
+	}
 }
 
 VOID EFIAPI PciePeReset(UINT32 Segment, BOOLEAN Enable)
@@ -324,15 +327,99 @@ VOID EFIAPI PciePeReset(UINT32 Segment, BOOLEAN Enable)
 	}
 }
 
-VOID EFIAPI PwmFanIoSetup(VOID)
+VOID
+EFIAPI
+HdmiTxIomux (
+  IN UINT32  Id
+  )
 {
+  switch (Id) {
+    case 0:
+      GpioPinSetFunction (4, GPIO_PIN_PC1, 5); // hdmim0_tx0_cec
+      GpioPinSetPull (4, GPIO_PIN_PC1, GPIO_PIN_PULL_NONE);
+      GpioPinSetFunction (1, GPIO_PIN_PA5, 5); // hdmim0_tx0_hpd
+      GpioPinSetPull (1, GPIO_PIN_PA5, GPIO_PIN_PULL_NONE);
+      GpioPinSetFunction (4, GPIO_PIN_PB7, 5); // hdmim0_tx0_scl
+      GpioPinSetPull (4, GPIO_PIN_PB7, GPIO_PIN_PULL_NONE);
+      GpioPinSetFunction (4, GPIO_PIN_PC0, 5); // hdmim0_tx0_sda
+      GpioPinSetPull (4, GPIO_PIN_PC0, GPIO_PIN_PULL_NONE);
+      break;
+    case 1:
+      GpioPinSetFunction (2, GPIO_PIN_PC4, 4); // hdmim0_tx1_cec
+      GpioPinSetPull (2, GPIO_PIN_PC4, GPIO_PIN_PULL_NONE);
+      GpioPinSetFunction (1, GPIO_PIN_PA6, 5); // hdmim0_tx1_hpd
+      GpioPinSetPull (1, GPIO_PIN_PA6, GPIO_PIN_PULL_NONE);
+      GpioPinSetFunction (3, GPIO_PIN_PC6, 5); // hdmim1_tx1_scl
+      GpioPinSetPull (3, GPIO_PIN_PC6, GPIO_PIN_PULL_NONE);
+      GpioPinSetFunction (3, GPIO_PIN_PC5, 5); // hdmim1_tx1_sda
+      GpioPinSetPull (3, GPIO_PIN_PC5, GPIO_PIN_PULL_NONE);
+      break;
+  }
 }
 
-VOID EFIAPI PwmFanSetSpeed(UINT32 Percentage)
+VOID
+EFIAPI
+PwmFanIoSetup (
+  VOID
+  )
 {
+	// TODO:
 }
 
-VOID EFIAPI PlatformEarlyInit(VOID)
+VOID
+EFIAPI
+PwmFanSetSpeed (
+  IN UINT32  Percentage
+  )
 {
-	// Configure various things specific to this platform
+	// TODO:
+}
+
+VOID
+EFIAPI
+PlatformInitLeds (
+  VOID
+  )
+{
+  /* Status indicator */
+	// TODO:
+}
+
+VOID
+EFIAPI
+PlatformSetStatusLed (
+  IN BOOLEAN  Enable
+  )
+{
+	// TODO:
+}
+
+CONST EFI_GUID *
+EFIAPI
+PlatformGetDtbFileGuid (
+  IN UINT32  CompatMode
+  )
+{
+	STATIC CONST EFI_GUID  VendorDtbFileGuid = {
+    // DeviceTree/Vendor.inf
+    0xd58b4028, 0x43d8, 0x4e97, { 0x87, 0xd4, 0x4e, 0x37, 0x16, 0x13, 0x65, 0x80 }
+  };
+
+  switch (CompatMode) {
+    case FDT_COMPAT_MODE_VENDOR:
+      return &VendorDtbFileGuid;
+    case FDT_COMPAT_MODE_MAINLINE:
+      return NULL;
+  }
+
+  return NULL;
+}
+
+VOID
+EFIAPI
+PlatformEarlyInit (
+  VOID
+  )
+{
+  // Configure various things specific to this platform
 }
