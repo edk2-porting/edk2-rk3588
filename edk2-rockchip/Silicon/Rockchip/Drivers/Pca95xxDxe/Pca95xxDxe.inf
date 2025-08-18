@@ -11,14 +11,14 @@
 
 [Defines]
   INF_VERSION                    = 0x00010019
-  BASE_NAME                      = Pca9555Dxe
+  BASE_NAME                      = Pca95xxDxe
   FILE_GUID                      = 2ee8d685-8066-4f37-ae0e-5235730b9cc7
   MODULE_TYPE                    = DXE_DRIVER
   VERSION_STRING                 = 1.0
-  ENTRY_POINT                    = Pca9555DxeInitialize
+  ENTRY_POINT                    = Pca95xxDxeInitialize
 
 [Sources.common]
-  Pca9555Dxe.c
+  Pca95xxDxe.c
 
 [Packages]
   MdePkg/MdePkg.dec
@@ -38,11 +38,12 @@
   gEfiI2cIoProtocolGuid                 ## CONSUMES
   gPca95xxProtocolGuid                  ## PRODUCES
   gRockchipI2cMasterProtocolGuid
-  
+
 [Pcd]
-  gRockchipTokenSpaceGuid.PcdPca9555Address
-  gRockchipTokenSpaceGuid.PcdPca9555Bus
+  gRockchipTokenSpaceGuid.PcdPca95xxAddress
+  gRockchipTokenSpaceGuid.PcdPca95xxBus
+  gRockchipTokenSpaceGuid.PcdPca95xxType
 
 [Depex]
   TRUE
-  
+

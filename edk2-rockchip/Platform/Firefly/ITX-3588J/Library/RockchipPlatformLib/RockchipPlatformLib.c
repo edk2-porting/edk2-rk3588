@@ -18,7 +18,7 @@
 #include <VarStoreData.h>
 #include <Library/UefiBootServicesTableLib.h>
 
-#include <Protocol/Pca9555.h>
+#include <Protocol/Pca95xx.h>
 
 static struct regulator_init_data  rk806_init_data[] = {
   /* Master PMIC */
@@ -49,7 +49,7 @@ static struct regulator_init_data  rk806_init_data[] = {
 
 EFI_STATUS
 EFIAPI
-GetPca9555Protocol (
+GetPca95xxProtocol (
   IN OUT PCA95XX_PROTOCOL  **Pca95xxProtocl
   )
 {
@@ -313,7 +313,7 @@ UsbPortPowerEnable (
   PCA95XX_PROTOCOL  *Pca95xxProtocol;
 
   /* On Firefly ITX-3588J this is controlled via the PCA9555. */
-  Status = GetPca9555Protocol (&Pca95xxProtocol);
+  Status = GetPca95xxProtocol (&Pca95xxProtocol);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Failed to get PCA9555! (%d)\n", Status));
   } else {
@@ -460,7 +460,7 @@ PwmFanIoSetup (
   EFI_STATUS        Status = EFI_SUCCESS;
   PCA95XX_PROTOCOL  *Pca95xxProtocol;
 
-  Status = GetPca9555Protocol (&Pca95xxProtocol);
+  Status = GetPca95xxProtocol (&Pca95xxProtocol);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Failed to get PCA9555! (%d)\n", Status));
   } else {
@@ -481,7 +481,7 @@ PwmFanSetSpeed (
   EFI_STATUS        Status = EFI_SUCCESS;
   PCA95XX_PROTOCOL  *Pca95xxProtocol;
 
-  Status = GetPca9555Protocol (&Pca95xxProtocol);
+  Status = GetPca95xxProtocol (&Pca95xxProtocol);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Failed to get PCA9555! (%d)\n", Status));
   } else {
@@ -531,7 +531,7 @@ PlatformSetStatusLed (
   PCA95XX_PROTOCOL  *Pca95xxProtocol;
 
   /* On Firefly ITX-3588J this is controlled via the PCA9555. */
-  Status = GetPca9555Protocol (&Pca95xxProtocol);
+  Status = GetPca95xxProtocol (&Pca95xxProtocol);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "Failed to get PCA9555! (%d)\n", Status));
   } else {

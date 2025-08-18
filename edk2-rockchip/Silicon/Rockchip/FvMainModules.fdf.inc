@@ -109,8 +109,8 @@
 !if $(RK_RTC8563_ENABLE) == TRUE
   INF Silicon/Rockchip/Drivers/Rtc8563PlatformDxe/Rtc8563PlatformDxe.inf
 !endif
-!if $(RK_PCA9555_ENABLE) == TRUE
-  INF Silicon/Rockchip/Drivers/Pca9555Dxe/Pca9555Dxe.inf
+!if $(RK_PCA95XX_ENABLE) == TRUE
+  INF Silicon/Rockchip/Drivers/Pca95xxDxe/Pca95xxDxe.inf
 !endif
 
   #
