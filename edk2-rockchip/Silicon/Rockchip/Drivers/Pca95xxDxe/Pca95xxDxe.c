@@ -1,6 +1,6 @@
 /** @file
  *
- *  PCA9555 GPIO driver for Rockchip platforms.
+ *  PCA95XX GPIO driver for Rockchip platforms.
  *
  *  Contribs:
  *
@@ -27,7 +27,7 @@
 #include <Protocol/I2c.h>
 #include <Protocol/EmbeddedGpio.h>
 
-#include <Protocol/Pca9555.h>
+#include <Protocol/Pca95xx.h>
 
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
@@ -40,9 +40,38 @@
 
 #include <Pi/PiI2c.h>
 
-#include "Pca9555Dxe.h"
+#include "Pca95xxDxe.h"
+#include "ProcessorBind.h"
+#include "Uefi/UefiBaseType.h"
+#include "Uefi/UefiSpec.h"
 
 STATIC CONST EFI_GUID  I2cGuid = I2C_GUID;
+
+
+typedef struct {
+    UINT8 Input;
+    UINT8 Output;
+    UINT8 Polarity;
+    UINT8 Control;
+} PCA95XX_REGMAP;
+
+typedef struct {
+    PCA95XX_REGMAP Regs;
+    UINT8 Ngpios;
+    UINT8 NBanks;
+} PCA95XX_CONFIG;
+
+typedef struct {
+    CHAR8       *Name;
+    PCA95XX_CONFIG PcaConfig;
+} PCA95XX_VARIANT;
+
+STATIC CONST PCA95XX_VARIANT mPca95xxVariants[] = {
+    { "PCA9554", {{0x00, 0x01, 0x02, 0x03}, 8,  1 }},
+    { "PCA9555", {{0x00, 0x02, 0x04, 0x06}, 16, 2 }},
+};
+
+STATIC CONST PCA95XX_CONFIG *mPca95xxConfig = NULL;
 
 /* Much of the driver below is ripped from the Marvell version, with
  * some adaptation.
@@ -82,7 +111,7 @@ Pca95xxI2cTransfer (
   /* Operations contain address and payload, consecutively. */
 
   /* Note: in the Rockchip I2C driver, a special control byte is sent with
-   *       each operation *implicitly*. PCA9555 expects this only ONCE. So
+   *       each operation *implicitly*. PCA95XX expects this only ONCE. So
    *       unlike the Marvell driver, we should encode the whole operation
    *       on a single buffer.
    */
@@ -149,26 +178,17 @@ DumpRegs (
   IN EFI_I2C_IO_PROTOCOL  *I2cIo
   )
 {
-  UINT8  Regs[6];
+  UINT8  Regs[8];
+  UINTN Index;
 
-  Pca95xxReadRegs (I2cIo, 0x0, &Regs[0]);
-  Pca95xxReadRegs (I2cIo, 0x1, &Regs[1]);
-  Pca95xxReadRegs (I2cIo, 0x2, &Regs[2]);
-  Pca95xxReadRegs (I2cIo, 0x3, &Regs[3]);
-  Pca95xxReadRegs (I2cIo, 0x4, &Regs[4]);
-  Pca95xxReadRegs (I2cIo, 0x5, &Regs[5]);
-  Pca95xxReadRegs (I2cIo, 0x6, &Regs[6]);
-  Pca95xxReadRegs (I2cIo, 0x7, &Regs[7]);
+  for (Index = 0; Index < 4 * mPca95xxConfig->NBanks; Index++) {
+    Pca95xxReadRegs (I2cIo, Index, &Regs[Index]);
+  }
 
-  DEBUG ((DEBUG_INFO, "PCA9555 state:\n"));
-  DEBUG ((DEBUG_INFO, "reg 0 = 0x%02X\n", Regs[0]));
-  DEBUG ((DEBUG_INFO, "reg 1 = 0x%02X\n", Regs[1]));
-  DEBUG ((DEBUG_INFO, "reg 2 = 0x%02X\n", Regs[2]));
-  DEBUG ((DEBUG_INFO, "reg 3 = 0x%02X\n", Regs[3]));
-  DEBUG ((DEBUG_INFO, "reg 4 = 0x%02X\n", Regs[4]));
-  DEBUG ((DEBUG_INFO, "reg 5 = 0x%02X\n", Regs[5]));
-  DEBUG ((DEBUG_INFO, "reg 6 = 0x%02X\n", Regs[6]));
-  DEBUG ((DEBUG_INFO, "reg 7 = 0x%02X\n", Regs[7]));
+  DEBUG ((DEBUG_INFO, "PCA95XX state:\n"));
+  for (Index = 0; Index < 4 * mPca95xxConfig->NBanks; Index++) {
+    DEBUG ((DEBUG_INFO, "reg %d = 0x%02X\n", Index, Regs[Index]));
+  }
   DEBUG ((DEBUG_INFO, "\n"));
 }
 
@@ -177,12 +197,12 @@ DumpRegs (
 /* ------------------------- */
 
 /* --- Driver Methods --- */
-STATIC PCA9555_CONTEXT  *mPca9555Context = NULL;
+STATIC PCA95XX_CONTEXT  *mPca95xxContext = NULL;
 
 /* Probe the device, bringing it up. */
 EFI_STATUS
 EFIAPI
-Pca9555Probe (
+Pca95xxProbe (
   IN EFI_I2C_IO_PROTOCOL  *I2c
   )
 {
@@ -190,26 +210,42 @@ Pca9555Probe (
   UINT8       Zero   = 0x00;
   UINTN       Index;
 
-  if (mPca9555Context != NULL) {
+  if (mPca95xxContext != NULL) {
     /* The device has already been brought online. Nothing to do. */
     return EFI_SUCCESS;
   }
 
-  mPca9555Context = AllocateZeroPool (sizeof (PCA9555_CONTEXT));
-  if (mPca9555Context == NULL) {
+  mPca95xxContext = AllocateZeroPool (sizeof (PCA95XX_CONTEXT));
+  if (mPca95xxContext == NULL) {
     DEBUG ((DEBUG_ERROR, "%a: context allocation failed\n", __func__));
     Status = EFI_OUT_OF_RESOURCES;
     goto fail;
   }
 
-  mPca9555Context->Signature = PCA95XX_SIGNATURE;
+  mPca95xxContext->Signature = PCA95XX_SIGNATURE;
 
-  mPca9555Context->I2cAddress = PcdGet8 (PcdPca9555Address);
-  mPca9555Context->I2cBus     = PcdGet8 (PcdPca9555Bus);
+  mPca95xxContext->I2cAddress = PcdGet8 (PcdPca95xxAddress);
+  mPca95xxContext->I2cBus     = PcdGet8 (PcdPca95xxBus);
+  mPca95xxContext->Type = (CONST CHAR8 *)PcdGetPtr (PcdPca95xxType);
+
+
+  for (Index = 0; Index < ARRAY_SIZE(mPca95xxVariants); Index++) {
+    if (AsciiStrCmp(mPca95xxContext->Type, mPca95xxVariants[Index].Name) == 0) {
+        mPca95xxConfig = &mPca95xxVariants[Index].PcaConfig;
+        break;
+    }
+  }
+
+  if (mPca95xxConfig == NULL) {
+    DEBUG ((DEBUG_ERROR, "%a: unsupported PCA95xx type '%a'\n",
+            __func__, mPca95xxContext->Type));
+    Status = EFI_UNSUPPORTED;
+    goto fail;
+  }
 
   /* Device setup: disable polarity inversion on all pins */
-  for (Index = 0; Index < PCA9555_NUM_BANKS; ++Index) {
-    Status = Pca95xxWriteRegs (I2c, PCA9555_INVERSION_REG_BASE + Index, Zero);
+  for (Index = 0; Index < mPca95xxConfig->NBanks; ++Index) {
+    Status = Pca95xxWriteRegs (I2c, mPca95xxConfig->Regs.Polarity + Index, Zero);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_INFO, "%a: setup failed!\n", __FUNCTION__));
       goto fail;
@@ -217,8 +253,8 @@ Pca9555Probe (
   }
 
   /* and preset all outputs to 0 */
-  for (Index = 0; Index < PCA9555_NUM_BANKS; ++Index) {
-    Status = Pca95xxWriteRegs (I2c, PCA9555_OUTPUT_REG_BASE + Index, Zero);
+  for (Index = 0; Index < mPca95xxConfig->NBanks; ++Index) {
+    Status = Pca95xxWriteRegs (I2c, mPca95xxConfig->Regs.Output + Index, Zero);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_INFO, "%a: setup failed!\n", __FUNCTION__));
       goto fail;
@@ -227,17 +263,17 @@ Pca9555Probe (
 
   DEBUG ((
     DEBUG_INFO,
-    "%a: PCA9555 bound at I2C addr 0x%02X, bus 0x%02X\n",
+    "%a: PCA95XX bound at I2C addr 0x%02X, bus 0x%02X\n",
     __FUNCTION__,
-    mPca9555Context->I2cAddress,
-    mPca9555Context->I2cBus
+    mPca95xxContext->I2cAddress,
+    mPca95xxContext->I2cBus
     ));
 
   return EFI_SUCCESS;
 fail:
-  if (mPca9555Context != NULL) {
-    FreePool (mPca9555Context);
-    mPca9555Context = NULL;
+  if (mPca95xxContext != NULL) {
+    FreePool (mPca95xxContext);
+    mPca95xxContext = NULL;
   }
 
   return Status;
@@ -246,15 +282,15 @@ fail:
 /* Shut down the device */
 EFI_STATUS
 EFIAPI
-Pca9555Unprobe (
+Pca95xxUnprobe (
   IN EFI_I2C_IO_PROTOCOL  *I2c
   )
 {
-  if (mPca9555Context != NULL) {
-    FreePool (mPca9555Context);
-    mPca9555Context = NULL;
+  if (mPca95xxContext != NULL) {
+    FreePool (mPca95xxContext);
+    mPca95xxContext = NULL;
 
-    DEBUG ((DEBUG_INFO, "%a: PCA9555 has been shut down.", __FUNCTION__));
+    DEBUG ((DEBUG_INFO, "%a: PCA95XX has been shut down.", __FUNCTION__));
   }
 
   return EFI_SUCCESS;
@@ -263,7 +299,7 @@ Pca9555Unprobe (
 /* Read a pin register */
 EFI_STATUS
 EFIAPI
-Pca9555ReadPinReg (
+Pca95xxReadPinReg (
   IN EFI_I2C_IO_PROTOCOL  *I2c,
   IN UINT8                BaseReg,
   IN UINTN                GpioPin,
@@ -274,7 +310,7 @@ Pca9555ReadPinReg (
   UINTN       Bank;
   UINT8       RegVal = 0x00;
 
-  if (mPca9555Context == NULL) {
+  if (mPca95xxContext == NULL) {
     DEBUG ((DEBUG_ERROR, "%a: device not probed", __FUNCTION__));
     return EFI_UNSUPPORTED;
   }
@@ -298,7 +334,7 @@ Pca9555ReadPinReg (
 /* Write the output pin register */
 EFI_STATUS
 EFIAPI
-Pca9555WritePinOutReg (
+Pca95xxWritePinOutReg (
   IN EFI_I2C_IO_PROTOCOL  *I2c,
   IN UINTN                GpioPin,
   IN UINTN                Value
@@ -308,7 +344,7 @@ Pca9555WritePinOutReg (
   UINTN       Bank;
   UINT8       RegVal = 0x00;
 
-  if (mPca9555Context == NULL) {
+  if (mPca95xxContext == NULL) {
     DEBUG ((DEBUG_ERROR, "%a: device not probed", __FUNCTION__));
     return EFI_UNSUPPORTED;
   }
@@ -317,7 +353,7 @@ Pca9555WritePinOutReg (
 
   Status = Pca95xxReadRegs (
              I2c,
-             PCA9555_OUTPUT_REG_BASE + Bank,
+             mPca95xxConfig->Regs.Output + Bank,
              &RegVal
              );
   if (EFI_ERROR (Status)) {
@@ -333,7 +369,7 @@ Pca9555WritePinOutReg (
 
   Status = Pca95xxWriteRegs (
              I2c,
-             PCA9555_OUTPUT_REG_BASE + Bank,
+             mPca95xxConfig->Regs.Output + Bank,
              RegVal
              );
   if (EFI_ERROR (Status)) {
@@ -347,7 +383,7 @@ Pca9555WritePinOutReg (
 /* Write the pin control register */
 EFI_STATUS
 EFIAPI
-Pca9555WritePinCtrlReg (
+Pca95xxWritePinCtrlReg (
   IN EFI_I2C_IO_PROTOCOL  *I2c,
   IN UINTN                GpioPin,
   IN UINTN                Value
@@ -357,7 +393,7 @@ Pca9555WritePinCtrlReg (
   UINTN       Bank;
   UINT8       RegVal = 0x00;
 
-  if (mPca9555Context == NULL) {
+  if (mPca95xxContext == NULL) {
     DEBUG ((DEBUG_ERROR, "%a: device not probed", __FUNCTION__));
     return EFI_UNSUPPORTED;
   }
@@ -366,7 +402,7 @@ Pca9555WritePinCtrlReg (
 
   Status = Pca95xxReadRegs (
              I2c,
-             PCA9555_CONTROL_REG_BASE + Bank,
+             mPca95xxConfig->Regs.Control + Bank,
              &RegVal
              );
   if (EFI_ERROR (Status)) {
@@ -382,7 +418,7 @@ Pca9555WritePinCtrlReg (
 
   Status = Pca95xxWriteRegs (
              I2c,
-             PCA9555_CONTROL_REG_BASE + Bank,
+             mPca95xxConfig->Regs.Control + Bank,
              RegVal
              );
   if (EFI_ERROR (Status)) {
@@ -400,7 +436,7 @@ Pca9555WritePinCtrlReg (
 /* Get the I2C */
 EFI_STATUS
 EFIAPI
-Pca9555GetI2c (
+Pca95xxGetI2c (
   IN OUT EFI_I2C_IO_PROTOCOL  **I2cIo
   )
 {
@@ -409,13 +445,13 @@ Pca9555GetI2c (
   EFI_HANDLE  *HandleBuffer;
   EFI_STATUS  Status;
 
-  if (mPca9555Context == NULL) {
+  if (mPca95xxContext == NULL) {
     DEBUG ((DEBUG_ERROR, "%a: device not probed\n", __FUNCTION__));
     return EFI_UNSUPPORTED;
   }
 
-  I2cBus     = mPca9555Context->I2cBus;
-  I2cAddress = mPca9555Context->I2cAddress;
+  I2cBus     = mPca95xxContext->I2cBus;
+  I2cAddress = mPca95xxContext->I2cAddress;
 
   /* Locate Handles of all EfiI2cIoProtocol producers */
   Status = gBS->LocateHandleBuffer (
@@ -461,11 +497,11 @@ Pca9555GetI2c (
 /* A validator; unlike Marvell version we only assume 1 chip */
 STATIC
 EFI_STATUS
-Pca9555ValidatePin (
+Pca95xxValidatePin (
   IN UINTN  GpioPin
   )
 {
-  if (GpioPin >= PCA9555_NUM_GPIO) {
+  if (GpioPin >= mPca95xxConfig->Ngpios) {
     DEBUG ((
       DEBUG_ERROR,
       "%a: GPIO pin #%d not available\n",
@@ -499,7 +535,7 @@ Returns:
 **/
 STATIC
 EFI_STATUS
-Pca9555Get (
+Pca95xxGet (
   IN  EMBEDDED_GPIO      *This,
   IN  EMBEDDED_GPIO_PIN  Gpio,
   OUT UINTN              *Value
@@ -511,15 +547,15 @@ Pca9555Get (
 
   GpioPin = GPIO_PIN (Gpio);
 
-  ASSERT_EFI_ERROR (Pca9555ValidatePin (GpioPin));
+  ASSERT_EFI_ERROR (Pca95xxValidatePin (GpioPin));
 
-  Status = Pca9555GetI2c (&I2cIo);
+  Status = Pca95xxGetI2c (&I2cIo);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: fail to get I2C protocol\n", __FUNCTION__));
     return Status;
   }
 
-  Status = Pca9555ReadPinReg (I2cIo, PCA9555_INPUT_REG_BASE, Gpio, Value);
+  Status = Pca95xxReadPinReg (I2cIo, mPca95xxConfig->Regs.Input, Gpio, Value);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: register read failure\n", __FUNCTION__));
     return Status;
@@ -548,7 +584,7 @@ Returns:
 **/
 STATIC
 EFI_STATUS
-Pca9555Set (
+Pca95xxSet (
   IN EMBEDDED_GPIO       *This,
   IN EMBEDDED_GPIO_PIN   Gpio,
   IN EMBEDDED_GPIO_MODE  Mode
@@ -561,9 +597,9 @@ Pca9555Set (
 
   GpioPin = GPIO_PIN (Gpio);
 
-  ASSERT_EFI_ERROR (Pca9555ValidatePin (GpioPin));
+  ASSERT_EFI_ERROR (Pca95xxValidatePin (GpioPin));
 
-  Status = Pca9555GetI2c (&I2cIo);
+  Status = Pca95xxGetI2c (&I2cIo);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: fail to get I2C protocol\n", __FUNCTION__));
     return Status;
@@ -583,13 +619,13 @@ Pca9555Set (
         Bit = 1;
       }
 
-      Status = Pca9555WritePinOutReg (I2cIo, GpioPin, Bit);
+      Status = Pca95xxWritePinOutReg (I2cIo, GpioPin, Bit);
       if (EFI_ERROR (Status)) {
         DEBUG ((DEBUG_ERROR, "%a: fail to set ouput value\n", __FUNCTION__));
         return Status;
       }
 
-      Status = Pca9555WritePinCtrlReg (I2cIo, GpioPin, 0);
+      Status = Pca95xxWritePinCtrlReg (I2cIo, GpioPin, 0);
       if (EFI_ERROR (Status)) {
         DEBUG ((DEBUG_ERROR, "%a: fail to set direction\n", __FUNCTION__));
         return Status;
@@ -597,7 +633,7 @@ Pca9555Set (
 
       break;
     case GPIO_MODE_INPUT:
-      Status = Pca9555WritePinCtrlReg (I2cIo, GpioPin, 1);
+      Status = Pca95xxWritePinCtrlReg (I2cIo, GpioPin, 1);
       if (EFI_ERROR (Status)) {
         DEBUG ((DEBUG_ERROR, "%a: fail to set direction\n", __FUNCTION__));
         return Status;
@@ -637,7 +673,7 @@ Returns:
 **/
 STATIC
 EFI_STATUS
-Pca9555GetMode (
+Pca95xxGetMode (
   IN  EMBEDDED_GPIO       *This,
   IN  EMBEDDED_GPIO_PIN   Gpio,
   OUT EMBEDDED_GPIO_MODE  *Mode
@@ -650,15 +686,15 @@ Pca9555GetMode (
 
   GpioPin = GPIO_PIN (Gpio);
 
-  ASSERT_EFI_ERROR (Pca9555ValidatePin (GpioPin));
+  ASSERT_EFI_ERROR (Pca95xxValidatePin (GpioPin));
 
-  Status = Pca9555GetI2c (&I2cIo);
+  Status = Pca95xxGetI2c (&I2cIo);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: fail to get I2C protocol\n", __FUNCTION__));
     return Status;
   }
 
-  Status = Pca9555ReadPinReg (I2cIo, PCA9555_CONTROL_REG_BASE, Gpio, &RegVal);
+  Status = Pca95xxReadPinReg (I2cIo, mPca95xxConfig->Regs.Control, Gpio, &RegVal);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "%a: register read failure\n", __FUNCTION__));
     return Status;
@@ -666,7 +702,7 @@ Pca9555GetMode (
 
   if (RegVal == 0) {
     /* output modes */
-    Status = Pca9555ReadPinReg (I2cIo, PCA9555_OUTPUT_REG_BASE, Gpio, &RegVal);
+    Status = Pca95xxReadPinReg (I2cIo, mPca95xxConfig->Regs.Output, Gpio, &RegVal);
     if (EFI_ERROR (Status)) {
       DEBUG ((DEBUG_ERROR, "%a: register read failure\n", __FUNCTION__));
       return Status;
@@ -704,7 +740,7 @@ Returns:
 **/
 EFI_STATUS
 EFIAPI
-Pca9555SetPull (
+Pca95xxSetPull (
   IN EMBEDDED_GPIO       *This,
   IN EMBEDDED_GPIO_PIN   Gpio,
   IN EMBEDDED_GPIO_PULL  Direction
@@ -715,10 +751,10 @@ Pca9555SetPull (
 
 PCA95XX_PROTOCOL  mPca95xxProtocol = {
   .GpioProtocol = {
-    .Get     = Pca9555Get,
-    .Set     = Pca9555Set,
-    .GetMode = Pca9555GetMode,
-    .SetPull = Pca9555SetPull,
+    .Get     = Pca95xxGet,
+    .Set     = Pca95xxSet,
+    .GetMode = Pca95xxGetMode,
+    .SetPull = Pca95xxSetPull,
   },
 };
 
@@ -726,14 +762,14 @@ PCA95XX_PROTOCOL  mPca95xxProtocol = {
 
 /* --- Binding Protocol --- */
 EFI_DRIVER_BINDING_PROTOCOL  mDriverBindingProtocol = {
-  Pca9555Supported,
-  Pca9555Start,
-  Pca9555Stop,
+  Pca95xxSupported,
+  Pca95xxStart,
+  Pca95xxStop,
 };
 
 EFI_STATUS
 EFIAPI
-Pca9555Supported (
+Pca95xxSupported (
   IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   ControllerHandle,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
@@ -741,8 +777,8 @@ Pca9555Supported (
 {
   EFI_STATUS           Status = EFI_UNSUPPORTED;
   EFI_I2C_IO_PROTOCOL  *TmpI2cIo;
-  UINT8                Pca9555Address = 0x00;
-  UINT8                Pca9555Bus     = 0x00;
+  UINT8                Pca95xxAddress = 0x00;
+  UINT8                Pca95xxBus     = 0x00;
 
   Status = gBS->OpenProtocol (
                   ControllerHandle,
@@ -756,21 +792,21 @@ Pca9555Supported (
     return EFI_UNSUPPORTED;
   }
 
-  Pca9555Address = PcdGet8 (PcdPca9555Address);
-  Pca9555Bus     = PcdGet8 (PcdPca9555Bus);
+  Pca95xxAddress = PcdGet8 (PcdPca95xxAddress);
+  Pca95xxBus     = PcdGet8 (PcdPca95xxBus);
 
   DEBUG ((
     DEBUG_INFO,
     "%a: addr = 0x%02X, bus = 0x%02X\n",
     __FUNCTION__,
-    Pca9555Address,
-    Pca9555Bus
+    Pca95xxAddress,
+    Pca95xxBus
     ));
 
   if (CompareGuid (TmpI2cIo->DeviceGuid, &I2cGuid) &&
-      (TmpI2cIo->DeviceIndex == I2C_DEVICE_INDEX (Pca9555Bus, Pca9555Address)))
+      (TmpI2cIo->DeviceIndex == I2C_DEVICE_INDEX (Pca95xxBus, Pca95xxAddress)))
   {
-    DEBUG ((DEBUG_INFO, "%a: PCA9555 device is supported\n", __FUNCTION__));
+    DEBUG ((DEBUG_INFO, "%a: PCA95XX device is supported\n", __FUNCTION__));
     Status = EFI_SUCCESS;
   }
 
@@ -787,7 +823,7 @@ Pca9555Supported (
 
 EFI_STATUS
 EFIAPI
-Pca9555Start (
+Pca95xxStart (
   IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   ControllerHandle,
   IN EFI_DEVICE_PATH_PROTOCOL     *RemainingDevicePath OPTIONAL
@@ -808,7 +844,7 @@ Pca9555Start (
     return EFI_UNSUPPORTED;
   }
 
-  Status = Pca9555Probe (TmpI2cIo);
+  Status = Pca95xxProbe (TmpI2cIo);
   if (EFI_ERROR (Status)) {
     goto fail;
   }
@@ -838,7 +874,7 @@ fail:
 
 EFI_STATUS
 EFIAPI
-Pca9555Stop (
+Pca95xxStop (
   IN EFI_DRIVER_BINDING_PROTOCOL  *This,
   IN EFI_HANDLE                   ControllerHandle,
   IN UINTN                        NumberOfChildren,
@@ -859,7 +895,7 @@ Pca9555Stop (
   /* (SS) is this necessary? */
 
   /*
-  Status = Pca9555Unprobe();
+  Status = Pca95xxUnprobe();
   gBS->CloseProtocol (
         ControllerHandle,
         &gEfiI2cIoProtocolGuid,
@@ -875,7 +911,7 @@ Pca9555Stop (
 
 EFI_STATUS
 EFIAPI
-Pca9555DxeInitialize (
+Pca95xxDxeInitialize (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )

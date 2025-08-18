@@ -100,8 +100,9 @@
   gRockchipTokenSpaceGuid.PcdRkMtlMailBoxSize|0x100|UINT32|0x00001001
   gRockchipTokenSpaceGuid.PcdRkMtlMailBoxSmcId|0x82000010|UINT32|0x00010002
 
-  gRockchipTokenSpaceGuid.PcdPca9555Address|0|UINT8|0x03000001
-  gRockchipTokenSpaceGuid.PcdPca9555Bus|0|UINT8|0x03000002
+  gRockchipTokenSpaceGuid.PcdPca95xxAddress|0|UINT8|0x03000001
+  gRockchipTokenSpaceGuid.PcdPca95xxBus|0|UINT8|0x03000002
+  gRockchipTokenSpaceGuid.PcdPca95xxType|"Unknown"|VOID*|0x03000003
 
   gRockchipTokenSpaceGuid.PcdUartClkInHz|0|UINT32|0x04000001
   gRockchipTokenSpaceGuid.PcdSerialPortSendDelay|0|UINT32|0x04000002
