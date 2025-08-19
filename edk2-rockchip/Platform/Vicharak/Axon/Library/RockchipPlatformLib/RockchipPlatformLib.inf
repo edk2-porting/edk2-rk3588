@@ -31,5 +31,8 @@
   GpioLib
   PWMLib
 
+[Protocols]
+  gPca95xxProtocolGuid
+
 [Sources.common]
   RockchipPlatformLib.c

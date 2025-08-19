@@ -14,6 +14,9 @@
 #include <Library/PWMLib.h>
 #include <Soc.h>
 #include <VarStoreData.h>
+#include <Library/UefiBootServicesTableLib.h>
+
+#include <Protocol/Pca95xx.h>
 
 static struct regulator_init_data  rk806_init_data[] = {
   /* Master PMIC */
@@ -59,6 +62,52 @@ static struct regulator_init_data  rk806_init_data[] = {
   RK8XX_VOLTAGE_INIT (MASTER_NLDO5,  750000),
   /* No dual PMICs on this platform */
 };
+
+EFI_STATUS
+EFIAPI
+GetPca95xxProtocol (
+  IN OUT PCA95XX_PROTOCOL  **Pca95xxProtocl
+  )
+{
+  EFI_HANDLE  *HandleBuffer;
+  EFI_STATUS  Status;
+  UINTN       HandleCount;
+
+  /* Locate Handles of all PCA95XX_PROTOCOL producers */
+  Status = gBS->LocateHandleBuffer (
+                  ByProtocol,
+                  &gPca95xxProtocolGuid,
+                  NULL,
+                  &HandleCount,
+                  &HandleBuffer
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%a: Unable to locate handles\n", __FUNCTION__));
+    return Status;
+  }
+
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: got %d PCA95XX_PROTOCOLs\n",
+    __FUNCTION__,
+    HandleCount
+    ));
+
+  /*
+   * Open Pca95xxProtocl. With EFI_OPEN_PROTOCOL_GET_PROTOCOL attribute
+   * the consumer is not obliged to call CloseProtocol.
+   */
+  Status = gBS->OpenProtocol (
+                  HandleBuffer[0],
+                  &gPca95xxProtocolGuid,
+                  (VOID **)Pca95xxProtocl,
+                  HandleBuffer[0],
+                  NULL,
+                  EFI_OPEN_PROTOCOL_GET_PROTOCOL
+                  );
+
+  return Status;
+}
 
 VOID EFIAPI
 SdmmcIoMux (
@@ -268,17 +317,49 @@ I2cIomux (
   }
 }
 
-VOID EFIAPI
+VOID
+EFIAPI
 UsbPortPowerEnable (
   VOID
   )
 {
-  DEBUG ((DEBUG_INFO, "UsbPortPowerEnable called\n"));
+  EFI_STATUS        Status = EFI_SUCCESS;
+  PCA95XX_PROTOCOL  *Pca95xxProtocol;
 
-  /* vbus5v0_typec0 */
-  // Need to implement PCA9554 IO Expander support
-  /* vbus5v0_typec1 */
-  // Need to implement PCA9554 IO Expander support
+  Status = GetPca95xxProtocol (&Pca95xxProtocol);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "UsbPortPowerEnable failed to get PCA9555! (%d)\n", Status));
+  } else {
+    /* USB-C */
+    Pca95xxProtocol->GpioProtocol.Set (
+                                    &Pca95xxProtocol->GpioProtocol,
+                                    6, /* vbus5v0_typec0_pwr_en */
+                                    GPIO_MODE_OUTPUT_0
+                                    );
+
+    gBS->Stall (1200000);
+
+    Pca95xxProtocol->GpioProtocol.Set (
+                                    &Pca95xxProtocol->GpioProtocol,
+                                    6, /* vbus5v0_typec0_pwr_en */
+                                    GPIO_MODE_OUTPUT_1
+                                    );
+
+    Pca95xxProtocol->GpioProtocol.Set (
+                                    &Pca95xxProtocol->GpioProtocol,
+                                    4, /* vbus5v0_typec0_pwr_en */
+                                    GPIO_MODE_OUTPUT_0
+                                    );
+
+    gBS->Stall (1200000);
+
+    Pca95xxProtocol->GpioProtocol.Set (
+                                    &Pca95xxProtocol->GpioProtocol,
+                                    4, /* vbus5v0_typec0_pwr_en */
+                                    GPIO_MODE_OUTPUT_1
+                                    );
+
+  }
 }
 
 #define USB2PHY0_GRF_BASE      0xFD5D0000
