@@ -47,6 +47,7 @@ Note that this list is subject to change at any time as devices gain better supp
 - [Mixtile Blade 3](https://www.mixtile.com/blade-3)
 - [FriendlyELEC NanoPi M6](https://wiki.friendlyelec.com/wiki/index.php/NanoPi_M6)
 - [Hinlink H88K](http://www.hinlink.com)
+- [Vicharak Axon](https://vicharak.in/axon)
 
 # Supported OSes
 ## In ACPI mode
@@ -222,6 +223,7 @@ In addition to the default paths above, it is possible to specify custom ones vi
 | `rk3588s-nanopi-r6s`                    | NanoPi R6S                    |
 | `rk3588s-nanopi-m6`                     | NanoPi M6                     |
 | `rk3588-hinlink-h88k`                   | H88K                          |
+| `rk3588-axon-linux`                     | Vicharak Axon                 |
 
 **Notes:**
 * The firmware applies some fix-ups to the DTB depending on the user settings (e.g. PCIe/SATA/USB selection, making SATA overlays redundant). These fix-ups are not applied when providing overrides by other means, such as the Grub `devicetree` command.
