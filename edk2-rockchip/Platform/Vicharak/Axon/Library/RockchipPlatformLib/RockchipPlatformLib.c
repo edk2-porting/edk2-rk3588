@@ -229,7 +229,8 @@ NorFspiEnableClock (
 {
 }
 
-VOID EFIAPI
+VOID
+EFIAPI
 GmacIomux (
   IN UINT32  Id
   )
@@ -237,34 +238,11 @@ GmacIomux (
   switch (Id) {
     case 1:
       /* gmac1 iomux */
-      BUS_IOC->GPIO3A_IOMUX_SEL_L =
-        // write_enable
-        (0xFFFFUL << 16) |
-        // GMAC1_RXD3, GMAC1_RXD2, GMAC1_TXD3, GMAC1_TXD2
-        (0x1111);
-
-      BUS_IOC->GPIO3A_IOMUX_SEL_H =
-        // write_enable
-        (0xF0FFUL << 16) |
-        // GMAC1_RXD0, GMAC1_RXCLK, GMAC1_TXCLK
-        (0x1011);
-
-      BUS_IOC->GPIO3B_IOMUX_SEL_L =
-        (0xF0FFUL << 16) |
-        // GMAC1_TXD0, GMAC1_RXDV_CRS, GMAC1_RXD1
-        (0x1011);
-
-      BUS_IOC->GPIO3B_IOMUX_SEL_H =
-        // write_enable
-        (0x0FFFUL << 16) |
-        // GMAC1_PTP_REF_CLK, GMAC1_MCLKINOUT, GMAC1_TXEN, GMAC1_TXD1
-        (0x0111);
-
-      BUS_IOC->GPIO3C_IOMUX_SEL_L =
-        // write_enable
-        (0xFF00UL << 16) |
-        // GMAC1_MDIO, GMAC1_MDC
-        (0x1100);
+      BUS_IOC->GPIO3B_IOMUX_SEL_H = (0x0FFFUL << 16) | 0x0111; /* GMAC1_MCLKINOUT, GMAC1_TXEN, GMAC1_TXD1 */
+      BUS_IOC->GPIO3A_IOMUX_SEL_L = (0xFFFFUL << 16) | 0x1111; /* GMAC1_RXD3, GMAC1_RXD2, GMAC1_TXD3, GMAC1_TXD2 */
+      BUS_IOC->GPIO3B_IOMUX_SEL_L = (0xF0FFUL << 16) | 0x1011; /* GMAC1_TXD0, GMAC1_RXDV_CRS, GMAC1_RXD1 */
+      BUS_IOC->GPIO3A_IOMUX_SEL_H = (0xF0FFUL << 16) | 0x1011; /* GMAC1_RXD0, GMAC1_RXCLK, GMAC1_TXCLK */
+      BUS_IOC->GPIO3C_IOMUX_SEL_L = (0xFF00UL << 16) | 0x1100; /* GMAC1_MDIO, GMAC1_MDC */
 
       /* phy1 reset */
       GpioPinSetDirection (3, GPIO_PIN_PB7, GPIO_PIN_OUTPUT);

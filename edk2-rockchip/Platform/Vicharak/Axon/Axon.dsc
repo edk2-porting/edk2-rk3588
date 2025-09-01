@@ -121,6 +121,12 @@
     VOP_OUTPUT_IF_DP0
   })}
 
+  #
+  # GMAC
+  #
+  gRK3588TokenSpaceGuid.PcdGmac1Supported|TRUE
+  gRK3588TokenSpaceGuid.PcdGmac1TxDelay|0x43
+
 ################################################################################
 #
 # Components Section - list of all EDK II Modules needed by this Platform.
