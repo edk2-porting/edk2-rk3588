@@ -482,7 +482,19 @@ PlatformInitLeds (
   )
 {
   /* Status indicator */
-  // TODO:
+  EFI_STATUS        Status = EFI_SUCCESS;
+  PCA95XX_PROTOCOL  *Pca95xxProtocol;
+
+  Status = GetPca95xxProtocol (&Pca95xxProtocol);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%s failed to get PCA9555! (%d)\n", __FUNCTION__, Status));
+  } else {
+    Pca95xxProtocol->GpioProtocol.Set (
+                                    &Pca95xxProtocol->GpioProtocol,
+                                    1, /* Status Led */
+                                    GPIO_MODE_OUTPUT_0
+                                    );
+  }
 }
 
 VOID
@@ -491,7 +503,19 @@ PlatformSetStatusLed (
   IN BOOLEAN  Enable
   )
 {
-  // TODO:
+  EFI_STATUS        Status = EFI_SUCCESS;
+  PCA95XX_PROTOCOL  *Pca95xxProtocol;
+
+  Status = GetPca95xxProtocol (&Pca95xxProtocol);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_ERROR, "%s failed to get PCA9555! (%d)\n", __FUNCTION__, Status));
+  } else {
+    Pca95xxProtocol->GpioProtocol.Set (
+                                    &Pca95xxProtocol->GpioProtocol,
+                                    1, /* Status Led */
+                                    Enable ? GPIO_MODE_OUTPUT_1 : GPIO_MODE_OUTPUT_0
+                                    );
+  }
 }
 
 CONST EFI_GUID *
