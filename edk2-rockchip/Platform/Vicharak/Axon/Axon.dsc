@@ -104,8 +104,8 @@
   #
   gRK3588TokenSpaceGuid.PcdUsbDpPhy0Supported|TRUE
   gRK3588TokenSpaceGuid.PcdUsbDpPhy1Supported|TRUE
-  gRK3588TokenSpaceGuid.PcdDp0LaneMux|{ 0x0, 0x1, 0x2, 0x3 }
-  gRK3588TokenSpaceGuid.PcdDp1LaneMux|{ 0x0, 0x1, 0x2, 0x3 }
+  gRK3588TokenSpaceGuid.PcdDp0LaneMux|{ 0x2, 0x3 }
+  gRK3588TokenSpaceGuid.PcdDp1LaneMux|{ 0x0 }
 
   #
   # On-Board fan output
