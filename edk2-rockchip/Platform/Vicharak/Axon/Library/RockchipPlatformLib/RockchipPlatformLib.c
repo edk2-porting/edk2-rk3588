@@ -546,4 +546,5 @@ PlatformEarlyInit (
   )
 {
   // Configure various things specific to this platform
+  GpioPinSetFunction (1, GPIO_PIN_PC4, 0); // Jack detect
 }
