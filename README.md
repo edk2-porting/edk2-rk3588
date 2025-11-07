@@ -47,6 +47,7 @@ Note that this list is subject to change at any time as devices gain better supp
 - [Mixtile Blade 3](https://www.mixtile.com/blade-3)
 - [FriendlyELEC NanoPi M6](https://wiki.friendlyelec.com/wiki/index.php/NanoPi_M6)
 - [Hinlink H88K](http://www.hinlink.com)
+- [Radxa ROCK 5C](https://radxa.com/products/rock5/5c/)
 
 # Supported OSes
 ## In ACPI mode
@@ -202,7 +203,8 @@ In addition to the default paths above, it is possible to specify custom ones vi
 | --------------------------------------- | ----------------------------- |
 | `rk3588-rock-5b`                        | ROCK 5B                       |
 | `rk3588-rock-5bp`                       | ROCK 5B+                      |
-| `rk3588s-rock-5a`                       | ROCK 5A                       |
+| `rk3588s-rock-5a`                       | ROCK 5A   
+| `rk3588s-rock-5c`                       | ROCK 5C                       |                    |
 | `rk3588-rock-5-itx`                     | ROCK 5 ITX                    |
 | `rk3588s-orangepi-5`                    | Orange Pi 5                   |
 | `rk3588-orangepi-5-plus`                | Orange Pi 5 Plus              |
