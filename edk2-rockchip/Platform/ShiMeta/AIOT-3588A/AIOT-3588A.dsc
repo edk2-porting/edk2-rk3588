@@ -83,35 +83,10 @@
   gRK3588TokenSpaceGuid.PcdComboPhy1ModeDefault|$(COMBO_PHY_MODE_PCIE)
   gRK3588TokenSpaceGuid.PcdComboPhy2ModeDefault|$(COMBO_PHY_MODE_PCIE)
 
-# USB2 PHY support flags
-gRK3588TokenSpaceGuid.PcdUsb2Phy0Supported | TRUE
-gRK3588TokenSpaceGuid.PcdUsb2Phy1Supported | TRUE
-gRK3588TokenSpaceGuid.PcdUsb2Phy2Supported | TRUE
-
-# PHY reset registers (from DTS resets)
-gRK3588TokenSpaceGuid.PcdUsb2Phy0ResetReg | 0xc0047
-gRK3588TokenSpaceGuid.PcdUsb2Phy1ResetReg | 0xc0049
-gRK3588TokenSpaceGuid.PcdUsb2Phy2ResetReg | 0xc004a
-
-# PHY clocks
-gRK3588TokenSpaceGuid.PcdUsb2Phy0Clock | 0x2b5
-gRK3588TokenSpaceGuid.PcdUsb2Phy1Clock | 0x2b5
-gRK3588TokenSpaceGuid.PcdUsb2Phy2Clock | 0x2b5
-
-# PHY clock output names (可选，用于驱动标识)
-gRK3588TokenSpaceGuid.PcdUsb2Phy0ClockOutput | "usb480m_phy0"
-gRK3588TokenSpaceGuid.PcdUsb2Phy1ClockOutput | "usb480m_phy2"
-gRK3588TokenSpaceGuid.PcdUsb2Phy2ClockOutput | "usb480m_phy3"
-
-# PHY ports类型 (OTG/Host)
-gRK3588TokenSpaceGuid.PcdUsb2Phy0PortType | 1
-gRK3588TokenSpaceGuid.PcdUsb2Phy1PortType | 0
-gRK3588TokenSpaceGuid.PcdUsb2Phy2PortType | 0
-# PHY GRF寄存器基地址
-gRK3588TokenSpaceGuid.PcdUsb2Phy0Grf | 0x76
-gRK3588TokenSpaceGuid.PcdUsb2Phy1Grf | 0x0
-gRK3588TokenSpaceGuid.PcdUsb2Phy2Grf | 0x0
-
+    # USB2 PHY support flags
+    gRK3588TokenSpaceGuid.PcdUsb2Phy0Supported | TRUE
+    gRK3588TokenSpaceGuid.PcdUsb2Phy1Supported | TRUE
+    gRK3588TokenSpaceGuid.PcdUsb2Phy2Supported | TRUE
 
   #
   # I2S
