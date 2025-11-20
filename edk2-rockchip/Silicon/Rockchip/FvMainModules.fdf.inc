@@ -223,6 +223,13 @@
   INF EmbeddedPkg/Drivers/MemoryAttributeManagerDxe/MemoryAttributeManagerDxe.inf
 
   #
+  # x64 Binary Compatibility Support
+  #
+!if $(RK_X86_EMULATOR_ENABLE) == TRUE
+  INF Emulator/X86EmulatorDxe/X86EmulatorDxe.inf
+!endif
+
+  #
   # Bds
   #
   INF MdeModulePkg/Universal/BootManagerPolicyDxe/BootManagerPolicyDxe.inf

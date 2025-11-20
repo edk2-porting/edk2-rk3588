@@ -66,6 +66,13 @@
   DEFINE DEBUG_PROPERTY_MASK             = 0x0f
 !endif
 
+  #
+  # Default support flags
+  #
+!ifndef RK_X86_EMULATOR_ENABLE
+  DEFINE RK_X86_EMULATOR_ENABLE         = TRUE
+!endif
+
 ################################################################################
 #
 # Library Class section - list of all common Library Classes needed by Rockchip platforms.
@@ -781,6 +788,13 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
   # EFI Memory Attribute Protocol state manager (rhboot shim workaround)
   #
   EmbeddedPkg/Drivers/MemoryAttributeManagerDxe/MemoryAttributeManagerDxe.inf
+
+  #
+  # x64 Binary Compatibility Support
+  #
+!if $(RK_X86_EMULATOR_ENABLE) == TRUE
+  Emulator/X86EmulatorDxe/X86EmulatorDxe.inf
+!endif
 
   #
   # Bds
