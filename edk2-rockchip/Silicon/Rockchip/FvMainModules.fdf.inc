@@ -127,6 +127,12 @@
   INF Silicon/Rockchip/Library/DisplayLib/DwMipiDsi2Lib.inf
   INF Silicon/Rockchip/Drivers/LcdGraphicsOutputDxe/LcdGraphicsOutputDxe.inf
 
+!if $(RK_AMD_GOP_ENABLE) == TRUE
+  INF Drivers/AMD/Gop/AmdGopOpRomOverrideDxe.inf
+  INF Drivers/AMD/Gop/AmdGopPreSoc15Dxe.inf
+  INF Drivers/AMD/Gop/AmdGopPostSoc15Dxe.inf
+!endif
+
   #
   # USB Support
   #

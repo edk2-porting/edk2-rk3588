@@ -72,6 +72,9 @@
 !ifndef RK_X86_EMULATOR_ENABLE
   DEFINE RK_X86_EMULATOR_ENABLE         = TRUE
 !endif
+!ifndef RK_AMD_GOP_ENABLE
+  DEFINE RK_AMD_GOP_ENABLE              = TRUE
+!endif
 
 ################################################################################
 #
@@ -635,6 +638,12 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
   Silicon/Rockchip/Library/DisplayLib/DwDpLib.inf
   Silicon/Rockchip/Library/DisplayLib/DwMipiDsi2Lib.inf
   Silicon/Rockchip/Drivers/LcdGraphicsOutputDxe/LcdGraphicsOutputDxe.inf
+
+!if $(RK_AMD_GOP_ENABLE) == TRUE
+  Drivers/AMD/Gop/AmdGopOpRomOverrideDxe.inf
+  Drivers/AMD/Gop/AmdGopPreSoc15Dxe.inf
+  Drivers/AMD/Gop/AmdGopPostSoc15Dxe.inf
+!endif
 
   #
   # USB Support

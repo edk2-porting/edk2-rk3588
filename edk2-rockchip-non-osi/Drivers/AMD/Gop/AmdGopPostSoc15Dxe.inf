@@ -1,0 +1,9 @@
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = AMDGopPostSoc15Dxe
+  FILE_GUID                      = 92f10585-fb63-430f-8188-71feeb2dda5b
+  MODULE_TYPE                    = UEFI_DRIVER
+  VERSION_STRING                 = 1.0
+
+[Binaries.AARCH64]
+  PE32|AArch64/ARM64Gop_2_10.efi|*

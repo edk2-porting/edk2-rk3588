@@ -1,0 +1,40 @@
+#/** @file
+#
+#  AMD GOP OpROM override
+#
+#  Copyright (c) 2025, Mario Bălănică <mariobalanica02@gmail.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x0001001A
+  BASE_NAME                      = AmdGopOpRomOverrideDxe
+  FILE_GUID                      = 261d0e39-4663-4f0f-94ad-2903b7bb31e1
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = AmdGopOpRomOverrideInitialize
+
+[Sources]
+  AmdGopOpRomOverride.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseMemoryLib
+  DebugLib
+  DevicePathLib
+  UefiBootServicesTableLib
+  UefiLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gEfiDriverBindingProtocolGuid
+  gEfiDriverFamilyOverrideProtocolGuid
+  gEfiLoadedImageProtocolGuid
+
+[Depex]
+  TRUE
