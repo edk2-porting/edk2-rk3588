@@ -35,6 +35,23 @@ IsFdtCompatModeSupported (
   return PlatformGetDtbFileGuid (CompatMode) != NULL;
 }
 
+STATIC
+BOOLEAN
+IsAcpiPcieEcamCompatModeSupported (
+  IN UINT32  CompatMode
+  )
+{
+  switch (CompatMode) {
+    case ACPI_PCIE_ECAM_COMPAT_MODE_AUTO:
+    case ACPI_PCIE_ECAM_COMPAT_MODE_SINGLE_DEV:
+    case ACPI_PCIE_ECAM_COMPAT_MODE_NXPMX6:
+    case ACPI_PCIE_ECAM_COMPAT_MODE_GRAVITON:
+      return TRUE;
+  }
+
+  return FALSE;
+}
+
 VOID
 EFIAPI
 ApplyConfigTableVariables (
@@ -79,7 +96,7 @@ SetupConfigTableVariables (
                   &Size,
                   &Var32
                   );
-  if (EFI_ERROR (Status)) {
+  if (EFI_ERROR (Status) || !IsAcpiPcieEcamCompatModeSupported (Var32)) {
     Status = PcdSet32S (PcdAcpiPcieEcamCompatMode, FixedPcdGet32 (PcdAcpiPcieEcamCompatModeDefault));
     ASSERT_EFI_ERROR (Status);
   }

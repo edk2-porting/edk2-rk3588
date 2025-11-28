@@ -241,13 +241,17 @@ AcpiFixupPcieEcam (
 
   PcieEcamMode = PcdGet32 (PcdAcpiPcieEcamCompatMode);
 
-  if ((PcieEcamMode == ACPI_PCIE_ECAM_COMPAT_MODE_NXPMX6_SINGLE_DEV) ||
-      (PcieEcamMode == ACPI_PCIE_ECAM_COMPAT_MODE_NXPMX6_GRAVITON))
-  {
-    if (OsType == ExitBootServicesOsWindows) {
-      PcieEcamMode = ACPI_PCIE_ECAM_COMPAT_MODE_NXPMX6;
-    } else {
-      PcieEcamMode &= ~ACPI_PCIE_ECAM_COMPAT_MODE_NXPMX6;
+  if (PcieEcamMode == ACPI_PCIE_ECAM_COMPAT_MODE_AUTO) {
+    switch (OsType) {
+      case ExitBootServicesOsWindows:
+        PcieEcamMode = ACPI_PCIE_ECAM_COMPAT_MODE_NXPMX6;
+        break;
+      case ExitBootServicesOsLinux:
+        PcieEcamMode = ACPI_PCIE_ECAM_COMPAT_MODE_GRAVITON;
+        break;
+      default:
+        PcieEcamMode = ACPI_PCIE_ECAM_COMPAT_MODE_SINGLE_DEV;
+        break;
     }
   }
 
