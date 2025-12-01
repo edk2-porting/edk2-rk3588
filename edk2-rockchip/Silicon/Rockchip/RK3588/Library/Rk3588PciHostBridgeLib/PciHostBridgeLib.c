@@ -1,6 +1,7 @@
 /** @file
   PCI Host Bridge Library instance for Rockchip Rk3588
 
+  Copyright (c) 2023-2025, Mario Bălănică <mariobalanica02@gmail.com>
   Copyright (c) 2023, Molly Sophia <mollysophia379@gmail.com>
   Copyright (c) 2021, Jared McNeill <jmcneill@invisible.ca>
   Copyright (c) 2016, Linaro Ltd. All rights reserved.<BR>
@@ -192,15 +193,16 @@ PciHostBridgeGetRootBridges (
     mPciRootBridges[Loop].AllocationAttributes  = EFI_PCI_HOST_BRIDGE_COMBINE_MEM_PMEM |
                                                   EFI_PCI_HOST_BRIDGE_MEM64_DECODE;
 
-    mPciRootBridges[Loop].Bus.Base  = 0;
-    mPciRootBridges[Loop].Bus.Limit = PCIE_BUS_LIMIT;
+    mPciRootBridges[Loop].Bus.Base  = PCIE_BUS_BASE (Idx);
+    mPciRootBridges[Loop].Bus.Limit = PCIE_BUS_LIMIT (Idx);
 
-    mPciRootBridges[Loop].Io.Base        = PCIE_IO_BASE;
+    mPciRootBridges[Loop].Io.Base        = PCIE_IO_BUS_BASE;
     mPciRootBridges[Loop].Io.Limit       = mPciRootBridges[Loop].Io.Base + PCIE_IO_SIZE - 1;
-    mPciRootBridges[Loop].Io.Translation = MAX_UINT64 - PCIE_IO_XLATE (Idx) + 1;
+    mPciRootBridges[Loop].Io.Translation = MAX_UINT64 - PCIE_IO_TRANSLATION (Idx) + 1;
 
-    mPciRootBridges[Loop].Mem.Base  = PCIE_MEM_BASE (Idx);
-    mPciRootBridges[Loop].Mem.Limit = mPciRootBridges[Loop].Mem.Base + PCIE_MEM_SIZE - 1;
+    mPciRootBridges[Loop].Mem.Base        = PCIE_MEM32_BUS_BASE;
+    mPciRootBridges[Loop].Mem.Limit       = mPciRootBridges[Loop].Mem.Base + PCIE_MEM32_SIZE - 1;
+    mPciRootBridges[Loop].Mem.Translation = MAX_UINT64 - PCIE_MEM32_TRANSLATION (Idx) + 1;
 
     mPciRootBridges[Loop].MemAbove4G.Base  = PCIE_MEM64_BASE (Idx);
     mPciRootBridges[Loop].MemAbove4G.Limit = mPciRootBridges[Loop].MemAbove4G.Base + PCIE_MEM64_SIZE - 1;
@@ -211,7 +213,6 @@ PciHostBridgeGetRootBridges (
     mPciRootBridges[Loop].PMemAbove4G.Limit = 0;
     mPciRootBridges[Loop].DevicePath        = (EFI_DEVICE_PATH_PROTOCOL *)&mEfiPciRootBridgeDevicePath[Idx];
 
-    DEBUG ((DEBUG_INFO, "0x%llx 0x%llx 0x%llx\n", mPciRootBridges[Loop].Mem.Base, mPciRootBridges[Loop].MemAbove4G.Base, mPciRootBridges[Loop].Io.Translation));
     Loop++;
   }
 

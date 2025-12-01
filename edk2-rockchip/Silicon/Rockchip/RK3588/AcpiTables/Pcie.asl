@@ -16,7 +16,11 @@
     Name (_UID, Segment)                                                       \
     Name (_SEG, Segment)                                                       \
     Method (_BBN) {                                                            \
-      Return (PBMI)                                                            \
+      If (PBOF) {                                                              \
+        Return (PCIE_BUS_BASE (Segment) + PBMI)                                \
+      } Else {                                                                 \
+        Return (PBMI)                                                          \
+      }                                                                        \
     }                                                                          \
     Name (_STA, 0xF)                                                           \
                                                                                \
@@ -30,14 +34,34 @@
     Method (_CRS, 0, Serialized) {                                             \
       Name (RBUF, ResourceTemplate () {                                        \
         WORDBUSNUMBER_BUF (00, ResourceProducer)                               \
-        DWORDMEMORY_BUF (01, ResourceProducer)                                 \
+        QWORDMEMORY_BUF (01, ResourceProducer)                                 \
         QWORDMEMORY_BUF (02, ResourceProducer)                                 \
         QWORDIO_BUF (03, ResourceProducer)                                     \
       })                                                                       \
-      WORD_SET (00, PBMI, PBMA - PBMI + 1, 0)                                  \
-      DWORD_SET (01, PCIE_MEM_BASE (Segment), PCIE_MEM_SIZE, 0)                \
-      QWORD_SET (02, PCIE_MEM64_BASE (Segment), PCIE_MEM64_SIZE, 0)            \
-      QWORD_SET (03, PCIE_IO_BASE, PCIE_IO_SIZE, PCIE_IO_XLATE (Segment))      \
+      WORD_SET (                                                               \
+        00,                                                                    \
+        _BBN,                                                                  \
+        PBMA - PBMI + 1,                                                       \
+        0                                                                      \
+      )                                                                        \
+      QWORD_SET (                                                              \
+        01,                                                                    \
+        PCIE_MEM32_BUS_BASE,                                                   \
+        PCIE_MEM32_SIZE,                                                       \
+        PCIE_MEM32_TRANSLATION (Segment)                                       \
+      )                                                                        \
+      QWORD_SET (                                                              \
+        02,                                                                    \
+        PCIE_MEM64_BASE (Segment),                                             \
+        PCIE_MEM64_SIZE,                                                       \
+        0                                                                      \
+      )                                                                        \
+      QWORD_SET (                                                              \
+        03,                                                                    \
+        PCIE_IO_BUS_BASE,                                                      \
+        PCIE_IO_SIZE,                                                          \
+        PCIE_IO_TRANSLATION (Segment)                                          \
+      )                                                                        \
       Return (RBUF)                                                            \
     }                                                                          \
                                                                                \
@@ -61,7 +85,7 @@
         Name (RBUF, ResourceTemplate () {                                      \
           QWORDMEMORY_BUF (00, ResourceProducer)                               \
         })                                                                     \
-        QWORD_SET (00, PCIE_CFG_BASE (Segment), SIZE_256MB, 0)                 \
+        QWORD_SET (00, PCIE_CFG_BASE (Segment), PCIE_CFG_SIZE , 0)             \
         Return (RBUF)                                                          \
       }                                                                        \
     }                                                                          \
@@ -111,6 +135,7 @@
 Scope (\_SB_) {
   Name (PBMI, 0xABCD)   // PCI Bus Minimum
   Name (PBMA, 0xABCD)   // PCI Bus Maximum
+  Name (PBOF, 1)        // PCI Bus Offset
 
   PCIE_ROOT_COMPLEX (0, 292)
   PCIE_ROOT_COMPLEX (1, 287)

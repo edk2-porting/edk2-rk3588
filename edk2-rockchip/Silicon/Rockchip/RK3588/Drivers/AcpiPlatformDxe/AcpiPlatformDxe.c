@@ -218,9 +218,9 @@ AcpiFixupPcieEcam (
   UINT32                       PcieEcamMode;
   UINT8                        PcieBusMin;
   UINT8                        PcieBusMax;
-  UINT8                        McfgMainBusMin;
-  BOOLEAN                      McfgSplitRootPort;
-  BOOLEAN                      McfgSingleDevQuirk;
+  BOOLEAN                      PcieBusOffset;
+  BOOLEAN                      McfgDeviceFiltering;
+  BOOLEAN                      McfgSplitConfigSpaces;
 
   Index  = 0;
   Status = AcpiLocateTableBySignature (
@@ -257,11 +257,21 @@ AcpiFixupPcieEcam (
 
   switch (PcieEcamMode) {
     case ACPI_PCIE_ECAM_COMPAT_MODE_NXPMX6:
-      PcieBusMin         = 0;
-      PcieBusMax         = PCIE_BUS_LIMIT;
-      McfgMainBusMin     = 1;
-      McfgSplitRootPort  = TRUE;
-      McfgSingleDevQuirk = FALSE;
+      //
+      // This workaround ought to filter duplicate devices on the primary
+      // and secondary buses, but it appears that recent Windows versions
+      // only do so for bus numbers 0 and 1.
+      // Not all segments start at bus 0 anymore, since they need to be made
+      // distinct to the SMMU & ITS (see Rk3588Pcie.h). However, these features
+      // can't be enabled in Windows anyway, so we'll disable the bus offset and
+      // let it reassign bus numbers from 0.
+      // It's possible to enable PcieBusOffset by disabling McfgDeviceFiltering,
+      // but this will hide the root port and may cause the system to lock-up
+      // with certain endpoints that have broken CFG0 filtering.
+      //
+      PcieBusOffset         = FALSE;
+      McfgDeviceFiltering   = !PcieBusOffset;
+      McfgSplitConfigSpaces = TRUE;
 
       Index  = 0;
       Status = AcpiLocateTableBySignature (
@@ -285,44 +295,97 @@ AcpiFixupPcieEcam (
       break;
 
     case ACPI_PCIE_ECAM_COMPAT_MODE_GRAVITON:
-      PcieBusMin         = 0;
-      PcieBusMax         = PCIE_BUS_LIMIT;
-      McfgMainBusMin     = 0;
-      McfgSplitRootPort  = FALSE;
-      McfgSingleDevQuirk = FALSE;
+      PcieBusOffset         = TRUE;
+      McfgDeviceFiltering   = TRUE;
+      McfgSplitConfigSpaces = FALSE;
 
       CopyMem (McfgTable->Header.Header.OemId, "AMAZON", sizeof (McfgTable->Header.Header.OemId));
       McfgTable->Header.Header.OemTableId = SIGNATURE_64 ('G', 'R', 'A', 'V', 'I', 'T', 'O', 'N');
       break;
 
     default: // ACPI_PCIE_ECAM_COMPAT_MODE_SINGLE_DEV
-      PcieBusMin         = 1;
-      PcieBusMax         = 1;
-      McfgMainBusMin     = 1;
-      McfgSplitRootPort  = FALSE;
-      McfgSingleDevQuirk = TRUE;
+      PcieBusOffset         = TRUE;
+      McfgDeviceFiltering   = FALSE;
+      McfgSplitConfigSpaces = FALSE;
       break;
   }
 
-  for (Index = 0; Index < ARRAY_SIZE (McfgTable->MainEntries); Index++) {
-    if (McfgSingleDevQuirk) {
-      if ((PcdGet32 (PcdPcieEcamCompliantSegmentsMask) & (1 << Index)) == 0) {
-        McfgTable->MainEntries[Index].BaseAddress += 0x8000;
+  PcieBusMin = 0;
+  PcieBusMax = PCIE_BUS_COUNT - 1;
+
+  if (!McfgDeviceFiltering) {
+    //
+    // Skip the primary bus as it only spans a single function (root port)
+    // and the remaining DBI region has to be filtered out.
+    //
+    PcieBusMin = 1;
+
+    if (!McfgSplitConfigSpaces) {
+      //
+      // It's not possible to have more than a single bus due to the
+      // the device offset workaround below.
+      //
+      PcieBusMax = PcieBusMin;
+    }
+  }
+
+  for (Index = 0; Index < NUM_PCIE_CONTROLLER; Index++) {
+    McfgTable->ConfigSpaces[0][Index].PciSegmentGroupNumber = Index;
+    McfgTable->ConfigSpaces[0][Index].BaseAddress           = PCIE_CFG_BASE (Index) + PCIE_BUS_BASE_OFFSET (Index);
+    McfgTable->ConfigSpaces[0][Index].StartBusNumber        = PcieBusMin;
+    McfgTable->ConfigSpaces[0][Index].EndBusNumber          = PcieBusMax;
+
+    if (PcieBusOffset) {
+      McfgTable->ConfigSpaces[0][Index].BaseAddress    -= PCIE_BUS_BASE_OFFSET (Index);
+      McfgTable->ConfigSpaces[0][Index].StartBusNumber += PCIE_BUS_BASE (Index);
+      McfgTable->ConfigSpaces[0][Index].EndBusNumber   += PCIE_BUS_BASE (Index);
+    }
+
+    if (McfgSplitConfigSpaces) {
+      McfgTable->ConfigSpaces[1][Index].PciSegmentGroupNumber = McfgTable->ConfigSpaces[0][Index].PciSegmentGroupNumber;
+      McfgTable->ConfigSpaces[1][Index].StartBusNumber        = McfgTable->ConfigSpaces[0][Index].StartBusNumber;
+
+      if (McfgDeviceFiltering) {
+        //
+        // The OS is expected to filter devices on the primary and secondary
+        // buses, so we can expose the root port in this entry (primary bus)
+        // and remaining buses in the first entry.
+        //
+        McfgTable->ConfigSpaces[1][Index].BaseAddress  = PCIE_DBI_BASE (Index);
+        McfgTable->ConfigSpaces[1][Index].EndBusNumber = McfgTable->ConfigSpaces[1][Index].StartBusNumber;
+
+        McfgTable->ConfigSpaces[0][Index].StartBusNumber += 1;
+      } else {
+        //
+        // The OS will not filter devices on any bus, so we can't expose
+        // the root port. Use this entry for buses following secondary and
+        // limit the first entry to the secondary bus only, so the device
+        // offset workaround below can work.
+        //
+        McfgTable->ConfigSpaces[1][Index].BaseAddress     = McfgTable->ConfigSpaces[0][Index].BaseAddress;
+        McfgTable->ConfigSpaces[1][Index].StartBusNumber += 1;
+        McfgTable->ConfigSpaces[1][Index].EndBusNumber    = McfgTable->ConfigSpaces[0][Index].EndBusNumber;
+
+        McfgTable->ConfigSpaces[0][Index].EndBusNumber = McfgTable->ConfigSpaces[0][Index].StartBusNumber;
       }
     }
 
-    McfgTable->MainEntries[Index].StartBusNumber = McfgMainBusMin;
-    McfgTable->MainEntries[Index].EndBusNumber   = PcieBusMax;
+    if (!McfgDeviceFiltering &&
+        ((PcdGet32 (PcdPcieEcamCompliantSegmentsMask) & (1 << Index)) == 0))
+    {
+      McfgTable->ConfigSpaces[0][Index].BaseAddress += 0x8000;
+    }
   }
 
-  if (McfgSplitRootPort == FALSE) {
-    McfgTable->Header.Header.Length -= sizeof (McfgTable->RootPortEntries);
+  if (!McfgSplitConfigSpaces) {
+    McfgTable->Header.Header.Length = OFFSET_OF (RK3588_MCFG_TABLE, ConfigSpaces[1]);
   }
 
   AcpiUpdateChecksum ((UINT8 *)McfgTable, McfgTable->Header.Header.Length);
 
   AcpiUpdateSdtNameInteger (mDsdtTable, "PBMI", PcieBusMin);
   AcpiUpdateSdtNameInteger (mDsdtTable, "PBMA", PcieBusMax);
+  AcpiUpdateSdtNameInteger (mDsdtTable, "PBOF", PcieBusOffset);
 
   return EFI_SUCCESS;
 }

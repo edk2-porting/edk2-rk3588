@@ -574,19 +574,14 @@ InitializePciHost (
   UINT32  Segment
   )
 {
-  EFI_PHYSICAL_ADDRESS  ApbBase  = PCIE_APB_BASE (Segment);
-  EFI_PHYSICAL_ADDRESS  DbiBase  = PCIE_DBI_BASE (Segment);
-  EFI_PHYSICAL_ADDRESS  PcieBase = PCIE_CFG_BASE (Segment);
+  EFI_PHYSICAL_ADDRESS  ApbBase = PCIE_APB_BASE (Segment);
+  EFI_PHYSICAL_ADDRESS  DbiBase = PCIE_DBI_BASE (Segment);
+  EFI_PHYSICAL_ADDRESS  CfgBase;
+  EFI_PHYSICAL_ADDRESS  CfgSize;
   EFI_STATUS            Status;
   UINTN                 Retry;
   UINT32                LinkSpeed;
   UINT32                LinkWidth;
-  UINT64                Cfg0Base;
-  UINT64                Cfg0Size;
-  UINT64                Cfg1Base;
-  UINT64                Cfg1Size;
-  UINT64                PciIoBase;
-  UINT64                PciIoSize;
   UINT8                 Pcie30PhyMode;
 
   Pcie30PhyMode = PcdGet8 (PcdPcie30PhyMode);
@@ -611,7 +606,6 @@ InitializePciHost (
 
   /* Log settings */
   DEBUG ((DEBUG_INIT, "\nPCIe: Segment %u\n", Segment));
-  DEBUG ((DEBUG_INIT, "PCIe: PciExpressBaseAddress 0x%lx\n", PcieBase));
   DEBUG ((DEBUG_INIT, "PCIe: ApbBase 0x%lx\n", ApbBase));
   DEBUG ((DEBUG_INIT, "PCIe: DbiBase 0x%lx\n", DbiBase));
   DEBUG ((DEBUG_INIT, "PCIe: NumLanes %u\n", LinkWidth));
@@ -645,16 +639,41 @@ InitializePciHost (
   PciSetupBars (DbiBase);
 
   DEBUG ((DEBUG_INIT, "PCIe: Setup iATU\n"));
-  Cfg0Base  = SIZE_1MB;
-  Cfg0Size  = SIZE_64KB;
-  Cfg1Base  = SIZE_2MB;
-  Cfg1Size  = 0x10000000UL - (SIZE_2MB + SIZE_64KB);
-  PciIoBase = 0x2FFF0000UL;
-  PciIoSize = SIZE_64KB;
+  CfgBase = PCIE_CFG_BASE (Segment) + PCIE_BUS_BASE_OFFSET (Segment);
+  CfgSize = PCIE_BUS_COUNT * SIZE_1MB;
 
-  PciSetupAtu (DbiBase, 0, IATU_TYPE_CFG0, PcieBase + Cfg0Base, Cfg0Base, Cfg0Size);
-  PciSetupAtu (DbiBase, 1, IATU_TYPE_CFG1, PcieBase + Cfg1Base, Cfg1Base, Cfg1Size);
-  PciSetupAtu (DbiBase, 2, IATU_TYPE_IO, PcieBase + PciIoBase, 0, PciIoSize);
+  PciSetupAtu (
+    DbiBase,
+    0,
+    IATU_TYPE_CFG0,
+    CfgBase + SIZE_1MB,   // Bus 1
+    SIZE_1MB,
+    SIZE_64KB             // Should be 32KB but granule is 64KB (see PciValidateCfg0())
+    );
+  PciSetupAtu (
+    DbiBase,
+    1,
+    IATU_TYPE_CFG1,
+    CfgBase + SIZE_2MB,   // Bus 2 and above
+    SIZE_2MB,
+    CfgSize - SIZE_2MB
+    );
+  PciSetupAtu (
+    DbiBase,
+    2,
+    IATU_TYPE_IO,
+    PCIE_IO_BASE (Segment),
+    PCIE_IO_BUS_BASE,
+    PCIE_IO_SIZE
+    );
+  PciSetupAtu (
+    DbiBase,
+    3,
+    IATU_TYPE_MEM,
+    PCIE_MEM32_BASE (Segment),
+    PCIE_MEM32_BUS_BASE,
+    PCIE_MEM32_SIZE
+    );
 
   DEBUG ((DEBUG_INIT, "PCIe: Set link speed\n"));
   PciSetupLinkSpeed (DbiBase, LinkSpeed, LinkWidth);
@@ -692,7 +711,7 @@ InitializePciHost (
   PciGetLinkSpeedWidth (DbiBase, &LinkSpeed, &LinkWidth);
   PciPrintLinkSpeedWidth (LinkSpeed, LinkWidth);
 
-  PciValidateCfg0 (Segment, PcieBase + Cfg0Base);
+  PciValidateCfg0 (Segment, CfgBase + SIZE_1MB);
 
   return EFI_SUCCESS;
 }

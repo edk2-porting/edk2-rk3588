@@ -17,6 +17,7 @@
 #include <Library/PrintLib.h>
 #include <Library/DxeServicesLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/Rk3588Pcie.h>
 #include <Library/RockchipPlatformLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
@@ -282,6 +283,121 @@ FdtFixupPcie3Devices (
 STATIC
 VOID
 EFIAPI
+FdtFixupPcieResources (
+  IN VOID  *Fdt
+  )
+{
+  STATIC CHAR8  *PcieNodes[] = {
+    [PCIE_SEGMENT_PCIE30X4] = "/pcie@fe150000",
+    [PCIE_SEGMENT_PCIE30X2] = "/pcie@fe160000",
+    [PCIE_SEGMENT_PCIE20L0] = "/pcie@fe170000",
+    [PCIE_SEGMENT_PCIE20L1] = "/pcie@fe180000",
+    [PCIE_SEGMENT_PCIE20L2] = "/pcie@fe190000",
+  };
+
+  UINT32  Segment;
+  CHAR8   *NodePath;
+  INT32   Node;
+  INT32   Ret;
+
+  DEBUG ((DEBUG_INFO, "FdtPlatform: Fixing up PCIe resources\n"));
+
+  for (Segment = 0; Segment < ARRAY_SIZE (PcieNodes); Segment++) {
+    NodePath = PcieNodes[Segment];
+
+    Node = fdt_path_offset (Fdt, NodePath);
+    if (Node < 0) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "FdtPlatform: Couldn't locate '%a' node. Ret=%a\n",
+        NodePath,
+        fdt_strerror (Node)
+        ));
+      continue;
+    }
+
+    UINT32  Ranges[][7] = {
+      {
+        cpu_to_fdt32 (0x01000000), // I/O space
+        cpu_to_fdt32 ((UINT32)((UINT64)PCIE_IO_BUS_BASE >> 32)),
+        cpu_to_fdt32 ((UINT32)(PCIE_IO_BUS_BASE)),
+        cpu_to_fdt32 ((UINT32)((UINT64)PCIE_IO_BASE (Segment) >> 32)),
+        cpu_to_fdt32 ((UINT32)(PCIE_IO_BASE (Segment))),
+        cpu_to_fdt32 ((UINT32)((UINT64)PCIE_IO_SIZE >> 32)),
+        cpu_to_fdt32 ((UINT32)(PCIE_IO_SIZE))
+      },
+      {
+        cpu_to_fdt32 (0x02000000), // 32-bit non-prefetchable memory
+        cpu_to_fdt32 ((UINT32)((UINT64)PCIE_MEM32_BUS_BASE >> 32)),
+        cpu_to_fdt32 ((UINT32)(PCIE_MEM32_BUS_BASE)),
+        cpu_to_fdt32 ((UINT32)((UINT64)PCIE_MEM32_BASE (Segment) >> 32)),
+        cpu_to_fdt32 ((UINT32)(PCIE_MEM32_BASE (Segment))),
+        cpu_to_fdt32 ((UINT32)((UINT64)PCIE_MEM32_SIZE >> 32)),
+        cpu_to_fdt32 ((UINT32)(PCIE_MEM32_SIZE))
+      },
+      {
+        cpu_to_fdt32 (0x43000000), // 64-bit prefetchable memory
+        cpu_to_fdt32 ((UINT32)((UINT64)PCIE_MEM64_BASE (Segment) >> 32)),
+        cpu_to_fdt32 ((UINT32)(PCIE_MEM64_BASE (Segment))),
+        cpu_to_fdt32 ((UINT32)((UINT64)PCIE_MEM64_BASE (Segment) >> 32)),
+        cpu_to_fdt32 ((UINT32)(PCIE_MEM64_BASE (Segment))),
+        cpu_to_fdt32 ((UINT32)((UINT64)PCIE_MEM64_SIZE >> 32)),
+        cpu_to_fdt32 ((UINT32)(PCIE_MEM64_SIZE))
+      },
+    };
+    Ret = fdt_setprop (Fdt, Node, "ranges", Ranges, sizeof (Ranges));
+    if (Ret < 0) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "FdtPlatform: Failed to set 'ranges' property for '%a'. Ret=%a\n",
+        NodePath,
+        fdt_strerror (Ret)
+        ));
+      continue;
+    }
+
+    UINT32  BusRange[] = {
+      cpu_to_fdt32 (PCIE_BUS_BASE (Segment)),
+      cpu_to_fdt32 (PCIE_BUS_LIMIT (Segment))
+    };
+    Ret = fdt_setprop (Fdt, Node, "bus-range", BusRange, sizeof (BusRange));
+    if (Ret < 0) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "FdtPlatform: Failed to set 'bus-range' property for '%a'. Ret=%a\n",
+        NodePath,
+        fdt_strerror (Ret)
+        ));
+      continue;
+    }
+
+    CHAR8  *RidMapProps[] = { "msi-map", "iommu-map" };
+    for (UINT32 RidMapIndex = 0; RidMapIndex < ARRAY_SIZE (RidMapProps); RidMapIndex++) {
+      UINT32  *RidMap;
+      INT32   RidMapLength;
+
+      RidMap = (UINT32 *)fdt_getprop (Fdt, Node, RidMapProps[RidMapIndex], &RidMapLength);
+      if ((RidMap == NULL) || (RidMapLength != sizeof (UINT32) * 4)) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "FdtPlatform: Failed to get '%a' property for '%a'. Ret=%a\n",
+          RidMapProps[RidMapIndex],
+          NodePath,
+          fdt_strerror ((RidMapLength < 0) ? RidMapLength : -FDT_ERR_BADVALUE)
+          ));
+        continue;
+      }
+
+      RidMap[0] = cpu_to_fdt32 (PCIE_BUS_BASE (Segment) << 8);
+      RidMap[2] = RidMap[0];
+      RidMap[3] = cpu_to_fdt32 (PCIE_BUS_COUNT << 8);
+    }
+  }
+}
+
+STATIC
+VOID
+EFIAPI
 FdtFixupVopDevices (
   IN VOID  *Fdt
   )
@@ -444,6 +560,7 @@ ApplyPlatformFdtFixups (
 
   FdtFixupComboPhyDevices (*Fdt);
   FdtFixupPcie3Devices (*Fdt);
+  FdtFixupPcieResources (*Fdt);
   FdtFixupVopDevices (*Fdt);
 
   return EFI_SUCCESS;
