@@ -7,8 +7,8 @@
  *
  **/
 
-#ifndef __PCA9555_H__
-#define __PCA9555_H__
+#ifndef __PCA95XX_H__
+#define __PCA95XX_H__
 
 #include <Uefi/UefiBaseType.h>
 
@@ -25,4 +25,4 @@ struct _PCA95XX_PROTOCOL {
 
 extern EFI_GUID  gPca95xxProtocolGuid;
 
-#endif // __PCA9555_H__
+#endif // __PCA95XX_H__
