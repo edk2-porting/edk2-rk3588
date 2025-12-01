@@ -46,6 +46,7 @@ jobs:
           - rock-5b
           - rock-5bplus
           - station-m3
+          - vicharak-axon
         CONFIGURATION: ${{ fromJSON(format('[{0}]', inputs.build-configs || '"Debug"')) }}
     steps:
       - name: Checkout
