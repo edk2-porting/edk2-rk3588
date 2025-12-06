@@ -11,16 +11,60 @@ function _help(){
     echo "  -r, --release MODE          Release mode for building, default is 'DEBUG', 'RELEASE' alternatively."
     echo "  -t, --toolchain TOOLCHAIN   Set toolchain, default is 'GCC'."
     echo "  --open-tfa ENABLE           Use open-source TF-A submodule. Default: ${OPEN_TFA}"
-    echo "  -C, --clean                 Clean workspace and output."
-    echo "  -D, --distclean             Clean up all files that are not in repo."
     echo "  --tfa-flags \"FLAGS\"         Flags appended to open TF-A build process."
     echo "  --edk2-flags \"FLAGS\"        Flags appended to the EDK2 build process."
+    echo "  --skip-patchsets            Skip applying upstream submodule patchsets during development."
+    echo "  -C, --clean                 Clean workspace and output."
+    echo "  -D, --distclean             Clean up all files that are not in repo."
     echo "  -h, --help                  Show this help."
     echo
     exit "${1}"
 }
 
 function _error() { echo "${@}" >&2; exit 1; }
+
+function apply_patchset() {
+    ${SKIP_PATCHSETS} && return 0
+
+    local patches_dir="$1"
+    local target_dir="$2"
+
+    [ ! -d "${patches_dir}" ] && return 0
+
+    if [ ! -d "${target_dir}" ]; then
+        echo "Patchset target directory does not exist: ${target_dir}"
+        return 1
+    fi
+
+    echo "Checking patchset ${patches_dir} for ${target_dir}"
+
+    local patch_count=0
+    local applied_count=0
+
+    for patch_file in "${patches_dir}"/*.patch; do
+        [ -f "${patch_file}" ] || continue
+
+        patch_name=$(basename "${patch_file}")
+        echo "Patch ${patch_count}: ${patch_name}"
+
+        ((patch_count++))
+
+        if patch -p1 -d "${target_dir}" -R --dry-run -s -f < "${patch_file}" > /dev/null 2>&1; then
+            echo "  Already applied - skipping"
+        else
+            if patch -p1 -d "${target_dir}" < "${patch_file}"; then
+                echo "  Successfully applied"
+                ((applied_count++))
+            else
+                echo "  Failed to apply - aborting"
+                return 1
+            fi
+        fi
+    done
+
+    echo "Patchset summary: ${patch_count} total, ${applied_count} applied"
+    return 0
+}
 
 function _build_idblock() {
     echo " => Building idblock.bin"
@@ -58,7 +102,7 @@ function _build_fit() {
     BL31="${ROOTDIR}/misc/rkbin/${BL31_RKBIN}"
     BL32="${ROOTDIR}/misc/rkbin/${BL32_RKBIN}"
 
-    if [ ${OPEN_TFA} == 1 ]; then
+    if ${OPEN_TFA}; then
         BL31="${ROOTDIR}/arm-trusted-firmware/build/${TFA_PLAT}/${RELEASE_TYPE,,}/bl31/bl31.elf"
     fi
 
@@ -117,7 +161,9 @@ function _build(){
     #
     # Build TF-A
     #
-    if [ ${OPEN_TFA} == 1 ]; then
+    if ${OPEN_TFA}; then
+        apply_patchset "${ROOTDIR}/arm-trusted-firmware-patches" "${ROOTDIR}/arm-trusted-firmware" || exit 1
+
         pushd arm-trusted-firmware
 
         if [ ${RELEASE_TYPE} == "DEBUG" ]; then
@@ -134,6 +180,9 @@ function _build(){
     #
     # Build EDK2
     #
+    apply_patchset "${ROOTDIR}/edk2-patches" "${ROOTDIR}/edk2" || exit 1
+    apply_patchset "${ROOTDIR}/devicetree/mainline/patches" "${ROOTDIR}/devicetree/mainline/upstream" || exit 1
+
     [ -d "${WORKSPACE}/Conf" ] || mkdir -p "${WORKSPACE}/Conf"
 
     export GCC_AARCH64_PREFIX="${CROSS_COMPILE}"
@@ -183,9 +232,10 @@ typeset -u RELEASE_TYPE
 DEVICE=""
 RELEASE_TYPE=DEBUG
 TOOLCHAIN=GCC
-OPEN_TFA=1
+OPEN_TFA=true
 TFA_FLAGS=""
 EDK2_FLAGS=""
+SKIP_PATCHSETS=false
 CLEAN=false
 DISTCLEAN=false
 OUTDIR="${PWD}"
@@ -193,7 +243,7 @@ OUTDIR="${PWD}"
 #
 # Get options
 #
-OPTS=$(getopt -o "d:r:t:CDh" -l "device:,release:,toolchain:,open-tfa:,tfa-flags:,edk2-flags:,clean,distclean,help" -n build.sh -- "${@}") || _help $?
+OPTS=$(getopt -o "d:r:t:CDh" -l "device:,release:,toolchain:,open-tfa:,tfa-flags:,edk2-flags:,skip-patchsets,clean,distclean,help" -n build.sh -- "${@}") || _help $?
 eval set -- "${OPTS}"
 while true; do
     case "${1}" in
@@ -203,6 +253,7 @@ while true; do
         --open-tfa) OPEN_TFA="${2}"; shift 2 ;;
         --tfa-flags) TFA_FLAGS="${2}"; shift 2 ;;
         --edk2-flags) EDK2_FLAGS="${2}"; shift 2 ;;
+        --skip-patchsets) SKIP_PATCHSETS=true; shift ;;
         -C|--clean) CLEAN=true; shift ;;
         -D|--distclean) DISTCLEAN=true; shift ;;
         -h|--help) _help 0; shift ;;
