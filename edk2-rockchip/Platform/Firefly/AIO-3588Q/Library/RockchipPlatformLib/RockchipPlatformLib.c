@@ -18,7 +18,7 @@
 #include <VarStoreData.h>
 #include <Library/UefiBootServicesTableLib.h>
 
-#include <Protocol/Pca9555.h>
+#include <Protocol/Pca95xx.h>
 
 static struct regulator_init_data  rk806_init_data[] = {
   /* Master PMIC */
@@ -49,7 +49,7 @@ static struct regulator_init_data  rk806_init_data[] = {
 
 EFI_STATUS
 EFIAPI
-GetPca9555Protocol (
+GetPca95xxProtocol (
   IN OUT PCA95XX_PROTOCOL  **Pca95xxProtocl
   )
 {
@@ -277,7 +277,7 @@ UsbPortPowerEnable (
   PCA95XX_PROTOCOL  *Pca95xxProtocol;
 
   /* On Firefly AIO-3588Q this is controlled via the PCA9555. */
-  Status = GetPca9555Protocol (&Pca95xxProtocol);
+  Status = GetPca95xxProtocol (&Pca95xxProtocol);
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "UsbPortPowerEnable failed to get PCA9555! (%d)\n", Status));
   } else {
@@ -398,7 +398,7 @@ PciePeReset (
     case PCIE_SEGMENT_PCIE20L1:
       break;
     case PCIE_SEGMENT_PCIE20L2:
-      Status = GetPca9555Protocol (&Pca95xxProtocol);
+      Status = GetPca95xxProtocol (&Pca95xxProtocol);
       if (EFI_ERROR (Status)) {
         DEBUG ((DEBUG_ERROR, "PciePeReset(L2) failed to get PCA9555! (%d)\n", Status));
       } else {

@@ -23,10 +23,10 @@
   DEFINE RK_RTC8563_ENABLE = TRUE
 
   #
-  # PCA9555 GPIO extender support
+  # PCA95XX GPIO extender support
   # I2C location configured by PCDs below.
   #
-  DEFINE RK_PCA9555_ENABLE = TRUE
+  DEFINE RK_PCA95XX_ENABLE = TRUE
 
   #
   # RK3588-based platform
@@ -69,8 +69,9 @@
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorTags|{ $(SCMI_CLK_CPUB01), $(SCMI_CLK_CPUB23) }
   gPcf8563RealTimeClockLibTokenSpaceGuid.PcdI2cSlaveAddress|0x51
   gRockchipTokenSpaceGuid.PcdRtc8563Bus|0x6
-  gRockchipTokenSpaceGuid.PcdPca9555Address|0x21
-  gRockchipTokenSpaceGuid.PcdPca9555Bus|0x6
+  gRockchipTokenSpaceGuid.PcdPca95xxAddress|0x21
+  gRockchipTokenSpaceGuid.PcdPca95xxBus|0x6
+  gRockchipTokenSpaceGuid.PcdPca95xxType|"PCA9555"
 
   #
   # PCIe/SATA/USB Combo PIPE PHY support flags and default values
@@ -132,7 +133,7 @@
   # Splash screen logo
   $(VENDOR_DIRECTORY)/Drivers/LogoDxe/LogoDxe.inf
 
-  # Hack to enable use of PCA9555 during PCIe initialization.
+  # Hack to enable use of PCA95XX during PCIe initialization.
   MdeModulePkg/Bus/Pci/PciHostBridgeDxe/PciHostBridgeDxe.inf {
     <LibraryClasses>
       RockchipPlatformLib|Platform/Firefly/AIO-3588Q/Library/RockchipPlatformLib/RockchipPlatformLibPcaDepex.inf
