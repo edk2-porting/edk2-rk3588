@@ -98,13 +98,11 @@ OhciReset (
   Ohc    = USB_OHCI_HC_DEV_FROM_THIS (This);
 
   if ((Attributes & EFI_USB_HC_RESET_HOST_CONTROLLER) != 0) {
-    gBS->Stall (50 * 1000);
     Status = OhciSetHcCommandStatus (Ohc, HC_RESET, HC_RESET);
     if (EFI_ERROR (Status)) {
       return EFI_DEVICE_ERROR;
     }
 
-    gBS->Stall (50 * 1000);
     //
     // Wait for host controller reset.
     //
@@ -159,11 +157,8 @@ OhciReset (
   OhciGetCapability (This, NULL, &NumOfPorts, NULL);
   for (Index = 0; Index < NumOfPorts; Index++) {
     if (!EFI_ERROR (OhciSetRootHubPortFeature (This, Index, EfiUsbPortReset))) {
-      gBS->Stall (200 * 1000);
       OhciClearRootHubPortFeature (This, Index, EfiUsbPortReset);
-      gBS->Stall (1000);
       OhciSetRootHubPortFeature (This, Index, EfiUsbPortEnable);
-      gBS->Stall (1000);
     }
   }
 
@@ -172,7 +167,7 @@ OhciReset (
   OhciSetMemoryPointer (Ohc, HC_BULK_HEAD, NULL);
   OhciSetHcControl (Ohc, PERIODIC_ENABLE | CONTROL_ENABLE | BULK_ENABLE, 1); /*ISOCHRONOUS_ENABLE*/
   OhciSetHcControl (Ohc, HC_FUNCTIONAL_STATE, HC_STATE_OPERATIONAL);
-  gBS->Stall (50*1000);
+
   //
   // Wait till first SOF occurs, and then clear it
   //
@@ -403,8 +398,6 @@ OhciControlTransfer (
     return EFI_DEVICE_ERROR;
   }
 
-  gBS->Stall (20 * 1000);
-
   OhciSetMemoryPointer (Ohc, HC_CONTROL_HEAD, NULL);
   Ed = OhciCreateED (Ohc);
   if (Ed == NULL) {
@@ -587,8 +580,6 @@ OhciControlTransfer (
     goto UNMAP_DATA_BUFF;
   }
 
-  gBS->Stall (20 * 1000);
-
   TimeCount = 0;
   Status    = CheckIfDone (Ohc, CONTROL_LIST, Ed, HeadTd, &EdResult);
 
@@ -614,7 +605,7 @@ OhciControlTransfer (
 
     *DataLength = 0;
   } else {
-    DEBUG ((DEBUG_INFO, "Control transfer successed\r\n"));
+    DEBUG ((DEBUG_VERBOSE, "Control transfer successed\r\n"));
   }
 
 UNMAP_DATA_BUFF:
@@ -763,8 +754,6 @@ OhciBulkTransfer (
     return EFI_DEVICE_ERROR;
   }
 
-  gBS->Stall (20 * 1000);
-
   OhciSetMemoryPointer (Ohc, HC_BULK_HEAD, NULL);
 
   Ed = OhciCreateED (Ohc);
@@ -885,8 +874,6 @@ OhciBulkTransfer (
     goto FREE_OHCI_TDBUFF;
   }
 
-  gBS->Stall (20 * 1000);
-
   TimeCount = 0;
   Status    = CheckIfDone (Ohc, BULK_LIST, Ed, HeadTd, &EdResult);
   while (Status == EFI_NOT_READY && TimeCount <= TimeOut) {
@@ -907,7 +894,7 @@ OhciBulkTransfer (
 
     *DataLength = 0;
   } else {
-    DEBUG ((DEBUG_INFO, "Bulk transfer successed\r\n"));
+    DEBUG ((DEBUG_VERBOSE, "Bulk transfer successed\r\n"));
   }
 
   // *DataToggle = (UINT8) OhciGetEDField (Ed, ED_DTTOGGLE);
@@ -2033,88 +2020,10 @@ OhcInitHC (
   IN USB_OHCI_HC_DEV  *Ohc
   )
 {
-  EFI_STATUS  Status;
-  UINT8       Index;
-  UINT8       NumOfPorts;
-  UINT32      PowerOnGoodTime;
-  UINT32      Data32;
-  BOOLEAN     Flag = FALSE;
-
-  Status = OhciSetHcCommandStatus (Ohc, HC_RESET, HC_RESET);
-  if (EFI_ERROR (Status)) {
-    return EFI_DEVICE_ERROR;
-  }
-
-  gBS->Stall (50 * 1000);
-  //
-  // Wait for host controller reset.
-  //
-  PowerOnGoodTime = 50;
-  do {
-    gBS->Stall (1000);
-    Data32 = OhciGetOperationalReg (Ohc, HC_COMMAND_STATUS);
-    if ((Data32 & HC_RESET) == 0) {
-      Flag = TRUE;
-      break;
-    }
-  } while (PowerOnGoodTime--);
-
-  if (!Flag) {
-    return EFI_DEVICE_ERROR;
-  }
-
-  OhciInitializeInterruptList (Ohc);
-
-  OhciSetFrameInterval (Ohc, FRAME_INTERVAL, 0x2edf);
-  Status = OhciSetHcControl (Ohc, HC_FUNCTIONAL_STATE, HC_STATE_RESET);
-  if (EFI_ERROR (Status)) {
-    return EFI_DEVICE_ERROR;
-  }
-
-  gBS->Stall (50 * 1000);
-  //
-  // Initialize host controller operational registers
-  //
-  OhciSetFrameInterval (Ohc, FS_LARGEST_DATA_PACKET, 0x2778);
-  OhciSetFrameInterval (Ohc, FRAME_INTERVAL, 0x2edf);
-  OhciSetPeriodicStart (Ohc, 0x2a2f);
-  OhciSetHcControl (Ohc, CONTROL_BULK_RATIO, 0x3);
-  OhciSetHcCommandStatus (Ohc, CONTROL_LIST_FILLED | BULK_LIST_FILLED, 0);
-  OhciSetRootHubDescriptor (Ohc, RH_PSWITCH_MODE, 0);
-  OhciSetRootHubDescriptor (Ohc, RH_NO_PSWITCH | RH_NOC_PROT, 1);
-
-  OhciSetRootHubDescriptor (Ohc, RH_DEV_REMOVABLE, 0);
-  OhciSetRootHubDescriptor (Ohc, RH_PORT_PWR_CTRL_MASK, 0xffff);
-  OhciSetRootHubStatus (Ohc, RH_LOCAL_PSTAT_CHANGE);
-  OhciSetRootHubPortStatus (Ohc, 0, RH_SET_PORT_POWER);
-  OhciGetCapability (&Ohc->Usb2Hc, NULL, &NumOfPorts, NULL);
-
-  for (Index = 0; Index < NumOfPorts; Index++) {
-    if (!EFI_ERROR (OhciSetRootHubPortFeature (&Ohc->Usb2Hc, Index, EfiUsbPortReset))) {
-      gBS->Stall (200 * 1000);
-      OhciClearRootHubPortFeature (&Ohc->Usb2Hc, Index, EfiUsbPortReset);
-      gBS->Stall (1000);
-      OhciSetRootHubPortFeature (&Ohc->Usb2Hc, Index, EfiUsbPortEnable);
-      gBS->Stall (1000);
-    }
-  }
-
-  OhciSetMemoryPointer (Ohc, HC_HCCA, Ohc->HccaMemoryBlock);
-  OhciSetMemoryPointer (Ohc, HC_CONTROL_HEAD, NULL);
-  OhciSetMemoryPointer (Ohc, HC_BULK_HEAD, NULL);
-  OhciSetHcControl (Ohc, PERIODIC_ENABLE | CONTROL_ENABLE | BULK_ENABLE, 1);
-  OhciSetHcControl (Ohc, HC_FUNCTIONAL_STATE, HC_STATE_OPERATIONAL);
-
-  //
-  // Wait till first SOF occurs, and then clear it
-  //
-  while (OhciGetHcInterruptStatus (Ohc, START_OF_FRAME) == 0) {
-  }
-
-  OhciClearInterruptStatus (Ohc, START_OF_FRAME);
-  gBS->Stall (1000);
-
-  return EFI_SUCCESS;
+  return OhciReset (
+           &Ohc->Usb2Hc,
+           EFI_USB_HC_RESET_GLOBAL | EFI_USB_HC_RESET_HOST_CONTROLLER
+           );
 }
 
 /**
