@@ -64,7 +64,7 @@
   gRockchipTokenSpaceGuid.PcdPlatformVendorName|"Radxa"
   gRockchipTokenSpaceGuid.PcdFamilyName|"ROCK 5"
   gRockchipTokenSpaceGuid.PcdProductUrl|"https://docs.radxa.com/en/rock5/rock5b"
-  gRockchipTokenSpaceGuid.PcdDeviceTreeName|"rk3588-rock-5bp"
+  gRockchipTokenSpaceGuid.PcdDeviceTreeName|"rk3588-rock-5b-plus"
 
   # I2C
   gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x42, 0x43, 0x51, 0x11 }
@@ -127,6 +127,7 @@
 
   # Device Tree Support
   $(PLATFORM_DIRECTORY)/DeviceTree/Vendor.inf
-
+  $(PLATFORM_DIRECTORY)/DeviceTree/Mainline.inf
+  
   # Splash screen logo
   $(VENDOR_DIRECTORY)/Drivers/LogoDxe/LogoDxe.inf
