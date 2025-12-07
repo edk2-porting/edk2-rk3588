@@ -1,6 +1,7 @@
 ## @file
 # OHCI USB Host Controller UEFI Driver
 #
+# Copyright (c) 2025, Mario Bălănică <mariobalanica02@gmail.com>
 # Copyright (c) 2013 - 2018, Intel Corporation. All rights reserved.<BR>
 #
 # SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -62,8 +63,8 @@
   gEfiEndOfDxeEventGroupGuid
 
 [Protocols]
-  gOhciDeviceProtocolGuid                           ## TO_START
-  gEfiUsbHcProtocolGuid                         ## BY_START
+  gOhciDeviceProtocolGuid                       ## TO_START
+  gEfiUsb2HcProtocolGuid                        ## BY_START
 
 [Depex]
   TRUE

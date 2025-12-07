@@ -1,6 +1,7 @@
 /** @file
 UEFI Component Name and Name2 protocol for OHCI driver.
 
+Copyright (c) 2025, Mario Bălănică <mariobalanica02@gmail.com>
 Copyright (c) 2013-2015 Intel Corporation.
 
 SPDX-License-Identifier: BSD-2-Clause-Patent
@@ -166,9 +167,9 @@ OhciComponentNameGetControllerName (
   OUT CHAR16                       **ControllerName
   )
 {
-  EFI_STATUS           Status;
-  USB_OHCI_HC_DEV      *OhciDev;
-  EFI_USB_HC_PROTOCOL  *UsbHc;
+  EFI_STATUS            Status;
+  USB_OHCI_HC_DEV       *OhciDev;
+  EFI_USB2_HC_PROTOCOL  *Usb2Hc;
 
   //
   // This is a device driver, so ChildHandle must be NULL.
@@ -194,8 +195,8 @@ OhciComponentNameGetControllerName (
   //
   Status = gBS->OpenProtocol (
                   ControllerHandle,
-                  &gEfiUsbHcProtocolGuid,
-                  (VOID **)&UsbHc,
+                  &gEfiUsb2HcProtocolGuid,
+                  (VOID **)&Usb2Hc,
                   gOhciDriverBinding.DriverBindingHandle,
                   ControllerHandle,
                   EFI_OPEN_PROTOCOL_GET_PROTOCOL
@@ -204,7 +205,7 @@ OhciComponentNameGetControllerName (
     return Status;
   }
 
-  OhciDev = USB_OHCI_HC_DEV_FROM_THIS (UsbHc);
+  OhciDev = USB_OHCI_HC_DEV_FROM_THIS (Usb2Hc);
 
   return LookupUnicodeString2 (
            Language,

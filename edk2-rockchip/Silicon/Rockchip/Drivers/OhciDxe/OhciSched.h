@@ -24,7 +24,7 @@ struct _INTERRUPT_CONTEXT_ENTRY {
   ED_DESCRIPTOR                      *Ed;
   TD_DESCRIPTOR                      *DataTd;
   BOOLEAN                            IsSlowDevice;
-  UINT8                              MaxPacketLength;
+  UINT8                              MaximumPacketLength;
   UINTN                              PollingInterval;
   EFI_ASYNC_USB_TRANSFER_CALLBACK    CallBackFunction;
   VOID                               *Context;
