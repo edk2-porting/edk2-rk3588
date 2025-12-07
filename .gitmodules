@@ -13,7 +13,7 @@
 	branch = rk3588
 [submodule "devicetree/mainline/upstream"]
 	path = devicetree/mainline/upstream
-	url = https://git.kernel.org/pub/scm/linux/kernel/git/devicetree/devicetree-rebasing.git
+	url = https://kernel.googlesource.com/pub/scm/linux/kernel/git/devicetree/devicetree-rebasing.git
 [submodule "edk2-platforms"]
 	path = edk2-platforms
 	url = https://github.com/tianocore/edk2-platforms.git
