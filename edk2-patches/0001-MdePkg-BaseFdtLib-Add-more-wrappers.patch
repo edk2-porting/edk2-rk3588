@@ -1,0 +1,103 @@
+From 7f9f0713b06cadff7071271c76d10a2091c8823d Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Mario=20B=C4=83l=C4=83nic=C4=83?=
+ <mariobalanica02@gmail.com>
+Date: Fri, 5 Dec 2025 14:02:15 +0200
+Subject: [PATCH] MdePkg/BaseFdtLib: Add more wrappers
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Add FDT_HEADER field accessors and FdtOverlayApply() wrapper.
+
+Signed-off-by: Mario Bălănică <mariobalanica02@gmail.com>
+---
+ MdePkg/Include/Library/FdtLib.h    | 29 ++++++++++++++++++++++++++++-
+ MdePkg/Library/BaseFdtLib/FdtLib.c | 18 ++++++++++++++++++
+ 2 files changed, 46 insertions(+), 1 deletion(-)
+
+diff --git a/MdePkg/Include/Library/FdtLib.h b/MdePkg/Include/Library/FdtLib.h
+index a7f63f3d5a..16e8179af4 100644
+--- a/MdePkg/Include/Library/FdtLib.h
++++ b/MdePkg/Include/Library/FdtLib.h
+@@ -181,7 +181,16 @@ typedef struct {
+ 
+ #define FdtGetHeader(Fdt, Field) \
+   (Fdt32ToCpu (((const FDT_HEADER *)(Fdt))->Field))
+-#define FdtTotalSize(Fdt)  (FdtGetHeader ((Fdt), TotalSize))
++#define FdtMagic(Fdt)            (FdtGetHeader ((Fdt), Magic))
++#define FdtTotalSize(Fdt)        (FdtGetHeader ((Fdt), TotalSize))
++#define FdtOffsetDtStruct(Fdt)   (FdtGetHeader ((Fdt), OffsetDtStruct))
++#define FdtOffsetDtStrings(Fdt)  (FdtGetHeader ((Fdt), OffsetDtStrings))
++#define FdtOffsetMemRsvmap(Fdt)  (FdtGetHeader ((Fdt), OffsetMemRsvmap))
++#define FdtVersion(Fdt)          (FdtGetHeader ((Fdt), Version))
++#define FdtLastCompVersion(Fdt)  (FdtGetHeader ((Fdt), LastCompVersion))
++#define FdtBootCpuidPhys(Fdt)    (FdtGetHeader ((Fdt), BootCpuidPhys))
++#define FdtSizeDtStrings(Fdt)    (FdtGetHeader ((Fdt), SizeDtStrings))
++#define FdtSizeDtStruct(Fdt)     (FdtGetHeader ((Fdt), SizeDtStruct))
+ 
+ #define FdtForEachSubnode(Node, Fdt, Parent) \
+   for (Node = FdtFirstSubnode (Fdt, Parent); \
+@@ -191,6 +200,9 @@ typedef struct {
+ #define FdtSetPropString(Fdt, NodeOffset, Name, String) \
+   FdtSetProp ((Fdt), (NodeOffset), (Name), (String), AsciiStrLen (String) + 1)
+ 
++#define FdtSetPropEmpty(Fdt, NodeOffset, Name) \
++  FdtSetProp ((Fdt), (NodeOffset), (Name), NULL, 0)
++
+ /**
+   Convert UINT16 data of the FDT blob to little-endian
+ 
+@@ -960,6 +972,21 @@ FdtGetPhandle (
+   IN INT32       NodeOffset
+   );
+ 
++/**
++  Applies a DT overlay on a base DT.
++
++  @param[in] Fdt            The pointer to FDT blob.
++  @param[in] Fdto           The pointer to FDT overlay blob.
++
++  @return 0 on success, or negative error code.
++**/
++INT32
++EFIAPI
++FdtOverlayApply (
++  IN VOID  *Fdt,
++  IN VOID  *Fdto
++  );
++
+ /* Debug functions. */
+ CONST
+ CHAR8
+diff --git a/MdePkg/Library/BaseFdtLib/FdtLib.c b/MdePkg/Library/BaseFdtLib/FdtLib.c
+index 3dacfbee45..8c986650dc 100644
+--- a/MdePkg/Library/BaseFdtLib/FdtLib.c
++++ b/MdePkg/Library/BaseFdtLib/FdtLib.c
+@@ -918,6 +918,24 @@ FdtGetPhandle (
+   return fdt_get_phandle (Fdt, NodeOffset);
+ }
+ 
++/**
++  Applies a DT overlay on a base DT.
++
++  @param[in] Fdt            The pointer to FDT blob.
++  @param[in] Fdto           The pointer to FDT overlay blob.
++
++  @return 0 on success, or negative error code.
++**/
++INT32
++EFIAPI
++FdtOverlayApply (
++  IN VOID  *Fdt,
++  IN VOID  *Fdto
++  )
++{
++  return fdt_overlay_apply (Fdt, Fdto);
++}
++
+ /* Debug functions. */
+ CONST
+ CHAR8
+-- 
+2.39.1.windows.1
+

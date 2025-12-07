@@ -31,21 +31,20 @@
   Silicon/Rockchip/RockchipPkg.dec
 
 [LibraryClasses]
-  IoLib
   BaseLib
-  DebugLib
-  HobLib
-  UefiLib
-  UefiDriverEntryPoint
-  UefiBootServicesTableLib
-  UefiRuntimeLib
   BaseMemoryLib
+  DebugLib
   DevicePathLib
   DxeServicesTableLib
-  MemoryAllocationLib
-  UefiRuntimeServicesTableLib
-  RkAtagsLib
   FdtLib
+  HobLib
+  MemoryAllocationLib
+  PcdLib
+  RkAtagsLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+  UefiLib
+  UefiRuntimeLib
 
 [Guids]
   gEdkiiNvVarStoreFormattedGuid

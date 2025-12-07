@@ -28,16 +28,17 @@
 
 [LibraryClasses]
   BaseLib
+  BaseMemoryLib
   DebugLib
   DevicePathLib
-  PrintLib
   DxeServicesLib
+  FdtLib
   MemoryAllocationLib
+  PrintLib
   RockchipPlatformLib
   UefiBootServicesTableLib
   UefiDriverEntryPoint
   UefiLib
-  FdtLib
 
 [Guids]
   gFdtTableGuid

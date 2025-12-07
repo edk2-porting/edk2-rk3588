@@ -17,15 +17,16 @@
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>
+#include <Library/DevicePathLib.h>
 #include <Library/DxeServicesTableLib.h>
+#include <Library/FdtLib.h>
 #include <Library/HobLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/PcdLib.h>
+#include <Library/RkAtagsLib.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiLib.h>
 #include <Library/UefiRuntimeLib.h>
-#include <Library/DevicePathLib.h>
-#include <Library/RkAtagsLib.h>
 #include <Protocol/DiskIo.h>
 #include <Protocol/LoadedImage.h>
 #include <Protocol/NonDiscoverableDevice.h>
@@ -34,7 +35,6 @@
 #include <Guid/SystemNvDataGuid.h>
 #include <Guid/VariableFormat.h>
 #include <Guid/EventGroup.h>
-#include <libfdt.h>
 
 #include "RkFvbDxe.h"
 
@@ -1349,7 +1349,7 @@ FvbCheckBootDiskDeviceHasFirmware (
   EFI_DISK_IO_PROTOCOL  *DiskIo;
   UINT64                Offset;
   UINTN                 Size;
-  struct fdt_header     FdtHeader;
+  FDT_HEADER            FdtHeader;
   VOID                  *Fdt = NULL;
   INT32                 Ret;
   INT32                 Node;
@@ -1378,19 +1378,19 @@ FvbCheckBootDiskDeviceHasFirmware (
     goto Exit;
   }
 
-  Ret = fdt_check_header (&FdtHeader);
+  Ret = FdtCheckHeader (&FdtHeader);
   if (Ret) {
     DEBUG ((
       DEBUG_ERROR,
       "%a: [%s] FIT has an invalid header! Ret=%a\n",
       __FUNCTION__,
       DevicePathText,
-      fdt_strerror (Ret)
+      FdtStrerror (Ret)
       ));
     goto Exit;
   }
 
-  Size = fdt_totalsize (&FdtHeader);
+  Size = FdtTotalSize (&FdtHeader);
   Fdt  = AllocatePool (Size);
 
   Status = DiskIo->ReadDisk (DiskIo, MediaId, Offset, Size, Fdt);
@@ -1407,14 +1407,14 @@ FvbCheckBootDiskDeviceHasFirmware (
     goto Exit;
   }
 
-  Node = fdt_path_offset (Fdt, "/images/edk2");
+  Node = FdtPathOffset (Fdt, "/images/edk2");
   if (Node < 0) {
     DEBUG ((
       DEBUG_ERROR,
       "%a: [%s] FIT: Couldn't locate '/images/edk2' node! Ret=%a\n",
       __FUNCTION__,
       DevicePathText,
-      fdt_strerror (Node)
+      FdtStrerror (Node)
       ));
     goto Exit;
   }
