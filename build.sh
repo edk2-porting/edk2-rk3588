@@ -38,31 +38,41 @@ function apply_patchset() {
 
     echo "Checking patchset ${patches_dir} for ${target_dir}"
 
+    local patchset_name=$(basename "${patches_dir}")
+    local patchset_marker="${target_dir}/.patchset_${patchset_name}"
+
+    if [ ! -f "${patchset_marker}" ] || [ "${patches_dir}" -nt "${patchset_marker}" ]; then
+        echo "Patchset needs to be (re)applied"
+        if ! git -C "${target_dir}" reset --hard || ! git -C "${target_dir}" clean -xfd; then
+            echo "Failed to reset git repository - aborting"
+            return 1
+        fi
+    else
+        echo "Patchset already applied - skipping"
+        return 0
+    fi
+
+    local patch_file
     local patch_count=0
-    local applied_count=0
 
     for patch_file in "${patches_dir}"/*.patch; do
         [ -f "${patch_file}" ] || continue
 
-        patch_name=$(basename "${patch_file}")
+        local patch_name=$(basename "${patch_file}")
         echo "Patch ${patch_count}: ${patch_name}"
 
-        ((patch_count++))
-
-        if patch -p1 -d "${target_dir}" -R --dry-run -s -f < "${patch_file}" > /dev/null 2>&1; then
-            echo "  Already applied - skipping"
+        if patch -p1 -d "${target_dir}" < "${patch_file}"; then
+            echo "  Successfully applied"
+            ((patch_count++))
         else
-            if patch -p1 -d "${target_dir}" < "${patch_file}"; then
-                echo "  Successfully applied"
-                ((applied_count++))
-            else
-                echo "  Failed to apply - aborting"
-                return 1
-            fi
+            echo "  Failed to apply - aborting"
+            return 1
         fi
     done
 
-    echo "Patchset summary: ${patch_count} total, ${applied_count} applied"
+    touch "${patchset_marker}"
+
+    echo "Patchset summary: ${patch_count} applied"
     return 0
 }
 
