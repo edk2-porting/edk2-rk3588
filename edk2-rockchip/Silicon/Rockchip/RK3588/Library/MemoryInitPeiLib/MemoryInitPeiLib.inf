@@ -24,6 +24,7 @@
   ArmPkg/ArmPkg.dec
   ArmPlatformPkg/ArmPlatformPkg.dec
   Silicon/Rockchip/RK3588/RK3588.dec
+  UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
   DebugLib

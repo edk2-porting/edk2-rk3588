@@ -18,7 +18,6 @@
 
 #include <Protocol/ComponentName.h>
 #include <Protocol/ComponentName2.h>
-#include <Protocol/DeviceIo.h>
 #include <Protocol/DriverBinding.h>
 #include <Protocol/SdMmcPassThru.h>
 

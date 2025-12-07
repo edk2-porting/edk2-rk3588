@@ -20,6 +20,7 @@
 
 [Packages]
   EmbeddedPkg/EmbeddedPkg.dec
+  MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
   Silicon/Rockchip/Library/Pcf8563RealTimeClockLib/Pcf8563RealTimeClockLib.dec
 

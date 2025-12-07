@@ -272,14 +272,13 @@ CHAR8               *mEnclosureInfoType3Strings[] = {
         SMBIOS data definition  TYPE4  Processor Information
 ************************************************************************/
 SMBIOS_TABLE_TYPE4  mProcessorInfoType4 = {
-  { EFI_SMBIOS_TYPE_PROCESSOR_INFORMATION, sizeof (SMBIOS_TABLE_TYPE4), 0    },
+  { EFI_SMBIOS_TYPE_PROCESSOR_INFORMATION, sizeof (SMBIOS_TABLE_TYPE4), 0 },
   1,                               // Socket String
   CentralProcessor,                // ProcessorType;          ///< The enumeration value from PROCESSOR_TYPE_DATA.
   ProcessorFamilyIndicatorFamily2, // ProcessorFamily;        ///< The enumeration value from PROCESSOR_FAMILY2_DATA.
   2,                               // ProcessorManufacture String;
   {                                // ProcessorId;
-    { 0x00,                                  0x00,                        0x00, 0x00},
-    { 0x00,                                  0x00,                        0x00, 0x00}
+    0x00, 0x00, 0x00, 0x00
   },
   3,                    // ProcessorVersion String;
   {     // Voltage;
@@ -344,8 +343,8 @@ SMBIOS_TABLE_TYPE7  mCacheInfoType7_L1I = {
   // Enabled/Disabled   :1  (Enabled)
   // Operational Mode   :2  (Unknown)
   // Reserved           :6
-  0x0020,                   // Maximum Size (32KB)
-  0x0020,                   // Install Size (32KB)
+  { 0x0020,                            0 },   // Maximum Size (32KB)
+  { 0x0020,                            0 },   // Install Size (32KB)
   {     // Supported SRAM Type
     0,  // Other             :1
     0,  // Unknown           :1
@@ -387,8 +386,8 @@ SMBIOS_TABLE_TYPE7  mCacheInfoType7_L1D = {
   // Enabled/Disabled   :1  (Enabled)
   // Operational Mode   :2  (WB)
   // Reserved           :6
-  0x0020,                   // Maximum Size (32KB)
-  0x0020,                   // Install Size (32KB)
+  { 0x0020,                            0 },   // Maximum Size (32KB)
+  { 0x0020,                            0 },   // Install Size (32KB)
   {     // Supported SRAM Type
     0,  // Other             :1
     0,  // Unknown           :1
@@ -430,8 +429,8 @@ SMBIOS_TABLE_TYPE7  mCacheInfoType7_L2 = {
   // Enabled/Disabled   :1  (Enabled)
   // Operational Mode   :2  (WB)
   // Reserved           :6
-  0x0200,                   // Maximum Size (512KB)
-  0x0200,                   // Install Size (512KB)
+  { 0x0200,                            0 },   // Maximum Size (512KB)
+  { 0x0200,                            0 },   // Install Size (512KB)
   {     // Supported SRAM Type
     0,  // Other             :1
     0,  // Unknown           :1

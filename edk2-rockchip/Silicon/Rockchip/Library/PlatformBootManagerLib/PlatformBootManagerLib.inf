@@ -53,9 +53,6 @@
   UefiLib
   UefiRuntimeServicesTableLib
 
-[FeaturePcd]
-  gEfiMdePkgTokenSpaceGuid.PcdUgaConsumeSupport
-
 [FixedPcd]
   gEfiMdeModulePkgTokenSpaceGuid.PcdEmuVariableNvModeEnable
   gEfiMdeModulePkgTokenSpaceGuid.PcdFirmwareVersionString

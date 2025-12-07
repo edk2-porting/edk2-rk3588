@@ -26,11 +26,11 @@
   ArmPlatformPkg/ArmPlatformPkg.dec
   Silicon/Rockchip/RK3588/RK3588.dec
   Silicon/Rockchip/RockchipPkg.dec
+  UefiCpuPkg/UefiCpuPkg.dec
 
 [LibraryClasses]
   ArmLib
   BaseVariableLib
-  FdtLib
   IoLib
   MemoryAllocationLib
   PcdLib

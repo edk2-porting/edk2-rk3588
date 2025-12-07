@@ -991,11 +991,11 @@ DwMmcCreateTrb (
   IN EFI_EVENT                            Event
   )
 {
-  DW_MMC_HC_TRB          *Trb;
-  EFI_STATUS             Status;
-  EFI_TPL                OldTpl;
-  EFI_IO_OPERATION_TYPE  Flag;
-  UINTN                  MapLength;
+  DW_MMC_HC_TRB      *Trb;
+  EFI_STATUS         Status;
+  EFI_TPL            OldTpl;
+  DMA_MAP_OPERATION  MapOperation;
+  UINTN              MapLength;
 
   Trb = AllocateZeroPool (sizeof (DW_MMC_HC_TRB));
   if (Trb == NULL) {
@@ -1035,9 +1035,9 @@ DwMmcCreateTrb (
     Trb->Mode = SdMmcPioMode;
   } else {
     if (Trb->Read) {
-      Flag = EfiBusMasterWrite;
+      MapOperation = MapOperationBusMasterWrite;
     } else {
-      Flag = EfiBusMasterRead;
+      MapOperation = MapOperationBusMasterRead;
     }
 
     if (Private->Slot[Trb->Slot].CardType == SdCardType) {
@@ -1046,7 +1046,7 @@ DwMmcCreateTrb (
       Trb->UseFifo = FALSE;
       if (Trb->DataLen) {
         MapLength = Trb->DataLen;
-        Status    = DmaMap (Flag, Trb->Data, &MapLength, &Trb->DataPhy, &Trb->DataMap);
+        Status    = DmaMap (MapOperation, Trb->Data, &MapLength, &Trb->DataPhy, &Trb->DataMap);
 
         /*        Status = DevIo->Map (
                                   DevIo,
