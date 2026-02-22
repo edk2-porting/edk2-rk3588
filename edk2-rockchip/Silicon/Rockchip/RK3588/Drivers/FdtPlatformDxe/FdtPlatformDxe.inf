@@ -20,9 +20,11 @@
   FdtPlatformDxe.c
 
 [Packages]
+  CryptoPkg/CryptoPkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
+  NetworkPkg/NetworkPkg.dec
   Silicon/Rockchip/RockchipPkg.dec
   Silicon/Rockchip/RK3588/RK3588.dec
 
@@ -34,6 +36,7 @@
   DxeServicesLib
   FdtLib
   MemoryAllocationLib
+  OtpLib
   PrintLib
   RockchipPlatformLib
   UefiBootServicesTableLib
