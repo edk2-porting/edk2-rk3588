@@ -11,6 +11,7 @@
  **/
 
 #include <IndustryStandard/Acpi.h>
+#include <AcpiHelperMacros.h>
 #include <Library/AcpiLib.h>
 #include <Library/PcdLib.h>
 
@@ -61,22 +62,22 @@ EFI_ACPI_6_3_FIXED_ACPI_DESCRIPTION_TABLE  Fadt = {
   EFI_ACPI_RESERVED_BYTE,                                                   // UINT8      Reserved1
   EFI_ACPI_6_3_WBINVD | EFI_ACPI_6_3_SLP_BUTTON |                           // UINT32     Flags
   EFI_ACPI_6_3_HW_REDUCED_ACPI,
-  NULL_GAS,                                                                 // EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  ResetReg
+  ACPI_NULL_GAS,                                                                 // EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  ResetReg
   0,                                                                        // UINT8      ResetValue
   EFI_ACPI_6_3_ARM_PSCI_COMPLIANT,                                          // UINT16     ArmBootArchFlags
   EFI_ACPI_6_3_FIXED_ACPI_DESCRIPTION_TABLE_MINOR_REVISION,                 // UINT8      MinorRevision
   0,                                                                        // UINT64     XFirmwareCtrl
   0,                                                                        // UINT64     XDsdt
-  NULL_GAS,                                                                 // EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  XPm1aEvtBlk
-  NULL_GAS,                                                                 // EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  XPm1bEvtBlk
-  NULL_GAS,                                                                 // EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  XPm1aCntBlk
-  NULL_GAS,                                                                 // EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  XPm1bCntBlk
-  NULL_GAS,                                                                 // EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  XPm2CntBlk
-  NULL_GAS,                                                                 // EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  XPmTmrBlk
-  NULL_GAS,                                                                 // EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  XGpe0Blk
-  NULL_GAS,                                                                 // EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  XGpe1Blk
-  NULL_GAS,                                                                 // EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  SleepControlReg
-  NULL_GAS                                                                  // EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  SleepStatusReg
+  ACPI_NULL_GAS,                                                                 // EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  XPm1aEvtBlk
+  ACPI_NULL_GAS,                                                                 // EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  XPm1bEvtBlk
+  ACPI_NULL_GAS,                                                                 // EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  XPm1aCntBlk
+  ACPI_NULL_GAS,                                                                 // EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  XPm1bCntBlk
+  ACPI_NULL_GAS,                                                                 // EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  XPm2CntBlk
+  ACPI_NULL_GAS,                                                                 // EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  XPmTmrBlk
+  ACPI_NULL_GAS,                                                                 // EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  XGpe0Blk
+  ACPI_NULL_GAS,                                                                 // EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  XGpe1Blk
+  ACPI_NULL_GAS,                                                                 // EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  SleepControlReg
+  ACPI_NULL_GAS                                                                  // EFI_ACPI_6_3_GENERIC_ADDRESS_STRUCTURE  SleepStatusReg
 };
 
 //

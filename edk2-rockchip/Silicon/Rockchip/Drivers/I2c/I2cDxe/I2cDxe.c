@@ -898,7 +898,6 @@ I2cStartRequest (
   )
 {
   UINTN               Count = RequestPacket->OperationCount;
-  UINTN               ReadMode;
   UINTN               Transmitted;
   I2C_MASTER_CONTEXT  *I2cMasterContext = I2C_SC_FROM_MASTER (This);
   EFI_I2C_OPERATION   *Operation;
@@ -939,7 +938,6 @@ I2cStartRequest (
 
   for (i = 0; i < Count; i++) {
     Operation = &RequestPacket->Operation[i];
-    ReadMode  = Operation->Flags & I2C_FLAG_READ;
 
     if (Operation->Flags & I2C_FLAG_READ) {
       /* If snd is true, it is TRX mode. */
