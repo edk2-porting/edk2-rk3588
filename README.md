@@ -24,12 +24,15 @@ Note that this list is subject to change at any time as devices gain better supp
 
 ## Platinum
 - [Radxa ROCK 5B](https://radxa.com/products/rock5/5b/)
+- [Radxa ROCK 5B+](https://radxa.com/products/rock5/5bp)
 - [Radxa ROCK 5A](https://radxa.com/products/rock5/5a/)
 - [Radxa ROCK 5 ITX](https://radxa.com/products/rock5/5itx/)
 - [Orange Pi 5](http://www.orangepi.org/html/hardWare/computerAndMicrocontrollers/details/Orange-Pi-5.html)
 - [Orange Pi 5 Plus](http://www.orangepi.org/html/hardWare/computerAndMicrocontrollers/details/Orange-Pi-5-plus.html)
 - [Khadas Edge2](https://www.khadas.com/edge2)
+- [Firefly ITX-3588J](https://en.t-firefly.com/product/industry/itx3588j)
 - [BuzzTV P6](https://buzztvglobal.com/products/powerstation-6)
+- [Mekotronics R58 Mini](https://www.mekotronics.com/h-pd-76.html)
 - [FriendlyELEC NanoPC T6](https://wiki.friendlyelec.com/wiki/index.php/NanoPC-T6)
 - [FriendlyELEC NanoPi R6C](https://wiki.friendlyelec.com/wiki/index.php/NanoPi_R6C)
 - [FriendlyELEC NanoPi R6S](https://wiki.friendlyelec.com/wiki/index.php/NanoPi_R6S)
@@ -37,13 +40,10 @@ Note that this list is subject to change at any time as devices gain better supp
 - [ameriDroid Indiedroid Nova](https://indiedroid.us)
 
 ## Bronze
-- [Radxa ROCK 5B+](https://radxa.com/products/rock5/5bp)
 - [Fydetab Duo](https://fydetabduo.com/)
 - [Firefly AIO-3588Q](https://en.t-firefly.com/product/industry/aio3588q)
-- [Firefly ITX-3588J](https://en.t-firefly.com/product/industry/itx3588j)
 - [Firefly ROC-RK3588S-PC](https://en.t-firefly.com/product/industry/rocrk3588spc) / [StationPC Station M3](https://www.stationpc.com/product/stationm3)
 - [Mekotronics R58X](https://www.mekotronics.com/h-pd-75.html)
-- [Mekotronics R58 Mini](https://www.mekotronics.com/h-pd-76.html)
 - [Mixtile Blade 3](https://www.mixtile.com/blade-3)
 - [FriendlyELEC NanoPi M6](https://wiki.friendlyelec.com/wiki/index.php/NanoPi_M6)
 - [Hinlink H88K](http://www.hinlink.com)
@@ -101,6 +101,19 @@ Note that this list is subject to change at any time as devices gain better supp
 | Status LED                            | 🟢 Working     | |
 | Voltage regulators (RK806/RK860)      | 🟢 Working     | |
 | FUSB302 USB Type-C Controller         | 🔴 Not working | Required for PD negotiation and connector orientation switching |
+
+## Platform-specific notes
+Deviations from the table above, configured in each platform's build files:
+
+| Platform | Note |
+| --- | --- |
+| Fydetab Duo | No HDMI output; the display controller is not enabled on this platform. |
+| Fydetab Duo | SD card is limited to high-speed modes — DDR50/SDR50/SDR104 are disabled because UHS-I is unreliable here. |
+| Mekotronics R58X | eMMC HS400 is disabled; the eMMC is unusable with it enabled. |
+| Mekotronics R58 Mini | No SD card slot on this board, so SD support is not built. |
+| ameriDroid Indiedroid Nova | GMAC Ethernet is not exposed; no status LED. |
+| Mixtile Blade 3 | GMAC Ethernet is not exposed; no status LED. |
+| Mixtile Blade 3 | Requires a fixed input voltage *higher than* 5 V — see [Requirements](#1-requirements). USB-PD negotiation is not supported by firmware. |
 
 # Getting started
 ## 1. Requirements

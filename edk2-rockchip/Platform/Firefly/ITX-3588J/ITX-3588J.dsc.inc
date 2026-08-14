@@ -120,6 +120,7 @@
 
   # Device Tree Support
   Platform/Firefly/ITX-3588J/DeviceTree/Vendor.inf
+  Platform/Firefly/ITX-3588J/DeviceTree/Mainline.inf
 
   # Splash screen logo
   $(VENDOR_DIRECTORY)/Drivers/LogoDxe/LogoDxe.inf

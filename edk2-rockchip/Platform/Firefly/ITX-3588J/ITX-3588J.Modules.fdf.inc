@@ -12,6 +12,7 @@
 
   # Device Tree Support
   INF RuleOverride = DTB Platform/Firefly/ITX-3588J/DeviceTree/Vendor.inf
+  INF RuleOverride = DTB Platform/Firefly/ITX-3588J/DeviceTree/Mainline.inf
 
   # Splash screen logo
   INF $(VENDOR_DIRECTORY)/Drivers/LogoDxe/LogoDxe.inf
