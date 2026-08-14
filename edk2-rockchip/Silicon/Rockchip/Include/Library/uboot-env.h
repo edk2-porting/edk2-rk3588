@@ -88,16 +88,26 @@ typedef UINT16 __be16;
 #define readl(addr)		MmioRead32(addr)
 
 //
-// TODO: Actually check for timeout below...
+// Polls at 1 us intervals, for up to timeout_us microseconds. Note that
+// udelay() overhead makes the effective timeout somewhat longer than
+// requested, which is the safe direction to err in.
 //
 #define readx_poll_timeout(op, addr, val, cond, timeout_us)	\
 ({ \
+	UINT64 __left = (UINT64)(timeout_us); \
+	INT32 __ret = 0; \
 	for (;;) { \
 		(val) = op(addr); \
 		if (cond) \
 			break; \
+		if (__left == 0) { \
+			__ret = -ETIMEDOUT; \
+			break; \
+		} \
+		udelay(1); \
+		__left--; \
 	} \
-	(cond) ? 0 : -ETIMEDOUT; \
+	__ret; \
 })
 
 #define readl_poll_timeout(addr, val, cond, timeout_us) \
@@ -106,6 +116,8 @@ typedef UINT16 __be16;
 #define regmap_read_poll_timeout(map, addr, val, cond, sleep_us, \
 				      timeout_ms) \
 ({ \
+	UINT64 __step = (sleep_us) ? (UINT64)(sleep_us) : 1; \
+	UINT64 __left = ((UINT64)(timeout_ms) * 1000) / __step; \
 	int __ret; \
 	for (;;) { \
 		__ret = regmap_read((map), (addr), &(val)); \
@@ -113,10 +125,14 @@ typedef UINT16 __be16;
 			break; \
 		if (cond) \
 			break; \
-		if ((sleep_us)) \
-			udelay((sleep_us)); \
+		if (__left == 0) { \
+			__ret = -ETIMEDOUT; \
+			break; \
+		} \
+		udelay(__step); \
+		__left--; \
 	} \
-	__ret ?: ((cond) ? 0 : -ETIMEDOUT); \
+	__ret; \
 })
 
 static inline int regmap_write(UINTN map, uint offset, uint val)
