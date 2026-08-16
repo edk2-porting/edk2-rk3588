@@ -1306,8 +1306,74 @@ AnalogixDpConnectorGetEdid (
   OUT DISPLAY_STATE                *DisplayState
   )
 {
-  // Todo
-  return 0;
+  struct AnalogixDpDevice  *Dp;
+  CONNECTOR_STATE          *ConnectorState;
+  EFI_STATUS               Status;
+  UINT32                   BlockIndex;
+  UINT32                   Extensions;
+  UINT8                    *Buffer;
+  UINTN                    Retry;
+  INTN                     Ret;
+
+  Dp             = ANALOGIX_DP_FROM_CONNECTOR_PROTOCOL (This);
+  ConnectorState = &DisplayState->ConnectorState;
+
+  //
+  // The AUX I2C helper has no E-DDC segment support, so only the first two
+  // blocks are reachable. eDP panels virtually always report a single block.
+  //
+  for (BlockIndex = 0, Extensions = 0; BlockIndex <= Extensions; BlockIndex++) {
+    if (BlockIndex > 1) {
+      DEBUG ((
+        DEBUG_WARN,
+        "%a: Ignoring EDID block %u, segment addressing is unsupported.\n",
+        __func__,
+        BlockIndex
+        ));
+      break;
+    }
+
+    Buffer = EDID_BLOCK (ConnectorState->Edid, BlockIndex);
+
+    for (Retry = 3; Retry > 0; Retry--) {
+      Ret = AnalogixDpReadBytesFromI2c (
+              Dp,
+              I2C_EDID_DEVICE_ADDR,
+              BlockIndex * EDID_BLOCK_LENGTH,
+              EDID_BLOCK_LENGTH,
+              Buffer
+              );
+      if (Ret != 0) {
+        DEBUG ((
+          DEBUG_ERROR,
+          "%a: Failed to read EDID block %u over AUX.\n",
+          __func__,
+          BlockIndex
+          ));
+        return EFI_DEVICE_ERROR;
+      }
+
+      Status = CheckEdidBlock (Buffer, BlockIndex);
+      if (!EFI_ERROR (Status)) {
+        break;
+      }
+
+      /* Might be corrupted due to a bus condition, try again. */
+    }
+
+    if (Retry == 0) {
+      return Status;
+    }
+
+    if (BlockIndex == 0) {
+      Extensions = ((EDID_BASE *)ConnectorState->Edid)->ExtensionFlag;
+      if (Extensions > EDID_MAX_EXTENSION_BLOCKS) {
+        Extensions = EDID_MAX_EXTENSION_BLOCKS;
+      }
+    }
+  }
+
+  return EFI_SUCCESS;
 }
 
 EFI_STATUS

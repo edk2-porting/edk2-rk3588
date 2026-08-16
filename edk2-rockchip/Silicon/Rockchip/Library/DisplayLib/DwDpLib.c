@@ -554,6 +554,29 @@ static int dw_dp_link_power_up(struct dw_dp *dp)
 	return 0;
 }
 
+static int dw_dp_link_power_down(struct dw_dp *dp)
+{
+	struct dw_dp_link *link = &dp->link;
+	u8 value;
+	int ret;
+
+	if (link->revision < 0x11)
+		return 0;
+
+	ret = drm_dp_dpcd_readb(&dp->aux, DP_SET_POWER, &value);
+	if (ret < 0)
+		return ret;
+
+	value &= ~DP_SET_POWER_MASK;
+	value |= DP_SET_POWER_D3;
+
+	ret = drm_dp_dpcd_writeb(&dp->aux, DP_SET_POWER, value);
+	if (ret < 0)
+		return ret;
+
+	return 0;
+}
+
 static int dw_dp_link_probe(struct dw_dp *dp)
 {
 	struct dw_dp_link *link = &dp->link;
@@ -1423,8 +1446,143 @@ static int dw_dp_connector_init(ROCKCHIP_CONNECTOR_PROTOCOL *conn, DISPLAY_STATE
 	return ret;
 }
 
+/*
+ * I2C-over-AUX, used to reach the sink's DDC bus for EDID. The controller can
+ * move at most 16 bytes (AUX_LEN_REQ is 4 bits wide, and there are only four
+ * DPTX_AUX_DATA registers) per transaction, so larger reads are chunked.
+ */
+#define DDC_ADDR			0x50
+#define DDC_SEGMENT_ADDR		0x30
+#define AUX_I2C_MAX_TRANSFER_SIZE	16
+#define AUX_I2C_RETRIES			7
+#define AUX_I2C_RETRY_INTERVAL		500 /* us */
+
+static int dw_dp_aux_i2c_xfer(struct dw_dp *dp, u8 address, u8 request,
+			      void *buffer, size_t size)
+{
+	struct drm_dp_aux_msg msg;
+	unsigned int retry;
+	ssize_t ret = -EIO;
+
+	memset(&msg, 0, sizeof(msg));
+	msg.address = address;
+	msg.request = request;
+	msg.buffer = buffer;
+	msg.size = size;
+
+	for (retry = 0; retry < AUX_I2C_RETRIES; retry++) {
+		ret = dp->aux.transfer(&dp->aux, &msg);
+		if (ret < 0) {
+			/*
+			 * A short read is reported as -EBUSY and is worth
+			 * another attempt; anything else is fatal.
+			 */
+			if (ret == -EBUSY)
+				continue;
+			return ret;
+		}
+
+		if ((msg.reply & DP_AUX_NATIVE_REPLY_MASK) !=
+		    DP_AUX_NATIVE_REPLY_ACK)
+			return -EIO;
+
+		switch (msg.reply & DP_AUX_I2C_REPLY_MASK) {
+		case DP_AUX_I2C_REPLY_ACK:
+			if (size > 0 && (size_t)ret != size)
+				return -EPROTO;
+			return 0;
+		case DP_AUX_I2C_REPLY_DEFER:
+			udelay(AUX_I2C_RETRY_INTERVAL);
+			continue;
+		default:
+			return -EIO;
+		}
+	}
+
+	return -ETIMEDOUT;
+}
+
+/* Terminate the DDC transaction with an address-only cycle, MOT cleared. */
+static void dw_dp_aux_i2c_stop(struct dw_dp *dp)
+{
+	dw_dp_aux_i2c_xfer(dp, DDC_ADDR, DP_AUX_I2C_WRITE, NULL, 0);
+}
+
+static int dw_dp_read_edid_block(struct dw_dp *dp, u8 block, u8 *buffer)
+{
+	u8 segment = block >> 1;
+	u8 offset = (block & 1) * EDID_BLOCK_SIZE;
+	size_t done;
+	int ret;
+
+	/*
+	 * E-DDC segment select. Sinks with two blocks or fewer don't implement
+	 * it and are allowed to NAK the address, so only send it when a segment
+	 * beyond the first is actually needed.
+	 */
+	if (segment) {
+		ret = dw_dp_aux_i2c_xfer(dp, DDC_SEGMENT_ADDR,
+					 DP_AUX_I2C_WRITE | DP_AUX_I2C_MOT,
+					 &segment, 1);
+		if (ret < 0)
+			goto out;
+	}
+
+	ret = dw_dp_aux_i2c_xfer(dp, DDC_ADDR,
+				 DP_AUX_I2C_WRITE | DP_AUX_I2C_MOT,
+				 &offset, 1);
+	if (ret < 0)
+		goto out;
+
+	for (done = 0; done < EDID_BLOCK_SIZE; done += AUX_I2C_MAX_TRANSFER_SIZE) {
+		ret = dw_dp_aux_i2c_xfer(dp, DDC_ADDR,
+					 DP_AUX_I2C_READ | DP_AUX_I2C_MOT,
+					 buffer + done,
+					 AUX_I2C_MAX_TRANSFER_SIZE);
+		if (ret < 0)
+			goto out;
+	}
+
+out:
+	dw_dp_aux_i2c_stop(dp);
+	return ret;
+}
+
 static int dw_dp_connector_get_edid(ROCKCHIP_CONNECTOR_PROTOCOL *conn, DISPLAY_STATE *state)
 {
+	CONNECTOR_STATE *conn_state = &state->ConnectorState;
+	struct dw_dp *dp = DW_DP_FROM_CONNECTOR_PROTOCOL (conn);
+	u32 block, extensions;
+	u8 *buffer;
+	int retry, ret = -EIO;
+
+	for (block = 0, extensions = 0; block <= extensions; block++) {
+		buffer = EDID_BLOCK (conn_state->Edid, block);
+
+		for (retry = AUX_I2C_RETRIES; retry > 0; retry--) {
+			ret = dw_dp_read_edid_block(dp, block, buffer);
+			if (ret < 0)
+				return ret;
+
+			/* Might be corrupted due to a bus condition, try again. */
+			if (EFI_ERROR (CheckEdidBlock (buffer, block)))
+				continue;
+
+			break;
+		}
+
+		if (retry == 0) {
+			printf("EDID block %u is invalid\n", block);
+			return -EINVAL;
+		}
+
+		if (block == 0) {
+			extensions = ((EDID_BASE *)conn_state->Edid)->ExtensionFlag;
+			if (extensions > EDID_MAX_EXTENSION_BLOCKS)
+				extensions = EDID_MAX_EXTENSION_BLOCKS;
+		}
+	}
+
 	return 0;
 }
 
@@ -1480,8 +1638,19 @@ static int dw_dp_connector_enable(ROCKCHIP_CONNECTOR_PROTOCOL *conn, DISPLAY_STA
 	} else {
 		ret = dw_dp_link_enable(dp);
 		if (ret < 0) {
-			printf("failed to enable link: %d\n", ret);
-			return ret;
+			/*
+			 * Training failed against a sink that did answer on
+			 * AUX. Rather than leaving the user with no picture,
+			 * fall back to the blind configuration.
+			 */
+			printf("failed to enable link: %d, forcing output\n", ret);
+
+			dp->force_output = true;
+			ret = dw_dp_set_phy_default_config(dp);
+			if (ret < 0) {
+				printf("failed to set phy_default config: %d\n", ret);
+				return ret;
+			}
 		}
 	}
 
@@ -1496,15 +1665,57 @@ static int dw_dp_connector_enable(ROCKCHIP_CONNECTOR_PROTOCOL *conn, DISPLAY_STA
 
 static int dw_dp_connector_disable(ROCKCHIP_CONNECTOR_PROTOCOL *conn, DISPLAY_STATE *state)
 {
-	/* TODO */
+	struct dw_dp *dp = DW_DP_FROM_CONNECTOR_PROTOCOL (conn);
+
+	/* Stop the video stream. */
+	regmap_update_bits(dp->regmap, DPTX_VSAMPLE_CTRL, VIDEO_STREAM_ENABLE,
+			   FIELD_PREP(VIDEO_STREAM_ENABLE, 0));
+
+	/* Stop the link and park the PHY in P3. */
+	dw_dp_phy_xmit_enable(dp, 0);
+	regmap_update_bits(dp->regmap, DPTX_PHYIF_CTRL, PHY_POWERDOWN,
+			   FIELD_PREP(PHY_POWERDOWN, 0x3));
+
+	/*
+	 * Put the sink back into D3. Only meaningful once we've talked DPCD to
+	 * it, which doesn't happen when the link was forced up blindly.
+	 */
+	if (!dp->force_output)
+		dw_dp_link_power_down(dp);
+
+	dp->phy->PowerOff (dp->phy);
 
 	return 0;
 }
 
 static int dw_dp_connector_detect(ROCKCHIP_CONNECTOR_PROTOCOL *conn, DISPLAY_STATE *state)
 {
-	/* TODO */
-	return -ENODEV;
+	struct dw_dp *dp = DW_DP_FROM_CONNECTOR_PROTOCOL (conn);
+	u32 value;
+	int ret;
+
+	if (!dp->force_hpd) {
+		regmap_read(dp->regmap, DPTX_HPD_STATUS, &value);
+
+		if (FIELD_GET(HPD_STATE, value) != SOURCE_STATE_PLUG)
+			return -ENODEV;
+	}
+
+	/*
+	 * A sink is there, so read its capabilities over AUX. Succeeding here
+	 * is what lets us train the link properly; if the sink won't talk, we
+	 * leave force_output set and fall back to the blind configuration that
+	 * this driver has always used.
+	 */
+	ret = dw_dp_link_probe(dp);
+	if (ret < 0) {
+		printf("failed to probe DP link: %d\n", ret);
+		return 0;
+	}
+
+	dp->force_output = false;
+
+	return 0;
 }
 
 static int dw_dp_ddc_init(struct dw_dp *dp)
@@ -1674,6 +1885,16 @@ DpPhyRegistrationEventHandler (
 			if (DwDp->id == DpPhy->Id && (PcdGet32 (PcdDisplayConnectorsMask) & DwDp->output_if)) {
 				DwDp->Signature = DW_DP_SIGNATURE;
 				DwDp->phy = DpPhy;
+				/*
+				 * Assume HBR3 and let dw_dp_link_probe() clamp
+				 * it down to what the PHY and the sink support.
+				 */
+				DwDp->max_link_rate = 810000;
+				/*
+				 * Cleared by a successful detect. Until then we
+				 * keep the historical blind-output behaviour, so
+				 * boards whose HPD isn't usable are unaffected.
+				 */
 				DwDp->force_output = TRUE;
 				CopyMem (&DwDp->connector, &mDpConnectorOps, sizeof (ROCKCHIP_CONNECTOR_PROTOCOL));
 				dw_dp_ddc_init (DwDp);
