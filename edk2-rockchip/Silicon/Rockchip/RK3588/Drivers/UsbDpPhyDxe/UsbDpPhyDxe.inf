@@ -31,10 +31,12 @@
   DebugLib
   IoLib
   TimerLib
+  MemoryAllocationLib
   RockchipPlatformLib
 
 [Protocols]
   gDpPhyProtocolGuid                ## PRODUCES
+  gUsbTypeCPortProtocolGuid         ## CONSUMES
 
 [Pcd]
   gRK3588TokenSpaceGuid.PcdUsbDpPhy0Supported

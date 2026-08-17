@@ -112,6 +112,9 @@
 !if $(RK_PCA9555_ENABLE) == TRUE
   INF Silicon/Rockchip/Drivers/Pca9555Dxe/Pca9555Dxe.inf
 !endif
+!if $(RK_FUSB302_ENABLE) == TRUE
+  INF Silicon/Rockchip/Drivers/I2c/Fusb302Dxe/Fusb302Dxe.inf
+!endif
 
   #
   # Display Support

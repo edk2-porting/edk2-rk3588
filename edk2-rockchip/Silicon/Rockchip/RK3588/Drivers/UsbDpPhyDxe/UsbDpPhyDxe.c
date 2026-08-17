@@ -21,8 +21,10 @@
  **/
 
 #include <Protocol/DpPhy.h>
+#include <Protocol/UsbTypeCPort.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>
+#include <Library/MemoryAllocationLib.h>
 #include <Library/IoLib.h>
 #include <Library/TimerLib.h>
 #include <Library/RockchipPlatformLib.h>
@@ -479,7 +481,6 @@ static int udphy_dplane_enable(struct rockchip_udphy *udphy, int dp_lanes)
 	return ret;
 }
 
-__maybe_unused
 static int upphy_set_typec_default_mapping(struct rockchip_udphy *udphy)
 {
 	if (udphy->flip) {
@@ -1043,6 +1044,73 @@ static int rk3588_dp_phy_set_voltages(struct rockchip_udphy *udphy,
 	return 0;
 }
 
+/*
+ * Ask the Type-C port controller which way round the plug is and, when the
+ * board shares the connector between DP and USB 3, remap the lanes to match.
+ *
+ * Without this the mapping comes from a fixed board description, so only one
+ * of the two plug orientations ever worked. Boards with no port controller,
+ * or with all four lanes dedicated to DP, are left exactly as they were.
+ */
+STATIC
+VOID
+UsbDpPhyApplyTypeCOrientation (
+	IN struct rockchip_udphy *udphy
+	)
+{
+	EFI_STATUS			Status;
+	EFI_HANDLE			*Handles = NULL;
+	UINTN				HandleCount = 0;
+	UINTN				Index;
+	USB_TYPE_C_PORT_PROTOCOL	*Port;
+	USB_TYPE_C_ORIENTATION		Orientation;
+	BOOLEAN				Flip;
+
+	if (udphy->mode != UDPHY_MODE_DP_USB)
+		return;
+
+	Status = gBS->LocateHandleBuffer (ByProtocol, &gUsbTypeCPortProtocolGuid,
+					  NULL, &HandleCount, &Handles);
+	if (EFI_ERROR (Status))
+		return;
+
+	for (Index = 0; Index < HandleCount; Index++) {
+		Status = gBS->HandleProtocol (Handles[Index],
+					      &gUsbTypeCPortProtocolGuid,
+					      (VOID **) &Port);
+		if (EFI_ERROR (Status) || Port->PhyId != (UINT32) udphy->id)
+			continue;
+
+		Status = Port->GetOrientation (Port, &Orientation);
+		if (EFI_ERROR (Status)) {
+			DEBUG ((DEBUG_INFO,
+				"%a: PHY %u: no usable Type-C orientation (%r), "
+				"keeping the board default\n",
+				__func__, udphy->id, Status));
+			break;
+		}
+
+		Flip = (Orientation == UsbTypeCOrientationFlipped);
+		if (Flip == udphy->flip)
+			break;
+
+		DEBUG ((DEBUG_INFO, "%a: PHY %u: remapping lanes for %a plug\n",
+			__func__, udphy->id, Flip ? "flipped" : "normal"));
+
+		udphy->flip = Flip;
+		upphy_set_typec_default_mapping (udphy);
+
+		/*
+		 * If the PHY was already brought up for USB, udphy_power_on()
+		 * needs to tear it down and redo the setup with the new mux.
+		 */
+		udphy->mode_change = true;
+		break;
+	}
+
+	FreePool (Handles);
+}
+
 EFI_STATUS
 EFIAPI
 DpPhyPowerOn (
@@ -1053,6 +1121,8 @@ DpPhyPowerOn (
 	int ret;
 
 	udphy = ROCKCHIP_UDPHY_FROM_DP_PHY_PROTOCOL (This);
+
+	UsbDpPhyApplyTypeCOrientation (udphy);
 
 	ret = rockchip_dpphy_power_on (udphy);
 	if (ret)
