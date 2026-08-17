@@ -1,0 +1,45 @@
+#/** @file
+#
+#  Describes this board's FUSB302 Type-C ports to Fusb302Dxe
+#
+#  Copyright (c) 2026 Corey Moyer <cronmod.dev@gmail.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010005
+  BASE_NAME                      = Fusb302PlatformRkDxe
+  FILE_GUID                      = 3d7c1a46-58e2-4b90-a1f7-6c05d9e82b33
+  MODULE_TYPE                    = DXE_DRIVER
+  VERSION_STRING                 = 1.0
+  ENTRY_POINT                    = Fusb302PlatformRkInitialize
+
+[Sources.common]
+  Fusb302PlatformRkDxe.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  Silicon/Rockchip/RockchipPkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  MemoryAllocationLib
+  PcdLib
+  RockchipPlatformLib
+  UefiBootServicesTableLib
+  UefiDriverEntryPoint
+
+[Protocols]
+  gFusb302PlatformDeviceProtocolGuid   ## PRODUCES
+
+[FixedPcd]
+  gRockchipTokenSpaceGuid.PcdFusb302Addresses
+  gRockchipTokenSpaceGuid.PcdFusb302Buses
+  gRockchipTokenSpaceGuid.PcdFusb302PhyIds
+
+[Depex]
+  TRUE
