@@ -16,6 +16,7 @@
 
 [Sources.common]
   Fusb302Dxe.c
+  Fusb302Pd.c
 
 [Packages]
   MdeModulePkg/MdeModulePkg.dec
@@ -42,6 +43,8 @@
   gRockchipTokenSpaceGuid.PcdFusb302Addresses
   gRockchipTokenSpaceGuid.PcdFusb302Buses
   gRockchipTokenSpaceGuid.PcdFusb302PhyIds
+  gRockchipTokenSpaceGuid.PcdFusb302MaxVoltageMv
+  gRockchipTokenSpaceGuid.PcdFusb302MaxCurrentMa
 
 [Depex]
   TRUE

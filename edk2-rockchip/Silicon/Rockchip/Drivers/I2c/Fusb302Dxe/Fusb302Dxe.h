@@ -72,7 +72,114 @@
 #define   FUSB302_STATUS0_COMP              BIT5
 #define   FUSB302_STATUS0_BC_LVL_MASK       (BIT1 | BIT0)
 #define FUSB302_REG_STATUS1                 0x41
+#define   FUSB302_STATUS1_RX_EMPTY          BIT5
+#define   FUSB302_STATUS1_RX_FULL           BIT4
+#define   FUSB302_STATUS1_TX_EMPTY          BIT3
+#define   FUSB302_STATUS1_TX_FULL           BIT2
 #define FUSB302_REG_INTERRUPT               0x42
+#define   FUSB302_INTERRUPT_I_CRC_CHK       BIT4
+#define FUSB302_REG_FIFOS                   0x43
+
+//
+// FIFO tokens. A transmitted message is framed as the SOP ordered set, a
+// PACKSYM carrying the byte count, the payload, then CRC/EOP/TXOFF and finally
+// TXON to key the transmitter.
+//
+#define FUSB302_TKN_TXON                    0xA1
+#define FUSB302_TKN_SYNC1                   0x12
+#define FUSB302_TKN_SYNC2                   0x13
+#define FUSB302_TKN_SYNC3                   0x1B
+#define FUSB302_TKN_RST1                    0x15
+#define FUSB302_TKN_RST2                    0x16
+#define FUSB302_TKN_PACKSYM                 0x80
+#define FUSB302_TKN_JAMCRC                  0xFF
+#define FUSB302_TKN_EOP                     0x14
+#define FUSB302_TKN_TXOFF                   0xFE
+
+//
+// A received frame starts with a token whose top three bits identify the
+// ordered set; only SOP is of interest here.
+//
+#define FUSB302_RX_TOKEN_MASK               0xE0
+#define FUSB302_RX_TOKEN_SOP                0xE0
+
+//
+// USB Power Delivery message header, as defined by the specification.
+//
+#define PD_HEADER_TYPE(Header)              ((Header) & 0x1F)
+#define PD_HEADER_ID(Header)                (((Header) >> 9) & 0x7)
+#define PD_HEADER_COUNT(Header)             (((Header) >> 12) & 0x7)
+#define PD_HEADER_EXTENDED(Header)          (((Header) >> 15) & 0x1)
+
+#define PD_HEADER_BUILD(Type, Id, Count, DataRole, PowerRole, Revision)  \
+  ((UINT16)(((Type) & 0x1F)             |                                \
+            (((DataRole) & 0x1) << 5)   |                                \
+            (((Revision) & 0x3) << 6)   |                                \
+            (((PowerRole) & 0x1) << 8)  |                                \
+            (((Id) & 0x7) << 9)         |                                \
+            (((Count) & 0x7) << 12)))
+
+#define PD_REV_2_0                          1
+
+//
+// Control message types.
+//
+#define PD_CTRL_GOOD_CRC                    1
+#define PD_CTRL_ACCEPT                      3
+#define PD_CTRL_REJECT                      4
+#define PD_CTRL_PS_RDY                      6
+#define PD_CTRL_SOFT_RESET                  13
+#define PD_CTRL_WAIT                        12
+
+//
+// Data message types.
+//
+#define PD_DATA_SOURCE_CAP                  1
+#define PD_DATA_REQUEST                     2
+
+//
+// Power data objects. Only fixed supplies are considered: variable and
+// battery supplies cannot be requested by voltage in the same way, and no
+// board here needs them.
+//
+#define PD_PDO_TYPE(Pdo)                    (((Pdo) >> 30) & 0x3)
+#define PD_PDO_TYPE_FIXED                   0
+#define PD_PDO_FIXED_VOLTAGE_MV(Pdo)        ((((Pdo) >> 10) & 0x3FF) * 50)
+#define PD_PDO_FIXED_CURRENT_MA(Pdo)        (((Pdo) & 0x3FF) * 10)
+
+//
+// Fixed request data object.
+//
+#define PD_RDO_FIXED(ObjectPosition, OperatingMa, MaxMa)  \
+  ((UINT32)((((ObjectPosition) & 0x7) << 28)            | \
+            (((((OperatingMa) / 10)) & 0x3FF) << 10)    | \
+            (((MaxMa) / 10) & 0x3FF)                    | \
+            BIT25 /* USB communications capable */ ))
+
+#define PD_MAX_DATA_OBJECTS                 7
+
+//
+// A source sends Source_Capabilities every ~150 ms until a contract exists, so
+// this catches several attempts while staying short enough not to stall the
+// boot by much when the partner does not speak PD at all.
+//
+#define PD_SOURCE_CAP_TIMEOUT_US            (600 * 1000)
+//
+// Once a Soft_Reset has been accepted the partner is known to speak PD, so it
+// is worth waiting longer for the advertisement that follows.
+//
+#define PD_SOURCE_CAP_RETRY_TIMEOUT_US      (1200 * 1000)
+//
+// tSenderResponse is 30 ms; allow a little more before giving up.
+//
+#define PD_SENDER_RESPONSE_TIMEOUT_US       (60 * 1000)
+//
+// tPSTransition is 550 ms at worst.
+//
+#define PD_PS_TRANSITION_TIMEOUT_US         (600 * 1000)
+
+#define PD_POLL_INTERVAL_US                 500
+
 
 //
 // Expected value of the version field in DEVICE_ID for the parts this driver
@@ -108,10 +215,55 @@ typedef struct {
   EFI_I2C_IO_PROTOCOL         *I2cIo;
   USB_TYPE_C_PORT_PROTOCOL    TypeCPort;
   USB_TYPE_C_ORIENTATION      Orientation;
+  USB_TYPE_C_POWER_CONTRACT   Contract;
+  //
+  // TRUE when the partner supplies power to us, which is the only case
+  // where there is a contract to negotiate.
+  //
+  BOOLEAN                     PartnerIsSource;
+  //
+  // Rolling message ID for messages this driver sends, per the specification.
+  //
+  UINT8                       MessageId;
 } FUSB302_CONTEXT;
 
 #define FUSB302_SC_FROM_TYPEC_PORT(a) \
   CR (a, FUSB302_CONTEXT, TypeCPort, FUSB302_SIGNATURE)
+
+EFI_STATUS
+Fusb302RegRead (
+  IN  FUSB302_CONTEXT  *Context,
+  IN  UINT8            Register,
+  OUT UINT8            *Value
+  );
+
+EFI_STATUS
+Fusb302RegWrite (
+  IN FUSB302_CONTEXT  *Context,
+  IN UINT8            Register,
+  IN UINT8            Value
+  );
+
+EFI_STATUS
+Fusb302RegUpdate (
+  IN FUSB302_CONTEXT  *Context,
+  IN UINT8            Register,
+  IN UINT8            Mask,
+  IN UINT8            Value
+  );
+
+/**
+  Negotiate a USB Power Delivery contract as a sink.
+
+  @param[in,out] Context      Driver context; Contract is updated on success.
+  @param[in]     Orientation  Which CC pin the partner is on.
+
+**/
+EFI_STATUS
+Fusb302PdNegotiateSink (
+  IN OUT FUSB302_CONTEXT         *Context,
+  IN     USB_TYPE_C_ORIENTATION  Orientation
+  );
 
 EFI_STATUS
 EFIAPI

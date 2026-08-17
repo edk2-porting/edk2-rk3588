@@ -49,8 +49,40 @@ EFI_STATUS
   OUT USB_TYPE_C_ORIENTATION     *Orientation
   );
 
+//
+// The power contract in force on the port.
+//
+typedef struct {
+  //
+  // TRUE when a USB Power Delivery contract was negotiated. When FALSE the
+  // remaining fields describe what Type-C current advertisement alone allows,
+  // which is what a port without PD is limited to.
+  //
+  BOOLEAN    PdNegotiated;
+  UINT32     VoltageMv;
+  UINT32     CurrentMa;
+} USB_TYPE_C_POWER_CONTRACT;
+
+/**
+  Return the power contract currently in force on the port.
+
+  @param[in]  This        Protocol instance.
+  @param[out] Contract    Receives the contract.
+
+  @retval EFI_SUCCESS     Contract returned.
+  @retval EFI_NOT_READY   Nothing is attached to the port.
+
+**/
+typedef
+EFI_STATUS
+(EFIAPI *USB_TYPE_C_PORT_GET_POWER_CONTRACT)(
+  IN  USB_TYPE_C_PORT_PROTOCOL     *This,
+  OUT USB_TYPE_C_POWER_CONTRACT    *Contract
+  );
+
 struct _USB_TYPE_C_PORT_PROTOCOL {
-  USB_TYPE_C_PORT_GET_ORIENTATION    GetOrientation;
+  USB_TYPE_C_PORT_GET_ORIENTATION       GetOrientation;
+  USB_TYPE_C_PORT_GET_POWER_CONTRACT    GetPowerContract;
   //
   // Identifies the USBDP combo PHY this port is wired to, matching
   // DP_PHY_PROTOCOL.Id.

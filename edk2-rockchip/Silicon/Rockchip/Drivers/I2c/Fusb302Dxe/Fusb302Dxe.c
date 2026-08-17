@@ -39,7 +39,6 @@ EFI_DRIVER_BINDING_PROTOCOL  gFusb302DriverBinding = {
 /**
   Read a single FUSB302 register.
 **/
-STATIC
 EFI_STATUS
 Fusb302RegRead (
   IN  FUSB302_CONTEXT  *Context,
@@ -86,7 +85,6 @@ Fusb302RegRead (
 /**
   Write a single FUSB302 register.
 **/
-STATIC
 EFI_STATUS
 Fusb302RegWrite (
   IN FUSB302_CONTEXT  *Context,
@@ -130,7 +128,6 @@ Fusb302RegWrite (
   return Status;
 }
 
-STATIC
 EFI_STATUS
 Fusb302RegUpdate (
   IN FUSB302_CONTEXT  *Context,
@@ -352,10 +349,16 @@ Fusb302DetectOrientation (
 {
   EFI_STATUS  Status;
 
-  *Orientation = UsbTypeCOrientationNone;
+  *Orientation             = UsbTypeCOrientationNone;
+  Context->PartnerIsSource = FALSE;
 
   Status = Fusb302ProbeRole (Context, Fusb302RoleSink, Orientation);
   if (!EFI_ERROR (Status)) {
+    //
+    // We matched while presenting Rd, so the partner is driving Rp: it is the
+    // source and we are the sink.
+    //
+    Context->PartnerIsSource = TRUE;
     goto Restore;
   }
 
@@ -378,6 +381,31 @@ Restore:
 STATIC
 EFI_STATUS
 EFIAPI
+Fusb302GetPowerContract (
+  IN  USB_TYPE_C_PORT_PROTOCOL   *This,
+  OUT USB_TYPE_C_POWER_CONTRACT  *Contract
+  )
+{
+  FUSB302_CONTEXT  *Context;
+
+  if ((This == NULL) || (Contract == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Context = FUSB302_SC_FROM_TYPEC_PORT (This);
+
+  if (Context->Orientation == UsbTypeCOrientationNone) {
+    return EFI_NOT_READY;
+  }
+
+  CopyMem (Contract, &Context->Contract, sizeof (*Contract));
+
+  return EFI_SUCCESS;
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
 Fusb302GetOrientation (
   IN  USB_TYPE_C_PORT_PROTOCOL  *This,
   OUT USB_TYPE_C_ORIENTATION    *Orientation
@@ -393,8 +421,19 @@ Fusb302GetOrientation (
   Context = FUSB302_SC_FROM_TYPEC_PORT (This);
 
   //
-  // Re-measure rather than returning the cached value: a cable may well have
-  // been plugged in since we started.
+  // Measuring means taking the CC pins back to plain terminations, which would
+  // drop the BMC receiver and tear down a contract we have already negotiated.
+  // Once PD is up the orientation cannot have changed underneath us anyway, so
+  // report what was found then.
+  //
+  if (Context->Contract.PdNegotiated) {
+    *Orientation = Context->Orientation;
+    return (*Orientation == UsbTypeCOrientationNone) ? EFI_NOT_READY : EFI_SUCCESS;
+  }
+
+  //
+  // Otherwise re-measure rather than returning the cached value: a cable may
+  // well have been plugged in since we started.
   //
   Status = Fusb302DetectOrientation (Context, Orientation);
   if (!EFI_ERROR (Status)) {
@@ -602,7 +641,8 @@ Fusb302Start (
   Context->I2cIo     = I2cIo;
   Context->Handle    = ControllerHandle;
 
-  Context->TypeCPort.GetOrientation = Fusb302GetOrientation;
+  Context->TypeCPort.GetOrientation   = Fusb302GetOrientation;
+  Context->TypeCPort.GetPowerContract = Fusb302GetPowerContract;
   Context->TypeCPort.PhyId          = 0;
 
   //
@@ -645,6 +685,24 @@ Fusb302Start (
       Context->TypeCPort.PhyId,
       Orientation == UsbTypeCOrientationFlipped ? "flipped" : "normal"
       ));
+
+    //
+    // Only worth attempting where the partner is the source. Where this board
+    // is the source there is nothing to ask for, and this driver does not
+    // offer power itself.
+    //
+    if (Context->PartnerIsSource) {
+      Fusb302PdNegotiateSink (Context, Orientation);
+    }
+
+    if (!Context->Contract.PdNegotiated) {
+      //
+      // Fall back to describing what Type-C advertisement alone permits. The
+      // conservative 5 V / 500 mA is what any port guarantees without PD.
+      //
+      Context->Contract.VoltageMv = 5000;
+      Context->Contract.CurrentMa = 500;
+    }
   } else {
     DEBUG ((DEBUG_INFO, "%a: PHY %u Type-C port is empty\n", __func__, Context->TypeCPort.PhyId));
   }
