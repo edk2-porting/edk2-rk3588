@@ -180,10 +180,13 @@ Fusb302VdmHasDisplayPort (
 /**
   Choose a pin assignment from what the display offers.
 
-  Four lanes are preferred: they allow a higher resolution than two, and
-  firmware has no use for the USB 3 link that the two lane assignments keep
-  alive. Assignment E is what a plain adapter offers, C what a dock offers for
-  the same thing.
+  Assignment D is preferred: it carries two DisplayPort lanes alongside a live
+  USB 3 link, which keeps boot devices on the port working, and two lanes are
+  ample for anything firmware puts on screen. It is also the mapping the lane
+  mux in UsbDpPhyDxe has always been set up for on these boards.
+
+  C and E give four lanes at the cost of USB 3, and are taken only where D is
+  not on offer.
 
   @param[out] Lanes   DisplayPort lanes the choice provides.
 
@@ -204,6 +207,11 @@ Fusb302VdmSelectPinAssignment (
   //
   Offered = (UINT8)DP_CAP_PIN_ASSIGN_UFP_D (DpCapVdo);
 
+  if ((Offered & USB_TYPE_C_DP_PIN_ASSIGN_D) != 0) {
+    *Lanes = 2;
+    return USB_TYPE_C_DP_PIN_ASSIGN_D;
+  }
+
   if ((Offered & USB_TYPE_C_DP_PIN_ASSIGN_C) != 0) {
     *Lanes = 4;
     return USB_TYPE_C_DP_PIN_ASSIGN_C;
@@ -212,11 +220,6 @@ Fusb302VdmSelectPinAssignment (
   if ((Offered & USB_TYPE_C_DP_PIN_ASSIGN_E) != 0) {
     *Lanes = 4;
     return USB_TYPE_C_DP_PIN_ASSIGN_E;
-  }
-
-  if ((Offered & USB_TYPE_C_DP_PIN_ASSIGN_D) != 0) {
-    *Lanes = 2;
-    return USB_TYPE_C_DP_PIN_ASSIGN_D;
   }
 
   *Lanes = 0;

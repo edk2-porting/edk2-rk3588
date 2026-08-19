@@ -37,6 +37,7 @@
 
 #include <Protocol/RockchipConnectorProtocol.h>
 #include <Protocol/DpPhy.h>
+#include <Protocol/UsbTypeCPort.h>
 
 #define DPTX_VERSION_NUMBER			0x0000
 #define DPTX_VERSION_TYPE			0x0004
@@ -1688,17 +1689,77 @@ static int dw_dp_connector_disable(ROCKCHIP_CONNECTOR_PROTOCOL *conn, DISPLAY_ST
 	return 0;
 }
 
+/*
+ * Hot-plug detect for a DisplayPort sink reached over a Type-C connector does
+ * not arrive on a wire: there is no HPD pin in the cable, and nothing on these
+ * boards drives the controller's HPD input, so DPTX_HPD_STATUS stays low no
+ * matter what is plugged in. The state is carried in a DisplayPort Status
+ * message instead, which the Type-C port driver collects when it enters the
+ * mode.
+ *
+ * Returns TRUE when a Type-C port owns this PHY and answered, in which case
+ * Present says whether a display is out there.
+ */
+static bool dw_dp_typec_hpd(struct dw_dp *dp, bool *present)
+{
+	EFI_STATUS			Status;
+	EFI_HANDLE			*Handles = NULL;
+	UINTN				HandleCount = 0;
+	UINTN				Index;
+	USB_TYPE_C_PORT_PROTOCOL	*Port;
+	USB_TYPE_C_DP_ALT_MODE		AltMode;
+	bool				found = false;
+
+	Status = gBS->LocateHandleBuffer (ByProtocol, &gUsbTypeCPortProtocolGuid,
+					  NULL, &HandleCount, &Handles);
+	if (EFI_ERROR (Status))
+		return false;
+
+	for (Index = 0; Index < HandleCount; Index++) {
+		Status = gBS->HandleProtocol (Handles[Index],
+					      &gUsbTypeCPortProtocolGuid,
+					      (VOID **) &Port);
+		if (EFI_ERROR (Status) || Port->PhyId != (UINT32) dp->id)
+			continue;
+
+		Status = Port->GetDpAltMode (Port, &AltMode);
+		if (EFI_ERROR (Status)) {
+			/*
+			 * A port is there but is not in DisplayPort Alt Mode,
+			 * so nothing that could drive a display is attached.
+			 */
+			*present = false;
+			found = true;
+			break;
+		}
+
+		*present = AltMode.HpdAsserted;
+		found = true;
+		break;
+	}
+
+	FreePool (Handles);
+
+	return found;
+}
+
 static int dw_dp_connector_detect(ROCKCHIP_CONNECTOR_PROTOCOL *conn, DISPLAY_STATE *state)
 {
 	struct dw_dp *dp = DW_DP_FROM_CONNECTOR_PROTOCOL (conn);
+	bool present;
 	u32 value;
 	int ret;
 
 	if (!dp->force_hpd) {
-		regmap_read(dp->regmap, DPTX_HPD_STATUS, &value);
+		if (dw_dp_typec_hpd(dp, &present)) {
+			if (!present)
+				return -ENODEV;
+		} else {
+			regmap_read(dp->regmap, DPTX_HPD_STATUS, &value);
 
-		if (FIELD_GET(HPD_STATE, value) != SOURCE_STATE_PLUG)
-			return -ENODEV;
+			if (FIELD_GET(HPD_STATE, value) != SOURCE_STATE_PLUG)
+				return -ENODEV;
+		}
 	}
 
 	/*

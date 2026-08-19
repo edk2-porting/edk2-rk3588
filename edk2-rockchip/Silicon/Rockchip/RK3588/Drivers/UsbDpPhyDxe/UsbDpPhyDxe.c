@@ -1111,6 +1111,57 @@ UsbDpPhyApplyTypeCOrientation (
 	FreePool (Handles);
 }
 
+/*
+ * Report where the pin assignment the sink agreed to disagrees with the lane
+ * mux this board is built around.
+ *
+ * The mapping is not changed to match. Remapping for the four lane assignments
+ * means a lane order this driver has never been exercised with, and getting it
+ * wrong produces a blank screen rather than an obvious failure, so the board
+ * description stays in charge and this only says when the two differ.
+ */
+STATIC
+VOID
+UsbDpPhyCheckTypeCLaneCount (
+	IN struct rockchip_udphy *udphy
+	)
+{
+	EFI_STATUS			Status;
+	EFI_HANDLE			*Handles = NULL;
+	UINTN				HandleCount = 0;
+	UINTN				Index;
+	USB_TYPE_C_PORT_PROTOCOL	*Port;
+	USB_TYPE_C_DP_ALT_MODE		AltMode;
+	int				configured;
+
+	Status = gBS->LocateHandleBuffer (ByProtocol, &gUsbTypeCPortProtocolGuid,
+					  NULL, &HandleCount, &Handles);
+	if (EFI_ERROR (Status))
+		return;
+
+	for (Index = 0; Index < HandleCount; Index++) {
+		Status = gBS->HandleProtocol (Handles[Index],
+					      &gUsbTypeCPortProtocolGuid,
+					      (VOID **) &Port);
+		if (EFI_ERROR (Status) || Port->PhyId != (UINT32) udphy->id)
+			continue;
+
+		Status = Port->GetDpAltMode (Port, &AltMode);
+		if (EFI_ERROR (Status))
+			break;
+
+		configured = udphy_dplane_get (udphy);
+		if (AltMode.DpLanes != (UINT8) configured)
+			DEBUG ((DEBUG_WARN,
+				"%a: PHY %u: sink negotiated %u DisplayPort lane(s) but this "
+				"board is wired for %d; using the board mapping\n",
+				__func__, udphy->id, AltMode.DpLanes, configured));
+		break;
+	}
+
+	FreePool (Handles);
+}
+
 EFI_STATUS
 EFIAPI
 DpPhyPowerOn (
@@ -1123,6 +1174,7 @@ DpPhyPowerOn (
 	udphy = ROCKCHIP_UDPHY_FROM_DP_PHY_PROTOCOL (This);
 
 	UsbDpPhyApplyTypeCOrientation (udphy);
+	UsbDpPhyCheckTypeCLaneCount (udphy);
 
 	ret = rockchip_dpphy_power_on (udphy);
 	if (ret)
