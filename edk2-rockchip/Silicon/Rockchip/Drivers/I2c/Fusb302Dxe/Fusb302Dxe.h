@@ -128,6 +128,7 @@
 #define PD_CTRL_ACCEPT                      3
 #define PD_CTRL_REJECT                      4
 #define PD_CTRL_PS_RDY                      6
+#define PD_CTRL_DR_SWAP                     9
 #define PD_CTRL_SOFT_RESET                  13
 #define PD_CTRL_WAIT                        12
 
@@ -180,6 +181,86 @@
 
 #define PD_POLL_INTERVAL_US                 500
 
+//
+// Vendor defined messages. Only structured VDMs are used here.
+//
+#define PD_DATA_VENDOR_DEFINED              15
+
+#define PD_VDM_SVID_PD                      0xFF00
+#define PD_VDM_SVID_DISPLAYPORT             0xFF01
+
+#define PD_VDM_HEADER(Svid, ObjectPosition, CommandType, Command)  \
+  ((UINT32)(((UINT32)(Svid) << 16)        |                        \
+            BIT15 /* structured */        |                        \
+            (((ObjectPosition) & 0x7) << 8) |                      \
+            (((CommandType) & 0x3) << 6)  |                        \
+            ((Command) & 0x1F)))
+
+#define PD_VDM_CMD_TYPE(Vdm)                (((Vdm) >> 6) & 0x3)
+#define PD_VDM_CMD(Vdm)                     ((Vdm) & 0x1F)
+#define PD_VDM_SVID(Vdm)                    (((Vdm) >> 16) & 0xFFFF)
+#define PD_VDM_IS_STRUCTURED(Vdm)           (((Vdm) >> 15) & 0x1)
+
+#define PD_VDM_TYPE_REQ                     0
+#define PD_VDM_TYPE_ACK                     1
+#define PD_VDM_TYPE_NAK                     2
+#define PD_VDM_TYPE_BUSY                    3
+
+#define PD_VDM_DISCOVER_IDENTITY            1
+#define PD_VDM_DISCOVER_SVIDS               2
+#define PD_VDM_DISCOVER_MODES               3
+#define PD_VDM_ENTER_MODE                   4
+#define PD_VDM_EXIT_MODE                    5
+#define PD_VDM_ATTENTION                    6
+#define PD_VDM_DP_STATUS                    16
+#define PD_VDM_DP_CONFIGURE                 17
+
+//
+// The identity header says whether the partner supports any alternate mode at
+// all, which saves asking further questions of one that does not.
+//
+#define PD_ID_HEADER_MODAL_OPERATION(Vdo)   (((Vdo) >> 26) & 0x1)
+
+//
+// DisplayPort capability VDO, returned by Discover Modes for the DisplayPort
+// SVID. Note the pin assignment fields are named for the role the *partner*
+// plays: a display sink fills in the UFP_D field.
+//
+#define DP_CAP_PORT_CAPABILITY(Vdo)         ((Vdo) & 0x3)
+#define   DP_CAP_PORT_UFP_D                 1
+#define   DP_CAP_PORT_DFP_D                 2
+#define   DP_CAP_PORT_BOTH                  3
+#define DP_CAP_PIN_ASSIGN_UFP_D(Vdo)        (((Vdo) >> 8) & 0xFF)
+#define DP_CAP_PIN_ASSIGN_DFP_D(Vdo)        (((Vdo) >> 16) & 0xFF)
+
+//
+// DisplayPort status VDO, returned by the DisplayPort Status command.
+//
+#define DP_STATUS_HPD_STATE(Vdo)            (((Vdo) >> 7) & 0x1)
+#define DP_STATUS_HPD_IRQ(Vdo)              (((Vdo) >> 8) & 0x1)
+
+//
+// DisplayPort configure VDO.
+//
+//
+// Select Configuration says which role the partner is to take, so a display
+// has to be told to be the UFP_D. Telling it to be the DFP_D instead gets the
+// configuration refused, since a display cannot source DisplayPort.
+//
+#define DP_CONFIG_SELECT_UFP_U_AS_DFP_D     1
+#define DP_CONFIG_SELECT_UFP_U_AS_UFP_D     2
+#define DP_CONFIG_SIGNALLING_DP             1
+#define DP_CONFIG_BUILD(PinAssignment)          \
+  ((UINT32)(DP_CONFIG_SELECT_UFP_U_AS_UFP_D |     \
+            (DP_CONFIG_SIGNALLING_DP << 2)  |     \
+            ((UINT32)(PinAssignment) << 8)))
+
+//
+// tVDMSenderResponse is 30 ms at most; discovery is otherwise not time
+// critical.
+//
+#define PD_VDM_RESPONSE_TIMEOUT_US          (60 * 1000)
+
 
 //
 // Expected value of the version field in DEVICE_ID for the parts this driver
@@ -202,6 +283,11 @@
 //
 #define FUSB302_MEASURE_SETTLE_US           350
 
+typedef struct {
+  UINT16    Header;
+  UINT32    Objects[PD_MAX_DATA_OBJECTS];
+} PD_MESSAGE;
+
 typedef enum {
   Fusb302RoleSink,
   Fusb302RoleSource
@@ -221,6 +307,14 @@ typedef struct {
   // where there is a contract to negotiate.
   //
   BOOLEAN                     PartnerIsSource;
+  USB_TYPE_C_DP_ALT_MODE      DpAltMode;
+  //
+  // TRUE once we are the downstream facing port for data. A sink starts
+  // out upstream facing and has to swap to drive alternate modes. Every
+  // message header must agree with this and with SWITCHES1, or the
+  // partner ignores it.
+  //
+  BOOLEAN                     DataRoleDfp;
   //
   // Rolling message ID for messages this driver sends, per the specification.
   //
@@ -260,9 +354,43 @@ Fusb302RegUpdate (
 
 **/
 EFI_STATUS
+Fusb302PdSend (
+  IN FUSB302_CONTEXT  *Context,
+  IN UINT16           Header,
+  IN CONST UINT32     *Objects
+  );
+
+EFI_STATUS
+Fusb302PdWaitFor (
+  IN  FUSB302_CONTEXT  *Context,
+  IN  BOOLEAN          WantData,
+  IN  UINT8            Type,
+  IN  UINTN            TimeoutUs,
+  OUT PD_MESSAGE       *Message
+  );
+
+EFI_STATUS
 Fusb302PdNegotiateSink (
   IN OUT FUSB302_CONTEXT         *Context,
   IN     USB_TYPE_C_ORIENTATION  Orientation
+  );
+
+/**
+  Discover and enter DisplayPort Alternate Mode, and read back whether a
+  display is present.
+
+  Requires a PD link to already be up, which Fusb302PdNegotiateSink() leaves
+  running on success.
+
+**/
+EFI_STATUS
+Fusb302PdDataRoleSwapToDfp (
+  IN OUT FUSB302_CONTEXT  *Context
+  );
+
+EFI_STATUS
+Fusb302DpAltModeEnter (
+  IN OUT FUSB302_CONTEXT  *Context
   );
 
 EFI_STATUS

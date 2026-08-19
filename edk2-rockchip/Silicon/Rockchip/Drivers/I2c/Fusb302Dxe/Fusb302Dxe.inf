@@ -17,6 +17,7 @@
 [Sources.common]
   Fusb302Dxe.c
   Fusb302Pd.c
+  Fusb302Vdm.c
 
 [Packages]
   MdeModulePkg/MdeModulePkg.dec

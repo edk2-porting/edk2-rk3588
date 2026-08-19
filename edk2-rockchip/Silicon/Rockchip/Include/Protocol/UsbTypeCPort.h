@@ -80,9 +80,59 @@ EFI_STATUS
   OUT USB_TYPE_C_POWER_CONTRACT    *Contract
   );
 
+//
+// State of DisplayPort Alternate Mode on the port.
+//
+typedef struct {
+  //
+  // The partner advertises the DisplayPort SVID and we successfully entered
+  // the mode.
+  //
+  BOOLEAN    Entered;
+  //
+  // A display is present downstream of the partner. Over USB-C this is the
+  // only source of hot-plug detect: there is no HPD wire, the state arrives in
+  // a DisplayPort Status VDM.
+  //
+  BOOLEAN    HpdAsserted;
+  //
+  // Pin assignment selected for the link, as the DisplayPort Alt Mode
+  // specification numbers them. C and E carry four DisplayPort lanes; D
+  // carries two alongside USB 3.
+  //
+  UINT8      PinAssignment;
+  //
+  // DisplayPort lanes the selected pin assignment gives us, either 2 or 4.
+  //
+  UINT8      DpLanes;
+} USB_TYPE_C_DP_ALT_MODE;
+
+#define USB_TYPE_C_DP_PIN_ASSIGN_C  BIT2
+#define USB_TYPE_C_DP_PIN_ASSIGN_D  BIT3
+#define USB_TYPE_C_DP_PIN_ASSIGN_E  BIT4
+
+/**
+  Return the DisplayPort Alternate Mode state of the port.
+
+  @param[in]  This        Protocol instance.
+  @param[out] AltMode     Receives the state.
+
+  @retval EFI_SUCCESS       State returned.
+  @retval EFI_UNSUPPORTED   The partner does not do DisplayPort Alt Mode.
+  @retval EFI_NOT_READY     Nothing is attached to the port.
+
+**/
+typedef
+EFI_STATUS
+(EFIAPI *USB_TYPE_C_PORT_GET_DP_ALT_MODE)(
+  IN  USB_TYPE_C_PORT_PROTOCOL   *This,
+  OUT USB_TYPE_C_DP_ALT_MODE     *AltMode
+  );
+
 struct _USB_TYPE_C_PORT_PROTOCOL {
   USB_TYPE_C_PORT_GET_ORIENTATION       GetOrientation;
   USB_TYPE_C_PORT_GET_POWER_CONTRACT    GetPowerContract;
+  USB_TYPE_C_PORT_GET_DP_ALT_MODE       GetDpAltMode;
   //
   // Identifies the USBDP combo PHY this port is wired to, matching
   // DP_PHY_PROTOCOL.Id.

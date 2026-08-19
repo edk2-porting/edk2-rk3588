@@ -40,11 +40,6 @@
 
 #include "Fusb302Dxe.h"
 
-typedef struct {
-  UINT16    Header;
-  UINT32    Objects[PD_MAX_DATA_OBJECTS];
-} PD_MESSAGE;
-
 /**
   Prepare the PD transmitter and receiver on the CC pin the partner is on.
 **/
@@ -81,7 +76,8 @@ Fusb302PdEnable (
   //
   Switches1 = (UseCc2 ? FUSB302_SWITCHES1_TXCC2_EN : FUSB302_SWITCHES1_TXCC1_EN) |
               FUSB302_SWITCHES1_AUTO_GCRC |
-              (PD_REV_2_0 << FUSB302_SWITCHES1_SPECREV_SHIFT);
+              (PD_REV_2_0 << FUSB302_SWITCHES1_SPECREV_SHIFT) |
+              (Context->DataRoleDfp ? FUSB302_SWITCHES1_DATAROLE : 0);
 
   Status = Fusb302RegWrite (Context, FUSB302_REG_SWITCHES1, Switches1);
   if (EFI_ERROR (Status)) {
@@ -111,7 +107,8 @@ Fusb302PdEnable (
     return Status;
   }
 
-  Context->MessageId = 0;
+  Context->MessageId  = 0;
+  Context->DataRoleDfp = FALSE;
 
   return EFI_SUCCESS;
 }
@@ -140,7 +137,6 @@ Fusb302PdDisable (
   The payload is framed with the SOP ordered set and handed to the transmitter;
   the controller appends the CRC itself in response to the JAM_CRC token.
 **/
-STATIC
 EFI_STATUS
 Fusb302PdSend (
   IN FUSB302_CONTEXT  *Context,
@@ -300,7 +296,6 @@ Fusb302PdReceive (
   @param[in]  Type        Message type to wait for.
 
 **/
-STATIC
 EFI_STATUS
 Fusb302PdWaitFor (
   IN  FUSB302_CONTEXT  *Context,
@@ -466,7 +461,14 @@ Fusb302PdNegotiateSink (
     //
     DEBUG ((DEBUG_INFO, "%a: no advertisement; sending Soft_Reset\n", __func__));
 
-    Header = PD_HEADER_BUILD (PD_CTRL_SOFT_RESET, 0, 0, 0, 0, PD_REV_2_0);
+    Header = PD_HEADER_BUILD (
+               PD_CTRL_SOFT_RESET,
+               0,
+               0,
+               Context->DataRoleDfp ? 1 : 0,
+               0,
+               PD_REV_2_0
+               );
 
     Status = Fusb302PdSend (Context, Header, NULL);
     if (EFI_ERROR (Status)) {
@@ -523,7 +525,14 @@ Fusb302PdNegotiateSink (
 
   Rdo = PD_RDO_FIXED (Position, CurrentMa, CurrentMa);
 
-  Header = PD_HEADER_BUILD (PD_DATA_REQUEST, Context->MessageId, 1, 0, 0, PD_REV_2_0);
+  Header = PD_HEADER_BUILD (
+             PD_DATA_REQUEST,
+             Context->MessageId,
+             1,
+             Context->DataRoleDfp ? 1 : 0,
+             0,
+             PD_REV_2_0
+             );
 
   Status = Fusb302PdSend (Context, Header, &Rdo);
   if (EFI_ERROR (Status)) {
@@ -569,4 +578,54 @@ Fusb302PdNegotiateSink (
 Disable:
   Fusb302PdDisable (Context);
   return Status;
+}
+
+EFI_STATUS
+Fusb302PdDataRoleSwapToDfp (
+  IN OUT FUSB302_CONTEXT  *Context
+  )
+{
+  EFI_STATUS  Status;
+  PD_MESSAGE  Message;
+  UINT16      Header;
+
+  if (Context->DataRoleDfp) {
+    return EFI_SUCCESS;
+  }
+
+  Header = PD_HEADER_BUILD (PD_CTRL_DR_SWAP, Context->MessageId, 0, 0, 0, PD_REV_2_0);
+
+  Status = Fusb302PdSend (Context, Header, NULL);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Context->MessageId = (Context->MessageId + 1) & 0x7;
+
+  Status = Fusb302PdWaitFor (Context, FALSE, PD_CTRL_ACCEPT, PD_SENDER_RESPONSE_TIMEOUT_US, &Message);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_INFO, "%a: partner refused the data role swap (%r)\n", __func__, Status));
+    return Status;
+  }
+
+  //
+  // The controller builds its automatic GoodCRC replies from these bits, so it
+  // has to be told about the new role as well; a GoodCRC disagreeing with our
+  // own messages gets us ignored.
+  //
+  Status = Fusb302RegUpdate (
+             Context,
+             FUSB302_REG_SWITCHES1,
+             FUSB302_SWITCHES1_DATAROLE,
+             FUSB302_SWITCHES1_DATAROLE
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Context->DataRoleDfp = TRUE;
+
+  DEBUG ((DEBUG_INFO, "%a: now the downstream facing port for data\n", __func__));
+
+  return EFI_SUCCESS;
 }

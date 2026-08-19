@@ -381,6 +381,35 @@ Restore:
 STATIC
 EFI_STATUS
 EFIAPI
+Fusb302GetDpAltMode (
+  IN  USB_TYPE_C_PORT_PROTOCOL  *This,
+  OUT USB_TYPE_C_DP_ALT_MODE    *AltMode
+  )
+{
+  FUSB302_CONTEXT  *Context;
+
+  if ((This == NULL) || (AltMode == NULL)) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Context = FUSB302_SC_FROM_TYPEC_PORT (This);
+
+  if (Context->Orientation == UsbTypeCOrientationNone) {
+    return EFI_NOT_READY;
+  }
+
+  if (!Context->DpAltMode.Entered) {
+    return EFI_UNSUPPORTED;
+  }
+
+  CopyMem (AltMode, &Context->DpAltMode, sizeof (*AltMode));
+
+  return EFI_SUCCESS;
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
 Fusb302GetPowerContract (
   IN  USB_TYPE_C_PORT_PROTOCOL   *This,
   OUT USB_TYPE_C_POWER_CONTRACT  *Contract
@@ -643,6 +672,7 @@ Fusb302Start (
 
   Context->TypeCPort.GetOrientation   = Fusb302GetOrientation;
   Context->TypeCPort.GetPowerContract = Fusb302GetPowerContract;
+  Context->TypeCPort.GetDpAltMode     = Fusb302GetDpAltMode;
   Context->TypeCPort.PhyId          = 0;
 
   //
@@ -692,7 +722,16 @@ Fusb302Start (
     // offer power itself.
     //
     if (Context->PartnerIsSource) {
-      Fusb302PdNegotiateSink (Context, Orientation);
+      Status = Fusb302PdNegotiateSink (Context, Orientation);
+
+      //
+      // Alternate mode needs the PD link that negotiation leaves running. It
+      // is the only way to learn whether a display is attached over a Type-C
+      // connector, there being no hot-plug detect wire to read.
+      //
+      if (!EFI_ERROR (Status)) {
+        Fusb302DpAltModeEnter (Context);
+      }
     }
 
     if (!Context->Contract.PdNegotiated) {
