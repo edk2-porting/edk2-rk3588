@@ -18,16 +18,19 @@
   Fusb302Dxe.c
   Fusb302Pd.c
   Fusb302Vdm.c
+  Fusb302Source.c
 
 [Packages]
   MdeModulePkg/MdeModulePkg.dec
   MdePkg/MdePkg.dec
   Silicon/Rockchip/RockchipPkg.dec
+  Silicon/Rockchip/RK3588/RK3588.dec
 
 [LibraryClasses]
   BaseLib
   BaseMemoryLib
   DebugLib
+  GpioLib
   MemoryAllocationLib
   PcdLib
   TimerLib
@@ -46,6 +49,11 @@
   gRockchipTokenSpaceGuid.PcdFusb302PhyIds
   gRockchipTokenSpaceGuid.PcdFusb302MaxVoltageMv
   gRockchipTokenSpaceGuid.PcdFusb302MaxCurrentMa
+  gRockchipTokenSpaceGuid.PcdFusb302SourceEnable
+  gRockchipTokenSpaceGuid.PcdFusb302VbusGpioBank
+  gRockchipTokenSpaceGuid.PcdFusb302VbusGpioPin
+  gRockchipTokenSpaceGuid.PcdFusb302VbusGpioActiveHigh
+  gRockchipTokenSpaceGuid.PcdFusb302SourceCurrentMa
 
 [Depex]
   TRUE

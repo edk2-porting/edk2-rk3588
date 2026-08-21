@@ -734,10 +734,24 @@ Fusb302Start (
       }
     }
 
-    if (!Context->Contract.PdNegotiated) {
+    //
+    // The other direction: a sink attached to us gets powered, where the board
+    // says it can do that.
+    //
+    if (!Context->PartnerIsSource) {
+      Fusb302PdSourceRun (Context, Orientation);
+    }
+
+    if (Context->Contract.VoltageMv == 0) {
       //
-      // Fall back to describing what Type-C advertisement alone permits. The
-      // conservative 5 V / 500 mA is what any port guarantees without PD.
+      // Nothing described the port yet, so fall back to what Type-C
+      // advertisement alone permits. The conservative 5 V / 500 mA is what any
+      // port guarantees without power delivery.
+      //
+      // Note this deliberately tests the voltage rather than PdNegotiated:
+      // sourcing sets a contract from the Rp we present whether or not the
+      // sink went on to negotiate, and that is a better description of the
+      // port than this default.
       //
       Context->Contract.VoltageMv = 5000;
       Context->Contract.CurrentMa = 500;

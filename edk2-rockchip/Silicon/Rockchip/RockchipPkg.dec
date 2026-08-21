@@ -81,6 +81,16 @@
   # 5 V is the only universally safe default; raise it per board.
   gRockchipTokenSpaceGuid.PcdFusb302MaxVoltageMv|5000|UINT32|0x02000012
   gRockchipTokenSpaceGuid.PcdFusb302MaxCurrentMa|3000|UINT32|0x02000013
+  # Sourcing power over USB-C. Off unless a board opts in: it energises VBUS,
+  # and which GPIO does that, and how much the supply behind it can deliver,
+  # are board facts this driver cannot discover.
+  gRockchipTokenSpaceGuid.PcdFusb302SourceEnable|FALSE|BOOLEAN|0x02000014
+  gRockchipTokenSpaceGuid.PcdFusb302VbusGpioBank|0xFF|UINT8|0x02000015
+  gRockchipTokenSpaceGuid.PcdFusb302VbusGpioPin|0xFF|UINT8|0x02000016
+  gRockchipTokenSpaceGuid.PcdFusb302VbusGpioActiveHigh|TRUE|BOOLEAN|0x02000017
+  # Advertised source current at 5 V. 1.5 A is what a Type-C port may offer
+  # without power delivery, so it is a safe ceiling for most boards.
+  gRockchipTokenSpaceGuid.PcdFusb302SourceCurrentMa|1500|UINT32|0x02000018
 
   gRockchipTokenSpaceGuid.PcdRkSdmmcBaseAddress|0x0|UINT32|0x40000030
   gRockchipTokenSpaceGuid.PcdRkSdmmcCardDetectBroken|FALSE|BOOLEAN|0x40000031

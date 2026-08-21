@@ -261,6 +261,30 @@
 //
 #define PD_VDM_RESPONSE_TIMEOUT_US          (60 * 1000)
 
+//
+// Source role. A sink must answer an advertisement within tSenderResponse, and
+// the specification has the source repeat Source_Capabilities every 100-200 ms
+// until it does.
+//
+#define PD_SOURCE_CAP_INTERVAL_US           (150 * 1000)
+#define PD_SOURCE_ATTACH_TIMEOUT_US         (1500 * 1000)
+//
+// Time allowed for VBUS to come up once the supply is switched on.
+//
+#define PD_VBUS_ON_TIMEOUT_US               (200 * 1000)
+
+//
+// Fixed supply power data object we advertise, at 5 V.
+//
+#define PD_PDO_FIXED_BUILD(VoltageMv, CurrentMa)    \
+  ((UINT32)((((VoltageMv) / 50) & 0x3FF) << 10    | \
+            (((CurrentMa) / 10) & 0x3FF)          | \
+            BIT29 /* dual-role power */           | \
+            BIT26 /* USB communications capable */| \
+            BIT25 /* dual-role data */))
+
+#define PD_RDO_OBJECT_POSITION(Rdo)         (((Rdo) >> 28) & 0x7)
+
 
 //
 // Expected value of the version field in DEVICE_ID for the parts this driver
@@ -383,6 +407,19 @@ Fusb302PdNegotiateSink (
   running on success.
 
 **/
+/**
+  Act as a power source for an attached sink.
+
+  Only does anything where the board has opted in and can actually supply
+  power. Refuses to switch VBUS on if something else is already driving it.
+
+**/
+EFI_STATUS
+Fusb302PdSourceRun (
+  IN OUT FUSB302_CONTEXT         *Context,
+  IN     USB_TYPE_C_ORIENTATION  Orientation
+  );
+
 EFI_STATUS
 Fusb302PdDataRoleSwapToDfp (
   IN OUT FUSB302_CONTEXT  *Context
