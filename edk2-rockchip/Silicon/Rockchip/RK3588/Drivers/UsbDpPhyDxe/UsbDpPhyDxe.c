@@ -137,6 +137,7 @@ struct rockchip_udphy {
 	bool flip;
 	bool mode_change;
 	u8 mode;
+	u8 board_mode;	/* mode the board description asked for */
 	u8 status;
 
 	/* utilized for USB */
@@ -545,6 +546,7 @@ static int udphy_parse_lane_mux_data(struct rockchip_udphy *udphy, UINT8 *prop, 
 		dev_dbg(udphy->dev,
 			"failed to find dp lane mux, following dp alt mode\n");
 		udphy->mode = UDPHY_MODE_USB;
+		udphy->board_mode = udphy->mode;
 		return 0;
 	}
 
@@ -582,6 +584,8 @@ static int udphy_parse_lane_mux_data(struct rockchip_udphy *udphy, UINT8 *prop, 
 		udphy->mode |= UDPHY_MODE_USB;
 		udphy->flip = udphy->lane_mux_sel[0] == PHY_LANE_MUX_DP ? true : false;
 	}
+
+	udphy->board_mode = udphy->mode;
 
 	return 0;
 }
@@ -1066,7 +1070,7 @@ UsbDpPhyApplyTypeCOrientation (
 	USB_TYPE_C_ORIENTATION		Orientation;
 	BOOLEAN				Flip;
 
-	if (udphy->mode != UDPHY_MODE_DP_USB)
+	if (udphy->board_mode != UDPHY_MODE_DP_USB)
 		return;
 
 	Status = gBS->LocateHandleBuffer (ByProtocol, &gUsbTypeCPortProtocolGuid,
@@ -1112,17 +1116,24 @@ UsbDpPhyApplyTypeCOrientation (
 }
 
 /*
- * Report where the pin assignment the sink agreed to disagrees with the lane
- * mux this board is built around.
+ * Apply the lane count the sink agreed to.
  *
- * The mapping is not changed to match. Remapping for the four lane assignments
- * means a lane order this driver has never been exercised with, and getting it
- * wrong produces a blank screen rather than an obvious failure, so the board
- * description stays in charge and this only says when the two differ.
+ * Pin assignments C and E give DisplayPort all four lanes and leave nothing
+ * for USB 3; D splits the connector two and two. The board description can
+ * only ever describe one of those, so a shared connector has to be remapped
+ * once the partner has told us which it picked.
+ *
+ * The lane *order* does not need inventing: upphy_set_typec_default_mapping()
+ * already fills all four dp_lane_sel[] entries from the plug orientation, and
+ * rk3588_udphy_dplane_select() already indexes entries 2 and 3 in its
+ * UDPHY_MODE_DP case. Only the lane mux and the mode were missing, so this
+ * re-derives the mapping from flip and then hands every lane to DisplayPort.
+ *
+ * Boards whose connector is not shared are left exactly as they were.
  */
 STATIC
 VOID
-UsbDpPhyCheckTypeCLaneCount (
+UsbDpPhyApplyTypeCLaneCount (
 	IN struct rockchip_udphy *udphy
 	)
 {
@@ -1132,7 +1143,11 @@ UsbDpPhyCheckTypeCLaneCount (
 	UINTN				Index;
 	USB_TYPE_C_PORT_PROTOCOL	*Port;
 	USB_TYPE_C_DP_ALT_MODE		AltMode;
-	int				configured;
+	BOOLEAN				FourLane;
+	int				i;
+
+	if (udphy->board_mode != UDPHY_MODE_DP_USB)
+		return;
 
 	Status = gBS->LocateHandleBuffer (ByProtocol, &gUsbTypeCPortProtocolGuid,
 					  NULL, &HandleCount, &Handles);
@@ -1147,15 +1162,39 @@ UsbDpPhyCheckTypeCLaneCount (
 			continue;
 
 		Status = Port->GetDpAltMode (Port, &AltMode);
-		if (EFI_ERROR (Status))
+		if (EFI_ERROR (Status) || !AltMode.Entered)
 			break;
 
-		configured = udphy_dplane_get (udphy);
-		if (AltMode.DpLanes != (UINT8) configured)
-			DEBUG ((DEBUG_WARN,
-				"%a: PHY %u: sink negotiated %u DisplayPort lane(s) but this "
-				"board is wired for %d; using the board mapping\n",
-				__func__, udphy->id, AltMode.DpLanes, configured));
+		FourLane = (AltMode.DpLanes == 4);
+
+		if (FourLane && udphy->mode != UDPHY_MODE_DP) {
+			DEBUG ((DEBUG_INFO,
+				"%a: PHY %u: pin assignment %a, giving all four lanes to "
+				"DisplayPort (USB 3 unavailable on this port)\n",
+				__func__, udphy->id,
+				(AltMode.PinAssignment & USB_TYPE_C_DP_PIN_ASSIGN_C) ? "C" : "E"));
+
+			/*
+			 * Re-derive from flip so that all four dp_lane_sel[]
+			 * entries are populated; a two lane board description
+			 * only ever filled the first two.
+			 */
+			upphy_set_typec_default_mapping (udphy);
+
+			for (i = 0; i < 4; i++)
+				udphy->lane_mux_sel[i] = PHY_LANE_MUX_DP;
+
+			udphy->mode = UDPHY_MODE_DP;
+			udphy->mode_change = true;
+		} else if (!FourLane && udphy->mode != UDPHY_MODE_DP_USB) {
+			DEBUG ((DEBUG_INFO,
+				"%a: PHY %u: pin assignment D, two lanes each to "
+				"DisplayPort and USB 3\n", __func__, udphy->id));
+
+			upphy_set_typec_default_mapping (udphy);
+			udphy->mode_change = true;
+		}
+
 		break;
 	}
 
@@ -1174,7 +1213,7 @@ DpPhyPowerOn (
 	udphy = ROCKCHIP_UDPHY_FROM_DP_PHY_PROTOCOL (This);
 
 	UsbDpPhyApplyTypeCOrientation (udphy);
-	UsbDpPhyCheckTypeCLaneCount (udphy);
+	UsbDpPhyApplyTypeCLaneCount (udphy);
 
 	ret = rockchip_dpphy_power_on (udphy);
 	if (ret)
