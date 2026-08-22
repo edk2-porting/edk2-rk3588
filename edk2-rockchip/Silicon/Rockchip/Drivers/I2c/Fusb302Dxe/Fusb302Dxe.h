@@ -420,6 +420,24 @@ Fusb302PdSourceRun (
   IN     USB_TYPE_C_ORIENTATION  Orientation
   );
 
+/**
+  Present a source termination and switch VBUS on with nothing attached.
+
+  A board that can source power is expected to have a live port whether or not
+  anything was plugged in when firmware started, which is what an always on
+  supply gave before this driver took the rail over. Rp alone advertises
+  Type-C default current, so a device attached later is still powered
+  correctly even though no negotiation ever runs for it.
+
+  @retval EFI_SUCCESS       The port was left live.
+  @retval EFI_UNSUPPORTED   The board does not source power.
+
+**/
+EFI_STATUS
+Fusb302SourceIdle (
+  IN OUT FUSB302_CONTEXT  *Context
+  );
+
 EFI_STATUS
 Fusb302PdDataRoleSwapToDfp (
   IN OUT FUSB302_CONTEXT  *Context

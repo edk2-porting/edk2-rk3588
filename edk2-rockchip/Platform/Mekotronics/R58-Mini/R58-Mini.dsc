@@ -80,6 +80,13 @@
   gRockchipTokenSpaceGuid.PcdFusb302Addresses|{ 0x22 }
   gRockchipTokenSpaceGuid.PcdFusb302Buses|{ 0x6 }
   gRockchipTokenSpaceGuid.PcdFusb302PhyIds|{ 0x0 }
+  # This port can supply an attached device (GPIO4_PA7). The driver only
+  # switches the rail on once it has established that the partner is a
+  # sink and that nothing else is already driving VBUS.
+  gRockchipTokenSpaceGuid.PcdFusb302SourceEnable|TRUE
+  gRockchipTokenSpaceGuid.PcdFusb302VbusGpioBank|4
+  gRockchipTokenSpaceGuid.PcdFusb302VbusGpioPin|7
+  gRockchipTokenSpaceGuid.PcdFusb302VbusGpioActiveHigh|TRUE
 
   #
   # PCIe/SATA/USB Combo PIPE PHY support flags and default values

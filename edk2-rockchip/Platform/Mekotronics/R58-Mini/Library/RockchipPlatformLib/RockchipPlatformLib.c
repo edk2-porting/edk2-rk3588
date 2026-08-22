@@ -240,9 +240,12 @@ UsbPortPowerEnable (
 {
   DEBUG ((DEBUG_INFO, "UsbPortPowerEnable called\n"));
 
-  /* Enable USB-C VBUS */
-  GpioPinWrite (4, GPIO_PIN_PA7, TRUE);
-  GpioPinSetDirection (4, GPIO_PIN_PA7, GPIO_PIN_OUTPUT);
+  /*
+   * The Type-C rail (GPIO4_PA7) is left to Fusb302Dxe, which switches it
+   * on for a sink and keeps it off when the port is being used to charge
+   * the board. Driving it unconditionally here put this board's supply
+   * onto a VBUS a charger was already driving.
+   */
 
   /* Enable USB HOST VBUS */
   GpioPinWrite (4, GPIO_PIN_PB0, TRUE);

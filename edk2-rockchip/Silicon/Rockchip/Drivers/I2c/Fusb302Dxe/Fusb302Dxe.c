@@ -758,6 +758,13 @@ Fusb302Start (
     }
   } else {
     DEBUG ((DEBUG_INFO, "%a: PHY %u Type-C port is empty\n", __func__, Context->TypeCPort.PhyId));
+
+    //
+    // A board that supplies this port still needs it live, so that a device
+    // plugged in after firmware has run is powered. Boards that do not source
+    // are unaffected.
+    //
+    Fusb302SourceIdle (Context);
   }
 
   Status = gBS->InstallMultipleProtocolInterfaces (

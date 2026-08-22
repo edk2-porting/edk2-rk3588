@@ -210,6 +210,58 @@ Fusb302SourceVbusPresent (
 }
 
 EFI_STATUS
+Fusb302SourceIdle (
+  IN OUT FUSB302_CONTEXT  *Context
+  )
+{
+  EFI_STATUS  Status;
+  UINT32      CurrentMa;
+
+  if (!PcdGetBool (PcdFusb302SourceEnable)) {
+    return EFI_UNSUPPORTED;
+  }
+
+  //
+  // Same rule as the negotiating path: never add our supply to a rail that
+  // already has one.
+  //
+  if (Fusb302SourceVbusPresent (Context)) {
+    return EFI_ALREADY_STARTED;
+  }
+
+  CurrentMa = PcdGet32 (PcdFusb302SourceCurrentMa);
+
+  //
+  // Orientation is unknown with nothing attached, so this pulls up both pins
+  // and measures CC1 arbitrarily. It is the Rp itself, on both pins, that a
+  // later attachment reads.
+  //
+  Status = Fusb302SourceSetRp (Context, UsbTypeCOrientationNormal, CurrentMa);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Status = Fusb302SourceSetVbus (TRUE);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Context->Contract.PdNegotiated = FALSE;
+  Context->Contract.VoltageMv    = FUSB302_SOURCE_VOLTAGE_MV;
+  Context->Contract.CurrentMa    = CurrentMa;
+
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: empty port left live at %u mV %u mA\n",
+    __func__,
+    FUSB302_SOURCE_VOLTAGE_MV,
+    CurrentMa
+    ));
+
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
 Fusb302PdSourceRun (
   IN OUT FUSB302_CONTEXT         *Context,
   IN     USB_TYPE_C_ORIENTATION  Orientation
