@@ -29,6 +29,7 @@
   UefiDriverEntryPoint
   UefiBootServicesTableLib
   DebugLib
+  GpioLib
   IoLib
   TimerLib
   MemoryAllocationLib
@@ -45,6 +46,8 @@
   gRK3588TokenSpaceGuid.PcdDp1LaneMux
   gRK3588TokenSpaceGuid.PcdUsbDpPhy0Usb3State
   gRK3588TokenSpaceGuid.PcdUsbDpPhy1Usb3State
+  gRK3588TokenSpaceGuid.PcdUsbDpPhy0SbuGpios
+  gRK3588TokenSpaceGuid.PcdUsbDpPhy1SbuGpios
 
 [Depex]
   gRockchipPlatformConfigAppliedProtocolGuid

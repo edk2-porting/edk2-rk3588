@@ -24,6 +24,7 @@
 #include <Protocol/UsbTypeCPort.h>
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/DebugLib.h>
+#include <Library/GpioLib.h>
 #include <Library/MemoryAllocationLib.h>
 #include <Library/IoLib.h>
 #include <Library/TimerLib.h>
@@ -138,14 +139,17 @@ struct rockchip_udphy {
 	bool mode_change;
 	u8 mode;
 	u8 board_mode;	/* mode the board description asked for */
+	EFI_EVENT TypeCEvent;
+	VOID *TypeCRegistration;
 	u8 status;
 
 	/* utilized for USB */
 	bool hs; /* flag for high-speed */
 
 	/* utilized for DP */
-	//struct gpio_desc *sbu1_dc_gpio;
-	//struct gpio_desc *sbu2_dc_gpio;
+	/* SBU DC blocking switches; 0xFF bank means the board has none. */
+	UINT8 sbu1_dc_bank, sbu1_dc_pin;
+	UINT8 sbu2_dc_bank, sbu2_dc_pin;
 	u32 lane_mux_sel[4];
 	u32 dp_lane_sel[4];
 	u32 dp_aux_dout_sel;
@@ -482,6 +486,30 @@ static int udphy_dplane_enable(struct rockchip_udphy *udphy, int dp_lanes)
 	return ret;
 }
 
+/*
+ * Steer the SBU pair to the half of the connector the plug landed on.
+ *
+ * SBU1 and SBU2 swap over when the plug is flipped, so the DisplayPort AUX
+ * channel reaches the sink through one or the other. Boards that break the
+ * pair out through DC blocking switches have to throw them to match, or AUX
+ * lands on the wrong pin and alternate mode gets no reply in one of the two
+ * orientations.
+ */
+static void udphy_set_sbu_switches(struct rockchip_udphy *udphy)
+{
+	if (udphy->sbu1_dc_bank == 0xFF || udphy->sbu2_dc_bank == 0xFF)
+		return;
+
+	GpioPinWrite (udphy->sbu1_dc_bank, udphy->sbu1_dc_pin, udphy->flip);
+	GpioPinSetDirection (udphy->sbu1_dc_bank, udphy->sbu1_dc_pin, GPIO_PIN_OUTPUT);
+
+	GpioPinWrite (udphy->sbu2_dc_bank, udphy->sbu2_dc_pin, !udphy->flip);
+	GpioPinSetDirection (udphy->sbu2_dc_bank, udphy->sbu2_dc_pin, GPIO_PIN_OUTPUT);
+
+	DEBUG ((DEBUG_INFO, "%a: PHY %u: SBU switches set for %a plug\n",
+		__func__, udphy->id, udphy->flip ? "flipped" : "normal"));
+}
+
 static int upphy_set_typec_default_mapping(struct rockchip_udphy *udphy)
 {
 	if (udphy->flip) {
@@ -507,6 +535,8 @@ static int upphy_set_typec_default_mapping(struct rockchip_udphy *udphy)
 		udphy->dp_aux_dout_sel = PHY_AUX_DP_DATA_POL_NORMAL;
 		udphy->dp_aux_din_sel = PHY_AUX_DP_DATA_POL_NORMAL;
 	}
+
+	udphy_set_sbu_switches(udphy);
 
 	udphy->mode = UDPHY_MODE_DP_USB;
 
@@ -871,6 +901,26 @@ static int rk3588_udphy_init(struct rockchip_udphy *udphy)
 				      udphy->lane_mux_sel[0]) |
 			   FIELD_PREP(CMN_DP_LANE_EN_ALL, 0));
 
+	/*
+	 * Report the mapping actually committed to the hardware. Which lanes
+	 * carry USB 3 is the whole question when SuperSpeed trains in one plug
+	 * orientation and not the other, and reading this back from the OS side
+	 * is not safe: walking the PMA range through regmap debugfs touches
+	 * registers that abort without the right clocks.
+	 */
+	{
+		uint mux_val = 0;
+
+		regmap_read(udphy->pma_regmap, CMN_LANE_MUX_AND_EN_OFFSET, &mux_val);
+		DEBUG ((DEBUG_INFO,
+			"%a: PHY %u: flip=%a lane_mux_sel=[%u %u %u %u] "
+			"(DP=%u USB=%u) CMN_LANE_MUX_AND_EN=0x%08x\n",
+			__func__, udphy->id, udphy->flip ? "yes" : "no",
+			udphy->lane_mux_sel[0], udphy->lane_mux_sel[1],
+			udphy->lane_mux_sel[2], udphy->lane_mux_sel[3],
+			(uint) PHY_LANE_MUX_DP, (uint) PHY_LANE_MUX_USB, mux_val));
+	}
+
 	/* Step 4: deassert init rstn and wait for 200ns from datasheet */
 	if (udphy->mode & UDPHY_MODE_USB)
 		udphy_reset_deassert(&udphy->rst_init);
@@ -1057,7 +1107,7 @@ static int rk3588_dp_phy_set_voltages(struct rockchip_udphy *udphy,
  * or with all four lanes dedicated to DP, are left exactly as they were.
  */
 STATIC
-VOID
+EFI_STATUS
 UsbDpPhyApplyTypeCOrientation (
 	IN struct rockchip_udphy *udphy
 	)
@@ -1069,14 +1119,15 @@ UsbDpPhyApplyTypeCOrientation (
 	USB_TYPE_C_PORT_PROTOCOL	*Port;
 	USB_TYPE_C_ORIENTATION		Orientation;
 	BOOLEAN				Flip;
+	BOOLEAN				Found = FALSE;
 
 	if (udphy->board_mode != UDPHY_MODE_DP_USB)
-		return;
+		return EFI_UNSUPPORTED;
 
 	Status = gBS->LocateHandleBuffer (ByProtocol, &gUsbTypeCPortProtocolGuid,
 					  NULL, &HandleCount, &Handles);
 	if (EFI_ERROR (Status))
-		return;
+		return EFI_NOT_FOUND;
 
 	for (Index = 0; Index < HandleCount; Index++) {
 		Status = gBS->HandleProtocol (Handles[Index],
@@ -1084,6 +1135,8 @@ UsbDpPhyApplyTypeCOrientation (
 					      (VOID **) &Port);
 		if (EFI_ERROR (Status) || Port->PhyId != (UINT32) udphy->id)
 			continue;
+
+		Found = TRUE;
 
 		Status = Port->GetOrientation (Port, &Orientation);
 		if (EFI_ERROR (Status)) {
@@ -1095,8 +1148,16 @@ UsbDpPhyApplyTypeCOrientation (
 		}
 
 		Flip = (Orientation == UsbTypeCOrientationFlipped);
-		if (Flip == udphy->flip)
+
+		if (Flip == udphy->flip) {
+			/*
+			 * The lane mux already matches the plug, but the SBU
+			 * switches are not derived from it and still have to be
+			 * thrown before DisplayPort AUX will reach the sink.
+			 */
+			udphy_set_sbu_switches (udphy);
 			break;
+		}
 
 		DEBUG ((DEBUG_INFO, "%a: PHY %u: remapping lanes for %a plug\n",
 			__func__, udphy->id, Flip ? "flipped" : "normal"));
@@ -1113,6 +1174,8 @@ UsbDpPhyApplyTypeCOrientation (
 	}
 
 	FreePool (Handles);
+
+	return Found ? EFI_SUCCESS : EFI_NOT_FOUND;
 }
 
 /*
@@ -1201,6 +1264,75 @@ UsbDpPhyApplyTypeCLaneCount (
 	FreePool (Handles);
 }
 
+/*
+ * Apply the plug orientation to the USB side of a shared connector.
+ *
+ * rockchip_u3phy_init() commits the lane mux when this driver starts, which
+ * is before the Type-C port controller on I2C has been found, so USB 3 came
+ * up on the board default mapping and worked in one plug orientation only.
+ * The DisplayPort side picked the orientation up in DpPhyPowerOn(), but that
+ * only runs when a display is attached, so a plain USB 3 device never saw the
+ * benefit.
+ *
+ * Re-commit the USB bring-up when the orientation turns out to differ. This
+ * runs during driver dispatch, long before the host controllers are connected
+ * at BDS, so nothing is using the PHY yet to disturb.
+ */
+STATIC
+EFI_STATUS
+UsbDpPhyApplyOrientationForUsb (
+	IN struct rockchip_udphy *udphy
+	)
+{
+	EFI_STATUS	Status;
+	int		ret;
+
+	Status = UsbDpPhyApplyTypeCOrientation (udphy);
+	if (EFI_ERROR (Status))
+		return Status;
+
+	/* Orientation already matched the board mapping; nothing to redo. */
+	if (!udphy->mode_change)
+		return EFI_SUCCESS;
+
+	DEBUG ((DEBUG_INFO, "%a: PHY %u: re-applying USB lane mapping\n",
+		__func__, udphy->id));
+
+	ret = rockchip_u3phy_init (udphy);
+	if (ret) {
+		DEBUG ((DEBUG_ERROR, "%a: PHY %u: USB re-init failed, errno %d\n",
+			__func__, udphy->id, ret));
+		return EFI_DEVICE_ERROR;
+	}
+
+	return EFI_SUCCESS;
+}
+
+/*
+ * The port controller is a driver binding on I2C, so it may well start after
+ * this one. Pick the orientation up when it does.
+ */
+STATIC
+VOID
+EFIAPI
+UsbDpPhyTypeCPortArrived (
+	IN EFI_EVENT	Event,
+	IN VOID		*Context
+	)
+{
+	struct rockchip_udphy *udphy = Context;
+
+	if (UsbDpPhyApplyOrientationForUsb (udphy) == EFI_NOT_FOUND)
+		return;
+
+	/*
+	 * Exactly one port controller ever matches a given PHY, so stop
+	 * listening once it has turned up.
+	 */
+	gBS->CloseEvent (udphy->TypeCEvent);
+	udphy->TypeCEvent = NULL;
+}
+
 EFI_STATUS
 EFIAPI
 DpPhyPowerOn (
@@ -1264,11 +1396,27 @@ UsbDpPhySetup (
 	IN struct rockchip_udphy *UdPhy,
 	IN UINT8 *DpLaneMux,
 	IN UINTN DpNumLanes,
-	IN UINT32 Usb3State
+	IN UINT32 Usb3State,
+	IN UINT8 *SbuGpios,
+	IN UINTN SbuGpiosSize
 	)
 {
 	EFI_STATUS Status;
 	int ret = 0;
+
+	/*
+	 * { sbu1 bank, sbu1 pin, sbu2 bank, sbu2 pin }. Anything shorter is the
+	 * default placeholder, meaning this board has no SBU switches.
+	 */
+	UdPhy->sbu1_dc_bank = 0xFF;
+	UdPhy->sbu2_dc_bank = 0xFF;
+
+	if (SbuGpios != NULL && SbuGpiosSize >= 4) {
+		UdPhy->sbu1_dc_bank = SbuGpios[0];
+		UdPhy->sbu1_dc_pin  = SbuGpios[1];
+		UdPhy->sbu2_dc_bank = SbuGpios[2];
+		UdPhy->sbu2_dc_pin  = SbuGpios[3];
+	}
 
 	// treat default byte array definition as NULL
 	if (DpNumLanes == 1 && DpLaneMux[0] == 0) {
@@ -1292,10 +1440,34 @@ UsbDpPhySetup (
 		DEBUG ((DEBUG_ERROR, "%a: udphy_reset_init errno %d\n", __func__, ret));
 		return EFI_DEVICE_ERROR;
 	}
+	/*
+	 * Take the plug orientation before the first bring-up rather than
+	 * after it. USB 3 on a shared Type-C connector needs the lane mux to
+	 * match the plug, not the board default, and settling that here means
+	 * the PHY is built once with the right mapping instead of being torn
+	 * down and rebuilt a moment later.
+	 */
+	Status = UsbDpPhyApplyTypeCOrientation (UdPhy);
+
 	ret = rockchip_u3phy_init (UdPhy);
 	if (ret) {
 		DEBUG ((DEBUG_ERROR, "%a: rockchip_u3phy_init errno %d\n", __func__, ret));
 		return EFI_DEVICE_ERROR;
+	}
+
+	/*
+	 * The port controller is a driver binding on I2C and may not have
+	 * started yet. Where it has not, pick the orientation up when it
+	 * appears -- that path does have to redo the bring-up.
+	 */
+	if (Status == EFI_NOT_FOUND) {
+		Status = gBS->CreateEvent (EVT_NOTIFY_SIGNAL, TPL_CALLBACK,
+					   UsbDpPhyTypeCPortArrived, UdPhy,
+					   &UdPhy->TypeCEvent);
+		if (!EFI_ERROR (Status))
+			gBS->RegisterProtocolNotify (&gUsbTypeCPortProtocolGuid,
+						     UdPhy->TypeCEvent,
+						     &UdPhy->TypeCRegistration);
 	}
 
 	if (UdPhy->mode & UDPHY_MODE_DP) {
@@ -1398,7 +1570,9 @@ UsbDpPhyDxeInitialize (
 		UsbDpPhySetup (&usbdp_phy[0],
 			PcdGetPtr (PcdDp0LaneMux),
 			PcdGetSize (PcdDp0LaneMux),
-			PcdGet32 (PcdUsbDpPhy0Usb3State)
+			PcdGet32 (PcdUsbDpPhy0Usb3State),
+			PcdGetPtr (PcdUsbDpPhy0SbuGpios),
+			PcdGetSize (PcdUsbDpPhy0SbuGpios)
 		);
 	}
 
@@ -1406,7 +1580,9 @@ UsbDpPhyDxeInitialize (
 		UsbDpPhySetup (&usbdp_phy[1],
 			PcdGetPtr (PcdDp1LaneMux),
 			PcdGetSize (PcdDp1LaneMux),
-			PcdGet32 (PcdUsbDpPhy1Usb3State)
+			PcdGet32 (PcdUsbDpPhy1Usb3State),
+			PcdGetPtr (PcdUsbDpPhy1SbuGpios),
+			PcdGetSize (PcdUsbDpPhy1SbuGpios)
 		);
 	}
 
