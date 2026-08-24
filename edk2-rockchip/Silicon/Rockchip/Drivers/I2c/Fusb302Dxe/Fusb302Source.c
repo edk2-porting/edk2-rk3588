@@ -47,7 +47,6 @@
   @retval EFI_UNSUPPORTED   No supply GPIO was configured for this board.
 
 **/
-STATIC
 EFI_STATUS
 Fusb302SourceSetVbus (
   IN BOOLEAN  Enable

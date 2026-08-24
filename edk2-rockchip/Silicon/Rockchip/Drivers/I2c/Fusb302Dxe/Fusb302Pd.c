@@ -416,6 +416,84 @@ Fusb302PdSelectPdo (
 }
 
 EFI_STATUS
+Fusb302PdHardReset (
+  IN OUT FUSB302_CONTEXT  *Context
+  )
+{
+  EFI_STATUS  Status;
+  UINT8       Status0;
+  UINTN       Waited;
+  BOOLEAN     Gone;
+
+  DEBUG ((DEBUG_INFO, "%a: sending Hard Reset\n", __func__));
+
+  Status = Fusb302RegUpdate (
+             Context,
+             FUSB302_REG_CONTROL3,
+             FUSB302_CONTROL3_SEND_HARD_RESET,
+             FUSB302_CONTROL3_SEND_HARD_RESET
+             );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Both ends start counting from zero again.
+  //
+  Context->MessageId             = 0;
+  Context->Contract.PdNegotiated = FALSE;
+
+  //
+  // Watch VBUS fall and rise again. Seeing it go is what tells us the source
+  // acted on the reset rather than ignoring it, but a source that recovers
+  // quickly can be back before we look, so a rail that never appears to drop
+  // is not treated as a failure.
+  //
+  Gone = FALSE;
+
+  for (Waited = 0; Waited < PD_HARD_RESET_RECOVER_US; Waited += PD_POLL_INTERVAL_US) {
+    Status = Fusb302RegRead (Context, FUSB302_REG_STATUS0, &Status0);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    if ((Status0 & FUSB302_STATUS0_VBUSOK) == 0) {
+      Gone = TRUE;
+    } else if (Gone) {
+      break;
+    }
+
+    MicroSecondDelay (PD_POLL_INTERVAL_US);
+  }
+
+  Status = Fusb302RegRead (Context, FUSB302_REG_STATUS0, &Status0);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  if ((Status0 & FUSB302_STATUS0_VBUSOK) == 0) {
+    DEBUG ((DEBUG_ERROR, "%a: VBUS did not return after Hard Reset\n", __func__));
+    return EFI_TIMEOUT;
+  }
+
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: VBUS %a; port is back\n",
+    __func__,
+    Gone ? "cycled" : "never seen to drop"
+    ));
+
+  //
+  // Anything the controller buffered belongs to the conversation we just tore
+  // down.
+  //
+  Fusb302RegUpdate (Context, FUSB302_REG_CONTROL1, FUSB302_CONTROL1_RX_FLUSH, FUSB302_CONTROL1_RX_FLUSH);
+  Fusb302RegUpdate (Context, FUSB302_REG_CONTROL0, FUSB302_CONTROL0_TX_FLUSH, FUSB302_CONTROL0_TX_FLUSH);
+
+  return EFI_SUCCESS;
+}
+
+EFI_STATUS
 Fusb302PdNegotiateSink (
   IN OUT FUSB302_CONTEXT         *Context,
   IN     USB_TYPE_C_ORIENTATION  Orientation
@@ -454,10 +532,9 @@ Fusb302PdNegotiateSink (
     //
     // Silence does not mean there is no source: once a contract exists the
     // source stops advertising, which is what we find on a warm reboot or
-    // where an earlier boot stage already negotiated. Soft_Reset returns both
-    // ends to a known protocol state and makes the source advertise again. It
-    // does not disturb VBUS, unlike a hard reset, so it is safe to send even
-    // when the board is running off this port.
+    // where an earlier boot stage already negotiated. Try Soft_Reset first,
+    // since it returns both ends to a known protocol state without disturbing
+    // VBUS.
     //
     DEBUG ((DEBUG_INFO, "%a: no advertisement; sending Soft_Reset\n", __func__));
 
@@ -481,21 +558,60 @@ Fusb302PdNegotiateSink (
     Context->MessageId = 0;
 
     Status = Fusb302PdWaitFor (Context, FALSE, PD_CTRL_ACCEPT, PD_SENDER_RESPONSE_TIMEOUT_US, &Message);
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_INFO, "%a: Soft_Reset unanswered (%r); partner is not a PD source\n", __func__, Status));
-      goto Disable;
+    if (!EFI_ERROR (Status)) {
+      Status = Fusb302PdWaitFor (
+                 Context,
+                 TRUE,
+                 PD_DATA_SOURCE_CAP,
+                 PD_SOURCE_CAP_RETRY_TIMEOUT_US,
+                 &Message
+                 );
+    } else {
+      DEBUG ((DEBUG_INFO, "%a: Soft_Reset unanswered (%r)\n", __func__, Status));
     }
 
-    Status = Fusb302PdWaitFor (
-               Context,
-               TRUE,
-               PD_DATA_SOURCE_CAP,
-               PD_SOURCE_CAP_RETRY_TIMEOUT_US,
-               &Message
-               );
     if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_WARN, "%a: no Source_Capabilities after Soft_Reset (%r)\n", __func__, Status));
-      goto Disable;
+      //
+      // A source holding a contract agreed before this firmware started may
+      // refuse to answer Soft_Reset at all, because from its point of view
+      // nothing is wrong. Hard Reset is what the specification leaves for
+      // that: it tears the contract down at both ends and the source starts
+      // advertising from scratch. It costs a momentary loss of VBUS, which is
+      // why it is tried only once Soft_Reset has failed.
+      //
+      DEBUG ((DEBUG_INFO, "%a: falling back to Hard Reset\n", __func__));
+
+      Status = Fusb302PdHardReset (Context);
+      if (EFI_ERROR (Status)) {
+        goto Disable;
+      }
+
+      //
+      // The terminations and the receiver have to be put back afterwards; a
+      // Hard Reset returns the controller to its unattached state.
+      //
+      Status = Fusb302PdEnable (Context, Orientation);
+      if (EFI_ERROR (Status)) {
+        goto Disable;
+      }
+
+      Status = Fusb302PdWaitFor (
+                 Context,
+                 TRUE,
+                 PD_DATA_SOURCE_CAP,
+                 PD_SOURCE_CAP_RETRY_TIMEOUT_US,
+                 &Message
+                 );
+      if (EFI_ERROR (Status)) {
+        DEBUG ((
+          DEBUG_WARN,
+          "%a: no Source_Capabilities after Hard Reset (%r); "
+          "partner is not a PD source\n",
+          __func__,
+          Status
+          ));
+        goto Disable;
+      }
     }
   }
 

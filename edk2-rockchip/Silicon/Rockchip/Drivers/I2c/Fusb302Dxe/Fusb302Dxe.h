@@ -54,6 +54,12 @@
 #define FUSB302_REG_CONTROL2                0x08
 #define   FUSB302_CONTROL2_TOGGLE           BIT0
 #define FUSB302_REG_CONTROL3                0x09
+#define   FUSB302_CONTROL3_SEND_HARD_RESET  BIT6
+#define   FUSB302_CONTROL3_AUTO_HARDRESET   BIT4
+#define   FUSB302_CONTROL3_AUTO_SOFTRESET   BIT3
+#define   FUSB302_CONTROL3_N_RETRIES_MASK   (BIT2 | BIT1)
+#define   FUSB302_CONTROL3_N_RETRIES_SHIFT  1
+#define   FUSB302_CONTROL3_AUTO_RETRY       BIT0
 #define FUSB302_REG_MASK                    0x0A
 #define FUSB302_REG_POWER                   0x0B
 #define   FUSB302_POWER_PWR_BANDGAP         BIT0
@@ -110,6 +116,9 @@
 #define PD_HEADER_ID(Header)                (((Header) >> 9) & 0x7)
 #define PD_HEADER_COUNT(Header)             (((Header) >> 12) & 0x7)
 #define PD_HEADER_EXTENDED(Header)          (((Header) >> 15) & 0x1)
+#define PD_HEADER_REV(Header)               (((Header) >> 6) & 0x3)
+#define PD_HEADER_DATA_ROLE(Header)         (((Header) >> 5) & 0x1)
+#define PD_HEADER_POWER_ROLE(Header)        (((Header) >> 8) & 0x1)
 
 #define PD_HEADER_BUILD(Type, Id, Count, DataRole, PowerRole, Revision)  \
   ((UINT16)(((Type) & 0x1F)             |                                \
@@ -274,6 +283,21 @@
 #define PD_VBUS_ON_TIMEOUT_US               (200 * 1000)
 
 //
+// After a Hard Reset the source takes VBUS to zero and brings it back. The
+// specification allows tSafe0V plus tSrcRecover for that, which together come
+// to around a second; allow half again on top.
+//
+#define PD_HARD_RESET_RECOVER_US            (1500 * 1000)
+
+//
+// A source may advertise again straight after a contract. Answer a few of
+// those before deciding it will never settle, so a partner stuck repeating
+// itself cannot hold up the rest of the boot.
+//
+#define PD_SOURCE_CAP_REPEAT_US             (250 * 1000)
+#define PD_SOURCE_CAP_REPEAT_LIMIT          4
+
+//
 // Fixed supply power data object we advertise, at 5 V.
 //
 #define PD_PDO_FIXED_BUILD(VoltageMv, CurrentMa)    \
@@ -433,8 +457,47 @@ Fusb302PdSourceRun (
   @retval EFI_UNSUPPORTED   The board does not source power.
 
 **/
+/**
+  Switch this board's USB-C supply on or off.
+
+  Boards whose supply defaults to on at reset have to be able to take it down
+  again: driving VBUS while a source is attached puts two supplies onto one
+  rail, and a source will not negotiate into that.
+
+  @retval EFI_SUCCESS       The supply was switched.
+  @retval EFI_UNSUPPORTED   No supply GPIO was configured for this board.
+
+**/
+EFI_STATUS
+Fusb302SourceSetVbus (
+  IN BOOLEAN  Enable
+  );
+
 EFI_STATUS
 Fusb302SourceIdle (
+  IN OUT FUSB302_CONTEXT  *Context
+  );
+
+/**
+  Send a USB Power Delivery Hard Reset and wait for the port to come back.
+
+  The last resort when a source will not talk to us. Both ends drop their
+  protocol state and the source removes VBUS and restores it, after which it
+  advertises from scratch. That is the only way back when a source is still
+  holding a contract agreed before this firmware started and does not answer
+  Soft_Reset.
+
+  Because VBUS really does go away for a moment, a board drawing all its power
+  from this port will brown out. That is inherent to Hard Reset rather than
+  anything this driver can avoid, and it is what the specification requires a
+  sink to do when capabilities never arrive.
+
+  @retval EFI_SUCCESS       The reset was sent and VBUS returned.
+  @retval EFI_TIMEOUT       VBUS did not come back.
+
+**/
+EFI_STATUS
+Fusb302PdHardReset (
   IN OUT FUSB302_CONTEXT  *Context
   );
 

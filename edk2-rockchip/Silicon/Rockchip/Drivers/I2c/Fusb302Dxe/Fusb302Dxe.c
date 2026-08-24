@@ -722,6 +722,15 @@ Fusb302Start (
     // offer power itself.
     //
     if (Context->PartnerIsSource) {
+      //
+      // Stop driving VBUS first. A board whose supply comes up enabled at
+      // reset is pushing into the attached source's own output, and a source
+      // will not negotiate onto a rail something else is already holding up.
+      // Boards that never drive it return EFI_UNSUPPORTED here, which is
+      // exactly right and costs nothing.
+      //
+      Fusb302SourceSetVbus (FALSE);
+
       Status = Fusb302PdNegotiateSink (Context, Orientation);
 
       //
