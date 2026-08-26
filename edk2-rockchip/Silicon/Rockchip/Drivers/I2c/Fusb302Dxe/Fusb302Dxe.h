@@ -298,6 +298,14 @@
 #define PD_SOURCE_CAP_REPEAT_LIMIT          4
 
 //
+// A display behind an adapter is not necessarily awake when alternate mode is
+// entered, and hot-plug detect asserts once it is. Give it a moment rather
+// than reporting the port empty on the strength of a single early read.
+//
+#define PD_DP_HPD_TIMEOUT_US                (2500 * 1000)
+#define PD_DP_HPD_POLL_US                   (250 * 1000)
+
+//
 // Fixed supply power data object we advertise, at 5 V.
 //
 #define PD_PDO_FIXED_BUILD(VoltageMv, CurrentMa)    \

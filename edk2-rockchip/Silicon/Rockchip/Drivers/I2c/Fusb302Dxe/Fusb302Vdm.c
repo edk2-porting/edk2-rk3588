@@ -237,6 +237,7 @@ Fusb302DpAltModeEnter (
   UINT32      Config;
   UINT32      Zero = 0;
   UINT8       PinAssignment;
+  UINTN       Waited;
   UINT8       Lanes;
   UINTN       Count;
 
@@ -438,6 +439,44 @@ Fusb302DpAltModeEnter (
   if (PD_HEADER_COUNT (Response.Header) >= 2) {
     Context->DpAltMode.HpdAsserted = DP_STATUS_HPD_STATE (Response.Objects[1]) != 0;
   }
+
+  //
+  // Hot-plug detect is asserted by the sink once its own display is up, which
+  // is not necessarily by the time alternate mode is entered -- an adapter
+  // driving an HDMI monitor has a whole downstream link to bring up first. The
+  // partner announces the change with an Attention message, but asking again
+  // costs one exchange and does not depend on catching an unsolicited message
+  // at the right moment.
+  //
+  for (Waited = 0;
+       !Context->DpAltMode.HpdAsserted && (Waited < PD_DP_HPD_TIMEOUT_US);
+       Waited += PD_DP_HPD_POLL_US)
+  {
+    MicroSecondDelay (PD_DP_HPD_POLL_US);
+
+    Status = Fusb302VdmRequest (
+               Context,
+               PD_VDM_SVID_DISPLAYPORT,
+               PD_VDM_DP_STATUS,
+               1,
+               &Zero,
+               1,
+               &Response
+               );
+    if (EFI_ERROR (Status)) {
+      break;
+    }
+
+    if (PD_HEADER_COUNT (Response.Header) >= 2) {
+      Context->DpAltMode.HpdAsserted = DP_STATUS_HPD_STATE (Response.Objects[1]) != 0;
+    }
+  }
+
+  //
+  // Whether it ever asserted or not, the link is configured and the caller can
+  // still drive the port blind if it wants to.
+  //
+  Status = EFI_SUCCESS;
 
   DEBUG ((
     DEBUG_INFO,
