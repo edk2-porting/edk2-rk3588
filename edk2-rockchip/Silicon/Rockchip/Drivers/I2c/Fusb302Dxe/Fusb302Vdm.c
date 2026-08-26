@@ -243,13 +243,24 @@ Fusb302DpAltModeEnter (
   ZeroMem (&Context->DpAltMode, sizeof (Context->DpAltMode));
 
   //
-  // Alternate modes are discovered by the downstream facing port. Attaching as
-  // a sink leaves us upstream facing, so ask to swap before anything else; a
-  // partner that refuses cannot be driven as a display from here.
+  // Alternate modes are discovered by the downstream facing port, and
+  // attaching as a sink leaves us upstream facing, so ask to swap first.
+  //
+  // A refusal is not fatal. A dock is a hub and wants to stay upstream facing,
+  // so it has no reason to swap and may already regard us as the downstream
+  // port; asking again for a role we hold gets silence rather than a rejection.
+  // Carry on and let Discover Identity settle it -- a partner that genuinely
+  // will not talk to us in this role simply fails that instead, one exchange
+  // later.
   //
   Status = Fusb302PdDataRoleSwapToDfp (Context);
   if (EFI_ERROR (Status)) {
-    return EFI_UNSUPPORTED;
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: no data role swap (%r); trying discovery in the role we have\n",
+      __func__,
+      Status
+      ));
   }
 
   //

@@ -320,11 +320,28 @@ Fusb302PdWaitFor (
       return Status;
     }
 
+    Count = PD_HEADER_COUNT (Message->Header);
+
+    //
+    // Log everything that arrives, matching or not. What a partner sends
+    // unprompted between exchanges is the only way to tell a message we got
+    // wrong from one the partner never sent.
+    //
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: rx %a type %u id %u objects %u rev %u%a\n",
+      __func__,
+      Count > 0 ? "data" : "ctrl",
+      (UINT32)PD_HEADER_TYPE (Message->Header),
+      (UINT32)PD_HEADER_ID (Message->Header),
+      (UINT32)Count,
+      (UINT32)PD_HEADER_REV (Message->Header),
+      PD_HEADER_EXTENDED (Message->Header) ? " extended" : ""
+      ));
+
     if (PD_HEADER_EXTENDED (Message->Header)) {
       continue;
     }
-
-    Count = PD_HEADER_COUNT (Message->Header);
 
     if (!WantData && (Count == 0) && (PD_HEADER_TYPE (Message->Header) == Type)) {
       return EFI_SUCCESS;
@@ -508,6 +525,7 @@ Fusb302PdNegotiateSink (
   UINT32      CurrentMa;
   UINT32      MaxVoltageMv;
   UINT32      MaxCurrentMa;
+  UINTN       Attempt;
 
   MaxVoltageMv = PcdGet32 (PcdFusb302MaxVoltageMv);
   MaxCurrentMa = PcdGet32 (PcdFusb302MaxCurrentMa);
@@ -624,57 +642,82 @@ Fusb302PdNegotiateSink (
     MaxCurrentMa
     ));
 
-  Status = Fusb302PdSelectPdo (&Message, MaxVoltageMv, MaxCurrentMa, &Position, &VoltageMv, &CurrentMa);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_WARN, "%a: no acceptable power data object offered\n", __func__));
-    goto Disable;
-  }
-
-  DEBUG ((
-    DEBUG_INFO,
-    "%a: requesting object %u: %u mV, %u mA\n",
-    __func__,
-    (UINT32)Position,
-    VoltageMv,
-    CurrentMa
-    ));
-
-  Rdo = PD_RDO_FIXED (Position, CurrentMa, CurrentMa);
-
-  Header = PD_HEADER_BUILD (
-             PD_DATA_REQUEST,
-             Context->MessageId,
-             1,
-             Context->DataRoleDfp ? 1 : 0,
-             0,
-             PD_REV_2_0
-             );
-
-  Status = Fusb302PdSend (Context, Header, &Rdo);
-  if (EFI_ERROR (Status)) {
-    goto Disable;
-  }
-
-  Context->MessageId = (Context->MessageId + 1) & 0x7;
-
-  Status = Fusb302PdWaitFor (Context, FALSE, PD_CTRL_ACCEPT, PD_SENDER_RESPONSE_TIMEOUT_US, &Message);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_WARN, "%a: request not accepted (%r)\n", __func__, Status));
-    goto Disable;
-  }
-
   //
-  // The source now moves the supply; PS_RDY says it has arrived.
+  // A source is entitled to advertise again after a contract, and a sink has
+  // to answer every Source_Capabilities with a Request. Ignoring a repeat
+  // leaves the source part way through an exchange, after which it ignores
+  // everything else we send -- which looks exactly like a partner that does
+  // not support alternate mode.
   //
-  Status = Fusb302PdWaitFor (Context, FALSE, PD_CTRL_PS_RDY, PD_PS_TRANSITION_TIMEOUT_US, &Message);
-  if (EFI_ERROR (Status)) {
-    DEBUG ((DEBUG_WARN, "%a: no PS_RDY after Accept (%r)\n", __func__, Status));
-    goto Disable;
-  }
+  for (Attempt = 0; Attempt < PD_SOURCE_CAP_REPEAT_LIMIT; Attempt++) {
+    Status = Fusb302PdSelectPdo (&Message, MaxVoltageMv, MaxCurrentMa, &Position, &VoltageMv, &CurrentMa);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_WARN, "%a: no acceptable power data object offered\n", __func__));
+      goto Disable;
+    }
 
-  Context->Contract.PdNegotiated = TRUE;
-  Context->Contract.VoltageMv    = VoltageMv;
-  Context->Contract.CurrentMa    = CurrentMa;
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: requesting object %u: %u mV, %u mA\n",
+      __func__,
+      (UINT32)Position,
+      VoltageMv,
+      CurrentMa
+      ));
+
+    Rdo = PD_RDO_FIXED (Position, CurrentMa, CurrentMa);
+
+    Header = PD_HEADER_BUILD (
+               PD_DATA_REQUEST,
+               Context->MessageId,
+               1,
+               Context->DataRoleDfp ? 1 : 0,
+               0,
+               PD_REV_2_0
+               );
+
+    Status = Fusb302PdSend (Context, Header, &Rdo);
+    if (EFI_ERROR (Status)) {
+      goto Disable;
+    }
+
+    Context->MessageId = (Context->MessageId + 1) & 0x7;
+
+    Status = Fusb302PdWaitFor (Context, FALSE, PD_CTRL_ACCEPT, PD_SENDER_RESPONSE_TIMEOUT_US, &Message);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_WARN, "%a: request not accepted (%r)\n", __func__, Status));
+      goto Disable;
+    }
+
+    //
+    // The source now moves the supply; PS_RDY says it has arrived.
+    //
+    Status = Fusb302PdWaitFor (Context, FALSE, PD_CTRL_PS_RDY, PD_PS_TRANSITION_TIMEOUT_US, &Message);
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_WARN, "%a: no PS_RDY after Accept (%r)\n", __func__, Status));
+      goto Disable;
+    }
+
+    Context->Contract.PdNegotiated = TRUE;
+    Context->Contract.VoltageMv    = VoltageMv;
+    Context->Contract.CurrentMa    = CurrentMa;
+
+    //
+    // Settled, unless the source immediately offers again.
+    //
+    Status = Fusb302PdWaitFor (
+               Context,
+               TRUE,
+               PD_DATA_SOURCE_CAP,
+               PD_SOURCE_CAP_REPEAT_US,
+               &Message
+               );
+    if (EFI_ERROR (Status)) {
+      break;
+    }
+
+    DEBUG ((DEBUG_INFO, "%a: source advertised again; answering\n", __func__));
+  }
 
   DEBUG ((
     DEBUG_INFO,
