@@ -585,8 +585,12 @@ static int dw_dp_link_probe(struct dw_dp *dp)
 	int ret;
 
 	ret = drm_dp_read_dpcd_caps(&dp->aux, link->dpcd);
-	if (ret < 0)
+	if (ret < 0) {
+		DEBUG ((DEBUG_WARN,
+			"%a: cannot read DPCD over AUX (%d); no sink responding\n",
+			__func__, ret));
 		return ret;
+	}
 
 	ret = drm_dp_dpcd_readb(&dp->aux, DP_DPRX_FEATURE_ENUMERATION_LIST,
 				&dpcd);
@@ -608,6 +612,15 @@ static int dw_dp_link_probe(struct dw_dp *dp)
 	link->caps.channel_coding = drm_dp_channel_coding_supported(link->dpcd);
 	link->caps.ssc = !!(link->dpcd[DP_MAX_DOWNSPREAD] &
 			    DP_MAX_DOWNSPREAD_0_5);
+
+	DEBUG ((DEBUG_INFO,
+		"%a: sink DPCD rev %u.%u, link %u kHz x%u lanes "
+		"(phy offers %u kHz x%u)\n",
+		__func__,
+		(link->revision >> 4) & 0xF, link->revision & 0xF,
+		link->rate, link->lanes,
+		dp->phy->Capabilities.MaximumLinkRate * 100,
+		dp->phy->Capabilities.BusWidth));
 
 	return 0;
 }
@@ -1621,6 +1634,8 @@ static int dw_dp_connector_prepare(ROCKCHIP_CONNECTOR_PROTOCOL *conn, DISPLAY_ST
 	return 0;
 }
 
+static bool dw_dp_typec_hpd(struct dw_dp *dp, bool *present);
+
 static int dw_dp_connector_enable(ROCKCHIP_CONNECTOR_PROTOCOL *conn, DISPLAY_STATE *state)
 {
 	CONNECTOR_STATE *conn_state = &state->ConnectorState;
@@ -1631,6 +1646,49 @@ static int dw_dp_connector_enable(ROCKCHIP_CONNECTOR_PROTOCOL *conn, DISPLAY_STA
 
 	memcpy(&video->mode, mode, sizeof(video->mode));
 	video->pixel_mode = DPTX_MP_QUAD_PIXEL;
+
+	/*
+	 * Behind a Type-C connector the sink is only reachable once alternate
+	 * mode has been entered, and that happens after the display subsystem
+	 * has probed its connectors -- the port controller sits on I2C and is
+	 * not started until later. Detection therefore records the port as
+	 * empty and leaves it forced, which drives it blind: no DPCD, no link
+	 * training, and a sink that shows nothing.
+	 *
+	 * By the time the link is enabled alternate mode is up and AUX works,
+	 * so ask once more before giving up on a real link. Anything that
+	 * still does not answer stays forced, exactly as before.
+	 */
+	if (dp->force_output) {
+		bool present = false;
+
+		if (dw_dp_typec_hpd(dp, &present) && present) {
+			/*
+			 * Power the PHY again first. It was brought up during
+			 * connector init, which is also before the port
+			 * controller existed, so it holds the board default
+			 * mapping -- including the AUX polarity, which is the
+			 * wrong way round for a flipped plug and makes every
+			 * AUX transaction time out. Powering on now re-reads
+			 * the orientation and rebuilds the mapping.
+			 */
+			dp->phy->PowerOn (dp->phy);
+
+			/* Let the rebuilt PHY come back before using AUX. */
+			mdelay(20);
+
+			/*
+			 * Where AUX does answer this gets a trained link and a
+			 * real mode from EDID. Where it does not -- SBU is not
+			 * routed on every board -- the port stays forced, which
+			 * now at least drives the correct lanes.
+			 */
+			if (dw_dp_link_probe(dp) == 0) {
+				printf("sink answered on AUX after detection; training the link\n");
+				dp->force_output = false;
+			}
+		}
+	}
 
 	if (dp->force_output) {
 		ret = dw_dp_set_phy_default_config(dp);
@@ -1824,6 +1882,9 @@ DwDpConnectorDetect (
 	int ret;
 
 	ret = dw_dp_connector_detect(This, DisplayState);
+
+	DEBUG ((DEBUG_INFO, "%a: detect returned %d\n", __func__, ret));
+
 	if (ret)
 		return EFI_NOT_FOUND;
 
@@ -1839,6 +1900,9 @@ DwDpConnectorGetEdid (
 	int ret;
 
 	ret = dw_dp_connector_get_edid(This, DisplayState);
+
+	DEBUG ((DEBUG_INFO, "%a: EDID read returned %d\n", __func__, ret));
+
 	if (ret)
 		return EFI_DEVICE_ERROR;
 
@@ -1857,6 +1921,9 @@ DwDpConnectorEnable (
 	dw_dp_connector_prepare (This, DisplayState);
 
 	ret = dw_dp_connector_enable(This, DisplayState);
+
+	DEBUG ((DEBUG_INFO, "%a: enable returned %d\n", __func__, ret));
+
 	if (ret)
 		return EFI_DEVICE_ERROR;
 

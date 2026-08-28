@@ -980,6 +980,14 @@ static int rk3588_udphy_dplane_select(struct rockchip_udphy *udphy)
 {
 	u32 value = 0;
 
+	DEBUG ((DEBUG_INFO,
+		"%a: PHY %u: mode %u flip=%a aux_din_sel=%u aux_dout_sel=%u "
+		"dp_lane_sel=[%u %u %u %u]\n",
+		__func__, udphy->id, udphy->mode, udphy->flip ? "yes" : "no",
+		udphy->dp_aux_din_sel, udphy->dp_aux_dout_sel,
+		udphy->dp_lane_sel[0], udphy->dp_lane_sel[1],
+		udphy->dp_lane_sel[2], udphy->dp_lane_sel[3]));
+
 	switch (udphy->mode) {
 	case UDPHY_MODE_DP:
 		value |= 2 << udphy->dp_lane_sel[2] * 2;
@@ -1343,6 +1351,9 @@ DpPhyPowerOn (
 	int ret;
 
 	udphy = ROCKCHIP_UDPHY_FROM_DP_PHY_PROTOCOL (This);
+
+	DEBUG ((DEBUG_INFO, "%a: PHY %u: powering on for DisplayPort\n",
+		__func__, udphy->id));
 
 	UsbDpPhyApplyTypeCOrientation (udphy);
 	UsbDpPhyApplyTypeCLaneCount (udphy);
