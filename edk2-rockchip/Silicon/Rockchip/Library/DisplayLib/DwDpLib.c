@@ -1758,6 +1758,41 @@ static int dw_dp_connector_disable(ROCKCHIP_CONNECTOR_PROTOCOL *conn, DISPLAY_ST
  * Returns TRUE when a Type-C port owns this PHY and answered, in which case
  * Present says whether a display is out there.
  */
+/*
+ * The Type-C port controller sits on I2C, and nothing connects those buses
+ * until I2cDxe's own EndOfDxe handler runs. Display detection is an EndOfDxe
+ * handler too, registered at the same TPL, and in practice it runs first -- so
+ * a port that is present and negotiated by the time anything is drawn still
+ * looks absent while the connector is being probed.
+ *
+ * Connect the masters ourselves the first time we go looking. ConnectController
+ * is idempotent, so this costs nothing once I2cDxe has been through, and the
+ * negotiation it triggers would have happened moments later regardless.
+ */
+static void dw_dp_connect_i2c_buses(void)
+{
+	static bool			done = false;
+	EFI_STATUS			Status;
+	EFI_HANDLE			*Handles = NULL;
+	UINTN				HandleCount = 0;
+	UINTN				Index;
+
+	if (done)
+		return;
+
+	done = true;
+
+	Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiI2cMasterProtocolGuid,
+					  NULL, &HandleCount, &Handles);
+	if (EFI_ERROR (Status))
+		return;
+
+	for (Index = 0; Index < HandleCount; Index++)
+		gBS->ConnectController (Handles[Index], NULL, NULL, TRUE);
+
+	FreePool (Handles);
+}
+
 static bool dw_dp_typec_hpd(struct dw_dp *dp, bool *present)
 {
 	EFI_STATUS			Status;
@@ -1767,6 +1802,8 @@ static bool dw_dp_typec_hpd(struct dw_dp *dp, bool *present)
 	USB_TYPE_C_PORT_PROTOCOL	*Port;
 	USB_TYPE_C_DP_ALT_MODE		AltMode;
 	bool				found = false;
+
+	dw_dp_connect_i2c_buses();
 
 	Status = gBS->LocateHandleBuffer (ByProtocol, &gUsbTypeCPortProtocolGuid,
 					  NULL, &HandleCount, &Handles);
