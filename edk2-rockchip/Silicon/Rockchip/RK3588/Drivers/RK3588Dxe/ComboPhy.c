@@ -70,12 +70,13 @@ InitComPhyConfig (
       MmioWrite32 (PhyBaseAddr + (0xb << 2), 0x47);
       MmioWrite32 (PhyBaseAddr + (0xd << 2), 0x57);
 
-      if (PhyBaseAddr == COMBO_PIPE_PHY0) {
-        MmioWrite32 (PHP_GRF_BASE + PHP_GRF_PCIESEL_CON, BIT1 << 16);
-      }
-
+      /* PHY0 feeds pcie2x1l2, which has no lane-select bit. */
       if (PhyBaseAddr == COMBO_PIPE_PHY1) {
         MmioWrite32 (PHP_GRF_BASE + PHP_GRF_PCIESEL_CON, BIT0 << 16);
+      }
+
+      if (PhyBaseAddr == COMBO_PIPE_PHY2) {
+        MmioWrite32 (PHP_GRF_BASE + PHP_GRF_PCIESEL_CON, BIT1 << 16);
       }
 
       break;
