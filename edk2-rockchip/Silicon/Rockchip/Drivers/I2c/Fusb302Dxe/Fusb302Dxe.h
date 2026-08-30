@@ -137,6 +137,8 @@
 #define PD_CTRL_ACCEPT                      3
 #define PD_CTRL_REJECT                      4
 #define PD_CTRL_PS_RDY                      6
+#define PD_CTRL_GET_SOURCE_CAP              7
+#define PD_CTRL_GET_SINK_CAP                8
 #define PD_CTRL_DR_SWAP                     9
 #define PD_CTRL_SOFT_RESET                  13
 #define PD_CTRL_WAIT                        12
@@ -146,6 +148,7 @@
 //
 #define PD_DATA_SOURCE_CAP                  1
 #define PD_DATA_REQUEST                     2
+#define PD_DATA_SINK_CAP                    4
 
 //
 // Power data objects. Only fixed supplies are considered: variable and
@@ -165,6 +168,24 @@
             (((((OperatingMa) / 10)) & 0x3FF) << 10)    | \
             (((MaxMa) / 10) & 0x3FF)                    | \
             BIT25 /* USB communications capable */ ))
+
+//
+// Sink fixed supply data object, as advertised in Sink_Capabilities. The
+// first object a sink lists has to be the 5 V one, and nothing here asks a
+// source for more than that: the board limit only bounds the current.
+//
+// Dual-role power is deliberately left clear. This driver swaps data roles to
+// drive alternate modes, but it has no path for becoming the supply on a port
+// that is already feeding it, and claiming otherwise invites a PR_Swap it
+// would have to reject.
+//
+#define PD_PDO_SINK_FIXED(VoltageMv, OperatingMa)            \
+  ((UINT32)(((((VoltageMv) / 50) & 0x3FF) << 10)           | \
+            ((((OperatingMa) / 10)) & 0x3FF)               | \
+            BIT26 /* USB communications capable */         | \
+            BIT25 /* dual-role data */ ))
+
+#define PD_SINK_CAP_VOLTAGE_MV              5000
 
 #define PD_MAX_DATA_OBJECTS                 7
 
@@ -418,11 +439,11 @@ Fusb302PdSend (
 
 EFI_STATUS
 Fusb302PdWaitFor (
-  IN  FUSB302_CONTEXT  *Context,
-  IN  BOOLEAN          WantData,
-  IN  UINT8            Type,
-  IN  UINTN            TimeoutUs,
-  OUT PD_MESSAGE       *Message
+  IN OUT FUSB302_CONTEXT  *Context,
+  IN     BOOLEAN          WantData,
+  IN     UINT8            Type,
+  IN     UINTN            TimeoutUs,
+  OUT    PD_MESSAGE       *Message
   );
 
 EFI_STATUS

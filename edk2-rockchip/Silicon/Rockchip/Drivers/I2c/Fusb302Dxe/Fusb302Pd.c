@@ -287,6 +287,160 @@ Fusb302PdReceive (
 }
 
 /**
+  Send a control message carrying the current message ID, and step the ID on.
+
+  Used for the short answers this driver owes a partner that asks something of
+  it out of turn, where there is nothing to report but the answer itself.
+
+**/
+STATIC
+EFI_STATUS
+Fusb302PdSendControl (
+  IN OUT FUSB302_CONTEXT  *Context,
+  IN     UINT8            Type
+  )
+{
+  EFI_STATUS  Status;
+  UINT16      Header;
+
+  Header = PD_HEADER_BUILD (
+             Type,
+             Context->MessageId,
+             0,
+             Context->DataRoleDfp ? 1 : 0,
+             0,
+             PD_REV_2_0
+             );
+
+  Status = Fusb302PdSend (Context, Header, NULL);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Context->MessageId = (Context->MessageId + 1) & 0x7;
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Accept a Soft_Reset the partner asked for.
+
+  Soft_Reset puts both ends back to a known protocol state without disturbing
+  VBUS, and the specification has the receiver answer Accept using message ID
+  zero, both counters having been reset. A partner that gets no answer escalates
+  to a Hard Reset, which drops the rail and costs us the contract and any
+  alternate mode along with it.
+
+  Whatever exchange was in flight is over either way; the caller sees its own
+  wait time out and decides what to do next.
+
+**/
+STATIC
+VOID
+Fusb302PdAcceptSoftReset (
+  IN OUT FUSB302_CONTEXT  *Context
+  )
+{
+  EFI_STATUS  Status;
+
+  //
+  // Both counters restart, and the Accept itself carries the first ID.
+  //
+  Context->MessageId = 0;
+
+  Status = Fusb302PdSendControl (Context, PD_CTRL_ACCEPT);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_WARN, "%a: could not accept Soft_Reset (%r)\n", __func__, Status));
+    return;
+  }
+
+  Context->Contract.PdNegotiated = FALSE;
+
+  DEBUG ((DEBUG_INFO, "%a: accepted Soft_Reset; message IDs restart\n", __func__));
+}
+
+/**
+  Turn down a request this driver cannot satisfy.
+
+  A sink asked for its source capabilities has none to give: this driver never
+  offers power on a port that is feeding it. Under the 2.0 protocol the answer
+  to a request that cannot be met is Reject, and saying so is what lets the
+  partner move on. Silence would strand it exactly as an unanswered
+  Get_Sink_Cap does.
+
+**/
+STATIC
+VOID
+Fusb302PdRejectRequest (
+  IN OUT FUSB302_CONTEXT  *Context,
+  IN     UINT8            Type
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = Fusb302PdSendControl (Context, PD_CTRL_REJECT);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_WARN, "%a: could not reject message type %u (%r)\n", __func__, (UINT32)Type, Status));
+    return;
+  }
+
+  DEBUG ((DEBUG_INFO, "%a: rejected message type %u\n", __func__, (UINT32)Type));
+}
+
+/**
+  Answer a Get_Sink_Cap with what this board is prepared to draw.
+
+  A source may ask at any point, and the question is its own atomic message
+  sequence: a source left waiting on the answer stays part way through an
+  exchange and ignores everything that follows it, alternate mode entry
+  included. That is the same failure a repeated Source_Capabilities caused.
+
+  Failure to reply is logged rather than propagated. The question is the
+  partner's, not ours, and losing the answer costs no less than never having
+  sent one.
+
+**/
+STATIC
+VOID
+Fusb302PdAnswerGetSinkCap (
+  IN OUT FUSB302_CONTEXT  *Context
+  )
+{
+  EFI_STATUS  Status;
+  UINT16      Header;
+  UINT32      Pdo;
+  UINT32      CurrentMa;
+
+  CurrentMa = PcdGet32 (PcdFusb302MaxCurrentMa);
+  Pdo       = PD_PDO_SINK_FIXED (PD_SINK_CAP_VOLTAGE_MV, CurrentMa);
+
+  Header = PD_HEADER_BUILD (
+             PD_DATA_SINK_CAP,
+             Context->MessageId,
+             1,
+             Context->DataRoleDfp ? 1 : 0,
+             0,
+             PD_REV_2_0
+             );
+
+  Status = Fusb302PdSend (Context, Header, &Pdo);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_WARN, "%a: could not answer Get_Sink_Cap (%r)\n", __func__, Status));
+    return;
+  }
+
+  Context->MessageId = (Context->MessageId + 1) & 0x7;
+
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: answered Get_Sink_Cap with %u mV, %u mA\n",
+    __func__,
+    (UINT32)PD_SINK_CAP_VOLTAGE_MV,
+    CurrentMa
+    ));
+}
+
+/**
   Wait for a specific message, discarding anything else that arrives.
 
   GoodCRC is skipped throughout: the controller generates and consumes those
@@ -298,11 +452,11 @@ Fusb302PdReceive (
 **/
 EFI_STATUS
 Fusb302PdWaitFor (
-  IN  FUSB302_CONTEXT  *Context,
-  IN  BOOLEAN          WantData,
-  IN  UINT8            Type,
-  IN  UINTN            TimeoutUs,
-  OUT PD_MESSAGE       *Message
+  IN OUT FUSB302_CONTEXT  *Context,
+  IN     BOOLEAN          WantData,
+  IN     UINT8            Type,
+  IN     UINTN            TimeoutUs,
+  OUT    PD_MESSAGE       *Message
   )
 {
   EFI_STATUS  Status;
@@ -341,6 +495,34 @@ Fusb302PdWaitFor (
 
     if (PD_HEADER_EXTENDED (Message->Header)) {
       continue;
+    }
+
+    //
+    // Answer what the partner asks for in passing, whatever we happen to be
+    // waiting for. A request left hanging strands the partner part way through
+    // an exchange, after which it ignores everything that follows.
+    //
+    // These answers are owed in the sink role, which is the only role this
+    // driver negotiates in; the source path builds its own replies, with the
+    // power role bit its headers need.
+    //
+    if (Context->PartnerIsSource && (Count == 0)) {
+      switch (PD_HEADER_TYPE (Message->Header)) {
+        case PD_CTRL_GET_SINK_CAP:
+          Fusb302PdAnswerGetSinkCap (Context);
+          continue;
+
+        case PD_CTRL_SOFT_RESET:
+          Fusb302PdAcceptSoftReset (Context);
+          continue;
+
+        case PD_CTRL_GET_SOURCE_CAP:
+          Fusb302PdRejectRequest (Context, PD_CTRL_GET_SOURCE_CAP);
+          continue;
+
+        default:
+          break;
+      }
     }
 
     if (!WantData && (Count == 0) && (PD_HEADER_TYPE (Message->Header) == Type)) {
