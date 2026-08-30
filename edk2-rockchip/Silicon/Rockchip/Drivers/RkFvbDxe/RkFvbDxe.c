@@ -1530,30 +1530,19 @@ FvbFindBootDiskDevice (
   for (DevIndex = 0; DevIndex < ARRAY_SIZE (mFvbSecondaryRkBootDevices); DevIndex++) {
     RkBootDevice = &mFvbSecondaryRkBootDevices[DevIndex];
 
+    /* Firmware on another medium must not claim the variable store. */
+    if ((mBootDeviceType != RkAtagBootDevTypeUnknown) &&
+        (mBootDeviceType != RkBootDevice->AtagBootDevType))
+    {
+      continue;
+    }
+
     for (HandleIndex = 0; HandleIndex < NoHandles; HandleIndex++) {
       Handle = Handles[HandleIndex];
 
       FvbProcessBootDiskDeviceHandle (Handle, RkBootDevice);
 
       if (mFvbDevice->DiskDevice != NULL) {
-        if ((mBootDeviceType != RkAtagBootDevTypeUnknown) &&
-            (mBootDeviceType != RkBootDevice->AtagBootDevType))
-        {
-          DEBUG ((
-            DEBUG_WARN,
-            "%a: WARNING: Found boot device type (0x%x) does not match SPL (0x%x)!\n",
-            __FUNCTION__,
-            RkBootDevice->AtagBootDevType,
-            mBootDeviceType
-            ));
-          DEBUG ((DEBUG_WARN, "%a: WARNING: Variable store might be using the wrong device!\n", __FUNCTION__));
-          DEBUG ((
-            DEBUG_WARN,
-            "%a: WARNING: Consider erasing any firmware present on other devices (SPI/EMMC/SD)!\n",
-            __FUNCTION__
-            ));
-        }
-
         Status = gBS->InstallMultipleProtocolInterfaces (
                         &Handle,
                         &gRockchipFirmwareBootDeviceProtocolGuid,
