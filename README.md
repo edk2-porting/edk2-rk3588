@@ -83,12 +83,12 @@ Note that this list is subject to change at any time as devices gain better supp
 
 | Device | Status | Notes |
 | --- | --- | --- |
-| USB 3 / 2.0 / 1.1                     | 🟢 Working     | Host-mode only. On a Type-C port both orientations work where the platform has a FUSB302 configured (see [Platform-specific notes](#platform-specific-notes)); elsewhere only one orientation does. |
+| USB 3 / 2.0 / 1.1                     | 🟢 Working     | Host-mode only. Where a platform has a FUSB302 configured, the firmware reads the plug orientation and programs the port to match, so a device enumerates either way up; without one, only one orientation works at all. SuperSpeed additionally needs the board to route both SuperSpeed pairs to the connector, and not every board does — where it does not, a flipped plug falls back to high speed (see [Platform-specific notes](#platform-specific-notes)). |
 | PCIe 3.0 / 2.1                        | 🟢 Working     | |
 | SATA                                  | 🟢 Working     | |
 | SD/eMMC                               | 🟢 Working     | |
 | HDMI output                           | 🟢 Working     | |
-| DisplayPort output (USB-C)            | 🟡 Partial     | Hot-plug detect, EDID and link probing are implemented. Detection of a display behind a Type-C connector goes through DisplayPort Alternate Mode, since the SoC has no hot-plug detect wire on that path, so it needs a platform with a FUSB302 configured. Without one, output is blind and works in one orientation only. Some displays may not work regardless. |
+| DisplayPort output (USB-C)            | 🟡 Partial     | Hot-plug detect, EDID and link probing are implemented. Detection of a display behind a Type-C connector goes through DisplayPort Alternate Mode, since the SoC has no hot-plug detect wire on that path, so it needs a platform with a FUSB302 configured. Without one, output is blind and works in one orientation only. EDID and link training also need the board to route the Type-C sideband (SBU) to the connector; where it does not, the firmware falls back to a blind mode. Some displays may not work regardless. |
 | eDP output                            | 🟡 Partial     | Disabled, requires manual configuration depending on the platform and panel. A platform enabling `RK_ANALOGIX_DP_ENABLE` must also implement `EdpEnableBacklight()` in its `RockchipPlatformLib`; no platform does today, so enabling the flag alone will not link. |
 | DSI output                            | 🟢 Working     | Only enabled on Fydetab Duo. Requires manual configuration depending on the platform and panel. |
 | GMAC Ethernet                         | 🟢 Working     | |
@@ -114,8 +114,8 @@ Deviations from the table above, configured in each platform's build files:
 | ameriDroid Indiedroid Nova | GMAC Ethernet is not exposed; no status LED. |
 | Mixtile Blade 3 | GMAC Ethernet is not exposed; no status LED. |
 | Mixtile Blade 3 | Requires a fixed input voltage *higher than* 5 V — see [Requirements](#1-requirements). USB-PD negotiation is not supported by firmware. |
-| BuzzTV PowerStation 6 | FUSB302 Type-C controller enabled: both plug orientations, power delivery, and DisplayPort Alternate Mode. The port supplies 5 V to an attached sink. |
-| Mekotronics R58 Mini | FUSB302 Type-C controller enabled: both plug orientations, power delivery, and DisplayPort Alternate Mode. The port supplies 5 V to an attached sink. |
+| BuzzTV PowerStation 6 | FUSB302 Type-C controller enabled: plug orientation, power delivery, and DisplayPort Alternate Mode. The port supplies 5 V to an attached sink. Only one SuperSpeed pair reaches the connector, so a flipped plug enumerates at high speed rather than SuperSpeed; the sideband is likewise not routed, so DisplayPort output is blind (no EDID, no link training). |
+| Mekotronics R58 Mini | FUSB302 Type-C controller configured for plug orientation, power delivery, and DisplayPort Alternate Mode, and the port supplies 5 V to an attached sink. Not yet verified on hardware. |
 
 # Getting started
 ## 1. Requirements
