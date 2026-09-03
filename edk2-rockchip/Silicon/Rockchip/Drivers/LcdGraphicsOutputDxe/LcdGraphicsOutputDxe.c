@@ -24,6 +24,12 @@
 
 STATIC EFI_CPU_ARCH_PROTOCOL  *mCpu;
 
+//
+// The instance that owns whatever is currently on screen, kept so the display
+// can be shut down again on the way out of firmware.
+//
+STATIC LCD_INSTANCE  *mLcdInstance = NULL;
+
 STATIC LCD_INSTANCE  mLcdTemplate = {
   LCD_INSTANCE_SIGNATURE,
   NULL,                                        // Handle
@@ -638,6 +644,8 @@ LcdGraphicsOutputInit (
   Instance->Gop.Mode  = &Instance->Mode;
   Instance->Mode.Info = &Instance->ModeInfo;
 
+  mLcdInstance = Instance;
+
   Status = GetSupportedDisplayModes (Instance, PrimaryDisplayState);
   if (EFI_ERROR (Status)) {
     goto Exit;
@@ -669,6 +677,66 @@ Exit:
   return Status;
 }
 
+/**
+  Shut the display down before handing the machine to the operating system.
+
+  Firmware leaves the display controller and its PHY running so the boot logo
+  survives until the kernel puts something of its own on screen. The cost is that
+  the next driver inherits live hardware, and it reprograms only what it believes
+  has changed: where the mode it wants matches the mode already running, it
+  concludes there is nothing to do and keeps this configuration, including
+  details it never chose -- the colour depth among them. Controller and PHY then
+  disagree about what is being sent, and the sink shows nothing.
+
+  The failure is invisible from firmware, because the picture stays correct right
+  up until the kernel takes over, and it appears only when the mode chosen here
+  happens to be the one the kernel would choose too. Asking for the display's
+  native mode is the surest way to arrange exactly that.
+
+  Turning the connectors off here means no driver can skip a step: whatever comes
+  next has to bring the display up from nothing. The picture goes out slightly
+  earlier in the boot as a result, which is the price of it coming back reliably.
+
+**/
+STATIC
+VOID
+EFIAPI
+LcdGraphicsOutputExitBootServicesHandler (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  UINTN                        Index;
+  DISPLAY_STATE                *DisplayState;
+  CONNECTOR_STATE              *ConnectorState;
+  ROCKCHIP_CONNECTOR_PROTOCOL  *Connector;
+
+  if (mLcdInstance == NULL) {
+    return;
+  }
+
+  for (Index = 0; Index < mLcdInstance->DisplayStatesCount; Index++) {
+    DisplayState = mLcdInstance->DisplayStates[Index];
+    if ((DisplayState == NULL) || !DisplayState->IsEnable) {
+      continue;
+    }
+
+    ConnectorState = &DisplayState->ConnectorState;
+    Connector      = (ROCKCHIP_CONNECTOR_PROTOCOL *)ConnectorState->Connector;
+    if (Connector == NULL) {
+      continue;
+    }
+
+    if (Connector->Disable != NULL) {
+      Connector->Disable (Connector, DisplayState);
+    }
+
+    if (Connector->Unprepare != NULL) {
+      Connector->Unprepare (Connector, DisplayState);
+    }
+  }
+}
+
 VOID
 EFIAPI
 LcdGraphicsOutputEndOfDxeEventHandler (
@@ -690,6 +758,7 @@ LcdGraphicsOutputDxeInitialize (
 {
   EFI_STATUS  Status;
   EFI_EVENT   EndOfDxeEvent;
+  EFI_EVENT   ExitBootServicesEvent;
 
   Status = gBS->LocateProtocol (
                   &gEfiCpuArchProtocolGuid,
@@ -708,6 +777,15 @@ LcdGraphicsOutputDxeInitialize (
                   NULL,
                   &gEfiEndOfDxeEventGroupGuid,
                   &EndOfDxeEvent
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  Status = gBS->CreateEvent (
+                  EVT_SIGNAL_EXIT_BOOT_SERVICES,
+                  TPL_NOTIFY,
+                  LcdGraphicsOutputExitBootServicesHandler,
+                  NULL,
+                  &ExitBootServicesEvent
                   );
   ASSERT_EFI_ERROR (Status);
 
