@@ -320,8 +320,8 @@
   gRockchipTokenSpaceGuid.PcdNetworkStackEnabledDefault|TRUE
   gRockchipTokenSpaceGuid.PcdNetworkStackIpv4EnabledDefault|TRUE
   gRockchipTokenSpaceGuid.PcdNetworkStackIpv6EnabledDefault|TRUE
-  gRockchipTokenSpaceGuid.PcdNetworkStackPxeBootEnabledDefault|TRUE
-  gRockchipTokenSpaceGuid.PcdNetworkStackHttpBootEnabledDefault|TRUE
+  gRockchipTokenSpaceGuid.PcdNetworkStackPxeBootEnabledDefault|FALSE
+  gRockchipTokenSpaceGuid.PcdNetworkStackHttpBootEnabledDefault|FALSE
 
 [PcdsPatchableInModule]
   gEfiMdePkgTokenSpaceGuid.PcdUartDefaultBaudRate|1500000
