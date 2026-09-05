@@ -87,6 +87,12 @@
 #string STR_DISPLAY_FORCE_OUTPUT_HELP                      #language en-US "Enable or disable the display output even when none is connected.\n\n"
                                                                            "If the serial console is used instead, this option can be disabled to allow OSes to prefer it when possible."
 
+#string STR_DISPLAY_RESET_BEFORE_BOOT_PROMPT               #language en-US "Reset Display Before Boot"
+#string STR_DISPLAY_RESET_BEFORE_BOOT_HELP                 #language en-US "Turn the display off when handing control to an operating system that programs it itself.\n\n"
+                                                                           "Leaving it running lets such an OS inherit this configuration and skip parts of its own setup, which can result in no picture at all once it takes over. "
+                                                                           "An OS relying on the firmware framebuffer instead, such as Windows, is left alone either way. "
+                                                                           "Disabling this keeps the firmware image on screen for longer during boot."
+
 #string STR_DISPLAY_DUPLICATE_OUTPUT_PROMPT                #language en-US "Duplicate Primary Display"
 #string STR_DISPLAY_DUPLICATE_OUTPUT_HELP                  #language en-US "Enable or disable duplication of the primary display output on other connected displays.\n"
                                                                            "Note that this will use the same mode/resolution everywhere, even if it is not supported by the other displays."

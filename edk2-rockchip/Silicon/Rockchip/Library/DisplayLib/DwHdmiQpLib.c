@@ -1059,7 +1059,18 @@ DwHdmiQpConnectorDisable (
   OUT DISPLAY_STATE                *DisplayState
   )
 {
-  // Todo
+  struct DwHdmiQpDevice  *Hdmi;
+
+  Hdmi = DW_HDMI_QP_FROM_CONNECTOR_PROTOCOL (This);
+
+  //
+  // Only the PHY needs putting back. The controller stops mattering the moment
+  // there is no link for it to drive, and the operating system reprograms it
+  // from scratch either way; the PHY is the piece a driver will skip when it
+  // finds the rate already set to what it wanted.
+  //
+  HdptxPowerDown (&Hdmi->HdptxPhy);
+
   return EFI_SUCCESS;
 }
 
