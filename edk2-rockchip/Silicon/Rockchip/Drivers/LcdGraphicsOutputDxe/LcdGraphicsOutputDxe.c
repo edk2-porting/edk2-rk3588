@@ -711,7 +711,7 @@ LcdGraphicsOutputExitBootServicesHandler (
   CONNECTOR_STATE              *ConnectorState;
   ROCKCHIP_CONNECTOR_PROTOCOL  *Connector;
 
-  if (mLcdInstance == NULL) {
+  if ((mLcdInstance == NULL) || !PcdGetBool (PcdDisplayResetBeforeBoot)) {
     return;
   }
 

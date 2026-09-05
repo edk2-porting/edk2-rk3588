@@ -136,6 +136,8 @@
   gRK3588TokenSpaceGuid.PcdDisplayConnectorsPriority
   gRK3588TokenSpaceGuid.PcdDisplayForceOutputDefault
   gRK3588TokenSpaceGuid.PcdDisplayForceOutput
+  gRK3588TokenSpaceGuid.PcdDisplayResetBeforeBootDefault
+  gRK3588TokenSpaceGuid.PcdDisplayResetBeforeBoot
   gRK3588TokenSpaceGuid.PcdDisplayDuplicateOutputDefault
   gRK3588TokenSpaceGuid.PcdDisplayDuplicateOutput
   gRK3588TokenSpaceGuid.PcdDisplayRotationDefault
