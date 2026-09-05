@@ -324,7 +324,7 @@
   gRockchipTokenSpaceGuid.PcdNetworkStackEnabledDefault|TRUE
   gRockchipTokenSpaceGuid.PcdNetworkStackIpv4EnabledDefault|TRUE
   gRockchipTokenSpaceGuid.PcdNetworkStackIpv6EnabledDefault|TRUE
-  gRockchipTokenSpaceGuid.PcdNetworkStackPxeBootEnabledDefault|TRUE
+  gRockchipTokenSpaceGuid.PcdNetworkStackPxeBootEnabledDefault|FALSE
   gRockchipTokenSpaceGuid.PcdNetworkStackHttpBootEnabledDefault|TRUE
 
 [PcdsPatchableInModule]
