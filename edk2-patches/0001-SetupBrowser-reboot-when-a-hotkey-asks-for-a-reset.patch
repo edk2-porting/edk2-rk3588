@@ -1,0 +1,40 @@
+diff --git a/MdeModulePkg/Universal/SetupBrowserDxe/Presentation.c b/MdeModulePkg/Universal/SetupBrowserDxe/Presentation.c
+index 05163b2cf2..9428ac92a7 100644
+--- a/MdeModulePkg/Universal/SetupBrowserDxe/Presentation.c
++++ b/MdeModulePkg/Universal/SetupBrowserDxe/Presentation.c
+@@ -1040,6 +1040,8 @@ ProcessAction (
+   IN UINT16  DefaultId
+   )
+ {
++  EFI_STATUS  SubmitStatus;
++
+   //
+   // This is caused by use press ESC, and it should not combine with other action type.
+   //
+@@ -1060,13 +1062,25 @@ ProcessAction (
+     UpdateStatementStatus (gCurrentSelection->FormSet, gCurrentSelection->Form, gBrowserSettingScope);
+   }
+ 
++  SubmitStatus = EFI_SUCCESS;
++
+   if ((Action & BROWSER_ACTION_SUBMIT) == BROWSER_ACTION_SUBMIT) {
+-    SubmitForm (gCurrentSelection->FormSet, gCurrentSelection->Form, gBrowserSettingScope);
++    SubmitStatus = SubmitForm (gCurrentSelection->FormSet, gCurrentSelection->Form, gBrowserSettingScope);
+   }
+ 
+   if ((Action & BROWSER_ACTION_RESET) == BROWSER_ACTION_RESET) {
+     gResetRequiredFormLevel   = TRUE;
+     gResetRequiredSystemLevel = TRUE;
++
++    //
++    // A hotkey that asks for a reset means reboot now, rather than only noting
++    // that one is owed and leaving it to whoever eventually unwinds the
++    // browser. Only do it if the save that came with it actually worked --
++    // rebooting over a failed submit would throw the settings away silently.
++    //
++    if (!EFI_ERROR (SubmitStatus)) {
++      gRT->ResetSystem (EfiResetCold, EFI_SUCCESS, 0, NULL);
++    }
+   }
+ 
+   if ((Action & BROWSER_ACTION_EXIT) == BROWSER_ACTION_EXIT) {

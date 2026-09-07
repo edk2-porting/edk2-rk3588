@@ -19,6 +19,7 @@
 #include <Library/UefiBootServicesTableLib.h>
 #include <Library/UefiRuntimeServicesTableLib.h>
 #include <Library/HiiLib.h>
+#include <Protocol/FormBrowserEx2.h>
 #include <Library/UefiLib.h>
 #include <Library/DxeServicesTableLib.h>
 #include <Library/NonDiscoverableDeviceRegistrationLib.h>
@@ -141,6 +142,104 @@ InstallSataDevices (
   }
 }
 
+//
+// Kept so the hotkey help text can be fetched once the browser is up.
+//
+STATIC EFI_HII_HANDLE  mHiiHandle = NULL;
+
+/**
+  Make F10 save and reset rather than just save.
+
+  Nearly every setting here is marked as requiring a reset before it takes
+  effect, so saving one is almost always followed by rebooting. Bundling the
+  two removes a step that was never really optional.
+
+  The display engine registers its own F10 as plain Save, and the browser
+  refuses to register a key that already exists, so the original registration
+  has to be removed first. That has to happen after the display engine has
+  been through, hence End of Dxe rather than driver start.
+
+  RESET does not reboot by itself: it records that a reset is owed, which the
+  firmware acts on when setup is left, after SUBMIT has written the settings
+  and EXIT has closed the form.
+
+**/
+STATIC
+VOID
+EFIAPI
+MakeF10SaveAndReset (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  EFI_STATUS                              Status;
+  EDKII_FORM_BROWSER_EXTENSION2_PROTOCOL  *FormBrowserEx2;
+  EFI_INPUT_KEY                           HotKey;
+  EFI_STRING                              Help;
+
+  gBS->CloseEvent (Event);
+
+  if (mHiiHandle == NULL) {
+    return;
+  }
+
+  Status = gBS->LocateProtocol (
+                  &gEdkiiFormBrowserEx2ProtocolGuid,
+                  NULL,
+                  (VOID **)&FormBrowserEx2
+                  );
+  if (EFI_ERROR (Status)) {
+    return;
+  }
+
+  //
+  // The footer lists hotkeys in registration order, so both have to come out
+  // and go back in: rebinding F10 alone would leave it sitting after F9.
+  //
+  HotKey.UnicodeChar = CHAR_NULL;
+
+  HotKey.ScanCode = SCAN_F10;
+  FormBrowserEx2->RegisterHotKey (&HotKey, BROWSER_ACTION_UNREGISTER, 0, NULL);
+
+  HotKey.ScanCode = SCAN_F9;
+  FormBrowserEx2->RegisterHotKey (&HotKey, BROWSER_ACTION_UNREGISTER, 0, NULL);
+
+  HotKey.ScanCode = SCAN_F10;
+  Help            = HiiGetString (mHiiHandle, STRING_TOKEN (STR_SAVE_AND_RESET), NULL);
+  if (Help != NULL) {
+    Status = FormBrowserEx2->RegisterHotKey (
+                               &HotKey,
+                               BROWSER_ACTION_SUBMIT | BROWSER_ACTION_RESET | BROWSER_ACTION_EXIT,
+                               0,
+                               Help
+                               );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_WARN, "%a: could not rebind F10 (%r)\n", __func__, Status));
+    }
+
+    FreePool (Help);
+  }
+
+  //
+  // Put F9 back exactly as the display engine had it.
+  //
+  HotKey.ScanCode = SCAN_F9;
+  Help            = HiiGetString (mHiiHandle, STRING_TOKEN (STR_RESET_TO_DEFAULTS), NULL);
+  if (Help != NULL) {
+    Status = FormBrowserEx2->RegisterHotKey (
+                               &HotKey,
+                               BROWSER_ACTION_DEFAULT,
+                               EFI_HII_DEFAULT_CLASS_STANDARD,
+                               Help
+                               );
+    if (EFI_ERROR (Status)) {
+      DEBUG ((DEBUG_WARN, "%a: could not restore F9 (%r)\n", __func__, Status));
+    }
+
+    FreePool (Help);
+  }
+}
+
 STATIC
 EFI_STATUS
 EFIAPI
@@ -151,6 +250,7 @@ InstallHiiPages (
   EFI_STATUS      Status;
   EFI_HII_HANDLE  HiiHandle;
   EFI_HANDLE      DriverHandle;
+  EFI_EVENT       EndOfDxeEvent;
 
   DriverHandle = NULL;
   Status       = gBS->InstallMultipleProtocolInterfaces (
@@ -179,6 +279,20 @@ InstallHiiPages (
            NULL
            );
     return EFI_OUT_OF_RESOURCES;
+  }
+
+  mHiiHandle = HiiHandle;
+
+  Status = gBS->CreateEventEx (
+                  EVT_NOTIFY_SIGNAL,
+                  TPL_CALLBACK,
+                  MakeF10SaveAndReset,
+                  NULL,
+                  &gEfiEndOfDxeEventGroupGuid,
+                  &EndOfDxeEvent
+                  );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_WARN, "%a: could not hook End of Dxe (%r)\n", __func__, Status));
   }
 
   return EFI_SUCCESS;

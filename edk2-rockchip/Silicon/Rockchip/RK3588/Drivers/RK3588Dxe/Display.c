@@ -76,7 +76,7 @@ InitializeDisplayVariables (
   if (PcdData != NULL) {
     Size   = sizeof (ModePreset);
     Status = gRT->SetVariable (
-                    L"DisplayModeDefault",
+                    L"DisplayModePresetDefault",
                     &gRK3588DxeFormSetGuid,
                     EFI_VARIABLE_BOOTSERVICE_ACCESS,
                     Size,
@@ -149,6 +149,19 @@ InitializeDisplayVariables (
                            ) : EFI_NOT_FOUND;
   if (EFI_ERROR (Status)) {
     Status = PcdSetBoolS (PcdDisplayForceOutput, FixedPcdGetBool (PcdDisplayForceOutputDefault));
+    ASSERT_EFI_ERROR (Status);
+  }
+
+  Size   = sizeof (Var8);
+  Status = !Reset ? gRT->GetVariable (
+                           L"DisplayResetBeforeBoot",
+                           &gRK3588DxeFormSetGuid,
+                           NULL,
+                           &Size,
+                           &Var8
+                           ) : EFI_NOT_FOUND;
+  if (EFI_ERROR (Status)) {
+    Status = PcdSetBoolS (PcdDisplayResetBeforeBoot, FixedPcdGetBool (PcdDisplayResetBeforeBootDefault));
     ASSERT_EFI_ERROR (Status);
   }
 

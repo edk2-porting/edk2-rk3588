@@ -59,6 +59,7 @@
   gEfiVariableWriteArchProtocolGuid               ## CONSUMES
   gEfiMemoryAttributeProtocolGuid                 ## CONSUMES
   gEfiSimpleTextInputExProtocolGuid               ## CONSUMES
+  gEdkiiFormBrowserEx2ProtocolGuid                ## CONSUMES
   gRk860xRegulatorProtocolGuid                    ## CONSUMES
   gRockchipPlatformConfigAppliedProtocolGuid      ## PRODUCES
 
@@ -147,6 +148,7 @@
 
 [Guids]
   gRK3588DxeFormSetGuid
+  gEfiEndOfDxeEventGroupGuid
 
 [Depex]
   TRUE

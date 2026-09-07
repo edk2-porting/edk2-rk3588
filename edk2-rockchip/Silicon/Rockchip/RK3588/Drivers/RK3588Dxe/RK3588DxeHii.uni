@@ -87,6 +87,9 @@
 #string STR_DISPLAY_FORCE_OUTPUT_HELP                      #language en-US "Enable or disable the display output even when none is connected.\n\n"
                                                                            "If the serial console is used instead, this option can be disabled to allow OSes to prefer it when possible."
 
+#string STR_SAVE_AND_RESET                                 #language en-US "F10=Save & Reset"
+#string STR_RESET_TO_DEFAULTS                              #language en-US "F9=Reset to Defaults"
+
 #string STR_DISPLAY_RESET_BEFORE_BOOT_PROMPT               #language en-US "Reset Display Before Boot"
 #string STR_DISPLAY_RESET_BEFORE_BOOT_HELP                 #language en-US "Turn the display off when handing control to the operating system.\n\n"
                                                                            "Leaving it running lets the OS inherit this configuration and skip parts of its own setup, which can result in no picture at all once it takes over. "
