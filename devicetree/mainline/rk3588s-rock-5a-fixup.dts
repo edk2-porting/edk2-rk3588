@@ -3,9 +3,9 @@
 #include "rk3588s-rock-5a.dts"
 
 &hdmi0_sound {
- 	status = "okay";
+	status = "okay";
 };
 
 &i2s5_8ch {
- 	status = "okay";
+	status = "okay";
 };
