@@ -7,6 +7,7 @@
 
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/input/input.h>
+#include <dt-bindings/leds/common.h>
 #include <dt-bindings/pinctrl/rockchip.h>
 #include <dt-bindings/soc/rockchip,vop2.h>
 #include <dt-bindings/usb/pd.h>
@@ -47,75 +48,25 @@
 		};
 	};
 
-	hdmi0-sound {
-		compatible = "simple-audio-card";
-		simple-audio-card,name = "rockchip-hdmi0";
-		simple-audio-card,format = "i2s";
-		simple-audio-card,mclk-fs = <128>;
-
-		simple-audio-card,cpu {
-			sound-dai = <&i2s5_8ch>;
-		};
-
-		simple-audio-card,codec {
-			sound-dai = <&hdmi0>;
-		};
-	};
-
-	hdmi1-sound {
-		compatible = "simple-audio-card";
-		simple-audio-card,name = "rockchip-hdmi1";
-		simple-audio-card,format = "i2s";
-		simple-audio-card,mclk-fs = <128>;
-
-		simple-audio-card,cpu {
-			sound-dai = <&i2s6_8ch>;
-		};
-
-		simple-audio-card,codec {
-			sound-dai = <&hdmi1>;
-		};
-	};
-
 	rfkill {
 		compatible = "rfkill-gpio";
 		label = "rfkill-pcie-wlan";
 		radio-type = "wlan";
-		shutdown-gpios = <&gpio1 RK_PB1 GPIO_ACTIVE_LOW>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&wifi_pwren>;
+		shutdown-gpios = <&gpio1 RK_PB1 GPIO_ACTIVE_HIGH>;
 	};
 
-	leds: leds {
+	leds {
 		compatible = "gpio-leds";
 		pinctrl-names = "default";
 		pinctrl-0 = <&led_pins>;
 
-/*		wifi_led: wifi-led {
-			gpios = <&gpio3 RK_PC5 GPIO_ACTIVE_HIGH>;
-			default-state = "off";
-			label = "blueberry:wifi";
-			function = "wifi";
-		};
-
-		hdd_led: hdd-led {
-			gpios = <&gpio3 RK_PC1 GPIO_ACTIVE_HIGH>;
-			default-state = "off";
-			label = "blueberry:hdd";
-			function = "disk-io";
-		};
-
-		eth_led: eth-led {
-			gpios = <&gpio3 RK_PC0 GPIO_ACTIVE_HIGH>;
-			default-state = "off";
-			label = "blueberry:eth";
-			function = "net";
-		};*/
-
-		work_led: work-led {
+		work_led: led-0 {
+			function = LED_FUNCTION_HEARTBEAT;
 			gpios = <&gpio3 RK_PB7 GPIO_ACTIVE_HIGH>;
-			default-state = "on";
-			label = "blueberry:work";
 			linux,default-trigger = "heartbeat";
-			function = "heartbeat";
+			default-state = "on";
 		};
 	};
 
@@ -131,7 +82,7 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&pwrbtn>;
 
-		power {
+		key-power {
 			debounce-interval = <100>;
 			gpios = <&gpio1 RK_PD3 GPIO_ACTIVE_LOW>;
 			label = "GPIO Key Power";
@@ -140,7 +91,7 @@
 		};
 	};
 
-	vcc12v_dcin: vcc12v-dcin {
+	vcc12v_dcin: regulator-vcc12v-dcin {
 		compatible = "regulator-fixed";
 		regulator-name = "vcc12v_dcin";
 		regulator-always-on;
@@ -161,7 +112,7 @@
 		vin-supply = <&vcc5v0_sys>;
 	};
 
-	vcc5v0_sys: vcc5v0-sys {
+	vcc5v0_sys: regulator-vcc5v0-sys {
 		compatible = "regulator-fixed";
 		regulator-name = "vcc5v0_sys";
 		regulator-always-on;
@@ -171,7 +122,7 @@
 		vin-supply = <&vcc12v_dcin>;
 	};
 
-	vcc5v0_host: vcc5v0-host {
+	vcc5v0_host: regulator-vcc5v0-host {
 		compatible = "regulator-fixed";
 		regulator-name = "vcc5v0_host";
 		regulator-boot-on;
@@ -185,7 +136,7 @@
 		vin-supply = <&vcc5v0_sys>;
 	};
 
-	vcc_1v1_nldo_s3: vcc-1v1-nldo-s3 {
+	vcc_1v1_nldo_s3: regulator-vcc-1v1-nldo-s3 {
 		compatible = "regulator-fixed";
 		regulator-name = "vcc_1v1_nldo_s3";
 		regulator-always-on;
@@ -245,14 +196,20 @@
 	status = "okay";
 };
 
-/*&dp1 {
+&dp1 {
 	pinctrl-0 = <&dp1m0_pins>;
 	pinctrl-names = "default";
 	status = "okay";
-};*/
+};
+
+&dp1_in {
+	dp1_in_vp1: endpoint {
+		remote-endpoint = <&vp1_out_dp1>;
+	};
+};
 
 &hdmi0 {
-	enable-gpios = <&gpio4 RK_PB1 GPIO_ACTIVE_HIGH>;
+	frl-enable-gpios = <&gpio4 RK_PB1 GPIO_ACTIVE_LOW>;
 	pinctrl-0 = <&hdmim0_tx0_cec &hdmim0_tx0_hpd
 		     &hdmim0_tx0_scl &hdmim0_tx0_sda &hdmi0_tx_on_h>;
 	pinctrl-names = "default";
@@ -276,7 +233,7 @@
 };
 
 &hdmi1 {
-	enable-gpios = <&gpio4 RK_PB2 GPIO_ACTIVE_HIGH>;
+	frl-enable-gpios = <&gpio4 RK_PB2 GPIO_ACTIVE_LOW>;
 	pinctrl-0 = <&hdmim0_tx1_cec &hdmim0_tx1_hpd
 		     &hdmim1_tx1_scl &hdmim1_tx1_sda &hdmi1_tx_on_h>;
 	pinctrl-names = "default";
@@ -284,8 +241,8 @@
 };
 
 &hdmi1_in {
-	hdmi1_in_vp1: endpoint {
-		remote-endpoint = <&vp1_out_hdmi1>;
+	hdmi1_in_vp2: endpoint {
+		remote-endpoint = <&vp2_out_hdmi1>;
 	};
 };
 
@@ -389,7 +346,7 @@
 &i2c6 {
 	status = "okay";
 
-	fusb302: fusb302@22 {
+	usbc0: usb-typec@22 {
 		compatible = "fcs,fusb302";
 		reg = <0x22>;
 		interrupt-parent = <&gpio3>;
@@ -397,7 +354,6 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&usbc0_int>;
 		vbus-supply = <&vbus5v0_typec>;
-		status = "okay";
 
 		usb_con: connector {
 			compatible = "usb-c-connector";
@@ -410,12 +366,8 @@
 			source-pdos = <PDO_FIXED(5000, 3000, PDO_FIXED_USB_COMM)>;
 
 			altmodes {
-				#address-cells = <1>;
-				#size-cells = <0>;
-
-				altmode@0 {
-					reg = <0>;
-					svid = <0xff01>;
+				displayport {
+					svid = /bits/ 16 <0xff01>;
 					vdo = <0xffffffff>;
 				};
 			};
@@ -426,32 +378,25 @@
 
 				port@0 {
 					reg = <0>;
-					usbc0_hs_sw: endpoint {
-						remote-endpoint = <&u2phy0_typec_hs>;
+
+					usbc0_hs: endpoint {
+						remote-endpoint = <&usb_host0_xhci_hs>;
 					};
 				};
 
-				/* Port 1: Data Role Switching (DWC3 Core) */
 				port@1 {
 					reg = <1>;
-					usbc0_role_sw: endpoint {
-						remote-endpoint = <&dwc3_0_role_switch>;
+
+					usbc0_ss: endpoint {
+						remote-endpoint = <&usbdp_phy0_ss>;
 					};
 				};
 
-				/* Port 2: Physical Orientation Configuration */
 				port@2 {
 					reg = <2>;
-					usbc0_orien_sw: endpoint {
-						remote-endpoint = <&usbdp_phy0_orientation_switch>;
-					};
-				};
 
-				/* Port 3: DisplayPort Mux Configuration Link */
-				port@3 {
-					reg = <3>;
-					dp_altmode_mux: endpoint {
-						remote-endpoint = <&usbdp_phy0_dp_altmode_mux>;
+					usbc0_sbu: endpoint {
+						remote-endpoint = <&usbdp_phy0_sbu>;
 					};
 				};
 			};
@@ -627,8 +572,14 @@
 				regulator-ramp-delay = <12500>;
 				regulator-name = "vdd_log_s0";
 
+				/*
+				 * Mekotronics keep this rail up across suspend
+				 * on this board rather than take the generic
+				 * off-in-suspend default; dropping it loses the
+				 * logic state the resume path expects.
+				 */
 				regulator-state-mem {
-					regulator-off-in-suspend;
+					regulator-on-in-suspend;
 					regulator-suspend-microvolt = <750000>;
 				};
 			};
@@ -880,11 +831,15 @@
 	uart-has-rtscts;
 
 	bluetooth {
-		// TODO: Correct compatible strings
-//		compatible = "realtek,rtl8852bs-bt", "realtek,rtl8822cs-bt";
-		enable-gpios = <&gpio1 RK_PB2 GPIO_ACTIVE_HIGH>;
-		host-wake-gpios = <&gpio1 RK_PA4 GPIO_ACTIVE_HIGH>;
-		device-wake-gpios = <&gpio1 RK_PB0 GPIO_ACTIVE_HIGH>;
+		compatible = "brcm,bcm4329-bt";
+		clocks = <&hym8563>;
+		clock-names = "lpo";
+		interrupt-parent = <&gpio1>;
+		interrupts = <RK_PB0 IRQ_TYPE_EDGE_FALLING>;
+		interrupt-names = "host-wakeup";
+		device-wakeup-gpios = <&gpio1 RK_PA4 GPIO_ACTIVE_HIGH>;
+		shutdown-gpios = <&gpio1 RK_PB2 GPIO_ACTIVE_HIGH>;
+		max-speed = <1500000>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&bt_reset>, <&bt_host_wake>, <&bt_dev_wake>;
 	};
@@ -897,12 +852,6 @@
 
 &u2phy0_otg {
 	status = "okay";
-
-	port {
-		u2phy0_typec_hs: endpoint {
-			remote-endpoint = <&usbc0_hs_sw>;
-		};
-	};
 };
 
 /* Secondary USB 3.0 / Combo Link Companion */
@@ -937,8 +886,8 @@
 
 /* Combo PHY for Reversible Signal Muxing */
 &usbdp_phy0 {
+	mode-switch;
 	orientation-switch;
-	svid = <0xff01>;
 	sbu1-dc-gpios = <&gpio0 RK_PC6 GPIO_ACTIVE_HIGH>;
 	sbu2-dc-gpios = <&gpio0 RK_PD3 GPIO_ACTIVE_HIGH>;
 	status = "okay";
@@ -947,14 +896,14 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 
-		usbdp_phy0_orientation_switch: endpoint@0 {
+		usbdp_phy0_ss: endpoint@0 {
 			reg = <0>;
-			remote-endpoint = <&usbc0_orien_sw>;
+			remote-endpoint = <&usbc0_ss>;
 		};
 
-		usbdp_phy0_dp_altmode_mux: endpoint@1 {
+		usbdp_phy0_sbu: endpoint@1 {
 			reg = <1>;
-			remote-endpoint = <&dp_altmode_mux>;
+			remote-endpoint = <&usbc0_sbu>;
 		};
 	};
 };
@@ -988,8 +937,8 @@
 	status = "okay";
 
 	port {
-		dwc3_0_role_switch: endpoint {
-			remote-endpoint = <&usbc0_role_sw>;
+		usb_host0_xhci_hs: endpoint {
+			remote-endpoint = <&usbc0_hs>;
 		};
 	};
 };
@@ -1032,10 +981,7 @@
 &pinctrl {
 	leds {
 		led_pins: led-pins {
-			rockchip,pins = /*<3 RK_PC5 RK_FUNC_GPIO &pcfg_pull_none>,
-				<3 RK_PC1 RK_FUNC_GPIO &pcfg_pull_none>,
-				<3 RK_PC0 RK_FUNC_GPIO &pcfg_pull_none>,*/
-				<3 RK_PB7 RK_FUNC_GPIO &pcfg_pull_none>;
+			rockchip,pins = <3 RK_PB7 RK_FUNC_GPIO &pcfg_pull_none>;
 		};
 	};
 
@@ -1103,10 +1049,6 @@
 	};
 
 	wlan {
-		wifi_host_wake_irq: wifi-host-wake-irq {
-			rockchip,pins = <1 RK_PA7 RK_FUNC_GPIO &pcfg_pull_down>;
-		};
-
 		wifi_pwren: wifi-pwren {
 			rockchip,pins = <1 RK_PB1 RK_FUNC_GPIO &pcfg_pull_up>;
 		};
@@ -1118,11 +1060,11 @@
 		};
 
 		bt_host_wake: bt-host-wake {
-			rockchip,pins = <1 RK_PA4 RK_FUNC_GPIO &pcfg_pull_down>;
+			rockchip,pins = <1 RK_PB0 RK_FUNC_GPIO &pcfg_pull_up>;
 		};
 
 		bt_dev_wake: bt-dev-wake {
-			rockchip,pins = <1 RK_PB0 RK_FUNC_GPIO &pcfg_pull_up>;
+			rockchip,pins = <1 RK_PA4 RK_FUNC_GPIO &pcfg_pull_down>;
 		};
 	};
 };
@@ -1142,19 +1084,24 @@
 	};
 };
 
+/*
+ * DP1 takes VP1 and HDMI1 takes VP2, matching the vendor device tree. This
+ * block previously held a verbatim copy of the ROCK 5 ITX's, which wires them
+ * the other way round.
+ */
 &vp1 {
-	vp1_out_hdmi1: endpoint@ROCKCHIP_VOP2_EP_HDMI1 {
-		reg = <ROCKCHIP_VOP2_EP_HDMI1>;
-		remote-endpoint = <&hdmi1_in_vp1>;
+	vp1_out_dp1: endpoint@b {
+		reg = <ROCKCHIP_VOP2_EP_DP1>;
+		remote-endpoint = <&dp1_in_vp1>;
 	};
 };
 
-/*&vp2 {
-	vp2_out_dp1: endpoint@a {
-		reg = <ROCKCHIP_VOP2_EP_DP1>;
-		remote-endpoint = <&dp1_in_vp2>;
+&vp2 {
+	vp2_out_hdmi1: endpoint@ROCKCHIP_VOP2_EP_HDMI1 {
+		reg = <ROCKCHIP_VOP2_EP_HDMI1>;
+		remote-endpoint = <&hdmi1_in_vp2>;
 	};
-};*/
+};
 
 &saradc {
 	status = "okay";
