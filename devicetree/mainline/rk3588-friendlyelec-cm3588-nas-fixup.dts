@@ -1,19 +1,48 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 
+#include <dt-bindings/thermal/thermal.h>
 #include "rk3588-friendlyelec-cm3588-nas.dts"
 
-&hdmi0_sound {
- 	status = "okay";
+/*
+ * Upstream describes the fan but never binds it to a thermal zone, so it keeps
+ * whatever duty cycle it powers up with no matter how hot the board gets --
+ * unhelpful on a NAS carrying four NVMe drives. Drive it from the package
+ * temperature the same way the NanoPC-T6 does.
+ */
+&package_thermal {
+	polling-delay = <1000>;
+
+	trips {
+		package_warm: package-warm {
+			temperature = <55000>;
+			hysteresis = <2000>;
+			type = "active";
+		};
+
+		package_hot: package-hot {
+			temperature = <65000>;
+			hysteresis = <2000>;
+			type = "active";
+		};
+	};
+
+	cooling-maps {
+		map0 {
+			trip = <&package_warm>;
+			cooling-device = <&fan THERMAL_NO_LIMIT 1>;
+		};
+
+		map1 {
+			trip = <&package_hot>;
+			cooling-device = <&fan 2 THERMAL_NO_LIMIT>;
+		};
+	};
 };
 
-&hdmi1_sound {
+&hdmi0_sound {
 	status = "okay";
 };
 
-&i2s5_8ch {
- 	status = "okay";
-};
-
-&i2s6_8ch {
+&hdmi1_sound {
 	status = "okay";
 };
