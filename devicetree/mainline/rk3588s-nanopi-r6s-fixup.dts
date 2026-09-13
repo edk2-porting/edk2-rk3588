@@ -2,10 +2,14 @@
 
 #include "rk3588s-nanopi-r6s.dts"
 
-&hdmi0_sound {
- 	status = "okay";
-};
-
-&i2s5_8ch {
- 	status = "okay";
+/*
+ * The R6C, the R6S and the NanoPC-T6 are all the same nanopi6 carrier design
+ * with the same eMMC part, and FriendlyELEC runs the whole family at HS400 with
+ * enhanced strobe. Upstream stops at HS200 on the R6 boards alone -- about half
+ * the bandwidth -- while the T6 already runs HS400 upstream.
+ */
+&sdhci {
+	max-frequency = <200000000>;
+	mmc-hs400-1_8v;
+	mmc-hs400-enhanced-strobe;
 };
