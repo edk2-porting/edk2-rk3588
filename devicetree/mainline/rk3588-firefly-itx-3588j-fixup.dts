@@ -2,10 +2,241 @@
 
 #include "rk3588-firefly-itx-3588j.dts"
 
+/ {
+	hdmi1-con {
+		compatible = "hdmi-connector";
+		type = "a";
+
+		port {
+			hdmi1_con_in: endpoint {
+				remote-endpoint = <&hdmi1_out_con>;
+			};
+		};
+	};
+
+	/*
+	 * The microSD slot is powered through bit 5 of the PCA9555 expander's
+	 * second bank. Upstream describes the expander but never this rail, so
+	 * the slot is left unusable.
+	 */
+	vcc_sdcard_pwr_en: regulator-vcc-sdcard-pwr-en {
+		compatible = "regulator-fixed";
+		enable-active-high;
+		gpios = <&pca9555 13 GPIO_ACTIVE_HIGH>;
+		regulator-boot-on;
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-name = "vcc_sdcard_pwr_en";
+		vin-supply = <&vcc_3v3_s3>;
+	};
+
+	/*
+	 * WIFI_REG_ON for the M.2 module on pcie2x1l0. Upstream enables the
+	 * link but never describes this enable line, so the module is never
+	 * powered and the port comes up empty.
+	 */
+	vcc3v3_wf: regulator-vcc3v3-wf {
+		compatible = "regulator-fixed";
+		enable-active-high;
+		gpio = <&gpio0 RK_PC4 GPIO_ACTIVE_HIGH>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&wifi_pwren>;
+		regulator-boot-on;
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-name = "vcc3v3_wf";
+		startup-delay-us = <50000>;
+		vin-supply = <&vcc_3v3_s3>;
+	};
+};
+
 &hdmi0_sound {
+	status = "okay";
+};
+
+/*
+ * The board has a second HDMI output that upstream never enables. The vendor
+ * device tree drives it from VP1 with the same enable line and pin muxing the
+ * NanoPC-T6 and CM3588 use, and those groups are the SoC defaults anyway.
+ */
+&hdmi1 {
+	frl-enable-gpios = <&gpio4 RK_PB2 GPIO_ACTIVE_LOW>;
+	pinctrl-0 = <&hdmim2_tx1_cec &hdmim0_tx1_hpd
+		     &hdmim1_tx1_scl &hdmim1_tx1_sda &hdmi1_tx_on_h>;
+	pinctrl-names = "default";
+	status = "okay";
+};
+
+&hdmi1_in {
+	hdmi1_in_vp1: endpoint {
+		remote-endpoint = <&vp1_out_hdmi1>;
+	};
+};
+
+&hdmi1_out {
+	hdmi1_out_con: endpoint {
+		remote-endpoint = <&hdmi1_con_in>;
+	};
+};
+
+&hdmi1_sound {
+	status = "okay";
+};
+
+/*
+ * HDMI input. The detect line and its pull come from the vendor device tree;
+ * the mux groups are hdmim1, which is what every board upstream that enables
+ * HDMI-RX uses -- including Rockchip's own EVB1 reference -- and nothing on
+ * this board contends for GPIO3_D1..D4.
+ */
+&hdmi_receiver {
+	hpd-gpios = <&gpio1 RK_PD5 GPIO_ACTIVE_LOW>;
+	pinctrl-0 = <&hdmim1_rx_cec &hdmim1_rx_hpdin
+		     &hdmim1_rx_scl &hdmim1_rx_sda &hdmirx_det>;
+	pinctrl-names = "default";
+	status = "okay";
+};
+
+&hdmi_receiver_cma {
+	status = "okay";
+};
+
+&hdptxphy1 {
 	status = "okay";
 };
 
 &i2s5_8ch {
 	status = "okay";
+};
+
+&i2s6_8ch {
+	status = "okay";
+};
+
+/*
+ * Both RGMII PHYs have a reset line that upstream leaves floating, so a PHY
+ * that powers up mid-reset is never recovered and the port comes up dead. The
+ * timings are the RTL8211F figures from the vendor device tree.
+ */
+&rgmii_phy0 {
+	reset-assert-us = <20000>;
+	reset-deassert-us = <100000>;
+	reset-gpios = <&gpio3 RK_PC7 GPIO_ACTIVE_LOW>;
+};
+
+&rgmii_phy1 {
+	reset-assert-us = <20000>;
+	reset-deassert-us = <100000>;
+	reset-gpios = <&gpio3 RK_PB7 GPIO_ACTIVE_LOW>;
+};
+
+&pcie2x1l0 {
+	vpcie3v3-supply = <&vcc3v3_wf>;
+};
+
+/*
+ * The board's four SATA ports hang off a port multiplier on sata0, which is
+ * why the vendor device tree enables sata0 alone. Upstream also enables sata1
+ * and sata2, and those claim combphy1_ps and combphy2_psu -- the same two combo
+ * PHYs this board needs for the PCIe Wi-Fi on pcie2x1l0 and for usb_host2_xhci.
+ * A combo PHY can only serve one consumer, so leave the extra ports disabled.
+ */
+&sata1 {
+	status = "disabled";
+};
+
+&sata2 {
+	status = "disabled";
+};
+
+&sdmmc {
+	bus-width = <4>;
+	cap-mmc-highspeed;
+	cap-sd-highspeed;
+	disable-wp;
+	max-frequency = <150000000>;
+	no-mmc;
+	no-sdio;
+	sd-uhs-sdr104;
+	vmmc-supply = <&vcc_sdcard_pwr_en>;
+	vqmmc-supply = <&vccio_sd_s0>;
+	status = "okay";
+};
+
+/*
+ * The AP6275P's Bluetooth side hangs off uart6; upstream leaves the port
+ * unconfigured. The GPIOs are the vendor's own bt_reset_gpio / bt_wake_gpio /
+ * bt_irq_gpio pin groups.
+ */
+&uart6 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&uart6m1_xfer>, <&uart6m1_rtsn>, <&uart6m1_ctsn>;
+	uart-has-rtscts;
+	status = "okay";
+
+	bluetooth {
+		compatible = "brcm,bcm4329-bt";
+		clocks = <&hym8563>;
+		clock-names = "lpo";
+		device-wakeup-gpios = <&gpio0 RK_PC5 GPIO_ACTIVE_HIGH>;
+		interrupt-parent = <&gpio0>;
+		interrupts = <RK_PA0 IRQ_TYPE_EDGE_FALLING>;
+		interrupt-names = "host-wakeup";
+		max-speed = <1500000>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&bt_reset>, <&bt_dev_wake>, <&bt_host_wake>;
+		shutdown-gpios = <&gpio0 RK_PC6 GPIO_ACTIVE_HIGH>;
+	};
+};
+
+/*
+ * The vendor holds this rail up across suspend rather than take the generic
+ * off-in-suspend default, so the fan controller survives deep sleep.
+ */
+&vdd_log_s0 {
+	regulator-state-mem {
+		regulator-on-in-suspend;
+		regulator-suspend-microvolt = <750000>;
+	};
+};
+
+&vp1 {
+	vp1_out_hdmi1: endpoint@8 {
+		reg = <ROCKCHIP_VOP2_EP_HDMI1>;
+		remote-endpoint = <&hdmi1_in_vp1>;
+	};
+};
+
+&pinctrl {
+	bluetooth {
+		bt_reset: bt-reset {
+			rockchip,pins = <0 RK_PC6 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+
+		bt_dev_wake: bt-dev-wake {
+			rockchip,pins = <0 RK_PC5 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+
+		bt_host_wake: bt-host-wake {
+			rockchip,pins = <0 RK_PA0 RK_FUNC_GPIO &pcfg_pull_down>;
+		};
+	};
+
+	hdmi {
+		hdmi1_tx_on_h: hdmi1-tx-on-h {
+			rockchip,pins = <4 RK_PB2 RK_FUNC_GPIO &pcfg_pull_none>;
+		};
+	};
+
+	hdmirx {
+		hdmirx_det: hdmirx-det {
+			rockchip,pins = <1 RK_PD5 RK_FUNC_GPIO &pcfg_pull_up>;
+		};
+	};
+
+	wireless-wlan {
+		wifi_pwren: wifi-pwren {
+			rockchip,pins = <0 RK_PC4 RK_FUNC_GPIO &pcfg_pull_up>;
+		};
+	};
 };
