@@ -208,6 +208,27 @@
 	status = "okay";
 };
 
+/*
+ * DisplayPort alt-mode over USB-C. HDMI0, DP1 and HDMI1 hold VP0, VP1 and VP2,
+ * so VP3 is the only one left; it tops out at 2048x1536 with a 200 MHz pixel
+ * clock, so this port is limited to about 1080p60 while the others are not.
+ */
+&dp0 {
+	status = "okay";
+};
+
+&dp0_in {
+	dp0_in_vp3: endpoint {
+		remote-endpoint = <&vp3_out_dp0>;
+	};
+};
+
+&dp0_out {
+	dp0_out_con: endpoint {
+		remote-endpoint = <&usbdp_phy0_dp_in>;
+	};
+};
+
 &dp1 {
 	pinctrl-0 = <&dp1m0_pins>;
 	pinctrl-names = "default";
@@ -406,7 +427,7 @@
 					reg = <1>;
 
 					usbc0_ss: endpoint {
-						remote-endpoint = <&usbdp_phy0_ss>;
+						remote-endpoint = <&usbdp_phy0_ss_out>;
 					};
 				};
 
@@ -414,7 +435,7 @@
 					reg = <2>;
 
 					usbc0_sbu: endpoint {
-						remote-endpoint = <&usbdp_phy0_sbu>;
+						remote-endpoint = <&usbdp_phy0_dp_out>;
 					};
 				};
 			};
@@ -914,13 +935,23 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 
-		usbdp_phy0_ss: endpoint@0 {
+		usbdp_phy0_ss_out: endpoint@0 {
 			reg = <0>;
 			remote-endpoint = <&usbc0_ss>;
 		};
 
-		usbdp_phy0_sbu: endpoint@1 {
+		usbdp_phy0_ss_in: endpoint@1 {
 			reg = <1>;
+			remote-endpoint = <&usb_host0_xhci_ss>;
+		};
+
+		usbdp_phy0_dp_in: endpoint@2 {
+			reg = <2>;
+			remote-endpoint = <&dp0_out_con>;
+		};
+
+		usbdp_phy0_dp_out: endpoint@3 {
+			reg = <3>;
 			remote-endpoint = <&usbc0_sbu>;
 		};
 	};
@@ -954,9 +985,24 @@
 	usb-role-switch;
 	status = "okay";
 
-	port {
-		usb_host0_xhci_hs: endpoint {
-			remote-endpoint = <&usbc0_hs>;
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			reg = <0>;
+
+			usb_host0_xhci_hs: endpoint {
+				remote-endpoint = <&usbc0_hs>;
+			};
+		};
+
+		port@1 {
+			reg = <1>;
+
+			usb_host0_xhci_ss: endpoint {
+				remote-endpoint = <&usbdp_phy0_ss_in>;
+			};
 		};
 	};
 };
@@ -1118,6 +1164,13 @@
 	vp2_out_hdmi1: endpoint@ROCKCHIP_VOP2_EP_HDMI1 {
 		reg = <ROCKCHIP_VOP2_EP_HDMI1>;
 		remote-endpoint = <&hdmi1_in_vp2>;
+	};
+};
+
+&vp3 {
+	vp3_out_dp0: endpoint@a {
+		reg = <ROCKCHIP_VOP2_EP_DP0>;
+		remote-endpoint = <&dp0_in_vp3>;
 	};
 };
 
