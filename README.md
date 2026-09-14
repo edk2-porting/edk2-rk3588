@@ -69,7 +69,7 @@ Note that this list is subject to change at any time as devices gain better supp
 ### Mainline compatibility mode
 | OS | Version | Tested/supported hardware | Notes |
 | --- | --- | --- | --- |
-| Generic upstream Linux | Kernel 6.10 or newer.<br> Tested with:<br> - Ubuntu 24.10<br> - Fedora Workstation 41<br> - Fedora Workstation Rawhide | Platform and kernel version dependent, see [Collabora's RK3588 upstream status](https://gitlab.collabora.com/hardware-enablement/rockchip-3588/notes-for-rockchip-3588/-/blob/main/mainline-status.md). | * Kernels older than 6.15 lack display output. To work around this, see: [Device Tree configuration](#device-tree-configuration). |
+| Generic upstream Linux | Kernel 7.2 or newer.<br> Tested with:<br> - Debian 13 (kernel 7.1.8) | Platform and kernel version dependent, see [Collabora's RK3588 upstream status](https://gitlab.collabora.com/hardware-enablement/rockchip-3588/notes-for-rockchip-3588/-/blob/main/mainline-status.md). | * The device trees track [devicetree-rebasing](https://git.kernel.org/pub/scm/linux/kernel/git/devicetree/devicetree-rebasing.git) `v7.2-dts`.<br> * On platforms with a Type-C controller, the USB-C/DisplayPort graph uses the current binding, which needs 6.19 or newer.<br> * Kernels older than 6.15 also lack display output. To work around this, see: [Device Tree configuration](#device-tree-configuration). |
 
 > [!NOTE]
 > Mainline support is only available on [Platinum](#platinum) platforms.
@@ -116,6 +116,15 @@ Deviations from the table above, configured in each platform's build files:
 | Mixtile Blade 3 | Requires a fixed input voltage *higher than* 5 V — see [Requirements](#1-requirements). USB-PD negotiation is not supported by firmware. |
 | BuzzTV PowerStation 6 | FUSB302 Type-C controller enabled: plug orientation, power delivery, and DisplayPort Alternate Mode. The port supplies 5 V to an attached sink. Only one SuperSpeed pair reaches the connector, so a flipped plug enumerates at high speed rather than SuperSpeed; the sideband is likewise not routed, so DisplayPort output is blind (no EDID, no link training). |
 | Mekotronics R58 Mini | FUSB302 Type-C controller configured for plug orientation, power delivery, and DisplayPort Alternate Mode, and the port supplies 5 V to an attached sink. Not yet verified on hardware. |
+| Khadas Edge2 | The mainline Device Tree wires USB-C DisplayPort Alternate Mode (FUSB302 on i2c2, two DP lanes alongside USB 3). HDMI0 takes VP0 and DP0 takes VP2, as the Khadas vendor Device Tree does. Not yet verified on hardware. |
+| Radxa ROCK 5 ITX | The connector labelled HDMI0 is really DP1 behind an on-board DP-to-HDMI bridge, wired to VP2, while HDMI1 is the one on VP1. This is the board's wiring, not something the firmware can route around. |
+| Radxa ROCK 5B / 5B+ | The Type-C controller is left disabled in the mainline Device Tree on purpose: the board is powered over USB-C, and a power-delivery contract negotiated as late as kernel probe makes the supply issue a hard reset, which reboots the board. Enabling it needs the contract established before the OS starts. |
+| FriendlyELEC NanoPC-T6 / NanoPi R6C / R6S / CM3588-NAS | The factory MAC address EEPROM on i2c6 is not described by the mainline Device Tree, so Linux generates a random MAC on each boot. |
+| FriendlyELEC NanoPi R6C / R6S | The eMMC is raised from HS200 to HS400 with enhanced strobe, matching FriendlyELEC's own tree for the whole nanopi6 family and the NanoPC-T6 upstream. Not yet verified on hardware. |
+| Firefly ITX-3588J | The second HDMI output (VP1), HDMI input, the microSD slot, Bluetooth on uart6, and the Wi-Fi module's enable line are all added; upstream describes none of them. Both RGMII PHYs also get their reset lines, which upstream leaves floating. Not yet verified on hardware. |
+| Firefly ITX-3588J | The Bluetooth `BT_REG_ON` line is taken as `GPIO0_C6`. The vendor tree claims that pin twice — once for Bluetooth reset and once for the LCD touch panel's reset — so if a touch panel is fitted, one of the two is wrong. |
+| Mekotronics R58 Mini / Firefly ITX-3588J | `vdd_log_s0` is held up across suspend rather than switched off, matching each board's vendor tree. |
+| Orange Pi 5 Plus | USB-C DisplayPort Alternate Mode is added. Upstream wires the port for USB and orientation only: it declares no alt modes, has no `dp0` node, and still uses the two-endpoint USBDP PHY graph, which has nowhere to attach one. The graph is rebuilt on the current four-endpoint binding and DP0 is routed through VP2, as the vendor does; VP0 and VP1 are both taken by HDMI, and VP3 would cap the port at 1080p. Not yet verified on hardware. |
 
 # Getting started
 ## 1. Requirements
@@ -181,12 +190,12 @@ For rich Linux support, it is recommended to enable Device Tree mode. You can do
 
 The firmware provides two compatibility modes:
 * `Vendor` - compatible with Rockchip SDK Linux 5.10/6.1 kernel only.
-* `Mainline` - compatible with generic upstream Linux 6.10 or newer kernel. This option is under active development and may lack certain features. Therefore, it is always recommended to use the latest kernel and firmware available in order to benefit from better device support.
+* `Mainline` - compatible with generic upstream Linux 7.2 or newer kernel. The device trees are built from `devicetree-rebasing` `v7.2-dts`; platforms whose board is carried upstream use that file directly, while the rest are maintained in `devicetree/mainline`. This option is under active development and may lack certain features. Therefore, it is always recommended to use the latest kernel and firmware available in order to benefit from better device support.
 
 [Platinum](#platinum) platforms will have the `Mainline` option enabled by default, while [Bronze](#bronze) ones will fall back to `Vendor`.
 
 > [!TIP]
-> In `Mainline` mode with generic Linux kernels older than 6.15, the HDMI output will not be usable. To use the UEFI-initialized display instead, go to `Device Manager`->`Rockchip Platform Configuration`->`ACPI / Device Tree` and enable `Force UEFI GOP Display`. Note that GPU acceleration cannot work in this mode.
+> In `Mainline` mode with generic Linux kernels older than 6.15, the HDMI output will not be usable. To use the UEFI-initialized display instead, go to `Device Manager`->`Rockchip Platform Configuration`->`ACPI / Device Tree` and enable `Force UEFI GOP Display`. Note that GPU acceleration cannot work in this mode. Running a kernel that old is outside what these device trees target — see [Mainline compatibility mode](#mainline-compatibility-mode).
 
 ### Custom Device Tree Blob (DTB) override and overlays
 It is also possible to provide a custom DTB and overlays. This is useful in cases where the firmware DTB is outdated, does not match the kernel used or for testing purposes. To enable overrides, go to `Device Manager`->`Rockchip Platform Configuration`->`ACPI / Device Tree` and set `Support DTB override & overlays` to `Enabled`.
