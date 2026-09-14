@@ -37,6 +37,9 @@
   #
   DEFINE RK_RTC8563_ENABLE = TRUE
 
+  # FUSB302 USB Type-C port controller on i2c4.
+  DEFINE RK_FUSB302_ENABLE = TRUE
+
   #
   # RK3588-based platform
   #
@@ -66,14 +69,24 @@
   gRockchipTokenSpaceGuid.PcdDeviceTreeName|"rk3588-rock-5b"
 
   # I2C
-  gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x42, 0x43, 0x51, 0x11 }
-  gRockchipTokenSpaceGuid.PcdI2cSlaveBuses|{ 0x0, 0x0, 0x6, 0x7 }
-  gRockchipTokenSpaceGuid.PcdI2cSlaveBusesRuntimeSupport|{ FALSE, FALSE, TRUE, FALSE }
+  gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x42, 0x43, 0x51, 0x11, 0x22 }
+  gRockchipTokenSpaceGuid.PcdI2cSlaveBuses|{ 0x0, 0x0, 0x6, 0x7, 0x4 }
+  gRockchipTokenSpaceGuid.PcdI2cSlaveBusesRuntimeSupport|{ FALSE, FALSE, TRUE, FALSE, FALSE }
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorAddresses|{ 0x42, 0x43 }
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorBuses|{ 0x0, 0x0 }
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorTags|{ $(SCMI_CLK_CPUB01), $(SCMI_CLK_CPUB23) }
   gPcf8563RealTimeClockLibTokenSpaceGuid.PcdI2cSlaveAddress|0x51
   gRockchipTokenSpaceGuid.PcdRtc8563Bus|0x6
+  gRockchipTokenSpaceGuid.PcdFusb302Addresses|{ 0x22 }
+  gRockchipTokenSpaceGuid.PcdFusb302Buses|{ 0x4 }
+  gRockchipTokenSpaceGuid.PcdFusb302PhyIds|{ 0x0 }
+  # This port can supply an attached device. The driver only switches the
+  # rail on once it has established that the partner is a sink and that
+  # nothing else is already driving VBUS.
+  gRockchipTokenSpaceGuid.PcdFusb302SourceEnable|TRUE
+  gRockchipTokenSpaceGuid.PcdFusb302VbusGpioBank|2
+  gRockchipTokenSpaceGuid.PcdFusb302VbusGpioPin|14
+  gRockchipTokenSpaceGuid.PcdFusb302VbusGpioActiveHigh|TRUE
 
   #
   # PCIe/SATA/USB Combo PIPE PHY support flags and default values

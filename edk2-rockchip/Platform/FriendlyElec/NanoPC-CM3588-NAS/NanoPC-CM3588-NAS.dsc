@@ -37,6 +37,9 @@
   #
   DEFINE RK_RTC8563_ENABLE = TRUE
 
+  # FUSB302 USB Type-C port controller on i2c6.
+  DEFINE RK_FUSB302_ENABLE = TRUE
+
   #
   # RK3588-based platform
   #
@@ -66,14 +69,18 @@
   gRockchipTokenSpaceGuid.PcdDeviceTreeName|"rk3588-nanopc-cm3588-nas"
 
   # I2C
-  gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x42, 0x43, 0x51 }
-  gRockchipTokenSpaceGuid.PcdI2cSlaveBuses|{ 0x0, 0x0, 0x6 }
-  gRockchipTokenSpaceGuid.PcdI2cSlaveBusesRuntimeSupport|{ FALSE, FALSE, TRUE }
+  gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x42, 0x43, 0x51, 0x22 }
+  gRockchipTokenSpaceGuid.PcdI2cSlaveBuses|{ 0x0, 0x0, 0x6, 0x6 }
+  gRockchipTokenSpaceGuid.PcdI2cSlaveBusesRuntimeSupport|{ FALSE, FALSE, TRUE, FALSE }
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorAddresses|{ 0x42, 0x43 }
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorBuses|{ 0x0, 0x0 }
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorTags|{ $(SCMI_CLK_CPUB01), $(SCMI_CLK_CPUB23) }
   gPcf8563RealTimeClockLibTokenSpaceGuid.PcdI2cSlaveAddress|0x51
   gRockchipTokenSpaceGuid.PcdRtc8563Bus|0x6
+  # No VBUS enable line is described for this port, so it is sink-only.
+  gRockchipTokenSpaceGuid.PcdFusb302Addresses|{ 0x22 }
+  gRockchipTokenSpaceGuid.PcdFusb302Buses|{ 0x6 }
+  gRockchipTokenSpaceGuid.PcdFusb302PhyIds|{ 0x0 }
 
   #
   # PCIe/SATA/USB Combo PIPE PHY support flags and default values

@@ -23,6 +23,9 @@
   #
   DEFINE RK_RTC8563_ENABLE = TRUE
 
+  # FUSB302 USB Type-C port controller on i2c6.
+  DEFINE RK_FUSB302_ENABLE = TRUE
+
   #
   # PCA9555 GPIO extender support
   # I2C location configured by PCDs below.
@@ -66,6 +69,11 @@
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorTags|{ $(SCMI_CLK_CPUB01), $(SCMI_CLK_CPUB23) }
   gPcf8563RealTimeClockLibTokenSpaceGuid.PcdI2cSlaveAddress|0x51
   gRockchipTokenSpaceGuid.PcdRtc8563Bus|0x6
+  # The VBUS enable for this port is behind the PCA9555 expander, which these
+  # PCDs cannot address, so the port is sink-only here.
+  gRockchipTokenSpaceGuid.PcdFusb302Addresses|{ 0x22 }
+  gRockchipTokenSpaceGuid.PcdFusb302Buses|{ 0x6 }
+  gRockchipTokenSpaceGuid.PcdFusb302PhyIds|{ 0x0 }
   gRockchipTokenSpaceGuid.PcdPca9555Address|0x21
   gRockchipTokenSpaceGuid.PcdPca9555Bus|0x6
 
