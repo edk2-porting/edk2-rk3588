@@ -76,6 +76,14 @@
   DEFINE RK_AMD_GOP_ENABLE              = TRUE
 !endif
 
+  #
+  # RngLib instance. SoC packages that have a usable hardware random number
+  # generator point this at their own before including this file.
+  #
+!ifndef RK_RNG_LIB
+  DEFINE RK_RNG_LIB                     = MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
+!endif
+
 ################################################################################
 #
 # Library Class section - list of all common Library Classes needed by Rockchip platforms.
@@ -219,7 +227,7 @@
 
   CapsuleLib|MdeModulePkg/Library/DxeCapsuleLibNull/DxeCapsuleLibNull.inf
   OpensslLib|CryptoPkg/Library/OpensslLib/OpensslLib.inf
-  RngLib|MdeModulePkg/Library/BaseRngLibTimerLib/BaseRngLibTimerLib.inf
+  RngLib|$(RK_RNG_LIB)
   ArmTrngLib|ArmPkg/Library/ArmTrngLib/ArmTrngLib.inf
   IntrinsicLib|CryptoPkg/Library/IntrinsicLib/IntrinsicLib.inf
   BaseCryptLib|CryptoPkg/Library/BaseCryptLib/BaseCryptLib.inf

@@ -29,6 +29,14 @@
   gRK3588TokenSpaceGuid = { 0x32594b40, 0x45e7, 0x11ec, { 0xbb, 0xc1, 0xf4, 0x2a, 0x7d, 0xcb, 0x92, 0x5d } }
   gRK3588DxeFormSetGuid = { 0x10f41c33, 0xa468, 0x42cd, { 0x85, 0xee, 0x70, 0x43, 0x21, 0x3f, 0x73, 0xa3 } }
 
+  #
+  # Algorithm GUID for the SoC's TRNG v1 block, reported by Rk3588RngLib.
+  # RngDxe lists each source it can serve separately, so this must not be
+  # gEfiRngAlgorithmRaw -- that is what the SMCCC TRNG is registered under,
+  # and reusing it would advertise the same algorithm twice.
+  #
+  gRk3588RngAlgorithmTrngV1Guid = { 0x658a3f48, 0x07e7, 0x4bdf, { 0xbc, 0x5e, 0x53, 0xa4, 0x8e, 0xe9, 0xeb, 0xd1 } }
+
 [PcdsFixedAtBuild]
   gRK3588TokenSpaceGuid.PcdCPULClusterClockPresetDefault|0|UINT32|0x00010001
   gRK3588TokenSpaceGuid.PcdCPUB01ClusterClockPresetDefault|0|UINT32|0x00010002

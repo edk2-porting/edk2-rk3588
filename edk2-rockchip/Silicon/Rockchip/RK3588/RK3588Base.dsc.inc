@@ -108,6 +108,18 @@
 !ifndef RK3588_GMAC_ENABLE
   DEFINE RK3588_GMAC_ENABLE         = TRUE
 !endif
+!ifndef RK3588_TRNG_ENABLE
+  DEFINE RK3588_TRNG_ENABLE         = TRUE
+!endif
+
+  #
+  # Back RngLib with the SoC's hardware TRNG instead of the performance
+  # counter. The driver checks the block's version register first and falls
+  # back on its own if it does not answer, so this is safe to leave on.
+  #
+!if $(RK3588_TRNG_ENABLE) == TRUE
+  DEFINE RK_RNG_LIB                 = Silicon/Rockchip/RK3588/Library/Rk3588RngLib/Rk3588RngLib.inf
+!endif
 
   #
   # Base platform description
