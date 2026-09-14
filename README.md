@@ -69,7 +69,7 @@ Note that this list is subject to change at any time as devices gain better supp
 ### Mainline compatibility mode
 | OS | Version | Tested/supported hardware | Notes |
 | --- | --- | --- | --- |
-| Generic upstream Linux | Kernel 7.2 or newer.<br> Tested with:<br> - Debian 13 (kernel 7.1.8) | Platform and kernel version dependent, see [Collabora's RK3588 upstream status](https://gitlab.collabora.com/hardware-enablement/rockchip-3588/notes-for-rockchip-3588/-/blob/main/mainline-status.md). | * The device trees track [devicetree-rebasing](https://git.kernel.org/pub/scm/linux/kernel/git/devicetree/devicetree-rebasing.git) `v7.2-dts`.<br> * On platforms with a Type-C controller, the USB-C/DisplayPort graph uses the current binding, which needs 6.19 or newer.<br> * Kernels older than 6.15 also lack display output. To work around this, see: [Device Tree configuration](#device-tree-configuration). |
+| Generic upstream Linux | Kernel 7.2 or newer.<br> Tested with:<br> - Debian 13 (kernel 7.1.8) | Platform and kernel version dependent, see [Collabora's RK3588 upstream status](https://gitlab.collabora.com/hardware-enablement/rockchip-3588/notes-for-rockchip-3588/-/blob/main/mainline-status.md). | * The device trees track [devicetree-rebasing](https://git.kernel.org/pub/scm/linux/kernel/git/devicetree/devicetree-rebasing.git) `v7.2-dts`.<br> * The USB-C/DisplayPort graphs span three generations of the USBDP PHY binding, all of which 7.2 satisfies: the four-endpoint form (6.19+) on the PowerStation 6, Khadas Edge2, Orange Pi 5 Plus and Indiedroid Nova; the two-endpoint form (6.18+) on the R58 Mini and ROCK 5B/5B+; and upstream's older form, left as-is, on the ITX-3588J, CM3588-NAS and ROCK 5 ITX.<br> * Kernels older than 6.15 also lack display output. To work around this, see: [Device Tree configuration](#device-tree-configuration). |
 
 > [!NOTE]
 > Mainline support is only available on [Platinum](#platinum) platforms.
@@ -103,7 +103,7 @@ Note that this list is subject to change at any time as devices gain better supp
 | FUSB302 USB Type-C Controller         | 🟡 Partial     | Driver handles orientation, sink and source power delivery contracts, and DisplayPort Alternate Mode. Opt-in per platform. State is sampled once when firmware starts, so a cable plugged in later is not noticed. |
 
 ## Platform-specific notes
-Deviations from the table above, configured in each platform's build files:
+Deviations from the table above, set in each platform's build files, plus notes on what its Device Tree describes in Device Tree mode:
 
 | Platform | Note |
 | --- | --- |
