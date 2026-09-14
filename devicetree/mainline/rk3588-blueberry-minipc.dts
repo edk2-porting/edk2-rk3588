@@ -26,6 +26,18 @@
 		stdout-path = "serial2:1500000n8";
 	};
 
+	dp-con {
+		compatible = "dp-connector";
+		label = "DP OUT";
+		type = "full-size";
+
+		port {
+			dp_con_in: endpoint {
+				remote-endpoint = <&dp1_out_con>;
+			};
+		};
+	};
+
 	hdmi0-con {
 		compatible = "hdmi-connector";
 		type = "a";
@@ -205,6 +217,12 @@
 &dp1_in {
 	dp1_in_vp1: endpoint {
 		remote-endpoint = <&vp1_out_dp1>;
+	};
+};
+
+&dp1_out {
+	dp1_out_con: endpoint {
+		remote-endpoint = <&dp_con_in>;
 	};
 };
 
