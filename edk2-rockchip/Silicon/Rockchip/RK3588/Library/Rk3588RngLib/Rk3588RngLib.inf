@@ -1,0 +1,35 @@
+#/** @file
+#
+#  RK3588 hardware random number generator (TRNG v1).
+#
+#  Copyright (c) 2025, Corey Moyer <corey@buzztv.com>
+#
+#  SPDX-License-Identifier: BSD-2-Clause-Patent
+#
+#**/
+
+[Defines]
+  INF_VERSION                    = 0x00010019
+  BASE_NAME                      = Rk3588RngLib
+  FILE_GUID                      = 2212139f-03ee-419d-bc3e-4a429d994b51
+  MODULE_TYPE                    = BASE
+  VERSION_STRING                 = 1.0
+  LIBRARY_CLASS                  = RngLib
+
+[Sources]
+  Rk3588RngLib.c
+
+[Packages]
+  MdePkg/MdePkg.dec
+  MdeModulePkg/MdeModulePkg.dec
+
+[LibraryClasses]
+  BaseLib
+  BaseMemoryLib
+  DebugLib
+  IoLib
+  TimerLib
+
+[Guids]
+  gEfiRngAlgorithmRaw
+  gEdkiiRngAlgorithmUnSafe
