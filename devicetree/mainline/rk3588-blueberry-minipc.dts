@@ -26,6 +26,11 @@
 		stdout-path = "serial2:1500000n8";
 	};
 
+	/*
+	 * Not every revision of this board has the DisplayPort connector
+	 * fitted. Describing it regardless is harmless -- an absent connector
+	 * simply never reports a sink.
+	 */
 	dp-con {
 		compatible = "dp-connector";
 		label = "DP OUT";
@@ -209,9 +214,10 @@
 };
 
 /*
- * DisplayPort alt-mode over USB-C. HDMI0, DP1 and HDMI1 hold VP0, VP1 and VP2,
- * so VP3 is the only one left; it tops out at 2048x1536 with a 200 MHz pixel
- * clock, so this port is limited to about 1080p60 while the others are not.
+ * DisplayPort alt-mode over USB-C, on VP3. The board drives four displays and
+ * the SoC has four video ports, so the assignment is forced: HDMI0, DP1 and
+ * HDMI1 take VP0, VP1 and VP2 in turn. VP3 is the smallest of the four
+ * (2048x1536, 200 MHz pixel clock), which puts this port at about 1080p60.
  */
 &dp0 {
 	status = "okay";
