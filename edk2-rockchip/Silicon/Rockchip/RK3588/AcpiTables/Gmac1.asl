@@ -30,11 +30,26 @@ Device (MAC1) {
   Name (_DSD, Package () {
     ToUUID("daffd814-6eba-4d8c-8a91-bc9bbf4aa301"),
     Package () {
-      Package () { "compatible", Package () { "snps,dwmac-4.20a", "snps,dwmac" } },
+      //
+      // "snps,dwc-qos-ethernet-4.10" is listed first so that distributions
+      // building CONFIG_DWMAC_DWC_QOS_ETH (Fedora 44, Ubuntu 26.04) bind the
+      // dwc-eth-dwmac driver here. It is the only stmmac front end that probes
+      // through PRP0001 without the Rockchip device tree glue.
+      //
+      // Distributions that leave that option unset get nothing from this entry
+      // and fall through to the ones after it. Debian 13 is one of them, so
+      // ACPI-mode ethernet does not work there at all -- use Device Tree mode.
+      //
+      // phy-mode is plain "rgmii" on purpose: GmacPlatformDxe has already
+      // applied the MAC-side TX/RX delays from the per-board PCDs, so the PHY
+      // must not add its own on top.
+      //
+      Package () { "compatible", Package () { "snps,dwc-qos-ethernet-4.10", "snps,dwmac-4.20a", "snps,dwmac" } },
       Package () { "interrupt-names", Package () { "macirq", "eth_wake_irq" } },
       Package () { "snps,mixed-burst", 1 },
       Package () { "snps,tso", 1 },
       Package () { "snps,axi-config", "AXIC" },
+      Package () { "phy-mode", "rgmii" },
     }
   })
 
