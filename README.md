@@ -96,7 +96,7 @@ Note that this list is subject to change at any time as devices gain better supp
 | Low-speed (GPIO/UART/I2C/SPI/PWM)     | 🟢 Working     | UART2 console available at 1500000 baud rate |
 | SPI NOR Flash                         | 🟢 Working     | |
 | HYM8563 real-time clock               | 🟢 Working     | |
-| RNG                                   | 🟢 Working     | |
+| RNG                                   | 🟢 Working     | Two independent sources. `EFI_RNG_PROTOCOL` comes from `RngDxe`, backed by the SMCCC TRNG that TF-A provides. `RngLib` — which `TlsDxe`, `Hash2DxeCrypto` and `IScsiDxe` link against directly, so it is what seeds HTTPS boot — is backed by the SoC's own hardware TRNG at `0xfe378000` (TRNG v1, the same block mainline drives as `rockchip,rk3588-rng`). The driver checks the block's version register before touching it and falls back to the performance counter if it does not answer, so a board where it is unreachable still has an RNG. Enabled on all platforms; set `RK3588_TRNG_ENABLE = FALSE` to opt out. |
 | Cooling fan                           | 🟢 Working     | Supported on most platforms. Fan connector where present, otherwise available at the GPIO header for 3-pin PWM fans (do *not* connect 2-pin fans there!):<br>* Orange Pi 5: `GPIO4_B2`<br>* Indiedroid Nova: `GPIO4_B4` |
 | Status LED                            | 🟢 Working     | |
 | Voltage regulators (RK806/RK860)      | 🟢 Working     | |
