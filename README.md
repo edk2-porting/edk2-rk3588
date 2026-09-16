@@ -79,7 +79,8 @@ Deviations from the table above, plus what each board's Device Tree describes in
 | Orange Pi 5 Plus | Adds USB-C DP Alt Mode. Upstream wires the port for USB and orientation only — no alt modes, no `dp0` node, and the two-endpoint USBDP PHY graph has nowhere to attach one. The graph is rebuilt on the four-endpoint binding and DP0 routed through VP2, as the vendor does; VP0 and VP1 are taken by HDMI, and VP3 would cap the port at 1080p.¹ |
 | Radxa ROCK 5B / 5B+ | The Type-C controller is disabled in the mainline Device Tree on purpose: the board is powered over USB-C, and a power-delivery contract negotiated as late as kernel probe makes the supply issue a hard reset. The firmware establishes the contract before the OS starts, which is what that needs.¹ If a board reboots during firmware startup, unset `RK_FUSB302_ENABLE` in its platform `.dsc`. |
 | Radxa ROCK 5 ITX | The connector labelled HDMI0 is really DP1 behind an on-board DP-to-HDMI bridge, wired to VP2; HDMI1 is the one on VP1. Board wiring, not something the firmware can route around. |
-| FriendlyELEC NanoPC-T6<br>NanoPi R6C / R6S<br>CM3588-NAS | The factory MAC address EEPROM on i2c6 is not described by the mainline Device Tree, so Linux generates a random MAC each boot. |
+| FriendlyELEC NanoPC-T6<br>NanoPi R6C / R6S<br>CM3588-NAS | The factory MAC address EEPROM on i2c6 is not described by the mainline Device Tree, so the address on the sticker is not the one in use. The firmware supplies a stable address derived from the SoC's OTP instead, so it does not change between boots. |
+| FriendlyELEC CM3588-NAS | Only 2 of the 4 M.2 NVMe slots are recognized — confirmed on the UEFI Shell `pci` listing, so this is firmware-level rather than a Linux driver issue. See [upstream#259](https://github.com/edk2-porting/edk2-rk3588/issues/259). Not diagnosed on hardware, but the combo PHY lane-select fix in this release is a candidate: the stray write it removes pointed `pcie2x1l1` at combphy2, which is in USB3 mode on this board, while the slot is really fed from the bifurcated PCIe 3 PHY. |
 | FriendlyELEC NanoPi R6C / R6S | eMMC raised from HS200 to HS400 with enhanced strobe, matching FriendlyELEC's own tree for the nanopi6 family and the NanoPC-T6 upstream.¹ |
 | Fydetab Duo | No HDMI output — the display controller is not enabled here.<br>SD card is limited to high-speed modes; DDR50/SDR50/SDR104 are disabled because UHS-I is unreliable on this board. |
 | Mekotronics R58X | eMMC HS400 is disabled; the eMMC is unusable with it enabled. |
@@ -213,7 +214,10 @@ Most often the firmware is the wrong one for the board, or was flashed incorrect
 If nothing works, the [serial console](#advanced-troubleshooting) is the only way in.
 
 ## Configuration settings do not get saved
-Seen when firmware is present on more than one device (SPI NOR, eMMC, SD). UEFI cannot tell which one it belongs to. Unplug or erase the others.
+Seen when firmware is present on more than one device (SPI NOR, eMMC, SD). The firmware now keeps its variable store on the medium it actually booted from, so an SD card carrying a second copy no longer takes the eMMC's place — but if the store still does not stick, erase the firmware from the devices you are not booting.
+
+## NVMe is not detected at boot
+`phy_rockchip_naneng_combphy` drives the PCIe combo PHYs and has to be loaded before the root filesystem mounts. Distributions that do not autoload it early — NixOS at least — need it named explicitly, e.g. `boot.initrd.availableKernelModules = [ "nvme" "phy_rockchip_naneng_combphy" ];`. See [upstream#217](https://github.com/edk2-porting/edk2-rk3588/issues/217).
 
 ## USB 3 devices do not work
 Try another port, try the other USB-C orientation (3.0 works in only one without a FUSB302), and check the power supply and cable.
