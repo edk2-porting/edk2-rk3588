@@ -55,7 +55,7 @@ Devices relevant to the firmware itself, not the OS. Applies to all platforms un
 | DisplayPort output (USB-C) | 🟢 Working | Detection goes through DisplayPort Alt Mode, as the SoC has no hot-plug detect wire on this path. EDID and link training need the Type-C sideband (SBU) routed to the connector; where a board does not route it, the firmware drives a default timing blind. Some displays may not work regardless. |
 | eDP output | 🟡 Partial | Disabled; needs per-panel configuration. A platform setting `RK_ANALOGIX_DP_ENABLE` must also implement `EdpEnableBacklight()` in its `RockchipPlatformLib` — none does today, so the flag alone will not link. |
 | DSI output | 🟢 Working | Fydetab Duo only. Needs per-panel configuration. |
-| GMAC Ethernet | 🟢 Working | |
+| GMAC Ethernet | 🟢 Working | The firmware writes its OTP-derived address into the Device Tree, so the port keeps one address across a UEFI network boot and the OS that follows. |
 | Realtek PCIe Ethernet | 🟢 Working | Some boards ship without a factory MAC; see [Networking does not work](#networking-does-not-work). |
 | Low-speed (GPIO/UART/I2C/SPI/PWM) | 🟢 Working | UART2 console at 1500000 baud. |
 | SPI NOR Flash | 🟢 Working | |
@@ -79,7 +79,7 @@ Deviations from the table above, plus what each board's Device Tree describes in
 | Orange Pi 5 Plus | Adds USB-C DP Alt Mode. Upstream wires the port for USB and orientation only — no alt modes, no `dp0` node, and the two-endpoint USBDP PHY graph has nowhere to attach one. The graph is rebuilt on the four-endpoint binding and DP0 routed through VP2, as the vendor does; VP0 and VP1 are taken by HDMI, and VP3 would cap the port at 1080p.¹ |
 | Radxa ROCK 5B / 5B+ | The Type-C controller is disabled in the mainline Device Tree on purpose: the board is powered over USB-C, and a power-delivery contract negotiated as late as kernel probe makes the supply issue a hard reset. The firmware establishes the contract before the OS starts, which is what that needs.¹ If a board reboots during firmware startup, unset `RK_FUSB302_ENABLE` in its platform `.dsc`. |
 | Radxa ROCK 5 ITX | The connector labelled HDMI0 is really DP1 behind an on-board DP-to-HDMI bridge, wired to VP2; HDMI1 is the one on VP1. Board wiring, not something the firmware can route around. |
-| FriendlyELEC NanoPC-T6<br>NanoPi R6C / R6S<br>CM3588-NAS | The factory MAC address EEPROM on i2c6 is not described by the mainline Device Tree, so the address on the sticker is not the one in use. The firmware supplies a stable address derived from the SoC's OTP instead, so it does not change between boots. |
+| FriendlyELEC NanoPC-T6<br>NanoPi R6C / R6S<br>CM3588-NAS | The factory MAC address EEPROM on i2c6 is not described by the mainline Device Tree, so the address on the sticker is not the one in use. The firmware supplies one derived from the SoC's OTP instead. |
 | FriendlyELEC CM3588-NAS | All four M.2 slots run as Gen3 x1 off the bifurcated PCIe 3 PHY. Slots 2 and 4 hang off the `pcie2x1l0` and `pcie2x1l1` controllers, which the firmware used to enable only when their combo PHY was in PCIe mode — so they never appeared, in UEFI or in the OS ([upstream#259](https://github.com/edk2-porting/edk2-rk3588/issues/259)). Fixed here, but untested on hardware. |
 | FriendlyELEC NanoPi R6C / R6S | eMMC raised from HS200 to HS400 with enhanced strobe, matching FriendlyELEC's own tree for the nanopi6 family and the NanoPC-T6 upstream.¹ |
 | Fydetab Duo | No HDMI output — the display controller is not enabled here.<br>SD card is limited to high-speed modes; DDR50/SDR50/SDR104 are disabled because UHS-I is unreliable on this board. |
@@ -215,6 +215,9 @@ If nothing works, the [serial console](#advanced-troubleshooting) is the only wa
 
 ## Configuration settings do not get saved
 Seen when firmware is present on more than one device (SPI NOR, eMMC, SD). The firmware now keeps its variable store on the medium it actually booted from, so an SD card carrying a second copy no longer takes the eMMC's place — but if the store still does not stick, erase the firmware from the devices you are not booting.
+
+## EFI variables written from the OS disappear on reboot
+Only on boards with no SPI NOR, where the variable store lives on the boot medium. The firmware writes it out at ReadyToBoot and when it is asked to reset, but Linux on these boards resets through PSCI rather than through EFI, so nothing flushes the store on the way down and anything written while the OS was running is lost. Settings made in the firmware's own setup menu are written before the OS starts and are unaffected. `efibootmgr` entries created by an installer are not — install with the firmware's own boot manager, or use a board with SPI NOR.
 
 ## NVMe is not detected at boot
 `phy_rockchip_naneng_combphy` drives the PCIe combo PHYs and has to be loaded before the root filesystem mounts. Distributions that do not autoload it early — NixOS at least — need it named explicitly, e.g. `boot.initrd.availableKernelModules = [ "nvme" "phy_rockchip_naneng_combphy" ];`. See [upstream#217](https://github.com/edk2-porting/edk2-rk3588/issues/217).
