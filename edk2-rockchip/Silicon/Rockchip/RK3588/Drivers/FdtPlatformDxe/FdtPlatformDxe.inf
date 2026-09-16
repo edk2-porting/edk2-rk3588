@@ -20,7 +20,6 @@
   FdtPlatformDxe.c
 
 [Packages]
-  CryptoPkg/CryptoPkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
   MdePkg/MdePkg.dec
   MdeModulePkg/MdeModulePkg.dec
@@ -36,6 +35,7 @@
   DxeServicesLib
   FdtLib
   MemoryAllocationLib
+  NetLib
   OtpLib
   PrintLib
   RockchipPlatformLib
