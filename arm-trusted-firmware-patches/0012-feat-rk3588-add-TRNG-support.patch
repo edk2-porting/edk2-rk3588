@@ -1,8 +1,8 @@
-From bd21a0e1fe83cd38caf637f193a00984d9a19bb9 Mon Sep 17 00:00:00 2001
+From 9eba1e8f6dbb58ea4a2483ad954b5d4e32f78a61 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Mario=20B=C4=83l=C4=83nic=C4=83?=
  <mariobalanica02@gmail.com>
 Date: Sun, 23 Jun 2024 22:40:55 +0300
-Subject: [PATCH 13/13] feat(rk3588): add TRNG support
+Subject: [PATCH 12/12] feat(rk3588): add TRNG support
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit

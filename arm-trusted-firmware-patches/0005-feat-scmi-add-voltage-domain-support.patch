@@ -1,8 +1,8 @@
-From 1cc33180306998dbeb28c77e584fe79ef5a52436 Mon Sep 17 00:00:00 2001
+From 1435837a7e67412b5dd6ce74c891804b4ce7401f Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Mario=20B=C4=83l=C4=83nic=C4=83?=
  <mariobalanica02@gmail.com>
 Date: Mon, 17 Jun 2024 21:37:23 +0300
-Subject: [PATCH 06/13] feat(scmi): add voltage domain support
+Subject: [PATCH 05/12] feat(scmi): add voltage domain support
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
