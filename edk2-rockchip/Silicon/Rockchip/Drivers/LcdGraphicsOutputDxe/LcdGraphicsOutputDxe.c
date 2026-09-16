@@ -20,9 +20,20 @@
 
 #include <Guid/GlobalVariable.h>
 
+#include <VarStoreData.h>
+
 #include "LcdGraphicsOutputDxe.h"
 
 STATIC EFI_CPU_ARCH_PROTOCOL  *mCpu;
+
+//
+// LINUX_EFI_MEMRESERVE_TABLE_GUID. The Linux EFI stub installs a table under
+// this GUID from install_memreserve_table(), on the way out of the stub and
+// before ExitBootServices. Nothing else installs it.
+//
+STATIC EFI_GUID  mLinuxEfiMemReserveTableGuid = {
+  0x888eb0c6, 0x8ede, 0x4ff5, { 0xa8, 0xf0, 0x9a, 0xee, 0x5c, 0xb9, 0x77, 0xc2 }
+};
 
 //
 // The instance that owns whatever is currently on screen, kept so the display
@@ -697,7 +708,68 @@ Exit:
   next has to bring the display up from nothing. The picture goes out slightly
   earlier in the boot as a result, which is the price of it coming back reliably.
 
+  All of which assumes something is coming that will program the display at all.
+  Where nothing is, the teardown is the whole failure rather than a cure for
+  anything, so it is done only for an OS that brings its own driver -- see
+  LcdGraphicsOutputOsWillProgramDisplay().
+
 **/
+/**
+  Work out whether the operating system taking over will program the display
+  itself.
+
+  Linux's EFI stub installs a memory reservation table of its own just before it
+  enters the kernel, from install_memreserve_table(), and it does so on every
+  boot through the stub. Nothing else installs one. Finding it in place at
+  ExitBootServices is therefore a dependable mark that Linux is what is
+  starting, and with a device tree exposed that means the rockchip display
+  driver is on its way and will program the controller from nothing. Leaving it
+  live hardware to inherit is precisely what the teardown exists to prevent.
+
+  Not finding it means the opposite. Windows never installs it, and has no
+  driver for this SoC's display controller: it drives the panel by scanning out
+  the framebuffer this firmware programmed and handed over through the Graphics
+  Output Protocol. Turning the connectors off leaves it with a framebuffer that
+  nothing is sending anywhere -- the boot logo goes, and the screen stays dark
+  for the rest of the boot while the OS comes up unaware behind it.
+
+  The device tree has to be on offer as well. Linux booted through ACPI alone
+  has no display driver here either, and falls back to the same firmware
+  framebuffer Windows uses, so it wants leaving alone for the same reason.
+
+  Firmware's own device tree is no help in telling these apart, incidentally,
+  and an earlier attempt at this went wrong by assuming otherwise: the arm64 EFI
+  stub builds its own copy and hands it to the kernel in a register, without
+  ever replacing the configuration table firmware installed. That table looks
+  identical either way.
+
+  @retval TRUE   Linux is taking over with a device tree, and will program the
+                 display for itself.
+  @retval FALSE  Whatever is taking over is relying on the framebuffer as this
+                 firmware left it.
+
+**/
+STATIC
+BOOLEAN
+LcdGraphicsOutputOsWillProgramDisplay (
+  VOID
+  )
+{
+  EFI_STATUS  Status;
+  VOID        *Table;
+
+  if ((PcdGet32 (PcdConfigTableMode) & CONFIG_TABLE_MODE_FDT) == 0) {
+    return FALSE;
+  }
+
+  Status = EfiGetSystemConfigurationTable (
+             &mLinuxEfiMemReserveTableGuid,
+             &Table
+             );
+
+  return (BOOLEAN)(!EFI_ERROR (Status) && (Table != NULL));
+}
+
 STATIC
 VOID
 EFIAPI
@@ -712,6 +784,15 @@ LcdGraphicsOutputExitBootServicesHandler (
   ROCKCHIP_CONNECTOR_PROTOCOL  *Connector;
 
   if ((mLcdInstance == NULL) || !PcdGetBool (PcdDisplayResetBeforeBoot)) {
+    return;
+  }
+
+  if (!LcdGraphicsOutputOsWillProgramDisplay ()) {
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: OS is using the firmware framebuffer, leaving the display up\n",
+      __func__
+      ));
     return;
   }
 

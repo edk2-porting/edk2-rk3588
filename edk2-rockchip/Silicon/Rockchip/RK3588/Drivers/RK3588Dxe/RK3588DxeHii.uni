@@ -91,8 +91,9 @@
 #string STR_RESET_TO_DEFAULTS                              #language en-US "F9=Reset to Defaults"
 
 #string STR_DISPLAY_RESET_BEFORE_BOOT_PROMPT               #language en-US "Reset Display Before Boot"
-#string STR_DISPLAY_RESET_BEFORE_BOOT_HELP                 #language en-US "Turn the display off when handing control to the operating system.\n\n"
-                                                                           "Leaving it running lets the OS inherit this configuration and skip parts of its own setup, which can result in no picture at all once it takes over. "
+#string STR_DISPLAY_RESET_BEFORE_BOOT_HELP                 #language en-US "Turn the display off when handing control to an operating system that programs it itself.\n\n"
+                                                                           "Leaving it running lets such an OS inherit this configuration and skip parts of its own setup, which can result in no picture at all once it takes over. "
+                                                                           "An OS relying on the firmware framebuffer instead, such as Windows, is left alone either way. "
                                                                            "Disabling this keeps the firmware image on screen for longer during boot."
 
 #string STR_DISPLAY_DUPLICATE_OUTPUT_PROMPT                #language en-US "Duplicate Primary Display"
