@@ -23,42 +23,7 @@
 				algo = "sha256";
 			};
 		};
-		atf-1 {
-			description = "ARM Trusted Firmware";
-			data = /incbin/("./bl31_0x00040000.bin");
-			type = "firmware";
-			arch = "arm64";
-			os = "arm-trusted-firmware";
-			compression = "none";
-			load = <0x00040000>;
-			hash {
-				algo = "sha256";
-			};
-		};
-		atf-2 {
-			description = "ARM Trusted Firmware";
-			data = /incbin/("./bl31_0x000f0000.bin");
-			type = "firmware";
-			arch = "arm64";
-			os = "arm-trusted-firmware";
-			compression = "none";
-			load = <0x000f0000>;
-			hash {
-				algo = "sha256";
-			};
-		};
-		atf-3 {
-			description = "ARM Trusted Firmware";
-			data = /incbin/("./bl31_0xff100000.bin");
-			type = "firmware";
-			arch = "arm64";
-			os = "arm-trusted-firmware";
-			compression = "none";
-			load = <0xff100000>;
-			hash {
-				algo = "sha256";
-			};
-		};
+@ATF_IMAGES@
 		optee {
 			description = "OP-TEE";
 			data = /incbin/("./bl32.bin");
@@ -98,7 +63,7 @@
 			description = "@DEVICE@";
 			rollback-index = <0x0>;
 			firmware = "atf-1";
-			loadables = "edk2", "atf-2", "atf-3", "optee", "nvdata";
+			loadables = "edk2", @ATF_LOADABLES@"optee", "nvdata";
 			fdt = "fdt";
 			signature {
 				algo = "sha256,rsa2048";

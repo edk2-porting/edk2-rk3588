@@ -119,15 +119,65 @@ function _build_fit() {
     rm -f bl31_0x*.bin ${WORKSPACE}/BL33_AP_UEFI.Fv ${SOC_L}_${DEVICE}_EFI.its
 
     ${ROOTDIR}/misc/extractbl31.py ${BL31}
-    if [ ! -f bl31_0x000f0000.bin ]; then
-        # Not used but FIT expects it.
-        touch bl31_0x000f0000.bin
+
+    #
+    # Emit one FIT image node per BL31 PT_LOAD segment.
+    #
+    # Which segments exist is up to the linker, and it moves with the TF-A
+    # version: through v2.12 rk3588 produced a single writable segment plus
+    # PMUSRAM, while v2.15 turns on the platform linker script and splits the
+    # main one into separate read-only and read-write segments. A fixed list in
+    # the .its silently drops any segment nobody thought to add -- BL31 is then
+    # loaded with that part of itself missing and dies before it can report why.
+    #
+    # extractbl31.py names each file after its load address, zero padded to
+    # eight hex digits, so sorting the names sorts them by address. The lowest
+    # is where BL31 is entered and becomes the FIT's "firmware"; the rest have
+    # to be listed as loadables or they are not loaded at all.
+    #
+    ATF_NODES="$(mktemp)"
+    ATF_LOADABLES=""
+    ATF_INDEX=0
+
+    for ATF_SEG in $(ls bl31_0x*.bin 2>/dev/null | sort); do
+        ATF_ADDR="${ATF_SEG#bl31_}"
+        ATF_ADDR="${ATF_ADDR%.bin}"
+        ATF_INDEX=$((ATF_INDEX + 1))
+
+        cat >> "${ATF_NODES}" <<EOF
+		atf-${ATF_INDEX} {
+			description = "ARM Trusted Firmware";
+			data = /incbin/("./${ATF_SEG}");
+			type = "firmware";
+			arch = "arm64";
+			os = "arm-trusted-firmware";
+			compression = "none";
+			load = <${ATF_ADDR}>;
+			hash {
+				algo = "sha256";
+			};
+		};
+EOF
+
+        if [ ${ATF_INDEX} -gt 1 ]; then
+            ATF_LOADABLES="${ATF_LOADABLES}\"atf-${ATF_INDEX}\", "
+        fi
+    done
+
+    if [ ${ATF_INDEX} -eq 0 ]; then
+        rm -f "${ATF_NODES}"
+        _error "No BL31 segments extracted from ${BL31}"
     fi
 
     cp ${BL32} ${WORKSPACE}/bl32.bin
     cp ${ROOTDIR}/misc/${SOC_L}_spl.dtb ${WORKSPACE}/${DEVICE}.dtb
     cp ${WORKSPACE}/Build/${PLATFORM_NAME}/${RELEASE_TYPE}_${TOOLCHAIN}/FV/BL33_AP_UEFI.Fv ${WORKSPACE}/
-    cat ${ROOTDIR}/misc/uefi_${SOC_L}.its | sed "s,@DEVICE@,${DEVICE},g" > ${SOC_L}_${DEVICE}_EFI.its
+    sed -e "s,@DEVICE@,${DEVICE},g" \
+        -e "s|@ATF_LOADABLES@|${ATF_LOADABLES}|" \
+        -e "/@ATF_IMAGES@/r ${ATF_NODES}" \
+        -e "/@ATF_IMAGES@/d" \
+        ${ROOTDIR}/misc/uefi_${SOC_L}.its > ${SOC_L}_${DEVICE}_EFI.its
+    rm -f "${ATF_NODES}"
     ${ROOTDIR}/misc/tools/${MACHINE_TYPE}/mkimage -f ${SOC_L}_${DEVICE}_EFI.its -E ${DEVICE}_EFI.itb
 
     popd
