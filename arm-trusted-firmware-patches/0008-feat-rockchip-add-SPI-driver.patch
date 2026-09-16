@@ -1,0 +1,874 @@
+From 44bffb6a05ddc08c8c61c81a9f61866444e84ae8 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Mario=20B=C4=83l=C4=83nic=C4=83?=
+ <mariobalanica02@gmail.com>
+Date: Mon, 17 Jun 2024 23:25:22 +0300
+Subject: [PATCH 08/13] feat(rockchip): add SPI driver
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Ported from https://github.com/edk2-porting/edk2-rk3588/blob/master/edk2-rockchip/Silicon/Rockchip/Library/SpiLib/SpiLib.c
+
+Change-Id: I4c9bc7d581f3684c090158ead6a03b83978e067d
+Signed-off-by: Mario Bălănică <mariobalanica02@gmail.com>
+---
+ plat/rockchip/common/drivers/spi/spi.c      | 490 ++++++++++++++++++++
+ plat/rockchip/common/drivers/spi/spi.h      | 244 ++++++++++
+ plat/rockchip/common/include/rockchip_spi.h | 100 ++++
+ 3 files changed, 834 insertions(+)
+ create mode 100644 plat/rockchip/common/drivers/spi/spi.c
+ create mode 100644 plat/rockchip/common/drivers/spi/spi.h
+ create mode 100644 plat/rockchip/common/include/rockchip_spi.h
+
+diff --git a/plat/rockchip/common/drivers/spi/spi.c b/plat/rockchip/common/drivers/spi/spi.c
+new file mode 100644
+index 000000000..2d6a6b72f
+--- /dev/null
++++ b/plat/rockchip/common/drivers/spi/spi.c
+@@ -0,0 +1,490 @@
++/*
++ * Copyright (c) 2020-2021, Rockchip, Inc. All rights reserved.
++ * Copyright (c) 2024, Mario Bălănică <mariobalanica02@gmail.com>
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <assert.h>
++#include <errno.h>
++
++#include <common/debug.h>
++#include <drivers/delay_timer.h>
++#include <lib/mmio.h>
++
++#include <rockchip_spi.h>
++
++#include "spi.h"
++
++/** @defgroup How_To_Use How To Use
++ *
++
++ The SPI HAL driver can be used as follows:
++
++ - Declare a rk_spi_controller handle structure, for example:
++   ```
++   struct rk_spi_controller instance;
++   ```
++
++ - Invoke rk_spi_init() API to configure default config:
++     - op_mode: slave or master
++     - apb_transform
++     - endian_mode
++     - ssd
++     - Clock rate
++
++ - Invoke rk_spi_configure() API to program other mode:
++     - Data size
++     - Clock polarity and phase
++     - FirstBit
++     - Clock div
++     - Number of data frames received at RX only mode
++     - IT FIFO Level and DMA FIFO Level
++     - Transfer Mode
++
++ - Blocking transfer:
++     - The communication is performed in polling mode by calling rk_spi_transfer().
++     - after transfer done, invoke rk_spi_stop to release the chip select.
++
++ */
++
++#define IS_SPI_MODE(__MODE__) (((__MODE__) == RK_SPI_CFG_OPM_SLAVE) || \
++                               ((__MODE__) == RK_SPI_CFG_OPM_MASTER))
++
++#define IS_SPI_DIRECTION(__MODE__) (((__MODE__) == RK_SPI_CFG_XFM_TR) || \
++                                    ((__MODE__) == RK_SPI_CFG_XFM_TO) || \
++                                    ((__MODE__) == RK_SPI_CFG_XFM_RO))
++
++#define IS_SPI_DATASIZE(__DATASIZE__) (((__DATASIZE__) == RK_SPI_CFG_DATA_FRAME_SIZE_4BIT) || \
++                                       ((__DATASIZE__) == RK_SPI_CFG_DATA_FRAME_SIZE_8BIT) || \
++                                       ((__DATASIZE__) == RK_SPI_CFG_DATA_FRAME_SIZE_16BIT))
++
++#define IS_SPI_CPOL(__CPOL__) (((__CPOL__) == RK_SPI_CFG_POLARITY_LOW) || \
++                               ((__CPOL__) == RK_SPI_CFG_POLARITY_HIGH))
++
++#define IS_SPI_CPHA(__CPHA__) (((__CPHA__) == RK_SPI_CFG_PHASE_1EDGE) || \
++                               ((__CPHA__) == RK_SPI_CFG_PHASE_2EDGE))
++
++#define IS_SPI_FIRST_BIT(__BIT__) (((__BIT__) == RK_SPI_CFG_FIRSTBIT_MSB) || \
++                                   ((__BIT__) == RK_SPI_CFG_FIRSTBIT_LSB))
++
++#define IS_SPI_APBTRANSFORM(__MODE__) (((__MODE__) == RK_SPI_CFG_BHT_16BIT) || \
++                                      ((__MODE__) == RK_SPI_CFG_BHT_8BIT))
++
++#define IS_SPI_ENDIAN_MODE(__MODE__) (((__MODE__) == RK_SPI_CFG_EM_BIG) || \
++                                      ((__MODE__) == RK_SPI_CFG_EM_LITTLE))
++
++#define IS_SPI_SSD_BIT(__MODE__) (((__MODE__) == RK_SPI_CFG_SSD_HALF) || \
++                                  ((__MODE__) == RK_SPI_CFG_SSD_ONE))
++
++#define IS_SPI_CSM(__NCYCLES__) (((__NCYCLES__) == RK_SPI_CFG_CSM_0CYCLE) ||  \
++                                 ((__NCYCLES__) == RK_SPI_CFG_CSM_1CYCLE) ||  \
++                                 ((__NCYCLES__) == RK_SPI_CFG_CSM_2CYCLES) || \
++                                 ((__NCYCLES__) == RK_SPI_CFG_CSM_3CYCLES))
++
++/**
++  * @brief  Initialize the SPI according to the specified parameters.
++  * @param  dev: pointer to a rk_spi_controller structure that contains
++  *               the configuration information for SPI module.
++  * @param  base: SPI controller register base address.
++  * @return status
++  */
++int rk_spi_init(struct rk_spi_controller *dev, uintptr_t base, uint32_t max_freq)
++{
++	dev->base = base;
++	dev->max_freq = max_freq;
++
++	/* Default config */
++	dev->config.op_mode = RK_SPI_CFG_OPM_MASTER;
++	dev->config.apb_transform = RK_SPI_CFG_BHT_8BIT;
++	dev->config.endian_mode = RK_SPI_CFG_EM_BIG;
++	dev->config.ssd = RK_SPI_CFG_SSD_ONE;
++	dev->config.csm = RK_SPI_CFG_CSM_0CYCLE;
++
++	return 0;
++}
++
++/**
++  * @brief  Start or stop the spi module.
++  * @param  dev: pointer to a rk_spi_controller structure that contains
++  *               the configuration information for SPI module.
++  * @param  enable: start or stop the spi module.
++  * @return status
++  */
++static inline int rk_spi_enable_chip(struct rk_spi_controller *dev, int enable)
++{
++	mmio_write_32(dev->base + SPI_ENR, (enable ? 1 : 0));
++
++	return 0;
++}
++
++/**
++  * @brief  Configure the spi clock division.
++  * @param  dev: pointer to a rk_spi_controller structure that contains
++  *               the configuration information for SPI module.
++  * @param  div: clock division.
++  * @return status
++  */
++static inline int rk_spi_set_clock(struct rk_spi_controller *dev, uint16_t div)
++{
++	mmio_write_32(dev->base + SPI_BAUDR, div);
++
++	return 0;
++}
++
++/**
++  * @brief  Configure the cs signal.
++  * @param  dev: pointer to a rk_spi_controller structure that contains
++  *               the configuration information for SPI module.
++  * @param select: cs number select.
++  * @param  enable: active or inactive the cs signal.
++  * @return status
++  */
++int rk_spi_set_cs(struct rk_spi_controller *dev, uint8_t select, bool enable)
++{
++	uint32_t ser;
++
++	assert(dev != NULL);
++
++	ser = mmio_read_32(dev->base + SPI_SER) & SPI_SER_SER_MASK;
++
++	if (enable) {
++		ser |= 1 << select;
++	} else {
++		ser &= ~(1 << select);
++	}
++
++	mmio_write_32(dev->base + SPI_SER, ser);
++
++	return 0;
++}
++
++/**
++  * @brief  Wait for the transfer finished.
++  * @param  dev: pointer to a rk_spi_controller structure that contains
++  *               the configuration information for SPI module.
++  * @return status
++  */
++int rk_spi_flush_fifo(struct rk_spi_controller *dev)
++{
++	assert(dev != NULL);
++
++	while (mmio_read_32(dev->base + SPI_RXFLR)) {
++		mmio_read_32(dev->base + SPI_RXDR);
++	}
++
++	return 0;
++}
++
++/**
++  * @brief  The max amount of data can be written in blocking mode.
++  * @param  dev: pointer to a rk_spi_controller structure that contains
++  *               the configuration information for SPI module.
++  * @return Max bytes can xfer.
++  */
++static inline uint32_t rk_spi_tx_max(struct rk_spi_controller *dev)
++{
++	uint32_t txLeft, txRoom;
++
++	txLeft = (dev->tx_buffer_end - dev->tx_buffer) / dev->config.num_bytes;
++	txRoom = SPI_FIFO_LENGTH - mmio_read_32(dev->base + SPI_TXFLR);
++
++	return MIN(txLeft, txRoom);
++}
++
++/**
++  * @brief  Send an amount of data in blocking mode.
++  * @param  dev: pointer to a rk_spi_controller structure that contains
++  *               the configuration information for SPI module.
++  * @return status
++  */
++static int rk_spi_pio_write(struct rk_spi_controller *dev)
++{
++	uint32_t max = rk_spi_tx_max(dev);
++	uint32_t txw = 0;
++
++	while (max--) {
++		if (dev->config.num_bytes == 1) {
++			txw = *(const uint8_t *)(dev->tx_buffer);
++		} else {
++			txw = *(const uint16_t *)(dev->tx_buffer);
++		}
++
++		mmio_write_32(dev->base + SPI_TXDR, txw);
++		dev->tx_buffer += dev->config.num_bytes;
++	}
++
++	return 0;
++}
++
++/**
++  * @brief  Read an amount of data(byte) in blocking mode.
++  * @param  dev: pointer to a rk_spi_controller structure that contains
++  *               the configuration information for SPI module.
++  * @return status
++  */
++static int rk_spi_pio_read_byte(struct rk_spi_controller *dev)
++{
++	uint32_t rx_left = dev->rx_buffer_end - dev->rx_buffer;
++	uint32_t rx_room = mmio_read_32(dev->base + SPI_RXFLR);
++	uint32_t max = MIN(rx_left, rx_room);
++
++	while (max > 7) {
++		*(dev->rx_buffer + 0) = (uint8_t)mmio_read_32(dev->base + SPI_RXDR);
++		*(dev->rx_buffer + 1) = (uint8_t)mmio_read_32(dev->base + SPI_RXDR);
++		*(dev->rx_buffer + 2) = (uint8_t)mmio_read_32(dev->base + SPI_RXDR);
++		*(dev->rx_buffer + 3) = (uint8_t)mmio_read_32(dev->base + SPI_RXDR);
++		*(dev->rx_buffer + 4) = (uint8_t)mmio_read_32(dev->base + SPI_RXDR);
++		*(dev->rx_buffer + 5) = (uint8_t)mmio_read_32(dev->base + SPI_RXDR);
++		*(dev->rx_buffer + 6) = (uint8_t)mmio_read_32(dev->base + SPI_RXDR);
++		*(dev->rx_buffer + 7) = (uint8_t)mmio_read_32(dev->base + SPI_RXDR);
++		dev->rx_buffer += 8;
++		max -= 8;
++	}
++
++	while (max--) {
++		*dev->rx_buffer = (uint8_t)mmio_read_32(dev->base + SPI_RXDR);
++		dev->rx_buffer++;
++	}
++
++	return 0;
++}
++
++/**
++  * @brief  Read an amount of data(short) in blocking mode.
++  * @param  dev: pointer to a rk_spi_controller structure that contains
++  *               the configuration information for SPI module.
++  * @return status
++  */
++static int rk_spi_pio_read_short(struct rk_spi_controller *dev)
++{
++	uint32_t rx_left = (dev->rx_buffer_end - dev->rx_buffer) >> 1;
++	uint32_t rx_room = mmio_read_32(dev->base + SPI_RXFLR);
++	uint32_t max = MIN(rx_left, rx_room);
++
++	while (max > 7) {
++		*((uint16_t *)dev->rx_buffer + 0) = (uint16_t)mmio_read_32(dev->base + SPI_RXDR);
++		*((uint16_t *)dev->rx_buffer + 1) = (uint16_t)mmio_read_32(dev->base + SPI_RXDR);
++		*((uint16_t *)dev->rx_buffer + 2) = (uint16_t)mmio_read_32(dev->base + SPI_RXDR);
++		*((uint16_t *)dev->rx_buffer + 3) = (uint16_t)mmio_read_32(dev->base + SPI_RXDR);
++		*((uint16_t *)dev->rx_buffer + 4) = (uint16_t)mmio_read_32(dev->base + SPI_RXDR);
++		*((uint16_t *)dev->rx_buffer + 5) = (uint16_t)mmio_read_32(dev->base + SPI_RXDR);
++		*((uint16_t *)dev->rx_buffer + 6) = (uint16_t)mmio_read_32(dev->base + SPI_RXDR);
++		*((uint16_t *)dev->rx_buffer + 7) = (uint16_t)mmio_read_32(dev->base + SPI_RXDR);
++		dev->rx_buffer += 16;
++		max -= 8;
++	}
++
++	while (max--) {
++		*((uint16_t *)dev->rx_buffer) = (uint16_t)mmio_read_32(dev->base + SPI_RXDR);
++		dev->rx_buffer += 2;
++	}
++
++	return 0;
++}
++
++/**
++  * @brief  Transmit an amount of data in blocking mode.
++  * @param  dev: pointer to a rk_spi_controller structure that contains
++  *               the configuration information for SPI module.
++  * @return status
++  */
++int rk_spi_transfer(struct rk_spi_controller *dev)
++{
++	uint32_t remain = 0;
++	uint64_t timeout;
++
++	assert(dev != NULL);
++
++	timeout = timeout_init_us(rk_spi_calc_timeout_us(dev));
++
++	rk_spi_enable_chip(dev, 1);
++
++	do {
++		if (dev->tx_buffer) {
++			remain = dev->tx_buffer_end - dev->tx_buffer;
++			rk_spi_pio_write(dev);
++		}
++
++		if (dev->rx_buffer) {
++			remain = dev->rx_buffer_end - dev->rx_buffer;
++
++			if (dev->config.num_bytes == 1) {
++				rk_spi_pio_read_byte(dev);
++			} else {
++				rk_spi_pio_read_short(dev);
++			}
++		}
++
++		if (timeout_elapsed(timeout)) {
++			return -ETIMEDOUT;
++		}
++	} while (remain);
++
++	return 0;
++}
++
++uint32_t rk_spi_calc_timeout_us(struct rk_spi_controller *dev)
++{
++	uint64_t timeout;
++
++	assert(dev != NULL);
++
++	timeout = dev->len * 8ULL * 1000000ULL / dev->actual_speed;
++	timeout += timeout + 100000; /* some tolerance */
++
++    	return timeout;
++}
++
++/**
++  * @brief  Query the SPI bus state is idle or busy.
++  * @param  dev: pointer to a rk_spi_controller structure that contains
++  *               the configuration information for SPI module.
++  * @return HAL status
++  */
++int rk_spi_query_bus_state(struct rk_spi_controller *dev)
++{
++	assert(dev != NULL);
++
++	if (!(mmio_read_32(dev->base + SPI_SR) & SPI_SR_BUSY)) {
++		return 0;
++	}
++
++	return -EBUSY;
++}
++
++/**
++  * @brief  Stop the transmit.
++  * @param  dev: pointer to a rk_spi_controller structure that contains
++  *               the configuration information for SPI module.
++  * @return status
++  */
++int rk_spi_stop(struct rk_spi_controller *dev)
++{
++	int ret = 0;
++	uint64_t timeout;
++
++	assert(dev != NULL);
++
++	timeout = timeout_init_us(5000);
++
++	while (rk_spi_query_bus_state(dev) != 0) {
++		if (timeout_elapsed(timeout)) {
++			ret = -ETIMEDOUT;
++			break;
++		}
++	}
++
++	rk_spi_enable_chip(dev, 0);
++
++	return ret;
++}
++
++/**
++  * @brief  Configure the SPI transfer mode depend on the tx/rx buffer.
++  * @param  dev: pointer to a rk_spi_controller structure that contains
++  *               the configuration information for SPI module.
++  * @return status
++  */
++static int rk_spi_configure_transfer_mode(struct rk_spi_controller *dev)
++{
++	uint32_t cr0;
++
++	if (dev->tx_buffer && dev->rx_buffer) {
++		dev->config.xfm_mode = RK_SPI_CFG_XFM_TR;
++	} else if (dev->tx_buffer) {
++		dev->config.xfm_mode = RK_SPI_CFG_XFM_TO;
++	} else if (dev->rx_buffer) {
++		dev->config.xfm_mode = RK_SPI_CFG_XFM_RO;
++	}
++
++	cr0 = mmio_read_32(dev->base + SPI_CTRLR0);
++	cr0 &= ~SPI_CTRLR0_XFM_MASK;
++	cr0 |= (dev->config.xfm_mode << SPI_CTRLR0_XFM_SHIFT) & SPI_CTRLR0_XFM_MASK;
++
++	mmio_write_32(dev->base + SPI_CTRLR0, cr0);
++
++	return 0;
++}
++
++/**
++  * @brief  Program the SPI config via this api.
++  * @param  dev: pointer to a rk_spi_controller structure that contains
++  *               the configuration information for SPI module.
++  * @param  tx_data: pointer to TX buffer.
++  * @param  rx_data: pointer to RX buffer.
++  * @param  size: amount of data to be sent.
++  * @return status
++  */
++int rk_spi_configure(struct rk_spi_controller *dev, const uint8_t *tx_data, uint8_t *rx_data, uint32_t size)
++{
++	uint32_t cr0 = 0;
++	uint32_t div = 0;
++
++	assert(dev != NULL);
++	assert((tx_data != NULL) || (rx_data != NULL));
++	assert(IS_SPI_MODE(dev->config.op_mode));
++	assert(IS_SPI_DIRECTION(dev->config.xfm_mode));
++	assert(IS_SPI_DATASIZE(dev->config.num_bytes));
++	assert(IS_SPI_CPOL(dev->config.clk_polarity));
++	assert(IS_SPI_CPHA(dev->config.clk_phase));
++	assert(IS_SPI_FIRST_BIT(dev->config.first_bit));
++	assert(IS_SPI_ENDIAN_MODE(dev->config.endian_mode));
++	assert(IS_SPI_APBTRANSFORM(dev->config.apb_transform));
++	assert(IS_SPI_SSD_BIT(dev->config.ssd));
++	assert(IS_SPI_CSM(dev->config.csm));
++
++	cr0 |= (dev->config.op_mode << SPI_CTRLR0_OPM_SHIFT) & SPI_CTRLR0_OPM_MASK;
++	cr0 |= (dev->config.xfm_mode << SPI_CTRLR0_XFM_SHIFT) & SPI_CTRLR0_XFM_MASK;
++
++	cr0 |= (dev->config.apb_transform << SPI_CTRLR0_BHT_SHIFT) & SPI_CTRLR0_BHT_MASK;
++	cr0 |= (dev->config.endian_mode << SPI_CTRLR0_EM_SHIFT) & SPI_CTRLR0_EM_MASK;
++	cr0 |= (dev->config.ssd << SPI_CTRLR0_SSD_SHIFT) & SPI_CTRLR0_SSD_MASK;
++
++	/* Data width */
++	cr0 |= (dev->config.num_bytes << SPI_CTRLR0_DFS_SHIFT) & SPI_CTRLR0_DFS_MASK;
++
++	/* Mode for polarity, phase, first bit and endian */
++	cr0 |= (dev->config.clk_polarity << SPI_CTRLR0_SCPOL_SHIFT) & SPI_CTRLR0_SCPOL_MASK;
++	cr0 |= (dev->config.clk_phase << SPI_CTRLR0_SCPH_SHIFT) & SPI_CTRLR0_SCPH_MASK;
++	cr0 |= (dev->config.first_bit << SPI_CTRLR0_FBM_SHIFT) & SPI_CTRLR0_FBM_MASK;
++
++	/* Config CSM cycles */
++	cr0 |= (dev->config.csm << SPI_CTRLR0_CSM_SHIFT) & SPI_CTRLR0_CSM_MASK;
++
++	/* div doesn't support odd number */
++	div = div_round_up(dev->max_freq, dev->config.speed);
++	div = (div + 1) & 0xfffe;
++
++	dev->actual_speed = dev->max_freq / div;
++
++	mmio_write_32(dev->base + SPI_CTRLR0, cr0);
++
++	mmio_write_32(dev->base + SPI_TXFTLR, SPI_FIFO_LENGTH / 2 - 1);
++	mmio_write_32(dev->base + SPI_RXFTLR, SPI_FIFO_LENGTH / 2 - 1);
++
++	mmio_write_32(dev->base + SPI_DMATDLR, SPI_FIFO_LENGTH / 2 - 1);
++	mmio_write_32(dev->base + SPI_DMARDLR, 0);
++
++	rk_spi_set_clock(dev, div);
++
++	dev->tx_buffer = tx_data;
++	dev->tx_buffer_end = tx_data + size;
++	dev->rx_buffer = rx_data;
++	dev->rx_buffer_end = rx_data + size;
++	dev->len = size;
++
++	rk_spi_configure_transfer_mode(dev);
++
++	if (dev->config.xfm_mode == RK_SPI_CFG_XFM_RO) {
++		if (dev->config.num_bytes == 1) {
++			mmio_write_32(dev->base + SPI_CTRLR1, dev->len - 1);
++		} else if (dev->config.num_bytes == 2) {
++			mmio_write_32(dev->base + SPI_CTRLR1, (dev->len / 2) - 1);
++		} else {
++			mmio_write_32(dev->base + SPI_CTRLR1, (dev->len * 2) - 1);
++		}
++	}
++
++	return 0;
++}
+diff --git a/plat/rockchip/common/drivers/spi/spi.h b/plat/rockchip/common/drivers/spi/spi.h
+new file mode 100644
+index 000000000..db1ecfd16
+--- /dev/null
++++ b/plat/rockchip/common/drivers/spi/spi.h
+@@ -0,0 +1,244 @@
++/*
++ * Copyright (c) 2020-2021, Rockchip, Inc. All rights reserved.
++ * Copyright (c) 2024, Mario Bălănică <mariobalanica02@gmail.com>
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef RK_SPI_H
++#define RK_SPI_H
++
++/* SPI Register Structure Define */
++#define SPI_CTRLR0		0x0000
++#define SPI_CTRLR1		0x0004
++#define SPI_ENR			0x0008
++#define SPI_SER			0x000C
++#define SPI_BAUDR		0x0010
++#define SPI_TXFTLR		0x0014
++#define SPI_RXFTLR		0x0018
++#define SPI_TXFLR		0x001C
++#define SPI_RXFLR		0x0020
++#define SPI_SR			0x0024
++#define SPI_IPR			0x0028
++#define SPI_IMR			0x002C
++#define SPI_ISR			0x0030
++#define SPI_RISR		0x0034
++#define SPI_ICR			0x0038
++#define SPI_DMACR		0x003C
++#define SPI_DMATDLR		0x0040
++#define SPI_DMARDLR		0x0044
++#define SPI_TIMEOUT 		0x004C
++#define SPI_BYPASS		0x0050
++#define SPI_TXDR		0x0400
++#define SPI_RXDR		0x0800
++
++/******************************************SPI*******************************************/
++/* CTRLR0 */
++#define SPI_CTRLR0_DFS_SHIFT                               (0U)
++#define SPI_CTRLR0_DFS_MASK                                (0x3U << SPI_CTRLR0_DFS_SHIFT)                               /* 0x00000003 */
++#define SPI_CTRLR0_CFS_SHIFT                               (2U)
++#define SPI_CTRLR0_CFS_MASK                                (0xFU << SPI_CTRLR0_CFS_SHIFT)                               /* 0x0000003C */
++#define SPI_CTRLR0_SCPH_SHIFT                              (6U)
++#define SPI_CTRLR0_SCPH_MASK                               (0x1U << SPI_CTRLR0_SCPH_SHIFT)                              /* 0x00000040 */
++#define SPI_CTRLR0_SCPOL_SHIFT                             (7U)
++#define SPI_CTRLR0_SCPOL_MASK                              (0x1U << SPI_CTRLR0_SCPOL_SHIFT)                             /* 0x00000080 */
++#define SPI_CTRLR0_CSM_SHIFT                               (8U)
++#define SPI_CTRLR0_CSM_MASK                                (0x3U << SPI_CTRLR0_CSM_SHIFT)                               /* 0x00000300 */
++#define SPI_CTRLR0_SSD_SHIFT                               (10U)
++#define SPI_CTRLR0_SSD_MASK                                (0x1U << SPI_CTRLR0_SSD_SHIFT)                               /* 0x00000400 */
++#define SPI_CTRLR0_EM_SHIFT                                (11U)
++#define SPI_CTRLR0_EM_MASK                                 (0x1U << SPI_CTRLR0_EM_SHIFT)                                /* 0x00000800 */
++#define SPI_CTRLR0_FBM_SHIFT                               (12U)
++#define SPI_CTRLR0_FBM_MASK                                (0x1U << SPI_CTRLR0_FBM_SHIFT)                               /* 0x00001000 */
++#define SPI_CTRLR0_BHT_SHIFT                               (13U)
++#define SPI_CTRLR0_BHT_MASK                                (0x1U << SPI_CTRLR0_BHT_SHIFT)                               /* 0x00002000 */
++#define SPI_CTRLR0_RSD_SHIFT                               (14U)
++#define SPI_CTRLR0_RSD_MASK                                (0x3U << SPI_CTRLR0_RSD_SHIFT)                               /* 0x0000C000 */
++#define SPI_CTRLR0_FRF_SHIFT                               (16U)
++#define SPI_CTRLR0_FRF_MASK                                (0x3U << SPI_CTRLR0_FRF_SHIFT)                               /* 0x00030000 */
++#define SPI_CTRLR0_XFM_SHIFT                               (18U)
++#define SPI_CTRLR0_XFM_MASK                                (0x3U << SPI_CTRLR0_XFM_SHIFT)                               /* 0x000C0000 */
++#define SPI_CTRLR0_OPM_SHIFT                               (20U)
++#define SPI_CTRLR0_OPM_MASK                                (0x1U << SPI_CTRLR0_OPM_SHIFT)                               /* 0x00100000 */
++#define SPI_CTRLR0_MTM_SHIFT                               (21U)
++#define SPI_CTRLR0_MTM_MASK                                (0x1U << SPI_CTRLR0_MTM_SHIFT)                               /* 0x00200000 */
++#define SPI_CTRLR0_SOI_SHIFT                               (23U)
++#define SPI_CTRLR0_SOI_MASK                                (0x3U << SPI_CTRLR0_SOI_SHIFT)                               /* 0x01800000 */
++#define SPI_CTRLR0_LBK_SHIFT                               (25U)
++#define SPI_CTRLR0_LBK_MASK                                (0x1U << SPI_CTRLR0_LBK_SHIFT)                               /* 0x02000000 */
++/* CTRLR1 */
++#define SPI_CTRLR1_NDM_SHIFT                               (0U)
++#define SPI_CTRLR1_NDM_MASK                                (0xFFFFFFFFU << SPI_CTRLR1_NDM_SHIFT)                        /* 0xFFFFFFFF */
++/* ENR */
++#define SPI_ENR_ENR_SHIFT                                  (0U)
++#define SPI_ENR_ENR_MASK                                   (0x1U << SPI_ENR_ENR_SHIFT)                                  /* 0x00000001 */
++/* SER */
++#define SPI_SER_SER_SHIFT                                  (0U)
++#define SPI_SER_SER_MASK                                   (0x3U << SPI_SER_SER_SHIFT)                                  /* 0x00000003 */
++/* BAUDR */
++#define SPI_BAUDR_BAUDR_SHIFT                              (0U)
++#define SPI_BAUDR_BAUDR_MASK                               (0xFFFFU << SPI_BAUDR_BAUDR_SHIFT)                           /* 0x0000FFFF */
++/* TXFTLR */
++#define SPI_TXFTLR_XFTLR_SHIFT                             (0U)
++#define SPI_TXFTLR_XFTLR_MASK                              (0x3FU << SPI_TXFTLR_XFTLR_SHIFT)                            /* 0x0000003F */
++/* RXFTLR */
++#define SPI_RXFTLR_RXFTLR_SHIFT                            (0U)
++#define SPI_RXFTLR_RXFTLR_MASK                             (0x3FU << SPI_RXFTLR_RXFTLR_SHIFT)                           /* 0x0000003F */
++/* TXFLR */
++#define SPI_TXFLR_TXFLR_SHIFT                              (0U)
++#define SPI_TXFLR_TXFLR_MASK                               (0x7FU << SPI_TXFLR_TXFLR_SHIFT)                             /* 0x0000007F */
++/* RXFLR */
++#define SPI_RXFLR_RXFLR_SHIFT                              (0U)
++#define SPI_RXFLR_RXFLR_MASK                               (0x7FU << SPI_RXFLR_RXFLR_SHIFT)                             /* 0x0000007F */
++/* SR */
++#define SPI_SR_BSF_SHIFT                                   (0U)
++#define SPI_SR_BSF_MASK                                    (0x1U << SPI_SR_BSF_SHIFT)                                   /* 0x00000001 */
++#define SPI_SR_TFF_SHIFT                                   (1U)
++#define SPI_SR_TFF_MASK                                    (0x1U << SPI_SR_TFF_SHIFT)                                   /* 0x00000002 */
++#define SPI_SR_TFE_SHIFT                                   (2U)
++#define SPI_SR_TFE_MASK                                    (0x1U << SPI_SR_TFE_SHIFT)                                   /* 0x00000004 */
++#define SPI_SR_RFE_SHIFT                                   (3U)
++#define SPI_SR_RFE_MASK                                    (0x1U << SPI_SR_RFE_SHIFT)                                   /* 0x00000008 */
++#define SPI_SR_RFF_SHIFT                                   (4U)
++#define SPI_SR_RFF_MASK                                    (0x1U << SPI_SR_RFF_SHIFT)                                   /* 0x00000010 */
++#define SPI_SR_STB_SHIFT                                   (5U)
++#define SPI_SR_STB_MASK                                    (0x1U << SPI_SR_STB_SHIFT)                                   /* 0x00000020 */
++#define SPI_SR_SSI_SHIFT                                   (6U)
++#define SPI_SR_SSI_MASK                                    (0x1U << SPI_SR_SSI_SHIFT)                                   /* 0x00000040 */
++/* IPR */
++#define SPI_IPR_IPR_SHIFT                                  (0U)
++#define SPI_IPR_IPR_MASK                                   (0x1U << SPI_IPR_IPR_SHIFT)                                  /* 0x00000001 */
++/* IMR */
++#define SPI_IMR_TFEIM_SHIFT                                (0U)
++#define SPI_IMR_TFEIM_MASK                                 (0x1U << SPI_IMR_TFEIM_SHIFT)                                /* 0x00000001 */
++#define SPI_IMR_TFOIM_SHIFT                                (1U)
++#define SPI_IMR_TFOIM_MASK                                 (0x1U << SPI_IMR_TFOIM_SHIFT)                                /* 0x00000002 */
++#define SPI_IMR_RFUIM_SHIFT                                (2U)
++#define SPI_IMR_RFUIM_MASK                                 (0x1U << SPI_IMR_RFUIM_SHIFT)                                /* 0x00000004 */
++#define SPI_IMR_RFOIM_SHIFT                                (3U)
++#define SPI_IMR_RFOIM_MASK                                 (0x1U << SPI_IMR_RFOIM_SHIFT)                                /* 0x00000008 */
++#define SPI_IMR_RFFIM_SHIFT                                (4U)
++#define SPI_IMR_RFFIM_MASK                                 (0x1U << SPI_IMR_RFFIM_SHIFT)                                /* 0x00000010 */
++#define SPI_IMR_TOIM_SHIFT                                 (5U)
++#define SPI_IMR_TOIM_MASK                                  (0x1U << SPI_IMR_TOIM_SHIFT)                                 /* 0x00000020 */
++#define SPI_IMR_SSPIM_SHIFT                                (6U)
++#define SPI_IMR_SSPIM_MASK                                 (0x1U << SPI_IMR_SSPIM_SHIFT)                                /* 0x00000040 */
++#define SPI_IMR_TXFIM_SHIFT                                (7U)
++#define SPI_IMR_TXFIM_MASK                                 (0x1U << SPI_IMR_TXFIM_SHIFT)                                /* 0x00000080 */
++/* ISR */
++#define SPI_ISR_TFEIS_SHIFT                                (0U)
++#define SPI_ISR_TFEIS_MASK                                 (0x1U << SPI_ISR_TFEIS_SHIFT)                                /* 0x00000001 */
++#define SPI_ISR_TFOIS_SHIFT                                (1U)
++#define SPI_ISR_TFOIS_MASK                                 (0x1U << SPI_ISR_TFOIS_SHIFT)                                /* 0x00000002 */
++#define SPI_ISR_RFUIS_SHIFT                                (2U)
++#define SPI_ISR_RFUIS_MASK                                 (0x1U << SPI_ISR_RFUIS_SHIFT)                                /* 0x00000004 */
++#define SPI_ISR_RFOIS_SHIFT                                (3U)
++#define SPI_ISR_RFOIS_MASK                                 (0x1U << SPI_ISR_RFOIS_SHIFT)                                /* 0x00000008 */
++#define SPI_ISR_RFFIS_SHIFT                                (4U)
++#define SPI_ISR_RFFIS_MASK                                 (0x1U << SPI_ISR_RFFIS_SHIFT)                                /* 0x00000010 */
++#define SPI_ISR_TOIS_SHIFT                                 (5U)
++#define SPI_ISR_TOIS_MASK                                  (0x1U << SPI_ISR_TOIS_SHIFT)                                 /* 0x00000020 */
++#define SPI_ISR_SSPIS_SHIFT                                (6U)
++#define SPI_ISR_SSPIS_MASK                                 (0x1U << SPI_ISR_SSPIS_SHIFT)                                /* 0x00000040 */
++#define SPI_ISR_TXFIS_SHIFT                                (7U)
++#define SPI_ISR_TXFIS_MASK                                 (0x1U << SPI_ISR_TXFIS_SHIFT)                                /* 0x00000080 */
++/* RISR */
++#define SPI_RISR_TFERIS_SHIFT                              (0U)
++#define SPI_RISR_TFERIS_MASK                               (0x1U << SPI_RISR_TFERIS_SHIFT)                              /* 0x00000001 */
++#define SPI_RISR_TFORIS_SHIFT                              (1U)
++#define SPI_RISR_TFORIS_MASK                               (0x1U << SPI_RISR_TFORIS_SHIFT)                              /* 0x00000002 */
++#define SPI_RISR_RFURIS_SHIFT                              (2U)
++#define SPI_RISR_RFURIS_MASK                               (0x1U << SPI_RISR_RFURIS_SHIFT)                              /* 0x00000004 */
++#define SPI_RISR_RFORIS_SHIFT                              (3U)
++#define SPI_RISR_RFORIS_MASK                               (0x1U << SPI_RISR_RFORIS_SHIFT)                              /* 0x00000008 */
++#define SPI_RISR_RFFRIS_SHIFT                              (4U)
++#define SPI_RISR_RFFRIS_MASK                               (0x1U << SPI_RISR_RFFRIS_SHIFT)                              /* 0x00000010 */
++#define SPI_RISR_TORIS_SHIFT                               (5U)
++#define SPI_RISR_TORIS_MASK                                (0x1U << SPI_RISR_TORIS_SHIFT)                               /* 0x00000020 */
++#define SPI_RISR_SSPRIS_SHIFT                              (6U)
++#define SPI_RISR_SSPRIS_MASK                               (0x1U << SPI_RISR_SSPRIS_SHIFT)                              /* 0x00000040 */
++#define SPI_RISR_TXFRIS_SHIFT                              (7U)
++#define SPI_RISR_TXFRIS_MASK                               (0x1U << SPI_RISR_TXFRIS_SHIFT)                              /* 0x00000080 */
++/* ICR */
++#define SPI_ICR_CCI_SHIFT                                  (0U)
++#define SPI_ICR_CCI_MASK                                   (0x1U << SPI_ICR_CCI_SHIFT)                                  /* 0x00000001 */
++#define SPI_ICR_CRFUI_SHIFT                                (1U)
++#define SPI_ICR_CRFUI_MASK                                 (0x1U << SPI_ICR_CRFUI_SHIFT)                                /* 0x00000002 */
++#define SPI_ICR_CRFOI_SHIFT                                (2U)
++#define SPI_ICR_CRFOI_MASK                                 (0x1U << SPI_ICR_CRFOI_SHIFT)                                /* 0x00000004 */
++#define SPI_ICR_CTFOI_SHIFT                                (3U)
++#define SPI_ICR_CTFOI_MASK                                 (0x1U << SPI_ICR_CTFOI_SHIFT)                                /* 0x00000008 */
++#define SPI_ICR_CTOI_SHIFT                                 (4U)
++#define SPI_ICR_CTOI_MASK                                  (0x1U << SPI_ICR_CTOI_SHIFT)                                 /* 0x00000010 */
++#define SPI_ICR_CSSPI_SHIFT                                (5U)
++#define SPI_ICR_CSSPI_MASK                                 (0x1U << SPI_ICR_CSSPI_SHIFT)                                /* 0x00000020 */
++#define SPI_ICR_CTXFI_SHIFT                                (6U)
++#define SPI_ICR_CTXFI_MASK                                 (0x1U << SPI_ICR_CTXFI_SHIFT)                                /* 0x00000040 */
++/* DMACR */
++#define SPI_DMACR_RDE_SHIFT                                (0U)
++#define SPI_DMACR_RDE_MASK                                 (0x1U << SPI_DMACR_RDE_SHIFT)                                /* 0x00000001 */
++#define SPI_DMACR_TDE_SHIFT                                (1U)
++#define SPI_DMACR_TDE_MASK                                 (0x1U << SPI_DMACR_TDE_SHIFT)                                /* 0x00000002 */
++/* DMATDLR */
++#define SPI_DMATDLR_TDL_SHIFT                              (0U)
++#define SPI_DMATDLR_TDL_MASK                               (0x3FU << SPI_DMATDLR_TDL_SHIFT)                             /* 0x0000003F */
++/* DMARDLR */
++#define SPI_DMARDLR_RDL_SHIFT                              (0U)
++#define SPI_DMARDLR_RDL_MASK                               (0x3FU << SPI_DMARDLR_RDL_SHIFT)                             /* 0x0000003F */
++/* TIMEOUT */
++#define SPI_TIMEOUT_TOV_SHIFT                              (0U)
++#define SPI_TIMEOUT_TOV_MASK                               (0xFFFFU << SPI_TIMEOUT_TOV_SHIFT)                           /* 0x0000FFFF */
++#define SPI_TIMEOUT_TOE_SHIFT                              (16U)
++#define SPI_TIMEOUT_TOE_MASK                               (0x1U << SPI_TIMEOUT_TOE_SHIFT)                              /* 0x00010000 */
++/* BYPASS */
++#define SPI_BYPASS_BYEN_SHIFT                              (0U)
++#define SPI_BYPASS_BYEN_MASK                               (0x1U << SPI_BYPASS_BYEN_SHIFT)                              /* 0x00000001 */
++#define SPI_BYPASS_FBM_SHIFT                               (1U)
++#define SPI_BYPASS_FBM_MASK                                (0x1U << SPI_BYPASS_FBM_SHIFT)                               /* 0x00000002 */
++#define SPI_BYPASS_END_SHIFT                               (2U)
++#define SPI_BYPASS_END_MASK                                (0x1U << SPI_BYPASS_END_SHIFT)                               /* 0x00000004 */
++#define SPI_BYPASS_RXCP_SHIFT                              (3U)
++#define SPI_BYPASS_RXCP_MASK                               (0x1U << SPI_BYPASS_RXCP_SHIFT)                              /* 0x00000008 */
++#define SPI_BYPASS_TXCP_SHIFT                              (4U)
++#define SPI_BYPASS_TXCP_MASK                               (0x1U << SPI_BYPASS_TXCP_SHIFT)                              /* 0x00000010 */
++/* TXDR */
++#define SPI_TXDR_TXDR_SHIFT                                (0U)
++#define SPI_TXDR_TXDR_MASK                                 (0xFFFFU << SPI_TXDR_TXDR_SHIFT)                             /* 0x0000FFFF */
++/* RXDR */
++#define SPI_RXDR_RXDR_SHIFT                                (0U)
++#define SPI_RXDR_RXDR_MASK                                 (0xFFFFU << SPI_RXDR_RXDR_SHIFT)                             /* 0x0000FFFF */
++
++/* Bit fields in SR */
++#define SPI_SR_BUSY		(0x1 << SPI_SR_BSF_SHIFT)
++#define SPI_SR_STB_BUSY		(0x1 << SPI_SR_STB_SHIFT)
++
++/* Bit fields in ISR, IMR, RISR, 7 bits */
++#define SPI_INT_TXEI		(1 << SPI_IMR_TFEIM_SHIFT)
++#define SPI_INT_TXOI		(1 << SPI_IMR_TFOIM_SHIFT)
++#define SPI_INT_RXUI		(1 << SPI_IMR_RFUIM_SHIFT)
++#define SPI_INT_RXOI		(1 << SPI_IMR_RFOIM_SHIFT)
++#define SPI_INT_RXFI		(1 << SPI_IMR_RFFIM_SHIFT)
++#define SPI_INT_TOI		(1 << SPI_IMR_TOIM_SHIFT)
++#define SPI_INT_SSPI		(1 << SPI_IMR_SSPIM_SHIFT)
++#define SPI_INT_TXFIM		(1 << SPI_IMR_TXFIM_SHIFT)
++
++/* Bit fields in ICR */
++#define SPI_CLEAR_INT_ALL	(1 << SPI_ICR_CCI_SHIFT)
++#define SPI_CLEAR_INT_RXUI	(1 << SPI_ICR_CRFUI_SHIFT)
++#define SPI_CLEAR_INT_RXOI	(1 << SPI_ICR_CRFOI_SHIFT)
++#define SPI_CLEAR_INT_TXOI	(1 << SPI_ICR_CTFOI_SHIFT)
++#define SPI_CLEAR_INT_TOI	(1 << SPI_ICR_CTOI_SHIFT)
++#define SPI_ICR_SSPI_SHIFT	(1 << SPI_ICR_CSSPI_SHIFT)
++#define SPI_CLEAR_INT_TXFI	(1 << SPI_ICR_CTXFI_SHIFT)
++
++/* Bit fields in DMACR */
++#define SPI_DMACR_TX_ENABLE	(1 << SPI_DMACR_TDE_SHIFT)
++#define SPI_DMACR_RX_ENABLE	(1 << SPI_DMACR_RDE_SHIFT)
++
++/* Bit fields in SPI TIMEOUT */
++#define SPI_TIMEOUT_ENABLE	(1 << SPI_TIMEOUT_TOE_SHIFT)
++#define SPI_TIMEOUT_DISABLE	0
++
++#define SPI_FIFO_LENGTH		64
++
++#endif /* RK_SPI_H */
+diff --git a/plat/rockchip/common/include/rockchip_spi.h b/plat/rockchip/common/include/rockchip_spi.h
+new file mode 100644
+index 000000000..0e34757c8
+--- /dev/null
++++ b/plat/rockchip/common/include/rockchip_spi.h
+@@ -0,0 +1,100 @@
++/*
++ * Copyright (c) 2020-2021, Rockchip, Inc. All rights reserved.
++ * Copyright (c) 2024, Mario Bălănică <mariobalanica02@gmail.com>
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef ROCKCHIP_SPI_API_H
++#define ROCKCHIP_SPI_API_H
++
++#define SPI_MASTER_MAX_SCLK_OUT		50000000 /**< Max io clock in master mode */
++#define SPI_SLAVE_MAX_SCLK_OUT		20000000 /**< Max io in clock in slave mode */
++
++#define RK_SPI_CFG_DATA_FRAME_SIZE_4BIT		0x00
++#define RK_SPI_CFG_DATA_FRAME_SIZE_8BIT		0x01
++#define RK_SPI_CFG_DATA_FRAME_SIZE_16BIT	0x02
++
++/* serial clock toggles in middle of first data bit */
++#define RK_SPI_CFG_PHASE_1EDGE		0x00
++/* serial clock toggles at start of first data bit */
++#define RK_SPI_CFG_PHASE_2EDGE		0x01
++
++#define RK_SPI_CFG_POLARITY_LOW		0x00
++#define RK_SPI_CFG_POLARITY_HIGH	0x01
++
++/*
++ * The period between ss_n active and
++ * sclk_out active is half sclk_out cycles
++ */
++#define RK_SPI_CFG_SSD_HALF		0x00
++/*
++ * The period between ss_n active and
++ * sclk_out active is one sclk_out cycle
++ */
++#define RK_SPI_CFG_SSD_ONE		0x01
++
++#define RK_SPI_CFG_EM_LITTLE		0x0
++#define RK_SPI_CFG_EM_BIG		0x1
++
++#define RK_SPI_CFG_FIRSTBIT_MSB		0x0
++#define RK_SPI_CFG_FIRSTBIT_LSB		0x1
++
++#define RK_SPI_CFG_BHT_16BIT		0x0
++#define RK_SPI_CFG_BHT_8BIT		0x1
++
++#define RK_SPI_CFG_XFM_TR		0x00
++#define RK_SPI_CFG_XFM_TO		0x01
++#define RK_SPI_CFG_XFM_RO		0x02
++
++#define RK_SPI_CFG_OPM_MASTER		0x00
++#define RK_SPI_CFG_OPM_SLAVE		0x01
++
++#define RK_SPI_CFG_CSM_0CYCLE		0x00
++#define RK_SPI_CFG_CSM_1CYCLE		0x01
++#define RK_SPI_CFG_CSM_2CYCLES		0x02
++#define RK_SPI_CFG_CSM_3CYCLES		0x03
++
++/***************************** Structure Definition **************************/
++
++/** @brief  SPI Configuration Structure definition */
++struct rk_spi_config {
++	uint32_t op_mode;		/**< Specifies the SPI operating mode, master or slave. */
++	uint32_t xfm_mode;		/**< Specifies the SPI bidirectional mode state, tx only, rx only or trx mode. */
++	uint32_t num_bytes;		/**< Specifies the SPI data size. */
++	uint32_t clk_polarity;		/**< Specifies the serial clock steady state. */
++	uint32_t clk_phase;		/**< Specifies the clock active edge for the bit capture. */
++	uint32_t first_bit;		/**< Specifies whether data transfers start from MSB or LSB bit. */
++	uint32_t endian_mode;		/**< Specifies whether data transfers start from little or big endian. */
++	uint32_t apb_transform;		/**< Specifies apb transform type. */
++	uint32_t ssd;			/**< Specifies period between ss_n active and sclk_out. */
++	uint32_t speed;			/**< Specifies the Baud Rate prescaler value which will be
++					     used to configure the transmit and receive SCK clock. */
++	uint32_t ssi_type;		/**< Specifies if the TI mode is enabled or not.*/
++	uint32_t csm;			/**< Specifies Motorola SPI Master SS_N high cycles for each frame data is transfer. */
++};
++
++
++/** @brief  SPI handle Structure definition */
++struct rk_spi_controller {
++	uintptr_t base;			/**< Specifies SPI registers base address. */
++	uint32_t max_freq;		/**< Specifies SPI clock frequency. */
++	uint32_t actual_speed;		/**< Specifies actual SPI clock frequency after source division */
++	struct rk_spi_config config;	/**< Specifies SPI communication parameters. */
++	const uint8_t *tx_buffer;	/**< Specifies pointer to SPI Tx transfer Buffer. */
++	const uint8_t *tx_buffer_end;	/**< Specifies pointer to SPI Tx _end transfer Buffer. */
++	uint8_t *rx_buffer;		/**< Specifies pointer to SPI Rx transfer Buffer. */
++	uint8_t *rx_buffer_end;		/**< Specifies pointer to SPI Rx _end transfer Buffer. */
++	uint32_t len;			/**< Specifies the transfer length . */
++};
++
++int rk_spi_init(struct rk_spi_controller *dev, uintptr_t base, uint32_t max_freq);
++int rk_spi_flush_fifo(struct rk_spi_controller *dev);
++int rk_spi_set_cs(struct rk_spi_controller *dev, uint8_t select, bool enable);
++int rk_spi_transfer(struct rk_spi_controller *dev);
++int rk_spi_stop(struct rk_spi_controller *dev);
++int rk_spi_configure(struct rk_spi_controller *dev, const uint8_t *tx_data,
++		     uint8_t *rx_data, uint32_t Size);
++uint32_t rk_spi_calc_timeout_us(struct rk_spi_controller *dev);
++
++#endif /* ROCKCHIP_SPI_API_H */

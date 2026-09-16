@@ -1,0 +1,256 @@
+From cca17e0c30dbdc476f45812bf6995ac2e7ded9f3 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Mario=20B=C4=83l=C4=83nic=C4=83?=
+ <mariobalanica02@gmail.com>
+Date: Tue, 18 Jun 2024 01:05:14 +0300
+Subject: [PATCH 10/13] feat(rk3588): initial support for SCMI voltage domain
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Create a new platform that implements the SCMI voltage domain protocol
+for most RK3588 boards which follow the "standard" RK806 PMIC design.
+
+Right now we only support setting the SDMMC signaling voltage.
+
+Change-Id: I1e48c552a4b81c869f5532675d1a43a5fc39be87
+Signed-off-by: Mario Bălănică <mariobalanica02@gmail.com>
+---
+ plat/rockchip/common/bl31_plat_setup.c        |  4 +
+ plat/rockchip/common/include/plat_private.h   |  1 +
+ .../boards/rk3588_reference_pmic/board.c      | 14 +++
+ .../boards/rk3588_reference_pmic/platform.mk  | 21 +++++
+ .../rk3588_reference_pmic/scmi/rk3588_voltd.c | 88 +++++++++++++++++++
+ .../rk3588_reference_pmic/scmi/rk3588_voltd.h | 14 +++
+ plat/rockchip/rk3588/platform.mk              |  5 +-
+ plat/rockchip/rk3588/rk3588_def.h             |  2 +
+ 8 files changed, 147 insertions(+), 2 deletions(-)
+ create mode 100644 plat/rockchip/rk3588/boards/rk3588_reference_pmic/board.c
+ create mode 100644 plat/rockchip/rk3588/boards/rk3588_reference_pmic/platform.mk
+ create mode 100644 plat/rockchip/rk3588/boards/rk3588_reference_pmic/scmi/rk3588_voltd.c
+ create mode 100644 plat/rockchip/rk3588/boards/rk3588_reference_pmic/scmi/rk3588_voltd.h
+
+diff --git a/plat/rockchip/common/bl31_plat_setup.c b/plat/rockchip/common/bl31_plat_setup.c
+index 62147226a..5448e47ec 100644
+--- a/plat/rockchip/common/bl31_plat_setup.c
++++ b/plat/rockchip/common/bl31_plat_setup.c
+@@ -83,6 +83,10 @@ void bl31_platform_setup(void)
+ 	plat_rockchip_gic_driver_init();
+ 	plat_rockchip_gic_init();
+ 	plat_rockchip_pmu_init();
++
++#ifdef BOARD
++	plat_rockchip_board_init();
++#endif
+ }
+ 
+ /*******************************************************************************
+diff --git a/plat/rockchip/common/include/plat_private.h b/plat/rockchip/common/include/plat_private.h
+index f785429c0..41455f058 100644
+--- a/plat/rockchip/common/include/plat_private.h
++++ b/plat/rockchip/common/include/plat_private.h
+@@ -99,6 +99,7 @@ void plat_rockchip_gic_pcpu_init(void);
+ 
+ void plat_rockchip_pmu_init(void);
+ void plat_rockchip_soc_init(void);
++void plat_rockchip_board_init(void);
+ uintptr_t plat_get_sec_entrypoint(void);
+ 
+ void platform_cpu_warmboot(void);
+diff --git a/plat/rockchip/rk3588/boards/rk3588_reference_pmic/board.c b/plat/rockchip/rk3588/boards/rk3588_reference_pmic/board.c
+new file mode 100644
+index 000000000..ee7f59df9
+--- /dev/null
++++ b/plat/rockchip/rk3588/boards/rk3588_reference_pmic/board.c
+@@ -0,0 +1,14 @@
++/*
++ * Copyright (c) 2024, Mario Bălănică <mariobalanica02@gmail.com>
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <scmi/rk3588_voltd.h>
++
++#include <plat_private.h>
++
++void plat_rockchip_board_init(void)
++{
++	rk3588_reference_voltd_init();
++}
+diff --git a/plat/rockchip/rk3588/boards/rk3588_reference_pmic/platform.mk b/plat/rockchip/rk3588/boards/rk3588_reference_pmic/platform.mk
+new file mode 100644
+index 000000000..54f91ffb3
+--- /dev/null
++++ b/plat/rockchip/rk3588/boards/rk3588_reference_pmic/platform.mk
+@@ -0,0 +1,21 @@
++#
++# Copyright (c) 2024, Mario Bălănică <mariobalanica02@gmail.com>
++#
++# SPDX-License-Identifier: BSD-3-Clause
++#
++
++BOARD				:= ${PLAT}
++RK_PLAT_BOARD 			:= plat/rockchip/rk3588/boards/${BOARD}
++
++BL31_SOURCES		+=	drivers/scmi-msg/voltage_domain.c		\
++				${RK_PLAT_COMMON}/drivers/spi/spi.c		\
++				${RK_PLAT_COMMON}/drivers/rk806/rk806.c		\
++				${RK_PLAT_COMMON}/scmi/scmi_voltd.c		\
++				${RK_PLAT_BOARD}/scmi/rk3588_voltd.c		\
++				${RK_PLAT_BOARD}/board.c
++
++PLAT_INCLUDES		+=	-I${RK_PLAT_BOARD}/
++
++$(eval $(call add_define_val,BOARD,'"${BOARD}"'))
++
++include plat/rockchip/rk3588/platform.mk
+diff --git a/plat/rockchip/rk3588/boards/rk3588_reference_pmic/scmi/rk3588_voltd.c b/plat/rockchip/rk3588/boards/rk3588_reference_pmic/scmi/rk3588_voltd.c
+new file mode 100644
+index 000000000..491fd3317
+--- /dev/null
++++ b/plat/rockchip/rk3588/boards/rk3588_reference_pmic/scmi/rk3588_voltd.c
+@@ -0,0 +1,88 @@
++/*
++ * Copyright (c) 2024, Mario Bălănică <mariobalanica02@gmail.com>
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <assert.h>
++#include <errno.h>
++
++#include <drivers/rk806/rk806.h>
++#include <drivers/scmi.h>
++#include <platform_def.h>
++#include <rockchip_spi.h>
++#include <scmi_voltd.h>
++
++#include "rk3588_voltd.h"
++
++static struct rk_spi_controller spi_instance;
++static struct rk806_regulator rk806_instance;
++
++#define RK3588_SCMI_VOLTD(_id, _name, _min, _max, _step, _ops)	\
++	[_id] = {						\
++		.id = _id,					\
++		.name = _name,					\
++		.min_level = _min,				\
++		.max_level = _max,				\
++		.step_level = _step,				\
++		.voltd_ops = _ops,				\
++	}
++
++#define RK806_SCMI_REG(_scmi_id, _reg_id)	        	\
++	[_scmi_id] = {						\
++		.scmi_id = _scmi_id,				\
++		.reg_id = _reg_id,				\
++	}
++
++typedef struct rk806_scmi_reg {
++	uint32_t scmi_id;
++	uint32_t reg_id;
++} rk806_scmi_reg_t;
++
++rk806_scmi_reg_t rk806_ref_table[] = {
++	RK806_SCMI_REG(SCMI_VCCIO_SD_S0, MASTER_PLDO5),
++};
++
++static int32_t rk806_voltd_set_level(rk_scmi_voltd_t *voltd, int level)
++{
++	int ret;
++
++	if (voltd->id >= ARRAY_SIZE(rk806_ref_table)) {
++		assert(false);
++		return SCMI_NOT_FOUND;
++	}
++
++	ret = rk806_regulator_set_voltage(&rk806_instance,
++					  rk806_ref_table[voltd->id].reg_id,
++					  level);
++	if (ret) {
++		return SCMI_HARDWARE_ERROR;
++	}
++
++	return SCMI_SUCCESS;
++}
++
++static struct rk_scmi_voltd_ops rk806_voltd_ops = {
++	.set_level = rk806_voltd_set_level
++};
++
++static rk_scmi_voltd_t rk3588_voltd_table[] = {
++	RK3588_SCMI_VOLTD(SCMI_VCCIO_SD_S0, "scmi_vccio_sd_s0", 1800000, 3300000, 12500, &rk806_voltd_ops),
++};
++
++rk_scmi_voltd_t *rockchip_scmi_get_voltd(unsigned int agent_id,
++				       unsigned int scmi_id)
++{
++	return &rk3588_voltd_table[scmi_id];
++}
++
++size_t rockchip_scmi_voltd_count(unsigned int agent_id)
++{
++	return ARRAY_SIZE(rk3588_voltd_table);
++}
++
++void rk3588_reference_voltd_init(void)
++{
++	rk_spi_init(&spi_instance, SPI2_BASE, 24000000);
++	rk806_init(&rk806_instance, &spi_instance);
++}
+diff --git a/plat/rockchip/rk3588/boards/rk3588_reference_pmic/scmi/rk3588_voltd.h b/plat/rockchip/rk3588/boards/rk3588_reference_pmic/scmi/rk3588_voltd.h
+new file mode 100644
+index 000000000..6cbef8c73
+--- /dev/null
++++ b/plat/rockchip/rk3588/boards/rk3588_reference_pmic/scmi/rk3588_voltd.h
+@@ -0,0 +1,14 @@
++/*
++ * Copyright (c) 2024, Mario Bălănică <mariobalanica02@gmail.com>
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef __RK3588_VOLTD_H__
++#define __RK3588_VOLTD_H__
++
++#define SCMI_VCCIO_SD_S0		0
++
++void rk3588_reference_voltd_init(void);
++
++#endif
+diff --git a/plat/rockchip/rk3588/platform.mk b/plat/rockchip/rk3588/platform.mk
+index 413a20c16..1e8c59afe 100644
+--- a/plat/rockchip/rk3588/platform.mk
++++ b/plat/rockchip/rk3588/platform.mk
+@@ -4,8 +4,9 @@
+ # SPDX-License-Identifier: BSD-3-Clause
+ #
+ 
++SOC			:=	rk3588
+ RK_PLAT			:=	plat/rockchip
+-RK_PLAT_SOC		:=	${RK_PLAT}/${PLAT}
++RK_PLAT_SOC		:=	${RK_PLAT}/${SOC}
+ RK_PLAT_COMMON		:=	${RK_PLAT}/common
+ 
+ DISABLE_BIN_GENERATION	:=	1
+@@ -19,7 +20,7 @@ GICV3_SUPPORT_GIC600   	:=      1
+ # Include GICv3 driver files
+ include drivers/arm/gic/v3/gicv3.mk
+ 
+-PLAT_INCLUDES		:=	-Iinclude/plat/common				\
++PLAT_INCLUDES		+=	-Iinclude/plat/common				\
+ 				-Idrivers/arm/gic/v3/				\
+ 				-Idrivers/scmi-msg/				\
+ 				-I${RK_PLAT_COMMON}/				\
+diff --git a/plat/rockchip/rk3588/rk3588_def.h b/plat/rockchip/rk3588/rk3588_def.h
+index 78d64f7db..159ef762d 100644
+--- a/plat/rockchip/rk3588/rk3588_def.h
++++ b/plat/rockchip/rk3588/rk3588_def.h
+@@ -117,6 +117,8 @@
+ #define NSTIMER1_BASE		0xfeae8000
+ #define WDT_NS_BASE		0xfeaf0000
+ 
++#define SPI2_BASE		0xfeb20000
++
+ #define UART1_BASE		0xfeb40000
+ #define UART2_BASE		0xfeb50000
+ #define UART3_BASE		0xfeb60000

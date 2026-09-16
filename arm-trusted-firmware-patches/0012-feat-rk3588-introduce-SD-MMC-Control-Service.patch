@@ -1,0 +1,604 @@
+From 52f721a67f81add312e602622ff79d50df85145f Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Mario=20B=C4=83l=C4=83nic=C4=83?=
+ <mariobalanica02@gmail.com>
+Date: Tue, 18 Jun 2024 02:36:09 +0300
+Subject: [PATCH 12/13] feat(rk3588): introduce SD/MMC Control Service
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+The whole point of this service is to allow the Windows SD/eMMC drivers
+to effortlessly control necessary clocks and voltages, since this is all
+done in non-standard ways via CRU and a PMIC on the SPI bus.
+
+Why not use ACPI methods?
+
+We want to be able to collect crash dumps when SD/eMMC is used as a boot
+drive. The crash dump stack is much more limited and does not provide
+any means to call into the ACPI driver.
+
+Change-Id: I2b51f787a5255b2a30a6a5ec14f00031f351e6b2
+Signed-off-by: Mario Bălănică <mariobalanica02@gmail.com>
+---
+ .../common/include/rockchip_sip_svc.h         |  37 +-
+ .../boards/rk3588_reference_pmic/board.c      |   8 +
+ plat/rockchip/rk3588/plat_sip_calls.c         |  27 ++
+ plat/rockchip/rk3588/plat_sip_sdmmc.c         | 384 ++++++++++++++++++
+ plat/rockchip/rk3588/plat_sip_sdmmc.h         |  21 +
+ plat/rockchip/rk3588/platform.mk              |   1 +
+ plat/rockchip/rk3588/rk3588_def.h             |   3 +
+ 7 files changed, 478 insertions(+), 3 deletions(-)
+ create mode 100644 plat/rockchip/rk3588/plat_sip_sdmmc.c
+ create mode 100644 plat/rockchip/rk3588/plat_sip_sdmmc.h
+
+diff --git a/plat/rockchip/common/include/rockchip_sip_svc.h b/plat/rockchip/common/include/rockchip_sip_svc.h
+index 8836f9b58..e2ba1a1a6 100644
+--- a/plat/rockchip/common/include/rockchip_sip_svc.h
++++ b/plat/rockchip/common/include/rockchip_sip_svc.h
+@@ -13,16 +13,47 @@
+ #define SIP_SVC_VERSION			0x8200ff03
+ #define RK_SIP_SCMI_AGENT0		0x82000010
+ 
++/* Rockchip SD/MMC Control Service (for Windows on Arm) */
++#define RK_SIP_SDMMC_CLOCK_RATE_GET		0x82000020
++#define RK_SIP_SDMMC_CLOCK_RATE_SET		0x82000021
++#define RK_SIP_SDMMC_CLOCK_PHASE_GET		0x82000022
++#define RK_SIP_SDMMC_CLOCK_PHASE_SET		0x82000023
++#define RK_SIP_SDMMC_REGULATOR_VOLTAGE_GET	0x82000024
++#define RK_SIP_SDMMC_REGULATOR_VOLTAGE_SET	0x82000025
++#define RK_SIP_SDMMC_REGULATOR_ENABLE_GET	0x82000026
++#define RK_SIP_SDMMC_REGULATOR_ENABLE_SET	0x82000027
++
+ /* rockchip SiP Service Calls version numbers */
+-#define RK_SIP_SVC_VERSION_MAJOR	0x0
+-#define RK_SIP_SVC_VERSION_MINOR	0x1
++#define RK_SIP_SVC_VERSION_MAJOR	0x1
++#define RK_SIP_SVC_VERSION_MINOR	0x0
+ 
+ /* Number of ROCKCHIP SiP Calls implemented */
+ #define RK_COMMON_SIP_NUM_CALLS		0x3
+ 
++/*
++ * RK_SIP_SDMMC definitions
++*/
++typedef enum {
++	RK_SIP_SDMMC_CLOCK_ID_MSHC_CIU = 0,
++	RK_SIP_SDMMC_CLOCK_ID_MSHC_CIU_DRIVE,
++	RK_SIP_SDMMC_CLOCK_ID_MSHC_CIU_SAMPLE
++} RK_SIP_SDMMC_CLOCK_ID_MSHC;
++
++typedef enum {
++	RK_SIP_SDMMC_CLOCK_ID_EMMC_CCLK = 0
++} RK_SIP_SDMMC_CLOCK_ID_EMMC;
++
++typedef enum {
++	RK_SIP_SDMMC_REGULATOR_ID_SUPPLY = 0,
++	RK_SIP_SDMMC_REGULATOR_ID_SIGNAL
++} RK_SIP_SDMMC_REGULATOR_ID;
++
+ enum {
+ 	RK_SIP_E_SUCCESS = 0,
+-	RK_SIP_E_INVALID_PARAM = -1
++	RK_SIP_E_NOT_SUPPORTED = -1, // SMC_UNK
++	RK_SIP_E_INVALID_PARAM = -2,
++	RK_SIP_E_NOT_IMPLEMENTED = -3,
++	RK_SIP_E_DEVICE_ERROR = -4,
+ };
+ 
+ #endif /* ROCKCHIP_SIP_SVC_H */
+diff --git a/plat/rockchip/rk3588/boards/rk3588_reference_pmic/board.c b/plat/rockchip/rk3588/boards/rk3588_reference_pmic/board.c
+index ee7f59df9..e6256ed22 100644
+--- a/plat/rockchip/rk3588/boards/rk3588_reference_pmic/board.c
++++ b/plat/rockchip/rk3588/boards/rk3588_reference_pmic/board.c
+@@ -4,10 +4,18 @@
+  * SPDX-License-Identifier: BSD-3-Clause
+  */
+ 
++#include <drivers/scmi-msg.h>
+ #include <scmi/rk3588_voltd.h>
+ 
+ #include <plat_private.h>
+ 
++#include <plat_sip_sdmmc.h>
++
++int plat_rk3588_sdmmc_set_signal_voltage(unsigned int microvolts)
++{
++	return plat_scmi_voltd_set_level(0, SCMI_VCCIO_SD_S0, microvolts);
++}
++
+ void plat_rockchip_board_init(void)
+ {
+ 	rk3588_reference_voltd_init();
+diff --git a/plat/rockchip/rk3588/plat_sip_calls.c b/plat/rockchip/rk3588/plat_sip_calls.c
+index 496e8d751..352871db4 100644
+--- a/plat/rockchip/rk3588/plat_sip_calls.c
++++ b/plat/rockchip/rk3588/plat_sip_calls.c
+@@ -11,6 +11,8 @@
+ #include <plat_sip_calls.h>
+ #include <rockchip_sip_svc.h>
+ 
++#include "plat_sip_sdmmc.h"
++
+ uintptr_t rockchip_plat_sip_handler(uint32_t smc_fid,
+ 				    u_register_t x1,
+ 				    u_register_t x2,
+@@ -20,11 +22,36 @@ uintptr_t rockchip_plat_sip_handler(uint32_t smc_fid,
+ 				    void *handle,
+ 				    u_register_t flags)
+ {
++	if (GET_SMC_CC(smc_fid) == SMC_32) {
++		/* Clear top bits */
++		x1 = (uint32_t)x1;
++		x2 = (uint32_t)x2;
++		x3 = (uint32_t)x3;
++		x4 = (uint32_t)x4;
++	} else {
++		/*
++		 * ARM DEN 0028F:
++		 * SMC64/HVC64 calls are expected to be the 64-bit
++		 * equivalent to the 32-bit call, where applicable.
++		 */
++		smc_fid &= ~(SMC_64 << FUNCID_CC_SHIFT);
++	}
++
+ 	switch (smc_fid) {
+ 	case RK_SIP_SCMI_AGENT0:
+ 		scmi_smt_fastcall_smc_entry(0);
+ 		SMC_RET1(handle, 0);
+ 
++	case RK_SIP_SDMMC_CLOCK_RATE_GET:
++	case RK_SIP_SDMMC_CLOCK_RATE_SET:
++	case RK_SIP_SDMMC_CLOCK_PHASE_GET:
++	case RK_SIP_SDMMC_CLOCK_PHASE_SET:
++	case RK_SIP_SDMMC_REGULATOR_VOLTAGE_GET:
++	case RK_SIP_SDMMC_REGULATOR_VOLTAGE_SET:
++	case RK_SIP_SDMMC_REGULATOR_ENABLE_GET:
++	case RK_SIP_SDMMC_REGULATOR_ENABLE_SET:
++		return rk_sip_sdmmc_handler(smc_fid, x1, x2, x3, x4, cookie, handle, flags);
++
+ 	default:
+ 		ERROR("%s: unhandled SMC (0x%x)\n", __func__, smc_fid);
+ 		SMC_RET1(handle, SMC_UNK);
+diff --git a/plat/rockchip/rk3588/plat_sip_sdmmc.c b/plat/rockchip/rk3588/plat_sip_sdmmc.c
+new file mode 100644
+index 000000000..81e22a1f3
+--- /dev/null
++++ b/plat/rockchip/rk3588/plat_sip_sdmmc.c
+@@ -0,0 +1,384 @@
++/*
++ * Copyright (c) 2024, Mario Bălănică <mariobalanica02@gmail.com>
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <common/debug.h>
++#include <common/runtime_svc.h>
++#include <drivers/scmi-msg.h>
++#include <lib/mmio.h>
++
++#include <platform_def.h>
++#include <rockchip_sip_svc.h>
++#include <soc.h>
++
++#include <scmi_clock.h>
++#include <rk3588_clk.h>
++
++#include "plat_sip_sdmmc.h"
++
++/* This is board-specific (see rk3588_reference_pmic) */
++#pragma weak plat_rk3588_sdmmc_set_signal_voltage
++
++#define DIV_ROUND_CLOSEST(x, divisor) (((x) + ((divisor) / 2)) / (divisor))
++
++#define PICOSECONDS_PER_SECOND	1000000000000ULL
++
++#define CRU_SD_CON_SEL			BIT(11)
++#define CRU_SD_CON_DELAYNUM_SHIFT	3
++#define CRU_SD_CON_DELAYNUM_MASK 	GENMASK_32(10, 3)
++#define CRU_SD_CON_DEGREE_SHIFT		1
++#define CRU_SD_CON_DEGREE_MASK		GENMASK_32(2, 1)
++#define CRU_SD_CON_INIT_STATE		BIT(0)
++#define CRU_SD_CON_MASK			GENMASK_32(11, 0)
++
++#define CRU_SD_CON_DELAYNUM_MAX      255
++#define CRU_SD_CON_DEGREE_STEP       90
++
++/*
++ * RK3588 TRM-Part2 3.6.7:
++ * The delay time of every element is in the range of 36ps~68ps,
++ * varying with different voltage and temperature.
++ */
++#define CRU_SD_DELAY_ELEMENT_PS_MIN	36
++#define CRU_SD_DELAY_ELEMENT_PS_MAX	68
++#define CRU_SD_DELAY_ELEMENT_PS  \
++	((CRU_SD_DELAY_ELEMENT_PS_MIN + CRU_SD_DELAY_ELEMENT_PS_MAX) / 2)
++
++#define CRU_SD_CLKGEN_DIV	2
++
++static unsigned int cru_sd_get_phase(unsigned int con_reg,
++				     unsigned int rate_hz)
++{
++	unsigned int val;
++	unsigned int phase_degrees;
++	unsigned long long delaynum;
++
++	if (rate_hz == 0) {
++		return 0;
++	}
++
++	val = mmio_read_32(con_reg);
++
++	phase_degrees = (val & CRU_SD_CON_DEGREE_MASK) >> CRU_SD_CON_DEGREE_SHIFT;
++	phase_degrees *= CRU_SD_CON_DEGREE_STEP;
++
++	if ((val & CRU_SD_CON_SEL) != 0) {
++		delaynum = (val & CRU_SD_CON_DELAYNUM_MASK) >> CRU_SD_CON_DELAYNUM_SHIFT;
++		delaynum *= CRU_SD_DELAY_ELEMENT_PS * rate_hz * 360ULL;
++
++		phase_degrees += DIV_ROUND_CLOSEST(delaynum, PICOSECONDS_PER_SECOND);
++	}
++
++	return phase_degrees % 360;
++}
++
++static void cru_sd_set_phase(unsigned int con_reg,
++			     unsigned int rate_hz,
++			     unsigned int phase_degrees)
++{
++	unsigned int degree_sel, remaining_degrees;
++	unsigned long long delaynum;
++	unsigned int val = 0;
++
++	if (rate_hz == 0) {
++		return;
++	}
++
++	degree_sel = phase_degrees / CRU_SD_CON_DEGREE_STEP;
++	remaining_degrees = (phase_degrees % CRU_SD_CON_DEGREE_STEP);
++
++	delaynum = DIV_ROUND_CLOSEST(PICOSECONDS_PER_SECOND * remaining_degrees,
++			CRU_SD_DELAY_ELEMENT_PS * rate_hz * 360ULL);
++
++	delaynum = MIN(delaynum, (unsigned long long)CRU_SD_CON_DELAYNUM_MAX);
++
++	if (delaynum) {
++		val |= CRU_SD_CON_SEL;
++	}
++	val |= (delaynum << CRU_SD_CON_DELAYNUM_SHIFT) & CRU_SD_CON_DELAYNUM_MASK;
++	val |= (degree_sel << CRU_SD_CON_DEGREE_SHIFT) & CRU_SD_CON_DEGREE_MASK;
++
++	mmio_write_32(con_reg, (CRU_SD_CON_MASK << 16) | val);
++}
++
++static int get_mshc_phase_shift_cru_reg(uintptr_t controller_address,
++					unsigned int id,
++					unsigned int *cru_reg)
++{
++	switch (controller_address) {
++	case SDMMC_BASE:
++		switch (id) {
++		case RK_SIP_SDMMC_CLOCK_ID_MSHC_CIU_DRIVE:
++			*cru_reg = CRU_BASE + CRU_SDMMC_CON0;
++			return RK_SIP_E_SUCCESS;
++		case RK_SIP_SDMMC_CLOCK_ID_MSHC_CIU_SAMPLE:
++			*cru_reg = CRU_BASE + CRU_SDMMC_CON1;
++			return RK_SIP_E_SUCCESS;
++		}
++		break;
++	case SDIO_BASE:
++		switch (id) {
++		case RK_SIP_SDMMC_CLOCK_ID_MSHC_CIU_DRIVE:
++			*cru_reg = CRU_BASE + CRU_SDIO_CON0;
++			return RK_SIP_E_SUCCESS;
++		case RK_SIP_SDMMC_CLOCK_ID_MSHC_CIU_SAMPLE:
++			*cru_reg = CRU_BASE + CRU_SDIO_CON1;
++			return RK_SIP_E_SUCCESS;
++		}
++		break;
++	}
++
++	return RK_SIP_E_NOT_IMPLEMENTED;
++}
++
++static int get_sdmmc_card_clock_scmi_id(uintptr_t controller_address,
++					unsigned int id,
++					unsigned int *scmi_id)
++{
++	switch (controller_address) {
++	case SDMMC_BASE:
++		switch (id) {
++		case RK_SIP_SDMMC_CLOCK_ID_MSHC_CIU:
++			*scmi_id = SCMI_CCLK_SD;
++			return RK_SIP_E_SUCCESS;
++		}
++		break;
++	case EMMC_BASE:
++		switch (id) {
++		case RK_SIP_SDMMC_CLOCK_ID_EMMC_CCLK:
++			*scmi_id = SCMI_CCLK_EMMC;
++			return RK_SIP_E_SUCCESS;
++		}
++		break;
++	}
++
++	return RK_SIP_E_NOT_IMPLEMENTED;
++}
++
++static int rk_sip_sdmmc_clock_rate_get(uintptr_t controller_address,
++				       unsigned int id,
++				       unsigned int *rate_hz)
++{
++	int ret;
++	unsigned int scmi_id;
++
++	ret = get_sdmmc_card_clock_scmi_id(controller_address, id, &scmi_id);
++	if (ret) {
++		return ret;
++	}
++
++	*rate_hz = plat_scmi_clock_get_rate(0, scmi_id);
++	if (*rate_hz == 0) {
++		return RK_SIP_E_DEVICE_ERROR;
++	}
++
++	return RK_SIP_E_SUCCESS;
++}
++
++static int rk_sip_sdmmc_clock_rate_set(uintptr_t controller_address,
++				       unsigned int id,
++				       unsigned int rate_hz)
++{
++	int ret;
++	unsigned int scmi_id;
++
++	ret = get_sdmmc_card_clock_scmi_id(controller_address, id, &scmi_id);
++	if (ret) {
++		return ret;
++	}
++
++	ret = plat_scmi_clock_set_rate(0, scmi_id, rate_hz);
++	if (ret) {
++		return RK_SIP_E_DEVICE_ERROR;
++	}
++
++	return RK_SIP_E_SUCCESS;
++}
++
++static int rk_sip_sdmmc_clock_phase_get(uintptr_t controller_address,
++					unsigned int id,
++					unsigned int *phase_degrees)
++{
++	int ret;
++	unsigned int cru_reg;
++	unsigned int rate_hz;
++
++	ret = get_mshc_phase_shift_cru_reg(controller_address, id, &cru_reg);
++	if (ret) {
++		return ret;
++	}
++
++	ret = rk_sip_sdmmc_clock_rate_get(controller_address,
++					  RK_SIP_SDMMC_CLOCK_ID_MSHC_CIU,
++					  &rate_hz);
++	if (ret) {
++		return ret;
++	}
++
++	rate_hz /= CRU_SD_CLKGEN_DIV;
++
++	*phase_degrees = cru_sd_get_phase(cru_reg, rate_hz);
++
++	return RK_SIP_E_SUCCESS;
++}
++
++static int rk_sip_sdmmc_clock_phase_set(uintptr_t controller_address,
++					unsigned int id,
++					unsigned int phase_degrees)
++{
++	int ret;
++	unsigned int cru_reg;
++	unsigned int rate_hz;
++
++	ret = get_mshc_phase_shift_cru_reg(controller_address, id, &cru_reg);
++	if (ret) {
++		return ret;
++	}
++
++	ret = rk_sip_sdmmc_clock_rate_get(controller_address,
++					  RK_SIP_SDMMC_CLOCK_ID_MSHC_CIU,
++					  &rate_hz);
++	if (ret) {
++		return ret;
++	}
++
++	rate_hz /= CRU_SD_CLKGEN_DIV;
++
++	cru_sd_set_phase(cru_reg, rate_hz, phase_degrees);
++
++	return RK_SIP_E_SUCCESS;
++}
++
++static int rk_sip_sdmmc_regulator_voltage_get(uintptr_t controller_address,
++					      unsigned int id,
++					      unsigned int *microvolts)
++{
++	return RK_SIP_E_NOT_IMPLEMENTED;
++}
++
++static int rk_sip_sdmmc_regulator_voltage_set(uintptr_t controller_address,
++					      unsigned int id,
++					      unsigned int microvolts)
++{
++	int ret;
++
++	switch (controller_address) {
++	case SDMMC_BASE:
++		switch (id) {
++		case RK_SIP_SDMMC_REGULATOR_ID_SIGNAL:
++			ret = plat_rk3588_sdmmc_set_signal_voltage(microvolts);
++			if (ret) {
++				return RK_SIP_E_DEVICE_ERROR;
++			}
++			return RK_SIP_E_SUCCESS;
++		}
++		break;
++	}
++
++	return RK_SIP_E_NOT_IMPLEMENTED;
++}
++
++static int rk_sip_sdmmc_regulator_enable_get(uintptr_t controller_address,
++					     unsigned int id,
++					     bool *enable)
++{
++	return RK_SIP_E_NOT_IMPLEMENTED;
++}
++
++static int rk_sip_sdmmc_regulator_enable_set(uintptr_t controller_address,
++					     unsigned int id,
++					     bool enable)
++{
++	return RK_SIP_E_NOT_IMPLEMENTED;
++}
++
++int plat_rk3588_sdmmc_set_signal_voltage(unsigned int microvolts)
++{
++	return RK_SIP_E_NOT_IMPLEMENTED;
++}
++
++uintptr_t rk_sip_sdmmc_handler(uint32_t smc_fid,
++			       u_register_t x1,
++			       u_register_t x2,
++			       u_register_t x3,
++			       u_register_t x4,
++			       void *cookie,
++			       void *handle,
++			       u_register_t flags)
++{
++	int ret;
++
++	switch (smc_fid) {
++	case RK_SIP_SDMMC_CLOCK_RATE_GET: {
++		unsigned int rate_hz = 0;
++
++		ret = rk_sip_sdmmc_clock_rate_get(x1, x2, &rate_hz);
++		if (!ret) {
++			SMC_RET2(handle, RK_SIP_E_SUCCESS, rate_hz);
++		} else {
++			SMC_RET1(handle, ret);
++		}
++		break;
++	}
++	case RK_SIP_SDMMC_CLOCK_RATE_SET: {
++		ret = rk_sip_sdmmc_clock_rate_set(x1, x2, x3);
++		SMC_RET1(handle, ret);
++		break;
++	}
++	case RK_SIP_SDMMC_CLOCK_PHASE_GET: {
++		unsigned int phase_degrees = 0;
++
++		ret = rk_sip_sdmmc_clock_phase_get(x1, x2, &phase_degrees);
++		if (!ret) {
++			SMC_RET2(handle, RK_SIP_E_SUCCESS, phase_degrees);
++		} else {
++			SMC_RET1(handle, ret);
++		}
++		break;
++	}
++	case RK_SIP_SDMMC_CLOCK_PHASE_SET: {
++		ret = rk_sip_sdmmc_clock_phase_set(x1, x2, x3);
++		SMC_RET1(handle, ret);
++		break;
++	}
++	case RK_SIP_SDMMC_REGULATOR_VOLTAGE_GET: {
++		unsigned int microvolts = 0;
++
++		ret = rk_sip_sdmmc_regulator_voltage_get(x1, x2, &microvolts);
++		if (!ret) {
++			SMC_RET2(handle, RK_SIP_E_SUCCESS, microvolts);
++		} else {
++			SMC_RET1(handle, ret);
++		}
++		break;
++	}
++	case RK_SIP_SDMMC_REGULATOR_VOLTAGE_SET: {
++		ret = rk_sip_sdmmc_regulator_voltage_set(x1, x2, x3);
++		SMC_RET1(handle, ret);
++		break;
++	}
++	case RK_SIP_SDMMC_REGULATOR_ENABLE_GET: {
++		bool enable = false;
++
++		ret = rk_sip_sdmmc_regulator_enable_get(x1, x2, &enable);
++		if (!ret) {
++			SMC_RET2(handle, RK_SIP_E_SUCCESS, enable);
++		} else {
++			SMC_RET1(handle, ret);
++		}
++		break;
++	}
++	case RK_SIP_SDMMC_REGULATOR_ENABLE_SET: {
++		ret = rk_sip_sdmmc_regulator_enable_set(x1, x2, x3);
++		SMC_RET1(handle, ret);
++		break;
++	}
++	default:
++		ERROR("%s: unhandled SMC (0x%x)\n", __func__, smc_fid);
++		SMC_RET1(handle, SMC_UNK);
++	}
++
++	SMC_RET1(handle, SMC_UNK);
++}
+diff --git a/plat/rockchip/rk3588/plat_sip_sdmmc.h b/plat/rockchip/rk3588/plat_sip_sdmmc.h
+new file mode 100644
+index 000000000..63286f3bf
+--- /dev/null
++++ b/plat/rockchip/rk3588/plat_sip_sdmmc.h
+@@ -0,0 +1,21 @@
++/*
++ * Copyright (c) 2024, Mario Bălănică <mariobalanica02@gmail.com>
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef PLAT_SIP_SDMMC_H
++#define PLAT_SIP_SDMMC_H
++
++int plat_rk3588_sdmmc_set_signal_voltage(unsigned int microvolts);
++
++uintptr_t rk_sip_sdmmc_handler(uint32_t smc_fid,
++			       u_register_t x1,
++			       u_register_t x2,
++			       u_register_t x3,
++			       u_register_t x4,
++			       void *cookie,
++			       void *handle,
++			       u_register_t flags);
++
++#endif /* PLAT_SIP_SDMMC_H */
+diff --git a/plat/rockchip/rk3588/platform.mk b/plat/rockchip/rk3588/platform.mk
+index 1e8c59afe..0d23ac872 100644
+--- a/plat/rockchip/rk3588/platform.mk
++++ b/plat/rockchip/rk3588/platform.mk
+@@ -74,6 +74,7 @@ BL31_SOURCES		+=	${RK_GIC_SOURCES}				\
+ 				${RK_PLAT_COMMON}/scmi/scmi_clock.c		\
+ 				${RK_PLAT_COMMON}/scmi/scmi_rstd.c		\
+ 				${RK_PLAT_SOC}/plat_sip_calls.c         	\
++				${RK_PLAT_SOC}/plat_sip_sdmmc.c         	\
+ 				${RK_PLAT_SOC}/drivers/secure/secure.c		\
+ 				${RK_PLAT_SOC}/drivers/soc/soc.c		\
+ 				${RK_PLAT_SOC}/drivers/pmu/pmu.c		\
+diff --git a/plat/rockchip/rk3588/rk3588_def.h b/plat/rockchip/rk3588/rk3588_def.h
+index 159ef762d..f7d9ca5bb 100644
+--- a/plat/rockchip/rk3588/rk3588_def.h
++++ b/plat/rockchip/rk3588/rk3588_def.h
+@@ -106,6 +106,9 @@
+ #define DDRPHY2_BASE		0xfe0e0000
+ #define DDRPHY3_BASE		0xfe0f0000
+ #define TIMER_DDR_BASE		0xfe118000
++#define SDMMC_BASE		0xfe2c0000
++#define SDIO_BASE		0xfe2d0000
++#define EMMC_BASE		0xfe2e0000
+ #define KEYLADDER_BASE		0xfe380000
+ #define CRYPTO_S_BASE		0xfe390000
+ #define OTP_S_BASE		0xfe3a0000
