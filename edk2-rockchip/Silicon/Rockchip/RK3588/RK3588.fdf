@@ -50,16 +50,26 @@ NumBlocks     = 0x800
 gArmTokenSpaceGuid.PcdFvBaseAddress|gArmTokenSpaceGuid.PcdFvSize
 FV = BL33_AP_UEFI
 
+# The three regions below must stay contiguous and in this order -- RkFvbDxe
+# asserts it, and presents all three as a single firmware volume.
+#
+# NV_VARIABLE_STORE must keep its base address: it is what carries settings
+# across a firmware update, and moving it would orphan every deployed board.
+# That fixes the budget at the 256K between here and the end of the 8MB
+# device. FTW spare has to be at least as large as the variable store, since
+# reclaim writes the whole store through it (FtwVariableSpace), which leaves
+# 120K + 16K + 120K as the largest variable store this layout can hold.
+
 # NV_VARIABLE_STORE
-0x007C0000|0x00010000
+0x007C0000|0x0001E000
 gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableBase64|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageVariableSize
 
 # NV_FTW_WORKING header
-0x007D0000|0x00010000
+0x007DE000|0x00004000
 gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingBase64|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwWorkingSize
 
 # NV_FTW_WORKING data
-0x007E0000|0x00010000
+0x007E2000|0x0001E000
 gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareBase64|gEfiMdeModulePkgTokenSpaceGuid.PcdFlashNvStorageFtwSpareSize
 
 ################################################################################
