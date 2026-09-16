@@ -1,7 +1,7 @@
-From f20be36607154d7c2d498531be4fc9533055f9f0 Mon Sep 17 00:00:00 2001
+From b104f37527afece550676ae6bcbaea3eb3f9001d Mon Sep 17 00:00:00 2001
 From: Yann Gautier <yann.gautier@st.com>
 Date: Thu, 28 May 2026 16:17:30 +0200
-Subject: [PATCH 04/13] fix(rockchip): use #ifdef for IMAGE_BL flags
+Subject: [PATCH 03/12] fix(rockchip): use #ifdef for IMAGE_BL flags
 
 The different flags IMAGE_BL{1,2,31,32...} are only defined and not
 assigned a value. The correct way to handle it is with `#if defined`.

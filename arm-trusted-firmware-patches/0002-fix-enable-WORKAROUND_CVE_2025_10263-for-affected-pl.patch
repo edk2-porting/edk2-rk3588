@@ -1,7 +1,7 @@
 From fa58bf26cf45239871f263dc4502a69c9739c390 Mon Sep 17 00:00:00 2001
 From: John Powell <john.powell@arm.com>
 Date: Fri, 12 Jun 2026 11:54:06 -0500
-Subject: [PATCH 02/13] fix: enable WORKAROUND_CVE_2025_10263 for affected
+Subject: [PATCH 02/12] fix: enable WORKAROUND_CVE_2025_10263 for affected
  platforms
 
 This patch enables this build flag for affected platforms, meaning

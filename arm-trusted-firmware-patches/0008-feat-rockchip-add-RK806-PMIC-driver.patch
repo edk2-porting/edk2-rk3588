@@ -1,8 +1,8 @@
-From 08359ac44e2c29461882a4eea87eecd6050006ac Mon Sep 17 00:00:00 2001
+From fcc4c56a559e83734c4ac28d212b2e9fda75b6a6 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Mario=20B=C4=83l=C4=83nic=C4=83?=
  <mariobalanica02@gmail.com>
 Date: Mon, 17 Jun 2024 23:35:28 +0300
-Subject: [PATCH 09/13] feat(rockchip): add RK806 PMIC driver
+Subject: [PATCH 08/12] feat(rockchip): add RK806 PMIC driver
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit

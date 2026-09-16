@@ -1,8 +1,8 @@
-From 44bffb6a05ddc08c8c61c81a9f61866444e84ae8 Mon Sep 17 00:00:00 2001
+From 7e2feac654cbd99ccb89eaa4a990f21199a89a69 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Mario=20B=C4=83l=C4=83nic=C4=83?=
  <mariobalanica02@gmail.com>
 Date: Mon, 17 Jun 2024 23:25:22 +0300
-Subject: [PATCH 08/13] feat(rockchip): add SPI driver
+Subject: [PATCH 07/12] feat(rockchip): add SPI driver
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit

@@ -1,8 +1,8 @@
-From 52f721a67f81add312e602622ff79d50df85145f Mon Sep 17 00:00:00 2001
+From 2db2e617ce0ee5543ad46acc7a8ef80a9e5b24df Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Mario=20B=C4=83l=C4=83nic=C4=83?=
  <mariobalanica02@gmail.com>
 Date: Tue, 18 Jun 2024 02:36:09 +0300
-Subject: [PATCH 12/13] feat(rk3588): introduce SD/MMC Control Service
+Subject: [PATCH 11/12] feat(rk3588): introduce SD/MMC Control Service
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
