@@ -80,7 +80,7 @@ Deviations from the table above, plus what each board's Device Tree describes in
 | Radxa ROCK 5B / 5B+ | The Type-C controller is disabled in the mainline Device Tree on purpose: the board is powered over USB-C, and a power-delivery contract negotiated as late as kernel probe makes the supply issue a hard reset. The firmware establishes the contract before the OS starts, which is what that needs.¹ If a board reboots during firmware startup, unset `RK_FUSB302_ENABLE` in its platform `.dsc`. |
 | Radxa ROCK 5 ITX | The connector labelled HDMI0 is really DP1 behind an on-board DP-to-HDMI bridge, wired to VP2; HDMI1 is the one on VP1. Board wiring, not something the firmware can route around. |
 | FriendlyELEC NanoPC-T6<br>NanoPi R6C / R6S<br>CM3588-NAS | The factory MAC address EEPROM on i2c6 is not described by the mainline Device Tree, so the address on the sticker is not the one in use. The firmware supplies a stable address derived from the SoC's OTP instead, so it does not change between boots. |
-| FriendlyELEC CM3588-NAS | Only 2 of the 4 M.2 NVMe slots are recognized — confirmed on the UEFI Shell `pci` listing, so this is firmware-level rather than a Linux driver issue. See [upstream#259](https://github.com/edk2-porting/edk2-rk3588/issues/259). Not diagnosed on hardware, but the combo PHY lane-select fix in this release is a candidate: the stray write it removes pointed `pcie2x1l1` at combphy2, which is in USB3 mode on this board, while the slot is really fed from the bifurcated PCIe 3 PHY. |
+| FriendlyELEC CM3588-NAS | All four M.2 slots run as Gen3 x1 off the bifurcated PCIe 3 PHY. Slots 2 and 4 hang off the `pcie2x1l0` and `pcie2x1l1` controllers, which the firmware used to enable only when their combo PHY was in PCIe mode — so they never appeared, in UEFI or in the OS ([upstream#259](https://github.com/edk2-porting/edk2-rk3588/issues/259)). Fixed here, but untested on hardware. |
 | FriendlyELEC NanoPi R6C / R6S | eMMC raised from HS200 to HS400 with enhanced strobe, matching FriendlyELEC's own tree for the nanopi6 family and the NanoPC-T6 upstream.¹ |
 | Fydetab Duo | No HDMI output — the display controller is not enabled here.<br>SD card is limited to high-speed modes; DDR50/SDR50/SDR104 are disabled because UHS-I is unreliable on this board. |
 | Mekotronics R58X | eMMC HS400 is disabled; the eMMC is unusable with it enabled. |
@@ -295,11 +295,15 @@ Build errors are usually missing dependencies — the lists above are not exhaus
 | 0x00000000 | 0x00004400 | GPT Table | rk3588_spi_nor_gpt.img |
 | 0x00008000 | | IDBlock | idblock.bin |
 | 0x00100000 | 0x00500000 | BL33_AP_UEFI FV | ${DEVICE}_EFI.itb |
-| 0x007C0000 | 0x00010000 | NV_VARIABLE_STORE | |
-| 0x007D0000 | 0x00010000 | NV_FTW_WORKING | |
-| 0x007E0000 | 0x00010000 | NV_FTW_SPARE | |
+| 0x007C0000 | 0x0001E000 | NV_VARIABLE_STORE | |
+| 0x007DE000 | 0x00004000 | NV_FTW_WORKING | |
+| 0x007E2000 | 0x0001E000 | NV_FTW_SPARE | |
 
 The variable store is not part of the flash image, so updates do not overwrite your settings. The firmware expects these exact offsets — do not change them.
+
+The store is 120K, raised from 64K ([upstream#234](https://github.com/edk2-porting/edk2-rk3588/issues/234)). It cannot grow further without moving its base address, which is what carries settings across an update: the three regions have to be contiguous, fault-tolerant write needs a spare area at least as large as the store itself, and the whole set has to fit in the 256K between the base and the end of the 8MB device.
+
+> **Updating from a release with the old 64K layout resets your UEFI settings once.** The firmware checks the recorded volume size against the one it expects and rebuilds the store when they disagree, so boot entries and anything set in the setup menu go back to defaults on that first boot. Later updates are unaffected.
 
 ## Memory map
 | Address | Size | Description | File |
