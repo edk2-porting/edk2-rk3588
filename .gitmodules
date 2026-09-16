@@ -9,8 +9,7 @@
 	url = https://github.com/rockchip-linux/rkbin.git
 [submodule "arm-trusted-firmware"]
 	path = arm-trusted-firmware
-	url = https://github.com/worproject/arm-trusted-firmware
-	branch = rk3588
+	url = https://github.com/ARM-software/arm-trusted-firmware.git
 [submodule "devicetree/mainline/upstream"]
 	path = devicetree/mainline/upstream
 	url = https://kernel.googlesource.com/pub/scm/linux/kernel/git/devicetree/devicetree-rebasing.git
