@@ -115,11 +115,15 @@ IsPcieNumEnabled (
       break;
 
     case PCIE_SEGMENT_PCIE20L0:
-      Enabled = (PcdGet32 (PcdComboPhy1Mode) == COMBO_PHY_MODE_PCIE);
+      Enabled = (PcdGet32 (PcdComboPhy1Mode) == COMBO_PHY_MODE_PCIE) ||
+                ((PcdGet32 (PcdPcie30State) == PCIE30_STATE_ENABLED) &&
+                 PCIE30_PHY_MODE_FEEDS_PCIE20L0 (PcdGet8 (PcdPcie30PhyMode)));
       break;
 
     case PCIE_SEGMENT_PCIE20L1:
-      Enabled = (PcdGet32 (PcdComboPhy2Mode) == COMBO_PHY_MODE_PCIE);
+      Enabled = (PcdGet32 (PcdComboPhy2Mode) == COMBO_PHY_MODE_PCIE) ||
+                ((PcdGet32 (PcdPcie30State) == PCIE30_STATE_ENABLED) &&
+                 PCIE30_PHY_MODE_FEEDS_PCIE20L1 (PcdGet8 (PcdPcie30PhyMode)));
       break;
 
     case PCIE_SEGMENT_PCIE20L2:

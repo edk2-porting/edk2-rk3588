@@ -174,22 +174,41 @@ FdtFixupComboPhyDevices (
 
   DEBUG ((DEBUG_INFO, "FdtPlatform: Fixing up Combo PHY devices (PCIe, SATA, USB)\n"));
 
+  //
+  // A bifurcated PCIe 3 PHY port feeds its second lane to pcie2x1l0 or
+  // pcie2x1l1, so those controllers are live even when the combo PHY that
+  // would otherwise drive them is in SATA, USB 3 or unconnected mode.
+  //
+  BOOLEAN  Pcie30Enabled = FixedPcdGetBool (PcdPcie30Supported) &&
+                           (PcdGet32 (PcdPcie30State) == PCIE30_STATE_ENABLED);
+  UINT8    Pcie30PhyMode = PcdGet8 (PcdPcie30PhyMode);
+
   struct {
-    UINT32    Mode;
-    CHAR8     *PcieNodePath;
-    CHAR8     *SataNodePath;
-    CHAR8     *UsbNodePath;
+    UINT32     Mode;
+    CHAR8      *PcieNodePath;
+    CHAR8      *SataNodePath;
+    CHAR8      *UsbNodePath;
+    BOOLEAN    PcieFromPcie30Phy;
   } Phys[] = {
-    { PcdGet32 (PcdComboPhy0Mode), "/pcie@fe190000", "/sata@fe210000", NULL            },
-    { PcdGet32 (PcdComboPhy1Mode), "/pcie@fe170000", "/sata@fe220000", NULL            },
-    { PcdGet32 (PcdComboPhy2Mode), "/pcie@fe180000", "/sata@fe230000", "/usb@fcd00000" },
+    {
+      PcdGet32 (PcdComboPhy0Mode), "/pcie@fe190000", "/sata@fe210000", NULL,
+      FALSE
+    },
+    {
+      PcdGet32 (PcdComboPhy1Mode), "/pcie@fe170000", "/sata@fe220000", NULL,
+      Pcie30Enabled && PCIE30_PHY_MODE_FEEDS_PCIE20L0 (Pcie30PhyMode)
+    },
+    {
+      PcdGet32 (PcdComboPhy2Mode), "/pcie@fe180000", "/sata@fe230000", "/usb@fcd00000",
+      Pcie30Enabled && PCIE30_PHY_MODE_FEEDS_PCIE20L1 (Pcie30PhyMode)
+    },
   };
 
   for (Index = 0; Index < ARRAY_SIZE (Phys); Index++) {
     FdtEnableNode (
       Fdt,
       Phys[Index].PcieNodePath,
-      Phys[Index].Mode == COMBO_PHY_MODE_PCIE
+      (Phys[Index].Mode == COMBO_PHY_MODE_PCIE) || Phys[Index].PcieFromPcie30Phy
       );
 
     FdtEnableNode (

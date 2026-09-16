@@ -58,6 +58,16 @@ typedef struct {
   UINT8    Mode;
 } PCIE30_PHY_MODE_VARSTORE_DATA;
 
+//
+// When a PCIe 3 PHY port is bifurcated, its second lane is routed to one of
+// the PCIe 2 controllers instead of to that controller's combo PHY: port 0
+// lane 1 feeds pcie2x1l0 and port 1 lane 1 feeds pcie2x1l1. The two mode bits
+// select this, and Pcie30PhyInit() programs them into PHP_GRF_PCIESEL_CON.
+// AGGREGATION (4) has neither bit set, so it bifurcates nothing.
+//
+#define PCIE30_PHY_MODE_FEEDS_PCIE20L0(Mode)  (((Mode) & BIT0) != 0)
+#define PCIE30_PHY_MODE_FEEDS_PCIE20L1(Mode)  (((Mode) & BIT1) != 0)
+
 #define CONFIG_TABLE_MODE_ACPI      0x00000001
 #define CONFIG_TABLE_MODE_FDT       0x00000002
 #define CONFIG_TABLE_MODE_ACPI_FDT  0x00000003
