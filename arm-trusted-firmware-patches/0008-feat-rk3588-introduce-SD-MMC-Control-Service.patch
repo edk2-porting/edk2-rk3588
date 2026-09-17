@@ -1,8 +1,8 @@
-From 2db2e617ce0ee5543ad46acc7a8ef80a9e5b24df Mon Sep 17 00:00:00 2001
+From b47c95bce84d96844079c9fab1f655a35d1a5194 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Mario=20B=C4=83l=C4=83nic=C4=83?=
  <mariobalanica02@gmail.com>
 Date: Tue, 18 Jun 2024 02:36:09 +0300
-Subject: [PATCH 11/12] feat(rk3588): introduce SD/MMC Control Service
+Subject: [PATCH 8/9] feat(rk3588): introduce SD/MMC Control Service
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -577,7 +577,7 @@ index 000000000..63286f3bf
 +
 +#endif /* PLAT_SIP_SDMMC_H */
 diff --git a/plat/rockchip/rk3588/platform.mk b/plat/rockchip/rk3588/platform.mk
-index 1e8c59afe..0d23ac872 100644
+index 1974986db..a71fdf376 100644
 --- a/plat/rockchip/rk3588/platform.mk
 +++ b/plat/rockchip/rk3588/platform.mk
 @@ -74,6 +74,7 @@ BL31_SOURCES		+=	${RK_GIC_SOURCES}				\

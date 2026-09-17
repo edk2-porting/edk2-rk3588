@@ -1,8 +1,8 @@
-From 67540926b40214d2a8ec929c42961c43efab80a5 Mon Sep 17 00:00:00 2001
+From b61f4ed701b4a7ededf8617d707e76a591195a48 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Mario=20B=C4=83l=C4=83nic=C4=83?=
  <mariobalanica02@gmail.com>
 Date: Mon, 17 Jun 2024 22:45:00 +0300
-Subject: [PATCH 04/12] feat(rk3588): add doorbell interrupt support to SCMI
+Subject: [PATCH 1/9] feat(rk3588): add doorbell interrupt support to SCMI
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit

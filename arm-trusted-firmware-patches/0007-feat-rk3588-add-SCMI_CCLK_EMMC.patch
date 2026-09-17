@@ -1,8 +1,8 @@
-From 147aa3b4465d4d2d797a62c0dd625f815ceabc84 Mon Sep 17 00:00:00 2001
+From 2945d0e1a9b5e33afeb2687c7a915b57e524e445 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Mario=20B=C4=83l=C4=83nic=C4=83?=
  <mariobalanica02@gmail.com>
 Date: Tue, 18 Jun 2024 01:14:30 +0300
-Subject: [PATCH 10/12] feat(rk3588): add SCMI_CCLK_EMMC
+Subject: [PATCH 7/9] feat(rk3588): add SCMI_CCLK_EMMC
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit

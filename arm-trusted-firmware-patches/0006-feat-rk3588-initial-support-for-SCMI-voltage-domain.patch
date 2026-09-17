@@ -1,8 +1,8 @@
-From 2e8ca13f977c34d3ddadfb9d8e4cc20bee46a71f Mon Sep 17 00:00:00 2001
+From 0dca4fe9af0c742b0b58626617ac0a0b9d49f967 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Mario=20B=C4=83l=C4=83nic=C4=83?=
  <mariobalanica02@gmail.com>
 Date: Tue, 18 Jun 2024 01:05:14 +0300
-Subject: [PATCH 09/12] feat(rk3588): initial support for SCMI voltage domain
+Subject: [PATCH 6/9] feat(rk3588): initial support for SCMI voltage domain
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -45,7 +45,7 @@ index 62147226a..5448e47ec 100644
  
  /*******************************************************************************
 diff --git a/plat/rockchip/common/include/plat_private.h b/plat/rockchip/common/include/plat_private.h
-index 7dcbec9c9..b6ff2531b 100644
+index 2bbd7838e..43e8cf34d 100644
 --- a/plat/rockchip/common/include/plat_private.h
 +++ b/plat/rockchip/common/include/plat_private.h
 @@ -99,6 +99,7 @@ void plat_rockchip_gic_pcpu_init(void);
@@ -218,7 +218,7 @@ index 000000000..6cbef8c73
 +
 +#endif
 diff --git a/plat/rockchip/rk3588/platform.mk b/plat/rockchip/rk3588/platform.mk
-index 413a20c16..1e8c59afe 100644
+index 5c351f32f..1974986db 100644
 --- a/plat/rockchip/rk3588/platform.mk
 +++ b/plat/rockchip/rk3588/platform.mk
 @@ -4,8 +4,9 @@

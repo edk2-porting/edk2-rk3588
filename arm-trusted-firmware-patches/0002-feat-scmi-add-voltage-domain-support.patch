@@ -1,8 +1,8 @@
-From 1435837a7e67412b5dd6ce74c891804b4ce7401f Mon Sep 17 00:00:00 2001
+From 7963abe9d13f29a594fe1705f12f942742f41886 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Mario=20B=C4=83l=C4=83nic=C4=83?=
  <mariobalanica02@gmail.com>
 Date: Mon, 17 Jun 2024 21:37:23 +0300
-Subject: [PATCH 05/12] feat(scmi): add voltage domain support
+Subject: [PATCH 2/9] feat(scmi): add voltage domain support
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -11,12 +11,12 @@ Change-Id: Ieac8d72b24550865591a8d20ae0d483a3b124acd
 Signed-off-by: Mario Bălănică <mariobalanica02@gmail.com>
 ---
  drivers/scmi-msg/common.h         |   8 +
- drivers/scmi-msg/entry.c          |   7 +-
+ drivers/scmi-msg/entry.c          |   9 +
  drivers/scmi-msg/voltage_domain.c | 464 ++++++++++++++++++++++++++++++
  drivers/scmi-msg/voltage_domain.h | 142 +++++++++
  include/drivers/scmi-msg.h        | 112 ++++++++
  include/drivers/scmi.h            |   1 +
- 6 files changed, 732 insertions(+), 2 deletions(-)
+ 6 files changed, 736 insertions(+)
  create mode 100644 drivers/scmi-msg/voltage_domain.c
  create mode 100644 drivers/scmi-msg/voltage_domain.h
 
@@ -47,28 +47,30 @@ index 6b186d07d..aafd0a10a 100644
   * scmi_msg_get_sensor_handler - Return a handler for a sensor message
   * @msg - message to process
 diff --git a/drivers/scmi-msg/entry.c b/drivers/scmi-msg/entry.c
-index 5ac68e1e6..85be6db4b 100644
+index 14db61c54..85be6db4b 100644
 --- a/drivers/scmi-msg/entry.c
 +++ b/drivers/scmi-msg/entry.c
-@@ -14,7 +14,7 @@
+@@ -14,6 +14,7 @@
  #pragma weak scmi_msg_get_clock_handler
  #pragma weak scmi_msg_get_rstd_handler
  #pragma weak scmi_msg_get_pd_handler
--#pragma weak scmi_msg_get_voltage_handler
 +#pragma weak scmi_msg_get_voltd_handler
  #pragma weak scmi_msg_get_sensor_handler
  
  scmi_msg_handler_t scmi_msg_get_clock_handler(struct scmi_msg *msg __unused)
-@@ -32,7 +32,7 @@ scmi_msg_handler_t scmi_msg_get_pd_handler(struct scmi_msg *msg __unused)
+@@ -31,6 +32,11 @@ scmi_msg_handler_t scmi_msg_get_pd_handler(struct scmi_msg *msg __unused)
  	return NULL;
  }
  
--scmi_msg_handler_t scmi_msg_get_voltage_handler(struct scmi_msg *msg __unused)
 +scmi_msg_handler_t scmi_msg_get_voltd_handler(struct scmi_msg *msg __unused)
++{
++	return NULL;
++}
++
+ scmi_msg_handler_t scmi_msg_get_sensor_handler(struct scmi_msg *msg __unused)
  {
  	return NULL;
- }
-@@ -81,6 +81,9 @@ void scmi_process_message(struct scmi_msg *msg)
+@@ -75,6 +81,9 @@ void scmi_process_message(struct scmi_msg *msg)
  	case SCMI_PROTOCOL_ID_POWER_DOMAIN:
  		handler = scmi_msg_get_pd_handler(msg);
  		break;
