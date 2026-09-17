@@ -1,6 +1,8 @@
 #ifndef _UBOOT_ENV_H
 #define _UBOOT_ENV_H
 
+#include <Library/TimerLib.h>
+
 #include "errno.h"
 
 #define __maybe_unused
@@ -40,16 +42,31 @@ typedef BOOLEAN bool;
 		(typeof(_mask))(((_reg) & (_mask)) >> __bf_shf(_mask));	\
 	})
 
+/*
+ * Poll (addr) into (val) until (cond) holds, giving up after timeout_ms.
+ *
+ * The deadline is measured against the performance counter rather than
+ * accumulated from sleep_us: one caller polls with sleep_us == 0, so a
+ * budget decremented by the sleep alone would never advance and the loop
+ * would still spin forever.
+ */
 #define regmap_read_poll_timeout(map, addr, val, cond, sleep_us, \
 				      timeout_ms) \
 ({ \
 	int __ret; \
+	UINT64 __start = GetPerformanceCounter (); \
+	UINT64 __timeout_ns = (UINT64)(timeout_ms) * 1000000ULL; \
 	for (;;) { \
 		__ret = regmap_read((map), (addr), &(val)); \
 		if (__ret) \
 			break; \
 		if (cond) \
 			break; \
+		if (GetTimeInNanoSecond (GetPerformanceCounter () - __start) >= \
+		    __timeout_ns) { \
+			__ret = -ETIMEDOUT; \
+			break; \
+		} \
 		if ((sleep_us)) \
 			udelay((sleep_us)); \
 	} \
