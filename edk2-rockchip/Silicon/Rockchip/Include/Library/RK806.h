@@ -11,7 +11,7 @@
 #include "Soc.h"
 
 /* Not used or exisit register and configure */
-#define NA  -1
+#define NA  0xff
 #define BIT(n)  (1 << (n))
 /* rk806 buck*/
 #define RK806_BUCK_ON_VSEL(n)   (0x1a + n - 1)
