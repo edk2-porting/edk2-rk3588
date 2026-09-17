@@ -22,14 +22,18 @@
 
 [Packages]
   ArmPkg/ArmPkg.dec
+  CryptoPkg/CryptoPkg.dec
   MdePkg/MdePkg.dec
+  NetworkPkg/NetworkPkg.dec
   EmbeddedPkg/EmbeddedPkg.dec
   Silicon/Rockchip/RK3588/RK3588.dec
 
 [LibraryClasses]
   BaseLib
+  BaseCryptLib
   DebugLib
   IoLib
+  NetLib
   TimerLib
 
 [Guids]

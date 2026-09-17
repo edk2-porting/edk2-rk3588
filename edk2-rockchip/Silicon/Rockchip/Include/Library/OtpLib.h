@@ -32,4 +32,9 @@ OtpReadCpuVersion (
   OUT UINT8  *Version
   );
 
+VOID
+OtpGetGmacMacAddress (
+  OUT EFI_MAC_ADDRESS  *MacAddress
+  );
+
 #endif /* OTPLIB_H__ */

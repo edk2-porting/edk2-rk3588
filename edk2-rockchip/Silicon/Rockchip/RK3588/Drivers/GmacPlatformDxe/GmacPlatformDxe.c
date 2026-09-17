@@ -429,31 +429,6 @@ GmacPlatformSetInterfaceSpeed (
   return GmacSetTxClockSpeed (Gmac->Id, TRUE, Speed);
 }
 
-STATIC
-VOID
-GmacGetOtpMacAddress (
-  OUT EFI_MAC_ADDRESS  *MacAddress
-  )
-{
-  UINT8  OtpData[32];
-  UINT8  Hash[SHA256_DIGEST_SIZE];
-
-  /* Generate MAC addresses from the first 32 bytes in the OTP */
-  OtpRead (0x00, sizeof (OtpData), OtpData);
-  Sha256HashAll (OtpData, sizeof (OtpData), Hash);
-
-  /* Clear multicast bit, set locally administered bit. */
-  Hash[0] &= 0xFE;
-  Hash[0] |= 0x02;
-
-  /* ... and for compatibility with old drivers (see https://github.com/jaredmcneill/quartz64_uefi/pull/68) */
-  Hash[3] &= 0xFE;
-  Hash[3] |= 0x02;
-
-  ZeroMem (MacAddress, sizeof (EFI_MAC_ADDRESS));
-  CopyMem (MacAddress, Hash, NET_ETHER_ADDR_LEN);
-}
-
 EFI_STATUS
 EFIAPI
 GmacPlatformDxeInitialize (
@@ -467,7 +442,7 @@ GmacPlatformDxeInitialize (
   GMAC_DEVICE      *Gmac;
   EFI_HANDLE       Handle;
 
-  GmacGetOtpMacAddress (&MacAddress);
+  OtpGetGmacMacAddress (&MacAddress);
 
   for (Index = 0; Index < ARRAY_SIZE (mGmacDevices); Index++) {
     Gmac = &mGmacDevices[Index];

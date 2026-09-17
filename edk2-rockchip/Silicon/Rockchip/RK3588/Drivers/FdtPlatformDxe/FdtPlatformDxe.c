@@ -18,6 +18,8 @@
 #include <Library/DxeServicesLib.h>
 #include <Library/FdtLib.h>
 #include <Library/MemoryAllocationLib.h>
+#include <Library/NetLib.h>
+#include <Library/OtpLib.h>
 #include <Library/PrintLib.h>
 #include <Library/Rk3588Pcie.h>
 #include <Library/RockchipPlatformLib.h>
@@ -932,6 +934,59 @@ FdtPlatformBuildOverridePaths (
 }
 
 STATIC
+VOID
+EFIAPI
+FdtFixupGmacMacAddress (
+  IN VOID  **Fdt
+  )
+{
+  EFI_MAC_ADDRESS  MacAddress;
+  INT32            Node;
+  INT32            Ret;
+  EFI_MAC_ADDRESS  MacAddressCopy;
+  CONST struct {
+    CONST CHAR8  *NodePath;
+    UINT8        Increment;
+  } GmacNodes[] = {
+    { "/ethernet@fe1b0000", 0 },
+    { "/ethernet@fe1c0000", 1 },
+    { NULL,                 0 }
+  };
+  UINTN  Index;
+
+  DEBUG((DEBUG_INFO, "FdtPlatform: Fixing up GMAC MAC address\n"));
+
+  // Retrieve MAC address from OTP
+  OtpGetGmacMacAddress(&MacAddress);
+
+  // Iterate over GMAC nodes
+  for (Index = 0; GmacNodes[Index].NodePath != NULL; Index++) {
+    MacAddressCopy = MacAddress;
+    MacAddressCopy.Addr[5] += GmacNodes[Index].Increment;
+
+    Node = FdtPathOffset (*Fdt, GmacNodes[Index].NodePath);
+    if (Node < 0) {
+      DEBUG((DEBUG_WARN, "FdtPlatform: Couldn't locate FDT node '%a'. Ret=%a\n",
+             GmacNodes[Index].NodePath, FdtStrerror (Node)));
+      continue;
+    }
+
+    // Set the mac-address property (6 bytes)
+    Ret = FdtSetProp (*Fdt, Node, "mac-address", &MacAddressCopy.Addr, NET_ETHER_ADDR_LEN);
+    if (Ret < 0) {
+      DEBUG((DEBUG_ERROR, "FdtPlatform: Failed to set 'mac-address' for '%a'. Ret=%a\n",
+             GmacNodes[Index].NodePath, FdtStrerror (Ret)));     
+      continue;
+    }
+
+    DEBUG((DEBUG_INFO, "FdtPlatform: Set MAC address %02x:%02x:%02x:%02x:%02x:%02x for '%a'\n",
+           MacAddressCopy.Addr[0], MacAddressCopy.Addr[1], MacAddressCopy.Addr[2],
+           MacAddressCopy.Addr[3], MacAddressCopy.Addr[4], MacAddressCopy.Addr[5],
+           GmacNodes[Index].NodePath));
+  }
+}
+
+STATIC
 EFI_STATUS
 EFIAPI
 FdtPlatformProcessFileSystem (
@@ -1012,6 +1067,11 @@ FdtPlatformProcessFileSystem (
       Status = EFI_SUCCESS;
     }
   }
+
+  //
+  // Patch the FDT with our Mac Address
+  //
+  FdtFixupGmacMacAddress (&NewFdt);
 
   //
   // Use the new FDT if it overrides the platform default and/or has
@@ -1391,6 +1451,7 @@ FdtPlatformDxeInitialize (
   }
 
   ApplyPlatformFdtFixups (&mPlatformFdt);
+  FdtFixupGmacMacAddress (&mPlatformFdt);
 
   Status = gBS->InstallConfigurationTable (&gFdtTableGuid, mPlatformFdt);
   if (EFI_ERROR (Status)) {

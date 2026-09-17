@@ -11,8 +11,10 @@
 
 #include <Uefi.h>
 #include <Library/BaseLib.h>
+#include <Library/BaseCryptLib.h>
 #include <Library/DebugLib.h>
 #include <Library/IoLib.h>
+#include <Library/NetLib.h>
 #include <Library/TimerLib.h>
 #include <Library/OtpLib.h>
 
@@ -96,4 +98,28 @@ OtpReadCpuVersion (
   )
 {
   OtpRead (0x1c, 0x1, Version);
+}
+
+VOID
+OtpGetGmacMacAddress (
+  OUT EFI_MAC_ADDRESS  *MacAddress
+  )
+{
+  UINT8  OtpData[32];
+  UINT8  Hash[SHA256_DIGEST_SIZE];
+
+  /* Generate MAC addresses from the first 32 bytes in the OTP */
+  OtpRead (0x00, sizeof (OtpData), OtpData);
+  Sha256HashAll (OtpData, sizeof (OtpData), Hash);
+
+  /* Clear multicast bit, set locally administered bit. */
+  Hash[0] &= 0xFE;
+  Hash[0] |= 0x02;
+
+  /* ... and for compatibility with old drivers (see https://github.com/jaredmcneill/quartz64_uefi/pull/68) */
+  Hash[3] &= 0xFE;
+  Hash[3] |= 0x02;
+
+  ZeroMem (MacAddress, sizeof (EFI_MAC_ADDRESS));
+  CopyMem (MacAddress, Hash, NET_ETHER_ADDR_LEN);
 }
