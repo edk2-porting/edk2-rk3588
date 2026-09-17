@@ -689,6 +689,8 @@ pldo_set_enable (
     }
 
     ret =  pmic_reg_write (cs_id, en_reg, &value, 1);
+  } else {
+    ret = RETURN_INVALID_PARAMETER;
   }
 
   return ret;
