@@ -34,7 +34,7 @@
 [Protocols]
 
 [Guids]
-  gEfiEventExitBootServicesGuid
+  gEfiEventBeforeExitBootServicesGuid
   gRockchipEventPlatformBmAfterConsoleGuid
 
 [Depex]
