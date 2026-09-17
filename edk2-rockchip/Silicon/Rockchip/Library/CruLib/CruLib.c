@@ -88,17 +88,17 @@
 #define RK_PLL_MODE_SLOW      0
 #define RK_PLL_MODE_NORMAL    1
 #define RK_PLL_MODE_DEEP      2
-#define PLL_GET_PLLMODE(val, shift, mask)  (((uint32_t)(val) & mask) >> shift)
+#define PLL_GET_PLLMODE(val, shift, mask)  (((uint64_t)(val) & mask) >> shift)
 
-#define PLL_GET_FBDIV(x)  (((uint32_t)(x) & (PLL_FBDIV_MASK)) >> PLL_FBDIV_SHIFT)
+#define PLL_GET_FBDIV(x)  (((uint64_t)(x) & (PLL_FBDIV_MASK)) >> PLL_FBDIV_SHIFT)
 #define PLL_GET_REFDIV(x) \
-    (((uint32_t)(x) & (PLL_REFDIV_MASK)) >> PLL_REFDIV_SHIFT)
+    (((uint64_t)(x) & (PLL_REFDIV_MASK)) >> PLL_REFDIV_SHIFT)
 #define PLL_GET_POSTDIV1(x) \
-    (((uint32_t)(x) & (PLL_POSTDIV1_MASK)) >> PLL_POSTDIV1_SHIFT)
+    (((uint64_t)(x) & (PLL_POSTDIV1_MASK)) >> PLL_POSTDIV1_SHIFT)
 #define PLL_GET_POSTDIV2(x) \
-    (((uint32_t)(x) & (PLL_POSTDIV2_MASK)) >> PLL_POSTDIV2_SHIFT)
-#define PLL_GET_DSMPD(x)  (((uint32_t)(x) & (PLL_DSMPD_MASK)) >> PLL_DSMPD_SHIFT)
-#define PLL_GET_FRAC(x)   (((uint32_t)(x) & (PLL_FRAC_MASK)) >> PLL_FRAC_SHIFT)
+    (((uint64_t)(x) & (PLL_POSTDIV2_MASK)) >> PLL_POSTDIV2_SHIFT)
+#define PLL_GET_DSMPD(x)  (((uint64_t)(x) & (PLL_DSMPD_MASK)) >> PLL_DSMPD_SHIFT)
+#define PLL_GET_FRAC(x)   (((uint64_t)(x) & (PLL_FRAC_MASK)) >> PLL_FRAC_SHIFT)
 
 #define CRU_PLL_ROUND_UP_TO_KHZ(x)  (HAL_DIV_ROUND_UP((x), KHZ) * KHZ)
 
@@ -110,25 +110,21 @@ static struct PLL_CONFIG  g_rockchipAutoTable;
 /********************* Private Function Definition ***************************/
 
 /** Calculate the greatest common divisor */
-static uint32_t
+static uint64_t
 CRU_Gcd (
-  uint32_t  m,
-  uint32_t  n
+  uint64_t  m,
+  uint64_t  n
   )
 {
-  int  t;
+  while (n != 0) {
+    uint64_t  t;
 
-  while (m > 0) {
-    if (n > m) {
-      t = m;
-      m = n;
-      n = t;
-    }
-
-    m -= n;
+    t = m % n;
+    m = n;
+    n = t;
   }
 
-  return n;
+  return m;
 }
 
 /**
@@ -150,13 +146,13 @@ CRU_Gcd (
  */
 static HAL_Status
 CRU_PllSetPostDiv (
-  uint32_t  foutHz,
+  uint64_t  foutHz,
   uint32_t  *postDiv1,
   uint32_t  *postDiv2,
-  uint32_t  *foutVco
+  uint64_t  *foutVco
   )
 {
-  uint32_t  freq;
+  uint64_t  freq;
 
   if (foutHz < MIN_FOUTVCO_FREQ) {
     for (*postDiv1 = 1; *postDiv1 <= 7; (*postDiv1)++) {
@@ -199,15 +195,15 @@ CRU_PllSetPostDiv (
  */
 static const struct PLL_CONFIG *
 CRU_PllSetByAuto (
-  uint32_t  finHz,
-  uint32_t  foutHz
+  uint64_t  finHz,
+  uint64_t  foutHz
   )
 {
   struct PLL_CONFIG  *rateTable = &g_rockchipAutoTable;
-  uint32_t           foutVco = foutHz;
+  uint64_t           foutVco = foutHz;
   uint64_t           fin64, frac64;
   uint32_t           postDiv1, postDiv2;
-  uint32_t           clkGcd = 0;
+  uint64_t           clkGcd = 0;
   HAL_Status         error;
 
   if ((finHz == 0) || (foutHz == 0) || (foutHz == finHz)) {
@@ -277,7 +273,7 @@ CRU_PllSetByAuto (
 static const struct PLL_CONFIG *
 CRU_PllGetSettings (
   struct PLL_SETUP  *pSetup,
-  uint32_t          rate
+  uint64_t          rate
   )
 {
   const struct PLL_CONFIG  *rateTable = pSetup->rateTable;
@@ -303,8 +299,8 @@ CRU_PllGetSettings (
 
 static const struct PLL_CONFIG *
 CRU_PllV1SetByAuto (
-  uint32_t  fin_hz,
-  uint32_t  fout_hz
+  uint64_t  fin_hz,
+  uint64_t  fout_hz
   )
 {
   struct PLL_CONFIG  *rate_table = &g_rockchipAutoTable;
@@ -358,7 +354,7 @@ CRU_PllV1SetByAuto (
 static const struct PLL_CONFIG *
 CRU_PllV1GetSettings (
   struct PLL_SETUP  *pSetup,
-  uint32_t          rate
+  uint64_t          rate
   )
 {
   const struct PLL_CONFIG  *rateTable = pSetup->rateTable;
@@ -404,13 +400,13 @@ CRU_PllV1GetSettings (
  *     FOUTPOSTDIV = FOUTVCO / (POSTDIV1*POSTDIV2)
  *     FOUT = FOUTVCO / POSTDIV1 / POSTDIV2
  */
-uint32_t
+uint64_t
 HAL_CRU_GetPllFreq (
   struct PLL_SETUP  *pSetup
   )
 {
-  uint32_t  refDiv, fbDiv, postdDv1, postDiv2, frac, dsmpd;
-  uint32_t  mode = 0, rate = PLL_INPUT_OSC_RATE;
+  uint64_t  refDiv, fbDiv, postdDv1, postDiv2, frac, dsmpd;
+  uint64_t  mode = 0, rate = PLL_INPUT_OSC_RATE;
 
   mode = PLL_GET_PLLMODE (
            READ_REG (*(pSetup->modeOffset)),
@@ -467,7 +463,7 @@ HAL_CRU_GetPllFreq (
 HAL_Status
 HAL_CRU_SetPllFreq (
   struct PLL_SETUP  *pSetup,
-  uint32_t          rate
+  uint64_t          rate
   )
 {
   const struct PLL_CONFIG  *pConfig;
@@ -545,7 +541,7 @@ HAL_CRU_SetPllFreq (
  *     FOUTVCO = (FREF / P) * (M + K / 65536)
  *     FOUT = FOUTVCO / 2^S
  */
-uint32_t
+uint64_t
 HAL_CRU_GetPllV1Freq (
   struct PLL_SETUP  *pSetup
   )
@@ -613,7 +609,7 @@ HAL_CRU_GetPllV1Freq (
 HAL_Status
 HAL_CRU_SetPllV1Freq (
   struct PLL_SETUP  *pSetup,
-  uint32_t          rate
+  uint64_t          rate
   )
 {
   const struct PLL_CONFIG  *pConfig;
@@ -953,30 +949,33 @@ HAL_CRU_ClkGetMux (
  */
 HAL_Status
 HAL_CRU_FracdivGetConfig (
-  uint32_t  rateOut,
-  uint32_t  rate,
+  uint64_t  rateOut,
+  uint64_t  rate,
   uint32_t  *numerator,
   uint32_t  *denominator
   )
 {
-  uint32_t  gcdVal;
+  uint64_t  gcdVal, num, den;
 
   gcdVal = CRU_Gcd (rate, rateOut);
   if (!gcdVal) {
     return HAL_ERROR;
   }
 
-  *numerator   = rateOut / gcdVal;
-  *denominator = rate / gcdVal;
+  num = rateOut / gcdVal;
+  den = rate / gcdVal;
 
-  if (*numerator < 4) {
-    *numerator   *= 4;
-    *denominator *= 4;
+  if (num < 4) {
+    num *= 4;
+    den *= 4;
   }
 
-  if ((*numerator > 0xffff) || (*denominator > 0xffff)) {
+  if ((num > 0xffff) || (den > 0xffff)) {
     return HAL_INVAL;
   }
+
+  *numerator   = (uint32_t) num;
+  *denominator = (uint32_t) den;
 
   return HAL_OK;
 }
@@ -992,8 +991,8 @@ HAL_CRU_FracdivGetConfig (
 HAL_Status
 HAL_CRU_ClkNp5BestDiv (
   uint32_t  clockId,
-  uint32_t  rate,
-  uint32_t  pRate,
+  uint64_t  rate,
+  uint64_t  pRate,
   uint32_t  *bestdiv
   )
 {

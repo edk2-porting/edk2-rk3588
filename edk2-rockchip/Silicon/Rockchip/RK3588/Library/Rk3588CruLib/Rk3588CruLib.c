@@ -291,13 +291,13 @@ static CRU_RESET  Resets[RESET_COUNT] = {
 
 /********************* Private Variable Definition ***************************/
 
-static uint32_t  s_lpllFreq;
-static uint32_t  s_cpllFreq = 1500 * 1000 * 1000;
-static uint32_t  s_gpllFreq = 1188 * 1000 * 1000;
-static uint32_t  s_npllFreq;
-static uint32_t  s_v0pllFreq;
-static uint32_t  s_ppllFreq;
-static uint32_t  s_aupllFreq;
+static uint64_t  s_lpllFreq;
+static uint64_t  s_cpllFreq = 1500 * 1000 * 1000;
+static uint64_t  s_gpllFreq = 1188 * 1000 * 1000;
+static uint64_t  s_npllFreq;
+static uint64_t  s_v0pllFreq;
+static uint64_t  s_ppllFreq;
+static uint64_t  s_aupllFreq;
 
 /********************* Private Function Definition ***************************/
 
@@ -338,13 +338,13 @@ HAL_CRU_RstGetById (
  * @return rate.
  * @attention these APIs allow direct use in the HAL layer.
  */
-uint32_t
+uint64_t
 EFIAPI
 HAL_CRU_ClkGetFreq (
   uint32_t  clockId
   )
 {
-  uint32_t  pRate = 0, freq;
+  uint64_t  pRate = 0, freq;
 
   if (!s_cpllFreq) {
     s_cpllFreq = HAL_CRU_GetPllV1Freq (&CPLL);
@@ -462,11 +462,12 @@ HAL_Status
 EFIAPI
 HAL_CRU_ClkSetFreq (
   uint32_t  clockId,
-  uint32_t  rate
+  uint64_t  rate
   )
 {
   HAL_Status  error = HAL_OK;
-  uint32_t    mux = 0, div = 0, pRate = 0;
+  uint32_t    mux = 0, div = 0;
+  uint64_t    pRate = 0;
 
   if (!s_cpllFreq) {
     s_cpllFreq = HAL_CRU_GetPllV1Freq (&CPLL);
@@ -502,7 +503,7 @@ HAL_CRU_ClkSetFreq (
       return error;
     case PLL_GPLL:
       error = HAL_CRU_SetPllV1Freq (&GPLL, rate);
-      DEBUG ((DEBUG_INIT, "GPLL set rate: %d %x\n", rate, error));
+      DEBUG ((DEBUG_INIT, "GPLL set rate: %lu %x\n", rate, error));
       s_gpllFreq = HAL_CRU_GetPllV1Freq (&GPLL);
       return error;
     case PLL_NPLL:
