@@ -463,6 +463,7 @@ EdidGetPreferredModeDetailed (
     } else {
       switch (Edid[0x00]) {
         case EDID_EXTENSION_CEA_861:
+        {
           UINT8  DtdOffset = Edid[0x02];
           UINT8  DtdEnd    = EDID_BLOCK_SIZE - 1;
 
@@ -473,6 +474,7 @@ EdidGetPreferredModeDetailed (
           DetailedTimings      = (EDID_DETAILED_TIMING *)(Edid + DtdOffset);
           DetailedTimingsCount = (DtdEnd - DtdOffset) / sizeof (EDID_DETAILED_TIMING);
           break;
+        }
         case EDID_EXTENSION_VTB:
           if (Edid[0x01] != 1) {
             continue;
