@@ -640,9 +640,7 @@ HAL_CRU_SetPllV1Freq (
   WRITE_REG_MASK_WE (*(pSetup->conOffset0), PLLCON0_M_MASK, pConfig->m << PLLCON0_M_SHIFT);
   WRITE_REG_MASK_WE (*(pSetup->conOffset1), PLLCON1_P_MASK, pConfig->p << PLLCON1_P_SHIFT);
   WRITE_REG_MASK_WE (*(pSetup->conOffset1), PLLCON1_S_MASK, pConfig->s << PLLCON1_S_SHIFT);
-  if (pConfig->k) {
-    WRITE_REG_MASK_WE (*(pSetup->conOffset2), PLLCON2_K_MASK, pConfig->k << PLLCON2_K_SHIFT);
-  }
+  WRITE_REG_MASK_WE (*(pSetup->conOffset2), PLLCON2_K_MASK, pConfig->k << PLLCON2_K_SHIFT);
 
   /* Pll Power up */
   WRITE_REG_MASK_WE (*(pSetup->conOffset1), PWRDOWN_MASK, 0 << PWRDOWN_SHIT);
