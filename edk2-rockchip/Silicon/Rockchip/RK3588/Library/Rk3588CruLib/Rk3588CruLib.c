@@ -291,13 +291,10 @@ static CRU_RESET  Resets[RESET_COUNT] = {
 
 /********************* Private Variable Definition ***************************/
 
-static uint64_t  s_lpllFreq;
 static uint64_t  s_cpllFreq = 1500 * 1000 * 1000;
 static uint64_t  s_gpllFreq = 1188 * 1000 * 1000;
-static uint64_t  s_npllFreq;
 static uint64_t  s_v0pllFreq;
 static uint64_t  s_ppllFreq;
-static uint64_t  s_aupllFreq;
 
 /********************* Private Function Definition ***************************/
 
@@ -357,7 +354,6 @@ HAL_CRU_ClkGetFreq (
   switch (clockId) {
     case PLL_LPLL:
       freq       = HAL_CRU_GetPllV1Freq (&LPLL);
-      s_lpllFreq = freq;
 
       return freq;
     case PLL_B0PLL:
@@ -375,7 +371,6 @@ HAL_CRU_ClkGetFreq (
       return freq;
     case PLL_NPLL:
       freq       = HAL_CRU_GetPllV1Freq (&NPLL);
-      s_npllFreq = freq;
 
       return freq;
     case PLL_V0PLL:
@@ -385,7 +380,6 @@ HAL_CRU_ClkGetFreq (
       return freq;
     case PLL_AUPLL:
       freq        = HAL_CRU_GetPllV1Freq (&AUPLL);
-      s_aupllFreq = freq;
 
       return freq;
     case PLL_PPLL:
@@ -480,7 +474,6 @@ HAL_CRU_ClkSetFreq (
   switch (clockId) {
     case PLL_LPLL:
       error      = HAL_CRU_SetPllV1Freq (&LPLL, rate);
-      s_lpllFreq = HAL_CRU_GetPllV1Freq (&LPLL);
 
       return error;
     case PLL_B0PLL:
@@ -508,12 +501,10 @@ HAL_CRU_ClkSetFreq (
       return error;
     case PLL_NPLL:
       error      = HAL_CRU_SetPllV1Freq (&NPLL, rate);
-      s_npllFreq = HAL_CRU_GetPllV1Freq (&NPLL);
 
       return error;
     case PLL_AUPLL:
       error       = HAL_CRU_SetPllV1Freq (&AUPLL, rate);
-      s_aupllFreq = HAL_CRU_GetPllV1Freq (&AUPLL);
 
       return error;
     case PLL_V0PLL:
