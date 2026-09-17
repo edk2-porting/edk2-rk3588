@@ -207,7 +207,7 @@ function _build(){
     export PACKAGES_PATH
 
     make -C "${ROOTDIR}/edk2/BaseTools"
-    source "${ROOTDIR}/edk2/edksetup.sh"
+    source "${ROOTDIR}/edk2/edksetup.sh" --reconfig
 
     build \
         -s \
