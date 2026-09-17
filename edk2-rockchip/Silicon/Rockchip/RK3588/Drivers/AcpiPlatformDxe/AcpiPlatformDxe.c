@@ -14,6 +14,7 @@
 #include <Protocol/LoadedImage.h>
 #include <Protocol/NonDiscoverableDevice.h>
 #include <Library/AcpiLib.h>
+#include <AcpiHelperMacros.h>
 #include <Library/BaseLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/DebugLib.h>

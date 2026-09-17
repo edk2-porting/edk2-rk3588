@@ -1236,7 +1236,7 @@ static int dw_dp_video_enable(struct dw_dp *dp)
 	u8 color_format = video->color_format;
 	u8 bpc = video->bpc;
 	u8 pixel_mode = video->pixel_mode;
-	u8 bpp = video->bpp, init_threshold, vic;
+	u8 bpp = video->bpp, init_threshold;
 	u32 hactive, hblank, h_sync_width, h_front_porch;
 	u32 vactive, vblank, v_sync_width, v_front_porch;
 	u32 vstart = mode->VTotal - mode->VSyncStart;
@@ -1273,7 +1273,7 @@ static int dw_dp_video_enable(struct dw_dp *dp)
 	if (mode->Flags & DRM_MODE_FLAG_INTERLACE)
 		value |= FIELD_PREP(I_P, 1);
 #if 0
-	vic = drm_match_cea_mode(mode);
+	u8 vic = drm_match_cea_mode(mode);
 	if (vic == 5 || vic == 6 || vic == 7 ||
 	    vic == 10 || vic == 11 || vic == 20 ||
 	    vic == 21 || vic == 22 || vic == 39 ||
