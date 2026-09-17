@@ -1,0 +1,631 @@
+From 369e4ac1c2227c278e9ea87395b2785d5cc53717 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Mario=20B=C4=83l=C4=83nic=C4=83?=
+ <mariobalanica02@gmail.com>
+Date: Mon, 17 Jun 2024 23:35:28 +0300
+Subject: [PATCH 5/9] feat(rockchip): add RK806 PMIC driver
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Ported from https://github.com/edk2-porting/edk2-rk3588/blob/master/edk2-rockchip/Silicon/Rockchip/Library/SpiLib/RK806.c
+
+Change-Id: I5d152bbec2d942a44c2e9742d93c7ef193114e26
+Signed-off-by: Mario Bălănică <mariobalanica02@gmail.com>
+---
+ plat/rockchip/common/drivers/rk806/rk806.c | 431 +++++++++++++++++++++
+ plat/rockchip/common/drivers/rk806/rk806.h | 168 ++++++++
+ 2 files changed, 599 insertions(+)
+ create mode 100644 plat/rockchip/common/drivers/rk806/rk806.c
+ create mode 100644 plat/rockchip/common/drivers/rk806/rk806.h
+
+diff --git a/plat/rockchip/common/drivers/rk806/rk806.c b/plat/rockchip/common/drivers/rk806/rk806.c
+new file mode 100644
+index 000000000..023884d6d
+--- /dev/null
++++ b/plat/rockchip/common/drivers/rk806/rk806.c
+@@ -0,0 +1,431 @@
++/*
++ * Copyright (c) 2020-2021, Rockchip, Inc. All rights reserved.
++ * Copyright (c) 2024, Mario Bălănică <mariobalanica02@gmail.com>
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <assert.h>
++#include <errno.h>
++
++#include <common/debug.h>
++#include <drivers/delay_timer.h>
++
++#include <rockchip_spi.h>
++
++#include "rk806.h"
++
++static const struct rk8xx_reg_info rk806_buck[] = {
++	/* buck 1 */
++	{  500000,   6250, RK806_BUCK_ON_VSEL(1), RK806_BUCK_SLP_VSEL(1), RK806_BUCK_CONFIG(1), RK806_BUCK_VSEL_MASK, 0x00, 0xa0, 3},
++	{  1500000, 25000, RK806_BUCK_ON_VSEL(1), RK806_BUCK_SLP_VSEL(1), RK806_BUCK_CONFIG(1), RK806_BUCK_VSEL_MASK, 0xa1, 0xed, 3},
++	{  3400000,     0, RK806_BUCK_ON_VSEL(1), RK806_BUCK_SLP_VSEL(1), RK806_BUCK_CONFIG(1), RK806_BUCK_VSEL_MASK, 0xee, 0xff, 3},
++	/* buck 2 */
++	{  500000,   6250, RK806_BUCK_ON_VSEL(2), RK806_BUCK_SLP_VSEL(2), RK806_BUCK_CONFIG(2), RK806_BUCK_VSEL_MASK, 0x00, 0xa0, 3},
++	{  1500000, 25000, RK806_BUCK_ON_VSEL(2), RK806_BUCK_SLP_VSEL(2), RK806_BUCK_CONFIG(2), RK806_BUCK_VSEL_MASK, 0xa1, 0xed, 3},
++	{  3400000,     0, RK806_BUCK_ON_VSEL(2), RK806_BUCK_SLP_VSEL(2), RK806_BUCK_CONFIG(2), RK806_BUCK_VSEL_MASK, 0xee, 0xff, 3},
++	/* buck 3 */
++	{  500000,   6250, RK806_BUCK_ON_VSEL(3), RK806_BUCK_SLP_VSEL(3), RK806_BUCK_CONFIG(3), RK806_BUCK_VSEL_MASK, 0x00, 0xa0, 3},
++	{  1500000, 25000, RK806_BUCK_ON_VSEL(3), RK806_BUCK_SLP_VSEL(3), RK806_BUCK_CONFIG(3), RK806_BUCK_VSEL_MASK, 0xa1, 0xed, 3},
++	{  3400000,     0, RK806_BUCK_ON_VSEL(3), RK806_BUCK_SLP_VSEL(3), RK806_BUCK_CONFIG(3), RK806_BUCK_VSEL_MASK, 0xee, 0xff, 3},
++	/* buck 4 */
++	{  500000,   6250, RK806_BUCK_ON_VSEL(4), RK806_BUCK_SLP_VSEL(4), RK806_BUCK_CONFIG(4), RK806_BUCK_VSEL_MASK, 0x00, 0xa0, 3},
++	{  1500000, 25000, RK806_BUCK_ON_VSEL(4), RK806_BUCK_SLP_VSEL(4), RK806_BUCK_CONFIG(4), RK806_BUCK_VSEL_MASK, 0xa1, 0xed, 3},
++	{  3400000,     0, RK806_BUCK_ON_VSEL(4), RK806_BUCK_SLP_VSEL(4), RK806_BUCK_CONFIG(4), RK806_BUCK_VSEL_MASK, 0xee, 0xff, 3},
++	/* buck 5 */
++	{  500000,   6250, RK806_BUCK_ON_VSEL(5), RK806_BUCK_SLP_VSEL(5), RK806_BUCK_CONFIG(5), RK806_BUCK_VSEL_MASK, 0x00, 0xa0, 3},
++	{  1500000, 25000, RK806_BUCK_ON_VSEL(5), RK806_BUCK_SLP_VSEL(5), RK806_BUCK_CONFIG(5), RK806_BUCK_VSEL_MASK, 0xa1, 0xed, 3},
++	{  3400000,     0, RK806_BUCK_ON_VSEL(5), RK806_BUCK_SLP_VSEL(5), RK806_BUCK_CONFIG(5), RK806_BUCK_VSEL_MASK, 0xee, 0xff, 3},
++	/* buck 6 */
++	{  500000,   6250, RK806_BUCK_ON_VSEL(6), RK806_BUCK_SLP_VSEL(6), RK806_BUCK_CONFIG(6), RK806_BUCK_VSEL_MASK, 0x00, 0xa0, 3},
++	{  1500000, 25000, RK806_BUCK_ON_VSEL(6), RK806_BUCK_SLP_VSEL(6), RK806_BUCK_CONFIG(6), RK806_BUCK_VSEL_MASK, 0xa1, 0xed, 3},
++	{  3400000,     0, RK806_BUCK_ON_VSEL(6), RK806_BUCK_SLP_VSEL(6), RK806_BUCK_CONFIG(6), RK806_BUCK_VSEL_MASK, 0xee, 0xff, 3},
++	/* buck 7 */
++	{  500000,   6250, RK806_BUCK_ON_VSEL(7), RK806_BUCK_SLP_VSEL(7), RK806_BUCK_CONFIG(7), RK806_BUCK_VSEL_MASK, 0x00, 0xa0, 3},
++	{  1500000, 25000, RK806_BUCK_ON_VSEL(7), RK806_BUCK_SLP_VSEL(7), RK806_BUCK_CONFIG(7), RK806_BUCK_VSEL_MASK, 0xa1, 0xed, 3},
++	{  3400000,     0, RK806_BUCK_ON_VSEL(7), RK806_BUCK_SLP_VSEL(7), RK806_BUCK_CONFIG(7), RK806_BUCK_VSEL_MASK, 0xee, 0xff, 3},
++	/* buck 8 */
++	{  500000,   6250, RK806_BUCK_ON_VSEL(8), RK806_BUCK_SLP_VSEL(8), RK806_BUCK_CONFIG(8), RK806_BUCK_VSEL_MASK, 0x00, 0xa0, 3},
++	{  1500000, 25000, RK806_BUCK_ON_VSEL(8), RK806_BUCK_SLP_VSEL(8), RK806_BUCK_CONFIG(8), RK806_BUCK_VSEL_MASK, 0xa1, 0xed, 3},
++	{  3400000,     0, RK806_BUCK_ON_VSEL(8), RK806_BUCK_SLP_VSEL(8), RK806_BUCK_CONFIG(8), RK806_BUCK_VSEL_MASK, 0xee, 0xff, 3},
++	/* buck 9 */
++	{  500000,   6250, RK806_BUCK_ON_VSEL(9), RK806_BUCK_SLP_VSEL(9), RK806_BUCK_CONFIG(9), RK806_BUCK_VSEL_MASK, 0x00, 0xa0, 3},
++	{  1500000, 25000, RK806_BUCK_ON_VSEL(9), RK806_BUCK_SLP_VSEL(9), RK806_BUCK_CONFIG(9), RK806_BUCK_VSEL_MASK, 0xa1, 0xed, 3},
++	{  3400000,     0, RK806_BUCK_ON_VSEL(9), RK806_BUCK_SLP_VSEL(9), RK806_BUCK_CONFIG(9), RK806_BUCK_VSEL_MASK, 0xee, 0xff, 3},
++	/* buck 10 */
++	{  500000,   6250, RK806_BUCK_ON_VSEL(10), RK806_BUCK_SLP_VSEL(10), RK806_BUCK_CONFIG(10), RK806_BUCK_VSEL_MASK, 0x00, 0xa0, 3},
++	{  1500000, 25000, RK806_BUCK_ON_VSEL(10), RK806_BUCK_SLP_VSEL(10), RK806_BUCK_CONFIG(10), RK806_BUCK_VSEL_MASK, 0xa1, 0xed, 3},
++	{  3400000,     0, RK806_BUCK_ON_VSEL(10), RK806_BUCK_SLP_VSEL(10), RK806_BUCK_CONFIG(10), RK806_BUCK_VSEL_MASK, 0xee, 0xff, 3},
++};
++
++static const struct rk8xx_reg_info rk806_nldo[] = {
++	/* nldo1 */
++	{  500000, 12500, RK806_NLDO_ON_VSEL(1), RK806_NLDO_SLP_VSEL(1), NA, RK806_NLDO_VSEL_MASK, 0x00, },
++	{  3400000,    0, RK806_NLDO_ON_VSEL(1), RK806_NLDO_SLP_VSEL(1), NA, RK806_NLDO_VSEL_MASK, 0xE8, },
++	/* nldo2 */
++	{  500000, 12500, RK806_NLDO_ON_VSEL(2), RK806_NLDO_SLP_VSEL(2), NA, RK806_NLDO_VSEL_MASK, 0x00, },
++	{  3400000,    0, RK806_NLDO_ON_VSEL(2), RK806_NLDO_SLP_VSEL(2), NA, RK806_NLDO_VSEL_MASK, 0xE8, },
++	/* nldo3 */
++	{  500000, 12500, RK806_NLDO_ON_VSEL(3), RK806_NLDO_SLP_VSEL(3), NA, RK806_NLDO_VSEL_MASK, 0x00, },
++	{  3400000,    0, RK806_NLDO_ON_VSEL(3), RK806_NLDO_SLP_VSEL(3), NA, RK806_NLDO_VSEL_MASK, 0xE8, },
++	/* nldo4 */
++	{  500000, 12500, RK806_NLDO_ON_VSEL(4), RK806_NLDO_SLP_VSEL(4), NA, RK806_NLDO_VSEL_MASK, 0x00, },
++	{  3400000,    0, RK806_NLDO_ON_VSEL(4), RK806_NLDO_SLP_VSEL(4), NA, RK806_NLDO_VSEL_MASK, 0xE8, },
++	/* nldo5 */
++	{  500000, 12500, RK806_NLDO_ON_VSEL(5), RK806_NLDO_SLP_VSEL(5), NA, RK806_NLDO_VSEL_MASK, 0x00, },
++	{  3400000,    0, RK806_NLDO_ON_VSEL(5), RK806_NLDO_SLP_VSEL(5), NA, RK806_NLDO_VSEL_MASK, 0xE8, },
++};
++
++static const struct rk8xx_reg_info rk806_pldo[] = {
++	/* pldo1 */
++	{  500000, 12500, RK806_PLDO_ON_VSEL(1), RK806_PLDO_SLP_VSEL(1), NA, RK806_PLDO_VSEL_MASK, 0x00, },
++	{  3400000,    0, RK806_PLDO_ON_VSEL(1), RK806_PLDO_SLP_VSEL(1), NA, RK806_PLDO_VSEL_MASK, 0xE8, },
++	/* pldo2 */
++	{  500000, 12500, RK806_PLDO_ON_VSEL(2), RK806_PLDO_SLP_VSEL(2), NA, RK806_PLDO_VSEL_MASK, 0x00, },
++	{  3400000,    0, RK806_PLDO_ON_VSEL(2), RK806_PLDO_SLP_VSEL(2), NA, RK806_PLDO_VSEL_MASK, 0xE8, },
++	/* pldo3 */
++	{  500000, 12500, RK806_PLDO_ON_VSEL(3), RK806_PLDO_SLP_VSEL(3), NA, RK806_PLDO_VSEL_MASK, 0x00, },
++	{  3400000,    0, RK806_PLDO_ON_VSEL(3), RK806_PLDO_SLP_VSEL(3), NA, RK806_PLDO_VSEL_MASK, 0xE8, },
++	/* pldo4 */
++	{  500000, 12500, RK806_PLDO_ON_VSEL(4), RK806_PLDO_SLP_VSEL(4), NA, RK806_PLDO_VSEL_MASK, 0x00, },
++	{  3400000,    0, RK806_PLDO_ON_VSEL(4), RK806_PLDO_SLP_VSEL(4), NA, RK806_PLDO_VSEL_MASK, 0xE8, },
++	/* pldo5 */
++	{  500000, 12500, RK806_PLDO_ON_VSEL(5), RK806_PLDO_SLP_VSEL(5), NA, RK806_PLDO_VSEL_MASK, 0x00, },
++	{  3400000,    0, RK806_PLDO_ON_VSEL(5), RK806_PLDO_SLP_VSEL(5), NA, RK806_PLDO_VSEL_MASK, 0xE8, },
++	/* pldo6 */
++	{  500000, 12500, RK806_PLDO_ON_VSEL(6), RK806_PLDO_SLP_VSEL(6), NA, RK806_PLDO_VSEL_MASK, 0x00, },
++	{  3400000,    0, RK806_PLDO_ON_VSEL(6), RK806_PLDO_SLP_VSEL(6), NA, RK806_PLDO_VSEL_MASK, 0xE8, },
++};
++
++static int pmic_spi_read(struct rk806_regulator *dev, uint32_t cs_id,
++			 uint32_t reg, uint8_t *val)
++{
++	uint8_t txbuf[8];
++	int ret;
++
++	txbuf[0] = RK806_CMD_READ;
++	txbuf[1] = reg;
++	txbuf[2] = RK806_REG_H;
++
++	rk_spi_set_cs(dev->spi, cs_id, true);
++
++	rk_spi_configure(dev->spi, txbuf, NULL, 3);
++	ret = rk_spi_transfer(dev->spi);
++	if (ret != 0) {
++		goto exit;
++	}
++	rk_spi_stop(dev->spi);
++
++	rk_spi_configure(dev->spi, NULL, val, 1);
++	ret = rk_spi_transfer(dev->spi);
++
++exit:
++	rk_spi_stop(dev->spi);
++	rk_spi_set_cs(dev->spi, cs_id, false);
++
++	return ret;
++}
++
++static int pmic_spi_write(struct rk806_regulator *dev, uint32_t cs_id,
++			  uint32_t reg, const uint8_t *val)
++{
++	uint8_t txbuf[4];
++	int ret;
++
++	txbuf[0] = RK806_CMD_WRITE;
++	txbuf[1] = reg;
++	txbuf[2] = RK806_REG_H;
++	txbuf[3] = *val;
++
++	rk_spi_set_cs(dev->spi, cs_id, true);
++
++	rk_spi_configure(dev->spi, txbuf, NULL, 4);
++	ret = rk_spi_transfer(dev->spi);
++
++	rk_spi_stop(dev->spi);
++	rk_spi_set_cs(dev->spi, cs_id, false);
++
++	return ret;
++}
++
++static int pmic_reg_read(struct rk806_regulator *dev, uint32_t cs_id,
++			 uint32_t reg, uint8_t *buffer)
++{
++	int ret;
++
++	ret = pmic_spi_read(dev, cs_id, reg, buffer);
++	if (ret)
++		ERROR("%s: cs_id=%d reg(0x%x) buffer=%x ret=%d\n",
++		      __func__, cs_id, reg, buffer[0], ret);
++
++	return ret;
++}
++
++static int pmic_reg_write(struct rk806_regulator *dev, uint32_t cs_id,
++			      uint32_t reg, const uint8_t *buffer)
++{
++	int ret;
++
++	ret = pmic_spi_write(dev, cs_id, reg, buffer);
++	if (ret)
++		ERROR("%s: cs_id=%d reg(0x%x) buffer=%x ret=%d\n",
++		      __func__, cs_id, reg, buffer[0], ret);
++
++	return ret;
++}
++
++static int pmic_clrsetbits(struct rk806_regulator *dev, uint32_t cs_id,
++			   uint32_t reg, uint32_t clr, uint32_t set)
++{
++	uint8_t byte;
++	int ret;
++
++	ret = pmic_reg_read(dev, cs_id, reg, &byte);
++	if (ret < 0)
++		return ret;
++	byte = (ret & ~clr) | set;
++
++	pmic_reg_write(dev, cs_id, reg, &byte);
++	ret = pmic_reg_read(dev, cs_id, reg, &byte);
++	return ret;
++}
++
++static const struct rk8xx_reg_info *get_buck_reg(uint32_t num, uint32_t uvolt)
++{
++	if (uvolt < 1500000)
++		return &rk806_buck[num * 3 + 0];
++	else if (uvolt < 3400000)
++		return &rk806_buck[num * 3 + 1];
++	else
++		return &rk806_buck[num * 3 + 2];
++}
++
++static const struct rk8xx_reg_info *get_nldo_reg(uint32_t num, uint32_t uvolt)
++{
++	if (uvolt < 3400000)
++		return &rk806_nldo[num * 2];
++	else
++		return &rk806_nldo[num * 2 + 1];
++}
++
++static const struct rk8xx_reg_info *get_pldo_reg(uint32_t num, uint32_t uvolt)
++{
++	if (uvolt < 3400000)
++		return &rk806_pldo[num * 2];
++	else
++		return &rk806_pldo[num * 2 + 1];
++}
++
++static inline const char *reg_type_to_string(uint32_t reg_id)
++{
++	char *str;
++
++	switch (reg_id & REGULATOR_TYPE_MASK) {
++	case BUCK:
++		str = "buck";
++		break;
++	case NLDO:
++		str = "nldo";
++		break;
++	case PLDO:
++		str = "pldo";
++		break;
++	default:
++		assert(false);
++		str = "unknown";
++		break;
++	}
++	return str;
++}
++
++static int common_set_voltage(struct rk806_regulator *dev, uint32_t reg_id, uint32_t uvolt,
++			      const struct rk8xx_reg_info *info)
++{
++	uint32_t cs_id = (reg_id & CHIP_SELECT_MASK) >> CHIP_SELECT_SHIFT;
++	uint32_t num = (reg_id & REGULATOR_ID_MASK) >> REGULATOR_ID_SHIFT;
++	uint32_t value;
++
++	if (info->vsel_reg == NA)
++		return -EINVAL;
++
++	if (info->step_uv == 0)	/* Fixed voltage */
++		value = info->min_sel;
++	else
++		value = ((uvolt - info->min_uv) / info->step_uv) + info->min_sel;
++
++	INFO("%s: cs_id=%d, %s=%d, uvolt=%d, reg=0x%x, mask=0x%x, val=0x%x\n",
++	      __func__, cs_id, reg_type_to_string(reg_id), num + 1, uvolt,
++	      info->vsel_reg, info->vsel_mask, value);
++
++	return pmic_clrsetbits(dev, cs_id, info->vsel_reg, info->vsel_mask, value);
++}
++
++static int buck_set_enable(struct rk806_regulator *dev, uint32_t reg_id, bool enable)
++{
++	uint32_t cs_id = (reg_id & CHIP_SELECT_MASK) >> CHIP_SELECT_SHIFT;
++	uint32_t buck = (reg_id & REGULATOR_ID_MASK) >> REGULATOR_ID_SHIFT;
++	uint8_t value, en_reg;
++	int ret = 0;
++
++	en_reg = RK806_POWER_EN(buck / 4);
++	if (enable)
++		value = ((1 << buck % 4) | (1 << (buck % 4 + 4)));
++	else
++		value = ((0 << buck % 4) | (1 << (buck % 4 + 4)));
++
++	ret = pmic_reg_write(dev, cs_id, en_reg, &value);
++
++	return ret;
++}
++
++static int nldo_set_enable(struct rk806_regulator *dev, uint32_t reg_id, bool enable)
++{
++	uint32_t cs_id = (reg_id & CHIP_SELECT_MASK) >> CHIP_SELECT_SHIFT;
++	uint32_t ldo = (reg_id & REGULATOR_ID_MASK) >> REGULATOR_ID_SHIFT;
++	uint8_t value, en_reg;
++	int ret = 0;
++
++	if (ldo < 4) {
++		en_reg = RK806_NLDO_EN(0);
++		if (enable)
++			value = ((1 << ldo % 4) | (1 << (ldo % 4 + 4)));
++		else
++			value = ((0 << ldo % 4) | (1 << (ldo % 4 + 4)));
++		ret = pmic_reg_write(dev, cs_id, en_reg, &value);
++	} else {
++		en_reg = RK806_NLDO_EN(2);
++		if (enable)
++			value = 0x44;
++		else
++			value = 0x40;
++		ret = pmic_reg_write(dev, cs_id, en_reg, &value);
++	}
++
++	return ret;
++}
++
++static int pldo_set_enable(struct rk806_regulator *dev, uint32_t reg_id, bool enable)
++{
++	uint32_t cs_id = (reg_id & CHIP_SELECT_MASK) >> CHIP_SELECT_SHIFT;
++	uint32_t pldo = (reg_id & REGULATOR_ID_MASK) >> REGULATOR_ID_SHIFT;
++	uint8_t value, en_reg;
++	int ret = 0;
++
++	if (pldo < 3) {
++		en_reg = RK806_PLDO_EN(0);
++		if (enable)
++			value = RK806_PLDO0_2_SET(pldo);
++		else
++			value = RK806_PLDO0_2_CLR(pldo);
++		ret = pmic_reg_write(dev, cs_id, en_reg, &value);
++	} else if (pldo == 3) {
++		en_reg = RK806_PLDO_EN(1);
++		if (enable) {
++			value = ((1 << 0) | (1 << 4));
++		} else {
++			value = (1 << 4);
++		}
++		ret = pmic_reg_write(dev, cs_id, en_reg, &value);
++	} else if (pldo == 4) {
++		en_reg = RK806_PLDO_EN(1);
++		if (enable)
++			value = ((1 << 1) | (1 << 5));
++		else
++			value = ((0 << 1) | (1 << 5));
++		ret = pmic_reg_write(dev, cs_id, en_reg, &value);
++	} else if (pldo == 5) {
++		en_reg = RK806_PLDO_EN(0);
++		if (enable)
++			value = ((1 << 0) | (1 << 4));
++		else
++			value = ((0 << 0) | (1 << 4));
++		ret = pmic_reg_write(dev, cs_id, en_reg, &value);
++	} else {
++		ret = -EINVAL;
++	}
++
++	return ret;
++}
++
++int rk806_regulator_set_voltage(struct rk806_regulator *dev, uint32_t reg_id, uint32_t uvolt)
++{
++	uint32_t num = (reg_id & REGULATOR_ID_MASK) >> REGULATOR_ID_SHIFT;
++	int ret = 0;
++
++	switch (reg_id & REGULATOR_TYPE_MASK) {
++	case BUCK:
++		ret = common_set_voltage(dev, reg_id, uvolt, get_buck_reg(num, uvolt));
++		break;
++	case NLDO:
++		ret = common_set_voltage(dev, reg_id, uvolt, get_nldo_reg(num, uvolt));
++		break;
++	case PLDO:
++		ret = common_set_voltage(dev, reg_id, uvolt, get_pldo_reg(num, uvolt));
++		break;
++	default:
++		assert(false);
++		break;
++	}
++
++	return ret;
++}
++
++int rk806_regulator_set_state(struct rk806_regulator *dev, uint32_t reg_id, bool enable)
++{
++	int ret = 0;
++
++	switch (reg_id & REGULATOR_TYPE_MASK) {
++	case BUCK:
++		ret = buck_set_enable(dev, reg_id, enable);
++		break;
++	case NLDO:
++		ret = nldo_set_enable(dev, reg_id, enable);
++		break;
++	case PLDO:
++		ret = pldo_set_enable(dev, reg_id, enable);
++		break;
++	default:
++		assert(false);
++		break;
++	}
++
++	return ret;
++}
++
++static void rk806_spi_config(struct rk806_regulator *dev)
++{
++	struct rk_spi_controller *spi = dev->spi;
++
++	/* Data width */
++	spi->config.num_bytes = RK_SPI_CFG_DATA_FRAME_SIZE_8BIT;
++
++	/* CPOL */
++	spi->config.clk_polarity = RK_SPI_CFG_POLARITY_LOW;
++
++	/* CPHA */
++	spi->config.clk_phase = RK_SPI_CFG_PHASE_1EDGE;
++
++	/* MSB or LSB */
++	spi->config.first_bit = RK_SPI_CFG_FIRSTBIT_MSB;
++
++	/* Master or Slave */
++	spi->config.op_mode = RK_SPI_CFG_OPM_MASTER;
++
++	/* CSM cycles */
++	spi->config.csm = RK_SPI_CFG_CSM_0CYCLE;
++
++	spi->config.speed = 2000000;
++
++	if (spi->config.speed > SPI_MASTER_MAX_SCLK_OUT) {
++		spi->config.speed = SPI_MASTER_MAX_SCLK_OUT;
++	}
++}
++
++int rk806_init(struct rk806_regulator *dev, struct rk_spi_controller *spi)
++{
++	dev->spi = spi;
++
++	rk806_spi_config(dev);
++
++	return 0;
++}
+diff --git a/plat/rockchip/common/drivers/rk806/rk806.h b/plat/rockchip/common/drivers/rk806/rk806.h
+new file mode 100644
+index 000000000..c17e7a80b
+--- /dev/null
++++ b/plat/rockchip/common/drivers/rk806/rk806.h
+@@ -0,0 +1,168 @@
++/*
++ * Copyright (c) 2020-2021, Rockchip, Inc. All rights reserved.
++ * Copyright (c) 2024, Mario Bălănică <mariobalanica02@gmail.com>
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef RK_806_H
++#define RK_806_H
++
++/* Not used/existing register and configure */
++#define NA			-1
++
++/* rk806 buck*/
++#define RK806_BUCK_ON_VSEL(n)		(0x1a + n - 1)
++#define RK806_BUCK_SLP_VSEL(n)		(0x24 + n - 1)
++#define RK806_BUCK_CONFIG(n)		(0x10 + n - 1)
++#define RK806_BUCK_VSEL_MASK		0xff
++
++/* RK806 LDO */
++#define RK806_NLDO_ON_VSEL(n)		(0x43 + n - 1)
++#define RK806_NLDO_SLP_VSEL(n)		(0x48 + n - 1)
++#define RK806_NLDO_VSEL_MASK		0xff
++#define RK806_PLDO_ON_VSEL(n)		(0x4e + n - 1)
++#define RK806_PLDO_SLP_VSEL(n)		(0x54 + n - 1)
++#define RK806_PLDO_VSEL_MASK		0xff
++
++/* RK806 ENABLE */
++#define RK806_POWER_EN(n)		(0x00 + n)
++#define RK806_NLDO_EN(n)		(0x03 + n)
++#define RK806_PLDO_EN(n)		(0x04 + n)
++#define RK806_RAMP_RATE_MASK1		0xc0
++#define RK806_RAMP_RATE_REG1(n)		(0x10 + n)
++#define RK806_RAMP_RATE_REG1_8		0xeb
++#define RK806_RAMP_RATE_REG9_10		0xea
++
++#define RK806_RAMP_RATE_4LSB_PER_1CLK	0x00 /* LDO 100mV/uS buck 50mV/us */
++#define RK806_RAMP_RATE_2LSB_PER_1CLK	0x01 /* LDO 50mV/uS buck 25mV/us */
++#define RK806_RAMP_RATE_1LSB_PER_1CLK	0x02 /* LDO 25mV/uS buck 12.5mV/us */
++#define RK806_RAMP_RATE_1LSB_PER_2CLK	0x03 /* LDO 12.5mV/uS buck 6.25mV/us */
++
++#define RK806_RAMP_RATE_1LSB_PER_4CLK	0x04 /* LDO 6.28/2mV/uS buck 3.125mV/us */
++#define RK806_RAMP_RATE_1LSB_PER_8CLK	0x05 /* LDO 3.12mV/uS buck 1.56mV/us */
++#define RK806_RAMP_RATE_1LSB_PER_13CLK	0x06 /* LDO 1.9mV/uS buck 961mV/us */
++#define RK806_RAMP_RATE_1LSB_PER_32CLK	0x07 /* LDO 0.78mV/uS buck 0.39mV/us */
++
++#define RK806_PLDO0_2_MSK(pldo)		(BIT(pldo + 5))
++#define RK806_PLDO0_2_SET(pldo)		(BIT(pldo + 1) | RK806_PLDO0_2_MSK(pldo))
++#define RK806_PLDO0_2_CLR(pldo)		RK806_PLDO0_2_MSK(pldo)
++
++#define RK806_CHIP_NAME			0x5A
++#define RK806_CHIP_VER			0x5B
++
++#define RK806_CMD_READ			0
++#define RK806_CMD_WRITE			BIT(7)
++#define RK806_CMD_CRC_EN		BIT(6)
++#define RK806_CMD_CRC_DIS		0
++#define RK806_CMD_LEN_MSK		0x0f
++#define RK806_REG_H			0x00
++
++#define RK806_SYS_CFG1			0x5f
++#define RK806_SYS_CFG3			0x72
++#define RK806_PWRON_KEY			0x76
++#define RK806_INT_STS0			0x77
++#define RK806_INT_MSK0			0x78
++#define RK806_INT_STS1			0x79
++#define RK806_INT_MSK1			0x7A
++#define RK806_GPIO_INT_CONFIG		0x7B
++#define RK806_IRQ_PWRON_FALL_MSK	BIT(0)
++#define RK806_IRQ_PWRON_RISE_MSK	BIT(1)
++#define RK806_DEV_OFF			BIT(0)
++#define RK806_RST_MODE1			0x01
++#define RK806_RST_MODE2			0x02
++#define VERSION_AB			0x01
++
++struct rk8xx_reg_info {
++	uint32_t min_uv;
++	uint32_t step_uv;
++	uint8_t vsel_reg;
++	uint8_t vsel_sleep_reg;
++	uint8_t config_reg;
++	uint8_t vsel_mask;
++	uint8_t min_sel;
++	/* only for buck now */
++	uint8_t max_sel;
++	uint8_t range_num;
++};
++
++/******************************************
++8 -12: MASTER, SLAVE
++4 -7: BUCK, NLDO, PLDO
++0 -3:  num
++******************************************/
++#define CHIP_SELECT_MASK	GENMASK_32(11, 8)
++#define CHIP_SELECT_SHIFT	8
++#define MASTER			(0x0 << CHIP_SELECT_SHIFT)
++#define SLAVER			(0x1 << CHIP_SELECT_SHIFT)
++
++#define REGULATOR_TYPE_MASK	GENMASK_32(7, 4)
++#define REGULATOR_TYPE_SHIFT	4
++#define BUCK			(0x0 << REGULATOR_TYPE_SHIFT)
++#define NLDO			(0x1 << REGULATOR_TYPE_SHIFT)
++#define PLDO			(0x2 << REGULATOR_TYPE_SHIFT)
++
++#define REGULATOR_ID_MASK	GENMASK_32(3, 0)
++#define REGULATOR_ID_SHIFT	0
++
++enum master_num {
++	MASTER_BUCK1 = (MASTER | BUCK | 0),
++	MASTER_BUCK2 = (MASTER | BUCK | 1),
++	MASTER_BUCK3 = (MASTER | BUCK | 2),
++	MASTER_BUCK4 = (MASTER | BUCK | 3),
++	MASTER_BUCK5 = (MASTER | BUCK | 4),
++	MASTER_BUCK6 = (MASTER | BUCK | 5),
++	MASTER_BUCK7 = (MASTER | BUCK | 6),
++	MASTER_BUCK8 = (MASTER | BUCK | 7),
++	MASTER_BUCK9 = (MASTER | BUCK | 8),
++	MASTER_BUCK10 = (MASTER | BUCK | 9),
++
++	MASTER_NLDO1 = (MASTER | NLDO | 0),
++	MASTER_NLDO2 = (MASTER | NLDO | 1),
++	MASTER_NLDO3 = (MASTER | NLDO | 2),
++	MASTER_NLDO4 = (MASTER | NLDO | 3),
++	MASTER_NLDO5 = (MASTER | NLDO | 4),
++
++	MASTER_PLDO1 = (MASTER | PLDO | 0),
++	MASTER_PLDO2 = (MASTER | PLDO | 1),
++	MASTER_PLDO3 = (MASTER | PLDO | 2),
++	MASTER_PLDO4 = (MASTER | PLDO | 3),
++	MASTER_PLDO5 = (MASTER | PLDO | 4),
++	MASTER_PLDO6 = (MASTER | PLDO | 5),
++};
++
++enum slaver_num {
++	SLAVER_BUCK1 = (SLAVER | BUCK | 0),
++	SLAVER_BUCK2 = (SLAVER | BUCK | 1),
++	SLAVER_BUCK3 = (SLAVER | BUCK | 2),
++	SLAVER_BUCK4 = (SLAVER | BUCK | 3),
++	SLAVER_BUCK5 = (SLAVER | BUCK | 4),
++	SLAVER_BUCK6 = (SLAVER | BUCK | 5),
++	SLAVER_BUCK7 = (SLAVER | BUCK | 6),
++	SLAVER_BUCK8 = (SLAVER | BUCK | 7),
++	SLAVER_BUCK9 = (SLAVER | BUCK | 8),
++	SLAVER_BUCK10 = (SLAVER | BUCK | 9),
++
++	SLAVER_NLDO1 = (SLAVER | NLDO | 0),
++	SLAVER_NLDO2 = (SLAVER | NLDO | 1),
++	SLAVER_NLDO3 = (SLAVER | NLDO | 2),
++	SLAVER_NLDO4 = (SLAVER | NLDO | 3),
++	SLAVER_NLDO5 = (SLAVER | NLDO | 4),
++
++	SLAVER_PLDO1 = (SLAVER | PLDO | 0),
++	SLAVER_PLDO2 = (SLAVER | PLDO | 1),
++	SLAVER_PLDO3 = (SLAVER | PLDO | 2),
++	SLAVER_PLDO4 = (SLAVER | PLDO | 3),
++	SLAVER_PLDO5 = (SLAVER | PLDO | 4),
++	SLAVER_PLDO6 = (SLAVER | PLDO | 5),
++};
++
++struct rk806_regulator {
++	struct rk_spi_controller *spi;
++};
++
++int rk806_init(struct rk806_regulator *instance, struct rk_spi_controller *spi);
++int rk806_regulator_set_voltage(struct rk806_regulator *instance, uint32_t reg_id, uint32_t uvolt);
++int rk806_regulator_set_state(struct rk806_regulator *dev, uint32_t reg_id, bool enable);
++
++#endif /* RK_806_H */

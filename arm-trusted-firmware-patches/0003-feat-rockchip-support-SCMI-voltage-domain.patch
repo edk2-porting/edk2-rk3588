@@ -1,0 +1,207 @@
+From 94e6663cfe15c34679dec7a0590111178bec74bf Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Mario=20B=C4=83l=C4=83nic=C4=83?=
+ <mariobalanica02@gmail.com>
+Date: Tue, 18 Jun 2024 00:11:23 +0300
+Subject: [PATCH 3/9] feat(rockchip): support SCMI voltage domain
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Change-Id: I2b25929a445b6d72f58ce4df9aaa8c1b9741ff73
+Signed-off-by: Mario Bălănică <mariobalanica02@gmail.com>
+---
+ plat/rockchip/common/scmi/scmi.c       |   1 +
+ plat/rockchip/common/scmi/scmi_voltd.c | 116 +++++++++++++++++++++++++
+ plat/rockchip/common/scmi/scmi_voltd.h |  48 ++++++++++
+ 3 files changed, 165 insertions(+)
+ create mode 100644 plat/rockchip/common/scmi/scmi_voltd.c
+ create mode 100644 plat/rockchip/common/scmi/scmi_voltd.h
+
+diff --git a/plat/rockchip/common/scmi/scmi.c b/plat/rockchip/common/scmi/scmi.c
+index 5c43c511f..4e08a1fb2 100644
+--- a/plat/rockchip/common/scmi/scmi.c
++++ b/plat/rockchip/common/scmi/scmi.c
+@@ -25,6 +25,7 @@ const uint8_t rockchip_scmi_protocol_table[1][MAX_PROTOCOL_IN_LIST] = {
+ 	{
+ 		SCMI_PROTOCOL_ID_CLOCK,
+ 		SCMI_PROTOCOL_ID_RESET_DOMAIN,
++		SCMI_PROTOCOL_ID_VOLTAGE_DOMAIN,
+ 		0
+ 	}
+ };
+diff --git a/plat/rockchip/common/scmi/scmi_voltd.c b/plat/rockchip/common/scmi/scmi_voltd.c
+new file mode 100644
+index 000000000..a2413cdb1
+--- /dev/null
++++ b/plat/rockchip/common/scmi/scmi_voltd.c
+@@ -0,0 +1,116 @@
++/*
++ * Copyright (c) 2024, Rockchip, Inc. All rights reserved.
++ * Copyright (c) 2024, Mario Bălănică <mariobalanica02@gmail.com>
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <drivers/scmi-msg.h>
++#include <drivers/scmi.h>
++
++#include "scmi_voltd.h"
++
++#pragma weak rockchip_scmi_voltd_count
++#pragma weak rockchip_scmi_get_voltd
++
++size_t rockchip_scmi_voltd_count(unsigned int agent_id __unused)
++{
++	return 0;
++}
++
++rk_scmi_voltd_t *rockchip_scmi_get_voltd(uint32_t agent_id __unused,
++					 uint32_t scmi_id __unused)
++{
++	return NULL;
++}
++
++size_t plat_scmi_voltd_count(unsigned int agent_id)
++{
++	return rockchip_scmi_voltd_count(agent_id);
++}
++
++const char *plat_scmi_voltd_get_name(unsigned int agent_id,
++				     unsigned int scmi_id)
++{
++	rk_scmi_voltd_t *voltd;
++
++	voltd = rockchip_scmi_get_voltd(agent_id, scmi_id);
++	if (voltd == NULL)
++		return NULL;
++
++	return voltd->name;
++}
++
++int32_t plat_scmi_voltd_levels_array(unsigned int agent_id,
++				     unsigned int scmi_id,
++				     int *levels,
++				     size_t *nb_elts,
++				     uint32_t start_idx)
++{
++	return SCMI_NOT_SUPPORTED;
++}
++
++int32_t plat_scmi_voltd_levels_by_step(unsigned int agent_id __unused,
++				       unsigned int scmi_id __unused,
++				       int *steps __unused)
++{
++	rk_scmi_voltd_t *voltd;
++
++	voltd = rockchip_scmi_get_voltd(agent_id, scmi_id);
++	if (voltd == NULL)
++		return SCMI_NOT_FOUND;
++
++	steps[0] = voltd->min_level;
++	steps[1] = voltd->max_level;
++	steps[2] = voltd->step_level;
++
++	return SCMI_SUCCESS;
++}
++
++int32_t plat_scmi_voltd_get_level(unsigned int agent_id,
++				  unsigned int scmi_id,
++				  int *level)
++{
++	rk_scmi_voltd_t *voltd;
++
++	voltd = rockchip_scmi_get_voltd(agent_id, scmi_id);
++	if (voltd == NULL)
++		return SCMI_NOT_FOUND;
++
++	if (voltd->voltd_ops && voltd->voltd_ops->get_level)
++		*level = voltd->voltd_ops->get_level(voltd);
++
++	/* return cur_level if no get_level ops or get_level return 0 */
++	if (*level == 0)
++		*level = voltd->cur_level;
++
++	return SCMI_SUCCESS;
++}
++
++int32_t plat_scmi_voltd_set_level(unsigned int agent_id,
++				  unsigned int scmi_id,
++				  int level)
++{
++	rk_scmi_voltd_t *voltd;
++	int32_t status = 0;
++
++	voltd = rockchip_scmi_get_voltd(agent_id, scmi_id);
++	if (voltd == NULL)
++		return SCMI_NOT_FOUND;
++
++	if (voltd->voltd_ops && voltd->voltd_ops->set_level) {
++		if ((level >= voltd->min_level) &&
++		    (level <= voltd->max_level)) {
++			status = voltd->voltd_ops->set_level(voltd, level);
++		} else {
++			status = SCMI_INVALID_PARAMETERS;
++		}
++
++		if (status == SCMI_SUCCESS)
++			voltd->cur_level = level;
++	} else {
++		status = SCMI_NOT_SUPPORTED;
++	}
++
++	return status;
++}
+diff --git a/plat/rockchip/common/scmi/scmi_voltd.h b/plat/rockchip/common/scmi/scmi_voltd.h
+new file mode 100644
+index 000000000..d0001404c
+--- /dev/null
++++ b/plat/rockchip/common/scmi/scmi_voltd.h
+@@ -0,0 +1,48 @@
++/*
++ * Copyright (c) 2024, Rockchip, Inc. All rights reserved.
++ * Copyright (c) 2024, Mario Bălănică <mariobalanica02@gmail.com>
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#ifndef RK_SCMI_VOLTD_H
++#define RK_SCMI_VOLTD_H
++
++#include <stdint.h>
++
++#include <common.h>
++
++struct rk_scmi_voltd;
++
++struct rk_scmi_voltd_ops {
++	int (*get_level)(struct rk_scmi_voltd *voltd);
++	int32_t (*set_level)(struct rk_scmi_voltd *voltd, int level);
++};
++
++typedef struct rk_scmi_voltd {
++	char name[SCMI_VOLTAGE_DOMAIN_NAME_LENGTH_MAX];
++	uint32_t id;
++	int32_t min_level;
++	int32_t max_level;
++	int32_t step_level;
++	int32_t cur_level;
++	const struct rk_scmi_voltd_ops *voltd_ops;
++} rk_scmi_voltd_t;
++
++/*
++ * Return number of voltage domains for an agent
++ * @agent_id: SCMI agent ID
++ * Return number of voltage domains
++ */
++size_t rockchip_scmi_voltd_count(unsigned int agent_id);
++
++/*
++ * Get rk_scmi_voltd_t point
++ * @agent_id: SCMI agent ID
++ * @scmi_id: SCMI voltd ID
++ * Return a rk_scmi_voltd_t point
++ */
++rk_scmi_voltd_t *rockchip_scmi_get_voltd(uint32_t agent_id,
++					 uint32_t scmi_id);
++
++#endif /* RK_SCMI_VOLTD_H */

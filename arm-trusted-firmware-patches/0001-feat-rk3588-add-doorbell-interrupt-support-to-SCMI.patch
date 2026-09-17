@@ -1,0 +1,162 @@
+From b61f4ed701b4a7ededf8617d707e76a591195a48 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Mario=20B=C4=83l=C4=83nic=C4=83?=
+ <mariobalanica02@gmail.com>
+Date: Mon, 17 Jun 2024 22:45:00 +0300
+Subject: [PATCH 1/9] feat(rk3588): add doorbell interrupt support to SCMI
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+This is needed for ACPI calls, because Windows does not appear to
+support the Arm FFH spec.
+
+Change-Id: I0e9a57c34a3aec30a364cae4ab85206a3be89848
+Signed-off-by: Mario Bălănică <mariobalanica02@gmail.com>
+---
+ plat/rockchip/rk3588/drivers/soc/soc.c | 49 ++++++++++++++++++++++++++
+ plat/rockchip/rk3588/drivers/soc/soc.h | 13 +++++++
+ plat/rockchip/rk3588/rk3588_def.h      |  6 +++-
+ 3 files changed, 67 insertions(+), 1 deletion(-)
+
+diff --git a/plat/rockchip/rk3588/drivers/soc/soc.c b/plat/rockchip/rk3588/drivers/soc/soc.c
+index 6db81eeba..4cdacdfd7 100644
+--- a/plat/rockchip/rk3588/drivers/soc/soc.c
++++ b/plat/rockchip/rk3588/drivers/soc/soc.c
+@@ -9,9 +9,11 @@
+ 
+ #include <arch_helpers.h>
+ #include <bl31/bl31.h>
++#include <bl31/interrupt_mgmt.h>
+ #include <common/debug.h>
+ #include <drivers/console.h>
+ #include <drivers/delay_timer.h>
++#include <drivers/scmi-msg.h>
+ #include <lib/mmio.h>
+ #include <lib/xlat_tables/xlat_tables_compat.h>
+ #include <platform.h>
+@@ -26,6 +28,10 @@
+ #define RK3588_DEV_RNG0_BASE	0xf0000000
+ #define RK3588_DEV_RNG0_SIZE	0x0ffff000
+ 
++#define SCMI_MAILBOX_BASE	MAILBOX0_BASE
++#define SCMI_MAILBOX_CHANNEL	0
++#define SCMI_MAILBOX_IRQ	RK_IRQ_MAILBOX0_AP0
++
+ const mmap_region_t plat_rk_mmap[] = {
+ 	MAP_REGION_FLAT(RK3588_DEV_RNG0_BASE, RK3588_DEV_RNG0_SIZE,
+ 			MT_DEVICE | MT_RW | MT_SECURE),
+@@ -88,6 +94,48 @@ static void system_reset_init(void)
+ 	mmio_write_32(PMU0IOC_BASE + 0x0, 0x00f00020);
+ }
+ 
++static uint64_t scmi_mailbox_doorbell_handler(uint32_t id, uint32_t flags,
++					      void *handle, void *cookie)
++{
++	uint32_t irq;
++	uint32_t intr;
++	uint32_t status;
++
++	irq = plat_ic_acknowledge_interrupt();
++	intr = plat_ic_get_interrupt_id(irq);
++
++	status = mmio_read_32(SCMI_MAILBOX_BASE + MAILBOX_B2A_STATUS);
++
++	if ((intr == SCMI_MAILBOX_IRQ) &&
++	    ((status & (0x1 << SCMI_MAILBOX_CHANNEL)) != 0)) {
++		scmi_smt_interrupt_entry(0);
++
++		/* acknowledge mailbox interrupt */
++		mmio_write_32(SCMI_MAILBOX_BASE + MAILBOX_B2A_STATUS,
++			      0x1 << SCMI_MAILBOX_CHANNEL);
++	}
++
++	plat_ic_end_of_interrupt(irq);
++	return 0;
++}
++
++static void init_scmi_mailbox(void)
++{
++	uint32_t value;
++	uint32_t flags;
++
++	/* enable mailbox interrupt */
++	value = mmio_read_32(SCMI_MAILBOX_BASE + MAILBOX_B2A_INTEN);
++	value |= 0x1 << SCMI_MAILBOX_CHANNEL;
++	mmio_write_32(SCMI_MAILBOX_BASE + MAILBOX_B2A_INTEN, value);
++
++	flags = 0;
++	set_interrupt_rm_flag(flags, NON_SECURE);
++	register_interrupt_type_handler(INTR_TYPE_EL3,
++					scmi_mailbox_doorbell_handler,
++					flags);
++}
++
+ void plat_rockchip_soc_init(void)
+ {
+ 	rockchip_clock_init();
+@@ -96,4 +144,5 @@ void plat_rockchip_soc_init(void)
+ 	system_reset_init();
+ 	sgrf_init();
+ 	rockchip_init_scmi_server();
++	init_scmi_mailbox();
+ }
+diff --git a/plat/rockchip/rk3588/drivers/soc/soc.h b/plat/rockchip/rk3588/drivers/soc/soc.h
+index 9af179a4b..48a9d398d 100644
+--- a/plat/rockchip/rk3588/drivers/soc/soc.h
++++ b/plat/rockchip/rk3588/drivers/soc/soc.h
+@@ -195,4 +195,17 @@ enum pvtm_con0 {
+ 
+ #define DDR_CHN_CNT			4
+ 
++/* Mailbox */
++#define MAILBOX_A2B_INTEN		0x00
++#define MAILBOX_A2B_STATUS		0x04
++#define MAILBOX_A2B_CMD(i)		(0x08 + (i) * 8)
++#define MAILBOX_A2B_DAT(i)		(0x0c + (i) * 8)
++
++#define MAILBOX_B2A_INTEN		0x28
++#define MAILBOX_B2A_STATUS		0x2C
++#define MAILBOX_B2A_CMD(i)		(0x30 + (i) * 8)
++#define MAILBOX_B2A_DAT(i)		(0x34 + (i) * 8)
++
++#define MAILBOX_CHANNEL_CNT		4
++
+ #endif /* __SOC_H__ */
+diff --git a/plat/rockchip/rk3588/rk3588_def.h b/plat/rockchip/rk3588/rk3588_def.h
+index 412495a8b..78d64f7db 100644
+--- a/plat/rockchip/rk3588/rk3588_def.h
++++ b/plat/rockchip/rk3588/rk3588_def.h
+@@ -132,6 +132,7 @@
+ #define GPIO3_BASE		0xfec40000
+ #define GPIO4_BASE		0xfec50000
+ 
++#define MAILBOX0_BASE		0xfec60000
+ #define MAILBOX1_BASE		0xfec70000
+ #define OTP_NS_BASE		0xfecc0000
+ #define INTMUX0_DDR_BASE	0Xfecf8000
+@@ -190,7 +191,7 @@
+ #define PLAT_GICITS1_BASE		0xfe660000
+ 
+ /******************************************************************************
+- * sgi, ppi
++ * sgi, ppi, spi
+  ******************************************************************************/
+ #define RK_IRQ_SEC_SGI_0		8
+ #define RK_IRQ_SEC_SGI_1		9
+@@ -201,6 +202,7 @@
+ #define RK_IRQ_SEC_SGI_6		14
+ #define RK_IRQ_SEC_SGI_7		15
+ #define RK_IRQ_SEC_PHY_TIMER		29
++#define RK_IRQ_MAILBOX0_AP0		93
+ 
+ /*
+  * Define a list of Group 1 Secure and Group 0 interrupts as per GICv3
+@@ -214,6 +216,8 @@
+ 
+ #define PLAT_RK_GICV3_G0_IRQS						\
+ 	INTR_PROP_DESC(RK_IRQ_SEC_SGI_6, GIC_HIGHEST_SEC_PRIORITY,	\
++		       INTR_GROUP0, GIC_INTR_CFG_LEVEL),		\
++	INTR_PROP_DESC(RK_IRQ_MAILBOX0_AP0, GIC_HIGHEST_SEC_PRIORITY,	\
+ 		       INTR_GROUP0, GIC_INTR_CFG_LEVEL)
+ 
+ /******************************************************************************

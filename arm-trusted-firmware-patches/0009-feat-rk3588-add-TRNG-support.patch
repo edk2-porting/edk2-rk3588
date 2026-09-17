@@ -1,0 +1,180 @@
+From 4d8f3e77a7d96cd4cdb7f651125587273acdf7ae Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Mario=20B=C4=83l=C4=83nic=C4=83?=
+ <mariobalanica02@gmail.com>
+Date: Sun, 23 Jun 2024 22:40:55 +0300
+Subject: [PATCH 9/9] feat(rk3588): add TRNG support
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Change-Id: Ie8d123ab35f4eb2278a01045ce1c7def0e7edfba
+Signed-off-by: Mario Bălănică <mariobalanica02@gmail.com>
+---
+ plat/rockchip/rk3588/platform.mk   |   2 +
+ plat/rockchip/rk3588/rk3588_def.h  |   1 +
+ plat/rockchip/rk3588/rk3588_trng.c | 126 +++++++++++++++++++++++++++++
+ 3 files changed, 129 insertions(+)
+ create mode 100644 plat/rockchip/rk3588/rk3588_trng.c
+
+diff --git a/plat/rockchip/rk3588/platform.mk b/plat/rockchip/rk3588/platform.mk
+index a71fdf376..55697a51d 100644
+--- a/plat/rockchip/rk3588/platform.mk
++++ b/plat/rockchip/rk3588/platform.mk
+@@ -75,6 +75,7 @@ BL31_SOURCES		+=	${RK_GIC_SOURCES}				\
+ 				${RK_PLAT_COMMON}/scmi/scmi_rstd.c		\
+ 				${RK_PLAT_SOC}/plat_sip_calls.c         	\
+ 				${RK_PLAT_SOC}/plat_sip_sdmmc.c         	\
++				${RK_PLAT_SOC}/rk3588_trng.c			\
+ 				${RK_PLAT_SOC}/drivers/secure/secure.c		\
+ 				${RK_PLAT_SOC}/drivers/soc/soc.c		\
+ 				${RK_PLAT_SOC}/drivers/pmu/pmu.c		\
+@@ -97,4 +98,5 @@ USE_COHERENT_MEM	:=	0
+ ENABLE_SPE_FOR_LOWER_ELS	:= 0
+ 
+ PLAT_EXTRA_LD_SCRIPT	:=	1
++TRNG_SUPPORT		:=	1
+ $(eval $(call add_define,PLAT_RK_CPU_RESET_EARLY))
+diff --git a/plat/rockchip/rk3588/rk3588_def.h b/plat/rockchip/rk3588/rk3588_def.h
+index f7d9ca5bb..09b5d5c39 100644
+--- a/plat/rockchip/rk3588/rk3588_def.h
++++ b/plat/rockchip/rk3588/rk3588_def.h
+@@ -109,6 +109,7 @@
+ #define SDMMC_BASE		0xfe2c0000
+ #define SDIO_BASE		0xfe2d0000
+ #define EMMC_BASE		0xfe2e0000
++#define TRNG_BASE		0xfe378000
+ #define KEYLADDER_BASE		0xfe380000
+ #define CRYPTO_S_BASE		0xfe390000
+ #define OTP_S_BASE		0xfe3a0000
+diff --git a/plat/rockchip/rk3588/rk3588_trng.c b/plat/rockchip/rk3588/rk3588_trng.c
+new file mode 100644
+index 000000000..e64bc6128
+--- /dev/null
++++ b/plat/rockchip/rk3588/rk3588_trng.c
+@@ -0,0 +1,126 @@
++/*
++ * Copyright (c) 2024, Mario Bălănică <mariobalanica02@gmail.com>
++ * Copyright (c) 2024, Rockchip, Inc. All rights reserved.
++ *
++ * SPDX-License-Identifier: BSD-3-Clause
++ */
++
++#include <stdbool.h>
++#include <stdint.h>
++
++#include <drivers/delay_timer.h>
++#include <lib/mmio.h>
++#include <lib/utils_def.h>
++#include <platform_def.h>
++
++#include <lib/smccc.h>
++#include <services/trng_svc.h>
++#include <smccc_helpers.h>
++
++#include <plat/common/platform.h>
++
++#define TRNG_CTRL			0x0000
++#define TRNG_CTRL_CMD_NOP		(0 << 0)
++#define TRNG_CTRL_CMD_RAND		(1 << 0)
++#define TRNG_CTRL_CMD_SEED		(2 << 0)
++
++#define TRNG_STAT			0x0004
++#define TRNG_STAT_SEEDED		BIT(9)
++#define TRNG_STAT_GENERATING		BIT(30)
++#define TRNG_STAT_RESEEDING		BIT(31)
++
++#define TRNG_MODE			0x0008
++#define TRNG_MODE_128_BIT		(0 << 3)
++#define TRNG_MODE_256_BIT		(1 << 3)
++
++#define TRNG_IE				0x0010
++#define TRNG_IE_GLBL_EN			BIT(31)
++#define TRNG_IE_SEED_DONE_EN		BIT(1)
++#define TRNG_IE_RAND_RDY_EN		BIT(0)
++
++#define TRNG_ISTAT			0x0014
++#define TRNG_ISTAT_RAND_RDY		BIT(0)
++
++#define TRNG_RAND(x)			(0x0020 + (x) * 4)
++#define TRNG_RAND_CNT			8
++
++#define TRNG_AUTO_RQSTS			0x0060
++
++#define ROCKCHIP_POLL_TIMEOUT_US	50000
++
++DEFINE_SVC_UUID2(_plat_trng_uuid,
++	0x23523c58, 0x7448, 0x4083, 0x9d, 0x16,
++	0xe3, 0xfa, 0xb9, 0xf1, 0x73, 0xbc
++);
++uuid_t plat_trng_uuid;
++
++bool plat_get_entropy(uint64_t *out)
++{
++	bool success;
++	uint32_t reg;
++	unsigned int retry;
++
++	success = false;
++
++	/* Clear interrupt status */
++	reg = mmio_read_32(TRNG_BASE + TRNG_ISTAT);
++	mmio_write_32(TRNG_BASE + TRNG_ISTAT, reg);
++
++	/* Generate 128-bit random data */
++	mmio_write_32(TRNG_BASE + TRNG_MODE, TRNG_MODE_128_BIT);
++	mmio_write_32(TRNG_BASE + TRNG_CTRL, TRNG_CTRL_CMD_RAND);
++
++	/* Wait for data ready */
++	for (retry = ROCKCHIP_POLL_TIMEOUT_US; retry > 0; retry--) {
++		reg = mmio_read_32(TRNG_BASE + TRNG_ISTAT);
++		if (reg & TRNG_ISTAT_RAND_RDY) {
++			success = true;
++			break;
++		}
++		udelay(1);
++	}
++
++	if (retry == 0) {
++		goto done;
++	}
++
++	/* Grab 64-bit random data */
++	*out = mmio_read_64(TRNG_BASE + TRNG_RAND(0));
++
++	/* Clear interrupt status */
++	mmio_write_32(TRNG_BASE + TRNG_ISTAT, reg);
++
++done:
++	/* Close TRNG */
++	mmio_write_32(TRNG_BASE + TRNG_CTRL, TRNG_CTRL_CMD_NOP);
++
++	return success;
++}
++
++void plat_entropy_setup(void)
++{
++	uint32_t reg;
++	unsigned int retry;
++
++	plat_trng_uuid = _plat_trng_uuid;
++
++	/* Ensure TRNG is ready */
++	const uint32_t mask = TRNG_STAT_SEEDED |
++			      TRNG_STAT_GENERATING |
++			      TRNG_STAT_RESEEDING;
++
++	for (retry = ROCKCHIP_POLL_TIMEOUT_US; retry > 0; retry--) {
++		reg = mmio_read_32(TRNG_BASE + TRNG_STAT);
++		if ((reg & mask) == TRNG_STAT_SEEDED) {
++			break;
++		}
++		udelay(1);
++	}
++
++	/* Clear interrupt status */
++	reg = mmio_read_32(TRNG_BASE + TRNG_ISTAT);
++	mmio_write_32(TRNG_BASE + TRNG_ISTAT, reg);
++
++	/* Auto reseed after (1000 * 16) bytes of random data generated */
++	mmio_write_32(TRNG_BASE + TRNG_AUTO_RQSTS, 1000);
++}

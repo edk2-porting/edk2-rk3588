@@ -1,0 +1,833 @@
+From 7963abe9d13f29a594fe1705f12f942742f41886 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Mario=20B=C4=83l=C4=83nic=C4=83?=
+ <mariobalanica02@gmail.com>
+Date: Mon, 17 Jun 2024 21:37:23 +0300
+Subject: [PATCH 2/9] feat(scmi): add voltage domain support
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Change-Id: Ieac8d72b24550865591a8d20ae0d483a3b124acd
+Signed-off-by: Mario Bălănică <mariobalanica02@gmail.com>
+---
+ drivers/scmi-msg/common.h         |   8 +
+ drivers/scmi-msg/entry.c          |   9 +
+ drivers/scmi-msg/voltage_domain.c | 464 ++++++++++++++++++++++++++++++
+ drivers/scmi-msg/voltage_domain.h | 142 +++++++++
+ include/drivers/scmi-msg.h        | 112 ++++++++
+ include/drivers/scmi.h            |   1 +
+ 6 files changed, 736 insertions(+)
+ create mode 100644 drivers/scmi-msg/voltage_domain.c
+ create mode 100644 drivers/scmi-msg/voltage_domain.h
+
+diff --git a/drivers/scmi-msg/common.h b/drivers/scmi-msg/common.h
+index 6b186d07d..aafd0a10a 100644
+--- a/drivers/scmi-msg/common.h
++++ b/drivers/scmi-msg/common.h
+@@ -15,6 +15,7 @@
+ #include "clock.h"
+ #include "power_domain.h"
+ #include "reset_domain.h"
++#include "voltage_domain.h"
+ #include "sensor.h"
+ 
+ #define SCMI_VERSION			0x20000U
+@@ -119,6 +120,13 @@ scmi_msg_handler_t scmi_msg_get_rstd_handler(struct scmi_msg *msg);
+  */
+ scmi_msg_handler_t scmi_msg_get_pd_handler(struct scmi_msg *msg);
+ 
++/*
++ * scmi_msg_get_voltd_handler - Return a handler for a voltage domain message
++ * @msg - message to process
++ * Return a function handler for the message or NULL
++ */
++scmi_msg_handler_t scmi_msg_get_voltd_handler(struct scmi_msg *msg);
++
+ /*
+  * scmi_msg_get_sensor_handler - Return a handler for a sensor message
+  * @msg - message to process
+diff --git a/drivers/scmi-msg/entry.c b/drivers/scmi-msg/entry.c
+index 14db61c54..85be6db4b 100644
+--- a/drivers/scmi-msg/entry.c
++++ b/drivers/scmi-msg/entry.c
+@@ -14,6 +14,7 @@
+ #pragma weak scmi_msg_get_clock_handler
+ #pragma weak scmi_msg_get_rstd_handler
+ #pragma weak scmi_msg_get_pd_handler
++#pragma weak scmi_msg_get_voltd_handler
+ #pragma weak scmi_msg_get_sensor_handler
+ 
+ scmi_msg_handler_t scmi_msg_get_clock_handler(struct scmi_msg *msg __unused)
+@@ -31,6 +32,11 @@ scmi_msg_handler_t scmi_msg_get_pd_handler(struct scmi_msg *msg __unused)
+ 	return NULL;
+ }
+ 
++scmi_msg_handler_t scmi_msg_get_voltd_handler(struct scmi_msg *msg __unused)
++{
++	return NULL;
++}
++
+ scmi_msg_handler_t scmi_msg_get_sensor_handler(struct scmi_msg *msg __unused)
+ {
+ 	return NULL;
+@@ -75,6 +81,9 @@ void scmi_process_message(struct scmi_msg *msg)
+ 	case SCMI_PROTOCOL_ID_POWER_DOMAIN:
+ 		handler = scmi_msg_get_pd_handler(msg);
+ 		break;
++	case SCMI_PROTOCOL_ID_VOLTAGE_DOMAIN:
++		handler = scmi_msg_get_voltd_handler(msg);
++		break;
+ 	case SCMI_PROTOCOL_ID_SENSOR:
+ 		handler = scmi_msg_get_sensor_handler(msg);
+ 		break;
+diff --git a/drivers/scmi-msg/voltage_domain.c b/drivers/scmi-msg/voltage_domain.c
+new file mode 100644
+index 000000000..362208c11
+--- /dev/null
++++ b/drivers/scmi-msg/voltage_domain.c
+@@ -0,0 +1,464 @@
++// SPDX-License-Identifier: BSD-3-Clause
++/*
++ * Copyright (c) 2024, Arm Limited and Contributors. All rights reserved.
++ * Copyright (c) 2024, Mario Bălănică <mariobalanica02@gmail.com>
++ */
++
++#include <cdefs.h>
++#include <string.h>
++
++#include <drivers/scmi-msg.h>
++#include <drivers/scmi.h>
++#include <lib/utils_def.h>
++
++#include "common.h"
++
++#pragma weak plat_scmi_voltd_count
++#pragma weak plat_scmi_voltd_get_name
++#pragma weak plat_scmi_voltd_get_attributes
++#pragma weak plat_scmi_voltd_levels_array
++#pragma weak plat_scmi_voltd_levels_by_step
++#pragma weak plat_scmi_voltd_set_state
++#pragma weak plat_scmi_voltd_get_state
++#pragma weak plat_scmi_voltd_set_state_custom
++#pragma weak plat_scmi_voltd_get_state_custom
++#pragma weak plat_scmi_voltd_set_level
++#pragma weak plat_scmi_voltd_get_level
++
++static bool message_id_is_supported(unsigned int message_id);
++
++size_t plat_scmi_voltd_count(unsigned int agent_id __unused)
++{
++	return 0U;
++}
++
++const char *plat_scmi_voltd_get_name(unsigned int agent_id __unused,
++				     unsigned int domain_id __unused)
++{
++	return NULL;
++}
++
++unsigned int plat_scmi_voltd_get_attributes(unsigned int agent_id __unused,
++					    unsigned int domain_id __unused)
++{
++	return 0U;
++}
++
++int32_t plat_scmi_voltd_levels_array(unsigned int agent_id __unused,
++				     unsigned int scmi_id __unused,
++				     int *levels __unused,
++				     size_t *nb_elts __unused,
++				     uint32_t start_idx __unused)
++{
++	return SCMI_NOT_SUPPORTED;
++}
++
++int32_t plat_scmi_voltd_levels_by_step(unsigned int agent_id __unused,
++				       unsigned int scmi_id __unused,
++				       int *steps __unused)
++{
++	return SCMI_NOT_SUPPORTED;
++}
++
++int32_t plat_scmi_voltd_set_state(unsigned int agent_id __unused,
++				  unsigned int domain_id __unused,
++				  bool enable __unused)
++{
++	return SCMI_NOT_SUPPORTED;
++}
++
++int32_t plat_scmi_voltd_get_state(unsigned int agent_id __unused,
++				  unsigned int domain_id __unused,
++				  bool *enable __unused)
++{
++	return SCMI_NOT_SUPPORTED;
++}
++
++int32_t plat_scmi_voltd_set_state_custom(unsigned int agent_id __unused,
++					 unsigned int domain_id __unused,
++					 uint8_t state __unused)
++{
++	return SCMI_NOT_SUPPORTED;
++}
++
++int32_t plat_scmi_voltd_get_state_custom(unsigned int agent_id __unused,
++					 unsigned int domain_id __unused,
++					 uint8_t *state __unused)
++{
++	return SCMI_NOT_SUPPORTED;
++}
++
++
++int32_t plat_scmi_voltd_set_level(unsigned int agent_id __unused,
++				  unsigned int domain_id __unused,
++				  int level __unused)
++{
++	return SCMI_NOT_SUPPORTED;
++}
++
++int32_t plat_scmi_voltd_get_level(unsigned int agent_id __unused,
++				  unsigned int domain_id __unused,
++				  int *level __unused)
++{
++	return SCMI_NOT_SUPPORTED;
++}
++
++static void report_version(struct scmi_msg *msg)
++{
++	struct scmi_protocol_version_p2a return_values = {
++		.status = SCMI_SUCCESS,
++		.version = SCMI_PROTOCOL_VERSION_VOLTAGE_DOMAIN,
++	};
++
++	if (msg->in_size != 0) {
++		scmi_status_response(msg, SCMI_PROTOCOL_ERROR);
++		return;
++	}
++
++	scmi_write_response(msg, &return_values, sizeof(return_values));
++}
++
++static void report_attributes(struct scmi_msg *msg)
++{
++	struct scmi_protocol_attributes_p2a return_values = {
++		.status = SCMI_SUCCESS,
++	};
++
++	if (msg->in_size != 0) {
++		scmi_status_response(msg, SCMI_PROTOCOL_ERROR);
++		return;
++	}
++
++	return_values.attributes = plat_scmi_voltd_count(msg->agent_id);
++
++	scmi_write_response(msg, &return_values, sizeof(return_values));
++}
++
++static void report_message_attributes(struct scmi_msg *msg)
++{
++	struct scmi_protocol_message_attributes_a2p *in_args = (void *)msg->in;
++	struct scmi_protocol_message_attributes_p2a return_values = {
++		.status = SCMI_SUCCESS,
++		/* For this protocol, attributes shall be zero */
++		.attributes = 0U,
++	};
++
++	if (msg->in_size != sizeof(*in_args)) {
++		scmi_status_response(msg, SCMI_PROTOCOL_ERROR);
++		return;
++	}
++
++	if (!message_id_is_supported(in_args->message_id)) {
++		scmi_status_response(msg, SCMI_NOT_FOUND);
++		return;
++	}
++
++	scmi_write_response(msg, &return_values, sizeof(return_values));
++}
++
++static void scmi_voltd_attributes(struct scmi_msg *msg)
++{
++	const struct scmi_voltd_attributes_a2p *in_args = (void *)msg->in;
++	struct scmi_voltd_attributes_p2a return_values = {
++		.status = SCMI_SUCCESS,
++	};
++	const char *name = NULL;
++	unsigned int domain_id = 0U;
++
++	if (msg->in_size != sizeof(*in_args)) {
++		scmi_status_response(msg, SCMI_PROTOCOL_ERROR);
++		return;
++	}
++
++	domain_id = SPECULATION_SAFE_VALUE(in_args->domain_id);
++
++	if (domain_id >= plat_scmi_voltd_count(msg->agent_id)) {
++		scmi_status_response(msg, SCMI_INVALID_PARAMETERS);
++		return;
++	}
++
++	name = plat_scmi_voltd_get_name(msg->agent_id, domain_id);
++	if (name == NULL) {
++		scmi_status_response(msg, SCMI_NOT_FOUND);
++		return;
++	}
++
++	COPY_NAME_IDENTIFIER(return_values.name, name);
++
++	return_values.attributes = plat_scmi_voltd_get_attributes(msg->agent_id, domain_id);
++
++	scmi_write_response(msg, &return_values, sizeof(return_values));
++}
++
++#define LEVELS_ARRAY_SIZE_MAX	(SCMI_PLAYLOAD_MAX - \
++				 sizeof(struct scmi_voltd_describe_levels_p2a))
++
++#define SCMI_LEVELS_BY_ARRAY(_nb_levels, _rem_levels) \
++	SCMI_VOLTD_DESCRIBE_LEVELS_FLAGS((_nb_levels), \
++					 SCMI_VOLTAGE_LEVEL_FORMAT_LIST, \
++					 (_rem_levels))
++#define SCMI_LEVELS_BY_STEP \
++	SCMI_VOLTD_DESCRIBE_LEVELS_FLAGS(3U, \
++					 SCMI_VOLTAGE_LEVEL_FORMAT_RANGE, \
++					 0U)
++
++#define LEVEL_DESC_SIZE		sizeof(int32_t)
++
++static void write_level_desc_array_in_buffer(char *dest, int *levels,
++					    size_t nb_elt)
++{
++	int32_t *out = (int32_t *)(uintptr_t)dest;
++	size_t n;
++
++	ASSERT_SYM_PTR_ALIGN(out);
++
++	for (n = 0U; n < nb_elt; n++) {
++		out[n] = levels[n];
++	}
++}
++
++static void scmi_voltd_describe_levels(struct scmi_msg *msg)
++{
++	const struct scmi_voltd_describe_levels_a2p *in_args = (void *)msg->in;
++	struct scmi_voltd_describe_levels_p2a p2a = {
++		.status = SCMI_SUCCESS,
++	};
++	size_t nb_levels;
++	int32_t status;
++	unsigned int domain_id;
++
++	if (msg->in_size != sizeof(*in_args)) {
++		scmi_status_response(msg, SCMI_PROTOCOL_ERROR);
++		return;
++	}
++
++	domain_id = SPECULATION_SAFE_VALUE(in_args->domain_id);
++
++	if (domain_id >= plat_scmi_voltd_count(msg->agent_id)) {
++		scmi_status_response(msg, SCMI_INVALID_PARAMETERS);
++		return;
++	}
++
++	/* Platform may support array level description */
++	status = plat_scmi_voltd_levels_array(msg->agent_id, domain_id, NULL,
++					      &nb_levels, 0);
++	if (status == SCMI_SUCCESS) {
++		/* Currently 12 cells max, so it's affordable for the stack */
++		int plat_levels[LEVELS_ARRAY_SIZE_MAX / LEVEL_DESC_SIZE];
++		size_t max_nb = LEVELS_ARRAY_SIZE_MAX / LEVEL_DESC_SIZE;
++		size_t ret_nb = MIN(nb_levels - in_args->level_index, max_nb);
++		size_t rem_nb = nb_levels - in_args->level_index - ret_nb;
++
++		status =  plat_scmi_voltd_levels_array(msg->agent_id, domain_id,
++						       plat_levels, &ret_nb,
++						       in_args->level_index);
++		if (status == SCMI_SUCCESS) {
++			write_level_desc_array_in_buffer(msg->out + sizeof(p2a),
++							plat_levels, ret_nb);
++
++			p2a.flags = SCMI_LEVELS_BY_ARRAY(ret_nb, rem_nb);
++			p2a.status = SCMI_SUCCESS;
++
++			memcpy(msg->out, &p2a, sizeof(p2a));
++			msg->out_size_out = sizeof(p2a) +
++					    ret_nb * LEVEL_DESC_SIZE;
++		}
++	} else if (status == SCMI_NOT_SUPPORTED) {
++		int triplet[3] = { 0U, 0U, 0U };
++
++		/* Platform may support min/max/step triplet description */
++		status = plat_scmi_voltd_levels_by_step(msg->agent_id, domain_id,
++							triplet);
++		if (status == SCMI_SUCCESS) {
++			write_level_desc_array_in_buffer(msg->out + sizeof(p2a),
++							 triplet, 3U);
++
++			p2a.flags = SCMI_LEVELS_BY_STEP;
++			p2a.status = SCMI_SUCCESS;
++
++			memcpy(msg->out, &p2a, sizeof(p2a));
++			msg->out_size_out = sizeof(p2a) + (3U * LEVEL_DESC_SIZE);
++		}
++	} else {
++		/* Fallthrough generic exit sequence below with error status */
++	}
++
++	if (status != SCMI_SUCCESS) {
++		scmi_status_response(msg, status);
++	} else {
++		/*
++		 * Message payload is already written to msg->out, and
++		 * msg->out_size_out updated.
++		 */
++	}
++}
++
++static void scmi_voltd_config_set(struct scmi_msg *msg)
++{
++	const struct scmi_voltd_config_set_a2p *in_args = (void *)msg->in;
++	int32_t status = 0;
++	unsigned int domain_id = 0U;
++	unsigned int config = 0U;
++	uint8_t mode = 0U;
++
++	if (msg->in_size != sizeof(*in_args)) {
++		scmi_status_response(msg, SCMI_PROTOCOL_ERROR);
++		return;
++	}
++
++	domain_id = SPECULATION_SAFE_VALUE(in_args->domain_id);
++
++	if (domain_id >= plat_scmi_voltd_count(msg->agent_id)) {
++		scmi_status_response(msg, SCMI_INVALID_PARAMETERS);
++		return;
++	}
++
++	config = SPECULATION_SAFE_VALUE(in_args->config);
++	mode = config & SCMI_VOLTD_CONFIG_MODE_ID_MASK;
++
++	if ((config & SCMI_VOLTD_CONFIG_MODE_TYPE_IMPL) == 0) {
++		status = plat_scmi_voltd_set_state(msg->agent_id,
++						   domain_id,
++						   mode == SCMI_VOLTD_CONFIG_MODE_ID_ON);
++	} else {
++		status = plat_scmi_voltd_set_state_custom(msg->agent_id,
++							  domain_id,
++							  mode);
++	}
++
++	scmi_status_response(msg, status);
++}
++
++static void scmi_voltd_config_get(struct scmi_msg *msg)
++{
++	const struct scmi_voltd_config_get_a2p *in_args = (void *)msg->in;
++	struct scmi_voltd_config_get_p2a return_values = {
++		.status = SCMI_SUCCESS,
++	};
++	int32_t status = 0;
++	unsigned int domain_id = 0U;
++	bool enable = false;
++	uint8_t mode = 0U;
++
++	if (msg->in_size != sizeof(*in_args)) {
++		scmi_status_response(msg, SCMI_PROTOCOL_ERROR);
++		return;
++	}
++
++	domain_id = SPECULATION_SAFE_VALUE(in_args->domain_id);
++
++	if (domain_id >= plat_scmi_voltd_count(msg->agent_id)) {
++		scmi_status_response(msg, SCMI_INVALID_PARAMETERS);
++		return;
++	}
++
++	/* Platform may support architectural on/off description */
++	status = plat_scmi_voltd_get_state(msg->agent_id,
++					   domain_id,
++					   &enable);
++	if (status == SCMI_SUCCESS) {
++		return_values.config = enable ? SCMI_VOLTD_CONFIG_MODE_ID_ON :
++						SCMI_VOLTD_CONFIG_MODE_ID_OFF;
++	} else if (status == SCMI_NOT_SUPPORTED) {
++		/* Platform may support implementation-defined description */
++		status = plat_scmi_voltd_get_state_custom(msg->agent_id,
++							  domain_id,
++							  &mode);
++		return_values.config = SCMI_VOLTD_CONFIG_MODE_TYPE_IMPL |
++				       (mode & SCMI_VOLTD_CONFIG_MODE_ID_MASK);
++	} else {
++		/* Fallthrough generic exit sequence below with error status */
++	}
++
++	if (status != SCMI_SUCCESS) {
++		scmi_status_response(msg, status);
++	}
++
++	scmi_write_response(msg, &return_values, sizeof(return_values));
++}
++
++static void scmi_voltd_level_set(struct scmi_msg *msg)
++{
++	const struct scmi_voltd_level_set_a2p *in_args = (void *)msg->in;
++	int32_t status = 0;
++	unsigned int domain_id = 0U;
++	int level = 0;
++
++	if (msg->in_size != sizeof(*in_args)) {
++		scmi_status_response(msg, SCMI_PROTOCOL_ERROR);
++		return;
++	}
++
++	domain_id = SPECULATION_SAFE_VALUE(in_args->domain_id);
++
++	if (domain_id >= plat_scmi_voltd_count(msg->agent_id)) {
++		scmi_status_response(msg, SCMI_INVALID_PARAMETERS);
++		return;
++	}
++
++	level = SPECULATION_SAFE_VALUE(in_args->voltage_level);
++
++	status = plat_scmi_voltd_set_level(msg->agent_id, domain_id, level);
++
++	scmi_status_response(msg, status);
++}
++
++static void scmi_voltd_level_get(struct scmi_msg *msg)
++{
++	const struct scmi_voltd_level_get_a2p *in_args = (void *)msg->in;
++	int32_t status = 0;
++	struct scmi_voltd_level_get_p2a return_values = {
++		.status = SCMI_SUCCESS,
++	};
++	unsigned int domain_id = 0U;
++
++	if (msg->in_size != sizeof(*in_args)) {
++		scmi_status_response(msg, SCMI_PROTOCOL_ERROR);
++		return;
++	}
++
++	domain_id = SPECULATION_SAFE_VALUE(in_args->domain_id);
++
++	if (domain_id >= plat_scmi_voltd_count(msg->agent_id)) {
++		scmi_status_response(msg, SCMI_INVALID_PARAMETERS);
++		return;
++	}
++
++	status = plat_scmi_voltd_get_level(msg->agent_id, domain_id, &return_values.voltage_level);
++	if (status == SCMI_SUCCESS) {
++		scmi_write_response(msg, &return_values, sizeof(return_values));
++	} else {
++		scmi_status_response(msg, status);
++	}
++}
++
++static const scmi_msg_handler_t scmi_voltd_handler_table[] = {
++	[SCMI_PROTOCOL_VERSION] = report_version,
++	[SCMI_PROTOCOL_ATTRIBUTES] = report_attributes,
++	[SCMI_PROTOCOL_MESSAGE_ATTRIBUTES] = report_message_attributes,
++	[SCMI_VOLTAGE_DOMAIN_ATTRIBUTES] = scmi_voltd_attributes,
++	[SCMI_VOLTAGE_DOMAIN_DESCRIBE_LEVELS] = scmi_voltd_describe_levels,
++	[SCMI_VOLTAGE_DOMAIN_CONFIG_SET] = scmi_voltd_config_set,
++	[SCMI_VOLTAGE_DOMAIN_CONFIG_GET] = scmi_voltd_config_get,
++	[SCMI_VOLTAGE_DOMAIN_LEVEL_SET] = scmi_voltd_level_set,
++	[SCMI_VOLTAGE_DOMAIN_LEVEL_GET] = scmi_voltd_level_get,
++};
++
++static bool message_id_is_supported(unsigned int message_id)
++{
++	return (message_id < ARRAY_SIZE(scmi_voltd_handler_table)) &&
++	       (scmi_voltd_handler_table[message_id] != NULL);
++}
++
++scmi_msg_handler_t scmi_msg_get_voltd_handler(struct scmi_msg *msg)
++{
++	const size_t array_size = ARRAY_SIZE(scmi_voltd_handler_table);
++	unsigned int message_id = SPECULATION_SAFE_VALUE(msg->message_id);
++
++	if (message_id >= array_size) {
++		VERBOSE("Voltage domain handle not found %u", msg->message_id);
++		return NULL;
++	}
++
++	return scmi_voltd_handler_table[message_id];
++}
+diff --git a/drivers/scmi-msg/voltage_domain.h b/drivers/scmi-msg/voltage_domain.h
+new file mode 100644
+index 000000000..fc51e6ecd
+--- /dev/null
++++ b/drivers/scmi-msg/voltage_domain.h
+@@ -0,0 +1,142 @@
++// SPDX-License-Identifier: BSD-3-Clause
++/*
++ * Copyright (c) 2024, Arm Limited and Contributors. All rights reserved.
++ * Copyright (c) 2024, Mario Bălănică <mariobalanica02@gmail.com>
++ */
++
++#ifndef SCMI_MSG_VOLTAGE_DOMAIN_H
++#define SCMI_MSG_VOLTAGE_DOMAIN_H
++
++#include <stdint.h>
++
++#include <lib/utils_def.h>
++
++#define SCMI_PROTOCOL_VERSION_VOLTAGE_DOMAIN	0x10000U
++
++/*
++ * Identifiers of the SCMI Voltage domain management protocol commands
++ */
++enum scmi_voltd_command_id {
++	SCMI_VOLTAGE_DOMAIN_ATTRIBUTES 		= 0x003,
++	SCMI_VOLTAGE_DOMAIN_DESCRIBE_LEVELS 	= 0x004,
++	SCMI_VOLTAGE_DOMAIN_CONFIG_SET 		= 0x005,
++	SCMI_VOLTAGE_DOMAIN_CONFIG_GET 		= 0x006,
++	SCMI_VOLTAGE_DOMAIN_LEVEL_SET 		= 0x007,
++	SCMI_VOLTAGE_DOMAIN_LEVEL_GET 		= 0x008,
++};
++
++/*
++ * VOLTAGE_DOMAIN_ATTRIBUTES
++ */
++
++struct scmi_voltd_attributes_a2p {
++	uint32_t domain_id;
++};
++
++#define SCMI_VOLTAGE_DOMAIN_NAME_LENGTH_MAX	16U
++
++struct scmi_voltd_attributes_p2a {
++	int32_t status;
++	uint32_t attributes;
++	char name[SCMI_VOLTAGE_DOMAIN_NAME_LENGTH_MAX];
++};
++
++
++/*
++ * VOLTAGE_DESCRIBE_LEVELS
++ */
++
++#define SCMI_VOLTAGE_LEVEL_FORMAT_RANGE			1U
++#define SCMI_VOLTAGE_LEVEL_FORMAT_LIST			0U
++
++#define SCMI_VOLTD_DESCRIBE_LEVELS_REMAINING_MASK	GENMASK_32(31, 16)
++#define SCMI_VOLTD_DESCRIBE_LEVELS_REMAINING_POS	16
++
++#define SCMI_VOLTD_DESCRIBE_LEVELS_FORMAT_MASK		BIT(12)
++#define SCMI_VOLTD_DESCRIBE_LEVELS_FORMAT_POS		12
++
++#define SCMI_VOLTD_DESCRIBE_LEVELS_COUNT_MASK		GENMASK_32(11, 0)
++
++#define SCMI_VOLTD_DESCRIBE_LEVELS_FLAGS(_count, _fmt, _rem_levels) \
++	( \
++		((_count) & SCMI_VOLTD_DESCRIBE_LEVELS_COUNT_MASK) | \
++		(((_rem_levels) << SCMI_VOLTD_DESCRIBE_LEVELS_REMAINING_POS) & \
++		 SCMI_VOLTD_DESCRIBE_LEVELS_REMAINING_MASK) | \
++		(((_fmt) << SCMI_VOLTD_DESCRIBE_LEVELS_FORMAT_POS) & \
++		 SCMI_VOLTD_DESCRIBE_LEVELS_FORMAT_MASK) \
++	)
++
++struct scmi_voltd_describe_levels_a2p {
++	uint32_t domain_id;
++	uint32_t level_index;
++};
++
++struct scmi_voltd_describe_levels_p2a {
++	int32_t status;
++	uint32_t flags;
++	int32_t voltage[];
++};
++
++/*
++ * VOLTAGE_CONFIG
++ */
++
++#define SCMI_VOLTD_CONFIG_MODE_TYPE_IMPL	BIT(3)
++#define SCMI_VOLTD_CONFIG_MODE_ID_MASK		GENMASK_32(2, 0)
++#define SCMI_VOLTD_CONFIG_MODE_ID_ON 		0x7
++#define SCMI_VOLTD_CONFIG_MODE_ID_OFF 		0x0
++
++/*
++ * VOLTAGE_CONFIG_SET
++ */
++
++struct scmi_voltd_config_set_a2p {
++	uint32_t domain_id;
++	uint32_t config;
++};
++
++struct scmi_voltd_config_set_p2a {
++	int32_t status;
++};
++
++/*
++ * VOLTAGE_CONFIG_GET
++ */
++
++struct scmi_voltd_config_get_a2p {
++	uint32_t domain_id;
++};
++
++struct scmi_voltd_config_get_p2a {
++	int32_t status;
++	uint32_t config;
++};
++
++/*
++ * VOLTAGE_LEVEL_SET
++ */
++
++struct scmi_voltd_level_set_a2p {
++	uint32_t domain_id;
++	uint32_t flags;
++	int32_t voltage_level;
++};
++
++struct scmi_voltd_level_set_p2a {
++	int32_t status;
++};
++
++/*
++ * VOLTAGE_LEVEL_GET
++ */
++
++struct scmi_voltd_level_get_a2p {
++	uint32_t domain_id;
++};
++
++struct scmi_voltd_level_get_p2a {
++	int32_t status;
++	int32_t voltage_level;
++};
++
++#endif /* SCMI_MSG_VOLTAGE_DOMAIN_H */
+diff --git a/include/drivers/scmi-msg.h b/include/drivers/scmi-msg.h
+index 79a3d9ce3..8942fdfdb 100644
+--- a/include/drivers/scmi-msg.h
++++ b/include/drivers/scmi-msg.h
+@@ -276,4 +276,116 @@ int32_t plat_scmi_rstd_autonomous(unsigned int agent_id, unsigned int scmi_id,
+ int32_t plat_scmi_rstd_set_state(unsigned int agent_id, unsigned int scmi_id,
+ 				 bool assert_not_deassert);
+ 
++/* Handlers for SCMI Voltage Domain protocol services */
++
++/*
++ * Return number of voltage domains for the agent
++ * @agent_id: SCMI agent ID
++ * Return number of voltage domains
++ */
++size_t plat_scmi_voltd_count(unsigned int agent_id);
++
++/*
++ * Get voltage domain string ID (aka name)
++ * @agent_id: SCMI agent ID
++ * @scmi_id: SCMI voltage domain ID
++ * Return pointer to name or NULL
++ */
++const char *plat_scmi_voltd_get_name(unsigned int agent_id,
++				     unsigned int domain_id);
++
++/*
++ * Get possible voltages as an array of levels in microvolts
++ *
++ * @agent_id: SCMI agent ID
++ * @scmi_id: SCMI voltage domain ID
++ * @levels: If NULL, function returns, else output levels array
++ * @nb_elts: Array size of @levels.
++ * @start_idx: Start index of levels array
++ * Return an SCMI compliant error code
++ */
++int32_t plat_scmi_voltd_levels_array(unsigned int agent_id,
++				     unsigned int scmi_id,
++				     int *levels,
++				     size_t *nb_elts,
++				     uint32_t start_idx);
++
++/*
++ * Get possible voltages as range with regular steps in microvolts
++ *
++ * @agent_id: SCMI agent ID
++ * @scmi_id: SCMI voltage domain ID
++ * @steps: 3 cell array for min, max and step level data
++ * Return an SCMI compliant error code
++ */
++int32_t plat_scmi_voltd_levels_by_step(unsigned int agent_id,
++				       unsigned int scmi_id,
++				       int *steps);
++
++/*
++ * Set voltage domain state (enabled or disabled)
++ * @agent_id: SCMI agent ID
++ * @scmi_id: SCMI voltage domain ID
++ * @enable: Target domain state
++ * Return an SCMI compliant error code
++ */
++int32_t plat_scmi_voltd_set_state(unsigned int agent_id,
++				  unsigned int domain_id,
++				  bool enable);
++
++/*
++ * Get voltage domain state (enabled or disabled)
++ * @agent_id: SCMI agent ID
++ * @scmi_id: SCMI voltage domain ID
++ * @enable: Domain state
++ * Return an SCMI compliant error code
++ */
++int32_t plat_scmi_voltd_get_state(unsigned int agent_id,
++				  unsigned int domain_id,
++				  bool *enable);
++
++/*
++ * Set voltage domain state (implementation defined)
++ * @agent_id: SCMI agent ID
++ * @scmi_id: SCMI voltage domain ID
++ * @state: Target custom domain state
++ * Return an SCMI compliant error code
++ */
++int32_t plat_scmi_voltd_set_state_custom(unsigned int agent_id,
++					 unsigned int domain_id,
++					 uint8_t state);
++
++/*
++ * Get voltage domain state (implementation defined)
++ * @agent_id: SCMI agent ID
++ * @scmi_id: SCMI voltage domain ID
++ * @state: Custom domain state
++ * Return an SCMI compliant error code
++ */
++int32_t plat_scmi_voltd_get_state_custom(unsigned int agent_id,
++					 unsigned int domain_id,
++					 uint8_t *state);
++
++/*
++ * Set voltage domain level in microvolts
++ * @agent_id: SCMI agent ID
++ * @scmi_id: SCMI voltage domain ID
++ * @level: Target voltage level in microvolts
++ * Return a compliant SCMI error code
++ */
++int32_t plat_scmi_voltd_set_level(unsigned int agent_id,
++				  unsigned int domain_id,
++				  int level);
++
++/*
++ * Get voltage domain level in microvolts
++ * @agent_id: SCMI agent ID
++ * @scmi_id: SCMI voltage domain ID
++ * @level: Voltage level in microvolts
++ * Return a compliant SCMI error code
++ */
++int32_t plat_scmi_voltd_get_level(unsigned int agent_id,
++				  unsigned int domain_id,
++				  int *level);
++
+ #endif /* SCMI_MSG_H */
+diff --git a/include/drivers/scmi.h b/include/drivers/scmi.h
+index ac5dc3871..f8acc6a28 100644
+--- a/include/drivers/scmi.h
++++ b/include/drivers/scmi.h
+@@ -12,6 +12,7 @@
+ #define SCMI_PROTOCOL_ID_CLOCK			0x14U
+ #define SCMI_PROTOCOL_ID_SENSOR			0x15U
+ #define SCMI_PROTOCOL_ID_RESET_DOMAIN		0x16U
++#define SCMI_PROTOCOL_ID_VOLTAGE_DOMAIN		0x17U
+ 
+ /* SCMI error codes reported to agent through server-to-agent messages */
+ #define SCMI_SUCCESS			0
