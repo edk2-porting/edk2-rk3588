@@ -92,6 +92,7 @@ typedef UINT16 __be16;
 //
 #define readx_poll_timeout(op, addr, val, cond, timeout_us)	\
 ({ \
+	(void)(timeout_us); \
 	for (;;) { \
 		(val) = op(addr); \
 		if (cond) \

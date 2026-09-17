@@ -902,7 +902,6 @@ static int dw_mipi_dsi2_connector_pre_init(ROCKCHIP_CONNECTOR_PROTOCOL *conn,
 
 static int dw_mipi_dsi2_get_dsc_params_from_sink(struct dw_mipi_dsi2 *dsi2)
 {
-	struct udevice *dev = dsi2->device->dev;
 	ROCKCHIP_DSI_PANEL_PROTOCOL *Panel = dsi2->RockchipDsiPanel;
 	struct rockchip_cmd_header *header;
 	struct drm_dsc_picture_parameter_set *pps = NULL;
@@ -978,10 +977,12 @@ static int dw_mipi_dsi2_connector_init(ROCKCHIP_CONNECTOR_PROTOCOL *conn, DISPLA
 	CONNECTOR_STATE *conn_state = &state->ConnectorState;
 	CRTC_STATE *cstate = &state->CrtcState;
 	struct dw_mipi_dsi2 *dsi2 = DW_MIPI_DSI2_FROM_CONNECTOR_PROTOCOL(conn);
+#if 0
 	struct rockchip_phy *phy = NULL;
 	struct udevice *phy_dev;
 	struct udevice *dev;
 	int ret;
+#endif
 
 	conn_state->OutputMode = ROCKCHIP_OUT_MODE_P888;
 	conn_state->ColorSpace = V4L2_COLORSPACE_DEFAULT;

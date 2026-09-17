@@ -11,6 +11,7 @@
 #include <IndustryStandard/Acpi.h>
 #include <IndustryStandard/SerialPortConsoleRedirectionTable.h>
 #include <Library/AcpiLib.h>
+#include <AcpiHelperMacros.h>
 
 #include "AcpiTables.h"
 
@@ -24,7 +25,7 @@ STATIC EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE  Spcr = {
     ),
   EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERFACE_TYPE_16550_WITH_GAS,
   { EFI_ACPI_RESERVED_BYTE,                                                    EFI_ACPI_RESERVED_BYTE,EFI_ACPI_RESERVED_BYTE },
-  ARM_GAS32 (FixedPcdGet64 (PcdSerialRegisterBase)),
+  ACPI_GAS32 (FixedPcdGet64 (PcdSerialRegisterBase)),
   EFI_ACPI_SERIAL_PORT_CONSOLE_REDIRECTION_TABLE_INTERRUPT_TYPE_GIC,
   0,                                                                           /* Irq */
   365,                                                                         /* GlobalSystemInterrupt */

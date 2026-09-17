@@ -384,12 +384,9 @@ FvbSetAttributes (
   EFI_FVB_ATTRIBUTES_2  OldAttributes;
   EFI_FVB_ATTRIBUTES_2  FlashFvbAttributes;
   EFI_FVB_ATTRIBUTES_2  UnchangedAttributes;
-  FVB_DEVICE            *FlashInstance;
   UINT32                Capabilities;
   UINT32                OldStatus;
   UINT32                NewStatus;
-
-  FlashInstance = INSTANCE_FROM_FVB_THIS (This);
 
   //
   // Obtain attributes from FVB header

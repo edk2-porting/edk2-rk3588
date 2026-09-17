@@ -10,6 +10,7 @@
 #include <IndustryStandard/Acpi.h>
 #include <IndustryStandard/DebugPort2Table.h>
 #include <Library/AcpiLib.h>
+#include <AcpiHelperMacros.h>
 #include <Library/PcdLib.h>
 
 #include "AcpiTables.h"
@@ -55,7 +56,7 @@ STATIC DBG2_TABLE  Dbg2 = {
       OFFSET_OF (DBG2_DEBUG_DEVICE_INFORMATION, BaseAddressRegister),
       OFFSET_OF (DBG2_DEBUG_DEVICE_INFORMATION, AddressSize)
     },
-    ARM_GAS32 (FixedPcdGet64 (PcdSerialRegisterBase)), /* BaseAddressRegister */
+    ACPI_GAS32 (FixedPcdGet64 (PcdSerialRegisterBase)), /* BaseAddressRegister */
     0x1000,                                            /* AddressSize */
     UART_STR,                                          /* NameSpaceString */
   }

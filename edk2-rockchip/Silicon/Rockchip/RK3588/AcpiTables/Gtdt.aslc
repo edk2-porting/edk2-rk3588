@@ -9,6 +9,7 @@
 **/
 
 #include <Library/AcpiLib.h>
+#include <AcpiHelperMacros.h>
 #include <Library/PcdLib.h>
 #include <IndustryStandard/Acpi.h>
 
