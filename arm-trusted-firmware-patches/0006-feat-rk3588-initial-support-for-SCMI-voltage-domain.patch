@@ -178,7 +178,7 @@ index 000000000..491fd3317
 +};
 +
 +static rk_scmi_voltd_t rk3588_voltd_table[] = {
-+	RK3588_SCMI_VOLTD(SCMI_VCCIO_SD_S0, "scmi_vccio_sd_s0", 1800000, 3300000, 12500, &rk806_voltd_ops),
++	RK3588_SCMI_VOLTD(SCMI_VCCIO_SD_S0, "vccio_sd_s0", 1800000, 3300000, 12500, &rk806_voltd_ops),
 +};
 +
 +rk_scmi_voltd_t *rockchip_scmi_get_voltd(unsigned int agent_id,
