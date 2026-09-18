@@ -19,6 +19,8 @@
 #include <Library/UefiBootServicesTableLib.h>
 
 #include <Protocol/Pca95xx.h>
+#include <Library/RockchipPlatformLib.h>
+#include <dt-bindings/usb/pd.h>
 
 static struct regulator_init_data  rk806_init_data[] = {
   /* Master PMIC */
@@ -570,4 +572,29 @@ PlatformEarlyInit (
   VOID
   )
 {
+}
+
+/**
+  Describe one of this board's Type-C ports.
+
+**/
+EFI_STATUS
+EFIAPI
+PlatformGetTypeCPort (
+  IN  UINTN                             PortIndex,
+  OUT FUSB302_PLATFORM_DEVICE_PROTOCOL  *Port
+  )
+{
+  if (PortIndex >= 1) {
+    return EFI_UNSUPPORTED;
+  }
+
+  //
+  // The VBUS enable for this port is behind the PCA9555 expander rather
+  // than an SoC pin. Driving it from here would need PCA95XX_PROTOCOL and a
+  // board to test it on, so the port stays sink-only.
+  //
+  Port->SinkPdos[0] = PDO_FIXED (5000, 3000, PDO_FIXED_USB_COMM | PDO_FIXED_DATA_SWAP);
+
+  return EFI_SUCCESS;
 }

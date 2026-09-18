@@ -20,6 +20,8 @@
 #include <VarStoreData.h>
 
 #include <Protocol/KhadasMcu.h>
+#include <Library/RockchipPlatformLib.h>
+#include <dt-bindings/usb/pd.h>
 
 STATIC VOID                 *mKhadasMcuEventRegistration;
 STATIC KHADAS_MCU_PROTOCOL  *mKhadasMcu;
@@ -443,4 +445,40 @@ PlatformEarlyInit (
 
   GpioPinSetFunction (1, GPIO_PIN_PD3, 0); // jdet
   GpioPinSetFunction (1, GPIO_PIN_PD0, 0); // spk_con
+}
+
+STATIC
+EFI_STATUS
+EFIAPI
+PlatformTypeCSetVbus (
+  IN FUSB302_PLATFORM_DEVICE_PROTOCOL  *This,
+  IN BOOLEAN                           Enable
+  )
+{
+  GpioPinWrite (3, GPIO_PIN_PA4, Enable);
+  GpioPinSetDirection (3, GPIO_PIN_PA4, GPIO_PIN_OUTPUT);
+
+  return EFI_SUCCESS;
+}
+
+/**
+  Describe one of this board's Type-C ports.
+
+**/
+EFI_STATUS
+EFIAPI
+PlatformGetTypeCPort (
+  IN  UINTN                             PortIndex,
+  OUT FUSB302_PLATFORM_DEVICE_PROTOCOL  *Port
+  )
+{
+  if (PortIndex >= 1) {
+    return EFI_UNSUPPORTED;
+  }
+
+  Port->SourcePdos[0] = PDO_FIXED (5000, 1500, PDO_FIXED_DUAL_ROLE | PDO_FIXED_USB_COMM | PDO_FIXED_DATA_SWAP);
+  Port->SinkPdos[0]   = PDO_FIXED (5000, 3000, PDO_FIXED_USB_COMM | PDO_FIXED_DATA_SWAP);
+  Port->SetVbus       = PlatformTypeCSetVbus;
+
+  return EFI_SUCCESS;
 }
