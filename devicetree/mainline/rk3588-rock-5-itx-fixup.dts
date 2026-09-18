@@ -1,0 +1,41 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+
+#include "rk3588-rock-5-itx.dts"
+
+/ {
+	/delete-node/ pcie-oscillator;
+};
+
+&hdmi1_sound {
+	status = "okay";
+};
+
+&i2s6_8ch {
+	status = "okay";
+};
+
+/*
+ * Remove the "pcie30_refclk" gated-fixed-clock to maintain compatibility
+ * with kernels older than v6.13-rc1. It is backed by a GPIO regulator
+ * anyway, so simply referencing it in vpcie3v3-supply also addresses
+ * the potential issue where pcie3x2 might probe earlier than pcie3x4 and
+ * hang on DBI access because the clock didn't have a chance to be enabled.
+ */
+&pcie3x2 {
+	clocks = <&cru ACLK_PCIE_2L_MSTR>, <&cru ACLK_PCIE_2L_SLV>,
+		 <&cru ACLK_PCIE_2L_DBI>, <&cru PCLK_PCIE_2L>,
+		 <&cru CLK_PCIE_AUX1>, <&cru CLK_PCIE2L_PIPE>;
+	clock-names = "aclk_mst", "aclk_slv",
+		      "aclk_dbi", "pclk",
+		      "aux", "pipe";
+	vpcie3v3-supply = <&vcc3v3_pi6c_05>;
+};
+
+&pcie3x4 {
+	clocks = <&cru ACLK_PCIE_4L_MSTR>, <&cru ACLK_PCIE_4L_SLV>,
+		 <&cru ACLK_PCIE_4L_DBI>, <&cru PCLK_PCIE_4L>,
+		 <&cru CLK_PCIE_AUX0>, <&cru CLK_PCIE4L_PIPE>;
+	clock-names = "aclk_mst", "aclk_slv",
+		      "aclk_dbi", "pclk",
+		      "aux", "pipe";
+};
