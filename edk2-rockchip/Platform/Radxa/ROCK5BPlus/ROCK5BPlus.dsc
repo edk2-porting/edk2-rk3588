@@ -38,6 +38,9 @@
   #
   DEFINE RK_RTC8563_ENABLE = TRUE
 
+  # FUSB302 USB Type-C port controller on i2c4.
+  DEFINE RK_FUSB302_ENABLE = TRUE
+
   #
   # RK3588-based platform
   #
@@ -67,14 +70,17 @@
   gRockchipTokenSpaceGuid.PcdDeviceTreeName|"rk3588-rock-5bp"
 
   # I2C
-  gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x42, 0x43, 0x51, 0x11 }
-  gRockchipTokenSpaceGuid.PcdI2cSlaveBuses|{ 0x0, 0x0, 0x6, 0x7 }
-  gRockchipTokenSpaceGuid.PcdI2cSlaveBusesRuntimeSupport|{ FALSE, FALSE, TRUE, FALSE }
+  gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x42, 0x43, 0x51, 0x11, 0x22 }
+  gRockchipTokenSpaceGuid.PcdI2cSlaveBuses|{ 0x0, 0x0, 0x6, 0x7, 0x4 }
+  gRockchipTokenSpaceGuid.PcdI2cSlaveBusesRuntimeSupport|{ FALSE, FALSE, TRUE, FALSE, FALSE }
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorAddresses|{ 0x42, 0x43 }
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorBuses|{ 0x0, 0x0 }
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorTags|{ $(SCMI_CLK_CPUB01), $(SCMI_CLK_CPUB23) }
   gPcf8563RealTimeClockLibTokenSpaceGuid.PcdI2cSlaveAddress|0x51
   gRockchipTokenSpaceGuid.PcdRtc8563Bus|0x6
+  gRockchipTokenSpaceGuid.PcdFusb302Addresses|{ 0x22 }
+  gRockchipTokenSpaceGuid.PcdFusb302Buses|{ 0x4 }
+  gRockchipTokenSpaceGuid.PcdFusb302PhyIds|{ 0x0 }
 
   #
   # PCIe/SATA/USB Combo PIPE PHY support flags and default values
@@ -95,6 +101,12 @@
   gRK3588TokenSpaceGuid.PcdUsbDpPhy0Supported|TRUE
   gRK3588TokenSpaceGuid.PcdUsbDpPhy1Supported|TRUE
   gRK3588TokenSpaceGuid.PcdDp0LaneMux|{ 0x2, 0x3 }
+  # DisplayPort AUX SBU switches (GPIO0_C4 / GPIO0_C5),
+  # thrown per plug orientation.
+  # The 5B+ routes these differently from the ROCK 5B: mainline overrides the
+  # shared rock-5b dtsi for exactly this, and this board's vendor blob carries
+  # the 5B's pins rather than its own.
+  gRK3588TokenSpaceGuid.PcdUsbDpPhy0SbuGpios|{ 0, 20, 0, 21 }
   gRK3588TokenSpaceGuid.PcdDp1LaneMux|{ 0x0 }
 
   #

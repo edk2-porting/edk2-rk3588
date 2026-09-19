@@ -29,6 +29,11 @@
   DEFINE RK_PCA95XX_ENABLE = TRUE
 
   #
+  # FUSB302 USB Type-C port controller on i2c6.
+  #
+  DEFINE RK_FUSB302_ENABLE = TRUE
+
+  #
   # RK3588-based platform
   #
 !include Silicon/Rockchip/RK3588/RK3588Platform.dsc.inc
@@ -72,6 +77,9 @@
   gRockchipTokenSpaceGuid.PcdPca95xxAddress|0x21
   gRockchipTokenSpaceGuid.PcdPca95xxBus|0x6
   gRockchipTokenSpaceGuid.PcdPca95xxType|"PCA9555"
+  gRockchipTokenSpaceGuid.PcdFusb302Addresses|{ 0x22 }
+  gRockchipTokenSpaceGuid.PcdFusb302Buses|{ 0x6 }
+  gRockchipTokenSpaceGuid.PcdFusb302PhyIds|{ 0x0 }
 
   #
   # PCIe/SATA/USB Combo PIPE PHY support flags and default values

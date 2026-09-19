@@ -11,6 +11,7 @@
 #define __PALTFORM_LIB_H__
 
 #include <Uefi.h>
+#include <Protocol/Fusb302PlatformDevice.h>
 
 VOID
 EFIAPI
@@ -152,6 +153,29 @@ VOID
 EFIAPI
 PlatformEarlyInit (
   VOID
+  );
+
+/**
+  Describe one of this board's Type-C ports: what it may offer an attached
+  sink, what it will accept from a source, and how to switch its supply.
+
+  Called once per entry of PcdFusb302Addresses. Leaving SetVbus NULL is how
+  a port says it cannot energise its rail, whatever it may otherwise offer.
+  The caller fills in which I2C device the controller answers on and which
+  combo PHY it feeds, so a board need not repeat either.
+
+  @param[in]  PortIndex   Which port, indexed like PcdFusb302Addresses.
+  @param[out] Port        Receives the description.
+
+  @retval EFI_SUCCESS       The port was described.
+  @retval EFI_UNSUPPORTED   This board has no such Type-C port.
+
+**/
+EFI_STATUS
+EFIAPI
+PlatformGetTypeCPort (
+  IN  UINTN                             PortIndex,
+  OUT FUSB302_PLATFORM_DEVICE_PROTOCOL  *Port
   );
 
 #endif

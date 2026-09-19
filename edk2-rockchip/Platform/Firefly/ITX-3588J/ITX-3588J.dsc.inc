@@ -23,6 +23,9 @@
   #
   DEFINE RK_RTC8563_ENABLE = TRUE
 
+  # FUSB302 USB Type-C port controller on i2c6.
+  DEFINE RK_FUSB302_ENABLE = TRUE
+
   #
   # PCA95XX GPIO extender support
   # I2C location configured by PCDs below.
@@ -66,6 +69,9 @@
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorTags|{ $(SCMI_CLK_CPUB01), $(SCMI_CLK_CPUB23) }
   gPcf8563RealTimeClockLibTokenSpaceGuid.PcdI2cSlaveAddress|0x51
   gRockchipTokenSpaceGuid.PcdRtc8563Bus|0x6
+  gRockchipTokenSpaceGuid.PcdFusb302Addresses|{ 0x22 }
+  gRockchipTokenSpaceGuid.PcdFusb302Buses|{ 0x6 }
+  gRockchipTokenSpaceGuid.PcdFusb302PhyIds|{ 0x0 }
   gRockchipTokenSpaceGuid.PcdPca95xxAddress|0x21
   gRockchipTokenSpaceGuid.PcdPca95xxBus|0x6
   gRockchipTokenSpaceGuid.PcdPca95xxType|"PCA9555"
@@ -85,6 +91,12 @@
   #
   gRK3588TokenSpaceGuid.PcdUsbDpPhy0Supported|TRUE
   gRK3588TokenSpaceGuid.PcdUsbDpPhy1Supported|TRUE
+  # DP0 is the USB-C alt mode path. With no mux named the driver assumes
+  # all four lanes, leaving no pairs for USB 3 on that connector.
+  gRK3588TokenSpaceGuid.PcdDp0LaneMux|{ 0x2, 0x3 }
+  # DisplayPort AUX SBU switches (GPIO4_A6 / GPIO4_A7),
+  # thrown per plug orientation.
+  gRK3588TokenSpaceGuid.PcdUsbDpPhy0SbuGpios|{ 4, 6, 4, 7 }
   gRK3588TokenSpaceGuid.PcdDp1LaneMux|{ 0x2, 0x3 }
 
   #

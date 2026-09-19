@@ -16,6 +16,7 @@
 #include <Library/PWMLib.h>
 #include <Soc.h>
 #include <VarStoreData.h>
+#include <Library/RockchipPlatformLib.h>
 
 static struct regulator_init_data  rk806_init_data[] = {
   /* Master PMIC */
@@ -378,4 +379,21 @@ PlatformEarlyInit (
 {
   // Configure various things specific to this platform
   GpioPinSetFunction (1, GPIO_PIN_PC4, 0); // jdet
+}
+
+/**
+  Describe one of this board's Type-C ports.
+
+**/
+EFI_STATUS
+EFIAPI
+PlatformGetTypeCPort (
+  IN  UINTN                             PortIndex,
+  OUT FUSB302_PLATFORM_DEVICE_PROTOCOL  *Port
+  )
+{
+  //
+  // No Type-C port controller on this board.
+  //
+  return EFI_UNSUPPORTED;
 }

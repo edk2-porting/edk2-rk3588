@@ -16,6 +16,8 @@
 #include <Library/PWMLib.h>
 #include <Soc.h>
 #include <VarStoreData.h>
+#include <Library/RockchipPlatformLib.h>
+#include <dt-bindings/usb/pd.h>
 
 static struct regulator_init_data  rk806_init_data[] = {
   /* Master PMIC */
@@ -443,4 +445,28 @@ PlatformEarlyInit (
   // Configure various things specific to this platform
   PlatformPcieWiFiEnable (TRUE);
   GpioPinSetFunction (1, GPIO_PIN_PD5, 0); // jdet
+}
+
+/**
+  Describe one of this board's Type-C ports.
+
+**/
+EFI_STATUS
+EFIAPI
+PlatformGetTypeCPort (
+  IN  UINTN                             PortIndex,
+  OUT FUSB302_PLATFORM_DEVICE_PROTOCOL  *Port
+  )
+{
+  if (PortIndex >= 1) {
+    return EFI_UNSUPPORTED;
+  }
+
+  //
+  // This board does not fit the Type-C VBUS switch its sibling designs
+  // carry, so there is nothing here to energise the rail with.
+  //
+  Port->SinkPdos[0] = PDO_FIXED (5000, 3000, PDO_FIXED_USB_COMM | PDO_FIXED_DATA_SWAP);
+
+  return EFI_SUCCESS;
 }
