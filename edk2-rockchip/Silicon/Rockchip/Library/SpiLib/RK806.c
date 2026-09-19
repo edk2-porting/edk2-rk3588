@@ -8,7 +8,7 @@
 #include <Library/RK806.h>
 #if 0
 /* Not used or exisit register and configure */
-#define NA  -1
+#define NA  0xff
 #define BIT(n)  (1 << (n))
 #define RK806_DBG  DEBUG_ERROR
 /* rk806 buck*/
@@ -689,6 +689,8 @@ pldo_set_enable (
     }
 
     ret =  pmic_reg_write (cs_id, en_reg, &value, 1);
+  } else {
+    ret = RETURN_INVALID_PARAMETER;
   }
 
   return ret;

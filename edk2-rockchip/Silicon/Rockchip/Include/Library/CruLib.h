@@ -89,7 +89,7 @@
     }
 
 struct PLL_CONFIG {
-  uint32_t    rate;
+  uint64_t    rate;
   uint32_t    fbDiv;
   uint32_t    postDiv1;
   uint32_t    refDiv;
@@ -250,7 +250,7 @@ HAL_CRU_RstGetById (
   uint32_t  resetId
   );
 
-uint32_t
+uint64_t
 HAL_CRU_GetPllFreq (
   struct PLL_SETUP  *pSetup
   );
@@ -258,7 +258,7 @@ HAL_CRU_GetPllFreq (
 HAL_Status
 HAL_CRU_SetPllFreq (
   struct PLL_SETUP  *pSetup,
-  uint32_t          rate
+  uint64_t          rate
   );
 
 HAL_Status
@@ -271,7 +271,7 @@ HAL_CRU_SetPllPowerDown (
   struct PLL_SETUP  *pSetup
   );
 
-uint32_t
+uint64_t
 HAL_CRU_GetPllV1Freq (
   struct PLL_SETUP  *pSetup
   );
@@ -279,7 +279,7 @@ HAL_CRU_GetPllV1Freq (
 HAL_Status
 HAL_CRU_SetPllV1Freq (
   struct PLL_SETUP  *pSetup,
-  uint32_t          rate
+  uint64_t          rate
   );
 
 HAL_Check
@@ -321,13 +321,13 @@ HAL_CRU_ClkGetMux (
 
 HAL_Status
 HAL_CRU_FracdivGetConfig (
-  uint32_t  rateOut,
-  uint32_t  rate,
+  uint64_t  rateOut,
+  uint64_t  rate,
   uint32_t  *numerator,
   uint32_t  *denominator
   );
 
-uint32_t
+uint64_t
 HAL_CRU_ClkGetFreq (
   uint32_t  clockId
   );
@@ -335,7 +335,7 @@ HAL_CRU_ClkGetFreq (
 HAL_Status
 HAL_CRU_ClkSetFreq (
   uint32_t  clockId,
-  uint32_t  rate
+  uint64_t  rate
   );
 
 HAL_Status
@@ -351,8 +351,8 @@ HAL_CRU_VopDclkDisable (
 HAL_Status
 HAL_CRU_ClkNp5BestDiv (
   uint32_t  clockId,
-  uint32_t  rate,
-  uint32_t  pRate,
+  uint64_t  rate,
+  uint64_t  pRate,
   uint32_t  *bestdiv
   );
 

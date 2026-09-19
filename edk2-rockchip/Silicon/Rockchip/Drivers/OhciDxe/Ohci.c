@@ -2052,7 +2052,11 @@ OhciFreeDev (
     UsbHcFreeMemPool (Ohc->MemPool);
   }
 
-  if (Ohc->HccaMemoryMapping != NULL ) {
+  if (Ohc->HccaMemoryMapping != NULL) {
+    DmaUnmap (Ohc->HccaMemoryMapping);
+  }
+
+  if (Ohc->HccaMemoryBuf != NULL) {
     DmaFreeBuffer (Ohc->HccaMemoryPages, Ohc->HccaMemoryBuf);
   }
 
@@ -2222,6 +2226,9 @@ OHCIDriverBindingStart (
   VOID                  *Map;
   UINTN                 Pages;
   UINTN                 Bytes;
+  BOOLEAN DeviceProtocolOpened = FALSE;
+  BOOLEAN UsbHcInstalled       = FALSE;
+  BOOLEAN UsbHcInitialized     = FALSE;
 
   Ohc = AllocateZeroPool (sizeof (USB_OHCI_HC_DEV));
   if (Ohc == NULL) {
@@ -2243,8 +2250,9 @@ OHCIDriverBindingStart (
       __FUNCTION__,
       Status
       ));
-    goto FREE_OHC;
+    goto ERROR;
   }
+  DeviceProtocolOpened = TRUE;
 
   Ohc->Signature = USB_OHCI_HC_DEV_SIGNATURE;
 
@@ -2275,7 +2283,8 @@ OHCIDriverBindingStart (
 
   Ohc->MemPool = UsbHcInitMemPool (TRUE, 0);
   if (Ohc->MemPool == NULL) {
-    goto FREE_DEV_BUFFER;
+    Status = EFI_OUT_OF_RESOURCES;
+    goto ERROR;
   }
 
   Bytes = 4096;
@@ -2288,8 +2297,11 @@ OHCIDriverBindingStart (
              );
 
   if (EFI_ERROR (Status)) {
-    goto FREE_MEM_POOL;
+    goto ERROR;
   }
+
+  Ohc->HccaMemoryBuf     = (VOID *)(UINTN)Buf;
+  Ohc->HccaMemoryPages   = Pages;
 
   Status = DmaMap (
              MapOperationBusMasterCommonBuffer,
@@ -2299,14 +2311,17 @@ OHCIDriverBindingStart (
              &Map
              );
 
-  if (EFI_ERROR (Status) || (Bytes != 4096)) {
-    goto FREE_MEM_PAGE;
+  if (EFI_ERROR (Status)) {
+    goto ERROR;
   }
 
   Ohc->HccaMemoryBlock   = (HCCA_MEMORY_BLOCK *)(UINTN)PhyAddr;
   Ohc->HccaMemoryMapping = Map;
-  Ohc->HccaMemoryBuf     = (VOID *)(UINTN)Buf;
-  Ohc->HccaMemoryPages   = Pages;
+
+  if (Bytes != 4096) {
+    Status = EFI_DEVICE_ERROR;
+    goto ERROR;
+  }
 
   //
   // Install Host Controller Protocol
@@ -2319,8 +2334,9 @@ OHCIDriverBindingStart (
                   );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_INFO, "Install protocol error"));
-    goto FREE_OHC;
+    goto ERROR;
   }
+  UsbHcInstalled = TRUE;
 
   //
   // Create event to stop the HC on exit boot services.
@@ -2335,7 +2351,7 @@ OHCIDriverBindingStart (
                   );
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_INFO, "Create exit boot event error"));
-    goto UNINSTALL_USBHC;
+    goto ERROR;
   }
 
   //
@@ -2349,19 +2365,20 @@ OHCIDriverBindingStart (
                   &Ohc->HouseKeeperTimer
                   );
   if (EFI_ERROR (Status)) {
-    goto FREE_OHC;
+    goto ERROR;
   }
 
   Status = OhcInitHC (Ohc);
 
   if (EFI_ERROR (Status)) {
     DEBUG ((DEBUG_ERROR, "failed to init ohci host controller\n"));
-    goto UNINSTALL_USBHC;
+    goto ERROR;
   }
+  UsbHcInitialized = TRUE;
 
   Status = gBS->SetTimer (Ohc->HouseKeeperTimer, TimerPeriodic, 10 * 1000 * 10);
   if (EFI_ERROR (Status)) {
-    goto FREE_OHC;
+    goto ERROR;
   }
 
   DEBUG ((
@@ -2372,27 +2389,28 @@ OHCIDriverBindingStart (
     ));
   return EFI_SUCCESS;
 
-FREE_OHC:
+ERROR:
+  if (UsbHcInitialized) {
+      OhciSetHcControl (Ohc, PERIODIC_ENABLE | CONTROL_ENABLE | ISOCHRONOUS_ENABLE | BULK_ENABLE, 0);
+      Ohc->Usb2Hc.SetState (&Ohc->Usb2Hc, EfiUsbHcStateHalt);
+  }
+  if (UsbHcInstalled) {
+    gBS->UninstallMultipleProtocolInterfaces (
+        ControllerHandle,
+        &gEfiUsb2HcProtocolGuid,
+        &Ohc->Usb2Hc,
+        NULL
+        );
+  }
+  if (DeviceProtocolOpened) {
+    gBS->CloseProtocol (
+          ControllerHandle,
+          &gOhciDeviceProtocolGuid,
+          This->DriverBindingHandle,
+          ControllerHandle
+          );
+  }
   OhciFreeDev (Ohc);
-UNINSTALL_USBHC:
-  gBS->UninstallMultipleProtocolInterfaces (
-         ControllerHandle,
-         &gEfiUsb2HcProtocolGuid,
-         &Ohc->Usb2Hc,
-         NULL
-         );
-  gBS->CloseProtocol (
-         ControllerHandle,
-         &gOhciDeviceProtocolGuid,
-         This->DriverBindingHandle,
-         ControllerHandle
-         );
-FREE_MEM_PAGE:
-  DmaFreeBuffer (Pages, Buf);
-FREE_MEM_POOL:
-  UsbHcFreeMemPool (Ohc->MemPool);
-FREE_DEV_BUFFER:
-  FreePool (Ohc);
 
   return Status;
 }
