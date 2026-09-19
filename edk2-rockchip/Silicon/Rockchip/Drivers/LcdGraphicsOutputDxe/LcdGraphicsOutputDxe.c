@@ -20,9 +20,26 @@
 
 #include <Guid/GlobalVariable.h>
 
+#include <VarStoreData.h>
+
 #include "LcdGraphicsOutputDxe.h"
 
 STATIC EFI_CPU_ARCH_PROTOCOL  *mCpu;
+
+//
+// LINUX_EFI_MEMRESERVE_TABLE_GUID. The Linux EFI stub installs a table under
+// this GUID from install_memreserve_table(), on the way out of the stub and
+// before ExitBootServices. Nothing else installs it.
+//
+STATIC EFI_GUID  mLinuxEfiMemReserveTableGuid = {
+  0x888eb0c6, 0x8ede, 0x4ff5, { 0xa8, 0xf0, 0x9a, 0xee, 0x5c, 0xb9, 0x77, 0xc2 }
+};
+
+//
+// The instance that owns whatever is currently on screen, kept so the display
+// can be shut down again on the way out of firmware.
+//
+STATIC LCD_INSTANCE  *mLcdInstance = NULL;
 
 STATIC LCD_INSTANCE  mLcdTemplate = {
   LCD_INSTANCE_SIGNATURE,
@@ -638,6 +655,8 @@ LcdGraphicsOutputInit (
   Instance->Gop.Mode  = &Instance->Mode;
   Instance->Mode.Info = &Instance->ModeInfo;
 
+  mLcdInstance = Instance;
+
   Status = GetSupportedDisplayModes (Instance, PrimaryDisplayState);
   if (EFI_ERROR (Status)) {
     goto Exit;
@@ -669,6 +688,113 @@ Exit:
   return Status;
 }
 
+/**
+  Shut the display down before handing the machine to the operating system.
+
+  Firmware leaves the controller and PHY running so the boot logo survives
+  until the kernel puts up something of its own. The cost is that the next
+  driver inherits live hardware and reprograms only what it believes changed:
+  where the mode it wants matches the one already running, it keeps this
+  configuration, colour depth included. Controller and PHY then disagree about
+  what is being sent and the sink shows nothing.
+
+  Disabling the connectors here means nothing can skip a step -- whatever comes
+  next has to bring the display up from scratch. Only done for an OS that
+  brings its own driver; see LcdGraphicsOutputOsWillProgramDisplay().
+
+**/
+/**
+  Work out whether the OS taking over will program the display itself.
+
+  Linux's EFI stub installs a memory reservation table from
+  install_memreserve_table() just before entering the kernel, on every boot
+  through the stub, and nothing else installs one. Finding it at
+  ExitBootServices is a dependable mark that Linux is starting; with a device
+  tree exposed, the rockchip display driver is on its way.
+
+  Windows never installs it and has no driver for this controller -- it scans
+  out the framebuffer handed over through GOP, so tearing the connectors down
+  would leave it with a dark panel. Linux on ACPI alone does the same.
+
+  Firmware's own device tree cannot tell them apart: the arm64 stub builds its
+  own copy and passes it in a register, never replacing the configuration
+  table, so that table looks identical either way.
+
+  @retval TRUE   Linux is taking over with a device tree and will program the
+                 display itself.
+  @retval FALSE  Whatever is taking over relies on the framebuffer as firmware
+                 left it.
+
+**/
+STATIC
+BOOLEAN
+LcdGraphicsOutputOsWillProgramDisplay (
+  VOID
+  )
+{
+  EFI_STATUS  Status;
+  VOID        *Table;
+
+  if ((PcdGet32 (PcdConfigTableMode) & CONFIG_TABLE_MODE_FDT) == 0) {
+    return FALSE;
+  }
+
+  Status = EfiGetSystemConfigurationTable (
+             &mLinuxEfiMemReserveTableGuid,
+             &Table
+             );
+
+  return (BOOLEAN)(!EFI_ERROR (Status) && (Table != NULL));
+}
+
+STATIC
+VOID
+EFIAPI
+LcdGraphicsOutputExitBootServicesHandler (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  UINTN                        Index;
+  DISPLAY_STATE                *DisplayState;
+  CONNECTOR_STATE              *ConnectorState;
+  ROCKCHIP_CONNECTOR_PROTOCOL  *Connector;
+
+  if ((mLcdInstance == NULL) || !PcdGetBool (PcdDisplayResetBeforeBoot)) {
+    return;
+  }
+
+  if (!LcdGraphicsOutputOsWillProgramDisplay ()) {
+    DEBUG ((
+      DEBUG_INFO,
+      "%a: OS is using the firmware framebuffer, leaving the display up\n",
+      __func__
+      ));
+    return;
+  }
+
+  for (Index = 0; Index < mLcdInstance->DisplayStatesCount; Index++) {
+    DisplayState = mLcdInstance->DisplayStates[Index];
+    if ((DisplayState == NULL) || !DisplayState->IsEnable) {
+      continue;
+    }
+
+    ConnectorState = &DisplayState->ConnectorState;
+    Connector      = (ROCKCHIP_CONNECTOR_PROTOCOL *)ConnectorState->Connector;
+    if (Connector == NULL) {
+      continue;
+    }
+
+    if (Connector->Disable != NULL) {
+      Connector->Disable (Connector, DisplayState);
+    }
+
+    if (Connector->Unprepare != NULL) {
+      Connector->Unprepare (Connector, DisplayState);
+    }
+  }
+}
+
 VOID
 EFIAPI
 LcdGraphicsOutputEndOfDxeEventHandler (
@@ -690,6 +816,7 @@ LcdGraphicsOutputDxeInitialize (
 {
   EFI_STATUS  Status;
   EFI_EVENT   EndOfDxeEvent;
+  EFI_EVENT   ExitBootServicesEvent;
 
   Status = gBS->LocateProtocol (
                   &gEfiCpuArchProtocolGuid,
@@ -708,6 +835,15 @@ LcdGraphicsOutputDxeInitialize (
                   NULL,
                   &gEfiEndOfDxeEventGroupGuid,
                   &EndOfDxeEvent
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  Status = gBS->CreateEvent (
+                  EVT_SIGNAL_EXIT_BOOT_SERVICES,
+                  TPL_NOTIFY,
+                  LcdGraphicsOutputExitBootServicesHandler,
+                  NULL,
+                  &ExitBootServicesEvent
                   );
   ASSERT_EFI_ERROR (Status);
 

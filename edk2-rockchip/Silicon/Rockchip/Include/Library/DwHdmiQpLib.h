@@ -1004,4 +1004,9 @@ HdptxRopllCmnConfig (
   IN  UINT32                       BitRate
   );
 
+VOID
+HdptxPowerDown (
+  OUT struct RockchipHdptxPhyHdmi  *Hdptx
+  );
+
 #endif

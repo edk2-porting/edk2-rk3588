@@ -93,6 +93,7 @@
       VarStoreData.h
   }
   gRK3588TokenSpaceGuid.PcdDisplayForceOutputDefault|FALSE|BOOLEAN|0x00010805
+  gRK3588TokenSpaceGuid.PcdDisplayResetBeforeBootDefault|TRUE|BOOLEAN|0x00010809
   gRK3588TokenSpaceGuid.PcdDisplayDuplicateOutputDefault|FALSE|BOOLEAN|0x00010806
   gRK3588TokenSpaceGuid.PcdDisplayRotationDefault|0|UINT16|0x00010807
   gRK3588TokenSpaceGuid.PcdHdmiSignalingModeDefault|0|UINT8|0x00010808
@@ -166,6 +167,7 @@
       VarStoreData.h
   }
   gRK3588TokenSpaceGuid.PcdDisplayForceOutput|FALSE|BOOLEAN|0x00000805
+  gRK3588TokenSpaceGuid.PcdDisplayResetBeforeBoot|TRUE|BOOLEAN|0x00000809
   gRK3588TokenSpaceGuid.PcdDisplayDuplicateOutput|FALSE|BOOLEAN|0x00000806
   gRK3588TokenSpaceGuid.PcdDisplayRotation|0|UINT16|0x00000807
   gRK3588TokenSpaceGuid.PcdHdmiSignalingMode|0|UINT8|0x00000808

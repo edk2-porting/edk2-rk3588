@@ -832,6 +832,47 @@ HdptxPrePowerUp (
   GrfWrite (Hdptx, GRF_HDPTX_CON0, Val, 0);
 }
 
+/**
+  Put the HDMI PHY back the way it was found before anything configured it.
+
+  Firmware hands the display over to the operating system still running, and
+  the kernel's PHY driver reprograms only what it believes has changed. Where
+  the rate it wants matches the rate left behind, it concludes there is nothing
+  to do and inherits this configuration wholesale -- including the colour depth
+  the controller was set up for, which the kernel does not necessarily pick
+  again. The two then disagree and the sink never locks.
+
+  Holding the resets and dropping the PLL, bias and bandgap enables is what the
+  power-up path starts from, so the next driver to touch the PHY has to bring it
+  up from the beginning and cannot skip a step. It is the same teardown the
+  Linux driver performs.
+
+**/
+VOID
+HdptxPowerDown (
+  OUT struct RockchipHdptxPhyHdmi  *Hdptx
+  )
+{
+  //
+  // Assert lane, cmn and init resets.
+  //
+  if (!Hdptx->Id) {
+    CruWrite (PMU1CRU_SOFTRST_CON03, 0x3800, 0x3800);
+  } else {
+    CruWrite (PMU1CRU_SOFTRST_CON03, BIT (15), BIT (15));
+    CruWrite (PMU1CRU_SOFTRST_CON04, 0x3, 0x3);
+  }
+
+  GrfWrite (
+    Hdptx,
+    GRF_HDPTX_CON0,
+    HDPTX_I_PLL_EN | HDPTX_I_BIAS_EN | HDPTX_I_BGR_EN,
+    0
+    );
+
+  DEBUG ((DEBUG_INFO, "%a: HDMI PHY %u powered down\n", __func__, Hdptx->Id));
+}
+
 STATIC
 EFI_STATUS
 HdptxPostEnablePll (
