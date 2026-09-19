@@ -320,6 +320,7 @@
   UefiBootManagerLib|MdeModulePkg/Library/UefiBootManagerLib/UefiBootManagerLib.inf
 
 [LibraryClasses.common.UEFI_DRIVER]
+  RngLib|MdePkg/Library/DxeRngLib/DxeRngLib.inf
   ReportStatusCodeLib|MdeModulePkg/Library/DxeReportStatusCodeLib/DxeReportStatusCodeLib.inf
   ExtractGuidedSectionLib|MdePkg/Library/DxeExtractGuidedSectionLib/DxeExtractGuidedSectionLib.inf
   PerformanceLib|MdeModulePkg/Library/DxePerformanceLib/DxePerformanceLib.inf
