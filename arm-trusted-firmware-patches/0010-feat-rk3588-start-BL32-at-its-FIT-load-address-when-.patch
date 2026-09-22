@@ -1,0 +1,95 @@
+From 587e2f17e4f93ada6a36f7ad2dfbfb4dd5a21090 Mon Sep 17 00:00:00 2001
+From: Nikolay Bryskin <nikicat@users.noreply.github.com>
+Date: Sat, 19 Sep 2026 22:14:29 +0000
+Subject: [PATCH 10/11] feat(rk3588): start BL32 at its FIT load address when
+ the loader passes none
+
+Rockchip's SPL (rk3588_spl_v1.12 as shipped by edk2-rk3588) loads the
+FIT's "optee" image at 0x08400000 but hands BL31 a zero BL32 entry
+point, so a BL31 built with SPD=opteed never starts OP-TEE and every
+OP-TEE SMC returns SMC_UNK. Fall back to the fixed load address when the
+loader passed nothing; platforms that do not define PLAT_RK_SEC_DRAM_BASE
+keep the old behaviour.
+
+The SPL also leaves the BL32 arguments uninitialised (on the board below
+arg0 held 0x3fe0000 and arg2/arg3 leftover code). The OP-TEE dispatcher
+reads arg0 as the AArch32/AArch64 selector, so with only the entry point
+fixed OP-TEE was entered in AArch32 state and hung before BL33. Clear
+the arguments in the fallback as well.
+
+Tested on a Radxa ROCK 5B with edk2-rk3588 v1.1 and upstream OP-TEE 4.10.
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01VPqq7YaURA87cbGTbVXbrZ
+Change-Id: I90b7a9c390782cbdd8de7a25f7d2e884a1875f00
+Signed-off-by: Nikolay Bryskin <nikicat@users.noreply.github.com>
+---
+ plat/rockchip/common/bl31_plat_setup.c      | 21 +++++++++++++++++++++
+ plat/rockchip/rk3588/include/platform_def.h |  8 ++++++++
+ 2 files changed, 29 insertions(+)
+
+diff --git a/plat/rockchip/common/bl31_plat_setup.c b/plat/rockchip/common/bl31_plat_setup.c
+index 5448e47ec..f95553cd3 100644
+--- a/plat/rockchip/common/bl31_plat_setup.c
++++ b/plat/rockchip/common/bl31_plat_setup.c
+@@ -10,6 +10,7 @@
+ 
+ #include <common/bl_common.h>
+ #include <common/debug.h>
++#include <lib/utils.h>
+ #include <common/desc_image_load.h>
+ #include <drivers/console.h>
+ #include <drivers/generic_delay_timer.h>
+@@ -18,6 +19,10 @@
+ #include <plat_private.h>
+ #include <plat/common/platform.h>
+ 
++#ifndef PLAT_RK_SEC_DRAM_BASE
++#define PLAT_RK_SEC_DRAM_BASE	0
++#endif
++
+ static entry_point_info_t bl32_ep_info;
+ static entry_point_info_t bl33_ep_info;
+ 
+@@ -69,6 +74,22 @@ void bl31_early_platform_setup2(u_register_t arg0, u_register_t arg1,
+ 	VERBOSE("bl31_setup\n");
+ 
+ 	bl31_params_parse_helper(arg0, &bl32_ep_info, &bl33_ep_info);
++
++	/*
++	 * Rockchip's SPL loads a FIT "optee" image at its load address but
++	 * passes no BL32 entry point, so OP-TEE never starts. Use the FIT's
++	 * fixed load address when the loader passed nothing. The SPL leaves
++	 * the BL32 arguments uninitialised too; the OP-TEE dispatcher reads
++	 * arg0 as the AArch32/AArch64 selector, so clear them.
++	 */
++	if (bl32_ep_info.pc == 0 && PLAT_RK_SEC_DRAM_BASE != 0) {
++		SET_PARAM_HEAD(&bl32_ep_info, PARAM_EP, VERSION_1, 0);
++		SET_SECURITY_STATE(bl32_ep_info.h.attr, SECURE);
++		bl32_ep_info.pc = PLAT_RK_SEC_DRAM_BASE;
++		bl32_ep_info.spsr = SPSR_64(MODE_EL1, MODE_SP_ELX,
++					    DISABLE_ALL_EXCEPTIONS);
++		zeromem(&bl32_ep_info.args, sizeof(bl32_ep_info.args));
++	}
+ }
+ 
+ /*******************************************************************************
+diff --git a/plat/rockchip/rk3588/include/platform_def.h b/plat/rockchip/rk3588/include/platform_def.h
+index afc7f2bf8..4637dbe7e 100644
+--- a/plat/rockchip/rk3588/include/platform_def.h
++++ b/plat/rockchip/rk3588/include/platform_def.h
+@@ -80,6 +80,14 @@
+  * Put BL3-1 at the top of the Trusted RAM
+  */
+ #define BL31_BASE		(TZRAM_BASE + 0x40000)
++
++/*
++ * Start of the secure DRAM carve-out reserved for BL32, where the FIT the SPL
++ * loads places it.  A property of the platform, not of any particular BL32
++ * build: it is the window the non-secure loader has to keep out of the memory
++ * map it hands the OS.  0 disables the fallback.
++ */
++#define PLAT_RK_SEC_DRAM_BASE	0x08400000
+ #define BL31_LIMIT		(TZRAM_BASE + TZRAM_SIZE)
+ 
+ /*******************************************************************************

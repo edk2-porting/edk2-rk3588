@@ -1,0 +1,122 @@
+From 8ff0f12c375017ca704d0bdd54ccca9cf872285e Mon Sep 17 00:00:00 2001
+From: Nikolay Bryskin <nikicat@users.noreply.github.com>
+Date: Sat, 19 Sep 2026 22:14:29 +0000
+Subject: [PATCH 11/11] feat(rk3588): firewall the secure DRAM window reserved
+ for BL32
+
+Upstream OP-TEE for rk3588 programs the DDR/DSU firewall for its own
+memory from S-EL1. On a ROCK 5B running edk2-rk3588 that register write
+never returns and the primary core hangs in OP-TEE's platform_init. BL31
+already owns that block anyway: it clears regions 1-15, takes region 0
+for TZRAM, and carries every RGN/MST/CON register through suspend in
+PMUSRAM. Configure region 1 here as well, the index OP-TEE itself would
+use, next to region 0 (BL31) and region 2 (the DDR alias window), so
+OP-TEE can be built with its own firewall programming disabled
+(CFG_RK3588_FIREWALL_BY_BL31).
+
+What is protected is PLAT_RK_SEC_DRAM_BASE/SIZE, the secure DRAM window
+this platform reserves, rather than any particular BL32's base and size:
+a BL32 that moves within the window or grows is not a TF-A change. A
+loader-supplied BL32 entry point is checked against the window and panics
+when it falls outside, so a loader and TF-A disagreeing about where BL32
+lives fails loudly instead of leaving BL32 unprotected. The handover
+carries no BL32 size, so only the entry point can be checked.
+
+Co-Authored-By: Claude Fable 5.1 <noreply@anthropic.com>
+Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01VPqq7YaURA87cbGTbVXbrZ
+Claude-Session: https://claude.ai/code/session_01Rqe5yoJTwPu4ZZKb96vijY
+Signed-off-by: Nikolay Bryskin <nikicat@users.noreply.github.com>
+---
+ plat/rockchip/common/bl31_plat_setup.c       | 17 +++++++++++++++++
+ plat/rockchip/rk3588/drivers/secure/secure.c | 11 +++++++++++
+ plat/rockchip/rk3588/include/platform_def.h  | 17 +++++++++++++----
+ 3 files changed, 41 insertions(+), 4 deletions(-)
+
+diff --git a/plat/rockchip/common/bl31_plat_setup.c b/plat/rockchip/common/bl31_plat_setup.c
+index f95553cd3..d11d3693c 100644
+--- a/plat/rockchip/common/bl31_plat_setup.c
++++ b/plat/rockchip/common/bl31_plat_setup.c
+@@ -21,6 +21,7 @@
+ 
+ #ifndef PLAT_RK_SEC_DRAM_BASE
+ #define PLAT_RK_SEC_DRAM_BASE	0
++#define PLAT_RK_SEC_DRAM_SIZE	0
+ #endif
+ 
+ static entry_point_info_t bl32_ep_info;
+@@ -90,6 +91,22 @@ void bl31_early_platform_setup2(u_register_t arg0, u_register_t arg1,
+ 					    DISABLE_ALL_EXCEPTIONS);
+ 		zeromem(&bl32_ep_info.args, sizeof(bl32_ep_info.args));
+ 	}
++
++	/*
++	 * A loader that does pass a BL32 entry point decides where BL32 runs,
++	 * so check it against the window this platform firewalls rather than
++	 * assuming the two agree.  Only the entry point is available here (the
++	 * handover carries no BL32 size), so a BL32 that starts inside the
++	 * window but outgrows it is left for BL32 itself to notice.
++	 */
++	if (PLAT_RK_SEC_DRAM_SIZE != 0 && bl32_ep_info.pc != 0 &&
++	    (bl32_ep_info.pc < PLAT_RK_SEC_DRAM_BASE ||
++	     bl32_ep_info.pc >= PLAT_RK_SEC_DRAM_BASE + PLAT_RK_SEC_DRAM_SIZE)) {
++		ERROR("BL32 entry 0x%lx outside the secure DRAM window 0x%x-0x%x\n",
++		      (unsigned long)bl32_ep_info.pc, PLAT_RK_SEC_DRAM_BASE,
++		      PLAT_RK_SEC_DRAM_BASE + PLAT_RK_SEC_DRAM_SIZE);
++		panic();
++	}
+ }
+ 
+ /*******************************************************************************
+diff --git a/plat/rockchip/rk3588/drivers/secure/secure.c b/plat/rockchip/rk3588/drivers/secure/secure.c
+index 843bdd9a9..e53df8742 100644
+--- a/plat/rockchip/rk3588/drivers/secure/secure.c
++++ b/plat/rockchip/rk3588/drivers/secure/secure.c
+@@ -165,6 +165,17 @@ static void secure_region_init(void)
+ 	 * OP-TEE uses region 1 to configure its TZDRAM range.
+ 	 */
+ 	ddr_alias_rgn_protect(2);
++	/*
++	 * Region 1: the secure DRAM window reserved for BL32, on the index
++	 * OP-TEE would use for its TZDRAM if it programmed the firewall
++	 * itself.  BL31 already owns this block: it clears regions 1-15 above,
++	 * takes region 0 for TZRAM, and carries every RGN/MST/CON register
++	 * through suspend in PMUSRAM.
++	 */
++	dsu_fw_rgn_config(PLAT_RK_SEC_DRAM_BASE >> 20,
++			  (PLAT_RK_SEC_DRAM_BASE + PLAT_RK_SEC_DRAM_SIZE) >> 20, 1);
++	ddr_fw_rgn_config(PLAT_RK_SEC_DRAM_BASE >> 20,
++			  (PLAT_RK_SEC_DRAM_BASE + PLAT_RK_SEC_DRAM_SIZE) >> 20, 1);
+ 
+ 	/* Use FIREWALL_SYSMEM_RGN0 to config SRAM_ENTRY code(0~4k of sram) to secure */
+ 	sram_fw_rgn_config(0, 4, 0);
+diff --git a/plat/rockchip/rk3588/include/platform_def.h b/plat/rockchip/rk3588/include/platform_def.h
+index 4637dbe7e..e2512570b 100644
+--- a/plat/rockchip/rk3588/include/platform_def.h
++++ b/plat/rockchip/rk3588/include/platform_def.h
+@@ -82,12 +82,21 @@
+ #define BL31_BASE		(TZRAM_BASE + 0x40000)
+ 
+ /*
+- * Start of the secure DRAM carve-out reserved for BL32, where the FIT the SPL
+- * loads places it.  A property of the platform, not of any particular BL32
+- * build: it is the window the non-secure loader has to keep out of the memory
+- * map it hands the OS.  0 disables the fallback.
++ * Secure DRAM carve-out reserved for BL32: a property of the platform, not of
++ * any particular BL32 build.  It is the window the non-secure loader has to
++ * keep out of the memory map it hands the OS, declared here the same way
++ * TZRAM_BASE/TZRAM_SIZE above declare BL31's.  BL31 firewalls the whole
++ * window; a BL32 of any size boots as long as it fits inside it.  0 disables
++ * both the firewall region and the entry-point fallback.
+  */
+ #define PLAT_RK_SEC_DRAM_BASE	0x08400000
++/*
++ * The whole 16 MiB reserved window.  A build that puts a normal-world-readable
++ * RAM console inside it, for a board whose debug UART is not reachable, has to
++ * shrink this by the size of that console: leaving the tail non-secure lets the
++ * non-secure world read whatever BL32 logs there, so it is not the default.
++ */
++#define PLAT_RK_SEC_DRAM_SIZE	0x01000000
+ #define BL31_LIMIT		(TZRAM_BASE + TZRAM_SIZE)
+ 
+ /*******************************************************************************
