@@ -44,6 +44,7 @@
   DebugLib
   DevicePathLib
   DxeServicesLib
+  DxeServicesTableLib
   HobLib
   MemoryAllocationLib
   PcdLib
@@ -87,9 +88,11 @@
   gEfiBootManagerPolicyProtocolGuid
   gEfiDevicePathProtocolGuid
   gEfiGraphicsOutputProtocolGuid
+  gEfiI2cMasterProtocolGuid
   gEfiLoadedImageProtocolGuid
   gEfiPciRootBridgeIoProtocolGuid
   gEfiSimpleFileSystemProtocolGuid
   gEsrtManagementProtocolGuid
   gPlatformBootManagerProtocolGuid
   gOhciDeviceProtocolGuid
+  gRockchipPlatformPowerReadyProtocolGuid  ## PRODUCES
