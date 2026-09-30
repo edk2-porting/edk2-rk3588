@@ -14,10 +14,13 @@
 #include <Library/RK806.h>
 #include <Library/Rk3588Pcie.h>
 #include <Library/PWMLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Protocol/Fusb302PlatformDevice.h>
+#include <Protocol/I2c.h>
+#include <dt-bindings/usb/pd.h>
 #include <Soc.h>
 #include <VarStoreData.h>
 #include <Library/RockchipPlatformLib.h>
-#include <dt-bindings/usb/pd.h>
 
 static struct regulator_init_data  rk806_init_data[] = {
   /* Master PMIC */
@@ -436,37 +439,76 @@ PlatformGetDtbFileGuid (
   return NULL;
 }
 
+// ROCK5B has no controllable Type-C VBUS source switch. It accepts 5 V,
+// up to 3 A, and routes the connector to USB/DP PHY 0.
+STATIC struct RK_FUSB302_DEVICE {
+  FUSB302_PLATFORM_DEVICE_PROTOCOL    Controller;
+  struct {
+    BOOLEAN    Valid;
+    UINT8      Bank;
+    UINT8      Pin;
+    BOOLEAN    ActiveHigh;
+  } VbusGpio;
+} mFusb302Devices[] = {
+  {
+    .Controller ={
+      .DeviceIndex = I2C_DEVICE_INDEX (4, 0x22),
+      .PhyId       = 0,
+      .SinkPdos    = {
+        PDO_FIXED (12000, 3000, PDO_FIXED_USB_COMM | PDO_FIXED_DATA_SWAP)
+      }
+    }
+  }
+};
+
+STATIC
+EFI_STATUS
+EFIAPI
+PlatformTypeCSetVbus (
+  IN FUSB302_PLATFORM_DEVICE_PROTOCOL  *This,
+  IN BOOLEAN                           Enable
+  )
+{
+  CONST struct RK_FUSB302_DEVICE  *Device;
+
+  if (This == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Device = BASE_CR (This, struct RK_FUSB302_DEVICE, Controller);
+
+  GpioPinWrite (Device->VbusGpio.Bank, Device->VbusGpio.Pin, Enable == Device->VbusGpio.ActiveHigh);
+  GpioPinSetDirection (Device->VbusGpio.Bank, Device->VbusGpio.Pin, GPIO_PIN_OUTPUT);
+
+  return EFI_SUCCESS;
+}
+
 VOID
 EFIAPI
 PlatformEarlyInit (
   VOID
   )
 {
+  EFI_STATUS  Status;
+  EFI_HANDLE  Handle;
+  UINTN       Index;
+
   // Configure various things specific to this platform
   PlatformPcieWiFiEnable (TRUE);
   GpioPinSetFunction (1, GPIO_PIN_PD5, 0); // jdet
-}
 
-/**
-  Describe one of this board's Type-C ports.
+  for (Index = 0; Index < ARRAY_SIZE (mFusb302Devices); Index++) {
+    mFusb302Devices[Index].Controller.DeviceGuid = (EFI_GUID)ROCKCHIP_I2C_DEVICE_GUID;
+    mFusb302Devices[Index].Controller.SetVbus    = mFusb302Devices[Index].VbusGpio.Valid ? PlatformTypeCSetVbus : NULL;
 
-**/
-EFI_STATUS
-EFIAPI
-PlatformGetTypeCPort (
-  IN  UINTN                             PortIndex,
-  OUT FUSB302_PLATFORM_DEVICE_PROTOCOL  *Port
-  )
-{
-  if (PortIndex >= 1) {
-    return EFI_UNSUPPORTED;
+    Handle = NULL;
+
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &Handle,
+                    &gFusb302PlatformDeviceProtocolGuid,
+                    &mFusb302Devices[Index].Controller,
+                    NULL
+                    );
+    ASSERT_EFI_ERROR (Status);
   }
-
-  //
-  // This board does not fit the Type-C VBUS switch its sibling designs
-  // carry, so there is nothing here to energise the rail with.
-  //
-  Port->SinkPdos[0] = PDO_FIXED (5000, 3000, PDO_FIXED_USB_COMM | PDO_FIXED_DATA_SWAP);
-
-  return EFI_SUCCESS;
 }

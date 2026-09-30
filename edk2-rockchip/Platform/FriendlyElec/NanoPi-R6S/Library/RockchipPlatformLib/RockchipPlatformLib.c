@@ -379,20 +379,3 @@ PlatformEarlyInit (
 {
   // Configure various things specific to this platform
 }
-
-/**
-  Describe one of this board's Type-C ports.
-
-**/
-EFI_STATUS
-EFIAPI
-PlatformGetTypeCPort (
-  IN  UINTN                             PortIndex,
-  OUT FUSB302_PLATFORM_DEVICE_PROTOCOL  *Port
-  )
-{
-  //
-  // No Type-C port controller on this board.
-  //
-  return EFI_UNSUPPORTED;
-}

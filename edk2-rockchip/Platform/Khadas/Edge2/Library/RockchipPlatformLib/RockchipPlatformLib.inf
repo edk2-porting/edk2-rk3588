@@ -38,4 +38,5 @@
   RockchipPlatformLib.c
 
 [Protocols]
+  gFusb302PlatformDeviceProtocolGuid   ## PRODUCES
   gKhadasMcuProtocolGuid

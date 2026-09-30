@@ -15,6 +15,10 @@
 #ifndef _RK_I2C_H__
 #define _RK_I2C_H__
 
+// Device class published by the Rockchip I2C enumerator.
+#define ROCKCHIP_I2C_DEVICE_GUID \
+  { 0xadc1901b, 0xb83c, 0x4831, { 0x8f, 0x59, 0x70, 0x89, 0x8f, 0x26, 0x57, 0x1e } }
+
 /*
  * I2C_FLAG_NORESTART is not part of PI spec, it allows to continue
  * transmission without repeated start operation.

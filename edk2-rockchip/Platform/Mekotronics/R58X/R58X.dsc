@@ -74,9 +74,6 @@
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorTags|{ $(SCMI_CLK_CPUB01), $(SCMI_CLK_CPUB23) }
   gPcf8563RealTimeClockLibTokenSpaceGuid.PcdI2cSlaveAddress|0x51
   gRockchipTokenSpaceGuid.PcdRtc8563Bus|0x6
-  gRockchipTokenSpaceGuid.PcdFusb302Addresses|{ 0x22 }
-  gRockchipTokenSpaceGuid.PcdFusb302Buses|{ 0x6 }
-  gRockchipTokenSpaceGuid.PcdFusb302PhyIds|{ 0x0 }
 
   # Disable HS400 for now, otherwise eMMC is unusable.
   gRockchipTokenSpaceGuid.PcdDwcSdhciDisableHs400|TRUE

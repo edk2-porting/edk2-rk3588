@@ -43,6 +43,7 @@ typedef struct _FUSB302_PLATFORM_DEVICE_PROTOCOL FUSB302_PLATFORM_DEVICE_PROTOCO
 
   @retval EFI_SUCCESS       The supply was switched.
   @retval EFI_DEVICE_ERROR  The supply could not be reached.
+  @retval EFI_INVALID_PARAMETER  This is not a supported port instance.
 
 **/
 typedef

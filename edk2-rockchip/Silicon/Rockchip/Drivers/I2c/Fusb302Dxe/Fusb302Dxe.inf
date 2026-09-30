@@ -43,8 +43,4 @@
   gUsbTypeCPortProtocolGuid             ## PRODUCES
 
 [Depex]
-  #
-  # The board has to have described its ports before the driver can tell
-  # whether an I2C device it is offered is one of them.
-  #
-  gFusb302PlatformDeviceProtocolGuid
+  TRUE

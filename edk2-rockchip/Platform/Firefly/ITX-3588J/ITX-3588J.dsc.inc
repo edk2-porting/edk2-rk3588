@@ -69,9 +69,6 @@
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorTags|{ $(SCMI_CLK_CPUB01), $(SCMI_CLK_CPUB23) }
   gPcf8563RealTimeClockLibTokenSpaceGuid.PcdI2cSlaveAddress|0x51
   gRockchipTokenSpaceGuid.PcdRtc8563Bus|0x6
-  gRockchipTokenSpaceGuid.PcdFusb302Addresses|{ 0x22 }
-  gRockchipTokenSpaceGuid.PcdFusb302Buses|{ 0x6 }
-  gRockchipTokenSpaceGuid.PcdFusb302PhyIds|{ 0x0 }
   gRockchipTokenSpaceGuid.PcdPca95xxAddress|0x21
   gRockchipTokenSpaceGuid.PcdPca95xxBus|0x6
   gRockchipTokenSpaceGuid.PcdPca95xxType|"PCA9555"

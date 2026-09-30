@@ -72,9 +72,6 @@
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorBuses|{ 0x0, 0x0 }
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorTags|{ $(SCMI_CLK_CPUB01), $(SCMI_CLK_CPUB23) }
   # Type-C 0 rides usbdp_phy0, Type-C 1 rides usbdp_phy1.
-  gRockchipTokenSpaceGuid.PcdFusb302Addresses|{ 0x22, 0x22 }
-  gRockchipTokenSpaceGuid.PcdFusb302Buses|{ 0x6, 0x1 }
-  gRockchipTokenSpaceGuid.PcdFusb302PhyIds|{ 0x0, 0x1 }
 
   #
   # PCIe/SATA/USB Combo PIPE PHY support flags and default values

@@ -113,7 +113,6 @@
   INF Silicon/Rockchip/Drivers/Pca95xxDxe/Pca95xxDxe.inf
 !endif
 !if $(RK_FUSB302_ENABLE) == TRUE
-  INF Silicon/Rockchip/Drivers/I2c/Fusb302PlatformRkDxe/Fusb302PlatformRkDxe.inf
   INF Silicon/Rockchip/Drivers/I2c/Fusb302Dxe/Fusb302Dxe.inf
 !endif
 
