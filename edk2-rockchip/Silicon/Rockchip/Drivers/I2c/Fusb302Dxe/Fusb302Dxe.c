@@ -381,11 +381,27 @@ Fusb302DetectOrientation (
   )
 {
   EFI_STATUS  Status;
+  UINTN       Waited;
 
   *Orientation             = UsbTypeCOrientationNone;
   Context->PartnerIsSource = FALSE;
 
   Status = Fusb302ProbeRole (Context, Fusb302RoleSink, Orientation);
+
+  //
+  // A sink cannot be what holds VBUS up. Where it is up and no Rp was seen
+  // yet, wait for the source to show it; probing as source now can find the
+  // partner's Rd and take it for a sink.
+  //
+  for (Waited = 0;
+       (Status == EFI_NOT_READY) && (Waited < FUSB302_SINK_PROBE_RETRY_US) &&
+       Fusb302SourceVbusPresent (Context);
+       Waited += FUSB302_SINK_PROBE_INTERVAL_US)
+  {
+    MicroSecondDelay (FUSB302_SINK_PROBE_INTERVAL_US);
+    Status = Fusb302ProbeRole (Context, Fusb302RoleSink, Orientation);
+  }
+
   if (!EFI_ERROR (Status)) {
     //
     // We matched while presenting Rd, so the partner is driving Rp: it is the

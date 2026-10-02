@@ -210,10 +210,6 @@ Fusb302SourcePdEnable (
   return EFI_SUCCESS;
 }
 
-/**
-  Wait for VBUS to be seen by the controller.
-**/
-STATIC
 BOOLEAN
 Fusb302SourceVbusPresent (
   IN FUSB302_CONTEXT  *Context

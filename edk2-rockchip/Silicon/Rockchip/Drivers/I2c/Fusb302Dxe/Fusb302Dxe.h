@@ -379,6 +379,13 @@
 //
 #define FUSB302_MEASURE_SETTLE_US           350
 
+//
+// How long to keep looking for a source's Rp while VBUS is up. After a
+// reboot a source can take a few hundred milliseconds to show it again.
+//
+#define FUSB302_SINK_PROBE_RETRY_US         (1000 * 1000)
+#define FUSB302_SINK_PROBE_INTERVAL_US      (50 * 1000)
+
 typedef struct {
   UINT16    Header;
   UINT32    Objects[PD_MAX_DATA_OBJECTS];
@@ -556,6 +563,15 @@ EFI_STATUS
 Fusb302SourceSetVbus (
   IN FUSB302_CONTEXT  *Context,
   IN BOOLEAN          Enable
+  );
+
+/**
+  Whether the controller sees VBUS, from whichever supply.
+
+**/
+BOOLEAN
+Fusb302SourceVbusPresent (
+  IN FUSB302_CONTEXT  *Context
   );
 
 EFI_STATUS
