@@ -61,6 +61,12 @@
   gRK3588TokenSpaceGuid.PcdUsbDpPhy1Supported|FALSE|BOOLEAN|0x00010502
   gRK3588TokenSpaceGuid.PcdDp0LaneMux|{ 0x0 }|VOID*|0x00010503
   gRK3588TokenSpaceGuid.PcdDp1LaneMux|{ 0x0 }|VOID*|0x00010504
+  # SBU1/SBU2 DC blocking switches, as { sbu1 bank, sbu1 pin, sbu2 bank, sbu2 pin }.
+  # These route the DisplayPort AUX pair to whichever half of the connector the
+  # plug landed on, so alternate mode needs them set per orientation. Leave at
+  # the default where the board has no such switches.
+  gRK3588TokenSpaceGuid.PcdUsbDpPhy0SbuGpios|{ 0x0 }|VOID*|0x00010505
+  gRK3588TokenSpaceGuid.PcdUsbDpPhy1SbuGpios|{ 0x0 }|VOID*|0x00010506
 
   gRK3588TokenSpaceGuid.PcdGmac0Supported|FALSE|BOOLEAN|0x00010601
   gRK3588TokenSpaceGuid.PcdGmac1Supported|FALSE|BOOLEAN|0x00010602

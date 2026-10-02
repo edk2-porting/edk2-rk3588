@@ -83,12 +83,12 @@ Note that this list is subject to change at any time as devices gain better supp
 
 | Device | Status | Notes |
 | --- | --- | --- |
-| USB 3 / 2.0 / 1.1                     | 🟢 Working     | Host-mode only, USB 3 devices connected to a Type-C port only work in one orientation. |
+| USB 3 / 2.0 / 1.1                     | 🟢 Working     | Host-mode only. With a FUSB302 either plug orientation works, without one only one does. SuperSpeed also needs both SS pairs routed to the connector; where they are not, a flipped plug falls back to high speed. |
 | PCIe 3.0 / 2.1                        | 🟢 Working     | |
 | SATA                                  | 🟢 Working     | |
 | SD/eMMC                               | 🟢 Working     | |
 | HDMI output                           | 🟢 Working     | |
-| DisplayPort output (USB-C)            | 🟡 Partial     | No hot-plug detect & EDID. Only works in one orientation of the Type-C port. Some displays may not work regardless. |
+| DisplayPort output (USB-C)            | 🟢 Working     | Detection goes through DisplayPort Alt Mode, as the SoC has no hot-plug detect wire here. EDID needs the Type-C sideband (SBU) routed to the connector; without it a default timing is used. Some displays may not work regardless. |
 | eDP output                            | 🟡 Partial     | Disabled, requires manual configuration depending on the platform and panel. |
 | DSI output                            | 🟢 Working     | Only enabled on Fydetab Duo. Requires manual configuration depending on the platform and panel. |
 | GMAC Ethernet                         | 🟢 Working     | |
@@ -100,7 +100,7 @@ Note that this list is subject to change at any time as devices gain better supp
 | Cooling fan                           | 🟢 Working     | Supported on most platforms. Fan connector where present, otherwise available at the GPIO header for 3-pin PWM fans (do *not* connect 2-pin fans there!):<br>* Orange Pi 5: `GPIO4_B2`<br>* Indiedroid Nova: `GPIO4_B4` |
 | Status LED                            | 🟢 Working     | |
 | Voltage regulators (RK806/RK860)      | 🟢 Working     | |
-| FUSB302 USB Type-C Controller         | 🔴 Not working | Required for PD negotiation and connector orientation switching |
+| FUSB302 USB Type-C Controller         | 🟢 Working     | Plug orientation, sink and source power delivery, and DisplayPort Alt Mode. Enabled on all seventeen platforms that carry one, fourteen of which also switch their own VBUS. Sampled once at startup, so a cable plugged in later is not noticed. The NanoPi M6/R6C/R6S and ROCK 5A have no port controller; the Fydetab Duo and H88K carry an HUSB311, which this driver does not speak. |
 
 # Getting started
 ## 1. Requirements
@@ -300,7 +300,7 @@ Assuming the firmware loads fine:
 
 * Try booting without any display connected, then plug it in after a couple of seconds (when the status LED pattern changes). This will force the firmware to output at the minimum supported resolution. You can then increase the resolution by going to `Device Manager`->`Rockchip Platform Configuration`->`Display`.
 
-* If you're using USB-C to DisplayPort, only one orientation of the USB-C connector will work. Check both.
+* On a board without a FUSB302, USB-C to DisplayPort works in only one orientation. Check both.
 
 If you are still not able to get any display output, the only way to interact with UEFI is via the [serial console](#advanced-troubleshooting).
 
@@ -309,7 +309,7 @@ This has been observed in cases where firmware was present on more than one devi
 
 ### USB 3 devices do not work
 * Try a different port.
-* If you're using USB-C, 3.0 devices will only work in one orientation of the connector. Check both.
+* On a board without a FUSB302, USB-C 3.0 devices work in only one orientation. Check both.
 * Make sure the power supply and cable are good.
 
 ### Networking does not work

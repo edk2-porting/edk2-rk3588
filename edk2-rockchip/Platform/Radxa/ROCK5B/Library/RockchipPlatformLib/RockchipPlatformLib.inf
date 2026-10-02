@@ -31,6 +31,10 @@
   CruLib
   GpioLib
   PWMLib
+  UefiBootServicesTableLib
+
+[Protocols]
+  gFusb302PlatformDeviceProtocolGuid   ## PRODUCES
 
 [Sources.common]
   RockchipPlatformLib.c

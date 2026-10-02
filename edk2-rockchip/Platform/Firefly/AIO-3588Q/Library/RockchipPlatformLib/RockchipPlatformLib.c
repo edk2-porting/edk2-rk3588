@@ -19,6 +19,10 @@
 #include <Library/UefiBootServicesTableLib.h>
 
 #include <Protocol/Pca95xx.h>
+#include <Library/RockchipPlatformLib.h>
+#include <Protocol/Fusb302PlatformDevice.h>
+#include <Protocol/I2c.h>
+#include <dt-bindings/usb/pd.h>
 
 static struct regulator_init_data  rk806_init_data[] = {
   /* Master PMIC */
@@ -500,13 +504,76 @@ PlatformGetDtbFileGuid (
   return NULL;
 }
 
+// The VBUS enable is behind a PCA9555 expander; this port stays sink-only.
+STATIC struct RK_FUSB302_DEVICE {
+  FUSB302_PLATFORM_DEVICE_PROTOCOL    Controller;
+  struct {
+    BOOLEAN    Valid;
+    UINT8      Bank;
+    UINT8      Pin;
+    BOOLEAN    ActiveHigh;
+  } VbusGpio;
+} mFusb302Devices[] = {
+  {
+    .Controller ={
+      .DeviceIndex = I2C_DEVICE_INDEX (6, 0x22),
+      .PhyId       = 0,
+      .SelfPowered = TRUE,
+      .SinkPdos    = {
+        PDO_FIXED (5000, 3000, PDO_FIXED_USB_COMM | PDO_FIXED_DATA_SWAP)
+      }
+    }
+  }
+};
+
+STATIC
+EFI_STATUS
+EFIAPI
+PlatformTypeCSetVbus (
+  IN FUSB302_PLATFORM_DEVICE_PROTOCOL  *This,
+  IN BOOLEAN                           Enable
+  )
+{
+  CONST struct RK_FUSB302_DEVICE  *Device;
+
+  if (This == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Device = BASE_CR (This, struct RK_FUSB302_DEVICE, Controller);
+
+  GpioPinWrite (Device->VbusGpio.Bank, Device->VbusGpio.Pin, Enable == Device->VbusGpio.ActiveHigh);
+  GpioPinSetDirection (Device->VbusGpio.Bank, Device->VbusGpio.Pin, GPIO_PIN_OUTPUT);
+
+  return EFI_SUCCESS;
+}
+
 VOID
 EFIAPI
 PlatformEarlyInit (
   VOID
   )
 {
+  EFI_STATUS  Status;
+  EFI_HANDLE  Handle;
+  UINTN       Index;
+
   GpioPinSetDirection (4, GPIO_PIN_PB0, GPIO_PIN_OUTPUT); // headphone enable
   GpioPinWrite (4, GPIO_PIN_PB0, TRUE);
   GpioPinSetFunction (1, GPIO_PIN_PC4, 0); // headphone detect
+
+  for (Index = 0; Index < ARRAY_SIZE (mFusb302Devices); Index++) {
+    mFusb302Devices[Index].Controller.DeviceGuid = (EFI_GUID)ROCKCHIP_I2C_DEVICE_GUID;
+    mFusb302Devices[Index].Controller.SetVbus    = mFusb302Devices[Index].VbusGpio.Valid ? PlatformTypeCSetVbus : NULL;
+
+    Handle = NULL;
+
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &Handle,
+                    &gFusb302PlatformDeviceProtocolGuid,
+                    &mFusb302Devices[Index].Controller,
+                    NULL
+                    );
+    ASSERT_EFI_ERROR (Status);
+  }
 }

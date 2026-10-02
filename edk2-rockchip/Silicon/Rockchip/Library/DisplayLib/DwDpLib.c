@@ -37,6 +37,7 @@
 
 #include <Protocol/RockchipConnectorProtocol.h>
 #include <Protocol/DpPhy.h>
+#include <Protocol/UsbTypeCPort.h>
 
 #define DPTX_VERSION_NUMBER			0x0000
 #define DPTX_VERSION_TYPE			0x0004
@@ -584,8 +585,12 @@ static int dw_dp_link_probe(struct dw_dp *dp)
 	int ret;
 
 	ret = drm_dp_read_dpcd_caps(&dp->aux, link->dpcd);
-	if (ret < 0)
+	if (ret < 0) {
+		DEBUG ((DEBUG_WARN,
+			"%a: cannot read DPCD over AUX (%d); no sink responding\n",
+			__func__, ret));
 		return ret;
+	}
 
 	ret = drm_dp_dpcd_readb(&dp->aux, DP_DPRX_FEATURE_ENUMERATION_LIST,
 				&dpcd);
@@ -607,6 +612,15 @@ static int dw_dp_link_probe(struct dw_dp *dp)
 	link->caps.channel_coding = drm_dp_channel_coding_supported(link->dpcd);
 	link->caps.ssc = !!(link->dpcd[DP_MAX_DOWNSPREAD] &
 			    DP_MAX_DOWNSPREAD_0_5);
+
+	DEBUG ((DEBUG_INFO,
+		"%a: sink DPCD rev %u.%u, link %u kHz x%u lanes "
+		"(phy offers %u kHz x%u)\n",
+		__func__,
+		(link->revision >> 4) & 0xF, link->revision & 0xF,
+		link->rate, link->lanes,
+		dp->phy->Capabilities.MaximumLinkRate * 100,
+		dp->phy->Capabilities.BusWidth));
 
 	return 0;
 }
@@ -1620,6 +1634,25 @@ static int dw_dp_connector_prepare(ROCKCHIP_CONNECTOR_PROTOCOL *conn, DISPLAY_ST
 	return 0;
 }
 
+static bool dw_dp_typec_hpd(struct dw_dp *dp, bool *present);
+
+/*
+ * Rebuild the PHY on the orientation the port controller has since reported.
+ *
+ * dw_dp_typec_hpd() is what starts that controller -- its first call connects
+ * the I2C buses -- so the alternate mode entered there, and the plug
+ * orientation that comes with it, are both newer than the mapping the PHY was
+ * built with during connector init. AUX is polarity sensitive: left on the
+ * board default it times out on every transaction with a flipped plug.
+ */
+static void dw_dp_phy_reload(struct dw_dp *dp)
+{
+	dp->phy->PowerOn (dp->phy);
+
+	/* Let the rebuilt PHY come back before using AUX. */
+	mdelay(20);
+}
+
 static int dw_dp_connector_enable(ROCKCHIP_CONNECTOR_PROTOCOL *conn, DISPLAY_STATE *state)
 {
 	CONNECTOR_STATE *conn_state = &state->ConnectorState;
@@ -1630,6 +1663,37 @@ static int dw_dp_connector_enable(ROCKCHIP_CONNECTOR_PROTOCOL *conn, DISPLAY_STA
 
 	memcpy(&video->mode, mode, sizeof(video->mode));
 	video->pixel_mode = DPTX_MP_QUAD_PIXEL;
+
+	/*
+	 * Behind a Type-C connector the sink is only reachable once alternate
+	 * mode has been entered, and that happens after the display subsystem
+	 * has probed its connectors -- the port controller sits on I2C and is
+	 * not started until later. Detection therefore records the port as
+	 * empty and leaves it forced, which drives it blind: no DPCD, no link
+	 * training, and a sink that shows nothing.
+	 *
+	 * By the time the link is enabled alternate mode is up and AUX works,
+	 * so ask once more before giving up on a real link. Anything that
+	 * still does not answer stays forced, exactly as before.
+	 */
+	if (dp->force_output) {
+		bool present = false;
+
+		if (dw_dp_typec_hpd(dp, &present) && present) {
+			dw_dp_phy_reload(dp);
+
+			/*
+			 * Where AUX does answer this gets a trained link and a
+			 * real mode from EDID. Where it does not -- SBU is not
+			 * routed on every board -- the port stays forced, which
+			 * now at least drives the correct lanes.
+			 */
+			if (dw_dp_link_probe(dp) == 0) {
+				printf("sink answered on AUX after detection; training the link\n");
+				dp->force_output = false;
+			}
+		}
+	}
 
 	if (dp->force_output) {
 		ret = dw_dp_set_phy_default_config(dp);
@@ -1688,17 +1752,123 @@ static int dw_dp_connector_disable(ROCKCHIP_CONNECTOR_PROTOCOL *conn, DISPLAY_ST
 	return 0;
 }
 
+/*
+ * The Type-C port controller sits on I2C, and nothing connects those buses
+ * until I2cDxe's own EndOfDxe handler runs. Display detection is an EndOfDxe
+ * handler too, registered at the same TPL, and in practice it runs first -- so
+ * a port that is present and negotiated by the time anything is drawn still
+ * looks absent while the connector is being probed.
+ *
+ * Connect the masters ourselves the first time we go looking. ConnectController
+ * is idempotent, so this costs nothing once I2cDxe has been through, and the
+ * negotiation it triggers would have happened moments later regardless.
+ */
+static void dw_dp_connect_i2c_buses(void)
+{
+	static bool			done = false;
+	EFI_STATUS			Status;
+	EFI_HANDLE			*Handles = NULL;
+	UINTN				HandleCount = 0;
+	UINTN				Index;
+
+	if (done)
+		return;
+
+	Status = gBS->LocateHandleBuffer (ByProtocol, &gEfiI2cMasterProtocolGuid,
+					  NULL, &HandleCount, &Handles);
+	if (EFI_ERROR (Status))
+		return;
+
+	done = true;
+
+	for (Index = 0; Index < HandleCount; Index++)
+		gBS->ConnectController (Handles[Index], NULL, NULL, TRUE);
+
+	FreePool (Handles);
+}
+
+/*
+ * Hot-plug detect for a DisplayPort sink reached over a Type-C connector does
+ * not arrive on a wire: there is no HPD pin in the cable, and nothing on these
+ * boards drives the controller's HPD input, so DPTX_HPD_STATUS stays low no
+ * matter what is plugged in. The state is carried in a DisplayPort Status
+ * message instead, which the Type-C port driver collects when it enters the
+ * mode.
+ *
+ * Returns TRUE when a Type-C port owns this PHY and answered, in which case
+ * Present says whether a display is out there.
+ */
+static bool dw_dp_typec_hpd(struct dw_dp *dp, bool *present)
+{
+	EFI_STATUS			Status;
+	EFI_HANDLE			*Handles = NULL;
+	UINTN				HandleCount = 0;
+	UINTN				Index;
+	USB_TYPE_C_PORT_PROTOCOL	*Port;
+	USB_TYPE_C_DP_ALT_MODE		AltMode;
+	bool				found = false;
+
+	dw_dp_connect_i2c_buses();
+
+	Status = gBS->LocateHandleBuffer (ByProtocol, &gUsbTypeCPortProtocolGuid,
+					  NULL, &HandleCount, &Handles);
+	if (EFI_ERROR (Status))
+		return false;
+
+	for (Index = 0; Index < HandleCount; Index++) {
+		Status = gBS->HandleProtocol (Handles[Index],
+					      &gUsbTypeCPortProtocolGuid,
+					      (VOID **) &Port);
+		if (EFI_ERROR (Status) || Port->PhyId != (UINT32) dp->id)
+			continue;
+
+		Status = Port->GetDpAltMode (Port, &AltMode);
+		if (EFI_ERROR (Status)) {
+			/*
+			 * A port is there but is not in DisplayPort Alt Mode,
+			 * so nothing that could drive a display is attached.
+			 */
+			*present = false;
+			found = true;
+			break;
+		}
+
+		*present = AltMode.HpdAsserted;
+		found = true;
+		break;
+	}
+
+	FreePool (Handles);
+
+	return found;
+}
+
 static int dw_dp_connector_detect(ROCKCHIP_CONNECTOR_PROTOCOL *conn, DISPLAY_STATE *state)
 {
 	struct dw_dp *dp = DW_DP_FROM_CONNECTOR_PROTOCOL (conn);
+	bool present = false;
 	u32 value;
 	int ret;
 
 	if (!dp->force_hpd) {
-		regmap_read(dp->regmap, DPTX_HPD_STATUS, &value);
+		if (dw_dp_typec_hpd(dp, &present)) {
+			if (!present)
+				return -ENODEV;
 
-		if (FIELD_GET(HPD_STATE, value) != SOURCE_STATE_PLUG)
-			return -ENODEV;
+			/*
+			 * That call is what started the port controller, so the
+			 * PHY is still on the mapping it was built with. Rebuild
+			 * it before the probe below touches AUX: getting EDID
+			 * here is what picks the mode, and a probe that fails
+			 * leaves the display on the lowest one this driver has.
+			 */
+			dw_dp_phy_reload(dp);
+		} else {
+			regmap_read(dp->regmap, DPTX_HPD_STATUS, &value);
+
+			if (FIELD_GET(HPD_STATE, value) != SOURCE_STATE_PLUG)
+				return -ENODEV;
+		}
 	}
 
 	/*
@@ -1763,6 +1933,9 @@ DwDpConnectorDetect (
 	int ret;
 
 	ret = dw_dp_connector_detect(This, DisplayState);
+
+	DEBUG ((DEBUG_INFO, "%a: detect returned %d\n", __func__, ret));
+
 	if (ret)
 		return EFI_NOT_FOUND;
 
@@ -1778,6 +1951,9 @@ DwDpConnectorGetEdid (
 	int ret;
 
 	ret = dw_dp_connector_get_edid(This, DisplayState);
+
+	DEBUG ((DEBUG_INFO, "%a: EDID read returned %d\n", __func__, ret));
+
 	if (ret)
 		return EFI_DEVICE_ERROR;
 
@@ -1796,6 +1972,9 @@ DwDpConnectorEnable (
 	dw_dp_connector_prepare (This, DisplayState);
 
 	ret = dw_dp_connector_enable(This, DisplayState);
+
+	DEBUG ((DEBUG_INFO, "%a: enable returned %d\n", __func__, ret));
+
 	if (ret)
 		return EFI_DEVICE_ERROR;
 

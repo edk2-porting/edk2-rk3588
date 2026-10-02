@@ -1,0 +1,117 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+
+#include "rk3588-orangepi-5-plus.dts"
+
+/*
+ * Upstream wires the Type-C port for USB and plug orientation but stops short
+ * of DisplayPort: the connector declares no alt modes, there is no dp0 node,
+ * and the USBDP PHY still uses the old two-endpoint graph, which has no place
+ * to attach one. Rebuild the graph on the current four-endpoint binding and
+ * add the DP pipeline behind it.
+ *
+ * The lane mapping is deliberately left undescribed: the lanes are assigned by
+ * DisplayPort Alt Mode negotiation here, and the binding says
+ * rockchip,dp-lane-mux is not needed in that case.
+ */
+&usb_con {
+	altmodes {
+		displayport {
+			svid = /bits/ 16 <0xff01>;
+			vdo = <0xffffffff>;
+		};
+	};
+};
+
+&usbc0_hs {
+	remote-endpoint = <&usb_host0_xhci_hs>;
+};
+
+&usbc0_ss {
+	remote-endpoint = <&usbdp_phy0_ss_out>;
+};
+
+&usbc0_sbu {
+	remote-endpoint = <&usbdp_phy0_dp_out>;
+};
+
+&usbdp_phy0 {
+	/delete-node/ port;
+
+	port {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		usbdp_phy0_ss_out: endpoint@0 {
+			reg = <0>;
+			remote-endpoint = <&usbc0_ss>;
+		};
+
+		usbdp_phy0_ss_in: endpoint@1 {
+			reg = <1>;
+			remote-endpoint = <&usb_host0_xhci_ss>;
+		};
+
+		usbdp_phy0_dp_in: endpoint@2 {
+			reg = <2>;
+			remote-endpoint = <&dp0_out_con>;
+		};
+
+		usbdp_phy0_dp_out: endpoint@3 {
+			reg = <3>;
+			remote-endpoint = <&usbc0_sbu>;
+		};
+	};
+};
+
+&usb_host0_xhci {
+	/delete-node/ port;
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			reg = <0>;
+
+			usb_host0_xhci_hs: endpoint {
+				remote-endpoint = <&usbc0_hs>;
+			};
+		};
+
+		port@1 {
+			reg = <1>;
+
+			usb_host0_xhci_ss: endpoint {
+				remote-endpoint = <&usbdp_phy0_ss_in>;
+			};
+		};
+	};
+};
+
+&dp0 {
+	status = "okay";
+};
+
+/*
+ * HDMI0 holds VP0 and HDMI1 holds VP1, so DP0 takes VP2, which is where the
+ * vendor device tree puts it too. VP3 is the only other free port and it caps
+ * out at 1080p.
+ */
+&dp0_in {
+	dp0_in_vp2: endpoint {
+		remote-endpoint = <&vp2_out_dp0>;
+	};
+};
+
+&dp0_out {
+	dp0_out_con: endpoint {
+		remote-endpoint = <&usbdp_phy0_dp_in>;
+	};
+};
+
+&vp2 {
+	vp2_out_dp0: endpoint@a {
+		reg = <ROCKCHIP_VOP2_EP_DP0>;
+		remote-endpoint = <&dp0_in_vp2>;
+	};
+};

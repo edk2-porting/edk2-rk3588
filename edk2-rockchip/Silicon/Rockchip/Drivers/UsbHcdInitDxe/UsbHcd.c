@@ -318,18 +318,11 @@ FreeOhciDevice:
   return Status;
 }
 
-/**
-  This function gets registered as a callback to perform USB controller intialization
-
-  @param  Event         Event whose notification function is being invoked.
-  @param  Context       Pointer to the notification function's context.
-
-**/
-VOID
+EFI_STATUS
 EFIAPI
-UsbEndOfDxeCallback (
-  IN EFI_EVENT  Event,
-  IN VOID       *Context
+InitializeUsbHcd (
+  IN EFI_HANDLE        ImageHandle,
+  IN EFI_SYSTEM_TABLE  *SystemTable
   )
 {
   EFI_STATUS  Status;
@@ -340,8 +333,6 @@ UsbEndOfDxeCallback (
   UINT32      EhciControllerAddr;
   UINT32      OhciControllerAddr;
   UINT32      Index;
-
-  gBS->CloseEvent (Event);
 
   XhciControllerAddrArrayPtr  = PcdGetPtr (PcdDwc3BaseAddresses);
   XhciControllerAddrArraySize = PcdGetSize (PcdDwc3BaseAddresses);
@@ -421,36 +412,6 @@ UsbEndOfDxeCallback (
         ));
     }
   }
-}
 
-/**
-  The Entry Point of module. It follows the standard UEFI driver model.
-
-  @param[in] ImageHandle   The firmware allocated handle for the EFI image.
-  @param[in] SystemTable   A pointer to the EFI System Table.
-
-  @retval EFI_SUCCESS      The entry point is executed successfully.
-  @retval other            Some error occurs when executing this entry point.
-
-**/
-EFI_STATUS
-EFIAPI
-InitializeUsbHcd (
-  IN EFI_HANDLE        ImageHandle,
-  IN EFI_SYSTEM_TABLE  *SystemTable
-  )
-{
-  EFI_STATUS  Status;
-  EFI_EVENT   EndOfDxeEvent;
-
-  Status = gBS->CreateEventEx (
-                  EVT_NOTIFY_SIGNAL,
-                  TPL_CALLBACK,
-                  UsbEndOfDxeCallback,
-                  NULL,
-                  &gEfiEndOfDxeEventGroupGuid,
-                  &EndOfDxeEvent
-                  );
-
-  return Status;
+  return EFI_SUCCESS;
 }

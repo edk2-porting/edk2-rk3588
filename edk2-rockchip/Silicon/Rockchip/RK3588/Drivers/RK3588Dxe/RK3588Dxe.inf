@@ -61,6 +61,7 @@
   gEfiSimpleTextInputExProtocolGuid               ## CONSUMES
   gRk860xRegulatorProtocolGuid                    ## CONSUMES
   gRockchipPlatformConfigAppliedProtocolGuid      ## PRODUCES
+  gRockchipPlatformPowerReadyProtocolGuid         ## CONSUMES
 
 [Pcd]
   gRockchipTokenSpaceGuid.CruBaseAddr

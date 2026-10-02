@@ -29,12 +29,15 @@
   UefiDriverEntryPoint
   UefiBootServicesTableLib
   DebugLib
+  GpioLib
   IoLib
   TimerLib
+  MemoryAllocationLib
   RockchipPlatformLib
 
 [Protocols]
   gDpPhyProtocolGuid                ## PRODUCES
+  gUsbTypeCPortProtocolGuid         ## CONSUMES
 
 [Pcd]
   gRK3588TokenSpaceGuid.PcdUsbDpPhy0Supported
@@ -43,6 +46,8 @@
   gRK3588TokenSpaceGuid.PcdDp1LaneMux
   gRK3588TokenSpaceGuid.PcdUsbDpPhy0Usb3State
   gRK3588TokenSpaceGuid.PcdUsbDpPhy1Usb3State
+  gRK3588TokenSpaceGuid.PcdUsbDpPhy0SbuGpios
+  gRK3588TokenSpaceGuid.PcdUsbDpPhy1SbuGpios
 
 [Depex]
   gRockchipPlatformConfigAppliedProtocolGuid

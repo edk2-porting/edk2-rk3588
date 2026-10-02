@@ -206,11 +206,31 @@ SetupVariables (
 STATIC
 VOID
 EFIAPI
+OnPlatformPowerReady (
+  IN EFI_EVENT  Event,
+  IN VOID       *Context
+  )
+{
+  gBS->CloseEvent (Event);
+  InstallSataDevices ();
+}
+
+STATIC
+VOID
+EFIAPI
 AfterApplyVariablesInit (
   VOID
   )
 {
-  InstallSataDevices ();
+  VOID  *Registration;
+
+  EfiCreateProtocolNotifyEvent (
+    &gRockchipPlatformPowerReadyProtocolGuid,
+    TPL_CALLBACK,
+    OnPlatformPowerReady,
+    NULL,
+    &Registration
+    );
 }
 
 STATIC
