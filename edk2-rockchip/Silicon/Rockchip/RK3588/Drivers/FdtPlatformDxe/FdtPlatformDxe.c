@@ -547,6 +547,76 @@ FdtFixupVopDevices (
 }
 
 STATIC
+VOID
+EFIAPI
+FdtFixupHdmiPhyClocks (
+  IN VOID  *Fdt
+  )
+{
+  //
+  // Firmware hands the HDMI PHY over with its PLL still running. Linux 7.0
+  // to 7.2 read that rate back at probe and, when the mode they pick needs
+  // the same one, skip reprogramming the PHY, so the sink stays dark.
+  //
+  // Have the PHY assign its own PLL clock two different rates as it
+  // registers. At least one is a real change, so the kernel programs the
+  // PLL itself before any mode is set.
+  //
+  // Vendor device trees describe the PHY without #clock-cells, where the
+  // self-reference would fail its probe, so skip those.
+  //
+  STATIC CHAR8  *HdmiPhyNodes[] = {
+    "/phy@fed60000",
+    "/phy@fed70000",
+  };
+
+  UINTN         Index;
+  INT32         Node;
+  INT32         Ret;
+  INT32         Phandle;
+  INT32         Length;
+  CONST UINT32  *ClockCells;
+  UINT32        Rates[] = { CpuToFdt32 (33750000), CpuToFdt32 (50250000) };
+
+  if (PcdGet8 (PcdFdtForceGop)) {
+    return;
+  }
+
+  for (Index = 0; Index < ARRAY_SIZE (HdmiPhyNodes); Index++) {
+    Node = FdtPathOffset (Fdt, HdmiPhyNodes[Index]);
+    if (Node < 0) {
+      continue;
+    }
+
+    ClockCells = FdtGetProp (Fdt, Node, "#clock-cells", &Length);
+    if ((ClockCells == NULL) || (Length != sizeof (UINT32)) || (Fdt32ToCpu (*ClockCells) != 0)) {
+      continue;
+    }
+
+    Phandle = FdtGetPhandle (Fdt, Node);
+    if (Phandle <= 0) {
+      continue;
+    }
+
+    UINT32  Clocks[] = { CpuToFdt32 (Phandle), CpuToFdt32 (Phandle) };
+
+    Ret = FdtSetProp (Fdt, Node, "assigned-clocks", Clocks, sizeof (Clocks));
+    if (Ret == 0) {
+      Ret = FdtSetProp (Fdt, Node, "assigned-clock-rates", Rates, sizeof (Rates));
+    }
+
+    if (Ret < 0) {
+      DEBUG ((
+        DEBUG_ERROR,
+        "FdtPlatform: Failed to assign clock rates for '%a'. Ret=%a\n",
+        HdmiPhyNodes[Index],
+        FdtStrerror (Ret)
+        ));
+    }
+  }
+}
+
+STATIC
 EFI_STATUS
 EFIAPI
 ApplyPlatformFdtFixups (
@@ -565,6 +635,7 @@ ApplyPlatformFdtFixups (
   FdtFixupPcie3Devices (*Fdt);
   FdtFixupPcieResources (*Fdt);
   FdtFixupVopDevices (*Fdt);
+  FdtFixupHdmiPhyClocks (*Fdt);
 
   return EFI_SUCCESS;
 }
