@@ -439,8 +439,8 @@ PlatformGetDtbFileGuid (
   return NULL;
 }
 
-// ROCK5B has no controllable Type-C VBUS source switch. It accepts 5 V,
-// up to 3 A, and routes the connector to USB/DP PHY 0.
+// ROCK5B has no controllable Type-C VBUS source switch. It sinks 5-20 V,
+// as mainline describes it, and routes the connector to USB/DP PHY 0.
 STATIC struct RK_FUSB302_DEVICE {
   FUSB302_PLATFORM_DEVICE_PROTOCOL    Controller;
   struct {
@@ -456,7 +456,8 @@ STATIC struct RK_FUSB302_DEVICE {
       .PhyId       = 0,
       .SelfPowered = FALSE,
       .SinkPdos    = {
-        PDO_FIXED (12000, 3000, PDO_FIXED_USB_COMM | PDO_FIXED_DATA_SWAP)
+        PDO_FIXED (5000, 3000, PDO_FIXED_USB_COMM | PDO_FIXED_DATA_SWAP),
+        PDO_VAR (5000, 20000, 5000)
       }
     }
   }
