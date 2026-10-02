@@ -71,6 +71,11 @@
 #define   FUSB302_RESET_SW_RESET            BIT0
 #define FUSB302_REG_MASKA                   0x0E
 #define FUSB302_REG_MASKB                   0x0F
+#define FUSB302_REG_INTERRUPTA              0x3E
+#define   FUSB302_INTERRUPTA_RETRYFAIL      BIT4
+#define   FUSB302_INTERRUPTA_HARDSENT       BIT3
+#define   FUSB302_INTERRUPTA_TX_SUCCESS     BIT2
+#define   FUSB302_INTERRUPTA_HARDRESET      BIT0
 #define FUSB302_REG_STATUS0                 0x40
 #define   FUSB302_STATUS0_VBUSOK            BIT7
 #define   FUSB302_STATUS0_ACTIVITY          BIT6
@@ -194,6 +199,19 @@
 //
 #define PD_SENDER_RESPONSE_TIMEOUT_US       (60 * 1000)
 //
+// Longest the controller takes to report how a transmission went: a Hard
+// Reset sent, or a message acknowledged or given up on after its retries.
+//
+#define PD_TX_RESULT_US                     (5 * 1000)
+//
+// How long to keep offering Soft_Reset to a partner that does not yet answer
+// at all, and how often. A partner still settling after our reset can take a
+// couple of seconds to listen again, and Hard Reset, the alternative, cuts
+// VBUS -- which on a board powered from this port resets the board.
+//
+#define PD_SOFT_RESET_RETRY_US              (2000 * 1000)
+#define PD_SOFT_RESET_INTERVAL_US           (250 * 1000)
+//
 // tPSTransition is 550 ms at worst.
 //
 #define PD_PS_TRANSITION_TIMEOUT_US         (600 * 1000)
@@ -249,8 +267,17 @@
 #define   DP_CAP_PORT_UFP_D                 1
 #define   DP_CAP_PORT_DFP_D                 2
 #define   DP_CAP_PORT_BOTH                  3
-#define DP_CAP_PIN_ASSIGN_UFP_D(Vdo)        (((Vdo) >> 8) & 0xFF)
-#define DP_CAP_PIN_ASSIGN_DFP_D(Vdo)        (((Vdo) >> 16) & 0xFF)
+//
+// Which byte holds which role's pin assignments depends on whether the partner
+// has a receptacle or a captive plug, as in Linux's typec_dp.h.
+//
+#define DP_CAP_RECEPTACLE                   BIT6
+#define DP_CAP_PIN_ASSIGN_UFP_D(Vdo)                                   \
+  ((((Vdo) & DP_CAP_RECEPTACLE) != 0) ? (((Vdo) >> 16) & 0xFF) :       \
+                                         (((Vdo) >> 8) & 0xFF))
+#define DP_CAP_PIN_ASSIGN_DFP_D(Vdo)                                   \
+  ((((Vdo) & DP_CAP_RECEPTACLE) != 0) ? (((Vdo) >> 8) & 0xFF) :        \
+                                         (((Vdo) >> 16) & 0xFF))
 
 //
 // DisplayPort status VDO, returned by the DisplayPort Status command.
@@ -314,6 +341,11 @@
 //
 #define PD_SOURCE_CAP_REPEAT_US             (250 * 1000)
 #define PD_SOURCE_CAP_REPEAT_LIMIT          4
+//
+// A source that Hard Resets us mid-negotiation advertises afresh afterwards;
+// start over that many times before concluding it will not settle.
+//
+#define PD_PARTNER_HARD_RESET_LIMIT         2
 
 //
 // A display behind an adapter is not necessarily awake when alternate mode is

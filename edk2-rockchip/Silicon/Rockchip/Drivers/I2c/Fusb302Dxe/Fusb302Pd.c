@@ -41,6 +41,21 @@
 #include "Fusb302Dxe.h"
 
 /**
+  Reset the controller's PD protocol logic.
+
+  A Hard Reset, sent or received, leaves it unable to take the partner's next
+  messages until this is done, so both ends of that exchange go through here.
+**/
+STATIC
+EFI_STATUS
+Fusb302PdResetLogic (
+  IN FUSB302_CONTEXT  *Context
+  )
+{
+  return Fusb302RegWrite (Context, FUSB302_REG_RESET, FUSB302_RESET_PD_RESET);
+}
+
+/**
   Prepare the PD transmitter and receiver on the CC pin the partner is on.
 **/
 STATIC
@@ -88,6 +103,20 @@ Fusb302PdEnable (
               (Context->DataRoleDfp ? FUSB302_SWITCHES1_DATAROLE : 0);
 
   Status = Fusb302RegWrite (Context, FUSB302_REG_SWITCHES1, Switches1);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // Retransmit up to three times when no GoodCRC comes back, as revision 2.0
+  // asks of every port. Without it one missed GoodCRC loses the message.
+  //
+  Status = Fusb302RegUpdate (
+             Context,
+             FUSB302_REG_CONTROL3,
+             FUSB302_CONTROL3_N_RETRIES_MASK | FUSB302_CONTROL3_AUTO_RETRY,
+             (3 << FUSB302_CONTROL3_N_RETRIES_SHIFT) | FUSB302_CONTROL3_AUTO_RETRY
+             );
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -535,6 +564,7 @@ Fusb302PdWaitFor (
   UINT64      Start;
   UINT64      TimeoutNs;
   UINTN       Count;
+  UINT8       InterruptA;
 
   //
   // The timeout is a bound on time, not on how many messages arrive. Most of
@@ -548,6 +578,25 @@ Fusb302PdWaitFor (
   while (GetTimeInNanoSecond (GetPerformanceCounter () - Start) < TimeoutNs) {
     Status = Fusb302PdReceive (Context, Message);
     if (Status == EFI_NOT_READY) {
+      //
+      // A Hard Reset from the partner never reaches the FIFO. Pick it up
+      // here and reset the PD logic, or nothing the source sends next is
+      // received. Whatever we were waiting for is not coming: the caller
+      // has to start over from the source's next advertisement.
+      //
+      if (!EFI_ERROR (Fusb302RegRead (Context, FUSB302_REG_INTERRUPTA, &InterruptA)) &&
+          ((InterruptA & FUSB302_INTERRUPTA_HARDRESET) != 0))
+      {
+        DEBUG ((DEBUG_INFO, "%a: partner sent Hard Reset\n", __func__));
+        Fusb302PdResetLogic (Context);
+        Fusb302RegUpdate (Context, FUSB302_REG_SWITCHES1, FUSB302_SWITCHES1_DATAROLE, 0);
+        Fusb302RegUpdate (Context, FUSB302_REG_CONTROL1, FUSB302_CONTROL1_RX_FLUSH, FUSB302_CONTROL1_RX_FLUSH);
+        Context->DataRoleDfp           = FALSE;
+        Context->MessageId             = 0;
+        Context->Contract.PdNegotiated = FALSE;
+        return EFI_PROTOCOL_ERROR;
+      }
+
       MicroSecondDelay (PD_POLL_INTERVAL_US);
       continue;
     }
@@ -773,6 +822,8 @@ Fusb302PdHardReset (
 {
   EFI_STATUS  Status;
   UINT8       Status0;
+  UINT8       InterruptA;
+  UINT8       Value;
   UINTN       Waited;
   BOOLEAN     Gone;
 
@@ -784,6 +835,38 @@ Fusb302PdHardReset (
              FUSB302_CONTROL3_SEND_HARD_RESET,
              FUSB302_CONTROL3_SEND_HARD_RESET
              );
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  //
+  // The PD logic only takes messages again once it is reset, which has to
+  // wait until the Hard Reset ordered set has actually gone out.
+  //
+  InterruptA = 0;
+  for (Waited = 0; Waited < PD_TX_RESULT_US; Waited += PD_POLL_INTERVAL_US) {
+    Status = Fusb302RegRead (Context, FUSB302_REG_INTERRUPTA, &Value);
+    if (EFI_ERROR (Status)) {
+      return Status;
+    }
+
+    InterruptA |= Value;
+    if ((InterruptA & FUSB302_INTERRUPTA_HARDSENT) != 0) {
+      break;
+    }
+
+    MicroSecondDelay (PD_POLL_INTERVAL_US);
+  }
+
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: Hard Reset %a (INTERRUPTA 0x%02x)\n",
+    __func__,
+    ((InterruptA & FUSB302_INTERRUPTA_HARDSENT) != 0) ? "sent" : "not confirmed",
+    InterruptA
+    ));
+
+  Status = Fusb302PdResetLogic (Context);
   if (EFI_ERROR (Status)) {
     return Status;
   }
@@ -844,6 +927,107 @@ Fusb302PdHardReset (
   return EFI_SUCCESS;
 }
 
+/**
+  Send Soft_Reset and wait for the source to advertise again.
+
+  The controller reports whether a GoodCRC came back, which is what tells a
+  partner that ignored the message from one that never heard it.
+**/
+STATIC
+EFI_STATUS
+Fusb302PdSoftReset (
+  IN OUT FUSB302_CONTEXT  *Context,
+  OUT    PD_MESSAGE       *Message
+  )
+{
+  EFI_STATUS  Status;
+  UINT16      Header;
+  UINT8       InterruptA;
+  UINT8       Value;
+  UINTN       Waited;
+
+  //
+  // Drop stale interrupt bits so the result read below belongs to this message.
+  //
+  Fusb302RegRead (Context, FUSB302_REG_INTERRUPTA, &Value);
+
+  //
+  // Soft_Reset restarts both message counters and goes out as ID zero; the
+  // next message carries ID one.
+  //
+  Header = PD_HEADER_BUILD (
+             PD_CTRL_SOFT_RESET,
+             0,
+             0,
+             Context->DataRoleDfp ? 1 : 0,
+             FUSB302_POWER_ROLE (Context),
+             PD_REV_2_0
+             );
+
+  Status = Fusb302PdSend (Context, Header, NULL);
+  if (EFI_ERROR (Status)) {
+    return Status;
+  }
+
+  Context->MessageId = 1;
+
+  InterruptA = 0;
+  for (Waited = 0; Waited < PD_TX_RESULT_US; Waited += PD_POLL_INTERVAL_US) {
+    if (EFI_ERROR (Fusb302RegRead (Context, FUSB302_REG_INTERRUPTA, &Value))) {
+      break;
+    }
+
+    InterruptA |= Value;
+    if ((InterruptA & (FUSB302_INTERRUPTA_TX_SUCCESS | FUSB302_INTERRUPTA_RETRYFAIL)) != 0) {
+      break;
+    }
+
+    MicroSecondDelay (PD_POLL_INTERVAL_US);
+  }
+
+  if ((InterruptA & FUSB302_INTERRUPTA_TX_SUCCESS) == 0) {
+    DEBUG ((DEBUG_INFO, "%a: no GoodCRC for Soft_Reset (INTERRUPTA 0x%02x)\n", __func__, InterruptA));
+    return EFI_NO_RESPONSE;
+  }
+
+  Status = Fusb302PdWaitFor (Context, FALSE, PD_CTRL_ACCEPT, PD_SENDER_RESPONSE_TIMEOUT_US, Message);
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_INFO, "%a: Soft_Reset unanswered (%r)\n", __func__, Status));
+    return Status;
+  }
+
+  return Fusb302PdWaitFor (Context, TRUE, PD_DATA_SOURCE_CAP, PD_SOURCE_CAP_RETRY_TIMEOUT_US, Message);
+}
+
+/**
+  Wait for the source to advertise again after it Hard Reset us.
+
+  It drops VBUS, brings it back, and only then advertises, so this allows for
+  the whole recovery rather than an ordinary response time.
+**/
+STATIC
+EFI_STATUS
+Fusb302PdAwaitAfterPartnerHardReset (
+  IN OUT FUSB302_CONTEXT  *Context,
+  OUT    PD_MESSAGE       *Message
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = Fusb302PdWaitFor (
+             Context,
+             TRUE,
+             PD_DATA_SOURCE_CAP,
+             PD_HARD_RESET_RECOVER_US + PD_SOURCE_CAP_RETRY_TIMEOUT_US,
+             Message
+             );
+  if (EFI_ERROR (Status)) {
+    DEBUG ((DEBUG_WARN, "%a: no Source_Capabilities after the partner's Hard Reset (%r)\n", __func__, Status));
+  }
+
+  return Status;
+}
+
 EFI_STATUS
 Fusb302PdNegotiateSink (
   IN OUT FUSB302_CONTEXT         *Context,
@@ -859,8 +1043,11 @@ Fusb302PdNegotiateSink (
   UINT32        CurrentMa;
   CONST UINT32  *SinkPdos;
   UINTN         Attempt;
+  UINTN         Waited;
+  UINTN         PartnerHardResets;
 
-  SinkPdos = Context->Platform->SinkPdos;
+  SinkPdos          = Context->Platform->SinkPdos;
+  PartnerHardResets = 0;
 
   if (Fusb302PdoCount (SinkPdos) == 0) {
     DEBUG ((DEBUG_WARN, "%a: board lists nothing this port will accept\n", __func__));
@@ -894,38 +1081,20 @@ Fusb302PdNegotiateSink (
     DEBUG ((DEBUG_INFO, "%a: no advertisement; sending Soft_Reset\n", __func__));
 
     //
-    // Soft_Reset always carries message ID zero: both counters restart with it.
+    // A partner that does not even acknowledge Soft_Reset is not listening
+    // yet. Give it a little while before resorting to Hard Reset.
     //
-    Header = PD_HEADER_BUILD (
-               PD_CTRL_SOFT_RESET,
-               0,
-               0,
-               Context->DataRoleDfp ? 1 : 0,
-               FUSB302_POWER_ROLE (Context),
-               PD_REV_2_0
-               );
+    for (Waited = 0; ; Waited += PD_SOFT_RESET_INTERVAL_US) {
+      Status = Fusb302PdSoftReset (Context, &Message);
+      if ((Status != EFI_NO_RESPONSE) || (Waited >= PD_SOFT_RESET_RETRY_US)) {
+        break;
+      }
 
-    Status = Fusb302PdSend (Context, Header, NULL);
-    if (EFI_ERROR (Status)) {
-      goto Disable;
+      MicroSecondDelay (PD_SOFT_RESET_INTERVAL_US);
     }
 
-    //
-    // Soft_Reset resets the message counters at both ends.
-    //
-    Context->MessageId = 0;
-
-    Status = Fusb302PdWaitFor (Context, FALSE, PD_CTRL_ACCEPT, PD_SENDER_RESPONSE_TIMEOUT_US, &Message);
-    if (!EFI_ERROR (Status)) {
-      Status = Fusb302PdWaitFor (
-                 Context,
-                 TRUE,
-                 PD_DATA_SOURCE_CAP,
-                 PD_SOURCE_CAP_RETRY_TIMEOUT_US,
-                 &Message
-                 );
-    } else {
-      DEBUG ((DEBUG_INFO, "%a: Soft_Reset unanswered (%r)\n", __func__, Status));
+    if (Status == EFI_PROTOCOL_ERROR) {
+      Status = Fusb302PdAwaitAfterPartnerHardReset (Context, &Message);
     }
 
     if (EFI_ERROR (Status)) {
@@ -1023,18 +1192,38 @@ Fusb302PdNegotiateSink (
     Context->MessageId = (Context->MessageId + 1) & 0x7;
 
     Status = Fusb302PdWaitFor (Context, FALSE, PD_CTRL_ACCEPT, PD_SENDER_RESPONSE_TIMEOUT_US, &Message);
-    if (EFI_ERROR (Status)) {
+    if (!EFI_ERROR (Status)) {
+      //
+      // The source now moves the supply; PS_RDY says it has arrived.
+      //
+      Status = Fusb302PdWaitFor (Context, FALSE, PD_CTRL_PS_RDY, PD_PS_TRANSITION_TIMEOUT_US, &Message);
+      if (EFI_ERROR (Status) && (Status != EFI_PROTOCOL_ERROR)) {
+        DEBUG ((DEBUG_WARN, "%a: no PS_RDY after Accept (%r)\n", __func__, Status));
+        goto Disable;
+      }
+    } else if (Status != EFI_PROTOCOL_ERROR) {
       DEBUG ((DEBUG_WARN, "%a: request not accepted (%r)\n", __func__, Status));
       goto Disable;
     }
 
-    //
-    // The source now moves the supply; PS_RDY says it has arrived.
-    //
-    Status = Fusb302PdWaitFor (Context, FALSE, PD_CTRL_PS_RDY, PD_PS_TRANSITION_TIMEOUT_US, &Message);
-    if (EFI_ERROR (Status)) {
-      DEBUG ((DEBUG_WARN, "%a: no PS_RDY after Accept (%r)\n", __func__, Status));
-      goto Disable;
+    if (Status == EFI_PROTOCOL_ERROR) {
+      //
+      // The source Hard Reset us instead of finishing the transition. Its
+      // next advertisement starts the negotiation over.
+      //
+      if (++PartnerHardResets > PD_PARTNER_HARD_RESET_LIMIT) {
+        goto Disable;
+      }
+
+      DEBUG ((DEBUG_INFO, "%a: source Hard Reset during negotiation; starting over\n", __func__));
+
+      Status = Fusb302PdAwaitAfterPartnerHardReset (Context, &Message);
+      if (EFI_ERROR (Status)) {
+        goto Disable;
+      }
+
+      Attempt = (UINTN)-1;
+      continue;
     }
 
     Context->Contract.PdNegotiated = TRUE;
@@ -1051,6 +1240,22 @@ Fusb302PdNegotiateSink (
                PD_SOURCE_CAP_REPEAT_US,
                &Message
                );
+    if (Status == EFI_PROTOCOL_ERROR) {
+      if (++PartnerHardResets > PD_PARTNER_HARD_RESET_LIMIT) {
+        goto Disable;
+      }
+
+      DEBUG ((DEBUG_INFO, "%a: source Hard Reset after the contract; starting over\n", __func__));
+
+      Status = Fusb302PdAwaitAfterPartnerHardReset (Context, &Message);
+      if (EFI_ERROR (Status)) {
+        goto Disable;
+      }
+
+      Attempt = (UINTN)-1;
+      continue;
+    }
+
     if (EFI_ERROR (Status)) {
       break;
     }
