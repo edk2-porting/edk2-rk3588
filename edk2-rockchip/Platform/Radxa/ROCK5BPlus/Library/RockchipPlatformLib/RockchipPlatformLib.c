@@ -218,9 +218,12 @@ UsbPortPowerEnable (
   /* Set GPIO1 PA1 (USB_HOST_PWREN) output high to power USB ports */
   GpioPinWrite (1, GPIO_PIN_PA1, TRUE);
   GpioPinSetDirection (1, GPIO_PIN_PA1, GPIO_PIN_OUTPUT);
-  /* Set GPIO2 PB6 (USB_TYPEC_PWREN) output high to power USB ports */
-  GpioPinWrite (2, GPIO_PIN_PB6, TRUE);
-  GpioPinSetDirection (2, GPIO_PIN_PB6, GPIO_PIN_OUTPUT);
+
+  /*
+   * The Type-C rail (GPIO2_PB6) is left to Fusb302Dxe, which switches it
+   * on for a sink and keeps it off when the port is being used to charge
+   * the board.
+   */
 
   // DEBUG((DEBUG_INFO, "Trying to enable blue led\n"));
   // GpioPinWrite (0, GPIO_PIN_PB7, TRUE);

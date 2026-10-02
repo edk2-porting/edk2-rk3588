@@ -227,9 +227,11 @@ UsbPortPowerEnable (
   GpioPinWrite (3, GPIO_PIN_PA5, TRUE);
   GpioPinSetDirection (3, GPIO_PIN_PA5, GPIO_PIN_OUTPUT);
 
-  /* Set GPIO1 PD2 (TYPEC5V_PWREN) output high to power the type-c port */
-  GpioPinWrite (1, GPIO_PIN_PD2, TRUE);
-  GpioPinSetDirection (1, GPIO_PIN_PD2, GPIO_PIN_OUTPUT);
+  /*
+   * The Type-C rail (GPIO1_PD2) is left to Fusb302Dxe, which switches it
+   * on for a sink and keeps it off when the port is being used to charge
+   * the board.
+   */
 
   // DEBUG((DEBUG_INFO, "Trying to enable on-board LED1\n"));
   // GpioPinWrite (2, GPIO_PIN_PC0, TRUE);

@@ -216,16 +216,11 @@ UsbPortPowerEnable (
 {
   DEBUG ((DEBUG_INFO, "UsbPortPowerEnable called\n"));
 
-  /* vbus5v0_typec0 (data-only port) */
-  GpioPinWrite (4, GPIO_PIN_PB0, TRUE);
-  GpioPinSetDirection (4, GPIO_PIN_PB0, GPIO_PIN_OUTPUT);
-
-  /* vbus5v0_typec1 (PD + data port) */
-  // Won't enable 5V on VBUS for now, unsure if it's okay
-  // to do it when voltage > 5V is already supplied to this port.
-  //
-  // GpioPinWrite (4, GPIO_PIN_PA3, TRUE);
-  // GpioPinSetDirection (4, GPIO_PIN_PA3, GPIO_PIN_OUTPUT);
+  /*
+   * The Type-C rails (GPIO4_PB0, GPIO4_PA3) are left to Fusb302Dxe, which
+   * switches each on for a sink and keeps it off when the port is being
+   * used to charge the board.
+   */
 }
 
 VOID

@@ -226,9 +226,11 @@ UsbPortPowerEnable (
   )
 {
   DEBUG ((DEBUG_INFO, "UsbPortPowerEnable called\n"));
-  /* Set GPIO3 PC0 (TYPEC_EN) output high to power Type-C/USB2.0 ports */
-  GpioPinWrite (3, GPIO_PIN_PC0, TRUE);
-  GpioPinSetDirection (3, GPIO_PIN_PC0, GPIO_PIN_OUTPUT);
+  /*
+   * The Type-C rail (GPIO3_PC0) is left to Fusb302Dxe, which switches it
+   * on for a sink and keeps it off when the port is being used to charge
+   * the board.
+   */
 
   // DEBUG((DEBUG_INFO, "Trying to enable green led\n"));
   // GpioPinWrite (1, GPIO_PIN_PA2, TRUE);
