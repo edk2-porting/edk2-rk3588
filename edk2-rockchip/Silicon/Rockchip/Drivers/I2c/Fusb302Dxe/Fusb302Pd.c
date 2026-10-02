@@ -1097,6 +1097,20 @@ Fusb302PdNegotiateSink (
       Status = Fusb302PdAwaitAfterPartnerHardReset (Context, &Message);
     }
 
+    if (EFI_ERROR (Status) && !Context->Platform->SelfPowered) {
+      //
+      // Hard Reset drops VBUS, and with it a board that runs from this port.
+      // Leave PD off instead; the source keeps the contract it already has.
+      //
+      DEBUG ((
+        DEBUG_WARN,
+        "%a: no answer to Soft_Reset; not sending Hard Reset on a port that "
+        "may power the board\n",
+        __func__
+        ));
+      goto Disable;
+    }
+
     if (EFI_ERROR (Status)) {
       //
       // A source holding a contract agreed before this firmware started may

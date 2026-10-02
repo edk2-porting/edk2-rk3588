@@ -78,6 +78,12 @@ struct _FUSB302_PLATFORM_DEVICE_PROTOCOL {
   //
   UINT32                       SinkPdos[FUSB302_MAX_PDOS];
   //
+  // TRUE where the board has a supply of its own and never runs from this
+  // port. Only then will the driver send Hard Reset, which drops VBUS and
+  // would reset a board powered through the port.
+  //
+  BOOLEAN                      SelfPowered;
+  //
   // NULL where the board has no supply switch this driver can reach, which
   // stops the port sourcing whatever it offers above.
   //

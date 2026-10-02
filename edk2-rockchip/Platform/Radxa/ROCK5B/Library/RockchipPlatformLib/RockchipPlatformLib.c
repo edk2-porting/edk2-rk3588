@@ -454,6 +454,7 @@ STATIC struct RK_FUSB302_DEVICE {
     .Controller ={
       .DeviceIndex = I2C_DEVICE_INDEX (4, 0x22),
       .PhyId       = 0,
+      .SelfPowered = FALSE,
       .SinkPdos    = {
         PDO_FIXED (12000, 3000, PDO_FIXED_USB_COMM | PDO_FIXED_DATA_SWAP)
       }
