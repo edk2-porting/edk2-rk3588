@@ -291,6 +291,55 @@ RK3588SetupAudio (
   }
 }
 
+//
+// Start the TSADC the way the Linux rockchip_thermal driver does: sample all
+// seven sensors continuously and let the CRU reset the SoC at 120 C. Nothing
+// else does this, so an OS that relies on ACPI would have no temperature
+// readings and no over-temperature reset.
+//
+#define TSADC_BASE                  0xFEC00000
+#define TSADC_AUTO_CON              0x0004
+#define TSADC_AUTO_SRC_CON          0x000C
+#define TSADC_HSHUT_GPIO_INT_EN     0x0018
+#define TSADC_HSHUT_CRU_INT_EN      0x001C
+#define TSADC_COMP_SHUT(Channel)    (0x010C + (Channel) * 4)
+#define TSADC_HIGHT_INT_DEBOUNCE    0x014C
+#define TSADC_HIGHT_TSHUT_DEBOUNCE  0x0150
+#define TSADC_AUTO_PERIOD           0x0154
+#define TSADC_AUTO_PERIOD_HT        0x0158
+#define TSADC_CHANNELS              7
+#define TSADC_TSHUT_CODE            389       // 120 C
+
+STATIC
+VOID
+RK3588SetupTsadc (
+  VOID
+  )
+{
+  UINT32  Channel;
+
+  MmioWrite32 (CRU_BASE + CRU_CLKGATE_CON_OFFSET + 12 * 4, (BIT1 | BIT0) << 16);  // pclk_tsadc, clk_tsadc on
+  MmioWrite32 (CRU_BASE + CRU_CLKSEL_CON_OFFSET + 41 * 4, (0x1FFU << 16) | BIT8 | 11);  // clk_tsadc: xin24m (bit 8 set) / 12 = 2 MHz
+  MmioWrite32 (CRU_BASE + CRU_SOFTRST_CON_OFFSET + 12 * 4, ((BIT1 | BIT0) << 16) | BIT1 | BIT0);
+  gBS->Stall (20);
+  MmioWrite32 (CRU_BASE + CRU_SOFTRST_CON_OFFSET + 12 * 4, (BIT1 | BIT0) << 16);
+
+  MmioWrite32 (TSADC_BASE + TSADC_AUTO_PERIOD, 5000);
+  MmioWrite32 (TSADC_BASE + TSADC_AUTO_PERIOD_HT, 5000);
+  MmioWrite32 (TSADC_BASE + TSADC_HIGHT_INT_DEBOUNCE, 4);
+  MmioWrite32 (TSADC_BASE + TSADC_HIGHT_TSHUT_DEBOUNCE, 4);
+  MmioWrite32 (TSADC_BASE + TSADC_AUTO_CON, BIT24);                               // TSHUT active low
+
+  for (Channel = 0; Channel < TSADC_CHANNELS; Channel++) {
+    MmioWrite32 (TSADC_BASE + TSADC_HSHUT_GPIO_INT_EN, BIT16 << Channel);
+    MmioWrite32 (TSADC_BASE + TSADC_HSHUT_CRU_INT_EN, (BIT16 | BIT0) << Channel);
+    MmioWrite32 (TSADC_BASE + TSADC_COMP_SHUT (Channel), TSADC_TSHUT_CODE);
+    MmioWrite32 (TSADC_BASE + TSADC_AUTO_SRC_CON, (BIT16 | BIT0) << Channel);
+  }
+
+  MmioWrite32 (TSADC_BASE + TSADC_AUTO_CON, BIT16 | BIT0);
+}
+
 EFI_STATUS
 RK3588InitPeripherals (
   IN VOID
@@ -299,6 +348,8 @@ RK3588InitPeripherals (
   DEBUG ((DEBUG_INIT, "RK3588InitPeripherals: Entry\n"));
 
   RK3588SetupAudio ();
+
+  RK3588SetupTsadc ();
 
   Rk806Configure ();
 
