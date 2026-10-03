@@ -421,6 +421,13 @@ AcpiPlatformExitBootServicesOsHandler (
     AcpiUpdateSdtNameInteger (mDsdtTable, "SDRM", 0);
   }
 
+  //
+  // Keep ACPI fan control off the fan when it is disabled in setup.
+  //
+  if (PcdGet32 (PcdCoolingFanState) != COOLING_FAN_STATE_ENABLED) {
+    AcpiUpdateSdtNameInteger (mDsdtTable, "FANE", 0);
+  }
+
   AcpiFixupPcieEcam (OsType);
 
   AcpiUpdateChecksum ((UINT8 *)mDsdtTable, mDsdtTable->Length);
