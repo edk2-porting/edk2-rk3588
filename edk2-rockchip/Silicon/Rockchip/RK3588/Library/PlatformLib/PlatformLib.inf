@@ -36,6 +36,7 @@
   PcdLib
   PrintLib
   ResetUtilityLib
+  RkAtagsLib
   SaradcLib
   SdramLib
   SerialPortLib
