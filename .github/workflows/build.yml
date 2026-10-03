@@ -45,6 +45,7 @@ jobs:
           - rock-5a
           - rock-5b
           - rock-5bplus
+          - rock-5t
           - station-m3
         CONFIGURATION: ${{ fromJSON(format('[{0}]', inputs.build-configs || '"Debug"')) }}
     steps:
