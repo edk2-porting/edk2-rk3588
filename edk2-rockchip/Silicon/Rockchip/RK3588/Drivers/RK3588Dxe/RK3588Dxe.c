@@ -275,6 +275,10 @@ RK3588SetupAudio (
 
     HAL_CRU_ClkSetMux (CLK_I2S0_8CH_TX_SRC, 0x1); // clk_aupll_mux
     HAL_CRU_ClkSetMux (MCLK_I2S0_8CH_TX, 0x1);    // clk_i2s0_8ch_tx_frac
+
+    // Output MCLK to the codec
+    HAL_CRU_ClkSetMux (I2S0_8CH_MCLKOUT, 0x0); // mclk_i2s0_8ch_tx
+    HAL_CRU_ClkEnable (I2S0_8CH_MCLKOUT_TO_IO);
   }
 
   if (FixedPcdGetBool (PcdI2S1Supported)) {
