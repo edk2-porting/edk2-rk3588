@@ -488,6 +488,9 @@ SPI_Configure (
   UINT32  cr0 = 0;
   UINT32  div = 0;
 
+  // CTRLR0/CTRLR1 are only writable while disabled (DW_apb_ssi), matching U-Boot's claim_bus/xfer.
+  SPI_EnableChip (pSPI, 0);
+
   cr0 |= pSPI->config.opMode;
 
   cr0 |= pSPI->config.apbTransform | pSPI->config.endianMode | pSPI->config.ssd;
