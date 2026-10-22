@@ -179,17 +179,30 @@ FdtFixupComboPhyDevices (
     CHAR8     *PcieNodePath;
     CHAR8     *SataNodePath;
     CHAR8     *UsbNodePath;
+    BOOLEAN   PcieEnabled;
   } Phys[] = {
-    { PcdGet32 (PcdComboPhy0Mode), "/pcie@fe190000", "/sata@fe210000", NULL            },
-    { PcdGet32 (PcdComboPhy1Mode), "/pcie@fe170000", "/sata@fe220000", NULL            },
-    { PcdGet32 (PcdComboPhy2Mode), "/pcie@fe180000", "/sata@fe230000", "/usb@fcd00000" },
+    { PcdGet32 (PcdComboPhy0Mode), "/pcie@fe190000", "/sata@fe210000", NULL,
+      PcdGet32 (PcdComboPhy0Mode) == COMBO_PHY_MODE_PCIE }, 
+      /* 1l2: Combo PHY 0 only */
+    { PcdGet32 (PcdComboPhy1Mode), "/pcie@fe170000", "/sata@fe220000", NULL,
+      PcdGet32 (PcdComboPhy1Mode) == COMBO_PHY_MODE_PCIE ||
+      (PcdGet32 (PcdPcie30State) == PCIE30_STATE_ENABLED &&
+      (PcdGet8 (PcdPcie30PhyMode) & 0x1) != 0) }, 
+      /* 1l0 is fed either by Combo PHY 1 (PCIe 2.0) or by PCIe 3.0 PHY lane 1
+         when the PCIe 3.0 x4 PHY is bifurcated (phymode bit 0, TRM 6.19.2) */
+    { PcdGet32 (PcdComboPhy2Mode), "/pcie@fe180000", "/sata@fe230000", "/usb@fcd00000",
+      PcdGet32 (PcdComboPhy2Mode) == COMBO_PHY_MODE_PCIE ||
+      (PcdGet32 (PcdPcie30State) == PCIE30_STATE_ENABLED &&
+      (PcdGet8 (PcdPcie30PhyMode) & 0x2) != 0) },
+      /* 1l1 is fed either by Combo PHY 2 (PCIe 2.0) or by PCIe 3.0 PHY lane 3
+         when the PCIe 3.0 x2 PHY is bifurcated (phymode bit 1, TRM 6.19.2) */
   };
 
   for (Index = 0; Index < ARRAY_SIZE (Phys); Index++) {
     FdtEnableNode (
       Fdt,
       Phys[Index].PcieNodePath,
-      Phys[Index].Mode == COMBO_PHY_MODE_PCIE
+      Phys[Index].PcieEnabled
       );
 
     FdtEnableNode (
