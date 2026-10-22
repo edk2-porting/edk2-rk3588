@@ -119,8 +119,13 @@ AcpiDsdtFixupStatus (
     { "\\_SB.PCI1._STA", PcdGet32 (PcdPcie30State) == PCIE30_STATE_ENABLED &&
       FixedPcdGetBool (PcdPcie30x2Supported) &&
       PcdGet8 (PcdPcie30PhyMode) != PCIE30_PHY_MODE_AGGREGATION },
-    { "\\_SB.PCI2._STA", PcdGet32 (PcdComboPhy1Mode) == COMBO_PHY_MODE_PCIE },
-    { "\\_SB.PCI3._STA", PcdGet32 (PcdComboPhy2Mode) == COMBO_PHY_MODE_PCIE },
+    { "\\_SB.PCI2._STA", PcdGet32 (PcdComboPhy1Mode) == COMBO_PHY_MODE_PCIE ||
+      (PcdGet32 (PcdPcie30State) == PCIE30_STATE_ENABLED &&
+      (PcdGet8 (PcdPcie30PhyMode) & 0x1) != 0) },
+    { "\\_SB.PCI3._STA", PcdGet32 (PcdComboPhy2Mode) == COMBO_PHY_MODE_PCIE ||
+      (PcdGet32 (PcdPcie30State) == PCIE30_STATE_ENABLED &&
+      (PcdGet8 (PcdPcie30PhyMode) & 0x2) != 0) },
+
     { "\\_SB.PCI4._STA", PcdGet32 (PcdComboPhy0Mode) == COMBO_PHY_MODE_PCIE },
     { "\\_SB.ATA0._STA", PcdGet32 (PcdComboPhy0Mode) == COMBO_PHY_MODE_SATA },
     { "\\_SB.ATA1._STA", PcdGet32 (PcdComboPhy1Mode) == COMBO_PHY_MODE_SATA },

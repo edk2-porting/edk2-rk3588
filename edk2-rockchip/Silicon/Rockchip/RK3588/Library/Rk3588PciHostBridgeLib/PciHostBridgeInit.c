@@ -102,6 +102,10 @@ IsPcieNumEnabled (
    * According to TRM Part 1 6.19.2 PCIe3PHY_GRF_CMN_CON0,
    * if pcie l4(PCIE30X4) bifurcation enabled (phymode & 0b01), pcie3phy lane 1 is connected to 1l0
    * if pcie l2(PCIE30X2) bifurcation enabled (phymode & 0b10), pcie3phy lane 3 is connected to 1l1
+   *
+   * Consequently, 1l0 (PCIE20L0) and 1l1 (PCIE20L1) are also usable through the
+   * PCIe 3.0 PHY in the corresponding bifurcation modes, even when the Combo
+   * PHYs are not configured as PCIe 2.0 PHYs (e.g. CM3588 NAS Kit).
   */
   switch (PcieNum) {
     case PCIE_SEGMENT_PCIE30X4:
@@ -115,11 +119,17 @@ IsPcieNumEnabled (
       break;
 
     case PCIE_SEGMENT_PCIE20L0:
-      Enabled = (PcdGet32 (PcdComboPhy1Mode) == COMBO_PHY_MODE_PCIE);
+      /* 1l0 is fed either by Combo PHY 1 (PCIe 2.0) or by PCIe 3.0 PHY lane 1 (phymode bit 0) */
+      Enabled = (PcdGet32 (PcdComboPhy1Mode) == COMBO_PHY_MODE_PCIE) ||
+                (PcdGet32 (PcdPcie30State) == PCIE30_STATE_ENABLED &&
+                (PcdGet8 (PcdPcie30PhyMode) & 0x1) != 0);
       break;
 
     case PCIE_SEGMENT_PCIE20L1:
-      Enabled = (PcdGet32 (PcdComboPhy2Mode) == COMBO_PHY_MODE_PCIE);
+      /* 1l1 is fed either by Combo PHY 2 (PCIe 2.0) or by PCIe 3.0 PHY lane 3 (phymode bit 1) */
+      Enabled = (PcdGet32 (PcdComboPhy2Mode) == COMBO_PHY_MODE_PCIE) ||
+                (PcdGet32 (PcdPcie30State) == PCIE30_STATE_ENABLED &&
+                (PcdGet8 (PcdPcie30PhyMode) & 0x2) != 0);
       break;
 
     case PCIE_SEGMENT_PCIE20L2:
