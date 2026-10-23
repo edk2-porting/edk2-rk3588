@@ -21,11 +21,17 @@ typedef unsigned int uint;
 typedef UINTN ulong;
 typedef INTN ssize_t;
 typedef UINTN size_t;
-typedef BOOLEAN bool;
 typedef UINT16 __be16;
+
+//
+// C23 made bool, true and false keywords (GCC 15+ defaults to C23).
+//
+#if !defined (__STDC_VERSION__) || (__STDC_VERSION__ < 202311L)
+typedef BOOLEAN bool;
 
 #define true TRUE
 #define false FALSE
+#endif
 
 #define udelay(x)	MicroSecondDelay (x)
 #define mdelay(x) 	MicroSecondDelay (x * 1000)
