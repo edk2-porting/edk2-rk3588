@@ -88,6 +88,11 @@ function _build_idblock() {
 
     DDRBIN="${ROOTDIR}/misc/rkbin/${DDRBIN_RKBIN}"
 
+    # Allow a device config to pin a known-good DDR blob.
+    if [ -n "${DDRBIN_OVERRIDE}" ]; then
+        DDRBIN="${ROOTDIR}/${DDRBIN_OVERRIDE}"
+    fi
+
     #
     # SPL v1.13 has broken SD card support!
     # Use v1.12 instead.
