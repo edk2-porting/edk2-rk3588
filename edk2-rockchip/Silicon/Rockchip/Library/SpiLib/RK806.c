@@ -325,11 +325,13 @@ _spi_read (
   txbuf[1] = reg;
   txbuf[2] = RK806_REG_H;
 
-  SPI_SetCS (&gSPI, cs_id, 1);
+  // TRM Fig 31-7: SER is written as part of configure, between disable and enable.
   status = SPI_Configure (&gSPI, txbuf, NULL, 3);
+  SPI_SetCS (&gSPI, cs_id, 1);
   status = SPI_PioTransfer (&gSPI);
   SPI_Stop (&gSPI);
   status = SPI_Configure (&gSPI, NULL, buffer, 1);
+  SPI_SetCS (&gSPI, cs_id, 1);
   status = SPI_PioTransfer (&gSPI);
   SPI_Stop (&gSPI);
   SPI_SetCS (&gSPI, cs_id, 0);
@@ -345,17 +347,22 @@ _spi_write (
   INT32        len
   )
 {
-  UINT8          txbuf[4];
+  UINT8          txbuf[3];
   RETURN_STATUS  status;
 
   txbuf[0] = RK806_CMD_WRITE;
   txbuf[1] = reg;
   txbuf[2] = RK806_REG_H;
-  txbuf[3] = *buffer;
-  SPI_SetCS (&gSPI, cs_id, 1);
-  status = SPI_Configure (&gSPI, txbuf, NULL, 4);
-  status = SPI_PioTransfer (&gSPI);
 
+  // Header and data as separate legs, matching U-Boot's spi_write_then_read.
+  // TRM Fig 31-7: SER is written as part of configure, between disable and enable.
+  status = SPI_Configure (&gSPI, txbuf, NULL, 3);
+  SPI_SetCS (&gSPI, cs_id, 1);
+  status = SPI_PioTransfer (&gSPI);
+  SPI_Stop (&gSPI);
+  status = SPI_Configure (&gSPI, buffer, NULL, len);
+  SPI_SetCS (&gSPI, cs_id, 1);
+  status = SPI_PioTransfer (&gSPI);
   SPI_Stop (&gSPI);
   SPI_SetCS (&gSPI, cs_id, 0);
 
