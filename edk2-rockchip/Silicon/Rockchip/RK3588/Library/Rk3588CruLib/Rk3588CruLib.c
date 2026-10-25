@@ -22,6 +22,11 @@
  *  @{
  */
 /********************* Private MACRO Definition ******************************/
+
+#define SYS_GRF_BASE                 0xFD58C000U
+#define SYS_GRF_SOC_CON_OFFSET       0x300
+#define I2S0_8CH_MCLKOUT_TO_IO_GATE  96U /* SYS_GRF_SOC_CON6[0] */
+
 /********************* Private Structure Definition **************************/
 
 static struct PLL_CONFIG  PLL_TABLE[] = {
@@ -259,6 +264,18 @@ static CRU_CLOCK  Clocks[CLK_COUNT] = {
     MCLK_I2S0_8CH_TX_SEL,
     CRU_CLKGATE_CON_OFFSET,
     MCLK_I2S0_8CH_TX_GATE
+    ),
+  CRU_CLOCK_MUX_INIT (
+    I2S0_8CH_MCLKOUT,
+    CRU_BASE,
+    CRU_CLKSEL_CON_OFFSET,
+    I2S0_8CH_MCLKOUT_SEL
+    ),
+  CRU_CLOCK_GATE_INIT (
+    I2S0_8CH_MCLKOUT_TO_IO,
+    SYS_GRF_BASE,
+    SYS_GRF_SOC_CON_OFFSET,
+    I2S0_8CH_MCLKOUT_TO_IO_GATE
     ),
   CRU_CLOCK_NODIV_INIT (
     MCLK_I2S1_8CH_TX,
