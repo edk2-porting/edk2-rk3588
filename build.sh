@@ -12,6 +12,7 @@ function _help(){
     echo "  -t, --toolchain TOOLCHAIN   Set toolchain, default is 'GCC'."
     echo "  --open-tfa ENABLE           Use open-source TF-A submodule. Default: ${OPEN_TFA}"
     echo "  --tfa-flags \"FLAGS\"         Flags appended to open TF-A build process."
+    echo "  --bl32 FILE                 BL32 (OP-TEE) image to put in the FIT instead of the rkbin one, e.g. an upstream OP-TEE tee-raw.bin."
     echo "  --edk2-flags \"FLAGS\"        Flags appended to the EDK2 build process."
     echo "  --skip-patchsets            Skip applying upstream submodule patchsets during development."
     echo "  -C, --clean                 Clean workspace and output."
@@ -111,6 +112,9 @@ function _build_fit() {
 
     BL31="${ROOTDIR}/misc/rkbin/${BL31_RKBIN}"
     BL32="${ROOTDIR}/misc/rkbin/${BL32_RKBIN}"
+    if [ -n "${BL32_OVERRIDE}" ]; then
+        BL32="${BL32_OVERRIDE}"
+    fi
 
     if ${OPEN_TFA}; then
         BL31="${ROOTDIR}/arm-trusted-firmware/build/${TFA_PLAT}/${RELEASE_TYPE,,}/bl31/bl31.elf"
@@ -294,6 +298,7 @@ RELEASE_TYPE=DEBUG
 TOOLCHAIN=GCC
 OPEN_TFA=true
 TFA_FLAGS=""
+BL32_OVERRIDE=""
 EDK2_FLAGS=""
 SKIP_PATCHSETS=false
 CLEAN=false
@@ -303,7 +308,7 @@ OUTDIR="${PWD}"
 #
 # Get options
 #
-OPTS=$(getopt -o "d:r:t:CDh" -l "device:,release:,toolchain:,open-tfa:,tfa-flags:,edk2-flags:,skip-patchsets,clean,distclean,help" -n build.sh -- "${@}") || _help $?
+OPTS=$(getopt -o "d:r:t:CDh" -l "device:,release:,toolchain:,open-tfa:,tfa-flags:,bl32:,edk2-flags:,skip-patchsets,clean,distclean,help" -n build.sh -- "${@}") || _help $?
 eval set -- "${OPTS}"
 while true; do
     case "${1}" in
@@ -312,6 +317,7 @@ while true; do
         -t|--toolchain) TOOLCHAIN="${2}"; shift 2 ;;
         --open-tfa) OPEN_TFA="${2}"; shift 2 ;;
         --tfa-flags) TFA_FLAGS="${2}"; shift 2 ;;
+        --bl32) BL32_OVERRIDE="$(realpath "${2}")"; shift 2 ;;
         --edk2-flags) EDK2_FLAGS="${2}"; shift 2 ;;
         --skip-patchsets) SKIP_PATCHSETS=true; shift ;;
         -C|--clean) CLEAN=true; shift ;;
