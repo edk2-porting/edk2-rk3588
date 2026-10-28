@@ -16,6 +16,11 @@
 #include <Library/PWMLib.h>
 #include <Soc.h>
 #include <VarStoreData.h>
+#include <Library/RockchipPlatformLib.h>
+#include <Library/UefiBootServicesTableLib.h>
+#include <Protocol/Fusb302PlatformDevice.h>
+#include <Protocol/I2c.h>
+#include <dt-bindings/usb/pd.h>
 
 static struct regulator_init_data  rk806_init_data[] = {
   /* Master PMIC */
@@ -211,16 +216,11 @@ UsbPortPowerEnable (
 {
   DEBUG ((DEBUG_INFO, "UsbPortPowerEnable called\n"));
 
-  /* vbus5v0_typec0 (data-only port) */
-  GpioPinWrite (4, GPIO_PIN_PB0, TRUE);
-  GpioPinSetDirection (4, GPIO_PIN_PB0, GPIO_PIN_OUTPUT);
-
-  /* vbus5v0_typec1 (PD + data port) */
-  // Won't enable 5V on VBUS for now, unsure if it's okay
-  // to do it when voltage > 5V is already supplied to this port.
-  //
-  // GpioPinWrite (4, GPIO_PIN_PA3, TRUE);
-  // GpioPinSetDirection (4, GPIO_PIN_PA3, GPIO_PIN_OUTPUT);
+  /*
+   * The Type-C rails (GPIO4_PB0, GPIO4_PA3) are left to Fusb302Dxe, which
+   * switches each on for a sink and keeps it off when the port is being
+   * used to charge the board.
+   */
 }
 
 VOID
@@ -382,11 +382,91 @@ PlatformGetDtbFileGuid (
   return NULL;
 }
 
+STATIC struct RK_FUSB302_DEVICE {
+  FUSB302_PLATFORM_DEVICE_PROTOCOL    Controller;
+  struct {
+    BOOLEAN    Valid;
+    UINT8      Bank;
+    UINT8      Pin;
+    BOOLEAN    ActiveHigh;
+  } VbusGpio;
+} mFusb302Devices[] = {
+  {
+    .Controller ={
+      .DeviceIndex = I2C_DEVICE_INDEX (6, 0x22),
+      .PhyId       = 0,
+      .SelfPowered = TRUE,
+      .SourcePdos  = {
+        PDO_FIXED (5000, 1500, PDO_FIXED_DUAL_ROLE | PDO_FIXED_USB_COMM | PDO_FIXED_DATA_SWAP)
+      },
+      .SinkPdos    = {
+        PDO_FIXED (5000, 3000, PDO_FIXED_USB_COMM | PDO_FIXED_DATA_SWAP)
+      }
+    },
+    .VbusGpio ={ TRUE,               4, GPIO_PIN_PB0, TRUE }
+  },
+  {
+    .Controller ={
+      .DeviceIndex = I2C_DEVICE_INDEX (1, 0x22),
+      .PhyId       = 1,
+      .SelfPowered = FALSE,
+      .SourcePdos  = {
+        PDO_FIXED (5000, 1500, PDO_FIXED_DUAL_ROLE | PDO_FIXED_USB_COMM | PDO_FIXED_DATA_SWAP)
+      },
+      .SinkPdos    = {
+        PDO_FIXED (5000, 3000, PDO_FIXED_USB_COMM | PDO_FIXED_DATA_SWAP)
+      }
+    },
+    .VbusGpio ={ TRUE,               4, GPIO_PIN_PA3, TRUE }
+  }
+};
+
+STATIC
+EFI_STATUS
+EFIAPI
+PlatformTypeCSetVbus (
+  IN FUSB302_PLATFORM_DEVICE_PROTOCOL  *This,
+  IN BOOLEAN                           Enable
+  )
+{
+  CONST struct RK_FUSB302_DEVICE  *Device;
+
+  if (This == NULL) {
+    return EFI_INVALID_PARAMETER;
+  }
+
+  Device = BASE_CR (This, struct RK_FUSB302_DEVICE, Controller);
+
+  GpioPinWrite (Device->VbusGpio.Bank, Device->VbusGpio.Pin, Enable == Device->VbusGpio.ActiveHigh);
+  GpioPinSetDirection (Device->VbusGpio.Bank, Device->VbusGpio.Pin, GPIO_PIN_OUTPUT);
+
+  return EFI_SUCCESS;
+}
+
 VOID
 EFIAPI
 PlatformEarlyInit (
   VOID
   )
 {
+  EFI_STATUS  Status;
+  EFI_HANDLE  Handle;
+  UINTN       Index;
+
   // Configure various things specific to this platform
+
+  for (Index = 0; Index < ARRAY_SIZE (mFusb302Devices); Index++) {
+    mFusb302Devices[Index].Controller.DeviceGuid = (EFI_GUID)ROCKCHIP_I2C_DEVICE_GUID;
+    mFusb302Devices[Index].Controller.SetVbus    = mFusb302Devices[Index].VbusGpio.Valid ? PlatformTypeCSetVbus : NULL;
+
+    Handle = NULL;
+
+    Status = gBS->InstallMultipleProtocolInterfaces (
+                    &Handle,
+                    &gFusb302PlatformDeviceProtocolGuid,
+                    &mFusb302Devices[Index].Controller,
+                    NULL
+                    );
+    ASSERT_EFI_ERROR (Status);
+  }
 }

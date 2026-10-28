@@ -29,6 +29,11 @@
   DEFINE RK_PCA95XX_ENABLE = TRUE
 
   #
+  # FUSB302 USB Type-C port controller on i2c6.
+  #
+  DEFINE RK_FUSB302_ENABLE = TRUE
+
+  #
   # RK3588-based platform
   #
 !include Silicon/Rockchip/RK3588/RK3588Platform.dsc.inc

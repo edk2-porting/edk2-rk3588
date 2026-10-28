@@ -23,6 +23,7 @@
   Silicon/Rockchip/RockchipPkg.dec
 
 [LibraryClasses]
+  UefiBootServicesTableLib
   ArmLib
   HobLib
   IoLib
@@ -31,6 +32,9 @@
   CruLib
   GpioLib
   PWMLib
+
+[Protocols]
+  gFusb302PlatformDeviceProtocolGuid   ## PRODUCES
 
 [Sources.common]
   RockchipPlatformLib.c

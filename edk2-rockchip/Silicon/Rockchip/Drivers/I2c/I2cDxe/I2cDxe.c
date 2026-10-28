@@ -319,53 +319,6 @@ fail:
   return Status;
 }
 
-STATIC
-VOID
-EFIAPI
-OnEndOfDxe (
-  IN EFI_EVENT  Event,
-  IN VOID       *Context
-  )
-{
-  EFI_STATUS  Status;
-  EFI_HANDLE  *Handles;
-  UINTN       HandleCount;
-  UINTN       Index;
-
-  gBS->CloseEvent (Event);
-
-  Status = gBS->LocateHandleBuffer (
-                  ByProtocol,
-                  &gEfiI2cMasterProtocolGuid,
-                  NULL,
-                  &HandleCount,
-                  &Handles
-                  );
-  if (EFI_ERROR (Status)) {
-    DEBUG ((
-      DEBUG_WARN,
-      "%a: Couldn't locate gEfiI2cMasterProtocolGuid. Status=%r\n",
-      __func__,
-      Status
-      ));
-    return;
-  }
-
-  for (Index = 0; Index < HandleCount; Index++) {
-    Status = gBS->ConnectController (Handles[Index], NULL, NULL, TRUE);
-    if (EFI_ERROR (Status)) {
-      DEBUG ((
-        DEBUG_ERROR,
-        "%a: ConnectController () failed. Status=%r\n",
-        __func__,
-        Status
-        ));
-    }
-  }
-
-  gBS->FreePool (Handles);
-}
-
 EFI_STATUS
 EFIAPI
 I2cInitialise (
@@ -374,7 +327,6 @@ I2cInitialise (
   )
 {
   EFI_PHYSICAL_ADDRESS  BaseAddress;
-  EFI_EVENT             EndOfDxeEvent;
   UINT8                 *DeviceBusPcd;
   UINT32                DeviceBusCount;
   UINT8                 *BusRuntimeSupport;
@@ -431,16 +383,6 @@ I2cInitialise (
       return Status;
     }
   }
-
-  Status = gBS->CreateEventEx (
-                  EVT_NOTIFY_SIGNAL,
-                  TPL_CALLBACK,
-                  OnEndOfDxe,
-                  NULL,
-                  &gEfiEndOfDxeEventGroupGuid,
-                  &EndOfDxeEvent
-                  );
-  ASSERT_EFI_ERROR (Status);
 
   return EFI_SUCCESS;
 }

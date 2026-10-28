@@ -46,6 +46,8 @@
 [Protocols]
   gRockchipConnectorProtocolGuid        ## PRODUCES
   gDpPhyProtocolGuid                    ## CONSUMES
+  gUsbTypeCPortProtocolGuid             ## CONSUMES
+  gEfiI2cMasterProtocolGuid             ## CONSUMES
 
 [BuildOptions]
   GCC:*_*_AARCH64_CC_FLAGS  = -Wno-error=unused-function -Wno-error=unused-variable

@@ -54,7 +54,6 @@
   gRockchipTokenSpaceGuid.PcdI2cBaudRate
 
 [Guids]
-  gEfiEndOfDxeEventGroupGuid
   gEfiEventVirtualAddressChangeGuid
 
 [Depex]

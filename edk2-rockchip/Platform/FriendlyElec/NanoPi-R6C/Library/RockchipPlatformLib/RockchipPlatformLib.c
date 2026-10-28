@@ -15,6 +15,7 @@
 #include <Library/Rk3588Pcie.h>
 #include <Soc.h>
 #include <VarStoreData.h>
+#include <Library/RockchipPlatformLib.h>
 
 static struct regulator_init_data  rk806_init_data[] = {
   /* Master PMIC */

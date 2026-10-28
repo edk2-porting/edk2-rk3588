@@ -16,6 +16,7 @@
 #include <Library/BootLogoLib.h>
 #include <Library/CapsuleLib.h>
 #include <Library/DevicePathLib.h>
+#include <Library/DxeServicesTableLib.h>
 #include <Library/HobLib.h>
 #include <Library/PcdLib.h>
 #include <Library/UefiBootManagerLib.h>
@@ -25,6 +26,7 @@
 #include <Protocol/DevicePath.h>
 #include <Protocol/EsrtManagement.h>
 #include <Protocol/GraphicsOutput.h>
+#include <Protocol/I2cMaster.h>
 #include <Protocol/LoadedImage.h>
 #include <Protocol/NonDiscoverableDevice.h>
 #include <Protocol/PciIo.h>
@@ -330,6 +332,34 @@ Connect (
                   NULL,   // DriverImageHandle
                   NULL,   // RemainingDevicePath -- produce all children
                   FALSE   // Recursive
+                  );
+  DEBUG ((
+    EFI_ERROR (Status) ? DEBUG_ERROR : DEBUG_VERBOSE,
+    "%a: %s: %r\n",
+    __FUNCTION__,
+    ReportText,
+    Status
+    ));
+}
+
+/**
+  This CALLBACK_FUNCTION connects a handle and all its child controllers.
+**/
+STATIC
+VOID
+EFIAPI
+ConnectRecursively (
+  IN EFI_HANDLE    Handle,
+  IN CONST CHAR16  *ReportText
+  )
+{
+  EFI_STATUS  Status;
+
+  Status = gBS->ConnectController (
+                  Handle, // ControllerHandle
+                  NULL,   // DriverImageHandle
+                  NULL,   // RemainingDevicePath -- produce all children
+                  TRUE    // Recursive
                   );
   DEBUG ((
     EFI_ERROR (Status) ? DEBUG_ERROR : DEBUG_VERBOSE,
@@ -823,6 +853,9 @@ PlatformBootManagerBeforeConsole (
   VOID
   )
 {
+  EFI_STATUS  Status;
+  EFI_HANDLE  Handle = NULL;
+
   //
   // Signal EndOfDxe PI Event
   //
@@ -832,6 +865,33 @@ PlatformBootManagerBeforeConsole (
   // Dispatch deferred images after EndOfDxe event.
   //
   EfiBootManagerDispatchDeferredImages ();
+
+  //
+  // Connect all I2C controllers and devices
+  //
+  FilterAndProcess (&gEfiI2cMasterProtocolGuid, NULL, ConnectRecursively);
+
+  //
+  // Signal a power-ready protocol after giving controllers that may increase
+  // the platform's power budget a chance to run.
+  // This is currently limited to USB-C PD controllers on I2C, with the
+  // assumption that negotiation happens synchronously. We don't care about
+  // the negotiation result here.
+  //
+  // Drivers for peripheral hosts that may be power-demanding (e.g. PCIe, USB)
+  // can wait on this protocol before enabling their power rails, in order to
+  // prevent brownouts.
+  //
+  Status = gBS->InstallMultipleProtocolInterfaces (
+                  &Handle,
+                  &gRockchipPlatformPowerReadyProtocolGuid,
+                  NULL,
+                  NULL
+                  );
+  ASSERT_EFI_ERROR (Status);
+
+  // Dispatch drivers with a hard dependency on the power-ready protocol.
+  gDS->Dispatch ();
 
   //
   // Add the hardcoded short-form USB keyboard device path to ConIn.

@@ -23,6 +23,7 @@
   Silicon/Rockchip/RockchipPkg.dec
 
 [LibraryClasses]
+  UefiBootServicesTableLib
   ArmLib
   HobLib
   IoLib
@@ -33,6 +34,7 @@
   PWMLib
 
 [Protocols]
+  gFusb302PlatformDeviceProtocolGuid   ## PRODUCES
   gPca95xxProtocolGuid
 
 [Sources.common]

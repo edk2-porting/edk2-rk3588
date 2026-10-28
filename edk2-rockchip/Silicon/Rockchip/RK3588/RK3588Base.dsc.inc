@@ -83,6 +83,9 @@
 !ifndef RK_860X_REGULATOR_ENABLE
   DEFINE RK_860X_REGULATOR_ENABLE   = TRUE
 !endif
+!ifndef RK_FUSB302_ENABLE
+  DEFINE RK_FUSB302_ENABLE          = FALSE
+!endif
 !ifndef RK_SD_ENABLE
   DEFINE RK_SD_ENABLE               = TRUE
 !endif

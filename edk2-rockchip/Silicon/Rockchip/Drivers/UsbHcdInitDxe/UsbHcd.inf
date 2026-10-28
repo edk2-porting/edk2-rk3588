@@ -46,8 +46,5 @@
 [Protocols]
   gOhciDeviceProtocolGuid           ## PRODUCES
 
-[Guids]
-  gEfiEndOfDxeEventGroupGuid
-
 [Depex]
-  TRUE
+  gRockchipPlatformPowerReadyProtocolGuid

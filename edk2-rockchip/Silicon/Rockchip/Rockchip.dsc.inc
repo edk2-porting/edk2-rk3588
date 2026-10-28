@@ -618,6 +618,9 @@ FspiLib|Silicon/Rockchip/Library/FspiLib/FspiLib.inf
 !if $(RK_PCA95XX_ENABLE) == TRUE
   Silicon/Rockchip/Drivers/Pca95xxDxe/Pca95xxDxe.inf
 !endif
+!if $(RK_FUSB302_ENABLE) == TRUE
+  Silicon/Rockchip/Drivers/I2c/Fusb302Dxe/Fusb302Dxe.inf
+!endif
 
   #
   # Display Support

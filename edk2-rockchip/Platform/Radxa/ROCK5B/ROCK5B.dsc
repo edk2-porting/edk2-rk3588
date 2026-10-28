@@ -37,6 +37,9 @@
   #
   DEFINE RK_RTC8563_ENABLE = TRUE
 
+  # FUSB302 USB Type-C port controller on i2c4.
+  DEFINE RK_FUSB302_ENABLE = TRUE
+
   #
   # RK3588-based platform
   #
@@ -66,9 +69,9 @@
   gRockchipTokenSpaceGuid.PcdDeviceTreeName|"rk3588-rock-5b"
 
   # I2C
-  gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x42, 0x43, 0x51, 0x11 }
-  gRockchipTokenSpaceGuid.PcdI2cSlaveBuses|{ 0x0, 0x0, 0x6, 0x7 }
-  gRockchipTokenSpaceGuid.PcdI2cSlaveBusesRuntimeSupport|{ FALSE, FALSE, TRUE, FALSE }
+  gRockchipTokenSpaceGuid.PcdI2cSlaveAddresses|{ 0x42, 0x43, 0x51, 0x11, 0x22 }
+  gRockchipTokenSpaceGuid.PcdI2cSlaveBuses|{ 0x0, 0x0, 0x6, 0x7, 0x4 }
+  gRockchipTokenSpaceGuid.PcdI2cSlaveBusesRuntimeSupport|{ FALSE, FALSE, TRUE, FALSE, FALSE }
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorAddresses|{ 0x42, 0x43 }
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorBuses|{ 0x0, 0x0 }
   gRockchipTokenSpaceGuid.PcdRk860xRegulatorTags|{ $(SCMI_CLK_CPUB01), $(SCMI_CLK_CPUB23) }
@@ -91,6 +94,9 @@
   gRK3588TokenSpaceGuid.PcdUsbDpPhy0Supported|TRUE
   gRK3588TokenSpaceGuid.PcdUsbDpPhy1Supported|TRUE
   gRK3588TokenSpaceGuid.PcdDp0LaneMux|{ 0x2, 0x3 }
+  # DisplayPort AUX SBU switches (GPIO4_A6 / GPIO4_A7),
+  # thrown per plug orientation.
+  gRK3588TokenSpaceGuid.PcdUsbDpPhy0SbuGpios|{ 4, 6, 4, 7 }
   gRK3588TokenSpaceGuid.PcdDp1LaneMux|{ 0x0 }
 
   #
