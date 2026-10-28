@@ -1133,7 +1133,7 @@ I2cEnableConf (
 {
   /* do nothing */
   if (I2cStatus != NULL) {
-    I2cStatus = EFI_SUCCESS;
+    *I2cStatus = EFI_SUCCESS;
   }
 
   if (Event != NULL) {

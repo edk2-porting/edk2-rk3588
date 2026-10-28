@@ -472,7 +472,7 @@ index 000000000..c17e7a80b
 +#define RK_806_H
 +
 +/* Not used/existing register and configure */
-+#define NA			-1
++#define NA			0xff
 +
 +/* rk806 buck*/
 +#define RK806_BUCK_ON_VSEL(n)		(0x1a + n - 1)
