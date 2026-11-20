@@ -11,6 +11,7 @@
 
   # Device Tree Support
   INF RuleOverride = DTB $(PLATFORM_DIRECTORY)/DeviceTree/Vendor.inf
+  INF RuleOverride = DTB $(PLATFORM_DIRECTORY)/DeviceTree/Mainline.inf
 
   # Splash screen logo
   INF $(VENDOR_DIRECTORY)/Drivers/LogoDxe/LogoDxe.inf
